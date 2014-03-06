@@ -1,2 +1,0 @@
-liferay-qa-websites-ee
-======================
