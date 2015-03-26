@@ -1,0 +1,110 @@
+<definition>
+	<command name="addFreeApp">
+		<execute macro="Button#addNewApp" />
+
+		<execute macro="AccountAppAdd#addRequiredDetails">
+			<var name="appCategory" value="${appCategory}" />
+			<var name="appDescription" value="${appDescription}" />
+			<var name="appTitle" value="${appTitle}" />
+			<var name="developerWebsiteUrl" value="${developerWebsiteUrl}" />
+			<var name="isFreePaid" value="${isFreePaid}" />
+			<var name="supportUrl" value="${supportUrl}" />
+			<var name="versionNumber" value="${versionNumber}" />
+		</execute>
+
+		<execute macro="AccountAppAdd#uploadVersions">
+			<var name="appWarFile" value="${appWarFile}" />
+			<var name="versionNumber" value="${versionNumber}" />
+		</execute>
+	</command>
+
+	<command name="setupAppApprove">
+		<var name="pendingQADenyOrApprove" value="Approve" />
+		<var name="requestDenyOrSendToQA" value="Send To QA" />
+
+		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+
+		<execute macro="MarketplaceAdmin#workflowSubmittedApp">
+			<var name="appTitle" value="${appTitle}" />
+			<var name="pendingQADenyOrApprove" value="${pendingQADenyOrApprove}" />
+			<var name="requestDenyOrSendToQA" value="${requestDenyOrSendToQA}" />
+		</execute>
+	</command>
+
+	<command name="setupAppFree">
+		<var name="key_appTitle" value="${appTitle}" />
+
+		<execute macro="MarketplaceNavigation#gotoCompanyAccount">
+			<var name="companyName" value="${companyName}" />
+		</execute>
+
+		<execute macro="AccountNavigator#gotoDevSidebar">
+			<var name="devSidebarItem" value="Apps" />
+		</execute>
+
+		<if>
+			<condition function="IsElementNotPresent" locator1="MPDeveloperApps#APP_TITLE" />
+			<then>
+				<execute macro="Account#addFreeApp">
+					<var name="appCategory" value="${appCategory}" />
+					<var name="appDescription" value="${appDescription}" />
+					<var name="appIconFile" value="marketplace_icon.png" />
+					<var name="appTitle" value="${appTitle}" />
+					<var name="appWarFile" value="${appWarFile}" />
+					<var name="developerWebsiteUrl" value="${developerWebsiteUrl}" />
+					<var name="isFreePaid" value="${isFreePaid}" />
+					<var name="supportUrl" value="${supportUrl}" />
+					<var name="versionNumber" value="${versionNumber}" />
+				</execute>
+
+				<execute macro="AccountNavigator#gotoDevSidebar">
+					<var name="devSidebarItem" value="Apps" />
+				</execute>
+
+				<execute macro="AccountNavigator#gotoDevApp">
+					<var name="appTitle" value="${appTitle}" />
+				</execute>
+
+				<execute macro="AccountAppAdd#clickSubmit" />
+
+				<if>
+					<equals arg1="${doApprove}" arg2="True" />
+					<then>
+						<execute macro="User#logoutAndLogin">
+							<var name="liferayURL" value="${liferayURL}" />
+							<var name="userEmailAddress" value="${userEmailAddress5}" />
+							<var name="userPassword" value="${userPassword5}" />
+						</execute>
+
+						<execute macro="MarketplaceNavigation#gotoMarketplace" />
+
+						<execute macro="Account#setupAppApprove">
+							<var name="appTitle" value="${appTitleFree}" />
+						</execute>
+					</then>
+				</if>
+			</then>
+		</if>
+	</command>
+
+	<command name="tearDownSubmittedApp">
+		<execute macro="MarketplaceNavigation#gotoCompanyAccount">
+			<var name="companyName" value="${companyName}" />
+		</execute>
+
+		<execute macro="AccountNavigator#gotoDevSidebar">
+			<var name="devSidebarItem" value="Apps" />
+		</execute>
+
+		<execute macro="AccountNavigator#gotoDevApp">
+			<var name="appTitle" value="${appTitle}" />
+		</execute>
+
+		<execute macro="Button#cancelSubmission" />
+
+		<execute function="AssertClickNoError" locator1="MPDeveloperApps#DISCARD_CHANGES" value1="Discard Changes" />
+		<execute function="Confirm" locator1="Message#CONFIRMATION" value1="Are you sure you want to discard all changes?" />
+
+		<execute macro="Message#success" />
+	</command>
+</definition>
