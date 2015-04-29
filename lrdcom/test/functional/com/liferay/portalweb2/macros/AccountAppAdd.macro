@@ -1,4 +1,46 @@
 <definition>
+	<command name="addLicense">
+		<execute macro="AccountAppAddEntry#checkLicenseTerm" >
+			<var name="licenseTerm" value="${licenseTerm}" />
+		</execute>
+
+		<if>
+			<equals arg1="${subscriptionServices}" arg2="true" />
+			<then>
+				<execute macro="AccountAppAddEntry#checkSubscriptionServices" />
+			</then>
+		</if>
+
+		<for list="${standardLicenseQuantities}" param="standardLicenseQuantity">
+			<execute macro="AccountAppAddEntry#typeStandardLicenseQuantity">
+				<var name="standardLicensePrice" value="${standardLicensePrice}" />
+			</execute>
+
+			<execute function="Pause" locator1="1000" />
+			<execute macro="Button#standardLicenseAddQuantityButton" />
+		</for>
+
+		<for list="${developerLicenseQuantities}" param="developerLicenseQuantity">
+			<execute macro="AccountAppAddEntry#typeDeveloperLicenseQuantity">
+				<var name="developerLicenseQuantity" value="${developerLicenseQuantity}" />
+			</execute>
+
+			<execute function="Pause" locator1="1000" />
+			<execute macro="Button#developerLicenseAddQuantityButton" />
+		</for>
+
+		<if>
+			<equals arg1="${trialLicense}" arg2="false" />
+			<then>
+				<execute macro="AccountAppAddEntry#checkTrialLicense" />
+			</then>
+		</if>
+
+		<execute macro="Button#next" />
+
+		<execute macro="Message#success" />
+	</command>
+
 	<command name="addNewVersion">
 		<execute macro="Button#addNewVersion" />
 
@@ -8,6 +50,60 @@
 			<var name="appWarFile" value="${appWarFile}" />
 			<var name="versionNumber" value="${versionNumber}" />
 		</execute>
+	</command>
+
+	<command name="addPricing">
+		<execute macro="AccountAppAddEntry#selectCurrency">
+			<var name="currency" value="${currency}" />
+		</execute>
+
+		<var name="standardLicenseNum" value="1" />
+
+		<for list="${standardLicensePrices}" param="standardLicensePrice">
+			<execute macro="AccountAppAddEntry#typeStandardLicensePrice">
+				<var name="standardLicenseNum" value="${standardLicenseNum}" />
+				<var name="standardLicensePrice" value="${standardLicensePrice}" />
+			</execute>
+
+			<var name="standardLicenseNum" value="${standardLicenseNum?increment()}" />
+		</for>
+
+		<var name="developerLicenseNum" value="1" />
+
+		<for list="${developerLicensePrices}" param="developerLicensePrice">
+			<execute macro="AccountAppAddEntry#typeDeveloperLicensePrice">
+				<var name="developerLicenseNum" value="${developerLicenseNum}" />
+				<var name="developerLicensePrice" value="${developerLicensePrice}" />
+			</execute>
+
+			<var name="developerLicenseNum" value="${developerLicenseNum?increment()}" />
+		</for>
+
+		<if>
+			<isset var="standardSubscriptionPrice" />
+			<then>
+				<execute macro="AccountAppAddEntry#typeStandardSubscriptionPrice">
+					<var name="standardSubscriptionPrice" value="${standardSubscriptionPrice}" />
+				</execute>
+			</then>
+		</if>
+
+		<if>
+			<isset var="standardDeveloperPrice" />
+			<then>
+				<execute macro="AccountAppAddEntry#typeDeveloperSubscriptionPrice">
+					<var name="standardDeveloperPrice" value="${standardDeveloperPrice}" />
+				</execute>
+			</then>
+		</if>
+
+		<execute macro="AccountAppAddEntry#selectAllAvailableCountries" />
+
+		<execute macro="AccountAppAddEntry#moveSelectedCountries" />
+
+		<execute macro="Button#next" />
+
+		<execute macro="Message#success" />
 	</command>
 
 	<command name="addRequiredDetails">
@@ -23,11 +119,33 @@
 			<var name="appDescription" value="${appDescription}" />
 		</execute>
 
+		<if>
+			<isset var="translations" />
+			<then>
+				<execute macro="AccountAppAddEntry#checkLocalized" />
+			</then>
+		</if>
+
 		<execute macro="Button#iconBrowse" />
 
 		<execute macro="Sikuli#uploadFile">
 			<var name="fileName" value="${appIconFile}" />
 		</execute>
+
+		<if>
+			<isset var="screenCaptures" />
+			<then>
+				<for list="${screenCaptures}" param="screenShot">
+					<execute macro="Button#button2">
+						<var name="buttonName" value="Browse" />
+					</execute>
+
+					<execute macro="Sikuli#uploadFile">
+						<var name="fileName" value="${screenShot}" />
+					</execute>
+				</for>
+			</then>
+		</if>
 
 		<execute macro="AccountAppAddEntry#selectCategory">
 			<var name="appCategory" value="${appCategory}" />
@@ -40,6 +158,38 @@
 		<execute macro="AccountAppAddEntry#typeSupportUrl">
 			<var name="supportUrl" value="${supportUrl}" />
 		</execute>
+
+		<if>
+			<isset var="documentationUrl" />
+			<then>
+				<execute macro="AccountAppAddEntry#typeDocumentationUrl">
+					<var name="documentationUrl" value="${documentationUrl}" />
+				</execute>
+			</then>
+		</if>
+
+		<if>
+			<isset var="sourceCodeUrl" />
+			<then>
+				<execute macro="AccountAppAddEntry#typeSourceCodeUrl">
+					<var name="sourceCodeUrl" value="${sourceCodeUrl}" />
+				</execute>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${labs}" arg2="true" />
+			<then>
+				<execute macro="AccountAppAddEntry#checkLabs" />
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${security}" arg2="true" />
+			<then>
+				<execute macro="AccountAppAddEntry#checkSecurity" />
+			</then>
+		</if>
 
 		<execute macro="Button#next" />
 
@@ -73,5 +223,7 @@
 		<execute function="Pause" locator1="5000" />
 
 		<execute macro="Button#next" />
+
+		<execute macro="Message#success" />
 	</command>
 </definition>

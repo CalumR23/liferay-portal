@@ -3,17 +3,78 @@
 		<execute macro="Button#addNewApp" />
 
 		<execute macro="AccountAppAdd#addRequiredDetails">
-			<var name="appCategory" value="${appCategory}" />
-			<var name="appDescription" value="${appDescription}" />
+			<var name="appCategory" value="index=3" />
+			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
+			<var name="appIconFile" value="marketplace_icon.png" />
 			<var name="appTitle" value="${appTitle}" />
-			<var name="developerWebsiteUrl" value="${developerWebsiteUrl}" />
-			<var name="isFreePaid" value="${isFreePaid}" />
-			<var name="supportUrl" value="${supportUrl}" />
-			<var name="versionNumber" value="${versionNumber}" />
+			<var name="developerWebsiteUrl" value="http://www.liferay.com" />
+			<var name="isFreePaid" value="free" />
+			<var name="supportUrl" value="http://www-uat.liferay.com" />
 		</execute>
 
 		<execute macro="AccountAppAdd#uploadVersions">
 			<var name="appWarFile" value="${appWarFile}" />
+			<var name="versionNumber" value="1.0.0.0" />
+		</execute>
+	</command>
+
+	<command name="addPaidApp">
+		<execute macro="Button#addNewApp" />
+
+		<if>
+			<condition function="IsElementPresent" locator1="MPDeveloperAppsAddDetails#UPGRADE" />
+			<then>
+				<execute macro="Registration#convertToPaidDeveloperAccount">
+					<var name="companyName" value="${companyName}" />
+					<var name="userEmailAddress3" value="${userEmailAddress3}" />
+				</execute>
+			</then>
+		</if>
+
+		<execute macro="AccountAppAdd#addRequiredDetails">
+			<var name="appCategory" value="index=3" />
+			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
+			<var name="appIconFile" value="marketplace_icon.png" />
+			<var name="appTitle" value="${appTitle}" />
+			<var name="developerWebsiteUrl" value="http://www.liferay.com" />
+			<var name="isFreePaid" value="paid-license" />
+			<var name="supportUrl" value="http://www.liferay.com" />
+		</execute>
+
+		<execute macro="AccountAppAdd#uploadVersions">
+			<var name="appWarFile" value="${appWarFile}" />
+			<var name="versionNumber" value="1.0.0.0" />
+		</execute>
+
+		<execute macro="AccountAppAdd#addLicense">
+			<var name="developerLicenseQuantities" value="1" />
+			<var name="licenseTerm" value="Perpetual" />
+			<var name="standardLicenseQuantities" value="1" />
+			<var name="subscriptionServices" value="false" />
+			<var name="trialLicense" value="true" />
+		</execute>
+
+		<execute macro="AccountAppAdd#addPricing">
+			<var name="currency" value="USD" />
+			<var name="developerLicensePrices" value="12.00" />
+			<var name="standardLicensePrices" value="11.00" />
+		</execute>
+	</command>
+
+	<command name="reviewAppDetails">
+		<execute macro="AccountAppEntry#viewCompanyName">
+			<var name="companyName" value="${companyName}" />
+		</execute>
+
+		<execute macro="AccountAppEntry#viewAppTitle">
+			<var name="appTitle" value="${appTitle}" />
+		</execute>
+
+		<execute macro="AccountAppEntry#viewDescription">
+			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
+		</execute>
+
+		<execute macro="AccountAppEntry#viewVersion">
 			<var name="versionNumber" value="${versionNumber}" />
 		</execute>
 	</command>
@@ -88,23 +149,43 @@
 	</command>
 
 	<command name="tearDownSubmittedApp">
-		<execute macro="MarketplaceNavigation#gotoCompanyAccount">
-			<var name="companyName" value="${companyName}" />
-		</execute>
+		<var name="companyNames" value="Account Home,QA Company 2" />
+		<for list="${companyNames}" param="companyName" >
+			<for list="QA Discard" param="appTitle" >
+				<execute macro="MarketplaceNavigation#gotoCompanyAccount">
+					<var name="companyName" value="${companyName}" />
+				</execute>
 
-		<execute macro="AccountNavigator#gotoDevSidebar">
-			<var name="devSidebarItem" value="Apps" />
-		</execute>
+				<execute macro="AccountNavigator#gotoDevSidebar">
+					<var name="devSidebarItem" value="Apps" />
+				</execute>
 
-		<execute macro="AccountNavigator#gotoDevApp">
-			<var name="appTitle" value="${appTitle}" />
-		</execute>
+				<execute function="Pause" locator1="1000" />
 
-		<execute macro="Button#cancelSubmission" />
+				<var name="key_appTitle" value="${appTitle}" />
+				<if>
+					<condition function="IsElementPresent" locator1="MPDeveloperApps#APP_TITLE" />
+					<then>
+						<execute macro="AccountNavigator#gotoDevApp">
+							<var name="appTitle" value="${appTitle}" />
+						</execute>
 
-		<execute function="AssertClickNoError" locator1="MPDeveloperApps#DISCARD_CHANGES" value1="Discard Changes" />
-		<execute function="Confirm" locator1="Message#CONFIRMATION" value1="Are you sure you want to discard all changes?" />
+						<execute function="Pause" locator1="1000" />
 
-		<execute macro="Message#success" />
+						<if>
+							<condition function="IsElementPresent" locator1="Button#CANCEL_SUBMISSION_BUTTON" />
+							<then>
+								<execute macro="Button#cancelSubmission" />
+							</then>
+						</if>
+
+						<execute function="AssertClickNoError" locator1="MPDeveloperApps#DISCARD_CHANGES" value1="Discard Changes" />
+						<execute function="Confirm" locator1="Message#CONFIRMATION" value1="Are you sure you want to discard all changes?" />
+
+						<execute macro="Message#success" />
+					</then>
+				</if>
+			</for>
+		</for>
 	</command>
 </definition>
