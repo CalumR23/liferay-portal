@@ -1,4 +1,35 @@
 <definition>
+	<command name="addLicense">
+		<execute function="AssertClick" locator1="MPAdminCustomers#ADD_LICENSE_BUTTON" value1="Add License" />
+
+		<execute function="SelectWindow" locator1="title=Control Panel" />
+		
+		<execute function="Pause" locator1="3000" />
+
+		<if>
+			<equals arg1="${licenseType}" arg2="Standard" />
+			<then>
+				<execute function="ClickNoError" locator1="MPAdminCustomers#STANDARD_INSTANCE" />
+			</then>
+			<elseif>
+				<equals arg1="${licenseType}" arg2="Developer" />
+				<then>
+					<execute function="ClickNoError" locator1="MPAdminCustomers#DEVELOPER_INSTANCE" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${licenseType}" arg2="Trial" />
+				<then>
+					<execute function="ClickNoError" locator1="MPAdminCustomers#TRIAL_INSTANCE" />
+				</then>
+			</elseif>
+		</if>
+
+		<execute function="SelectWindow" locator1="title=Control Panel - Liferay.com" />
+
+		<execute macro="Message#success" />
+	</command>
+
 	<command name="denyOrApproveCompany">
 		<execute macro="Button#button1">
 			<var name="buttonName" value="${denyOrPass}" />
@@ -38,6 +69,14 @@
 		<execute macro="Message#success" />
 	</command>
 
+	<command name="lookforCustomer">
+		<execute function="Type" locator1="MPAdminCustomers#EMAIL_ADDRESS_FIELD" value1="${userEmailAddress}" />
+
+		<execute function="AssertClick" locator1="MPAdminCustomers#LOOKUP_BUTTON" value1="Lookup" />
+		
+		<execute function="AssertClick" locator1="MPAdminCustomers#APP_ENTRY_NAME" value1="${appTitle}" />
+	</command>
+
 	<command name="tearDownApprovedApp">
 		<execute macro="User#logoutAndLogin">
 			<var name="liferayURL" value="${liferayURL}" />
@@ -65,12 +104,9 @@
 		</if>
 
 		<if>
-			<condition function="IsElementPresent" locator1="Button#ADD_NEW_VERSION_BUTTON" />
+			<condition function="IsElementPresent" locator1="MPDeveloperApps#ADD_NEW_VERSION_BUTTON" />
 			<then>
-				<execute macro="Account#releaseNewFreeVersionViaAddNewVersion">
-					<var name="appWarFile" value="test-app3-portlet-6.2.0.3.war" />
-					<var name="versionNumber" value="1.0.0.0" />
-				</execute>
+				<execute macro="AccountAppAdd#addNewVersion" />
 			</then>
 		</if>
 
@@ -119,6 +155,17 @@
 		<execute macro="MarketplaceAdminNavigator#gotoApp">
 			<var name="appTitle" value="${appTitle}" />
 		</execute>
+
+		<if>
+			<condition function="IsElementPresent" locator1="MPAdminReviewApps#REVIEW_DEVELOPER_PAGE" />
+			<then>
+				<execute function="AssertClick" locator1="MPAdminReviewApps#REVIEW_DEVELOPER_PAGE" value1="Review Developer page" />
+				
+				<execute function="AssertClick" locator1="MPAdminDevelopers#APPROVE_PAID_DEVELOPER_STATUS_BUTTON" value1="Approve Paid Developer Status" />
+
+				<execute macro="Message#success" />
+			</then>
+		</if>
 
 		<execute macro="MarketplaceAdmin#denyOrPassApp">
 			<var name="denyOrPass" value="${requestDenyOrSendToQA}" />
