@@ -10,6 +10,19 @@
 		<if>
 			<isset var="isFreePaid" />
 			<then>
+				<if>
+					<and>
+						<contains string="${isFreePaid}" substring="paid" />
+						<condition function="IsElementPresent" locator1="MPDeveloperAppsAddDetails#UPGRADE" />
+					</and>
+					<then>
+						<execute macro="Registration#convertToPaidDeveloperAccount">
+							<var name="companyName" value="${companyName}" />
+							<var name="userEmailAddress3" value="${userEmailAddress3}" />
+						</execute>
+					</then>
+				</if>
+
 				<execute macro="AccountAppAddEntry#checkPricing">
 					<var name="isFreePaid" value="${isFreePaid}" />
 				</execute>
@@ -149,9 +162,16 @@
 		</if>
 
 		<if>
-			<isset var="standardLicenseQuantities" />
+			<isset var="standardLicenseUnitsList" />
 			<then>
-				<for list="${standardLicenseQuantities}" param="standardLicenseQuantity">
+				<while>
+					<condition function="IsElementPresent" locator1="MPDeveloperAppsAddLicense#STANDARD_DELETE" />
+					<then>
+						<execute function="Click" locator1="MPDeveloperAppsAddLicense#STANDARD_DELETE" />
+					</then>
+				</while>
+
+				<for list="${standardLicenseUnitsList}" param="standardLicenseQuantity">
 					<execute macro="AccountAppAddEntry#typeStandardLicenseQuantity">
 						<var name="standardLicensePrice" value="${standardLicensePrice}" />
 					</execute>
@@ -163,9 +183,16 @@
 		</if>
 
 		<if>
-			<isset var="developerLicenseQuantities" />
+			<isset var="developerLicenseUnitsList" />
 			<then>
-				<for list="${developerLicenseQuantities}" param="developerLicenseQuantity">
+				<while>
+					<condition function="IsElementPresent" locator1="MPDeveloperAppsAddLicense#DEVELOPER_DELETE" />
+					<then>
+						<execute function="Click" locator1="MPDeveloperAppsAddLicense#DEVELOPER_DELETE" />
+					</then>
+				</while>
+
+				<for list="${developerLicenseUnitsList}" param="developerLicenseQuantity">
 					<execute macro="AccountAppAddEntry#typeDeveloperLicenseQuantity">
 						<var name="developerLicenseQuantity" value="${developerLicenseQuantity}" />
 					</execute>
@@ -190,76 +217,140 @@
 
 	<command name="editPricing">
 		<if>
-			<isset var="currency" />
+			<isset var="tableTitleList" />
 			<then>
-				<execute macro="AccountAppAddEntry#selectCurrency">
-					<var name="currency" value="${currency}" />
-				</execute>
+				<var name="i" value="1" />
+				<for list="${tableTitleList}" param="tableTitle">
+					<execute macro="AccountAppAddEntry#typeTableTitle">
+						<var name="tableNum" value="${i}" />
+						<var name="tableTitle" value="${tableTitle}" />
+					</execute>
+
+					<var name="i" value="${i?increment()}" />
+				</for>
 			</then>
 		</if>
 
-		<var name="standardLicenseNum" value="1" />
+		<if>
+			<isset var="currencyList" />
+			<then>
+				<var name="i" value="1" />
+
+				<for list="${currencyList}" param="currency">
+					<execute macro="AccountAppAddEntry#selectCurrency">
+						<var name="currency" value="${currency}" />
+						<var name="tableNum" value="${i}" />
+					</execute>
+
+					<var name="i" value="${i?increment()}" />
+				</for>
+			</then>
+		</if>
 
 		<if>
-			<isset var="standardLicensePrices" />
+			<isset var="standardLicensePriceList" />
 			<then>
-				<for list="${standardLicensePrices}" param="standardLicensePrice">
+				<var name="j" value="1" />
+				<for list="${standardLicensePriceList}" param="standardLicensePrice">
 					<execute macro="AccountAppAddEntry#typeStandardLicensePrice">
-						<var name="standardLicenseNum" value="${standardLicenseNum}" />
+						<var name="licenseNum" value="${j}" />
 						<var name="standardLicensePrice" value="${standardLicensePrice}" />
+						<var name="tableNum" value="1" />
 					</execute>
 
-					<var name="standardLicenseNum" value="${standardLicenseNum?increment()}" />
+					<var name="j" value="${j?increment()}" />
 				</for>
 			</then>
 		</if>
 
-		<var name="developerLicenseNum" value="1" />
-
 		<if>
-			<isset var="developerLicensePrices" />
+			<isset var="developerLicensePriceList" />
 			<then>
-				<for list="${developerLicensePrices}" param="developerLicensePrice">
+				<var name="j" value="1" />
+				<for list="${developerLicensePriceList}" param="developerLicensePrice">
 					<execute macro="AccountAppAddEntry#typeDeveloperLicensePrice">
-						<var name="developerLicenseNum" value="${developerLicenseNum}" />
 						<var name="developerLicensePrice" value="${developerLicensePrice}" />
+						<var name="licenseNum" value="${j}" />
+						<var name="tableNum" value="1" />
 					</execute>
 
-					<var name="developerLicenseNum" value="${developerLicenseNum?increment()}" />
+					<var name="j" value="${j?increment()}" />
 				</for>
 			</then>
 		</if>
 
 		<if>
-			<isset var="standardSubscriptionPrice" />
+			<isset var="standardSubscriptionPriceList" />
 			<then>
-				<execute macro="AccountAppAddEntry#typeStandardSubscriptionPrice">
-					<var name="standardSubscriptionPrice" value="${standardSubscriptionPrice}" />
-				</execute>
-			</then>
-		</if>
+				<var name="i" value="1" />
+				<for list="${standardSubscriptionPriceList}" param="standardSubscriptionPrice">
+					<execute macro="AccountAppAddEntry#typeStandardSubscriptionPrice">
+						<var name="standardSubscriptionPrice" value="${standardSubscriptionPrice}" />
+						<var name="tableNum" value="${i}" />
+					</execute>
 
-		<if>
-			<isset var="standardDeveloperPrice" />
-			<then>
-				<execute macro="AccountAppAddEntry#typeDeveloperSubscriptionPrice">
-					<var name="standardDeveloperPrice" value="${standardDeveloperPrice}" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<isset var="licenseTerm" />
-			<then>
-				<for list="${selectedCountries}" param="country">
-					<execute macro="AccountAppAddEntry#moveSelectedCountries" />
+					<var name="i" value="${i?increment()}" />
 				</for>
 			</then>
-			<else>
-				<execute macro="AccountAppAddEntry#selectAllAvailableCountries" />
+		</if>
 
-				<execute macro="AccountAppAddEntry#moveSelectedCountries" />
-			</else>
+		<if>
+			<isset var="developerSubscriptionPriceList" />
+			<then>
+				<var name="i" value="1" />
+				<for list="${developerSubscriptionPriceList}" param="developerSubscriptionPrice">
+					<execute macro="AccountAppAddEntry#typeDeveloperSubscriptionPrice">
+						<var name="developerSubscriptionPrice" value="${developerSubscriptionPrice}" />
+						<var name="tableNum" value="${i}" />
+					</execute>
+
+					<var name="i" value="${i?increment()}" />
+				</for>
+			</then>
+		</if>
+
+		<if>
+			<isset var="removeCountryList" />
+			<then>
+				<if>
+					<equals arg1="${removeCountryList}" arg2="all" />
+					<then>
+						<execute macro="AccountAppAddEntry#moveAllCountriesFromTableToPool">
+							<var name="tableNum" value="1" />
+						</execute>
+					</then>
+					<else>
+						<for list="${countryList}" param="country">
+							<execute macro="AccountAppAddEntry#moveSelectedCountryToPool">
+								<var name="country" value="${country}" />
+								<var name="tableNum" value="1" />
+							</execute>
+						</for>
+					</else>
+				</if>
+			</then>
+		</if>
+
+		<if>
+			<isset var="addCountryList" />
+			<then>
+				<if>
+					<equals arg1="${addCountryList}" arg2="all" />
+					<then>
+						<execute macro="AccountAppAddEntry#moveAllCountriesFromPoolToTable">
+							<var name="tableNum" value="1" />
+						</execute>
+					</then>
+					<else>
+						<for list="${countryList}" param="country">
+							<execute macro="AccountAppAddEntry#moveSelectedCountryToTable">
+								<var name="country" value="${country}" />
+								<var name="tableNum" value="1" />
+							</execute>
+						</for>
+					</else>
+				</if>
+			</then>
 		</if>
 
 		<execute macro="Button#next" />
