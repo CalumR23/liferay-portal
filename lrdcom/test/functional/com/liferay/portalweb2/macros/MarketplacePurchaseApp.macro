@@ -28,6 +28,20 @@
 		</execute>
 	</command>
 
+	<command name="addLicenseQuantity">
+		<for list="${standardLicenseQuantityList}" param="quantity">
+			<execute macro="MarketplacePurchaseEntry#typeStandardLicenseQuantity">
+				<var name="quantity" value="${quantity}" />
+			</execute>
+		</for>
+
+		<for list="${developerLicenseQuantityList}" param="quantity">
+			<execute macro="MarketplacePurchaseEntry#typeDeveloperLicenseQuantity">
+				<var name="quantity" value="${quantity}" />
+			</execute>
+		</for>
+	</command>
+
 	<command name="addProject">
 		<execute macro="MarketplacePurchaseEntry#clickProjectCard">
 			<var name="projectName" value="Add a New Project" />
@@ -105,50 +119,26 @@
 		</if>
 	</command>
 
-	<command name="purchaseLicenseTab">
+	<command name="purchaseExtendedLicense">
+		<execute macro="MarketplacePurchaseEntry#checkPurchaseType">
+			<var name="licensePurchaseType" value="Add Additional Instance Units" />
+		</execute>
+
+		<execute macro="Button#next" />
+
+		<execute macro="MarketplacePurchaseApp#addLicenseQuantity">
+			<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
+			<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
+		</execute>
+
+		<execute macro="Button#next" />
+
 		<if>
-			<isset var="licensePurchaseType" />
+			<or>
+				<isset var="extendSubscriptionCheckList" />
+				<isset var="extendSubscriptionUncheckList" />
+			</or>
 			<then>
-				<execute macro="MarketplacePurchaseEntry#checkPurchaseType">
-					<var name="licensePurchaseType" value="${licensePurchaseType}" />
-				</execute>
-
-				<execute macro="Button#next" />
-			</then>
-		</if>
-
-		<if>
-			<isset var="renewSubscriptionCheckList" />
-			<then>
-				<for list="renewSubscriptionCheckList" param="renewSubscriptionType">
-					<execute macro="MarketplacePurchaseEntry#checkSubscriptionServicesType">
-						<var name="subscriptionType" value="${renewSubscriptionType}" />
-					</execute>
-				</for>
-			</then>
-			<elseif>
-				<isset var="renewSubscriptionUncheckList" />
-				<then>
-					<for list="renewSubscriptionUncheckList" param="renewSubscriptionType">
-						<execute macro="MarketplacePurchaseEntry#checkSubscriptionServicesType">
-							<var name="subscriptionType" value="${renewSubscriptionType}" />
-						</execute>
-					</for>
-				</then>
-			</elseif>
-			<else>
-				<for list="${standardLicenseQuantityList}" param="quantity">
-					<execute macro="MarketplacePurchaseEntry#typeStandardLicenseQuantity">
-						<var name="quantity" value="${quantity}" />
-					</execute>
-				</for>
-
-				<for list="${developerLicenseQuantityList}" param="quantity">
-					<execute macro="MarketplacePurchaseEntry#typeDeveloperLicenseQuantity">
-						<var name="quantity" value="${quantity}" />
-					</execute>
-				</for>
-
 				<if>
 					<isset var="extendSubscriptionCheckList" />
 					<then>
@@ -170,7 +160,60 @@
 						</for>
 					</then>
 				</if>
-			</else>
+
+				<execute macro="Button#next" />
+			</then>
+		</if>
+	</command>
+
+	<command name="purchaseLicense">
+		<execute macro="MarketplacePurchaseApp#addLicenseQuantity">
+			<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
+			<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
+		</execute>
+
+		<execute macro="Button#next" />
+	</command>
+
+	<command name="purchaseRenewLicense">
+		<execute macro="MarketplacePurchaseEntry#checkPurchaseType">
+			<var name="licensePurchaseType" value="Renew" />
+		</execute>
+
+		<execute macro="Button#next" />
+
+		<if>
+			<isset var="renewSubscriptionCheckList" />
+			<then>
+				<for list="renewSubscriptionCheckList" param="renewSubscriptionType">
+					<execute macro="MarketplacePurchaseEntry#checkSubscriptionServicesType">
+						<var name="subscriptionType" value="${renewSubscriptionType}" />
+					</execute>
+				</for>
+			</then>
+		</if>
+
+		<if>
+			<isset var="renewSubscriptionUncheckList" />
+			<then>
+				<for list="renewSubscriptionUncheckList" param="renewSubscriptionType">
+					<execute macro="MarketplacePurchaseEntry#checkSubscriptionServicesType">
+						<var name="subscriptionType" value="${renewSubscriptionType}" />
+					</execute>
+				</for>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${changeRenewLicenseQuantities}" arg2="true" />
+			<then>
+				<execute macro="MarketplacePurchaseEntry#clickChangeRenewInstanceQuantities" />
+
+				<execute macro="MarketplacePurchaseApp#addLicenseQuantity">
+					<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
+					<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
+				</execute>
+			</then>
 		</if>
 
 		<execute macro="Button#next" />
