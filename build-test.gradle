@@ -16,43 +16,45 @@ buildscript {
 	}
 }
 
-apply plugin: "com.liferay.poshi.runner"
+subprojects{
+	apply plugin: "com.liferay.poshi.runner"
 
-configurations {
-	sikuliComplete
-}
-
-dependencies {
-	["x86", "x86_64"].each {
-		sikuliComplete classifier: "linux-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
-		sikuliComplete classifier: "windows-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+	configurations {
+		sikuliComplete
 	}
 
-	sikuliComplete classifier: "macosx-x86_64", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
-}
+	dependencies {
+		["x86", "x86_64"].each {
+			sikuliComplete classifier: "linux-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+			sikuliComplete classifier: "windows-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+		}
 
-poshiRunner {
-	baseDir = file(".")
-	version = "1.0.26"
+		sikuliComplete classifier: "macosx-x86_64", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+	}
 
-	if (project.hasProperty("poshiRunnerExtProperties")) {
-		File poshiRunnerExtProperties = new File(project.properties["poshiRunnerExtProperties"])
+	poshiRunner {
+		baseDir = file(".")
+		version = "1.0.26"
 
-		if (poshiRunnerExtProperties.exists()) {
+		if (project.hasProperty("poshiRunnerExtProperties")) {
+			File poshiRunnerExtProperties = new File(project.properties["poshiRunnerExtProperties"])
 
-			project.ext.testProperties = new Properties()
+			if (poshiRunnerExtProperties.exists()) {
 
-			testProperties.load(new FileInputStream(project.properties["poshiRunnerExtProperties"]))
+				project.ext.testProperties = new Properties()
 
-			setPoshiProperties testProperties
+				testProperties.load(new FileInputStream(project.properties["poshiRunnerExtProperties"]))
+
+				setPoshiProperties testProperties
+			}
 		}
 	}
-}
 
-repositories {
-	mavenLocal()
+	repositories {
+		mavenLocal()
 
-	maven {
-		url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		maven {
+			url "http://cdn.repository.liferay.com/nexus/content/groups/public"
+		}
 	}
 }
