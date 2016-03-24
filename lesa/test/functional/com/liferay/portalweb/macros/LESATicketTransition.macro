@@ -21,23 +21,31 @@
 		<execute function="AssertTextEquals" locator1="LESATicketDetails#ASSIGNEE_NAME" value1="${name}" />
 	</command>
 
-	<command name="closeTicket">
+	<command name="changeTicketStatus">
 		<execute macro="LESATicketTransition#selectTicketStatus">
-			<var name="status" value="Closed" />
+			<var name="status" value="${newStatus}" />
 		</execute>
 
-		<execute function="SelectNoError" locator1="LESATicketDetails#RESOLUTION_SELECT" value1="${resolution}" />
+		<if>
+			<equals arg1="${newStatus}" arg2="Closed" />
+			<then>
+				<execute function="SelectNoError" locator1="LESATicketDetails#RESOLUTION_SELECT" value1="${resolution}" />
 
-		<execute function="Confirm" value1="Are you sure you want to modify the status from (${currentStatus}) to (Closed - Duplicate)?" />
+				<execute function="Confirm" value1="Are you sure you want to modify the status from (${currentStatus}) to (Closed - ${resolution})?" />
+
+				<execute macro="LESATicketView#viewTicketResolution">
+					<var name="resolution" value="(${resolution})" />
+				</execute>
+			</then>
+			<else>
+				<execute function="Confirm" value1="Are you sure you want to modify the status from (${currentStatus}) to (${newStatus})?" />
+			</else>
+		</if>
 
 		<execute macro="Message#success" />
 
 		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="Closed" />
-		</execute>
-
-		<execute macro="LESATicketView#viewTicketResolution">
-			<var name="resolution" value="(${resolution})" />
+			<var name="status" value="${newStatus}" />
 		</execute>
 	</command>
 
