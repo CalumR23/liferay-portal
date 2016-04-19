@@ -9,6 +9,18 @@
 		<execute function="Check" locator1="LESASearch#TICKETS_TAB_STATUS_CHECKBOX" />
 	</command>
 
+	<command name="displayTicketsAssigneeFilters">
+		<if>
+			<condition function="IsNotVisible" locator1="LESASearch#TICKETS_TAB_CHOOSE_ACCOUNT_WORKER_BUTTON" />
+			<then>
+				<var name="key_filter" value="Assignee" />
+
+				<execute function="Click" locator1="LESASearch#TICKETS_TAB" />
+				<execute function="Click" locator1="LESASearch#TICKETS_TAB_FILTER" />
+			</then>
+		</if>
+	</command>
+
 	<command name="filterTicketsByStatusAndResolution">
 		<var name="key_filter" value="Status" />
 
@@ -29,11 +41,49 @@
 		<return name="ticketCount" value="${ticketCount}" />
 	</command>
 
+	<command name="removeFilterTicketsAccountWorker">
+		<execute macro="LESASearch#displayTicketsAssigneeFilters" />
+
+		<for list="${accountWorkerList}" param="worker">
+			<var name="key_accountWorker" value="${worker}" />
+
+			<execute function="AssertClick#assertPartialTextClickAt" locator1="LESASearch#TICKETS_TAB_SELECTED_ACCOUNT_WORKER" value1="${worker}" />
+			<execute function="AssertElementNotPresent" locator1="LESASearch#TICKETS_TAB_SELECTED_ACCOUNT_WORKER" />
+		</for>
+	</command>
+
+	<command name="removeFilterTicketsAssignee">
+		<execute macro="LESASearch#displayTicketsAssigneeFilters" />
+
+		<for list="${assigneeList}" param="assignee">
+			<var name="key_assignee" value="${assignee}" />
+
+			<execute function="AssertClick" locator1="LESASearch#TICKETS_TAB_SELECTED_ASSIGNEE" value1="${assignee}" />
+			<execute function="AssertElementNotPresent" locator1="LESASearch#TICKETS_TAB_SELECTED_ASSIGNEE" />
+		</for>
+	</command>
+
 	<command name="search">
 		<execute function="Click" locator1="LESALeftNavigation#LESA_SEARCH_BUTTON" />
 
 		<execute function="Type" locator1="LESASearch#KEYWORD_FIELD" value1="${keyword}" />
 		<execute function="KeyPress" locator1="LESASearch#KEYWORD_FIELD" value1="\RETURN"  />
+	</command>
+
+	<command name="searchAndSelectByName">
+		<execute function="SelectWindow" locator1="title=Support" />
+
+		<for list="${nameList}" param="name">
+			<execute macro="OSBAdminSearch#searchBasic">
+				<var name="keyword" value="${name}" />
+			</execute>
+
+			<var name="key_name" value="${name}" />
+
+			<execute function="AssertClick" locator1="LESASearchTicketsChooseAssignee#SEARCH_RESULT_NAME" value1="${name}" />
+		</for>
+
+		<execute function="Close" locator1="title=Support" />
 	</command>
 
 	<command name="searchPartnersViaTicketsChooseAssignee">
@@ -73,6 +123,26 @@
 		<var name="key_projectName" value="${projectName}" />
 
 		<execute function="Click" locator1="LESASearch#RESULT_ROW_PROJECT_NAME" />
+	</command>
+
+	<command name="selectFilterTicketsAccountWorker">
+		<execute macro="LESASearch#displayTicketsAssigneeFilters" />
+
+		<execute function="Click" locator1="LESASearch#TICKETS_TAB_CHOOSE_ACCOUNT_WORKER_BUTTON" />
+
+		<execute macro="LESASearch#searchAndSelectByName">
+			<var name="nameList" value="${accountWorkerList}" />
+		</execute>
+	</command>
+
+	<command name="selectFilterTicketsAssignee">
+		<execute macro="LESASearch#displayTicketsAssigneeFilters" />
+
+		<execute function="Click" locator1="LESASearch#TICKETS_TAB_CHOOSE_ASSIGNEE_BUTTON" />
+
+		<execute macro="LESASearch#searchAndSelectByName">
+			<var name="nameList" value="${assigneeList}" />
+		</execute>
 	</command>
 
 	<command name="viewPartnerTicketSearchFilters">
@@ -134,5 +204,21 @@
 		<execute function="AssertElementNotPresent" locator1="LESASearch#TICKETS_TAB_FILTER" />
 
 		<execute function="AssertElementPresent" locator1="LESASearch#TICKETS_TAB_SEARCH_ATTACHMENTS_CHECKBOX" />
+	</command>
+
+	<command name="viewSelectedAccountWorkers">
+		<for list="${accountWorkerList}" param="worker">
+			<var name="key_accountWorker" value="${worker}" />
+
+			<execute function="AssertTextEquals#assertPartialText" locator1="LESASearch#TICKETS_TAB_SELECTED_ACCOUNT_WORKER" value1="${worker}" />
+		</for>
+	</command>
+
+	<command name="viewSelectedAssignees">
+		<for list="${assigneeList}" param="assignee">
+			<var name="key_assignee" value="${assignee}" />
+
+			<execute function="AssertTextEquals" locator1="LESASearch#TICKETS_TAB_SELECTED_ASSIGNEE" value1="${assignee}" />
+		</for>
 	</command>
 </definition>
