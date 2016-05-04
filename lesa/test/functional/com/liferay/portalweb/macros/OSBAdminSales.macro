@@ -6,8 +6,6 @@
 
 		<execute function="Select" locator1="OSBAdminSalesOfferingAdd#PRODUCT_SELECT" value1="${product}" />
 
-		<execute function="Select" locator1="OSBAdminSalesOfferingAdd#LICENSE_LIFETIME_SELECT" value1="${licenseLifetime}" />
-
 		<if>
 			<isset var="servers" />
 			<then>
@@ -16,13 +14,6 @@
 		</if>
 
 		<execute function="Select" locator1="OSBAdminSalesOfferingAdd#SUPPORT_SELECT" value1="${support}" />
-
-		<if>
-			<isset var="supportLifetime" />
-			<then>
-				<execute function="Select" locator1="OSBAdminSalesOfferingAdd#SUPPORT_LIFETIME_SELECT" value1="${supportLifetime}" />
-			</then>
-		</if>
 
 		<if>
 			<isset var="supportedServers" />
@@ -65,9 +56,9 @@
 
 		<execute macro="Button#search" />
 
-		<var name="key_retailPrice" value="${retailPrice}" />
+		<var name="key_servers" value="${servers}" />
 
-		<execute function="ClickNoError" locator1="OSBAdminSalesOfferings#SEARCH_RESULT_RETAIL_PRICE" />
+		<execute function="ClickNoError" locator1="OSBAdminSalesOfferings#SEARCH_RESULT_SERVERS" />
 
 		<execute function="SelectWindow" locator1="null" />
 
@@ -76,25 +67,63 @@
 		<execute macro="Message#success" />
 	</command>
 
-	<command name="deleteOffering">
+	<command name="teardownDeleteOffering">
 		<execute macro="OSBAdminSearch#searchOffering">
-			<var name="currency" value="${currency}" />
 			<var name="product" value="${product}" />
 			<var name="support" value="${support}" />
+			<var name="supportedServers" value="${supportedServers}" />
 		</execute>
 
-		<execute macro="OSBAdminSearch#deleteSearchResultRow">
-			<var name="code" value="${retailPrice}" />
+		<execute macro="OSBAdminSearch#teardownDeleteSearchResultRow">
+			<var name="code" value="${supportedServers}" />
 		</execute>
 	</command>
 
-	<command name="deleteOrder">
-		<execute macro="OSBAdminSearch#searchAdvancedOrders">
+	<command name="teardownDeleteOrder">
+		<execute macro="OSBAdminSales#teardownSearchAdvancedOrders">
 			<var name="projectCode" value="${projectCode}" />
 		</execute>
 
-		<execute macro="OSBAdminSearch#deleteSearchResultRow">
-			<var name="code" value="${actualPrice}" />
+		<execute macro="OSBAdminSearch#teardownDeleteSearchResultRow">
+			<var name="code" value="${projectName}" />
 		</execute>
+	</command>
+
+	<command name="teardownSearchAdvancedOrders">
+		<execute macro="Navigation#gotoOSBAdminSalesOrders" />
+
+		<execute macro="OSBAdminSearch#toggleSearch">
+			<var name="searchType" value="Advanced" />
+		</execute>
+
+		<execute function="Click" locator1="OSBAdminSalesOrders#ADVANCED_SEARCH_CHOOSE_PROJECT_BUTTON" />
+
+		<execute function="SelectWindow" locator1="title=Control Panel" />
+
+		<execute macro="OSBAdminSearch#toggleSearch">
+			<var name="searchType" value="Basic" />
+		</execute>
+
+		<execute function="Type" locator1="OSBAdmin#BASIC_SEARCH_KEYWORD_FIELD" value1="${projectCode}" />
+
+		<execute macro="Button#search" />
+
+		<var name="key_code" value="${projectCode}" />
+
+		<if>
+			<condition function="IsElementPresent" locator1="OSBAdmin#SEARCH_RESULT_CODE" />
+			<then>
+				<execute function="ClickNoError" locator1="OSBAdmin#SEARCH_RESULT_CODE" />
+			</then>
+			<else>
+				<execute function="Close" locator1="title=Control Panel" />
+			</else>
+		</if>
+
+		<execute function="SelectWindow" locator1="null" />
+
+		<execute function="Select" locator1="OSBAdminSalesOrders#CREATED_BY_SELECT" value1="Me" />
+
+		<execute macro="Button#searchAdvanced" />
 	</command>
 </definition>
