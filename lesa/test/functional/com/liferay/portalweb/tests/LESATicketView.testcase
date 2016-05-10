@@ -1,0 +1,67 @@
+<definition component-name="support-qa">
+	<property name="testray.main.component.name" value="Support QA" />
+
+	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.4')" name="customerPassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.7')" name="adminPassword" />
+
+	<var name="browser" value="Firefox 20+" />
+	<var name="product" value="Portal" />
+	<var name="project" value="Ameriprise Financial" />
+	<var name="savedEnvConfigName" value="Ameriprise Environment" />
+	<var name="server" value="Production" />
+	<var name="systemStatus" value="Completely Inoperable/Shutdown" />
+
+	<tear-down>
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="OSBAdminSales#editSupportLifetime">
+			<var name="product" value="Portal Production" />
+			<var name="project" value="${project}" />
+			<var name="projectCode" value="AMERIPRISE" />
+			<var name="supportLifetime" value="1 Year" />
+		</execute>	
+
+		<execute macro="User#logout" />
+	</tear-down>
+
+	<command name="ViewTicketExpiredSupport">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoOSBAdmin" />
+
+		<execute macro="OSBAdminSales#editSupportLifetime">
+			<var name="product" value="Portal Production" />
+			<var name="project" value="${project}" />
+			<var name="projectCode" value="AMERIPRISE" />
+			<var name="supportLifetime" value="1 Minute" />
+		</execute>	
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="LESATicket#createTicketBasicForm">
+			<var name="browser" value="${browser}" />
+			<var name="component" value="Document Library" />
+			<var name="configType" value="saved" />
+			<var name="description" value="QA Test for viewing expired support on a ticket." />
+			<var name="product" value="${product}" />
+			<var name="project" value="${project}" />
+			<var name="savedEnvConfigName" value="${savedEnvConfigName}" />
+			<var name="server" value="${server}" />
+			<var name="summary" value="QA Test View Ticket Expired Support" />
+			<var name="systemStatus" value="${systemStatus}" />
+		</execute>
+
+		<execute macro="LESATicketView#viewExpiredSupport" />
+	</command>
+</definition>
