@@ -3,13 +3,18 @@
 
 	<var method="TestPropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var name="currency" value="USD" />
 	<var name="product" value="Portal Non-Production" />
 	<var name="projectCode" value="AMERIPRISE" />
 	<var name="projectName" value="Ameriprise Financial" />
 	<var name="support" value="Americas English Gold" />			
 
+	<var name="staticTearDownOffering" static="true" value="" />
+	<var name="staticTearDownOrder" static="true" value="" />
+
 	<set-up>
+		<var name="staticTearDownOffering" value="" />
+		<var name="staticTearDownOrder" value="" />
+
 		<execute macro="User#login">
 			<var name="userEmailAddress" value="${adminEmailAddress}" />
 			<var name="userPassword" value="${adminPassword}" />
@@ -19,23 +24,46 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="OSBAdminSales#tearDownOrder">
-			<var name="projectCode" value="${projectCode}" />
-			<var name="projectName" value="${projectName}" />
-		</execute>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownOrder}" arg2="" />
+			</not>
+			<then>
+			  	<var method="StringUtil#extractFirst('${staticTearDownOrder}', ',')" name="projectCode" />
+			  	<var method="StringUtil#extractLast('${staticTearDownOrder}', ',')" name="projectName" />
 
-		<for list="11,22" param="server">
-			<execute macro="OSBAdminSales#tearDownOffering">
-				<var name="product" value="${product}" />
-				<var name="support" value="${support}" />			
-				<var name="supportedServers" value="${server}" />
-			</execute>
-		</for>
+				<execute macro="OSBAdminSales#tearDownOrder">
+					<var name="projectCode" value="${projectCode}" />
+					<var name="projectName" value="${projectName}" />
+				</execute>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<equals arg1="${staticTearDownOffering}" arg2="" />
+			</not>
+			<then>
+			  	<var method="StringUtil#extractFirst('${staticTearDownOffering}', ',')" name="product" />
+			  	<var method="StringUtil#extractLast('${staticTearDownOffering}', '${product}')" name="temp" />
+			  	<var method="StringUtil#replaceFirst('${temp}', ',','')" name="temp" />
+			  	<var method="StringUtil#extractFirst('${temp}', ',')" name="support" />
+			  	<var method="StringUtil#extractLast('${temp}', ',')" name="supportedServers" />
+
+				<execute macro="OSBAdminSales#tearDownOffering">
+					<var name="product" value="${product}" />
+					<var name="support" value="${support}" />			
+					<var name="supportedServers" value="${supportedServers}" />
+				</execute>
+			</then>
+		</if>
 
 		<execute macro="User#logout" />
 	</tear-down>
 
 	<command name="AddOffering">
+		<var name="staticTearDownOffering" value="${product},${support},11" />
+
 		<execute macro="OSBAdminSales#addOffering">
 			<var name="product" value="${product}" />
 			<var name="servers" value="11" />
@@ -46,6 +74,9 @@
 	</command>
 
 	<command name="AddOrder">
+		<var name="staticTearDownOffering" value="${product},${support},22" />
+		<var name="staticTearDownOrder" value="${projectCode},${projectName}" />
+
 		<execute macro="OSBAdminSales#addOffering">
 			<var name="product" value="${product}" />
 			<var name="servers" value="22" />

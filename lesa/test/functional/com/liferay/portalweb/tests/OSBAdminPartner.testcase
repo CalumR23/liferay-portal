@@ -6,7 +6,13 @@
 	<var method="TestPropsUtil#get('lesa.email.password.3')" name="casPassword" />
 	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
 
+	<var name="staticTearDownPartner" static="true" value="" />
+	<var name="staticTearDownProject" static="true" value="" />
+
 	<set-up>
+		<var name="staticTearDownPartner" value="" />
+		<var name="staticTearDownProject" value="" />
+
 		<execute macro="User#login">
 			<var name="userEmailAddress" value="${casEmailAddress}" />
 			<var name="userPassword" value="${casPassword}" />
@@ -16,22 +22,34 @@
 	</set-up>
 
 	<tear-down>
-		<for list="QATEST4" param="projectCode">
-			<execute macro="OSBAdminProject#tearDownProject">
-				<var name="projectCode" value="${projectCode}" />
-			</execute>
-		</for>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownProject}" arg2="" />
+			</not>
+			<then>
+				<execute macro="OSBAdminProject#tearDownProject">
+					<var name="projectCode" value="${staticTearDownProject}" />
+				</execute>
+			</then>
+		</if>
 
-		<for list="QAPARTNER1,QAPARTNER2" param="partnerCode">
-			<execute macro="OSBAdminPartner#tearDownPartner">
-				<var name="partnerCode" value="${partnerCode}" />
-			</execute>
-		</for>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownPartner}" arg2="" />
+			</not>
+			<then>
+				<execute macro="OSBAdminPartner#tearDownPartner">
+					<var name="partnerCode" value="${staticTearDownPartner}" />
+				</execute>
+			</then>
+		</if>
 
 		<execute macro="User#logout" />
 	</tear-down>
 
 	<command name="AddPartner">
+		<var name="staticTearDownPartner" value="QAPARTNER1" />
+
 		<execute macro="OSBAdminPartner#addPartner">
 			<var name="additionalNotes" value="This is a test." />
 			<var name="city" value="Diamond Bar" />
@@ -46,6 +64,9 @@
 	</command>
 
 	<command name="AddPartnerManagedAccount">
+		<var name="staticTearDownPartner" value="QAPARTNER2" />
+		<var name="staticTearDownProject" value="QATEST4" />
+
 		<execute macro="OSBAdminPartner#addPartner">
 			<var name="additionalNotes" value="This is a test." />
 			<var name="city" value="Diamond Bar" />

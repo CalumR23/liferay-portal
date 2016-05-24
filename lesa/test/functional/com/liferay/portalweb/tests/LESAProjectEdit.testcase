@@ -4,7 +4,13 @@
 	<var method="TestPropsUtil#get('lesa.email.address.3')" name="casEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.password.3')" name="casPassword" />
 
+	<var name="staticTearDownCallLog" static="true" value="" />
+	<var name="staticTearDownProject" static="true" value="" />
+
 	<set-up>
+		<var name="staticTearDownCallLog" value="" />
+		<var name="staticTearDownProject" value="" />
+
 		<execute macro="User#login">
 			<var name="userEmailAddress" value="${casEmailAddress}" />
 			<var name="userPassword" value="${casPassword}" />
@@ -12,23 +18,40 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="LESAProjectEdit#tearDownCallLog">
-			<var name="projectCode" value="AMERIPRISE" />
-			<var name="summary" value="QA Test call log" />		
-		</execute>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownCallLog}" arg2="" />
+			</not>
+			<then>
+			  	<var method="StringUtil#extractFirst('${staticTearDownCallLog}', ',')" name="projectCode" />
+			  	<var method="StringUtil#extractLast('${staticTearDownCallLog}', ',')" name="summary" />
+
+				<execute macro="LESAProjectEdit#tearDownCallLog">
+					<var name="projectCode" value="${projectCode}" />
+					<var name="summary" value="${summary}" />
+				</execute>
+			</then>
+		</if>
 
 		<execute macro="Navigation#gotoOSBAdmin" />
 
-		<for list="QATEST6,QATEST7" param="projectCode">
-			<execute macro="OSBAdminProject#tearDownProject">
-				<var name="projectCode" value="${projectCode}" />
-			</execute>
-		</for>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownProject}" arg2="" />
+			</not>
+			<then>
+				<execute macro="OSBAdminProject#tearDownProject">
+					<var name="projectCode" value="${staticTearDownProject}" />
+				</execute>
+			</then>
+		</if>
 
 		<execute macro="User#logout" />
 	</tear-down>
 
 	<command name="AddCallLogAsCAS">
+		<var name="staticTearDownCallLog" value="AMERIPRISE,QA Test call log" />
+
 		<execute macro="Navigation#gotoLESA" />
 
 		<execute macro="LESASearch#searchProject">
@@ -61,6 +84,8 @@
 	</command>
 
 	<command name="EditCASInformation">
+		<var name="staticTearDownProject" value="QATEST6" />
+
 		<execute macro="Navigation#gotoOSBAdmin" />
 
 		<execute macro="OSBAdminProject#addProject">
@@ -102,6 +127,8 @@
 	</command>
 
 	<command name="EditCEMCXMInformation">
+		<var name="staticTearDownProject" value="QATEST7" />
+
 		<execute macro="Navigation#gotoOSBAdmin" />
 
 		<execute macro="OSBAdminProject#addProject">

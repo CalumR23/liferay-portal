@@ -6,7 +6,15 @@
 	<var method="TestPropsUtil#get('lesa.email.address.3')" name="casEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
 
+	<var name="staticTearDownOffering" static="true" value="" />
+	<var name="staticTearDownOrder" static="true" value="" />
+	<var name="staticTearDownProject" static="true" value="" />
+
 	<set-up>
+		<var name="staticTearDownOffering" value="" />
+		<var name="staticTearDownOrder" value="" />
+		<var name="staticTearDownProject" value="" />
+
 		<execute macro="User#login">
 			<var name="userEmailAddress" value="${adminEmailAddress}" />
 			<var name="userPassword" value="${adminPassword}" />
@@ -16,27 +24,57 @@
 	</set-up>
 
 	<tear-down>
-		<execute macro="OSBAdminSales#tearDownOrder">
-			<var name="projectCode" value="QATEST5" />
-			<var name="projectName" value="QA Project 5" />
-		</execute>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownOrder}" arg2="" />
+			</not>
+			<then>
+			  	<var method="StringUtil#extractFirst('${staticTearDownOrder}', ',')" name="projectCode" />
+			  	<var method="StringUtil#extractLast('${staticTearDownOrder}', ',')" name="projectName" />
 
-		<execute macro="OSBAdminSales#tearDownOffering">
-			<var name="product" value="Portal Non-Production" />
-			<var name="support" value="Americas English Gold" />			
-			<var name="supportedServers" value="33" />
-		</execute>
+				<execute macro="OSBAdminSales#tearDownOrder">
+					<var name="projectCode" value="${projectCode}" />
+					<var name="projectName" value="${projectName}" />
+				</execute>
+			</then>
+		</if>
 
-		<for list="QATEST1,QATEST2,QATEST3,QATEST5" param="projectCode">
-			<execute macro="OSBAdminProject#tearDownProject">
-				<var name="projectCode" value="${projectCode}" />
-			</execute>
-		</for>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownOffering}" arg2="" />
+			</not>
+			<then>
+			  	<var method="StringUtil#extractFirst('${staticTearDownOffering}', ',')" name="product" />
+			  	<var method="StringUtil#extractLast('${staticTearDownOffering}', '${product}')" name="temp" />
+			  	<var method="StringUtil#replaceFirst('${temp}', ',','')" name="temp" />
+			  	<var method="StringUtil#extractFirst('${temp}', ',')" name="support" />
+			  	<var method="StringUtil#extractLast('${temp}', ',')" name="supportedServers" />
+
+				<execute macro="OSBAdminSales#tearDownOffering">
+					<var name="product" value="${product}" />
+					<var name="support" value="${support}" />			
+					<var name="supportedServers" value="${supportedServers}" />
+				</execute>
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<equals arg1="${staticTearDownProject}" arg2="" />
+			</not>
+			<then>
+				<execute macro="OSBAdminProject#tearDownProject">
+					<var name="projectCode" value="${staticTearDownProject}" />
+				</execute>
+			</then>
+		</if>
 
 		<execute macro="User#logout" />
 	</tear-down>
 
 	<command name="AddProject">
+		<var name="staticTearDownProject" value="QATEST1" />
+
 		<execute macro="OSBAdminProject#addProject">
 			<var name="additionalNotes" value="This is a test" />
 			<var name="addressLine" value="123 Main Street" />
@@ -56,6 +94,10 @@
 	</command>
 
 	<command name="AddProjectWithOffering">
+		<var name="staticTearDownOffering" value="Portal Non-Production,Americas English Gold,33" />
+		<var name="staticTearDownOrder" value="QATEST5,QA Project 5" />
+		<var name="staticTearDownProject" value="QATEST5" />
+
 		<execute macro="OSBAdminProject#addProject">
 			<var name="additionalNotes" value="This is a test" />
 			<var name="addressLine" value="123 Main Street" />
@@ -100,6 +142,8 @@
 	</command>
 
 	<command name="AssignCustomer">
+		<var name="staticTearDownProject" value="QATEST2" />
+
 		<execute macro="OSBAdminProject#addProject">
 			<var name="additionalNotes" value="This is a test" />
 			<var name="addressLine" value="123 Main Street" />
@@ -122,6 +166,8 @@
 	</command>
 
 	<command name="AssignWorker">
+		<var name="staticTearDownProject" value="QATEST3" />
+
 		<execute macro="OSBAdminProject#addProject">
 			<var name="additionalNotes" value="This is a test" />
 			<var name="addressLine" value="123 Main Street" />
