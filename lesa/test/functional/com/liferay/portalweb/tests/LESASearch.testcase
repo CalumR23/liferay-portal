@@ -5,14 +5,82 @@
 	<var method="TestPropsUtil#get('lesa.email.password.1')" name="csePassword" />
 	<var method="TestPropsUtil#get('lesa.cse.name.1')" name="cseName" />
 	<var method="TestPropsUtil#get('lesa.cas.name.3')" name="casName" />
-	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="TestPropsUtil#get('lesa.email.password.4')" name="customerPassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress1" />
+	<var method="TestPropsUtil#get('lesa.email.password.4')" name="customerPassword1" />
+	<var method="TestPropsUtil#get('lesa.email.address.5')" name="customerEmailAddress2" />
+	<var method="TestPropsUtil#get('lesa.email.password.5')" name="customerPassword2" />
 	<var method="TestPropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.7')" name="adminPassword" />
 
 	<tear-down>
+		<execute class="com.liferay.poshi.runner.PoshiRunnerContext" method="getTestCaseCommandName">
+			<return name="testCaseCommandName" />
+	  	</execute>
+
+	  	<var method="StringUtil#extractLast('${testCaseCommandName}', '#')" name="testCaseName" />
+
+		<if>
+			<equals arg1="${testCaseName}" arg2="FilterTicketsByProjectAsCustomer" />
+			<then>
+				<execute macro="User#logoutAndLogin">
+					<var name="userEmailAddress" value="${adminEmailAddress}" />
+					<var name="userPassword" value="${adminPassword}" />
+				</execute>
+
+				<execute macro="OSBAdminProject#tearDownUnassignCustomer">
+					<var name="emailAddress" value="${customerEmailAddress2}" />
+					<var name="projectCode" value="QATEST" />
+				</execute>
+			</then>
+		</if>
+
 		<execute macro="User#logout" />
 	</tear-down>
+
+	<command name="FilterTicketsByProjectAsCustomer">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${customerEmailAddress2}" />
+			<var name="userPassword" value="${customerPassword2}" />
+		</execute>
+		
+		<execute macro="Navigation#gotoLESASearch" />
+
+		<execute macro="LESASearch#viewSelectedProjectSingle">
+			<var name="project" value="California Casualty" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="OSBAdminProject#assignCustomer">
+			<var name="emailAddress" value="${customerEmailAddress2}" />
+			<var name="projectCode" value="QATEST" />
+			<var name="role" value="Developer" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${customerEmailAddress2}" />
+			<var name="userPassword" value="${customerPassword2}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESASearch" />
+
+		<execute macro="LESASearch#filterTicketsByProject">
+			<var name="projectName" value="California Casualty" />
+		</execute>
+
+		<execute macro="LESASearch#filterTicketsByProject">
+			<var name="projectName" value="QA Test Project" />
+		</execute>
+
+		<execute macro="LESASearch#viewSelectedProjects">
+			<var name="projectList" value="California Casualty,QA Test Project" />
+		</execute>
+	</command>
 
 	<command name="FilterTicketsByProjectAsPartner">
 		<execute macro="User#login">
@@ -111,8 +179,8 @@
 
 	<command name="SearchInvalidTicket">
 		<execute macro="User#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
+			<var name="userEmailAddress" value="${customerEmailAddress1}" />
+			<var name="userPassword" value="${customerPassword1}" />
 		</execute>
 
 		<execute macro="Navigation#gotoTicket">
