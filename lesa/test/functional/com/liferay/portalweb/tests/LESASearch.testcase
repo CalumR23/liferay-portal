@@ -11,6 +11,7 @@
 	<var method="TestPropsUtil#get('lesa.email.password.5')" name="customerPassword2" />
 	<var method="TestPropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	<var method="TestPropsUtil#get('lesa.partner.name.6')" name="partnerName" />
 	<var method="TestPropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
 	<var method="TestPropsUtil#get('lesa.email.password.7')" name="adminPassword" />
 
@@ -20,6 +21,21 @@
 	  	</execute>
 
 	  	<var method="StringUtil#extractLast('${testCaseCommandName}', '#')" name="testCaseName" />
+
+		<if>
+			<equals arg1="${testCaseName}" arg2="CreateTicketAsCustomerAndViewWithPartnerFilter" />
+			<then>
+				<execute macro="User#logoutAndLogin">
+					<var name="userEmailAddress" value="${adminEmailAddress}" />
+					<var name="userPassword" value="${adminPassword}" />
+				</execute>
+
+				<execute macro="OSBAdminProject#tearDownAssignedCustomer">
+					<var name="emailAddress" value="${partnerEmailAddress}" />
+					<var name="projectCode" value="QATEST" />
+				</execute>
+			</then>
+		</if>
 
 		<if>
 			<equals arg1="${testCaseName}" arg2="FilterTicketsByProjectAsCustomer" />
@@ -38,6 +54,63 @@
 
 		<execute macro="User#logout" />
 	</tear-down>
+
+	<command name="CreateTicketAsCustomerAndViewWithPartnerFilter">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+		
+		<execute macro="OSBAdminProject#assignCustomer">
+			<var name="emailAddress" value="${partnerEmailAddress}" />
+			<var name="projectCode" value="QATEST" />
+			<var name="role" value="Developer" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${partnerEmailAddress}" />
+			<var name="userPassword" value="${partnerPassword}" />
+		</execute>
+
+		<execute macro="LESATicket#createTicketBasicForm">
+			<var name="appServer" value="Weblogic 12c" />
+			<var name="browser" value="Chrome 28+" />
+			<var name="component" value="Security" />
+			<var name="configType" value="new" />
+			<var name="database" value="Oracle 11.2" />
+			<var name="description" value="QA Test for creating a ticket as a customer and viewing it with the partner." />
+			<var name="javaVM" value="Java 6" />
+			<var name="liferayVersion" value="6.2 EE" />
+			<var name="operatingSystem" value="Ubuntu 12" />
+			<var name="product" value="Portal" />
+			<var name="project" value="QA Test Project" />
+			<var name="server" value="Backup" />
+			<var name="summary" value="QA Test Create Ticket As Customer And View With Partner Filter" />
+			<var name="systemStatus" value="Functioning with Limited Capabilities" />
+			<return from="ticketNumber" name="ticketNumber" />
+		</execute>
+
+		<execute macro="LESATicketView#assertNotAssignedTo">
+			<var name="name" value="${partnerName}" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${cseEmailAddress}" />
+			<var name="userPassword" value="${csePassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESASearch" />
+
+		<execute macro="LESASearch#searchPartnersViaTicketsChooseAssignee">
+			<var name="code" value="CIGNEX Datamatics" />
+		</execute>
+
+		<execute macro="LESASearch#sortByTicketNumberDescending" />
+
+		<execute macro="LESASearch#assertTicketNotInResult">
+			<var name="ticketNumber" value="${ticketNumber}" />
+		</execute>
+	</command>
 
 	<command name="FilterTicketsByProjectAsCustomer">
 		<execute macro="User#login">
