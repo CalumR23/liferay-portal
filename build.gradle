@@ -54,12 +54,25 @@ allprojects {
 subprojects {
 	apply plugin: "com.liferay.poshi.runner"
 
+	task syncSikuliComplete(type: Copy)
+
 	configurations {
 		poshiRunner {
 			resolutionStrategy {
 				force group: "com.google.guava", name: "guava", version: "16.0.1"
 			}
 		}
+
+		sikuliComplete
+	}
+
+	dependencies {
+		["x86", "x86_64"].each {
+			sikuliComplete classifier: "linux-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+			sikuliComplete classifier: "windows-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+		}
+
+		sikuliComplete classifier: "macosx-x86_64", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
 	}
 
 	poshiRunner {
@@ -93,5 +106,14 @@ subprojects {
 				url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 			}
 		}
+	}
+
+	syncRemoteRepositories {
+		finalizedBy syncSikuliComplete
+	}
+
+	syncSikuliComplete {
+		from configurations.sikuliComplete
+		into rootProject.file(".ivy/org.bytedeco.javacpp-presets/opencv/${poshiRunner.openCVVersion}")
 	}
 }
