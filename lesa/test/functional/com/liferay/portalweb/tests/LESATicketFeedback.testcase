@@ -16,6 +16,70 @@
 	<var name="server" value="Production" />
 	<var name="systemStatus" value="Completely Inoperable/Shutdown" />
 
+	<command name="SubmitFeedbackAfterLiferayClosesTicket">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${cseEmailAddress}" />
+			<var name="userPassword" value="${csePassword}" />
+		</execute>
+
+		<execute macro="LESATicket#createTicketBasicForm">
+			<var name="browser" value="${browser}" />
+			<var name="component" value="Document Library" />
+			<var name="configType" value="saved" />
+			<var name="description" value="QA Test for submitting feedback after Liferay worker closes the ticket." />
+			<var name="product" value="${product}" />
+			<var name="project" value="${project}" />
+			<var name="savedEnvConfigName" value="${savedEnvConfigName}" />
+			<var name="server" value="${server}" />
+			<var name="summary" value="QA Test Submit Feedback After Liferay Closes Ticket" />
+			<var name="systemStatus" value="${systemStatus}" />
+			<return from="ticketNumber" name="ticketNumber" />
+		</execute>
+
+		<execute macro="Navigation#gotoTicketAsDifferentUser">
+			<var name="ticketNumber" value="${ticketNumber}" />
+			<var name="userEmailAddress" value="${managerEmailAddress}" />
+			<var name="userPassword" value="${managerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoProposeSolution" />
+
+		<execute macro="LESATicketSolution#proposeSolution">
+			<var name="solutionDescription" value="This is a QA test solution." />
+		</execute>
+
+		<execute macro="LESATicketTransition#changeTicketStatus">
+			<var name="currentStatus" value="Solution Proposed" />
+			<var name="newStatus" value="Closed" />
+			<var name="resolution" value="Completed" />
+		</execute>
+
+		<execute macro="Navigation#gotoTicketAsDifferentUser">
+			<var name="ticketNumber" value="${ticketNumber}" />
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="LESATicketFeedback#submitReply">
+			<var name="comment" value="Test negative feedback comment." />
+			<var name="reply" value="No" />
+		</execute>
+
+		<execute macro="Navigation#gotoTicketAsDifferentUser">
+			<var name="ticketNumber" value="${ticketNumber}" />
+			<var name="userEmailAddress" value="${cseEmailAddress}" />
+			<var name="userPassword" value="${csePassword}" />
+		</execute>
+
+		<execute macro="LESATicketFeedback#viewFeedback">
+			<var name="comment" value="Test negative feedback comment." />
+			<var name="reply" value="No" />
+			<var name="submitter" value="${customerName}" />
+		</execute>
+
+		<execute macro="User#logout" />
+	</command>
+
 	<command name="SubmitNegativeFeedback">
 		<execute macro="User#login">
 			<var name="userEmailAddress" value="${cseEmailAddress}" />
