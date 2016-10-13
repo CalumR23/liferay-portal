@@ -1,0 +1,129 @@
+<definition>
+	<command name="addAccountAddress">
+		<execute function="Click" locator1="SalesforceAccount#NEW_ADDRESS_BUTTON" />
+
+		<execute function="Type" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_ALIAS" value1="${salesforceAccountAddressAlias}" />
+		<execute function="Select" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_TYPE" value1="${salesforceAccountAddressType}" />
+		<execute function="Type" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_STREET" value1="${salesforceAccountAddressStreet}" />
+		<execute function="Type" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_CITY" value1="${salesforceAccountAddressCity}" />
+		<execute function="Select" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_COUNTRY" value1="${salesforceAccountAddressCountry}" />
+		<execute function="Select" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_STATE" value1="${salesforceAccountAddressState}" />
+		<execute function="Type" locator1="SalesforceAccountAddressAdd#ACCOUNT_ADDRESS_ZIP" value1="${salesforceAccountAddressZip}" />
+
+		<execute macro="Button#save" />
+	</command>
+
+	<command name="addDummyAccountAddress">
+		<execute macro="SalesforceAccount#addAccountAddress">
+			<var name="salesforceAccountAddressAlias" value="${salesforceAccountAddressType} Address" />
+			<var name="salesforceAccountAddressCity" value="Diamond Bar" />
+			<var name="salesforceAccountAddressCountry" value="United States" />
+			<var name="salesforceAccountAddressState" value="California" />
+			<var name="salesforceAccountAddressStreet" value="1400 Montefino Ave." />
+			<var name="salesforceAccountAddressType" value="Primary ${salesforceAccountAddressType} Address" />
+			<var name="salesforceAccountAddressZip" value="91765" />
+		</execute>
+	</command>
+
+	<command name="clickOpportunity">
+		<var name="key_salesforceOpportunityKeyword" value="${salesforceOpportunityKeyword}" />
+
+		<execute function="Click" locator1="SalesforceAccount#ACCOUNT_OPPORTUNITY_NAME" />
+	</command>
+
+	<command name="createNewOpportunity">
+		<execute function="Click" locator1="SalesforceAccount#NEW_OPPORTUNITY_BUTTON" />
+
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_RECORD_TYPE" value1="${salesforceOpportunityRecordType}" />
+
+		<execute macro="Button#continue" />
+
+		<execute function="Type" locator1="SalesforceOpportunityCreate#OPPORTUNITY_NAME" value1="${salesforceOpportunityName}" />
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_TYPE" value1="${salesforceOpportunityType}" />
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_STAGE" value1="${salesforceOpportunityStage}" />
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_STAGE_DETAIL" value1="${salesforceOpportunityStageDetail}" />
+		<execute function="Click" locator1="SalesforceOpportunityCreate#OPPORTUNITY_CLOSE_DATE_TODAY" />
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_CURRENCY" value1="${salesforceOpportunityCurrency}" />
+		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_SOLD_BY_COUNTRY" value1="Liferay ${salesforceOpportunitySoldByCountry}" />
+
+		<for list="${salesforceOpportunityPartnerTerritoryList}" param="salesforceOpportunityPartnerTerritory">
+			<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_PARTNER_TERRITORY" value1="${salesforceOpportunityPartnerTerritory}" />
+
+			<execute macro="Button#addFromList" />
+		</for>
+
+		<execute macro="Button#save" />
+	</command>
+
+	<command name="deleteAccount">
+		<execute macro="Button#delete" />
+
+		<while>
+			<and>
+				<condition function="IsElementPresent" locator1="SalesforceAccountDeleteConflicts#ERROR_DESCRIPTION" />
+				<condition function="IsElementPresent" locator1="SalesforceAccountDeleteConflicts#OPPORTUNITY_NAME" />
+			</and>
+			<then>
+				<execute function="Click" locator1="SalesforceAccountDeleteConflicts#OPPORTUNITY_NAME" />
+
+				<execute macro="SalesforceOpportunity#gotoDetails" />
+
+				<execute macro="Button#delete" />
+
+				<execute macro="SalesforceNavigation#gotoRecentAccount">
+					<var name="salesforceAccountName" value="${salesforceAccountName}" />
+				</execute>
+
+				<execute macro="Button#delete" />
+			</then>
+		</while>
+	</command>
+
+	<command name="editAccountDetails">
+		<execute macro="Button#edit" />
+
+		<execute function="Type" locator1="SalesforceAccountCreate#ACCOUNT_NAME" value1="${salesforceAccountName}" />
+		<execute function="Select" locator1="SalesforceAccountCreate#ACCOUNT_INDUSTRY" value1="${salesforceAccountIndustry}" />
+		<execute function="Type" locator1="SalesforceAccountCreate#ACCOUNT_DESCRIPTION" value1="${salesforceAccountDescription}" />
+
+		<execute macro="Button#save" />
+
+		<execute function="Pause" locator1="3000" />
+	</command>
+
+	<command name="viewAccountDetails">
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceAccount#ACCOUNT_DETAILS_NAME" value1="${salesforceAccountName}"  />
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceAccount#ACCOUNT_DETAILS_OWNER" value1="${salesforceAccountOwner}"  />
+		<execute function="AssertTextEquals" locator1="SalesforceAccount#ACCOUNT_DETAILS_INDUSTRY" value1="${salesforceAccountIndustry}"  />
+		<execute function="AssertTextEquals" locator1="SalesforceAccount#ACCOUNT_DETAILS_PARTNER_LEVEL" value1="${salesforceAccountPartnerLevel}"  />
+
+		<if>
+			<and>
+				<isset var="salesforceAccountDescription" />
+				<not>
+					<contains string="${salesforceAccountDescription}" substring="{salesforceAccountDescription}" />
+				</not>
+			</and>
+			<then>
+				<execute function="AssertTextEquals" locator1="SalesforceAccount#ACCOUNT_DETAILS_DESCRIPTION" value1="${salesforceAccountDescription}"  />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewPartnershipDetails">
+		<if>
+			<equals arg1="${salesforceAccountActiveServicePartner}" arg2="true" />
+			<then>
+				<execute function="AssertElementPresent" locator1="SalesforceAccount#ACCOUNT_DETAILS_ACTIVE_SERVICE_PARTNER_CHECKED" />
+				<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceAccount#ACCOUNT_DETAILS_ACCT_SVC_PARTNERSHIP_TERM" value1="${salesforceAccountAcctSvgPartnershipTerm}"  />
+			</then>
+			<elseif>
+				<equals arg1="${salesforceAccountActiveTrainingPartner}" arg2="true" />
+				<then>
+					<execute function="AssertElementPresent" locator1="SalesforceAccount#ACCOUNT_DETAILS_ACTIVE_TRAINING_PARTNER_CHECKED" />
+					<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceAccount#ACCOUNT_DETAILS_ACCT_TRG_PARTNERSHIP_TERM" value1="${salesforceAccountAcctTrgPartnershipTerm}"  />
+				</then>
+			</elseif>
+		</if>
+	</command>
+</definition>
