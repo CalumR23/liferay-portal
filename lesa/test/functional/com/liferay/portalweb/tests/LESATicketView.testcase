@@ -53,6 +53,16 @@
 			</then>
 		</if>
 
+		<if>
+			<equals arg1="${testCaseName}" arg2="ViewCreateTicketCustomerMultipleProjects" />
+			<then>
+				<execute macro="OSBAdminProject#tearDownAssignedCustomer">
+					<var name="emailAddress" value="${customerEmailAddress}" />
+					<var name="projectCode" value="QAPROJECT2" />
+				</execute>
+			</then>
+		</if>
+
 		<execute macro="User#logout" />
 	</tear-down>
 
@@ -146,6 +156,46 @@
 		<execute macro="LESATicketCreateView#viewSHMultiselectItems" />
 
 		<execute macro="LESATicketCreate#cancel" />
+	</command>
+
+	<command name="ViewCreateTicketCustomerMultipleProjects">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="OSBAdminProject#assignCustomer">
+			<var name="emailAddress" value="${customerEmailAddress}" />
+			<var name="projectCode" value="QAPROJECT2" />
+			<var name="role" value="Watcher" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="LESATicketCreate#newTicket" />
+
+		<execute macro="LESATicketCreateEntry#selectProject">
+			<var name="project" value="QA Test Project 1" />
+		</execute>
+
+		<execute macro="LESATicketCreateView#viewWatcherMessage">
+			<var name="present" value="no" />
+		</execute>
+
+		<execute macro="LESATicketCreateEntry#selectProject">
+			<var name="project" value="QA Test Project 2" />
+		</execute>
+
+		<execute macro="LESATicketCreateView#viewWatcherMessage">
+			<var name="present" value="yes" />
+		</execute>
+
+		<execute macro="LESATicketCreateView#assertFormNotLoaded" />
 	</command>
 
 	<command name="ViewCreateTicketDXPEnvironments">
