@@ -64,16 +64,20 @@ subprojects {
 	poshiRunner {
 		baseDir = "test/functional"
 
-		File testPropertiesFile = file("test.properties")
+		String[] testPropertiesFileNames = [
+			"test.properties",
+			"test.${System.env.HOSTNAME}.properties",
+			"test.${System.env.HOST}.properties",
+			"test.${System.env.COMPUTERNAME}.properties",
+			"test.${System.env.USER}.properties"
+		]
 
-		if (testPropertiesFile.exists()) {
-			Properties testProperties = new Properties()
+		for (String testPropertiesFileName in testPropertiesFileNames) {
+			File testPropertiesFile = file("${testPropertiesFileName}")
 
-			testPropertiesFile.withInputStream {
-				testProperties.load it
+			if (testPropertiesFile.exists()) {
+				poshiProperties << GUtil.loadProperties(testPropertiesFile)
 			}
-
-			poshiProperties = testProperties
 		}
 
 		poshiPropertiesFile = rootProject.file("test.properties")
