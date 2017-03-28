@@ -1,0 +1,87 @@
+<definition component-name="support-qa">
+	<property name="testray.main.component.name" value="Support QA" />
+
+	<var method="TestPropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.7')" name="adminPassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.customer.name.4')" name="customerName" />
+	<var method="TestPropsUtil#get('lesa.email.password.4')" name="customerPassword" />
+
+	<tear-down>
+		<execute class="com.liferay.poshi.runner.PoshiRunnerContext" method="getTestCaseCommandName">
+			<return name="testCaseCommandName" />
+		</execute>
+
+		<var method="StringUtil#extractLast('${testCaseCommandName}', '#')" name="testCaseName" />
+
+		<if>
+			<equals arg1="${testCaseName}" arg2="AddAndViewProjectMessage" />
+			<then>
+				<execute macro="User#logoutAndLogin">
+					<var name="userEmailAddress" value="${adminEmailAddress}" />
+					<var name="userPassword" value="${adminPassword}" />
+				</execute>
+
+				<execute macro="PAMessages#tearDownProjectMessage">
+					<var name="message" value="This is a test QA message." />
+				</execute>
+			</then>
+		</if>
+	</tear-down>
+
+	<command name="AddAndViewProjectMessage">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoProjectAdminMessages">
+			<var name="projectCode" value="${projectCode}" />
+		</execute>
+
+		<execute macro="PAMessages#addProjectMessage">
+			<var name="message" value="This is a test QA message." />
+			<var name="severity" value="Urgent" />
+			<var name="title" value="QA Test" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="LESASubscriptionMessages#viewProjectMessage">
+			<var name="message" value="This is a test QA message." />
+			<var name="projectName" value="QA Test Project 1" />
+			<var name="severity" value="urgent" />
+			<var name="title" value="QA Test" />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${adminEmailAddress}" />
+			<var name="userPassword" value="${adminPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoProjectAdminMessages">
+			<var name="projectCode" value="${projectCode}" />
+		</execute>
+
+		<execute macro="PAMessages#deleteProjectMessage">
+			<var name="message" value="This is a test QA message." />
+		</execute>
+
+		<execute macro="User#logoutAndLogin">
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="LESASubscriptionMessages#viewProjectMessageNotPresent">
+			<var name="projectName" value="QA Test Project 1" />
+			<var name="title" value="QA Test" />
+		</execute>
+	</command>
+</definition>
