@@ -1,0 +1,108 @@
+<definition component-name="support-qa">
+	<property name="testray.main.component.name" value="Support QA" />
+
+	<var method="TestPropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.1')" name="csePassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.4')" name="customerPassword" />
+	<var method="TestPropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
+	<var method="TestPropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+
+	<var name="staticTearDownEnvironmentConfig" static="true" value="" />
+
+	<set-up>
+		<var name="staticTearDownEnvironmentConfig" value="" />
+	</set-up>
+
+	<tear-down>
+		<if>
+			<not>
+				<equals arg1="${staticTearDownEnvironmentConfig}" arg2="" />
+			</not>
+			<then>
+				<var method="StringUtil#extractLast('${staticTearDownEnvironmentConfig}', ',')" name="name" />
+				<var method="StringUtil#extractFirst('${staticTearDownEnvironmentConfig}', ',')" name="product" />
+
+				<execute macro="LESAPreferences#tearDownEnvironmentConfiguration">
+					<var name="name" value="${name}" />
+					<var name="product" value="${product}" />
+				</execute>
+			</then>
+		</if>
+
+		<execute macro="User#logout" />
+	</tear-down>
+
+	<command name="CreateAndUpdateEnvironment">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${customerEmailAddress}" />
+			<var name="userPassword" value="${customerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="LESAPreferences#createEnvironmentConfiguration">
+			<var name="liferayVersion" value="7.0" />
+			<var name="name" value="QA Test Environment 1" />
+			<var name="server" value="Developer Tools" />
+		</execute>
+
+		<var name="staticTearDownEnvironmentConfig" value="Developer Tools,QA Test Environment 1" />
+
+		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
+			<var name="contentList" value="Server: Developer Tools,LR: 7.0,OS: N/A,JVM: N/A,AS: N/A,DB: N/A" />
+			<var name="name" value="QA Test Environment 1" />
+			<var name="product" value="Developer Tools" />
+		</execute>
+
+		<execute macro="LESAPreferences#updateEnvironmentConfiguration">
+			<var name="appServer" value="Tomcat 8.0" />
+			<var name="database" value="MySQL 5.7" />
+			<var name="jvm" value="Java 8" />
+			<var name="name" value="QA Test Environment 1" />
+			<var name="newName" value="QA Updated Test Environment 1" />
+			<var name="os" value="CentOS 7" />
+			<var name="patchLevelFile" value="patchinfo.txt" />
+			<var name="portalExtFile" value="portal-ext.properties" />
+			<var name="product" value="Developer Tools" />
+		</execute>
+
+		<var name="staticTearDownEnvironmentConfig" value="Developer Tools,QA Updated Test Environment 1" />
+
+		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
+			<var name="contentList" value="Server: Developer Tools,LR: 7.0,OS: CentOS 7,JVM: Java 8,AS: Tomcat 8.0,DB: MySQL 5.7,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt" />
+			<var name="name" value="QA Updated Test Environment 1" />
+			<var name="product" value="Developer Tools" />
+		</execute>
+	</command>
+
+	<command name="ViewNoSavedEnvironmentMessage">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${cseEmailAddress}" />
+			<var name="userPassword" value="${csePassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="Navigation#gotoEnvironmentConfigurations" />
+
+		<execute macro="LESATicketCreateEntry#selectProject">
+			<var name="project" value="QA Test Project 2" />
+		</execute>
+
+		<execute macro="Message#info">
+			<var name="message" value="There are no saved environment configurations for this product." />
+		</execute>
+	</command>
+
+	<command name="ViewNoSavedEnvironmentTab">
+		<execute macro="User#login">
+			<var name="userEmailAddress" value="${partnerEmailAddress}" />
+			<var name="userPassword" value="${partnerPassword}" />
+		</execute>
+
+		<execute macro="Navigation#gotoLESA" />
+
+		<execute macro="LESAPreferences#assertNoEnvironmentConfigurationsTab" />
+	</command>
+</definition>
