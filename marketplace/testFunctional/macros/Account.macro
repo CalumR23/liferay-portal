@@ -127,13 +127,12 @@
 	<command name="setupAndSubmitApp">
 		<var name="key_appTitle" value="${appTitle}" />
 
-		<execute macro="AccountNavigator#gotoDevAppFromHome">
-			<var name="appTitle" value="${appTitle}" />
+		<execute macro="AccountNavigator#gotoDevelopmentAppsViaAccount">
 			<var name="companyName" value="${companyName}" />
 		</execute>
 
 		<if>
-			<condition function="IsElementNotPresent" locator1="MPDeveloperApps#APP_TITLE" value1="appTitle" />
+			<condition function="IsElementNotPresent" locator1="MPDeveloperApps#APP_TITLE_LINK" />
 			<then>
 				<execute macro="Account#addApp">
 					<var name="appCategory" value="${appCategory}" />
@@ -200,56 +199,52 @@
 
 				<execute macro="AccountAppAdd#clickSubmit" />
 
+				<var name="pending" value="true" />
+			</then>
+			<else>
+				<execute function="Click" locator1="MPDeveloperApps#APP_TITLE_LINK" />
+
 				<if>
-					<equals arg1="${doApprove}" arg2="true" />
+					<and>
+						<condition function="IsElementPresent" locator1="MPDeveloperApps#ADD_NEW_VERSION_BUTTON" />
+						<equals arg1="${update}" arg2="true" />
+					</and>
 					<then>
-						<execute macro="MPUser#logoutAndLogin">
-							<var method="TestPropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-							<var method="TestPropsUtil#get('marketplace.email.password.5')" name="userPassword" />
+						<execute macro="Account#editAppWithNewVersion">
+							<var name="appFileList" value="${appFileList}" />
+							<var name="portalVersionName" value="${portalVersionName}" />
+							<var name="versionNumber" value="${versionNumber}" />
+							<var name="whatsNewDescription" value="This is an upgrade to versoin ${versionNumber}" />
 						</execute>
 
-						<execute macro="MarketplaceAdmin#setupAppApprove">
+						<execute macro="AccountNavigator#gotoDevelopmentAppsAppTitleViaAccount">
 							<var name="appTitle" value="${appTitle}" />
+							<var name="companyName" value="${companyName}" />
 						</execute>
+
+						<execute macro="AccountAppAdd#clickSubmit" />
+
+						<var name="pending" value="true" />
 					</then>
 				</if>
+			</else>
+		</if>
+
+		<if>
+			<and>
+				<equals arg1="${doApprove}" arg2="true" />
+				<equals arg1="${pending}" arg2="true" />
+			</and>
+			<then>
+				<execute macro="MPUser#logoutAndLogin">
+					<var method="TestPropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
+					<var method="TestPropsUtil#get('marketplace.email.password.5')" name="userPassword" />
+				</execute>
+
+				<execute macro="MarketplaceAdmin#setupAppApprove">
+					<var name="appTitle" value="${appTitle}" />
+				</execute>
 			</then>
-			<elseif>
-				<and>
-					<condition function="IsElementPresent" locator1="MPDeveloperApps#ADD_NEW_VERSION_BUTTON" />
-					<condition function="IsElementPresent" locator1="MPDeveloperApps#SUMMARY_STATUS" value1="Approved" />
-					<equals arg1="${update}" arg2="true" />
-				</and>
-				<then>
-					<execute macro="Account#editAppWithNewVersion">
-						<var name="appFileList" value="${appFileList}" />
-						<var name="portalVersionName" value="${portalVersionName}" />
-						<var name="versionNumber" value="${versionNumber}" />
-						<var name="whatsNewDescription" value="Delete when this isn't required anymore" />
-					</execute>
-
-					<execute macro="AccountNavigator#gotoDevelopmentAppsAppTitleViaAccount">
-						<var name="appTitle" value="${appTitle}" />
-						<var name="companyName" value="${companyName}" />
-					</execute>
-
-					<execute macro="AccountAppAdd#clickSubmit" />
-
-					<if>
-						<equals arg1="${doApprove}" arg2="true" />
-						<then>
-							<execute macro="MPUser#logoutAndLogin">
-								<var method="TestPropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-								<var method="TestPropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-							</execute>
-
-							<execute macro="MarketplaceAdmin#setupAppApprove">
-								<var name="appTitle" value="${appTitle}" />
-							</execute>
-						</then>
-					</if>
-				</then>
-			</elseif>
 		</if>
 	</command>
 
