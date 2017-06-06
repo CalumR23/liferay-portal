@@ -22,18 +22,70 @@
 		</if>
 	</command>
 
+	<command name="filterExternalArticle">
+		<execute macro="KBSearch#checkFilter">
+			<var name="filter" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBSearch#expandFilterGroup">
+			<var name="group" value="Permission" />
+		</execute>
+
+		<execute macro="KBSearch#checkPermissionFilter">
+			<var name="filter" value="External" />
+		</execute>
+	</command>
+
+	<command name="getFirstArticleTitle" returns="title">
+		<var locator="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" name="title" />
+
+		<return name="title" value="${title}" />
+	</command>
+
+	<command name="searchByKeyword">
+		<execute function="Type" locator1="KBSearch#SEARCH_KEYWORD_INPUT" value1="${keyword}" />
+		<execute function="KeyPress" locator1="KBSearch#SEARCH_KEYWORD_INPUT" value1="\RETURN"  />
+	</command>
+
 	<command name="uncheckFilter">
 		<var name="key_filter" value="${filter}" />
 
 		<execute function="Uncheck" locator1="KBSearch#FILTER_CHECKBOX" />
 	</command>
 
+	<command name="viewFirstSearchResultTitle">
+		<execute function="AssertTextEquals" locator1="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" value1="${title}" />
+	</command>
+
 	<command name="viewSearchResultKBArticle">
-		<var locator="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" name="docTitle" />
+		<execute macro="KBSearch#getFirstArticleTitle">
+			<return from="title" name="title" />
+		</execute>
 
 		<execute function="Click" locator1="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" />
 
-		<execute function="AssertTextEquals" locator1="KBArticle#DOCUMENT_TITLE" value1="${docTitle}" />
+		<execute function="AssertTextEquals" locator1="KBArticle#DOCUMENT_TITLE" value1="${title}" />
+
+		<if>
+			<isset var="permission" />
+			<then>
+				<if>
+					<equals arg1="${permission}" arg2="Internal" />
+					<then>
+						<execute function="AssertElementPresent" locator1="KBArticle#ARTICLE_SIDE_BAR_PERMISSIONS_INTERNAL" />
+					</then>
+					<elseif>
+						<equals arg1="${permission}" arg2="External" />
+						<then>
+							<execute function="AssertElementPresent" locator1="KBArticle#ARTICLE_SIDE_BAR_PERMISSIONS_EXTERNAL" />
+						</then>
+					</elseif>
+					<else>
+						<echo message="Wrong permission type" />
+					</else>
+				</if>
+			</then>
+		</if>
 	</command>
 
 	<command name="viewSearchResultNotEmpty">
