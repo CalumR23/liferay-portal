@@ -87,6 +87,25 @@
 		<execute function="AssertElementNotPresent" locator1="KBSearch#FILTER_LABEL" />
 	</command>
 
+	<command name="viewFirstPageSearchResultCategory">
+		<var name="key_n" value="1" />
+
+		<while max-iterations="30">
+			<condition function="IsElementPresent" locator1="KBSearch#NTH_SEARCH_RESULT_ARTICLE_CATEGORY" />
+			<then>
+				<echo message="${key_n}" />
+				<execute function="AssertTextEquals#assertPartialText" locator1="KBSearch#NTH_SEARCH_RESULT_ARTICLE_CATEGORY" value1="${category}" />
+
+				<var method="MathUtil#sum('${key_n}','1')" name="key_n" />
+			</then>
+		</while>
+	</command>
+
+	<command name="viewFirstSearchResultCategory">
+		<execute function="AssertTextEquals#assertPartialText" locator1="KBSearch#SEARCH_RESULT_ARTICLE_CATEGORY" value1="${category}" />
+		<execute function="AssertTextNotEquals" locator1="KBSearch#SEARCH_RESULT_ARTICLE_CATEGORY" value1="Web Content" />
+	</command>
+
 	<command name="viewFirstSearchResultTitle">
 		<execute function="AssertTextEquals" locator1="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" value1="${title}" />
 	</command>
@@ -96,6 +115,10 @@
 	</command>
 
 	<command name="viewSearchResultKBArticle">
+		<execute macro="KBSearch#viewFirstSearchResultCategory">
+			<var name="category" value="Knowledge Base" />
+		</execute>
+
 		<execute macro="KBSearch#getFirstArticleTitle">
 			<return from="title" name="title" />
 		</execute>
@@ -131,11 +154,17 @@
 	</command>
 
 	<command name="viewSearchResultOfficialDocumentation">
-		<var locator="KBSearch#SEARCH_RESULT_OFFICIAL_DOCUMENTATION" name="docTitle" />
+		<execute macro="KBSearch#viewFirstSearchResultCategory">
+			<var name="category" value="Official Documentation" />
+		</execute>
 
-		<execute function="Click" locator1="KBSearch#SEARCH_RESULT_OFFICIAL_DOCUMENTATION" />
+		<execute macro="KBSearch#getFirstArticleTitle">
+			<return from="title" name="title" />
+		</execute>
 
-		<execute function="AssertTextEquals" locator1="KBOfficialDocument#DOCUMENT_TITLE" value1="${docTitle}" />
+		<execute function="Click" locator1="KBSearch#SEARCH_RESULT_ARTICLE_TITLE" />
+
+		<execute function="AssertTextEquals" locator1="KBOfficialDocument#DOCUMENT_TITLE" value1="${title}" />
 	</command>
 
 	<command name="viewSuggestAnEditLinkNotPresent">
