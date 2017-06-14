@@ -7,6 +7,21 @@
 	<var method="TestPropsUtil#get('kb.email.password.1')" name="liferayPassword" />
 
 	<tear-down>
+		<execute class="com.liferay.poshi.runner.PoshiRunnerContext" method="getTestCaseCommandName">
+			<return name="testCaseCommandName" />
+		</execute>
+
+		<var method="StringUtil#extractLast('${testCaseCommandName}', '#')" name="testCaseName" />
+
+		<if>
+			<equals arg1="${testCaseName}" arg2="SearchInJapaneseLocale" />
+			<then>
+				<execute macro="KBUser#setLocale">
+					<var name="language" value="English" />
+				</execute>
+			</then>
+		</if>
+
 		<execute macro="KBUser#logout" />
 	</tear-down>
 
@@ -93,6 +108,45 @@
 
 		<execute macro="KBSearch#viewFilterNotPresent">
 			<var name="key_filter" value="${vocabulary}" />
+		</execute>
+	</command>
+
+	<command name="SearchInJapaneseLocale" priority="5">
+		<execute macro="KBUser#login">
+			<var name="userEmailAddress" value="${liferayEmailAddress}" />
+			<var name="userPassword" value="${liferayPassword}" />
+		</execute>
+
+		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+
+		<execute macro="KBSearch#checkFilter">
+			<var name="filter" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBSearch#expandFilterGroup">
+			<var name="group" value="Language" />
+		</execute>
+
+		<execute macro="KBSearch#checkLanguageFilter">
+			<var name="filter" value="日本語" />
+		</execute>
+
+		<execute macro="KBSearch#getSearchResultCount">
+			<return from="count" name="count" />
+		</execute>
+
+		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+
+		<execute macro="KBSearch#checkFilter">
+			<var name="filter" value="Knowledge Base" />
+		</execute>
+
+		<execute macro="KBUser#setLocale">
+			<var name="language" value="日本語" />
+		</execute>
+
+		<execute macro="KBSearch#viewFirstNResultsJapanese">
+			<var name="count" value="${count}" />
 		</execute>
 	</command>
 

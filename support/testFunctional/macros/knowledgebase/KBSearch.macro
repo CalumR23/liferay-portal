@@ -5,6 +5,12 @@
 		<execute function="Check" locator1="KBSearch#FILTER_CHECKBOX" />
 	</command>
 
+	<command name="checkLanguageFilter">
+		<var name="key_filter" value="${filter}" />
+
+		<execute function="Check" locator1="KBSearch#LANGUAGE_FILTER_CHECKBOX" />
+	</command>
+
 	<command name="checkPermissionFilter">
 		<var name="key_filter" value="${filter}" />
 
@@ -64,6 +70,18 @@
 		<return name="title" value="${title}" />
 	</command>
 
+	<command name="getSearchResultCount" returns="count">
+		<var locator="KBSearch#SEARCH_RESULT_DISPLAY" name="count" />
+
+		<var method="StringUtil#extractLast('${count}','-')" name="count" />
+
+		<var method="StringUtil#extractFirst('${count}','of')" name="count" />
+
+		<var method="StringUtil#trim('${count}')" name="count" />
+
+		<return name="count" value="${count}" />
+	</command>
+
 	<command name="searchByKeyword">
 		<execute function="Type" locator1="KBSearch#SEARCH_KEYWORD_INPUT" value1="${keyword}" />
 		<execute function="KeyPress" locator1="KBSearch#SEARCH_KEYWORD_INPUT" value1="\RETURN"  />
@@ -73,6 +91,12 @@
 		<var name="key_filter" value="${filter}" />
 
 		<execute function="Uncheck" locator1="KBSearch#FILTER_CHECKBOX" />
+	</command>
+
+	<command name="uncheckLanguageFilter">
+		<var name="key_filter" value="${filter}" />
+
+		<execute function="Uncheck" locator1="KBSearch#LANGUAGE_FILTER_CHECKBOX" />
 	</command>
 
 	<command name="uncheckPermissionFilter">
@@ -100,13 +124,29 @@
 		<execute function="AssertElementNotPresent" locator1="KBSearch#FILTER_LABEL" />
 	</command>
 
+	<command name="viewFirstNResultsJapanese">
+		<var name="key_n" value="1" />
+
+		<var method="MathUtil#sum('${count}','1')" name="count" />
+
+		<while max-iterations="20">
+			<not>
+				<equals arg1="${key_n}" arg2="${count}" />
+			</not>
+			<then>
+				<execute function="AssertElementPresent" locator1="KBSearch#NTH_SEARCH_RESULT_JAPANESE" />
+
+				<var method="MathUtil#sum('${key_n}','1')" name="key_n" />
+			</then>
+		</while>
+	</command>
+
 	<command name="viewFirstPageSearchResultCategory">
 		<var name="key_n" value="1" />
 
 		<while max-iterations="30">
 			<condition function="IsElementPresent" locator1="KBSearch#NTH_SEARCH_RESULT_ARTICLE_CATEGORY" />
 			<then>
-				<echo message="${key_n}" />
 				<execute function="AssertTextEquals#assertPartialText" locator1="KBSearch#NTH_SEARCH_RESULT_ARTICLE_CATEGORY" value1="${category}" />
 
 				<var method="MathUtil#sum('${key_n}','1')" name="key_n" />
