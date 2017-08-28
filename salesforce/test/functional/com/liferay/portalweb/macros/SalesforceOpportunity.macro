@@ -16,18 +16,6 @@
 		</execute>
 	</command>
 
-	<command name="addEndUserAmount">
-		<execute function="DoubleClick" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_END_USER_AMOUNT" />
-
-		<execute function="Type" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_DETAILS_END_USER_AMOUNT" value1="${salesforceOpportunityEndUserAmount}" />
-
-		<execute macro="SalesforceButton#save" />
-
-		<execute function="Pause" locator1="3000" />
-
-		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_END_USER_AMOUNT" value1="${salesforceOpportunityEndUserAmount}" />
-	</command>
-
 	<command name="addOrderForm">
 		<execute function="Click" locator1="SalesforceOpportunity#ADD_ORDER_FORM_BUTTON" />
 
@@ -139,12 +127,6 @@
 		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_FIRST_QUOTE_NUMBER" />
 	</command>
 
-	<command name="clickOpportunityProduct">
-		<var name="key_opportunityProductKeyword" value="${salesforceOpportunityProductKeyword}" />
-
-		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_PRODUCT_NAME" />
-	</command>
-
 	<command name="clickOrderForm">
 		<var name="key_orderFormKeyword" value="${salesforceOrderFormKeyword}" />
 
@@ -155,6 +137,18 @@
 		<var name="key_partnerOpportunityKeyword" value="${salesforcePartnerOpportunityKeyword}" />
 
 		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_PARTNER_OPPORTUNITY_ID" />
+	</command>
+
+	<command name="clickProduct">
+		<var name="key_productKeyword" value="${salesforceProductKeyword}" />
+
+		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_PRODUCT_NAME" />
+	</command>
+
+	<command name="clickProductLineItem">
+		<var name="key_productKeyword" value="${salesforceProductKeyword}" />
+
+		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_PRODUCT_NAME" />
 	</command>
 
 	<command name="createPartnerOpportunity">
@@ -205,6 +199,16 @@
 		<execute macro="SalesforceButton#delete" />
 	</command>
 
+	<command name="deleteProductLineItem">
+		<var name="key_productKeyword" value="${salesforceProductKeyword}" />
+
+		<execute function="Click" locator1="SalesforceOpportunity#OPPORTUNITY_PRODUCT_NAME" />
+
+		<execute macro="SalesforceButton#delete" />
+
+		<execute function="AssertElementNotPresent" locator1="SalesforceOpportunity#OPPORTUNITY_PRODUCT_NAME" />
+	</command>
+
 	<command name="editItem">
 		<var name="key_itemLabel" value="${salesforceOpportunityItemLabel}" />
 
@@ -226,6 +230,29 @@
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_ITEM" value1="${salesforceOpportunityItemValue}" />
 		<execute function="AssertNotVisible" locator1="SalesforceOpportunity#OPPORTUNITY_SAVE_ERROR" />
+	</command>
+
+	<command name="editItemWithError">
+		<var name="key_itemLabel" value="${salesforceOpportunityItemLabel}" />
+
+		<execute function="DoubleClick" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_ITEM" />
+
+		<if>
+			<condition function="IsElementPresent" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_DETAILS_SELECT" />
+			<then>
+				<execute function="Select" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_DETAILS_SELECT" value1="${salesforceOpportunityItemValue}" />
+			</then>
+			<else>
+				<execute function="Type" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_DETAILS_ITEM" value1="${salesforceOpportunityItemValue}" />
+			</else>
+		</if>
+
+		<execute macro="SalesforceButton#save" />
+
+		<execute function="Pause" locator1="3000" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_ITEM" value1="${salesforceOpportunityItemValue}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_SAVE_ERROR" value1="${salesforceOpportunitySaveError}" />
 	</command>
 
 	<command name="editStage">
@@ -286,6 +313,64 @@
 		<execute function="AssertNotVisible" locator1="SalesforceOpportunity#OPPORTUNITY_SAVE_ERROR" />
 	</command>
 
+	<command name="editStageWithError">
+		<execute function="DoubleClick" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_STAGE" />
+
+		<execute function="Select" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_STAGE" value1="${salesforceOpportunityStage}" />
+
+		<if>
+			<equals arg1="${salesforceOpportunityStage}" arg2="Closed Won" />
+			<then>
+				<execute function="AssertTextEquals" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_PROBABILITY" value1="100" />
+			</then>
+		</if>
+
+		<if>
+			<and>
+				<isset var="salesforceOpportunityTermType" />
+				<not>
+					<contains string="${salesforceOpportunityTermType}" substring="{salesforceOpportunityTermType}" />
+				</not>
+			</and>
+			<then>
+				<execute function="Select" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_TERM_TYPE" value1="${salesforceOpportunityTermType}" />
+			</then>
+		</if>
+
+		<if>
+			<condition function="IsElementPresent" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_PRIMARY_REASON_LOST" />
+			<then>
+				<execute function="Select" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_PRIMARY_REASON_LOST" value1="${salesforceOpportunityPrimaryReasonLost}" />
+				<execute function="Select" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_CLOSED_LOST_VENDOR_SELECTED" value1="${salesforceOpportunityClosedLostVendorSelected}" />
+			</then>
+		</if>
+
+		<execute macro="SalesforceButton#modalOK" />
+
+		<if>
+			<and>
+				<isset var="salesforceOpportunityPrimaryReasonLostComment" />
+				<not>
+					<contains string="${salesforceOpportunityPrimaryReasonLostComment}" substring="{salesforceOpportunityPrimaryReasonLostComment}" />
+				</not>
+			</and>
+			<then>
+				<execute function="DoubleClick" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_PRIMARY_REASON_LOST_COMMENTS" />
+
+				<execute function="Type" locator1="SalesforceOpportunity#EDIT_OPPORTUNITY_PRIMARY_REASON_LOST_COMMENTS" value1="${salesforceOpportunityPrimaryReasonLostComment}" />
+
+				<execute macro="SalesforceButton#modalOK" />
+			</then>
+		</if>
+
+		<execute macro="SalesforceButton#save" />
+
+		<execute function="Pause" locator1="3000" />
+
+		<execute function="AssertTextEquals" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_STAGE" value1="${salesforceOpportunityStage}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_SAVE_ERROR" value1="${salesforceOpportunitySaveError}" />
+	</command>
+
 	<command name="fillOpportunity">
 		<execute function="Type" locator1="SalesforceOpportunityCreate#OPPORTUNITY_NAME" value1="${salesforceOpportunityName}" />
 		<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_TYPE" value1="${salesforceOpportunityType}" />
@@ -319,6 +404,8 @@
 			</and>
 			<then>
 				<for list="${salesforceOpportunityPartnerTerritoryList}" param="salesforceOpportunityPartnerTerritory">
+					<var method="StringUtil#replace('${salesforceOpportunityPartnerTerritory}', ';', ',')" name="salesforceOpportunityPartnerTerritory" />
+
 					<execute function="Select" locator1="SalesforceOpportunityCreate#OPPORTUNITY_PARTNER_TERRITORY" value1="${salesforceOpportunityPartnerTerritory}" />
 
 					<execute macro="SalesforceButton#addFromList" />
@@ -353,6 +440,12 @@
 		</if>
 	</command>
 
+	<command name="viewItem">
+		<var name="key_itemLabel" value="${salesforceOpportunityItemLabel}" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_ITEM" value1="${salesforceOpportunityItemValue}" />
+	</command>
+
 	<command name="viewNoOrderForms">
 		<execute function="AssertElementNotPresent" locator1="SalesforceOpportunity#OPPORTUNITY_FIRST_ORDER_FORM_ID" />
 	</command>
@@ -384,7 +477,9 @@
 			</then>
 		</if>
 
+		<var method="StringUtil#replace('${salesforceOpportunityPartnerTerritoryList}', ';', '*')" name="salesforceOpportunityPartnerTerritoryList" />
 		<var method="StringUtil#replace('${salesforceOpportunityPartnerTerritoryList}', ',', '; ')" name="salesforceOpportunityPartnerTerritoryList" />
+		<var method="StringUtil#replace('${salesforceOpportunityPartnerTerritoryList}', '*', ',')" name="salesforceOpportunityPartnerTerritoryList" />
 
 		<execute function="AssertTextEquals" locator1="SalesforceOpportunity#OPPORTUNITY_DETAILS_PARTNER_TERRITORY" value1="${salesforceOpportunityPartnerTerritoryList}" />
 	</command>
