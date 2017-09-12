@@ -25,6 +25,8 @@ buildscript {
 
 apply plugin: "com.liferay.source.formatter"
 
+apply from: "properties.gradle"
+
 allprojects {
 	apply plugin: "org.ysb33r.ivypot"
 
@@ -77,31 +79,8 @@ subprojects {
 
 	poshiRunner {
 		baseDir = "test/functional"
-
-		String[] testPropertiesFileNames = [
-			"test.properties",
-			"test.${System.env.HOSTNAME}.properties",
-			"test.${System.env.HOST}.properties",
-			"test.${System.env.COMPUTERNAME}.properties",
-			"test.${System.env.USER}.properties"
-		]
-
-		for (String testPropertiesFileName in testPropertiesFileNames) {
-			File testPropertiesFile = file("${rootDir}/${testPropertiesFileName}")
-
-			if (testPropertiesFile.exists()) {
-				poshiProperties << GUtil.loadProperties(testPropertiesFile)
-			}
-		}
-
-		for (String testPropertiesFileName in testPropertiesFileNames) {
-			File testPropertiesFile = file("${testPropertiesFileName}")
-
-			if (testPropertiesFile.exists()) {
-				poshiProperties << GUtil.loadProperties(testPropertiesFile)
-			}
-		}
-
+		poshiProperties << getTestProperties(project)
+		poshiProperties.put("browser.type", browser.replaceAll("\\.", ""))
 		poshiPropertiesFile = rootProject.file("test.properties")
 		openCVVersion = "2.4.10-0.10"
 		version = "1.0.56"
