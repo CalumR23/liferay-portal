@@ -67,9 +67,15 @@ if (browser == "internet.explorer" && !operatingSystem.contains("win")) {
 	throw new IllegalStateException("Internet Explorer is not supported on your operating system")
 }
 
+task cleanWebDriver(type: Delete)
+task downloadChromeDriver(type: Download)
+task downloadInternetExplorerDriver(type: Download)
+task unzipChromeDriver(type: Copy)
+task unzipInternetExplorerDriver(type: Copy)
+
 File webDriverRootDir = file("${buildDir}/webdriver")
 
-task downloadInternetExplorerDriver(type: Download) {
+downloadInternetExplorerDriver {
 	String ieDriverServerOs
 
 	if (operatingSystem == "win64") {
@@ -84,23 +90,25 @@ task downloadInternetExplorerDriver(type: Download) {
 	overwrite false
 }
 
-task unzipInternetExplorerDriver(type: Copy, dependsOn: downloadInternetExplorerDriver) {
+unzipInternetExplorerDriver {
+	dependsOn downloadInternetExplorerDriver
 	from zipTree(downloadInternetExplorerDriver.dest)
 	into file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}")
 }
 
-task downloadChromeDriver(type: Download) {
+downloadChromeDriver {
 	src "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
 	dest file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}/chromedriver.zip")
 	overwrite false
 }
 
-task unzipChromeDriver(type: Copy, dependsOn: downloadChromeDriver) {
+unzipChromeDriver {
+	dependsOn downloadChromeDriver
 	from zipTree(downloadChromeDriver.dest)
 	into file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}")
 }
 
-task cleanWebDriver(type: Delete) {
+cleanWebDriver {
 	delete webDriverRootDir
 }
 
