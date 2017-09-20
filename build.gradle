@@ -70,16 +70,6 @@ if (browser == "internet.explorer" && !operatingSystem.contains("win")) {
 File webDriverRootDir = file("${buildDir}/webdriver")
 
 task downloadInternetExplorerDriver(type: Download) {
-	def parseMajorVersion = { version ->
-		def matcher = version =~ /^([0-9]+)\.([0-9]+).*/
-
-		if (!matcher.matches()) {
-			throw new IllegalArgumentException("${version} is not a valid version string")
-		}
-
-		return "${matcher.group(1)}.${matcher.group(2)}"
-	}
-
 	String ieDriverServerOs
 
 	if (operatingSystem == "win64") {
@@ -89,7 +79,7 @@ task downloadInternetExplorerDriver(type: Download) {
 		ieDriverServerOs = "Win32"
 	}
 
-	src "http://selenium-release.storage.googleapis.com/${parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
+	src "http://selenium-release.storage.googleapis.com/${_parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
 	dest file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip")
 	overwrite false
 }
@@ -176,52 +166,8 @@ subprojects {
 	}
 
 	poshiRunner {
-		def getCustomProperties = { String prefix, Project project ->
-			Properties properties = new Properties()
-
-			List<String> testPropertiesFileNames = [ "${prefix}.properties" ].asList()
-
-			if (System.env.HOSTNAME) {
-				testPropertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
-			}
-
-			if (System.env.HOST) {
-				testPropertiesFileNames << "${prefix}.${System.env.HOST}.properties"
-			}
-
-			if (System.env.COMPUTERNAME) {
-				testPropertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
-			}
-
-			if (System.env.USER) {
-				testPropertiesFileNames << "${prefix}.${System.env.USER}.properties"
-			}
-
-			for (String testPropertiesFileName in testPropertiesFileNames) {
-				File testPropertiesFile = file("${project.projectDir}/${testPropertiesFileName}")
-
-				if (testPropertiesFile.exists()) {
-					properties << GUtil.loadProperties(testPropertiesFile)
-				}
-			}
-
-			return properties
-		}
-
-		def getTestProperties = { Project project ->
-			Properties properties = new Properties()
-
-			properties << getCustomProperties("test", rootProject)
-
-			if (project != rootProject) {
-				properties << getCustomProperties("test", project)
-			}
-
-			return properties
-		}
-
 		baseDir = "test/functional"
-		poshiProperties << getTestProperties(project)
+		poshiProperties << _getTestProperties(project)
 		poshiProperties.put("browser.type", browser.replaceAll("\\.", ""))
 		poshiPropertiesFile = rootProject.file("test.properties")
 		openCVVersion = "2.4.10-0.10"
@@ -274,4 +220,58 @@ repositories {
 	maven {
 		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 	}
+}
+
+private Properties _getCustomProperties(String prefix, Project project) {
+	Properties properties = new Properties()
+
+	List<String> testPropertiesFileNames = ["${prefix}.properties"]
+
+	if (System.env.HOSTNAME) {
+		testPropertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
+	}
+
+	if (System.env.HOST) {
+		testPropertiesFileNames << "${prefix}.${System.env.HOST}.properties"
+	}
+
+	if (System.env.COMPUTERNAME) {
+		testPropertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
+	}
+
+	if (System.env.USER) {
+		testPropertiesFileNames << "${prefix}.${System.env.USER}.properties"
+	}
+
+	for (String testPropertiesFileName in testPropertiesFileNames) {
+		File testPropertiesFile = new File(project.projectDir, testPropertiesFileName)
+
+		if (testPropertiesFile.exists()) {
+			properties << GUtil.loadProperties(testPropertiesFile)
+		}
+	}
+
+	properties
+}
+
+private Properties _getTestProperties(Project project) {
+	Properties properties = new Properties()
+
+	properties << getCustomProperties("test", rootProject)
+
+	if (project != rootProject) {
+		properties << getCustomProperties("test", project)
+	}
+
+	properties
+}
+
+private String _parseMajorVersion(String version) {
+	Matcher matcher = version =~ /^([0-9]+)\.([0-9]+).*/
+
+	if (!matcher.matches()) {
+		throw new IllegalArgumentException("${version} is not a valid version string")
+	}
+
+	"${matcher.group(1)}.${matcher.group(2)}"
 }
