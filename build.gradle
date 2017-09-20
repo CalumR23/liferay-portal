@@ -33,84 +33,45 @@ buildscript {
 apply plugin: "com.liferay.source.formatter"
 apply plugin: "net.saliman.properties"
 
-ext {
-	if (!project.hasProperty("operatingSystem")) {
-		StringBuilder sb = new StringBuilder()
-
-		OperatingSystem operatingSystem = OperatingSystem.current()
-
-		if (operatingSystem.linux) {
-			sb.append "linux"
-		}
-		else if (operatingSystem.macOsX) {
-			sb.append "mac"
-		}
-		else if (operatingSystem.windows) {
-			sb.append "windows"
-		}
-		else {
-			throw new IllegalStateException("Unsupported operating system")
-		}
-
-		if (operatingSystem.toString().contains("64")) {
-			sb.append "64"
-		}
-		else {
-			sb.append "32"
-		}
-
-		operatingSystem = sb.toString()
-	}
-}
-
-if (browser == "internet.explorer" && !operatingSystem.contains("win")) {
-	throw new IllegalStateException("Internet Explorer is not supported on your operating system")
-}
-
 task cleanWebDriver(type: Delete)
 task downloadChromeDriver(type: Download)
 task downloadInternetExplorerDriver(type: Download)
 task unzipChromeDriver(type: Copy)
 task unzipInternetExplorerDriver(type: Copy)
 
-File webDriverRootDir = file("${buildDir}/webdriver")
+if (!hasProperty("operatingSystem")) {
+	StringBuilder sb = new StringBuilder()
 
-downloadInternetExplorerDriver {
-	String ieDriverServerOs
+	OperatingSystem operatingSystem = OperatingSystem.current()
 
-	if (operatingSystem == "win64") {
-		ieDriverServerOs = "x64"
+	if (operatingSystem.linux) {
+		sb.append "linux"
+	}
+	else if (operatingSystem.macOsX) {
+		sb.append "mac"
+	}
+	else if (operatingSystem.windows) {
+		sb.append "windows"
 	}
 	else {
-		ieDriverServerOs = "Win32"
+		throw new IllegalStateException("Unsupported operating system")
 	}
 
-	src "http://selenium-release.storage.googleapis.com/${_parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
-	dest file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip")
-	overwrite false
+	if (operatingSystem.toString().contains("64")) {
+		sb.append "64"
+	}
+	else {
+		sb.append "32"
+	}
+
+	ext.operatingSystem = sb.toString()
 }
 
-unzipInternetExplorerDriver {
-	dependsOn downloadInternetExplorerDriver
-	from zipTree(downloadInternetExplorerDriver.dest)
-	into file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}")
+if (browser == "internet.explorer" && !operatingSystem.contains("win")) {
+	throw new IllegalStateException("Internet Explorer is not supported on your operating system")
 }
 
-downloadChromeDriver {
-	src "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
-	dest file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}/chromedriver.zip")
-	overwrite false
-}
-
-unzipChromeDriver {
-	dependsOn downloadChromeDriver
-	from zipTree(downloadChromeDriver.dest)
-	into file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}")
-}
-
-cleanWebDriver {
-	delete webDriverRootDir
-}
+File webDriverRootDir = new File(buildDir, "webdriver")
 
 allprojects {
 	apply plugin: "net.saliman.properties"
@@ -141,15 +102,33 @@ allprojects {
 	}
 }
 
+cleanWebDriver {
+	delete webDriverRootDir
+}
+
+downloadChromeDriver {
+	dest new File(webDriverRootDir, "chromedriver/${chromeDriverVersion}/${operatingSystem}/chromedriver.zip")
+	overwrite false
+	src "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
+}
+
+downloadInternetExplorerDriver {
+	String ieDriverServerOs
+
+	if (operatingSystem == "win64") {
+		ieDriverServerOs = "x64"
+	}
+	else {
+		ieDriverServerOs = "Win32"
+	}
+
+	dest new File(webDriverRootDir, "iedriver/${seleniumVersion}/${operatingSystem}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip")
+	overwrite false
+	src "http://selenium-release.storage.googleapis.com/${_parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
+}
+
 subprojects {
 	apply plugin: "com.liferay.poshi.runner"
-
-	if (browser == "internet.explorer") {
-		runPoshi.dependsOn unzipInternetExplorerDriver
-	}
-	else if (browser == "chrome") {
-		runPoshi.dependsOn unzipChromeDriver
-	}
 
 	task syncSikuliComplete(type: Copy)
 
@@ -173,24 +152,6 @@ subprojects {
 		sikuliComplete
 	}
 
-	poshiRunner {
-		baseDir = "test/functional"
-		poshiProperties << _getTestProperties(project)
-		poshiProperties.put("browser.type", browser.replaceAll("\\.", ""))
-		poshiPropertiesFile = rootProject.file("test.properties")
-		openCVVersion = "2.4.10-0.10"
-		version = "1.0.56"
-
-		if (browser == "chrome") {
-			poshiProperties.put("selenium.executable.dir.name", "${unzipChromeDriver.destinationDir}${File.separator}")
-			poshiProperties.put("selenium.chrome.driver.executable", "chromedriver")
-		}
-		else if (browser == "internet.explorer") {
-			poshiProperties.put("selenium.executable.dir.name", "${unzipInternetExplorerDriver.destinationDir}${File.separator}")
-			poshiProperties.put("selenium.ie.driver.executable", "IEDriverServer.exe")
-		}
-	}
-
 	dependencies {
 		["x86", "x86_64"].each {
 			sikuliComplete classifier: "linux-${it}", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
@@ -198,6 +159,26 @@ subprojects {
 		}
 
 		sikuliComplete classifier: "macosx-x86_64", group: "org.bytedeco.javacpp-presets", name: "opencv", version: poshiRunner.openCVVersion
+	}
+
+	poshiRunner {
+		baseDir = "test/functional"
+		openCVVersion = "2.4.10-0.10"
+
+		poshiProperties << _getTestProperties(project)
+		poshiProperties.put "browser.type", browser.replaceAll("\\.", "")
+
+		if (browser == "chrome") {
+			poshiProperties.put "selenium.executable.dir.name", "${unzipChromeDriver.destinationDir}${File.separator}"
+			poshiProperties.put "selenium.chrome.driver.executable", "chromedriver"
+		}
+		else if (browser == "internet.explorer") {
+			poshiProperties.put "selenium.executable.dir.name", "${unzipInternetExplorerDriver.destinationDir}${File.separator}"
+			poshiProperties.put "selenium.ie.driver.executable", "IEDriverServer.exe"
+		}
+
+		poshiPropertiesFile = rootProject.file("test.properties")
+		version = "1.0.56"
 	}
 
 	repositories {
@@ -211,6 +192,15 @@ subprojects {
 			maven {
 				url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 			}
+		}
+	}
+
+	runPoshi {
+		if (browser == "chrome") {
+			dependsOn unzipChromeDriver
+		}
+		else if (browser == "internet.explorer") {
+			dependsOn unzipInternetExplorerDriver
 		}
 	}
 
@@ -228,6 +218,18 @@ repositories {
 	maven {
 		url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 	}
+}
+
+unzipChromeDriver {
+	dependsOn downloadChromeDriver
+	from zipTree(downloadChromeDriver.dest)
+	into new File(webDriverRootDir, "chromedriver/${chromeDriverVersion}/${operatingSystem}")
+}
+
+unzipInternetExplorerDriver {
+	dependsOn downloadInternetExplorerDriver
+	from zipTree(downloadInternetExplorerDriver.dest)
+	into new File(webDriverRootDir, "iedriver/${seleniumVersion}/${operatingSystem}")
 }
 
 private Properties _getCustomProperties(String prefix, Project project) {
