@@ -35,50 +35,6 @@ plugins {
 
 apply plugin: "com.liferay.source.formatter"
 
-def getCustomProperties = { String prefix, Project project ->
-	Properties properties = new Properties()
-
-	List<String> testPropertiesFileNames = [ "${prefix}.properties" ].asList()
-
-	if (System.env.HOSTNAME) {
-		testPropertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
-	}
-
-	if (System.env.HOST) {
-		testPropertiesFileNames << "${prefix}.${System.env.HOST}.properties"
-	}
-
-	if (System.env.COMPUTERNAME) {
-		testPropertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
-	}
-
-	if (System.env.USER) {
-		testPropertiesFileNames << "${prefix}.${System.env.USER}.properties"
-	}
-
-	for (String testPropertiesFileName in testPropertiesFileNames) {
-		File testPropertiesFile = file("${project.projectDir}/${testPropertiesFileName}")
-
-		if (testPropertiesFile.exists()) {
-			properties << GUtil.loadProperties(testPropertiesFile)
-		}
-	}
-
-	return properties
-}
-
-def getTestProperties = { Project project ->
-	Properties properties = new Properties()
-
-	properties << getCustomProperties("test", rootProject)
-
-	if (project != rootProject) {
-		properties << getCustomProperties("test", project)
-	}
-
-	return properties
-}
-
 ext {
 	if (!project.hasProperty("operatingSystem")) {
 		StringBuilder sb = new StringBuilder()
@@ -105,50 +61,62 @@ ext {
 
 		operatingSystem = sb.toString()
 	}
+}
 
-	webDriverRootDir = file("${buildDir}/webdriver")
+if (browser == "internet.explorer" && operatingSystem.contains("win")) {
+	throw new IllegalStateException("Internet Explorer is not supported on your operating system")
+}
+
+File webDriverRootDir = file("${buildDir}/webdriver")
+
+task downloadInternetExplorerDriver(type: Download) {
+	def parseMajorVersion = { version ->
+		def matcher = version =~ /^([0-9]+)\.([0-9]+).*/
+
+		if (!matcher.matches()) {
+			throw new IllegalArgumentException("${version} is not a valid version string")
+		}
+
+		return "${matcher.group(1)}.${matcher.group(2)}"
+	}
+
+	String ieDriverServerOs
+
+	if (operatingSystem == "win64") {
+		ieDriverServerOs = "x64"
+	}
+	else {
+		ieDriverServerOs = "Win32"
+	}
+
+	src "http://selenium-release.storage.googleapis.com/${parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
+	dest file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}/IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip")
+	overwrite false
+}
+
+task unzipInternetExplorerDriver(type: Copy, dependsOn: downloadInternetExplorerDriver) {
+	from zipTree(downloadInternetExplorerDriver.dest)
+	into file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}")
+}
+
+task downloadChromeDriver(type: Download) {
+	src "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
+	dest file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}/chromedriver.zip")
+	overwrite false
+}
+
+task unzipChromeDriver(type: Copy, dependsOn: downloadChromeDriver) {
+	from zipTree(downloadChromeDriver.dest)
+	into file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}")
+}
+
+task cleanWebDriver(type: Delete) {
+	delete webDriverRootDir
 }
 
 allprojects {
 	apply plugin: "net.saliman.properties"
 	apply plugin: "org.ysb33r.ivypot"
-
-	ext {
-		def parseMajorVersion = { version ->
-			def matcher = version =~ /^([0-9]+)\.([0-9]+).*/
-
-			if (!matcher.matches()) {
-				throw new IllegalArgumentException("${version} is not a valid version string")
-			}
-
-			return "${matcher.group(1)}.${matcher.group(2)}"
-		}
-
-		if (browser == "chrome") {
-			webDriverFolder = file("${webDriverRootDir}/chromedriver/${chromeDriverVersion}/${operatingSystem}")
-			webDriverZip = "chromedriver.zip"
-			webDriverExecutable = "chromedriver"
-			webDriverURL = "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
-		}
-		else if (browser == "internet.explorer") {
-			String ieDriverServerOs
-
-			if (operatingSystem == "win32") {
-				ieDriverServerOs = "Win32"
-			}
-			else if (operatingSystem == "win64") {
-				ieDriverServerOs = "x64"
-			}
-			else {
-				throw new IllegalStateException("Internet Explorer is not supported on your operating system")
-			}
-
-			webDriverFolder = file("${webDriverRootDir}/iedriver/${seleniumVersion}/${operatingSystem}")
-			webDriverExecutable = "IEDriverServer.exe"
-			webDriverZip = "IEDriverServer_${ieDriverServerOs}_${seleniumVersion}.zip"
-			webDriverURL = "http://selenium-release.storage.googleapis.com/${parseMajorVersion(seleniumVersion)}/${webDriverZip}"
-		}
-	}
 
 	syncRemoteRepositories {
 		doFirst {
@@ -174,37 +142,25 @@ allprojects {
 	}
 }
 
-if (browser == "chrome" || browser == "internet.explorer") {
-	task downloadWebDriver(type: Download) {
-		src webDriverURL
-		dest "${webDriverFolder}/${webDriverZip}"
-		overwrite false
-	}
-
-	task unzipWebDriver(type: Copy, dependsOn: downloadWebDriver) {
-		from zipTree(file("${webDriverFolder}/${webDriverZip}"))
-		into file(webDriverFolder)
-	}
-}
-
-task cleanWebDriver(type: Delete) {
-	delete webDriverRootDir
-}
-
 subprojects {
 	apply plugin: "com.liferay.poshi.runner"
 
-	if (project.tasks.findByName("unzipWebDriver")) {
-		runPoshi.dependsOn unzipWebDriver
+	if (browser == "internet.explorer") {
+		runPoshi.dependsOn unzipInternetExplorerDriver
+	}
+	else if (browser == "chrome") {
+		runPoshi.dependsOn unzipChromeDriver
 	}
 
 	task syncSikuliComplete(type: Copy)
 
-	clean(dependsOn: cleanWebDriver) {
+	clean {
 		delete "test.case.method.names.properties"
 		delete "test.generated.properties"
 		delete "test-results"
 		delete "tests"
+
+		dependsOn cleanWebDriver
 	}
 
 	configurations {
@@ -219,6 +175,50 @@ subprojects {
 	}
 
 	poshiRunner {
+		def getCustomProperties = { String prefix, Project project ->
+			Properties properties = new Properties()
+
+			List<String> testPropertiesFileNames = [ "${prefix}.properties" ].asList()
+
+			if (System.env.HOSTNAME) {
+				testPropertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
+			}
+
+			if (System.env.HOST) {
+				testPropertiesFileNames << "${prefix}.${System.env.HOST}.properties"
+			}
+
+			if (System.env.COMPUTERNAME) {
+				testPropertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
+			}
+
+			if (System.env.USER) {
+				testPropertiesFileNames << "${prefix}.${System.env.USER}.properties"
+			}
+
+			for (String testPropertiesFileName in testPropertiesFileNames) {
+				File testPropertiesFile = file("${project.projectDir}/${testPropertiesFileName}")
+
+				if (testPropertiesFile.exists()) {
+					properties << GUtil.loadProperties(testPropertiesFile)
+				}
+			}
+
+			return properties
+		}
+
+		def getTestProperties = { Project project ->
+			Properties properties = new Properties()
+
+			properties << getCustomProperties("test", rootProject)
+
+			if (project != rootProject) {
+				properties << getCustomProperties("test", project)
+			}
+
+			return properties
+		}
+
 		baseDir = "test/functional"
 		poshiProperties << getTestProperties(project)
 		poshiProperties.put("browser.type", browser.replaceAll("\\.", ""))
@@ -226,15 +226,13 @@ subprojects {
 		openCVVersion = "2.4.10-0.10"
 		version = "1.0.56"
 
-		if (browser == "chrome" || browser == "internet.explorer") {
-			poshiProperties.put("selenium.executable.dir.name", "${webDriverFolder}${File.separator}")
-
-			if (browser == "chrome") {
-				poshiProperties.put("selenium.chrome.driver.executable", webDriverExecutable)
-			}
-			else if (browser == "internet.explorer") {
-				poshiProperties.put("selenium.ie.driver.executable", webDriverExecutable)
-			}
+		if (browser == "chrome") {
+			poshiProperties.put("selenium.executable.dir.name", "${unzipChromeDriver.destinationDir}${File.separator}")
+			poshiProperties.put("selenium.chrome.driver.executable", "chromedriver")
+		}
+		else if (browser == "internet.explorer") {
+			poshiProperties.put("selenium.executable.dir.name", "${unzipInternetExplorerDriver.destinationDir}${File.separator}")
+			poshiProperties.put("selenium.ie.driver.executable", "IEDriverServer.exe")
 		}
 	}
 
