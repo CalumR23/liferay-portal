@@ -6,20 +6,12 @@ import java.util.regex.Matcher
 
 buildscript {
 	repositories {
-		if (System.getenv("JENKINS_HOME")) {
-			ivy {
-				layout "gradle"
-				url ".ivy"
-			}
+		maven {
+			url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 		}
-		else {
-			maven {
-				url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
-			}
 
-			maven {
-				url "https://plugins.gradle.org/m2/"
-			}
+		maven {
+			url "https://plugins.gradle.org/m2/"
 		}
 	}
 
@@ -27,7 +19,6 @@ buildscript {
 		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.poshi.runner", version: "1.0.10"
 		classpath group: "de.undercouch", name: "gradle-download-task", version: "3.2.0"
 		classpath group: "net.saliman", name: "gradle-properties-plugin", version: "1.4.6"
-		classpath group: "org.ysb33r.gradle", name: "ivypot", version: "0.4"
 	}
 }
 
@@ -75,31 +66,6 @@ File webDriverRootDir = new File(buildDir, "webdriver")
 
 allprojects {
 	apply plugin: "net.saliman.properties"
-	apply plugin: "org.ysb33r.ivypot"
-
-	syncRemoteRepositories {
-		doFirst {
-			configurations*.resolve()
-		}
-
-		includeBuildScriptDependencies = true
-
-		outputs.upToDateWhen {
-			false
-		}
-
-		repoRoot = rootProject.file(".ivy")
-
-		repositories {
-			maven {
-				url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
-			}
-
-			maven {
-				url "https://plugins.gradle.org/m2/"
-			}
-		}
-	}
 }
 
 cleanWebDriver {
@@ -142,8 +108,6 @@ unzipInternetExplorerDriver {
 subprojects {
 	apply plugin: "com.liferay.poshi.runner"
 
-	task syncSikuliComplete(type: Copy)
-
 	clean {
 		delete "test.case.method.names.properties"
 		delete "test.generated.properties"
@@ -154,13 +118,6 @@ subprojects {
 	}
 
 	configurations {
-		poshiRunner {
-			resolutionStrategy {
-				force group: "com.google.guava", name: "guava", version: "16.0.1"
-				force group: "commons-codec", name: "commons-codec", version: "1.10"
-			}
-		}
-
 		sikuliComplete
 	}
 
@@ -194,16 +151,8 @@ subprojects {
 	}
 
 	repositories {
-		if (System.getenv("JENKINS_HOME")) {
-			ivy {
-				layout "gradle"
-				url rootProject.file(".ivy")
-			}
-		}
-		else {
-			maven {
-				url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
-			}
+		maven {
+			url "https://cdn.lfrs.sl/repository.liferay.com/nexus/content/groups/public"
 		}
 	}
 
@@ -214,15 +163,6 @@ subprojects {
 		else if (browser == "internet.explorer") {
 			dependsOn unzipInternetExplorerDriver
 		}
-	}
-
-	syncRemoteRepositories {
-		finalizedBy syncSikuliComplete
-	}
-
-	syncSikuliComplete {
-		from configurations.sikuliComplete
-		into rootProject.file(".ivy/org.bytedeco.javacpp-presets/opencv/${poshiRunner.openCVVersion}")
 	}
 }
 
