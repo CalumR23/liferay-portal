@@ -47,12 +47,36 @@
 		</execute>
 	</command>
 
+	<command name="startFixPackCopyHotfixJob">
+		<var method="TestPropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
+		<var method="TestPropsUtil#get('portal.url')" name="portalUrl" />
+
+		<var name="curlURL" value="${portalUrl}/view/All/job/fixpack-copy-hotfix/build" />
+		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken}" />
+
+		<execute macro="Jenkins#executeCurl">
+			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
+		</execute>
+	</command>
+
 	<command name="startTestFixPackBuilderInstallJob">
 		<var method="TestPropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
 		<var method="TestPropsUtil#get('portal.url')" name="portalUrl" />
 
 		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters" />
 		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d bundle=${bundle} -d fixPack=${fixPack} -d hotfix=${hotfix} -d patchingTool=${patchingTool}" />
+
+		<execute macro="Jenkins#executeCurl">
+			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
+		</execute>
+	</command>
+
+	<command name="startTestFixPackBuilderPatchDifferenceJob">
+		<var method="TestPropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
+		<var method="TestPropsUtil#get('portal.url')" name="portalUrl" />
+
+		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-patch-difference/buildWithParameters" />
+		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d alphaPath=${alphaPath} -d betaPath=${betaPath}" />
 
 		<execute macro="Jenkins#executeCurl">
 			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
@@ -85,5 +109,86 @@
 
 	<command name="viewNoConsoleText">
 		<execute function="AssertTextNotEquals#assertNotPartialText" locator1="Jenkins#CONSOLE_OUTPUT_TEXT" value1="${consoleOutputText}" />
+	</command>
+
+	<command name="viewPatchDifferenceConsoleText">
+		<var locator="Jenkins#CONSOLE_OUTPUT_TEXT" name="consoleOutputText" />
+
+		<var method="StringUtil#count('${consoleOutputText}', 'file added')" name="fileAddedCount" />
+
+		<if>
+			<not>
+				<equals arg1="${fileAddedCount}" arg2="0" />
+			</not>
+			<then>
+				<var method="StringUtil#count('${consoleOutputText}', 'file added binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes-\d+\.zip')" name="acceptableFileAddedCount" />
+
+				<if>
+					<not>
+						<equals arg1="${fileAddedCount}" arg2="${acceptableFileAddedCount}" />
+					</not>
+					<then>
+						<fail message="Unexpected files may have been added.  The test counted ${fileAddedCount} added files but ${acceptableFileAddedCount} acceptable added files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed." />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<var method="StringUtil#count('${consoleOutputText}', 'file removed')" name="fileRemovedCount" />
+
+		<if>
+			<not>
+				<equals arg1="${fileRemovedCount}" arg2="0" />
+			</not>
+			<then>
+				<var method="StringUtil#count('${consoleOutputText}', 'file removed binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes-\d+\.zip')" name="acceptableFileRemovedCount" />
+
+				<if>
+					<not>
+						<equals arg1="${fileRemovedCount}" arg2="${acceptableFileRemovedCount}" />
+					</not>
+					<then>
+						<fail message="Unexpected files may have been removed.  The test counted ${fileRemovedCount} removed files but ${acceptableFileRemovedCount} acceptable removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed." />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<var method="StringUtil#count('${consoleOutputText}', 'file modified')" name="fileModifiedCount" />
+
+		<if>
+			<not>
+				<equals arg1="${fileModifiedCount}" arg2="0" />
+			</not>
+			<then>
+				<var method="StringUtil#count('${consoleOutputText}', 'file modified binaries/GLOBAL_LIB_PATH/portal-kernel.jar/META-INF/MANIFEST.MF')" name="acceptableFileModifiedCount" />
+
+				<if>
+					<not>
+						<equals arg1="${fileModifiedCount}" arg2="${acceptableFileModifiedCount}" />
+					</not>
+					<then>
+						<fail message="Unexpected files may have been modified.  Please check the most recent fix pack comparison.  The test counted ${fileModifiedCount} modified files but ${acceptableFileModifiedCount} modified removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed." />
+					</then>
+					<else>
+						<execute macro="Jenkins#viewConsoleText">
+							<var name="consoleOutputText" value="-Bnd-LastModified: \d+" />
+						</execute>
+
+						<execute macro="Jenkins#viewConsoleText">
+							<var name="consoleOutputText" value="+Bnd-LastModified: \d+" />
+						</execute>
+
+						<execute macro="Jenkins#viewNoConsoleText">
+							<var name="consoleOutputText" value="-Liferay-Portal-Server-Info: Liferay DXP Digital Enterprise" />
+						</execute>
+
+						<execute macro="Jenkins#viewNoConsoleText">
+							<var name="consoleOutputText" value="+Liferay-Portal-Server-Info: Liferay Community Edition Portal" />
+						</execute>
+					</else>
+				</if>
+			</then>
+		</if>
 	</command>
 </definition>
