@@ -3,6 +3,15 @@
 		<execute function="AssertClick" locator1="Jenkins#CONSOLE_OUTPUT_LINK" value1="Console Output" />
 	</command>
 
+	<command name="clickFullLogLink">
+		<if>
+			<condition function="IsElementPresent" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
+			<then>
+				<execute function="Click" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
+			</then>
+		</if>
+	</command>
+
 	<command name="clickJobHealthLink">
 		<var name="key_jobName" value="${jobName}" />
 
@@ -113,6 +122,40 @@
 		<execute function="AssertTextEquals#assertPartialText" locator1="Jenkins#CONSOLE_OUTPUT_TEXT" value1="${consoleOutputText}" />
 	</command>
 
+	<command name="viewInstallConsoleText">
+		<execute macro="Jenkins#clickFullLogLink" />
+
+		<var locator="Jenkins#CONSOLE_OUTPUT_TEXT" name="consoleOutputText" />
+
+		<var method="StringUtil#count('${consoleOutputText}', 'ERROR')" name="errorCount" />
+
+		<echo message="Number of errors: ${errorCount}" />
+
+		<if>
+			<not>
+				<equals arg1="${fileAddedCount}" arg2="0" />
+			</not>
+			<then>
+				<var method="StringUtil#count('${consoleOutputText}', 'ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found')" name="acceptableErrorCount" />
+
+				<echo message="Number of acceptable errors: ${acceptableErrorCount}" />
+
+				<if>
+					<not>
+						<equals arg1="${errorCount}" arg2="${acceptableErrorCount}" />
+					</not>
+					<then>
+						<fail message="Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack install and either apply fixes to the builder or update the test case as needed." />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<execute macro="Jenkins#viewConsoleText">
+			<var name="consoleOutputText" value="Server startup in" />
+		</execute>
+	</command>
+
 	<command name="viewJobStatusSuccess">
 		<var name="key_jobName" value="${jobName}" />
 
@@ -124,12 +167,7 @@
 	</command>
 
 	<command name="viewPatchDifferenceConsoleText">
-		<if>
-			<condition function="IsElementPresent" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
-			<then>
-				<execute function="Click" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
-			</then>
-		</if>
+		<execute macro="Jenkins#clickFullLogLink" />
 
 		<var locator="Jenkins#CONSOLE_OUTPUT_TEXT" name="consoleOutputText" />
 
