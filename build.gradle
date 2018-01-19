@@ -174,6 +174,40 @@ repositories {
 	}
 }
 
+private static Properties _expandProperties(Properties properties) {
+	boolean propertyExpanded = true
+
+	while (propertyExpanded) {
+		propertyExpanded = false
+
+		Set<String> propertyNames = properties.stringPropertyNames()
+
+		for (String propertyName : propertyNames) {
+			String propertyValue = properties.getProperty(propertyName)
+
+			Map<String, String> replacements = new HashMap<>()
+
+			propertyValue.eachMatch("\\\$\\{.+?\\}") { group ->
+				String name = group.replace("\${", "").replace("}", "")
+
+				if (propertyNames.contains(name) && group != properties.getProperty(name)) {
+					replacements.put(group, properties.getProperty(name))
+
+					propertyExpanded = true
+				}
+			}
+
+			for (String group : replacements.keySet()) {
+				propertyValue = propertyValue.replace(group, replacements.get(group))
+			}
+
+			properties.setProperty(propertyName, propertyValue)
+		}
+	}
+
+	properties
+}
+
 private Properties _getCustomProperties(String prefix, Project project) {
 	Properties properties = new Properties()
 
@@ -215,7 +249,7 @@ private Properties _getTestProperties(Project project) {
 		properties << _getCustomProperties("test", project)
 	}
 
-	properties
+	_expandProperties(properties)
 }
 
 private String _parseMajorVersion(String version) {
