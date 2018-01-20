@@ -208,45 +208,55 @@ private static Properties _expandProperties(Properties properties) {
 	properties
 }
 
-private static Properties _getCustomProperties(String prefix, Project project) {
+private static Properties _getCustomProperties(String prefix, File dir) {
 	Properties properties = new Properties()
 
-	List<String> testPropertiesFileNames = ["${prefix}.properties"]
-
-	if (System.env.HOSTNAME) {
-		testPropertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
-	}
-
-	if (System.env.HOST) {
-		testPropertiesFileNames << "${prefix}.${System.env.HOST}.properties"
-	}
-
-	if (System.env.COMPUTERNAME) {
-		testPropertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
-	}
-
-	if (System.env.USER) {
-		testPropertiesFileNames << "${prefix}.${System.env.USER}.properties"
-	}
-
-	for (String testPropertiesFileName in testPropertiesFileNames) {
-		File testPropertiesFile = new File(project.projectDir, testPropertiesFileName)
-
-		if (testPropertiesFile.exists()) {
-			properties << GUtil.loadProperties(testPropertiesFile)
-		}
+	for (File propertiesFile in _getCustomPropertiesFiles(prefix, dir)) {
+		properties << GUtil.loadProperties(propertiesFile)
 	}
 
 	properties
 }
 
+private static List<File> _getCustomPropertiesFiles(String prefix, File dir) {
+	List<String> propertiesFileNames = ["${prefix}.properties"]
+
+	if (System.env.HOSTNAME) {
+		propertiesFileNames << "${prefix}.${System.env.HOSTNAME}.properties"
+	}
+
+	if (System.env.HOST) {
+		propertiesFileNames << "${prefix}.${System.env.HOST}.properties"
+	}
+
+	if (System.env.COMPUTERNAME) {
+		propertiesFileNames << "${prefix}.${System.env.COMPUTERNAME}.properties"
+	}
+
+	if (System.env.USER) {
+		propertiesFileNames << "${prefix}.${System.env.USER}.properties"
+	}
+
+	List<File> propertiesFiles = new ArrayList<>()
+
+	for (String propertiesFileName in propertiesFileNames) {
+		File propertiesFile = new File(dir, propertiesFileName)
+
+		if (propertiesFile.exists()) {
+			propertiesFiles.add(propertiesFile)
+		}
+	}
+
+	propertiesFiles
+}
+
 private Properties _getTestProperties(Project project) {
 	Properties properties = new Properties()
 
-	properties << _getCustomProperties("test", rootProject)
+	properties << _getCustomProperties("test", rootProject.projectDir)
 
 	if (project != rootProject) {
-		properties << _getCustomProperties("test", project)
+		properties << _getCustomProperties("test", project.projectDir)
 	}
 
 	_expandProperties(properties)
