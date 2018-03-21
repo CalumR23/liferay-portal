@@ -1,15 +1,65 @@
 <definition>
-	<command name="viewSocialIconLinkWindow">
+	<command name="clickSocialIcon">
 		<var name="key_title" value="${iconTitle}" />
 
 		<execute function="ScrollWebElementIntoView" locator1="LRDCOMIcon#ICON_SOCIAL" />
 
 		<execute function="Click" locator1="LRDCOMIcon#ICON_SOCIAL" />
+	</command>
+
+	<command name="viewLiferayLinkedInWindow">
+		<var method="selenium#getTitle()" name="linkedInWindowTitle" />
+
+		<echo message="Window Title: ${linkedInWindowTitle}" />
+
+		<if>
+			<equals arg1="${linkedInWindowTitle}" arg2="Liferay, Inc | LinkedIn" />
+			<then>
+				<execute function="Close#closeWindow" locator1="title=${socialWindowTitle}" />
+
+				<execute function="SelectWindow#selectWindowTop" />
+			</then>
+			<else>
+				<var method="TestPropsUtil#get('lrdcom.email.address.2')" name="userEmailAddress" />
+				<var method="TestPropsUtil#get('lrdcom.email.password.2')" name="userPassword" />
+
+				<execute function="Click" locator1="LinkedInLogin#SIGN_IN" />
+
+				<execute function="Type" locator1="LinkedInLogin#EMAIL_ADDRESS" value1="${userEmailAddress}" />
+				<execute function="Type" locator1="LinkedInLogin#PASSWORD" value1="${userPassword}" />
+
+				<execute function="Click" locator1="LinkedInLogin#SUBMIT_BUTTON" />
+
+				<execute function="AssertElementNotPresent" locator1="LinkedInLogin#SUBMIT_BUTTON" />
+
+				<var method="selenium#getTitle()" name="linkedInWindowTitle" />
+
+				<echo message="Window Title: ${linkedInWindowTitle}" />
+
+				<if>
+					<equals arg1="${linkedInWindowTitle}" arg2="Liferay, Inc: Overview | LinkedIn" />
+					<then>
+						<execute function="Close#closeWindow" locator1="Liferay, Inc: Overview | LinkedIn" />
+
+						<execute function="SelectWindow#selectWindowTop" />
+					</then>
+					<else>
+						<fail message="Wrong Liferay LinkedIn URL link" />
+					</else>
+				</if>
+			</else>
+		</if>
+	</command>
+
+	<command name="viewSocialIconLinkWindow">
+		<execute macro="LRDCOMFooter#clickSocialIcon">
+			<var name="iconTitle" value="${iconTitle}" />
+		</execute>
 
 		<execute function="SelectWindow" locator1="title=${socialWindowTitle}" />
 
 		<execute function="Close#closeWindow" locator1="title=${socialWindowTitle}" />
 
-		<execute function="SelectWindow" locator1="${lrdcomWindowTitle}" />
+		<execute function="SelectWindow#selectWindowTop" />
 	</command>
 </definition>
