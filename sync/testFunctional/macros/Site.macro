@@ -1,0 +1,266 @@
+<definition>
+	<var name="siteMember" value="User" />
+	<var name="siteType" value="Open" />
+
+	<command name="addCP">
+		<execute macro="LexiconEntry#gotoAdd" />
+
+		<if>
+			<not>
+				<equals arg1="${singleSiteTypePermission}" arg2="true" />
+			</not>
+			<then>
+				<if>
+					<equals arg1="${siteType}" arg2="Blank" />
+					<then>
+						<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Blank Site">
+							<var name="key_menuItem" value="Blank Site" />
+						</execute>
+					</then>
+					<elseif>
+						<equals arg1="${siteType}" arg2="Community" />
+						<then>
+							<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Community Site">
+								<var name="key_menuItem" value="Community Site" />
+							</execute>
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${siteType}" arg2="Intranet" />
+						<then>
+							<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Intranet Site">
+								<var name="key_menuItem" value="Intranet Site" />
+							</execute>
+						</then>
+					</elseif>
+					<elseif>
+						<equals arg1="${siteType}" arg2="Site Template" />
+						<then>
+							<execute function="Click" locator1="MenuItem#ANY_MENU_ITEM">
+								<var name="key_menuItem" value="${siteTemplateName}" />
+							</execute>
+						</then>
+					</elseif>
+					<else>
+						<fail message="Invalid var siteType. Must be (Blank|Community|Intranet|Site Template)." />
+					</else>
+				</if>
+			</then>
+		</if>
+
+		<execute macro="PortletEntry#inputName">
+			<var name="name" value="${siteName}" />
+		</execute>
+
+		<if>
+			<or>
+				<equals arg1="${siteType}" arg2="Community" />
+				<equals arg1="${siteType}" arg2="Site Template" />
+			</or>
+			<then>
+				<if>
+					<equals arg1="${uncheckPropagation}" arg2="true" />
+					<then>
+						<execute macro="Panel#expandPanel">
+							<var name="panelHeading" value="Pages" />
+						</execute>
+
+						<execute function="Uncheck#uncheckToggleSwitch" locator1="Checkbox#ENABLE_PROPAGATION" />
+					</then>
+				</if>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${siteType}" arg2="Site Template" />
+			<then>
+				<if>
+					<equals arg1="${pageType}" arg2="Private" />
+					<then>
+						<execute function="Click" locator1="SiteSettings#PAGES_COPY_AS_PRIVATE_PAGES_RADIO_BUTTON" />
+					</then>
+					<else>
+						<execute function="Click" locator1="SiteSettings#PAGES_COPY_AS_PUBLIC_PAGES_RADIO_BUTTON" />
+					</else>
+				</if>
+			</then>
+		</if>
+
+		<if>
+			<equals arg1="${membershipType}" arg2="Private" />
+			<then>
+				<execute function="Select" locator1="SitesEditSite#MEMBERSHIP_TYPE" value1="Private" />
+			</then>
+			<elseif>
+				<equals arg1="${membershipType}" arg2="Restricted" />
+				<then>
+					<execute function="Select" locator1="SitesEditSite#MEMBERSHIP_TYPE" value1="Restricted" />
+				</then>
+			</elseif>
+			<else>
+				<execute function="Select" locator1="SitesEditSite#MEMBERSHIP_TYPE" value1="Open" />
+			</else>
+		</if>
+
+		<if>
+			<isset var="parentSiteName" />
+			<then>
+				<execute function="AssertClick" locator1="Button#SELECT" value1="Select" />
+
+				<var name="key_parentSiteName" value="${parentSiteName}" />
+
+				<execute function="SelectFrame" locator1="SitesSelectSite#SELECT_SITE_IFRAME" />
+
+				<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="${parentSiteName}" />
+
+				<execute function="KeyPress" locator1="NavBar#BASIC_SEARCH_FIELD" value1="\RETURN" />
+
+				<var name="key_site" value="${parentSiteName}" />
+
+				<execute function="AssertTextEquals" locator1="ContentRow#ENTRY_CONTENT_ROW_TD_1_SITE_LINK" value1="${parentSiteName}" />
+
+				<execute function="Click" locator1="ContentRow#ENTRY_CONTENT_ROW_TD_1_SITE_LINK" />
+
+				<var name="key_parentSiteName" value="${parentSiteName}" />
+
+				<execute function="SelectFrameTop" />
+			</then>
+		</if>
+
+		<execute macro="PortletEntry#save" />
+
+		<execute function="AssertTextEquals" locator1="SitesEditSite#DETAILS_NAME" value1="${siteName}" />
+	</command>
+
+	<command name="addPrivatePageTemplateCP">
+		<execute function="AssertTextEquals" locator1="TextInput#NAME" value1="${siteName}" />
+
+		<execute function="Select" locator1="SiteSettings#PAGES_PRIVATE_PAGES_SITE_TEMPLATE_SELECT" value1="${siteTemplateName}" />
+
+		<execute macro="PortletEntry#save" />
+	</command>
+
+	<command name="addSiteTemplateCP">
+		<execute macro="Site#addCP">
+			<var name="membershipType" value="${membershipType}" />
+			<var name="parentSiteName" value="${parentSiteName}" />
+			<var name="siteName" value="${siteName}" />
+			<var name="siteTemplateName" value="${siteTemplateName}" />
+			<var name="siteType" value="Site Template" />
+			<var name="uncheckPropagation" value="${uncheckPropagation}" />
+		</execute>
+	</command>
+
+	<command name="tearDownCP">
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Sites" />
+			<var name="panel" value="Control Panel" />
+			<var name="portlet" value="Sites" />
+		</execute>
+
+		<execute function="Type" locator1="NavBar#BASIC_SEARCH_FIELD" value1="Name" />
+
+		<execute function="Click" locator1="Icon#BASIC_SEARCH" />
+
+		<if>
+			<condition function="IsElementNotPresent" locator1="Message#EMPTY_INFO" />
+			<then>
+				<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
+
+				<execute function="ClickNoError" locator1="Icon#DELETE" />
+
+				<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
+
+				<execute macro="Alert#viewSuccessMessage" />
+			</then>
+		</if>
+	</command>
+
+	<command name="viewAdminMemberAsSiteAdminCP">
+		<execute macro="Portlet#changeDisplayStyle">
+			<var name="displayStyle" value="Icon" />
+		</execute>
+
+		<var name="key_cardText" value="${userScreenName}" />
+
+		<var method="StringUtil#replace('${userScreenName}', '.', ' ')" name="userNameLowerCased" />
+
+		<var method="StringUtil#extractFirst('${userNameLowerCased}', ' ')" name="userFirstNameLowerCased" />
+
+		<var method="StringUtil#extractLast('${userNameLowerCased}', ' ')" name="userLastNameLowerCased" />
+
+		<var method="StringUtil#upperCaseFirstLetter('${userFirstNameLowerCased}')" name="userFirstName" />
+
+		<var method="StringUtil#upperCaseFirstLetter('${userLastNameLowerCased}')" name="userLastName" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="Card#SPECIFIC_LARGE_TEXT" value1="${userFirstName} ${userLastName}" />
+		<execute function="AssertTextEquals" locator1="Card#SPECIFIC_TEXT" value1="${userScreenName}" />
+
+		<var name="key_rowEntry" value="${key_cardText}" />
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+
+		<execute function="AssertTextEquals" locator1="MenuItem#ANY_MENU_ITEM" value1="Assign Site Roles">
+			<var name="key_menuItem" value="Assign Site Roles" />
+		</execute>
+
+		<execute function="AssertElementNotPresent" locator1="MenuItem#ANY_MENU_ITEM" value1="Remove Membership">
+			<var name="key_menuItem" value="Remove Membership" />
+		</execute>
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+	</command>
+
+	<command name="viewAdminMemberAsSyncMemberManagerCP">
+		<execute macro="Site#viewAdminMemberAsSiteAdminCP">
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+	</command>
+
+	<command name="viewMemberAsSiteAdminCP">
+		<execute macro="Site#viewMemberAsSiteOwnerCP">
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+	</command>
+
+	<command name="viewMemberAsSiteOwnerCP">
+		<execute macro="Portlet#changeDisplayStyle">
+			<var name="displayStyle" value="Icon" />
+		</execute>
+
+		<var name="key_cardText" value="${userScreenName}" />
+
+		<var method="StringUtil#replace('${userScreenName}', '.', ' ')" name="userNameLowerCased" />
+
+		<var method="StringUtil#extractFirst('${userNameLowerCased}', ' ')" name="userFirstNameLowerCased" />
+
+		<var method="StringUtil#extractLast('${userNameLowerCased}', ' ')" name="userLastNameLowerCased" />
+
+		<var method="StringUtil#upperCaseFirstLetter('${userFirstNameLowerCased}')" name="userFirstName" />
+
+		<var method="StringUtil#upperCaseFirstLetter('${userLastNameLowerCased}')" name="userLastName" />
+
+		<execute function="AssertTextEquals#assertPartialText" locator1="Card#SPECIFIC_LARGE_TEXT" value1="${userFirstName} ${userLastName}" />
+		<execute function="AssertTextEquals" locator1="Card#SPECIFIC_TEXT" value1="${userScreenName}" />
+
+		<var name="key_rowEntry" value="${key_cardText}" />
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+
+		<execute function="AssertTextEquals" locator1="MenuItem#ANY_MENU_ITEM" value1="Assign Site Roles">
+			<var name="key_menuItem" value="Assign Site Roles" />
+		</execute>
+
+		<execute function="AssertTextEquals" locator1="MenuItem#ANY_MENU_ITEM" value1="Remove Membership">
+			<var name="key_menuItem" value="Remove Membership" />
+		</execute>
+
+		<execute function="Click" locator1="Icon#ROW_VERTICAL_ELLIPSIS" />
+	</command>
+
+	<command name="viewMemberAsSyncMemberManagerCP">
+		<execute macro="Site#viewMemberAsSiteOwnerCP">
+			<var name="userScreenName" value="${userScreenName}" />
+		</execute>
+	</command>
+</definition>
