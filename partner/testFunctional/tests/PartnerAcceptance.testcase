@@ -1,10 +1,25 @@
-<definition component-name="partner-acceptance">
+<definition component-name="partner">
 	<property name="testray.main.component.name" value="partner" />
 
+	<var name="partnerBusinessPlanID" static="true" />
 	<var name="partnerMDFClaimID" static="true" />
 	<var name="partnerMDFRequestID" static="true" />
 
-	<command name="ApproveMDFRequestAndClaim" priority="5">
+	<command name="ApproveBusinessPlan" priority="5">
+		<execute macro="PartnerWorkflow#createBusinessPlan">
+			<return from="partnerBusinessPlanID" name="partnerBusinessPlanID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#approveBusinessPlan">
+			<var name="partnerBusinessPlanID" value="partnerBusinessPlanID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#deleteBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
+	</command>
+
+	<command name="ApproveMDFRequestAndPayoutClaim" priority="5">
 		<execute macro="PartnerWorkflow#createMDFRequest">
 			<return from="partnerMDFRequestID" name="partnerMDFRequestID" />
 		</execute>
@@ -24,6 +39,58 @@
 
 		<execute macro="PartnerWorkflow#payoutMDFClaim">
 			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#deleteMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
+	</command>
+
+	<command name="RequestMoreInfoBusinessPlan" priority="5">
+		<execute macro="PartnerWorkflow#createBusinessPlan">
+			<return from="partnerBusinessPlanID" name="partnerBusinessPlanID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#editAndSubmitBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+			<var name="roleName" value="alliance_manager" />
+		</execute>
+
+		<!--Add workaround for LRIS-31451-->
+
+		<execute macro="PartnerWorkflow#resendForReviewBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#approveBusinessPlan">
+			<var name="partnerBusinessPlanID" value="partnerBusinessPlanID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#deleteBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
+	</command>
+
+	<command name="RequestMoreInfoMDFRequest" priority="5">
+		<execute macro="PartnerWorkflow#createMDFRequest">
+			<return from="partnerMDFRequestID" name="partnerMDFRequestID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#requestMoreInfoMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#editAndSubmitMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="roleName" value="partner" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#approveMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#deleteMDFRequest">
