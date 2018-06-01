@@ -1,4 +1,40 @@
 <definition>
+	<command name="approveAndPayoutMDFRequestClaim">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="regional_finance" />
+		</execute>
+
+		<execute macro="Partner#gotoMDFManager" />
+
+		<execute macro="PartnerMDFManager#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
+
+		<execute macro="PartnerMDFRequest#viewReimbursementClaimNumber">
+			<var name="partnerMDFClaimNumber" value="${partnerMDFClaimNumber}" />
+		</execute>
+
+		<execute macro="Partner#clickApproveButton" />
+
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Approved by Finance Manager." />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="Partner#reloadPage" />
+
+		<execute macro="PartnerMDFClaim#clickPayoutClaimButton" />
+
+		<execute macro="PartnerMDFClaim#fillPayoutClaim">
+			<var name="partnerMDFClaimCheckAmount" value="50.00" />
+			<var name="partnerMDFClaimCheckDate" value="01/01/2019" />
+			<var name="partnerMDFClaimCheckNumber" value="A12345" />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
+
 	<command name="approveBusinessPlan">
 		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="general_manager" />
@@ -151,7 +187,47 @@
 		<return name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
 	</command>
 
-	<command name="createMDFClaim" returns="partnerMDFClaimID">
+	<command name="createMDFClaimFull" returns="partnerMDFClaimID">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="partner" />
+		</execute>
+
+		<execute macro="Partner#gotoMDFPartner" />
+
+		<execute macro="PartnerMDFPartner#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
+
+		<execute macro="PartnerMDFRequest#clickNewClaimButton" />
+
+		<execute macro="PartnerMDFClaimForm#fillGeneralInformation">
+			<var name="partnerMDFClaimActivities" value="Test Activity1,Test Activity2" />
+			<var name="partnerMDFClaimInvoice" value="Document_1.pdf" />
+			<var name="partnerMDFClaimType" value="Full" />
+		</execute>
+
+		<execute macro="PartnerMDFClaimForm#uploadActivityPOPs">
+			<var name="partnerMDFClaimActivity" value="Test Activity1" />
+			<var name="partnerMDFClaimLabels" value="Event Collaterals,Event Invitation,Event Photos,Event Programs,List of Qualified Leads,Third Party Invoices" />
+		</execute>
+
+		<execute macro="PartnerMDFClaimForm#uploadActivityPOPs">
+			<var name="partnerMDFClaimActivity" value="Test Activity2" />
+			<var name="partnerMDFClaimLabels" value="All Contents,List of Qualified Leads,Telemarketing Metrics,Telemarketing Script,Third Party Invoices" />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButton" />
+
+		<execute macro="Partner#assertSuccess" />
+
+		<execute macro="Partner#readTitleID">
+			<return from="titleID" name="partnerMDFClaimID" />
+		</execute>
+
+		<return name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+	</command>
+
+	<command name="createMDFClaimsPartial">
 		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="partner" />
 		</execute>
@@ -170,51 +246,37 @@
 			<var name="partnerMDFClaimType" value="Partial" />
 		</execute>
 
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
+		<execute macro="PartnerMDFClaimForm#uploadActivityPOPs">
 			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Document_1.doc" />
-			<var name="partnerMDFClaimPOPLabel" value="Event Collaterals" />
-		</execute>
-
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
-			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Document_2.docx" />
-			<var name="partnerMDFClaimPOPLabel" value="Event Invitations" />
-		</execute>
-
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
-			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Document_1.jpeg" />
-			<var name="partnerMDFClaimPOPLabel" value="Event Photos" />
-		</execute>
-
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
-			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Document_1.jpg" />
-			<var name="partnerMDFClaimPOPLabel" value="Event Programs" />
-		</execute>
-
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
-			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Partner_Leads.xlsx" />
-			<var name="partnerMDFClaimPOPLabel" value="List of Qualified Leads" />
-		</execute>
-
-		<execute macro="PartnerMDFClaimForm#uploadProofOfPerformance" >
-			<var name="partnerMDFClaimActivity" value="Test Activity1" />
-			<var name="partnerMDFClaimPOP" value="Document_2.pdf" />
-			<var name="partnerMDFClaimPOPLabel" value="Third Party Invoices" />
+			<var name="partnerMDFClaimLabels" value="Event Collaterals,Event Invitation,Event Photos,Event Programs,List of Qualified Leads,Third Party Invoices" />
 		</execute>
 
 		<execute macro="Partner#clickSubmitButton" />
 
 		<execute macro="Partner#assertSuccess" />
 
-		<execute macro="PartnerMDFClaim#readMDFClaimID">
-			<return from="partnerMDFClaimID" name="partnerMDFClaimID" />
+		<execute macro="Partner#gotoMDFPartner" />
+
+		<execute macro="PartnerMDFPartner#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 		</execute>
 
-		<return name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		<execute macro="PartnerMDFRequest#clickNewClaimButton" />
+
+		<execute macro="PartnerMDFClaimForm#fillGeneralInformation">
+			<var name="partnerMDFClaimActivities" value="Test Activity2" />
+			<var name="partnerMDFClaimInvoice" value="Document_1.pdf" />
+			<var name="partnerMDFClaimType" value="Partial" />
+		</execute>
+
+		<execute macro="PartnerMDFClaimForm#uploadActivityPOPs">
+			<var name="partnerMDFClaimActivity" value="Test Activity2" />
+			<var name="partnerMDFClaimLabels" value="All Contents,List of Qualified Leads,Telemarketing Metrics,Telemarketing Script,Third Party Invoices" />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButton" />
+
+		<execute macro="Partner#assertSuccess" />
 	</command>
 
 	<command name="createMDFRequest" returns="partnerMDFRequestID">
@@ -274,10 +336,10 @@
 			<var name="partnerMDFRequestActivityLineItemCost" value="100" />
 			<var name="partnerMDFRequestActivityName" value="Test Activity2" />
 			<var name="partnerMDFRequestActivityStartDate" value="01/01/2019" />
-			<var name="partnerMDFRequestActivityTactic" value="In-Person Partner" />
+			<var name="partnerMDFRequestActivityTactic" value="Direct Mail" />
 			<var name="partnerMDFRequestActivityTargetAudience" value="Test Audience" />
 			<var name="partnerMDFRequestActivityTargetLeadGoal" value="Test Goal" />
-			<var name="partnerMDFRequestActivityType" value="Event" />
+			<var name="partnerMDFRequestActivityType" value="Traditional Marketing" />
 		</execute>
 
 		<execute macro="Partner#clickSubmitButton" />
@@ -313,6 +375,10 @@
 		</execute>
 
 		<execute macro="Partner#gotoMDFManager" />
+
+		<execute macro="Partner#findRowID">
+			<var name="rowID" value="${partnerMDFRequestID}" />
+		</execute>
 
 		<execute macro="PartnerMDFManager#deleteMDFRequest">
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
@@ -407,190 +473,190 @@
 
 		<execute macro="Partner#clickSubmitButton" />
 
-		<!--Workaround for LRIS-31451-->
+		<!--Workaround for LRIS-31451
 
-		<!--<execute macro="Partner#typeCommentInModal">
+		<execute macro="Partner#typeCommentInModal">
 			<var name="partnerMDFRequestComment" value="Adding an Edit as ${roleName}" />
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
 
-	<execute macro="Partner#assertSuccess" />-->
-</command>
+		<execute macro="Partner#assertSuccess" />-->
+	</command>
 
-<command name="editAndSubmitMDFRequest">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="${roleName}" />
-	</execute>
+	<command name="editAndSubmitMDFRequest">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="${roleName}" />
+		</execute>
 
-	<if>
-		<equals arg1="${roleName}" arg2="partner" />
-		<then>
-			<execute macro="Partner#gotoMDFPartner" />
+		<if>
+			<equals arg1="${roleName}" arg2="partner" />
+			<then>
+				<execute macro="Partner#gotoMDFPartner" />
 
-			<execute macro="PartnerMDFPartner#clickMDFRequest">
-				<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			</execute>
-		</then>
-		<else>
-			<execute macro="Partner#gotoMDFManager" />
+				<execute macro="PartnerMDFPartner#clickMDFRequest">
+					<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+				</execute>
+			</then>
+			<else>
+				<execute macro="Partner#gotoMDFManager" />
 
-			<execute macro="PartnerMDFManager#clickMDFRequest">
-				<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			</execute>
-		</else>
-	</if>
+				<execute macro="PartnerMDFManager#clickMDFRequest">
+					<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+				</execute>
+			</else>
+		</if>
 
-	<execute macro="Partner#clickEditButton" />
+		<execute macro="Partner#clickEditButton" />
 
-	<execute macro="PartnerMDFRequestForm#viewDisabledGeneralInformation">
-		<var name="partnerMDFRequestCompanyName" value="Arcusys USA" />
-		<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
-		<var name="partnerMDFRequestRegion" value="United States" />
-	</execute>
+		<execute macro="PartnerMDFRequestForm#viewDisabledGeneralInformation">
+			<var name="partnerMDFRequestCompanyName" value="Arcusys USA" />
+			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
+			<var name="partnerMDFRequestRegion" value="United States" />
+		</execute>
 
-	<execute macro="PartnerMDFRequestForm#editGeneralInformation">
-		<var name="partnerMDFRequestCurrencyCode" value="USD" />
-		<var name="partnerMDFRequestPhoneNumber" value="123 456 7891" />
-	</execute>
+		<execute macro="PartnerMDFRequestForm#editGeneralInformation">
+			<var name="partnerMDFRequestCurrencyCode" value="USD" />
+			<var name="partnerMDFRequestPhoneNumber" value="123 456 7891" />
+		</execute>
 
-	<execute macro="Partner#clickSaveAndContinueButton" />
+		<execute macro="Partner#clickSaveAndContinueButton" />
 
-	<execute macro="Partner#assertSuccess" />
+		<execute macro="Partner#assertSuccess" />
 
-	<execute macro="PartnerMDFRequestForm#editBusinessGoals">
-		<var name="partnerMDFRequestBusinessGoals" value="Banking,Retain" />
-		<var name="partnerMDFRequestUnselectBusinessGoals" value="Energy,Awareness" />
-	</execute>
+		<execute macro="PartnerMDFRequestForm#editBusinessGoals">
+			<var name="partnerMDFRequestBusinessGoals" value="Banking,Retain" />
+			<var name="partnerMDFRequestUnselectBusinessGoals" value="Energy,Awareness" />
+		</execute>
 
-	<execute macro="Partner#clickSaveAndContinueButton" />
+		<execute macro="Partner#clickSaveAndContinueButton" />
 
-	<execute macro="Partner#assertSuccess" />
+		<execute macro="Partner#assertSuccess" />
 
-	<execute macro="PartnerMDFRequestForm#addActivity">
-		<var name="partnerMDFRequestActivityCampaign" value="Mobile" />
-		<var name="partnerMDFRequestActivityEndDate" value="01/01/2019" />
-		<var name="partnerMDFRequestActivityFollowUpStrategy" value="Email Nurturing" />
-		<var name="partnerMDFRequestActivityLineItem" value="Sponsorship Fee" />
-		<var name="partnerMDFRequestActivityLineItemCost" value="100" />
-		<var name="partnerMDFRequestActivityName" value="Test Activity3" />
-		<var name="partnerMDFRequestActivityStartDate" value="01/01/2019" />
-		<var name="partnerMDFRequestActivityTactic" value="Blog" />
-		<var name="partnerMDFRequestActivityTargetAudience" value="Test Audience" />
-		<var name="partnerMDFRequestActivityTargetLeadGoal" value="Test Goal" />
-		<var name="partnerMDFRequestActivityType" value="Digital Marketing" />
-	</execute>
+		<execute macro="PartnerMDFRequestForm#addActivity">
+			<var name="partnerMDFRequestActivityCampaign" value="Mobile" />
+			<var name="partnerMDFRequestActivityEndDate" value="01/01/2019" />
+			<var name="partnerMDFRequestActivityFollowUpStrategy" value="Email Nurturing" />
+			<var name="partnerMDFRequestActivityLineItem" value="Sponsorship Fee" />
+			<var name="partnerMDFRequestActivityLineItemCost" value="100" />
+			<var name="partnerMDFRequestActivityName" value="Test Activity3" />
+			<var name="partnerMDFRequestActivityStartDate" value="01/01/2019" />
+			<var name="partnerMDFRequestActivityTactic" value="Blog" />
+			<var name="partnerMDFRequestActivityTargetAudience" value="Test Audience" />
+			<var name="partnerMDFRequestActivityTargetLeadGoal" value="Test Goal" />
+			<var name="partnerMDFRequestActivityType" value="Digital Marketing" />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButton" />
+		<execute macro="Partner#clickSubmitButton" />
 
-	<execute macro="Partner#typeCommentInModal">
-		<var name="partnerMDFRequestComment" value="Adding an Edit as ${roleName}" />
-	</execute>
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Adding an Edit as ${roleName}" />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
+		<execute macro="Partner#clickSubmitButtonInModal" />
 
-	<execute macro="PartnerMDFRequestForm#clickSeeMDFRequestsButton" />
-</command>
+		<execute macro="PartnerMDFRequestForm#clickSeeMDFRequestsButton" />
+	</command>
 
-<command name="payoutMDFClaim">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="regional_finance" />
-	</execute>
+	<command name="payoutMDFClaim">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="regional_finance" />
+		</execute>
 
-	<execute macro="Partner#gotoMDFManagerClaims" />
+		<execute macro="Partner#gotoMDFManagerClaims" />
 
-	<execute macro="PartnerMDFManager#clickMDFClaim">
-		<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-	</execute>
+		<execute macro="PartnerMDFManager#clickMDFClaim">
+			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		</execute>
 
-	<execute macro="PartnerMDFClaim#clickPayoutClaimButton" />
+		<execute macro="PartnerMDFClaim#clickPayoutClaimButton" />
 
-	<execute macro="PartnerMDFClaim#fillPayoutClaim">
-		<var name="partnerMDFClaimCheckAmount" value="50.00" />
-		<var name="partnerMDFClaimCheckDate" value="01/01/2019" />
-		<var name="partnerMDFClaimCheckNumber" value="A12345" />
-	</execute>
+		<execute macro="PartnerMDFClaim#fillPayoutClaim">
+			<var name="partnerMDFClaimCheckAmount" value="100.00" />
+			<var name="partnerMDFClaimCheckDate" value="01/01/2019" />
+			<var name="partnerMDFClaimCheckNumber" value="A12345" />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
-</command>
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
 
-<command name="requestMoreInfoBusinessPlan">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="general_manager" />
-	</execute>
+	<command name="requestMoreInfoBusinessPlan">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="general_manager" />
+		</execute>
 
-	<execute macro="Partner#gotoMDFManagerBusinessPlans" />
+		<execute macro="Partner#gotoMDFManagerBusinessPlans" />
 
-	<execute macro="PartnerMDFManager#clickBusinessPlan">
-		<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-	</execute>
+		<execute macro="PartnerMDFManager#clickBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
 
-	<execute macro="Partner#clickRequestMoreInfoButton" />
+		<execute macro="Partner#clickRequestMoreInfoButton" />
 
-	<execute macro="Partner#typeCommentInModal">
-		<var name="partnerMDFRequestComment" value="Requesting for More Info by General Manager." />
-	</execute>
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Requesting for More Info by General Manager." />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
-</command>
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
 
-<command name="requestMoreInfoMDFRequest">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="global_partner_marketing" />
-	</execute>
+	<command name="requestMoreInfoMDFRequest">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="global_partner_marketing" />
+		</execute>
 
-	<execute macro="Partner#gotoMDFManager" />
+		<execute macro="Partner#gotoMDFManager" />
 
-	<execute macro="PartnerMDFManager#clickMDFRequest">
-		<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-	</execute>
+		<execute macro="PartnerMDFManager#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
 
-	<execute macro="Partner#clickRequestMoreInfoButton" />
+		<execute macro="Partner#clickRequestMoreInfoButton" />
 
-	<execute macro="Partner#typeCommentInModal">
-		<var name="partnerMDFRequestComment" value="Requesting for More Info by GPM." />
-	</execute>
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Requesting for More Info by GPM." />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
-</command>
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
 
-<command name="resendForReviewBusinessPlan">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="alliance_manager" />
-	</execute>
+	<command name="resendForReviewBusinessPlan">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="alliance_manager" />
+		</execute>
 
-	<execute macro="Partner#gotoMDFManagerBusinessPlans" />
+		<execute macro="Partner#gotoMDFManagerBusinessPlans" />
 
-	<execute macro="PartnerMDFManager#clickBusinessPlan">
-		<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-	</execute>
+		<execute macro="PartnerMDFManager#clickBusinessPlan">
+			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		</execute>
 
-	<execute macro="Partner#clickResendForReviewButton" />
+		<execute macro="Partner#clickResendForReviewButton" />
 
-	<execute macro="Partner#typeCommentInModal">
-		<var name="partnerMDFRequestComment" value="Resubmitting for Review by Alliance Manager." />
-	</execute>
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Resending for Review by Alliance Manager." />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
-</command>
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
 
-<command name="resendForReviewMDFRequest">
-	<execute macro="Partner#logoutAndLoginUser">
-		<var name="roleName" value="partner" />
-	</execute>
+	<command name="resendForReviewMDFRequest">
+		<execute macro="Partner#logoutAndLoginUser">
+			<var name="roleName" value="partner" />
+		</execute>
 
-	<execute macro="Partner#gotoMDFManager" />
+		<execute macro="Partner#gotoMDFManager" />
 
-	<execute macro="PartnerMDFManager#clickMDFRequest">
-		<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-	</execute>
+		<execute macro="PartnerMDFManager#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		</execute>
 
-	<execute macro="Partner#clickRequestMoreInfoButton" />
+		<execute macro="Partner#clickRequestMoreInfoButton" />
 
-	<execute macro="Partner#typeCommentInModal">
-		<var name="partnerMDFRequestComment" value="Resubmitting for Review by Partner." />
-	</execute>
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerMDFRequestComment" value="Resending for Review by Partner." />
+		</execute>
 
-	<execute macro="Partner#clickSubmitButtonInModal" />
-</command>
+		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
 </definition>
