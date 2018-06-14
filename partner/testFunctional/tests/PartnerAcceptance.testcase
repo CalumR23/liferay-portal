@@ -2,82 +2,31 @@
 	<property name="testray.main.component.name" value="partner" />
 
 	<var name="partnerBusinessPlanID" static="true" />
+	<var name="partnerBusinessPlanStatus" static="true" />
 	<var name="partnerMDFClaimID" static="true" />
 	<var name="partnerMDFRequestID" static="true" />
+	<var name="partnerMDFRequestStatus" static="true" />
+	<var name="partnerTeardown" static="true" />
 
-	<command name="ApproveBusinessPlan" priority="5">
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return from="partnerBusinessPlanID" name="partnerBusinessPlanID" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveBusinessPlan">
-			<var name="partnerBusinessPlanID" value="partnerBusinessPlanID" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteBusinessPlan">
+	<tear-down>
+		<execute macro="PartnerWorkflow#teardown">
 			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-		</execute>
-	</command>
-
-	<command name="PayoutMDFClaimFull" priority="5">
-		<execute macro="PartnerWorkflow#createMDFRequest">
-			<return from="partnerMDFRequestID" name="partnerMDFRequestID" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveMDFRequest">
+			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
+			<var name="partnerTeardown" value="${partnerTeardown}" />
 		</execute>
+	</tear-down>
 
-		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return from="partnerMDFClaimID" name="partnerMDFClaimID" />
-		</execute>
+	<command name="BusinessPlan" priority="5">
+		<var name="partnerTeardown" value="Business Plan" />
 
-		<execute macro="PartnerWorkflow#approveMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#payoutMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-	</command>
-
-	<command name="PayoutMDFClaimsPartial" priority="5">
-		<execute macro="PartnerWorkflow#createMDFRequest">
-			<return from="partnerMDFRequestID" name="partnerMDFRequestID" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#createMDFClaimsPartial">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveAndPayoutMDFRequestClaim">
-			<var name="partnerMDFClaimNumber" value="1" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveAndPayoutMDFRequestClaim">
-			<var name="partnerMDFClaimNumber" value="2" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-		</execute>
-	</command>
-
-	<command name="RequestMoreInfoBusinessPlan" priority="5">
 		<execute macro="PartnerWorkflow#createBusinessPlan">
 			<return from="partnerBusinessPlanID" name="partnerBusinessPlanID" />
 		</execute>
+
+		<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+		<var name="partnerBusinessPlanStatus" value="Pending" />
 
 		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
 			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
@@ -91,16 +40,17 @@
 		<execute macro="PartnerWorkflow#approveBusinessPlan">
 			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-		</execute>
 	</command>
 
-	<command name="RequestMoreInfoMDFRequest" priority="5">
+	<command name="MDFRequestAndClaim" priority="5">
+		<var name="partnerTeardown" value="MDF Request" />
+
 		<execute macro="PartnerWorkflow#createMDFRequest">
 			<return from="partnerMDFRequestID" name="partnerMDFRequestID" />
 		</execute>
+
+		<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+		<var name="partnerMDFRequestStatus" value="Pending Marketing Review" />
 
 		<execute macro="PartnerWorkflow#requestMoreInfoMDFRequest">
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
@@ -115,8 +65,30 @@
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 		</execute>
 
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
+		<execute macro="PartnerWorkflow#createMDFClaimFull">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<return from="partnerMDFClaimID" name="partnerMDFClaimID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#requestMoreInfoMDFClaim">
+			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#editAndSubmitMDFClaim">
+			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 		</execute>
+
+		<execute macro="PartnerWorkflow#approveMDFClaim">
+			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#payoutMDFClaim">
+			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+		</execute>
+
+		<!-- Workaround for LRIS-31507 -->
+
+		<!--<var name="partnerBusinessPlanStatus" value="Completed" />-->
 	</command>
 </definition>

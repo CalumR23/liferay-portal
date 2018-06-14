@@ -3,6 +3,7 @@
 
 	<var name="partnerMDFClaimID" static="true" />
 	<var name="partnerMDFRequestID" static="true" />
+	<var name="partnerMDFRequestStatus" static="true" />
 
 	<set-up>
 		<execute macro="PartnerWorkflow#createMDFRequest">
@@ -14,7 +15,16 @@
 		<execute macro="PartnerWorkflow#approveMDFRequest">
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 		</execute>
+
+		<var name="partnerMDFRequestStatus" value="Approved" />
 	</set-up>
+
+	<tear-down>
+		<execute macro="PartnerWorkflow#deleteMDFRequest">
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
+		</execute>
+	</tear-down>
 
 	<command name="ApproveMDFClaim" priority="5">
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
@@ -63,7 +73,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Approved" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -90,12 +100,6 @@
 			<var name="partnerMDFClaimStatus" value="Approved" />
 			<var name="partnerMDFClaimType" value="Full" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-		</execute>
 	</command>
 
 	<command name="CreateMDFClaim" priority="5">
@@ -118,7 +122,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Finance Review" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -175,12 +179,6 @@
 			<var name="partnerMDFClaimStatus" value="Finance Review" />
 			<var name="partnerMDFClaimType" value="Full" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-		</execute>
 	</command>
 
 	<command name="CreateMDFClaims" priority="5">
@@ -195,7 +193,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Finance Review" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -244,12 +242,6 @@
 			<var name="partnerMDFClaimStatus" value="Finance Review" />
 			<var name="partnerMDFClaimType" value="Partial" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-		</execute>
 	</command>
 
 	<command name="EditAndSubmitMDFClaim" priority="5">
@@ -283,7 +275,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Finance Review" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -310,12 +302,6 @@
 			<var name="partnerMDFClaimStatus" value="Finance Review" />
 			<var name="partnerMDFClaimType" value="Full" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-		</execute>
 	</command>
 
 	<command name="PayoutMDFClaim" priority="5">
@@ -336,9 +322,10 @@
 
 		<!-- Workaround for LRIS-31507 -->
 
+		<!--<var name="partnerMDFRequestStatus" value="Completed" />-->
+
 		<execute macro="Partner#gotoTab">
-			<!--<var name="tabName" value="Completed" />-->
-			<var name="tabName" value="Active" />
+			<var name="tabName" value="Completed" />
 		</execute>
 
 		<execute macro="PartnerMDFManager#assertMDFClaim">
@@ -367,12 +354,19 @@
 
 		<execute macro="Partner#gotoMDFPartner" />
 
+		<!-- Workaround for LRIS-31507 -->
+
+		<execute macro="Partner#gotoTab">
+			<var name="tabName" value="Active" />
+			<!--<var name="tabName" value="Completed" />-->
+		</execute>
+
 		<execute macro="PartnerMDFPartner#assertMDFRequest">
 			<var name="partnerMDFRequestAmountRequested" value="$100.00" />
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Claim Paid" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -399,13 +393,6 @@
 			<var name="partnerMDFClaimStatus" value="Claim Paid" />
 			<var name="partnerMDFClaimType" value="Full" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-			<!--<var name="tabName" value="Completed" />-->
-		</execute>
 	</command>
 
 	<command name="PayoutMDFClaims" priority="5">
@@ -427,6 +414,8 @@
 
 		<!-- Workaround for LRIS-31507 -->
 
+		<!-- <var name="partnerMDFRequestStatus" value="Completed" />-->
+
 		<execute macro="Partner#gotoTab">
 			<!--<var name="tabName" value="Completed" />-->
 			<var name="tabName" value="Active" />
@@ -437,7 +426,7 @@
 			<var name="partnerMDFRequestAmountRequested" value="$100.00" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestPartner" value="Arcusys USA" />
-			<var name="partnerMDFRequestStatus" value="Completed" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -483,13 +472,6 @@
 			<var name="partnerMDFClaimPaymentReceived" value="$50.00" />
 			<var name="partnerMDFClaimStatus" value="Claim Paid" />
 			<var name="partnerMDFClaimType" value="Partial" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-			<!--<var name="tabName" value="Completed" />-->
 		</execute>
 	</command>
 
@@ -544,7 +526,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Rejected" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -570,12 +552,6 @@
 			<var name="partnerMDFClaimPaymentReceived" value="$0.00" />
 			<var name="partnerMDFClaimStatus" value="Rejected" />
 			<var name="partnerMDFClaimType" value="Full" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
 		</execute>
 	</command>
 
@@ -618,7 +594,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: More Info Requested" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -645,17 +621,11 @@
 			<var name="partnerMDFClaimStatus" value="More Info Requested" />
 			<var name="partnerMDFClaimType" value="Full" />
 		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
-		</execute>
 	</command>
 
 	<command name="ResendForReviewMDFClaim" priority="5">
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<return from="partnerMDFClaimID" name="partnerMDFClaimID" />
 		</execute>
 
@@ -684,7 +654,7 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 			<var name="partnerMDFRequestReimbursementClaims" value="Claim-${partnerMDFClaimID}: Finance Review" />
-			<var name="partnerMDFRequestStatus" value="Approved" />
+			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="$200.00" />
 		</execute>
 
@@ -710,12 +680,6 @@
 			<var name="partnerMDFClaimPaymentReceived" value="$0.00" />
 			<var name="partnerMDFClaimStatus" value="Finance Review" />
 			<var name="partnerMDFClaimType" value="Full" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<var name="roleName" value="global_partner_marketing" />
-			<var name="tabName" value="Active" />
 		</execute>
 	</command>
 </definition>

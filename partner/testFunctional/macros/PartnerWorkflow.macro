@@ -53,6 +53,8 @@
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="Partner#reloadPage" />
 	</command>
 
 	<command name="approveMDFClaim">
@@ -73,6 +75,8 @@
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="Partner#reloadPage" />
 	</command>
 
 	<command name="approveMDFRequest">
@@ -93,6 +97,8 @@
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="Partner#reloadPage" />
 	</command>
 
 	<command name="createBusinessPlan" returns="partnerBusinessPlanID">
@@ -358,22 +364,74 @@
 	</command>
 
 	<command name="deleteBusinessPlan">
+		<execute macro="Partner#assertID">
+			<var name="entryID" value="${partnerBusinessPlanID}" />
+		</execute>
+
 		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="alliance_manager" />
 		</execute>
 
 		<execute macro="Partner#gotoMDFManagerBusinessPlans" />
 
+		<if>
+			<or>
+				<equals arg1="${partnerBusinessPlanStatus}" arg2="Incomplete" />
+				<equals arg1="${partnerBusinessPlanStatus}" arg2="Draft" />
+			</or>
+			<then>
+				<var name="tabName" value="Drafts" />
+			</then>
+			<else>
+				<var name="tabName" value="Submissions" />
+			</else>
+		</if>
+
 		<execute macro="Partner#gotoTab">
 			<var name="tabName" value="${tabName}" />
+		</execute>
+
+		<execute macro="Partner#findRowID">
+			<var name="rowID" value="${partnerBusinessPlanID}" />
 		</execute>
 
 		<execute macro="PartnerMDFManager#deleteBusinessPlan">
 			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
 		</execute>
+
+		<echo>Deleted Business Plan ID: ${partnerBusinessPlanID}</echo>
 	</command>
 
 	<command name="deleteMDFRequest">
+		<execute macro="Partner#assertID">
+			<var name="entryID" value="${partnerMDFRequestID}" />
+		</execute>
+
+		<if>
+			<or>
+				<equals arg1="${partnerMDFRequestStatus}" arg2="Incomplete" />
+				<equals arg1="${partnerMDFRequestStatus}" arg2="Draft" />
+			</or>
+			<then>
+				<var name="tabName" value="Drafts" />
+				<var name="roleName" value="partner" />
+			</then>
+			<elseif>
+				<or>
+					<equals arg1="${partnerMDFRequestStatus}" arg2="Rejected" />
+					<equals arg1="${partnerMDFRequestStatus}" arg2="Completed" />
+				</or>
+				<then>
+					<var name="tabName" value="Completed" />
+					<var name="roleName" value="global_partner_marketing" />
+				</then>
+			</elseif>
+			<else>
+				<var name="tabName" value="Active" />
+				<var name="roleName" value="global_partner_marketing" />
+			</else>
+		</if>
+
 		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="${roleName}" />
 		</execute>
@@ -411,6 +469,8 @@
 				</execute>
 			</else>
 		</if>
+
+		<echo>Deleted MDF Request ID: ${partnerMDFRequestID}</echo>
 	</command>
 
 	<command name="editAndSubmitBusinessPlan">
@@ -801,5 +861,29 @@
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
+	</command>
+
+	<command name="teardown">
+		<for list="${partnerTeardown}" param="entry">
+			<if>
+				<equals arg1="${entry}" arg2="Business Plan" />
+				<then>
+					<execute macro="PartnerWorkflow#deleteBusinessPlan">
+						<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+						<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
+					</execute>
+				</then>
+			</if>
+
+			<if>
+				<equals arg1="${entry}" arg2="MDF Request" />
+				<then>
+					<execute macro="PartnerWorkflow#deleteMDFRequest">
+						<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+						<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
+					</execute>
+				</then>
+			</if>
+		</for>
 	</command>
 </definition>
