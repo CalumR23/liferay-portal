@@ -374,117 +374,75 @@
 	</command>
 
 	<command name="deleteBusinessPlan">
-		<execute macro="Partner#assertID">
-			<var name="entryID" value="${partnerBusinessPlanID}" />
-		</execute>
-
 		<if>
-			<or>
-				<equals arg1="${partnerBusinessPlanStatus}" arg2="Incomplete" />
-				<equals arg1="${partnerBusinessPlanStatus}" arg2="Draft" />
-			</or>
+			<and>
+				<isset var="partnerBusinessPlanID" />
+				<not>
+					<contains string="${partnerBusinessPlanID}" substring="{partnerBusinessPlanID}" />
+				</not>
+			</and>
 			<then>
-				<var name="tabName" value="Drafts" />
+				<execute macro="Partner#logoutAndLoginUser">
+					<var name="roleName" value="admin" />
+				</execute>
+
+				<execute macro="Partner#gotoCPServerAdministration" />
+
+				<execute macro="Partner#gotoTab">
+					<var name="tabName" value="Script" />
+				</execute>
+
+				<execute macro="PartnerCPServerAdministration#deleteBusinessPlan">
+					<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
+				</execute>
+
+				<execute macro="Partner#gotoTab">
+					<var name="tabName" value="Resources" />
+				</execute>
+
+				<execute macro="PartnerCPServerAdministration#executeResourcesAction">
+					<var name="partnerCPAction" value="Clear the database cache." />
+				</execute>
+
+				<echo>Deleted Business Plan ID: ${partnerBusinessPlanID}</echo>
 			</then>
-			<else>
-				<var name="tabName" value="Submissions" />
-			</else>
 		</if>
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="Partner#gotoTab">
-			<var name="tabName" value="${tabName}" />
-		</execute>
-
-		<execute macro="PartnerManagement#filterBusinessPlanByYear">
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#findRowID">
-			<var name="rowID" value="${partnerBusinessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerManagement#deleteBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-		</execute>
-
-		<echo>Deleted Business Plan ID: ${partnerBusinessPlanID}</echo>
 	</command>
 
 	<command name="deleteMDFRequest">
-		<execute macro="Partner#assertID">
-			<var name="entryID" value="${partnerMDFRequestID}" />
-		</execute>
-
 		<if>
-			<or>
-				<equals arg1="${partnerMDFRequestStatus}" arg2="Incomplete" />
-				<equals arg1="${partnerMDFRequestStatus}" arg2="Draft" />
-			</or>
+			<and>
+				<isset var="partnerMDFRequestID" />
+				<not>
+					<contains string="${partnerMDFRequestID}" substring="{partnerMDFRequestID}" />
+				</not>
+			</and>
 			<then>
-				<var name="tabName" value="Drafts" />
-				<var name="roleName" value="partner" />
-			</then>
-			<elseif>
-				<or>
-					<equals arg1="${partnerMDFRequestStatus}" arg2="Rejected" />
-					<equals arg1="${partnerMDFRequestStatus}" arg2="Completed" />
-				</or>
-				<then>
-					<var name="tabName" value="Completed" />
-					<var name="roleName" value="global_partner_marketing" />
-				</then>
-			</elseif>
-			<else>
-				<var name="tabName" value="Active" />
-				<var name="roleName" value="global_partner_marketing" />
-			</else>
-		</if>
+				<execute macro="Partner#logoutAndLoginUser">
+					<var name="roleName" value="admin" />
+				</execute>
 
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="${roleName}" />
-		</execute>
-
-		<if>
-			<equals arg1="${roleName}" arg2="partner" />
-			<then>
-				<execute macro="Partner#gotoMarketingMDF" />
+				<execute macro="Partner#gotoCPServerAdministration" />
 
 				<execute macro="Partner#gotoTab">
-					<var name="tabName" value="${tabName}" />
+					<var name="tabName" value="Script" />
 				</execute>
 
-				<execute macro="Partner#findRowID">
-					<var name="rowID" value="${partnerMDFRequestID}" />
-				</execute>
-
-				<execute macro="PartnerMarketingMDF#deleteMDFRequest">
+				<execute macro="PartnerCPServerAdministration#deleteMDFRequest">
 					<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
 				</execute>
-			</then>
-			<else>
-				<execute macro="Partner#gotoManagement" />
 
 				<execute macro="Partner#gotoTab">
-					<var name="tabName" value="${tabName}" />
+					<var name="tabName" value="Resources" />
 				</execute>
 
-				<execute macro="Partner#findRowID">
-					<var name="rowID" value="${partnerMDFRequestID}" />
+				<execute macro="PartnerCPServerAdministration#executeResourcesAction">
+					<var name="partnerCPAction" value="Clear the database cache." />
 				</execute>
 
-				<execute macro="PartnerManagement#deleteMDFRequest">
-					<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-				</execute>
-			</else>
+				<echo>Deleted MDF Request ID: ${partnerMDFRequestID}</echo>
+			</then>
 		</if>
-
-		<echo>Deleted MDF Request ID: ${partnerMDFRequestID}</echo>
 	</command>
 
 	<command name="editAndSubmitBusinessPlan">
@@ -922,30 +880,5 @@
 		</execute>
 
 		<execute macro="Partner#clickSubmitButtonInModal" />
-	</command>
-
-	<command name="teardown">
-		<for list="${partnerTeardown}" param="entry">
-			<if>
-				<equals arg1="${entry}" arg2="Business Plan" />
-				<then>
-					<execute macro="PartnerWorkflow#deleteBusinessPlan">
-						<var name="partnerBusinessPlanID" value="${partnerBusinessPlanID}" />
-						<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-						<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-					</execute>
-				</then>
-			</if>
-
-			<if>
-				<equals arg1="${entry}" arg2="MDF Request" />
-				<then>
-					<execute macro="PartnerWorkflow#deleteMDFRequest">
-						<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-						<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
-					</execute>
-				</then>
-			</if>
-		</for>
 	</command>
 </definition>

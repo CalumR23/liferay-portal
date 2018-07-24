@@ -42,7 +42,7 @@
 			<var name="rowID" value="${partnerMDFRequestID}" />
 		</execute>
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#MDF_REQUEST_PARTNER" value1="${partnerMDFRequestPartner}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#MDF_REQUEST_PARTNER" value1="${partnerMDFRequestCompanyName}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#MDF_REQUEST_STATUS" value1="${partnerMDFRequestStatus}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#MDF_REQUEST_TOTAL_COST" value1="${partnerMDFRequestTotalCost}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#MDF_REQUEST_AMOUNT_REQUESTED" value1="${partnerMDFRequestAmountRequested}" />
@@ -87,42 +87,26 @@
 		<execute function="Click" locator1="PartnerManagement#NEW_BUSINESS_PLAN_BUTTON" />
 	</command>
 
-	<command name="deleteBusinessPlan">
-		<var name="key_businessPlan" value="${partnerBusinessPlanID}" />
-
-		<execute function="Click" locator1="PartnerManagement#BUSINESS_PLAN_OPTIONS" />
-
-		<execute function="Click" locator1="Partner#DROPDOWN_OPTION_DELETE" />
-
-		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
-
-		<execute macro="Partner#pause">
-			<var name="pauseTime" value="2000" />
-		</execute>
-
-		<execute macro="Partner#assertSuccess" />
-	</command>
-
 	<command name="deleteBusinessPlanConflict">
 		<var name="key_businessPlanCompany" value="${partnerBusinessPlanCompany}" />
 		<var name="key_businessPlanRegion" value="${partnerBusinessPlanRegion}" />
 		<var name="key_businessPlanYear" value="${partnerBusinessPlanYear}" />
 
+		<execute macro="PartnerManagement#filterBusinessPlanByYear">
+			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
+		</execute>
+
 		<if>
-			<condition function="IsElementPresent" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR_OPTION" />
+			<equals arg1="${partnerBusinessPlanRegion}" arg2="United States" />
 			<then>
-				<execute macro="PartnerManagement#filterBusinessPlanByYear">
-					<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-				</execute>
+				<var name="key_businessPlanRegion" value="US" />
 			</then>
 		</if>
 
-		<var name="key_businessPlanRegion" value="US" />
-
 		<if>
-			<condition function="IsElementPresent" locator1="PartnerManagement#BUSINESS_PLAN_MORE_OPTIONS" />
+			<condition function="IsElementPresent" locator1="PartnerManagement#BUSINESS_PLAN_OPTIONS2" />
 			<then>
-				<execute function="Click" locator1="PartnerManagement#BUSINESS_PLAN_MORE_OPTIONS" />
+				<execute function="Click" locator1="PartnerManagement#BUSINESS_PLAN_OPTIONS2" />
 
 				<execute function="Click" locator1="Partner#DROPDOWN_OPTION_DELETE" />
 
@@ -141,27 +125,14 @@
 		</if>
 	</command>
 
-	<command name="deleteMDFRequest">
-		<var name="key_mdfRequest" value="${partnerMDFRequestID}" />
-
-		<execute function="Click" locator1="PartnerManagement#MDF_REQUEST_OPTIONS" />
-
-		<execute function="Click" locator1="Partner#DROPDOWN_OPTION_DELETE" />
-
-		<execute function="Confirm" value1="Are you sure you want to delete this? It will be deleted immediately." />
-
-		<execute macro="Partner#pause">
-			<var name="pauseTime" value="2000" />
-		</execute>
-
-		<execute macro="Partner#assertSuccess" />
-	</command>
-
 	<command name="filterBusinessPlanByYear">
-		<echo>Filter year by: ${partnerBusinessPlanYear}</echo>
+		<var name="key_businessPlanYear" value="${partnerBusinessPlanYear}" />
 
 		<if>
-			<contains string="${partnerBusinessPlanYear}" substring="20" />
+			<and>
+				<contains string="${partnerBusinessPlanYear}" substring="20" />
+				<condition function="IsElementPresent" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR_OPTION" />
+			</and>
 			<then>
 				<execute function="Select" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR" value1="Year ${partnerBusinessPlanYear}" />
 			</then>
