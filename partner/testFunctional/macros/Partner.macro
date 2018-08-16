@@ -1,6 +1,4 @@
 <definition>
-	<var method="TestPropsUtil#get('portal.url')" name="partnerUrl" />
-
 	<command name="assertApproveButton">
 		<execute function="AssertElementPresent" locator1="Partner#APPROVE_BUTTON" />
 	</command>
@@ -83,6 +81,10 @@
 		<execute function="Click" locator1="Partner#SAVE_AND_CONTINUE_BUTTON" />
 	</command>
 
+	<command name="clickSaveButton">
+		<execute function="Click" locator1="Partner#SAVE_BUTTON" />
+	</command>
+
 	<command name="clickSaveDraftButton">
 		<execute function="Click" locator1="Partner#SAVE_DRAFT_BUTTON" />
 	</command>
@@ -97,6 +99,15 @@
 
 	<command name="clickSubmitButtonInModal">
 		<execute function="Click" locator1="Partner#MODAL_SUBMIT" />
+	</command>
+
+	<command name="closeOverlay">
+		<if>
+			<condition function="IsElementPresent" locator1="Partner#CLOSE_OVERLAY_BUTTON" />
+			<then>
+				<execute function="Click" locator1="Partner#CLOSE_OVERLAY_BUTTON" />
+			</then>
+		</if>
 	</command>
 
 	<command name="findRowID">
@@ -115,7 +126,9 @@
 	</command>
 
 	<command name="gotoCPServerAdministration">
-		<execute function="Open" locator1="/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet" />
+		<execute macro="Partner#openURL">
+			<var name="appendUrl" value="/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet" />
+		</execute>
 	</command>
 
 	<command name="gotoHome">
@@ -158,6 +171,18 @@
 		<execute macro="PartnerSales#gotoBusinessPlans" />
 	</command>
 
+	<command name="gotoSalesPartnerOpportunities">
+		<execute function="Click" locator1="Partner#NAVBAR_SALES" />
+
+		<execute macro="PartnerSales#gotoPartnerOpportunities" />
+	</command>
+
+	<command name="gotoSalesRenewalOpportunities">
+		<execute function="Click" locator1="Partner#NAVBAR_SALES" />
+
+		<execute macro="PartnerSales#gotoRenewalOpportunities" />
+	</command>
+
 	<command name="gotoTab">
 		<var name="key_tabName" value="${tabName}" />
 
@@ -181,6 +206,8 @@
 
 		<execute function="Type" locator1="Partner#EMAIL_ADDRESS_FIELD" value1="${userEmailAddress}" />
 		<execute function="Type" locator1="Partner#PASSWORD_FIELD" value1="${userPassword}" />
+
+		<execute macro="Partner#closeOverlay" />
 
 		<execute function="AssertClick" locator1="Partner#SIGN_IN_BUTTON" value1="Sign In" />
 
@@ -213,14 +240,34 @@
 	</command>
 
 	<command name="logoutUserCP">
-		<execute function="Open" locator1="/c/portal/logout" />
+		<execute macro="Partner#openURL">
+			<var name="appendUrl" value="/c/portal/logout" />
+		</execute>
 
 		<execute macro="Partner#pause">
 			<var name="pauseTime" value="2000" />
 		</execute>
 	</command>
 
+	<command name="openSpecificURL">
+		<execute function="Open" locator1="${url}" />
+	</command>
+
 	<command name="openURL">
+		<var method="TestPropsUtil#get('portal.partner.url')" name="partnerUrl" />
+
+		<if>
+			<and>
+				<isset var="appendUrl" />
+				<not>
+					<contains string="${appendUrl}" substring="{appendUrl}" />
+				</not>
+			</and>
+			<then>
+				<var method="StringUtil#add('${partnerUrl}', '${appendUrl}', '')" name="partnerUrl" />
+			</then>
+		</if>
+
 		<execute function="Open" locator1="${partnerUrl}" />
 	</command>
 
