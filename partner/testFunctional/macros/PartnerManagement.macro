@@ -3,6 +3,11 @@
 		<var name="key_businessPlan" value="${partnerBusinessPlanID}" />
 		<var method="StringUtil#upperCase('${partnerBusinessPlanStatus}')" name="partnerBusinessPlanStatus" />
 
+		<execute macro="Partner#formatRegionCode">
+			<var name="regionCode" value="${partnerBusinessPlanRegionCode}" />
+			<return from="regionCodeFormatted" name="partnerBusinessPlanRegionCode" />
+		</execute>
+
 		<execute macro="PartnerManagement#filterBusinessPlanByYear">
 			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
 		</execute>
@@ -12,7 +17,7 @@
 		</execute>
 
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_PARTNER" value1="${partnerBusinessPlanCompany}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_REGION" value1="${partnerBusinessPlanRegion}" />
+		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_REGION_CODE" value1="${partnerBusinessPlanRegionCode}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_STATUS" value1="${partnerBusinessPlanStatus}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_LIFERAY_BUSINESS_PLAN_OWNER" value1="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
 		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerManagement#BUSINESS_PLAN_LIFERAY_MARKETING_PLAN_OWNER" value1="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
@@ -89,7 +94,6 @@
 
 	<command name="deleteBusinessPlanConflict">
 		<var name="key_businessPlanCompany" value="${partnerBusinessPlanCompany}" />
-		<var name="key_businessPlanRegion" value="${partnerBusinessPlanRegion}" />
 		<var name="key_businessPlanYear" value="${partnerBusinessPlanYear}" />
 
 		<execute macro="Partner#gotoManagementBusinessPlans" />
@@ -98,12 +102,12 @@
 			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
 		</execute>
 
-		<if>
-			<equals arg1="${partnerBusinessPlanRegion}" arg2="United States" />
-			<then>
-				<var name="key_businessPlanRegion" value="US" />
-			</then>
-		</if>
+		<execute macro="Partner#formatRegionCode">
+			<var name="regionCode" value="${partnerBusinessPlanRegionCode}" />
+			<return from="regionCodeFormatted" name="partnerBusinessPlanRegionCode" />
+		</execute>
+
+		<var name="key_businessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
 
 		<if>
 			<condition function="IsElementNotPresent" locator1="PartnerManagement#BUSINESS_PLAN_OPTIONS2" />
@@ -140,13 +144,15 @@
 	<command name="filterBusinessPlanByYear">
 		<var name="key_businessPlanYear" value="${partnerBusinessPlanYear}" />
 
+		<execute function="Click" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR" value1="Year ${partnerBusinessPlanYear}" />
+
 		<if>
 			<and>
 				<contains string="${partnerBusinessPlanYear}" substring="20" />
 				<condition function="IsElementPresent" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR_OPTION" />
 			</and>
 			<then>
-				<execute function="Select" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR" value1="Year ${partnerBusinessPlanYear}" />
+				<execute function="Click" locator1="PartnerManagement#BUSINESS_PLAN_FILTER_BY_YEAR_OPTION" value1="Year ${partnerBusinessPlanYear}" />
 			</then>
 		</if>
 

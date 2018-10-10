@@ -1,14 +1,24 @@
 <definition component-name="partner">
 	<property name="testray.main.component.name" value="partner" />
 
+	<var method="TestPropsUtil#get('partner.company')" name="partnerOpportunityPartnerAccount" />
+	<var method="TestPropsUtil#get('partner.region')" name="partnerOpportunityProspectCountry" />
+	<var method="TestPropsUtil#get('partner.region.code')" name="partnerRegionCode" />
+
+	<var method="TestPropsUtil#get('partner.${partnerRegionCode}.email.address.partner2')" name="partnerOpportunityEmailAddress2" />
+	<var method="TestPropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerOpportunityOwner" />
+
+	<set-up>
+		<execute macro="Partner#loginUser">
+			<var name="roleName" value="admin" />
+		</execute>
+	</set-up>
+
 	<command known-issues="true" name="AddPartnerOpportunity" priority="5">
 		<var name="partnerOpportunityCustomerEmailAddress" value="test@liferay.com" />
 		<var name="partnerOpportunityCustomerFirstName" value="Test" />
 		<var name="partnerOpportunityCustomerLastName" value="Test" />
-		<var name="partnerOpportunityOwner" value="Johnnie Stubbs" />
-		<var name="partnerOpportunityPartnerAccount" value="Valamis Inc." />
 		<var name="partnerOpportunityProspectAccountName" value="Deathray Inc - Test" />
-		<var name="partnerOpportunityProspectCountry" value="United States" />
 		<var name="partnerOpportunityProspectIndustry" value="Aerospace &amp; Defense" />
 		<var name="salesforceAccountName" value="Deathray Inc - Test" />
 		<var name="salesforceOpportunityName" value="Deathray Inc - Test" />
@@ -26,7 +36,7 @@
 
 		<execute macro="PartnerOpportunities#assertOpportunity">
 			<var name="partnerOpportunityAccountName" value="${partnerOpportunityProspectAccountName}" />
-			<var name="partnerOpportunityOwner" value="Johnnie Stubbs" />
+			<var name="partnerOpportunityOwner" value="${partnerOpportunityOwner}" />
 			<var name="partnerOpportunityStage" value="Pending Review" />
 		</execute>
 
@@ -112,7 +122,9 @@
 
 		<execute macro="Partner#openURL" />
 
-		<execute macro="Partner#gotoSalesPartnerOpportunities" />
+		<execute macro="Partner#gotoSalesPartnerOpportunities">
+			<var name="roleName" value="partner" />
+		</execute>
 
 		<execute macro="Partner#gotoTab">
 			<var name="tabName" value="Closed" />
@@ -124,7 +136,7 @@
 
 		<execute macro="PartnerOpportunities#assertOpportunity">
 			<var name="partnerOpportunityAccountName" value="${partnerOpportunityProspectAccountName}" />
-			<var name="partnerOpportunityOwner" value="Johnnie Stubbs" />
+			<var name="partnerOpportunityOwner" value="${partnerOpportunityOwner}" />
 			<var name="partnerOpportunityStage" value="Closed" />
 		</execute>
 
@@ -147,15 +159,16 @@
 
 	<command known-issues="true" name="RenewalOpportunityRequests" priority="5">
 		<var name="partnerOpportunityAllianceManager" value="Salesforce Integration" />
-		<var name="partnerOpportunityOwner" value="Johnnie Stubbs" />
 		<var name="partnerRenewalOpportunityAccount" value="Deathray Inc - Test" />
 		<var name="partnerRenewalOpportunityComment" value="Test" />
 
-		<execute macro="Partner#loginUser">
+		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="partner" />
 		</execute>
 
-		<execute macro="Partner#gotoSalesRenewalOpportunities" />
+		<execute macro="Partner#gotoSalesRenewalOpportunities">
+			<var name="roleName" value="partner" />
+		</execute>
 
 		<execute macro="PartnerRenewalOpportunities#clickRenewalOpportunity">
 			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
@@ -167,7 +180,9 @@
 
 		<execute macro="PartnerRenewalOpportunity#clickRequestOrderForm" />
 
-		<execute macro="Partner#gotoSalesRenewalOpportunities" />
+		<execute macro="Partner#gotoSalesRenewalOpportunities">
+			<var name="roleName" value="partner" />
+		</execute>
 
 		<execute macro="PartnerRenewalOpportunities#assertRenewalOpportunity">
 			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
@@ -187,7 +202,9 @@
 			<var name="partnerRenewalOpportunityTimelineActivity" value="Stage updated from Order Form Requested to Change Requested." />
 		</execute>
 
-		<execute macro="Partner#gotoSalesRenewalOpportunities" />
+		<execute macro="Partner#gotoSalesRenewalOpportunities">
+			<var name="roleName" value="partner" />
+		</execute>
 
 		<execute macro="PartnerRenewalOpportunities#assertRenewalOpportunity">
 			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
@@ -224,16 +241,7 @@
 	</command>
 
 	<command known-issues="true" name="ViewOpportunitiesAsManager" priority="5">
-		<var method="TestPropsUtil#get('partner.email.address.partner2')" name="partnerEmailAddress2" />
-		<var name="partnerOpportunityAccountName" value="Arcusys" />
-
-		<execute macro="Partner#loginUser">
-			<var name="roleName" value="partner2" />
-		</execute>
-
-		<execute macro="Partner#gotoSalesPartnerOpportunities" />
-
-		<execute macro="PartnerOpportunities#assertNoAccountDropdown" />
+		<var name="partnerOpportunityAccountName" value="Base22" />
 
 		<execute macro="OSBAdminUser#login">
 			<var name="liferayURL" value="https://web-uat.liferay.com" />
@@ -248,22 +256,20 @@
 		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
 
 		<execute macro="OSBAdminPartner#assignWorker">
-			<var name="emailAddress" value="${partnerEmailAddress2}" />
+			<var name="emailAddress" value="${partnerOpportunityEmailAddress2}" />
 			<var name="partnerCode" value="${partnerOpportunityAccountName}" />
-			<var name="role" value="Manager" />
+			<var name="role" value="Watcher" />
 		</execute>
 
 		<execute macro="Partner#logoutAndLoginUser">
 			<var name="roleName" value="partner2" />
 		</execute>
 
-		<execute macro="Partner#gotoSalesPartnerOpportunities" />
-
-		<execute macro="PartnerOpportunities#assertAccountDropdown" />
-
-		<execute macro="PartnerOpportunities#selectAccount">
-			<var name="partnerOpportunityAccountName" value="${partnerOpportunityAccountName}" />
+		<execute macro="Partner#gotoSalesPartnerOpportunities">
+			<var name="roleName" value="partner2" />
 		</execute>
+
+		<execute macro="PartnerOpportunities#assertNoAccountDropdown" />
 
 		<execute macro="Partner#openSpecificURL">
 			<var name="url" value="https://web-uat.liferay.com/group/control_panel" />
@@ -272,9 +278,19 @@
 		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
 
 		<execute macro="OSBAdminPartner#assignWorker">
-			<var name="emailAddress" value="${partnerEmailAddress2}" />
+			<var name="emailAddress" value="${partnerOpportunityEmailAddress2}" />
 			<var name="partnerCode" value="${partnerOpportunityAccountName}" />
-			<var name="role" value="Watcher" />
+			<var name="role" value="Manager" />
+		</execute>
+
+		<execute macro="Partner#gotoSalesPartnerOpportunities">
+			<var name="roleName" value="partner" />
+		</execute>
+
+		<execute macro="PartnerOpportunities#assertAccountDropdown" />
+
+		<execute macro="PartnerOpportunities#selectAccount">
+			<var name="partnerOpportunityAccountName" value="${partnerOpportunityAccountName}" />
 		</execute>
 	</command>
 </definition>
