@@ -1,18 +1,13 @@
 <definition component-name="partner">
 	<property name="testray.main.component.name" value="partner" />
 
-	<var name="partnerMDFClaimID" static="true" />
-	<var name="partnerMDFRequestID" static="true" />
+	<var name="mdfClaimID" static="true" />
+	<var name="mdfRequestID" static="true" />
 
 	<var method="PropsUtil#get('partner.company')" name="partnerMDFRequestCompanyName" />
 	<var method="PropsUtil#get('partner.name.global_partner_marketing')" name="partnerMDFRequestGlobalPartnerMarketing" />
 	<var method="PropsUtil#get('partner.region')" name="partnerMDFRequestRegion" />
 	<var method="PropsUtil#get('partner.region.code')" name="partnerRegionCode" />
-
-	<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
-	<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
-
-	<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 
 	<set-up>
 		<execute macro="Partner#loginUser">
@@ -25,19 +20,17 @@
 			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
 			<var name="partnerMDFRequestRegion" value="${partnerMDFRequestRegion}" />
 			<var name="partnerMDFRequestPhoneNumber" value="123 456 7890" />
-			<return name="partnerMDFRequestID" />
+			<return name="mdfRequestID" />
 		</execute>
 
-		<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-
 		<execute macro="PartnerWorkflow#approveMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 	</set-up>
 
 	<tear-down>
 		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 	</tear-down>
 
@@ -45,6 +38,7 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
 		<var name="partnerMDFClaimStatus" value="Approved" />
 		<var name="partnerMDFClaimType" value="Full" />
@@ -54,12 +48,12 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#approveMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -78,14 +72,14 @@
 		<execute macro="PartnerManagement#assertMDFClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
 			<var name="partnerMDFClaimAmountPaid" value="${partnerMDFClaimAmountPaid}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFClaimPartner" value="${partnerMDFClaimPartner}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerManagement#viewNoMDFClaimOptions">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="Partner#logoutAndLoginUser">
@@ -97,36 +91,36 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Edit,Delete" />
 			<var name="partnerOptionsList" value="View" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -147,7 +141,7 @@
 		<execute macro="Partner#gotoManagementClaims" />
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerOptionsList" value="Edit,Delete" />
 		</execute>
 
@@ -160,7 +154,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;Your Marketing Development Fund claim has been approved.;The reviewer's comment was:;Approved by Finance Manager.;Your approved claim and details about payment can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;Your Marketing Development Fund claim has been approved.;The reviewer's comment was:;Approved by Finance Manager.;Your approved claim and details about payment can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -172,7 +166,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="Finance Review" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
@@ -181,8 +177,8 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -197,36 +193,36 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Edit,Delete" />
 			<var name="partnerOptionsList" value="View" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -245,20 +241,20 @@
 		<execute macro="PartnerManagement#assertMDFClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
 			<var name="partnerMDFClaimAmountPaid" value="${partnerMDFClaimAmountPaid}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFClaimPartner" value="${partnerMDFClaimPartner}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Delete" />
 			<var name="partnerOptionsList" value="Edit" />
 		</execute>
 
 		<execute macro="PartnerManagement#clickMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="Partner#pause">
@@ -279,7 +275,7 @@
 		<execute macro="Partner#gotoManagementClaims" />
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerOptionsList" value="Edit,Delete" />
 		</execute>
 
@@ -292,7 +288,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -304,7 +300,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -324,7 +320,7 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimsPartial">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="Partner#gotoMarketingMDF">
@@ -334,13 +330,13 @@
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
@@ -400,7 +396,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="Finance Review" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
@@ -409,17 +407,17 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#requestMoreInfoMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#editAndSubmitMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -442,30 +440,30 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -492,7 +490,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;The requester's comment was:;Adding an Edit as Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;The requester's comment was:;Adding an Edit as Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -504,7 +502,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;The requester's comment was:;Adding an Edit as Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;The requester's comment was:;Adding an Edit as Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -516,7 +514,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 100" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 100" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="Claim Paid" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountApproved" value="USD 100" />
@@ -526,16 +526,16 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#approveMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#payoutMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -558,14 +558,14 @@
 		<execute macro="PartnerManagement#assertMDFClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
 			<var name="partnerMDFClaimAmountPaid" value="${partnerMDFClaimAmountPaid}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFClaimPartner" value="${partnerMDFClaimPartner}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerManagement#viewNoMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="Partner#logoutAndLoginUser">
@@ -581,17 +581,17 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertSummary">
@@ -605,20 +605,20 @@
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Edit,Delete" />
 			<var name="partnerOptionsList" value="View" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -639,7 +639,7 @@
 		<execute macro="Partner#gotoManagementClaims" />
 
 		<execute macro="PartnerManagement#viewNoMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#gotoMockMock" />
@@ -651,7 +651,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;A check has been sent for your Marketing Development Fund claim. The claim can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;A check has been sent for your Marketing Development Fund claim. The claim can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -672,17 +672,17 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimsPartial">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#approveAndPayoutMDFRequestClaim">
 			<var name="partnerMDFClaimNumber" value="1" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#approveAndPayoutMDFRequestClaim">
 			<var name="partnerMDFClaimNumber" value="2" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="Partner#gotoManagement" />
@@ -695,13 +695,13 @@
 			<var name="partnerMDFRequestAmountApproved" value="${partnerMDFRequestAmountApproved}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerManagement#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertSummary">
@@ -765,7 +765,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="Rejected" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
@@ -774,12 +776,12 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#rejectMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -802,14 +804,14 @@
 		<execute macro="PartnerManagement#assertMDFClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
 			<var name="partnerMDFClaimAmountPaid" value="${partnerMDFClaimAmountPaid}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFClaimPartner" value="${partnerMDFClaimPartner}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerManagement#viewNoMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="Partner#logoutAndLoginUser">
@@ -825,36 +827,36 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Edit,Delete" />
 			<var name="partnerOptionsList" value="View" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -879,7 +881,7 @@
 		</execute>
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerOptionsList" value="Edit,Delete" />
 		</execute>
 
@@ -892,7 +894,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;Unfortunately, your Marketing Development Fund claim has been rejected.;The reviewer's comment was:;Rejected by Finance Manager.;If you have any questions or believe this was done in error, please contact your Global Partner Marketing Manager or Alliance Manager.;The rejected claim can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;Unfortunately, your Marketing Development Fund claim has been rejected.;The reviewer's comment was:;Rejected by Finance Manager.;If you have any questions or believe this was done in error, please contact your Global Partner Marketing Manager or Alliance Manager.;The rejected claim can be found at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -914,17 +916,17 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimsPartial">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#rejectMDFRequestClaim">
 			<var name="partnerMDFClaimNumber" value="1" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#rejectMDFRequestClaim">
 			<var name="partnerMDFClaimNumber" value="2" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="Partner#gotoManagement" />
@@ -939,13 +941,13 @@
 			<var name="partnerMDFRequestAmountApproved" value="${partnerMDFRequestAmountApproved}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerManagement#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertSummary">
@@ -1009,7 +1011,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="More Info Requested" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
@@ -1018,12 +1022,12 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#requestMoreInfoMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -1042,14 +1046,14 @@
 		<execute macro="PartnerManagement#assertMDFClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
 			<var name="partnerMDFClaimAmountPaid" value="${partnerMDFClaimAmountPaid}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFClaimPartner" value="${partnerMDFClaimPartner}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFClaimPartner" value="${partnerMDFRequestCompanyName}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Delete" />
 			<var name="partnerOptionsList" value="Edit" />
 		</execute>
@@ -1063,36 +1067,36 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Delete" />
 			<var name="partnerOptionsList" value="View,Edit" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -1113,7 +1117,7 @@
 		<execute macro="Partner#gotoManagementClaims" />
 
 		<execute macro="PartnerManagement#viewMDFClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerOptionsList" value="Edit,Delete" />
 		</execute>
 
@@ -1126,7 +1130,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;A reviewer has requested more information for your Marketing Development Fund claim.;The reviewer's comment was:;Requesting for More Info by Finance Manager.;Please revise the claim and then resubmit it at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${partnerMDFClaimID}/edit" />
+			<var name="mockMockAsset" value="Dear ${partnerMDFClaimOwner},;A reviewer has requested more information for your Marketing Development Fund claim.;The reviewer's comment was:;Requesting for More Info by Finance Manager.;Please revise the claim and then resubmit it at the following link:;https://partner.liferay.com/mdf/-/mdf/claim/${mdfClaimID}/edit" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -1138,7 +1142,9 @@
 		<var name="partnerMDFClaimActivities" value="Test Activity1, Test Activity2" />
 		<var name="partnerMDFClaimAmountClaimed" value="USD 100" />
 		<var name="partnerMDFClaimAmountPaid" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerMDFClaimOwner" />
 		<var name="partnerMDFClaimPaymentReceived" value="USD 0" />
+		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerMDFClaimRegionalFinance" />
 		<var name="partnerMDFClaimStatus" value="Finance Review" />
 		<var name="partnerMDFClaimType" value="Full" />
 		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
@@ -1147,17 +1153,17 @@
 		<var name="partnerMDFRequestTotalCost" value="USD 200" />
 
 		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
-			<return name="partnerMDFClaimID" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#requestMoreInfoMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerWorkflow#resendForReviewMDFClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -1180,30 +1186,30 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#assertMDFRequest">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFRequestAmountRequested" value="${partnerMDFRequestAmountRequested}" />
 			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 			<var name="partnerMDFRequestStatus" value="${partnerMDFRequestStatus}" />
 			<var name="partnerMDFRequestTotalCost" value="${partnerMDFRequestTotalCost}" />
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -1230,7 +1236,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;The requester's comment was:;Resending for Review by Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Regional Finance,;A Marketing Development Fund claim was [re]submitted for review and payment.;The requester's comment was:;Resending for Review by Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -1242,7 +1248,7 @@
 		</execute>
 
 		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;The requester's comment was:;Resending for Review by Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${partnerMDFClaimID}" />
+			<var name="mockMockAsset" value="Dear Global Partner Marketing,;A Marketing Development Fund claim was [re]submitted.;The requester's comment was:;Resending for Review by Partner.;Please review the claim at the following link:;https://partner.liferay.com/mdf-claim-manager/-/mdf-claim-manager/claim/${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMockMock#backtoInbox" />
@@ -1271,7 +1277,7 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#clickNewClaimButton" />
@@ -1286,7 +1292,7 @@
 		<execute macro="Partner#assertSuccess" />
 
 		<execute macro="Partner#readTitleID">
-			<return name="partnerMDFClaimID" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="Partner#gotoMarketingMDF">
@@ -1294,24 +1300,24 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerOptionsList" value="View,Edit,Delete" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
@@ -1343,7 +1349,7 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#clickNewClaimButton" />
@@ -1358,7 +1364,7 @@
 		<execute macro="Partner#assertSuccess" />
 
 		<execute macro="Partner#readTitleID">
-			<return name="partnerMDFClaimID" />
+			<return name="mdfClaimID" />
 		</execute>
 
 		<execute macro="Partner#gotoMarketingMDF">
@@ -1366,11 +1372,11 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="Partner#clickEditButton" />
@@ -1400,26 +1406,26 @@
 		</execute>
 
 		<execute macro="PartnerMarketingMDF#clickMDFRequest">
-			<var name="partnerMDFRequestID" value="${partnerMDFRequestID}" />
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#assertReimbursementClaim">
 			<var name="partnerMDFClaimActivities" value="${partnerMDFClaimActivities}" />
 			<var name="partnerMDFClaimAmountClaimed" value="${partnerMDFClaimAmountClaimed}" />
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerMDFClaimPaymentReceived" value="${partnerMDFClaimPaymentReceived}" />
 			<var name="partnerMDFClaimStatus" value="${partnerMDFClaimStatus}" />
 			<var name="partnerMDFClaimType" value="${partnerMDFClaimType}" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaimOptions">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 			<var name="partnerNoOptionsList" value="Edit,Delete" />
 			<var name="partnerOptionsList" value="View" />
 		</execute>
 
 		<execute macro="PartnerMDFRequest#viewReimbursementClaim">
-			<var name="partnerMDFClaimID" value="${partnerMDFClaimID}" />
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
 		</execute>
 
 		<execute macro="PartnerMDFClaim#assertSummary">
