@@ -1,0 +1,212 @@
+definition {
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var apiToken = PropsUtil.get("zendesk.api.token");
+
+	@prose = "I create a user with the following values ${table}"
+	macro _createUser {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var userName = "${value}";
+			}
+			else if ("${field}" == "Role") {
+				var role = "${value}";
+			}
+			else if ("${field}" == "Access") {
+				var access = "${value}";
+			}
+			else if ("${field}" == "Email") {
+				var email = "${value}";
+			}
+			else if ("${field}" == "Phone Number") {
+				var phoneNumber = "${value}";
+			}
+			else if ("${field}" == "Tags") {
+				var tags = "${value}";
+			}
+			else if ("${field}" == "Organization") {
+				var organization = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				if("${value}" == "English") {
+					var localeId = "1";
+				}
+				else if("${value}" == "Japanese") {
+					var localeId = "67";
+				}
+				else if("${value}" == "Portuguese") {
+					var localeId = "1011";
+				}
+				else if("${value}" == "Simplified Chinese") {
+					var localeId = "10";
+				}
+				else if("${value}" == "Spanish") {
+					var localeId = "2";
+				}
+				else {
+					var localeId = "1";
+				}
+			}
+			else if ("${field}" == "Time Zone") {
+				var timeZone = "${value}";
+			}
+			else if ("${field}" == "Details") {
+				var details = "${value}";
+			}
+			else if ("${field}" == "Notes") {
+				var notes = "${value}";
+			}
+			else if ("${field}" == "External ID") {
+				var externalId = "${value}";
+			}
+			else if ("${field}" == "Password") {
+				var password = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		if (!(isSet(userName))) {
+			var userName = "";
+		}
+		if (!(isSet(role))) {
+			var role = "";
+		}
+		if (!(isSet(access))) {
+			var access = "";
+		}
+		if (!(isSet(email))) {
+			var email = "";
+		}
+		if (!(isSet(phoneNumber))) {
+			var phoneNumber = "";
+		}
+		if (!(isSet(tags))) {
+			var tags = "";
+		}
+		if (!(isSet(organization))) {
+			var organization = "";
+		}
+		if (!(isSet(localeId))) {
+			var localeId = "";
+		}
+		if (!(isSet(timeZone))) {
+			var timeZone = "";
+		}
+		if (!(isSet(details))) {
+			var details = "";
+		}
+		if (!(isSet(notes))) {
+			var notes = "";
+		}
+		if (!(isSet(externalId))) {
+			var externalId = "";
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/create_or_update.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"user":
+				{
+					"name": "${userName}",
+					"role": "${role}",
+					"ticket_restriction": "${access}",
+					"email": "${email}",
+					"phone": "${phoneNumber}",
+					"tags": "${tags}",
+					"locale_id": "${localeId}",
+					"time_zone": "${timeZone}",
+					"details": "${details}",
+					"notes": "${notes}",
+					"external_id": "${externalId}",
+					"organization":
+					{
+						"name": "${organization}"
+					}
+				}
+			}
+			''';
+
+		static var staticUserID = JSONCurlUtil.post("${curl}", "$.user.id");
+
+		echo("User ID: ${staticUserID}");
+
+		return "${staticUserID}";
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/${staticUserID}/password.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"password":"${password}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I teardown the user with userId ${staticUserID} from zendesk.liferay.com"
+	macro _tearDownUserById {
+		var curl = '''
+			${zendeskURL}/api/v2/users/${staticUserID}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I teardown users with the following userExternalIds from zendesk.liferay.com ${table}"
+	macro _tearDownUsersByExternalId {
+		var userCount = "0";
+		var userExternalIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userExternalId = "${row[0]}";
+
+			if("${userCount}" == "0") {
+				var userExternalIds = "${userExternalIds}${userExternalId}";
+			}
+			else {
+				var userExternalIds = "${userExternalIds},${userExternalId}";
+			}
+
+			var userCount = MathUtil.sum("${userCount}", "1");
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "the user with userExternalId ${userExternalId} on zendesk.liferay.com should have the name ${userName}"
+	macro _viewUserNameByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userNameFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].name");
+
+		echo("Expected User Name: ${userName}");
+		echo("Actual User Name: ${userNameFromAPI}");
+
+		if (!("${userNameFromAPI}" == "${userName}")) {
+			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
+		}
+	}
+}

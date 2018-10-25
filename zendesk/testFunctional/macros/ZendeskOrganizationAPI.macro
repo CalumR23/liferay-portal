@@ -1,0 +1,205 @@
+definition {
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var apiToken = PropsUtil.get("zendesk.api.token");
+
+	@prose = "I create an organization with the following values ${table}"
+	macro _createOrganization {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var organizationName = "${value}";
+			}
+			else if ("${field}" == "Tags") {
+				var tags = "${value}";
+			}
+			else if ("${field}" == "Shared Tickets") {
+				var sharedTicketsEnabled = "${value}";
+			}
+			else if ("${field}" == "Shared Comments") {
+				var sharedCommentsEnabled = "${value}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value}";
+			}
+			else if ("${field}" == "SLA") {
+				var sla = "${value}";
+			}
+			else if ("${field}" == "Tier") {
+				var tier = "${value}";
+			}
+			else if ("${field}" == "Support Region") {
+				var supportRegion = "${value}";
+			}
+			else if ("${field}" == "Support Language") {
+				var supportLanguage = "${value}";
+			}
+			else if ("${field}" == "Partner First Line Support") {
+				var partnerFirstLineSupportEnabled = "${value}";
+			}
+			else if ("${field}" == "Partner Organization Name") {
+				var partnerOrganization = "${value}";
+			}
+			else if ("${field}" == "Partner Jira Project") {
+				var partnerJiraProject = "${value}";
+			}
+			else if ("${field}" == "Partner") {
+				var partnerEnabled = "${value}";
+			}
+			else if ("${field}" == "External ID") {
+				var externalId = "${value}";
+			}
+			else {
+				fail("No such organization field ${field}");
+			}
+		}
+
+		if (!(isSet(organizationName))) {
+			var organizationName = "";
+		}
+		if (!(isSet(tags))) {
+			var tags = "";
+		}
+		if (!(isSet(sharedTicketsEnabled))) {
+			var sharedTicketsEnabled = "false";
+		}
+		if (!(isSet(sharedCommentsEnabled))) {
+			var sharedCommentsEnabled = "false";
+		}
+		if (!(isSet(status))) {
+			var status = "";
+		}
+		if (!(isSet(sla))) {
+			var sla = "";
+		}
+		if (!(isSet(tier))) {
+			var tier = "";
+		}
+		if (!(isSet(supportRegion))) {
+			var supportRegion = "";
+		}
+		if (!(isSet(supportLanguage))) {
+			var supportLanguage = "";
+		}
+		if (!(isSet(partnerFirstLineSupportEnabled))) {
+			var partnerFirstLineSupportEnabled = "";
+		}
+		if (!(isSet(partnerOrganization))) {
+			var partnerOrganization = "";
+		}
+		if (!(isSet(partnerJiraProject))) {
+			var partnerJiraProject = "";
+		}
+		if (!(isSet(partnerEnabled))) {
+			var partnerEnabled = "";
+		}
+		if (!(isSet(externalId))) {
+			var externalId = "";
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/organizations.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"organization":
+				{
+					"name": "${organizationName}",
+					"tags": "${tags}",
+					"shared_tickets": "${sharedTicketsEnabled}",
+					"shared_comments": "${sharedCommentsEnabled}",
+					"external_id": "${externalId}",
+					"organization_fields":
+					{
+						"status": "${status}",
+						"sla": "${sla}",
+						"tier": "${tier}",
+						"support_region": "${supportRegion}",
+						"support_language": "${supportLanguage}",
+						"partner_first_line_support": "${partnerFirstLineSupportEnabled}",
+						"partner_organization": "${partnerOrganization}",
+						"partner_jira_project": "${partnerJiraProject}",
+						"partner": "${partnerEnabled}"
+					}
+				}
+			}
+			''';
+
+		static var staticOrganizationID = JSONCurlUtil.post("${curl}", "$.organization.id");
+
+		echo("Organization ID: ${staticOrganizationID}");
+
+		return "${staticOrganizationID}";
+	}
+
+	@prose = "I teardown the organization with organizationId ${staticOrganizationId} from zendesk.liferay.com"
+	macro _tearDownOrganizationById {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/${staticOrganizationID}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I teardown organizations with the following organizationExternalIds from zendesk.liferay.com ${table}"
+	macro _tearDownOrganizationsByExternalId {
+		var organizationCount = "0";
+		var organizationExternalIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var organizationExternalId = "${row[0]}";
+
+			if("${organizationCount}" == "0") {
+				var organizationExternalIds = "${organizationExternalIds}${organizationExternalId}";
+			}
+			else {
+				var organizationExternalIds = "${organizationExternalIds},${organizationExternalId}";
+			}
+
+			var organizationCount = MathUtil.sum("${organizationCount}", "1");
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/destroy_many.json?external_ids=${organizationExternalIds}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "the organization with organizationExternalId ${organizationExternalId} on zendesk.liferay.com should have the name ${organizationName}"
+	macro _viewOrganizationNameByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/search.json?external_id=${organizationExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organizations[0].name");
+
+		echo("Expected Organization Name: ${organizationName}");
+		echo("Actual Organization Name: ${organizationNameFromAPI}");
+
+		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
+		}
+	}
+
+	macro _viewOrganizationIdByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/search.json?external_id=${organizationExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationID = JSONCurlUtil.get("${curl}", "$.organizations[0].id");
+
+		return "${organizationID}";
+	}
+}

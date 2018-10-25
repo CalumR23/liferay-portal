@@ -1,0 +1,287 @@
+definition {
+	@prose = "I create a request with the following values ${table}"
+	macro create {
+		Click(locator1 = "ZendeskHomepage#SUBMIT_A_TICKET_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+			var subValue = "${row[2]}";
+
+			if ("${field}" == "Organization") {
+				Click(locator1 = "ZendeskRequestAdd#ORGANIZATION_DROPDOWN_LINK");
+				Click(
+					locator1 = "ZendeskRequestAdd#OPTION",
+					key_option = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				Click(locator1 = "ZendeskRequestAdd#PRODUCT_DROPDOWN_LINK");
+				Click(
+					locator1 = "ZendeskRequestAdd#OPTION",
+					key_option = "${value}");
+				if (!("${subValue}" == "")) {
+					Click(
+						locator1 = "ZendeskRequestAdd#OPTION",
+						key_option = "${subValue}");
+				}
+			}
+			else if ("${field}" == "Component") {
+				Click(locator1 = "ZendeskRequestAdd#COMPONENT_DROPDOWN_LINK");
+				Click(
+					locator1 = "ZendeskRequestAdd#OPTION",
+					key_option = "${value}");
+			}
+			else if ("${field}" == "System Status") {
+				Click(locator1 = "ZendeskRequestAdd#SYSTEM_STATUS_DROPDOWN_LINK");
+				Click(
+					locator1 = "ZendeskRequestAdd#OPTION",
+					key_option = "${value}");
+				if (!("${subValue}" == "")) {
+					Click(
+						locator1 = "ZendeskRequestAdd#OPTION",
+						key_option = "${subValue}");
+				}
+			}
+			else if ("${field}" == "Subject") {
+				Type(
+					locator1 = "ZendeskRequestAdd#SUBJECT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Description") {
+				Type(
+					locator1 = "ZendeskRequestAdd#DESCRIPTION_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Attachments") {
+				MakeVisible(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD");
+
+				UploadCommonFile(
+					locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+		Click(locator1 = "ZendeskRequestAdd#SUBMIT_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your request was successfully submitted.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+	}
+
+	@prose = "I click on the request with the subject ${requestSubject} in the index"
+	macro gotoViaIndex {
+		Click(
+			locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
+			value1 = "${value}",
+			key_requestSubject = "${requestSubject}");
+	}
+
+	@prose = "I search for a request using the keyword ${keyword}"
+	macro typeSearchKeywordAndEnter {
+		Type(
+			locator1 = "ZendeskRequestIndex#SEARCH_FIELD",
+			value1 = "${keyword}");
+
+		KeyPress(
+			locator1 = "ZendeskRequestIndex#SEARCH_FIELD",
+			value1 = "\RETURN");
+	}
+
+	@prose = "I should be able to view a request with the following details ${table}"
+	macro view {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Subject") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_SUBJECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Id") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_ID",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Requester") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_REQUESTER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Created") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_CREATED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Last activity") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_LAST_ACTIVITY",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Organization") {
+				AssertSelectedLabel(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_ORGANIZATION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Priority") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_PRIORITY",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Sub-Status") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_SUB_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Component") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_COMPONENT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "System Status") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_SYSTEM_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Attachments") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_ATTACHMENT",
+					value1 = "${value}",
+					key_attachmentName = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a request comment containing the text ${commentContent} with the following details ${table}"
+	macro viewComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_AUTHOR",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Comment") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Attachments") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}",
+					key_attachmentName = "${value}");
+			}
+			else {
+				fail("No such request comment field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should see a request with the subject ${requestSubject} in the index with the following details ${table}"
+	macro viewViaIndex {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Subject") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
+					value1 = "${value}",
+					key_requestSubject = "${requestSubject}");
+			}
+			else if ("${field}" == "Id") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestIndex#REQUEST_ID",
+					value1 = "${value}",
+					key_requestSubject = "${requestSubject}");
+			}
+			else if ("${field}" == "Created") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestIndex#REQUEST_CREATED",
+					value1 = "${value}",
+					key_requestSubject = "${requestSubject}");
+			}
+			else if ("${field}" == "Last activity") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestIndex#REQUEST_LAST_ACTIVITY",
+					value1 = "${value}",
+					key_requestSubject = "${requestSubject}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestIndex#REQUEST_STATUS",
+					value1 = "${value}",
+					key_requestSubject = "${requestSubject}");
+			}
+			else {
+				fail("No such request index field ${field}");
+			}
+		}
+	}
+
+	@prose = "I submit a comment containing the following details ${table}"
+	macro submitComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Comment") {
+				Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
+				Type(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Attachments") {
+				MakeVisible(locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD");
+
+				UploadCommonFile(
+					locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+		Click(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your reply was successfully added.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+	}
+}

@@ -1,0 +1,73 @@
+definition {
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var apiToken = PropsUtil.get("zendesk.api.token");
+
+	@prose = "I teardown the ticket with ticketId ${ticketId} from zendesk.liferay.com"
+	macro _tearDownTicketById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "the ticket with ticketId ${ticketId} should have the environment ${environment}"
+	macro _viewTicketEnvironment {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[10].value");
+
+		echo("Expected Environment Name: ${environment}");
+		echo("Actual Environment Name: ${environmentFromAPI}");
+
+		if (!("${environmentFromAPI}" == "${environment}")) {
+			fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
+		}
+	}
+
+	@prose = "the ticket with ticketId ${ticketId} should be assigned to the group ${assignee}"
+	macro _viewTicketGroupAssignee {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var assigneeIdFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.assignee_id");
+
+		var curl = '''
+			${zendeskURL}/api/v2/groups/${assigneeIdFromAPI}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var assigneeFromAPI = JSONCurlUtil.get("${curl}", "$.group.name");
+
+		echo("Expected Assignee Name: ${assignee}");
+		echo("Actual Assignee Name: ${assigneeFromAPI}");
+
+		if (!("${assigneeFromAPI}" == "${assignee}")) {
+			fail("Actual value ${assigneeFromAPI} does not match expected value ${assignee}");
+		}
+	}
+
+	@prose = "the ticket with ticketId ${ticketId} should have the priority level ${priority}"
+	macro _viewTicketPriority {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var priorityFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.priority");
+
+		echo("Expected Priority Name: ${priority}");
+		echo("Actual Priority Name: ${priorityFromAPI}");
+
+		if (!("${priorityFromAPI}" == "${priority}")) {
+			fail("Actual value ${priorityFromAPI} does not match expected value ${priority}");
+		}
+	}
+}
