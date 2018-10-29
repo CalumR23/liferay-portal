@@ -1,7 +1,41 @@
 definition {
-	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
-	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+
+	@prose = "I assign an organization with organizationExternalId ${organizationExternalId} with the following tags ${table}"
+	macro _assignTagsToOrganization {
+		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByExternalId(organizationExternalId = "${organizationExternalId}");
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var tag = "${row[0]}";
+
+			if (contains("${tagList}", "{tagList}")) {
+				var tagList = "${tag}";
+			}
+			else {
+				var tagList = "${tagList},${tag}";
+			}
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/${organizationId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"organization":
+				{
+					"tags": "${tagList},${existingTags}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
 
 	@prose = "I create an organization with the following values ${table}"
 	macro _createOrganization {
@@ -173,6 +207,23 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _viewOrganizationExistingTagsByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/search.json?external_id=${organizationExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var existingTags = JSONCurlUtil.get("${curl}", "$.organizations[0].tags");
+
+		var existingTags = StringUtil.replace("${existingTags}", "[", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "]", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+
+		return "${existingTags}";
 	}
 
 	@prose = "the organization with organizationExternalId ${organizationExternalId} on zendesk.liferay.com should have the name ${organizationName}"

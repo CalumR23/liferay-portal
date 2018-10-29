@@ -1,7 +1,59 @@
 definition {
-	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
-	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+
+	@prose = "I assign a user with the email address ${userEmailAddress} as a watcher on an organization with organizationExternalId ${organizationExternalId}"
+	macro _assignWatcherRole {
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var tag = "osb_${organizationId}_watcher";
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"user":
+				{
+					"tags": "${tag},${existingTags}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I assign a user with the email address ${userEmailAddress} to an organization with organizationExternalId ${organizationExternalId}"
+	macro _assignUserToOrganization {
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/organization_memberships.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"organization_membership":
+				{
+					"user_id": "${userId}",
+					"organization_id": "${organizationId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
 
 	@prose = "I create a user with the following values ${table}"
 	macro _createUser {
@@ -117,6 +169,7 @@ definition {
 			{
 				"user":
 				{
+					"verified": true,
 					"name": "${userName}",
 					"role": "${role}",
 					"ticket_restriction": "${access}",
@@ -191,6 +244,56 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _viewUserExistingTagsByEmailAddress {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var existingTags = JSONCurlUtil.get("${curl}", "$.users[0].tags");
+
+		var existingTags = StringUtil.replace("${existingTags}", "[", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "]", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+
+		return "${existingTags}";
+	}
+
+	macro _viewUserExistingTagsByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var existingTags = JSONCurlUtil.get("${curl}", "$.users[0].tags");
+
+		return "${existingTags}";
+	}
+
+	macro _viewUserIdByEmailAddress {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userID = JSONCurlUtil.get("${curl}", "$.users[0].id");
+
+		return "${userID}";
+	}
+
+	macro _viewUserIdByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userID = JSONCurlUtil.get("${curl}", "$.users[0].id");
+
+		return "${userID}";
 	}
 
 	@prose = "the user with userExternalId ${userExternalId} on zendesk.liferay.com should have the name ${userName}"

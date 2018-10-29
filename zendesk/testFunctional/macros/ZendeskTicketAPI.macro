@@ -3,18 +3,22 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
 
-	@prose = "I teardown the ticket with ticketId ${ticketId} from zendesk.liferay.com"
-	macro _tearDownTicketById {
+	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
+	macro _tearDownTicketByIds {
+		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
 		var curl = '''
-			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList}
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
 	}
 
-	@prose = "the ticket with ticketId ${ticketId} should have the environment ${environment}"
+	@prose = "the ticket with ticket subject ${ticketSubject} should have the environment ${environment}"
 	macro _viewTicketEnvironment {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
+
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -30,8 +34,10 @@ definition {
 		}
 	}
 
-	@prose = "the ticket with ticketId ${ticketId} should be assigned to the group ${assignee}"
+	@prose = "the ticket with ticket subject ${ticketSubject} should be assigned to the group ${assignee}"
 	macro _viewTicketGroupAssignee {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
+
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -54,8 +60,48 @@ definition {
 		}
 	}
 
-	@prose = "the ticket with ticketId ${ticketId} should have the priority level ${priority}"
+	macro _viewTicketIdByTicketSubject {
+		var curl = '''
+			${zendeskURL}/api/v2/search.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-G --data-urlencode "query=type:ticket subject:${ticketSubject}"
+			''';
+
+		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
+
+		return "${ticketId}";
+	}
+
+	@prose = "the ticket with ticket subject ${ticketSubject} should have the organization ${organizationName}"
+	macro _viewTicketOrganization {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationId = JSONCurlUtil.get("${curl}", "$.ticket.organization_id");
+
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/${organizationId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organization.name");
+
+		echo("Expected Organization Name: ${organizationName}");
+		echo("Actual Organization Name: ${organizationNameFromAPI}");
+
+		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
+		}
+	}
+
+	@prose = "the ticket with ticket subject ${ticketSubject} should have the priority level ${priority}"
 	macro _viewTicketPriority {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
+
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json
 			-u ${zendeskAdminEmail}/token:${apiToken}

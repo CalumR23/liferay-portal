@@ -1,7 +1,7 @@
 definition {
-	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
-	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
 	@prose = "I create a request as a user with the email address ${requesterEmail} with the following values ${table}"
 	macro _createRequest {
@@ -86,10 +86,18 @@ definition {
 			}
 			''';
 
-		static var staticRequestID = JSONCurlUtil.post("${curl}", "$.request.id");
+		static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
 
-		echo("Request ID: ${staticRequestID}");
+		echo("Request ID: ${requestId}");
 
-		return "${staticRequestID}";
+		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			static var staticRequestIdList = "${requestId}";
+		}
+		else {
+			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+		}
+		echo("Request ID List: ${staticRequestIdList}");
+
+		return "${staticRequestIdList}";
 	}
 }

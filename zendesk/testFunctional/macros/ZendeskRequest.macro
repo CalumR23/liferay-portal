@@ -1,7 +1,22 @@
 definition {
+
+	@prose = "I click the option ${option}"
+	macro clickOption {
+		Click(
+			locator1 = "ZendeskRequestAdd#OPTION",
+			key_option = "${option}");
+	}
+
+	@prose = "I click on the ${dropdownLabel} dropdown"
+	macro clickRequestDropdown {
+		Click(
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
+			key_dropdownLabel = "${dropdownLabel}");
+	}
+
 	@prose = "I create a request with the following values ${table}"
 	macro create {
-		Click(locator1 = "ZendeskHomepage#SUBMIT_A_TICKET_BUTTON");
+		ZendeskHomepage.gotoSubmitATicket();
 
 		var RawTable rawTable = new RawTable("${table}");
 
@@ -72,6 +87,22 @@ definition {
 			value1 = "Your request was successfully submitted.");
 
 		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+
+		var requestId = selenium.getText("ZendeskRequestView#REQUEST_DETAILS_ID");
+
+		var requestId = StringUtil.replace("${requestId}", "#", "");
+
+		echo("Request ID: ${requestId}");
+
+		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			static var staticRequestIdList = "${requestId}";
+		}
+		else {
+			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+		}
+		echo("Request ID List: ${staticRequestIdList}");
+
+		return "${staticRequestIdList}";
 	}
 
 	@prose = "I click on the request with the subject ${requestSubject} in the index"
@@ -80,6 +111,48 @@ definition {
 			locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
 			value1 = "${value}",
 			key_requestSubject = "${requestSubject}");
+	}
+
+	@prose = "I select the organization ${organization} from the search dropdown"
+	macro selectOrganizationFromSearchDropdown {
+		Select(
+			locator1 = "ZendeskRequestIndex#ORGANIZATION_SELECT",
+			value1 = "${organization}");
+	}
+
+	@prose = "I submit a comment containing the following details ${table}"
+	macro submitComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Comment") {
+				Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
+				Type(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Attachments") {
+				MakeVisible(locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD");
+
+				UploadCommonFile(
+					locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+		Click(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your reply was successfully added.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
 	}
 
 	@prose = "I search for a request using the keyword ${keyword}"
@@ -206,6 +279,77 @@ definition {
 		}
 	}
 
+	@prose = "I should see the Description text field"
+	macro viewDescriptionTextField {
+		AssertVisible(locator1 = "ZendeskRequestAdd#DESCRIPTION_FIELD");
+	}
+
+	@prose = "I should see the ${dropdownLabel} dropdown"
+	macro viewDropdownMenu {
+		AssertVisible(
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
+			key_dropdownLabel = "${dropdownLabel}");
+	}
+
+	@prose = "the ${dropdownLabel} dropdown should not be visible"
+	macro viewDropdownMenuNotVisible {
+		AssertNotVisible(
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
+			key_dropdownLabel = "${dropdownLabel}");
+	}
+
+	@prose = "I should not see the request comment field"
+	macro viewNoCommentField {
+		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED");
+		AssertElementNotPresent(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
+	}
+
+	@prose = "I should not see the ${dropdownLabel} dropdown"
+	macro viewNoDropdownMenu {
+		AssertElementNotPresent(
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
+			key_dropdownLabel = "${dropdownLabel}");
+	}
+
+	@prose = "I should not see the ${value} option"
+	macro viewNoOption {
+		AssertElementNotPresent(
+			locator1 = "ZendeskRequestAdd#OPTION",
+			key_option = "${value}");
+	}
+
+	@prose = "the following options should not be visible ${table}"
+	macro viewNoOptionList {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var value = "${row[0]}";
+
+			AssertNotVisible(
+				locator1 = "ZendeskRequestAdd#OPTION",
+				key_option = "${value}");
+		}
+	}
+
+	@prose = "I should see the following options ${table}"
+	macro viewOptionList {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var value = "${row[0]}";
+
+			AssertVisible(
+				locator1 = "ZendeskRequestAdd#OPTION",
+				key_option = "${value}");
+		}
+	}
+
+	@prose = "I should see the Subject text field"
+	macro viewSubjectTextField {
+		AssertVisible(locator1 = "ZendeskRequestAdd#SUBJECT_FIELD");
+	}
+
 	@prose = "I should see a request with the subject ${requestSubject} in the index with the following details ${table}"
 	macro viewViaIndex {
 		var RawTable rawTable = new RawTable("${table}");
@@ -248,40 +392,5 @@ definition {
 				fail("No such request index field ${field}");
 			}
 		}
-	}
-
-	@prose = "I submit a comment containing the following details ${table}"
-	macro submitComment {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Comment") {
-				Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
-
-				Type(
-					locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Attachments") {
-				MakeVisible(locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD");
-
-				UploadCommonFile(
-					locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such request field ${field}");
-			}
-		}
-		Click(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
-
-		AssertTextEquals(
-			locator1 = "ZendeskHomepage#MESSAGE",
-			value1 = "Your reply was successfully added.");
-
-		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
 	}
 }
