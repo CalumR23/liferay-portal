@@ -1,0 +1,1042 @@
+Feature: Frontend Requests, Request Forms, and Request Comments
+	Frontend testing for creating and viewing requests as well as request comments
+
+Setup:
+	* I create an organization with the following values
+	| Status           | Approved                   |
+	| Name             | Organization Name 1        |
+	| Tags             | liferay_dxp,liferay_portal |
+	| Shared Tickets   | true                       |
+	| Shared Comments  | true                       |
+	| SLA              | Gold                       |
+	| Tier             | Regular                    |
+	| Support Region   | US                         |
+	| Support Language | English                    | 
+	| External ID      | Organization1              |
+	* I create an organization with the following values
+	| Status           | Approved                     |
+	| Name             | Organization Name 2          |
+	| Tags             | liferay_dxp,liferay_portal   |
+	| Shared Tickets   | true                         |
+	| Shared Comments  | true                         |
+	| SLA              | Gold                         |
+	| Tier             | Regular                      |
+	| Support Region   | Japan                        |
+	| Support Language | Japanese                     | 
+	| External ID      | Organization2                | 
+
+Teardown:
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I teardown users with the following userExternalIds from zendesk.liferay.com
+	| User1 |
+	| User2 |
+	* I teardown organizations with the following organizationExternalIds from zendesk.liferay.com
+	| Organization1 |
+	| Organization2 |
+
+Scenario: Request Creation
+	End users should be able to create and view a request using the Zendesk frontend.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            | 
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I create a request with the following values
+	| Product       | Liferay DXP                             | 7.1                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request Subject                         |                                       |
+	| Description   | Request Description                     |                                       |
+	| Attachments   | Document_1.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+	And I should be able to view a request comment containing the text "Request Description" with the following details
+	| Author      | Zendesk User1       |
+	| Comment     | Request Description |
+	| Attachments | Document_1.txt      |
+
+Scenario: Request Comment
+	End users should be able to create and view a comment on a request using the Zendesk frontend.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |  
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	Then I should see a request with the subject "Request Subject" in the index with the following details
+	| Subject       | Request Subject |
+	| Status        | OPEN            |
+	When I click on the request with the subject "Request Subject" in the index
+	And I submit a comment containing the following details
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	Then I should be able to view a request comment containing the text "Request Comment" with the following details
+	| Author      | Zendesk User1   |
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	And I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+
+Scenario: Watcher Permissions
+	End users who are watchers in an organization should not be able to create a request for their organization or add comments on any request for their organization.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk User2                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user2@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User2                            |
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |
+	And I assign a user with the email address "zendesk.user2@liferay.com.broken" as a watcher on an organization with organizationExternalId "Organization1"	
+	When I log into zendesk as "zendesk.user2@liferay.com.broken" with password "zendeskqauser"
+	Then I should not see the Submit a ticket link
+	When I go to My activities
+	And I go to the Organization requests tab
+	Then I should see a request with the subject "Request Subject" in the index with the following details
+	| Subject       | Request Subject |
+	| Status        | OPEN            |
+	When I click on the request with the subject "Request Subject" in the index
+	Then I should not see the request comment field
+
+Scenario: Developer Permissions
+	End users who are developers in an organization should be able to add comments to any request for their organization.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk User2                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user2@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User2                            |
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                               |
+	| Component                | activation_key_project_administration             |
+	| System Status            | production_functioning_with_limited_capabilities  |
+	| Subject                  | Request Subject                                   |
+	| Description              | Request Description                               |
+	| Organization External ID | Organization1                                     |
+	When I log into zendesk as "zendesk.user2@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I go to the Organization requests tab
+	Then I should see a request with the subject "Request Subject" in the index with the following details
+	| Subject       | Request Subject |
+	| Status        | OPEN            |
+	When I click on the request with the subject "Request Subject" in the index
+	And I submit a comment containing the following details
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	Then I should be able to view a request comment containing the text "Request Comment" with the following details
+	| Author      | Zendesk User2   |
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	And I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+
+Scenario: Organizational Permissions
+	End users who are developers in an organization but watchers in another should be only be able to submit a request and add comments on a request for the organization that they are a developer on.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk User2                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user2@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 2              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User2                            |
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" to an organization with organizationExternalId "Organization2"
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" as a watcher on an organization with organizationExternalId "Organization2"	
+	And I assign a user with the email address "zendesk.user2@liferay.com.broken" to an organization with organizationExternalId "Organization1"
+	And I assign a user with the email address "zendesk.user2@liferay.com.broken" as a watcher on an organization with organizationExternalId "Organization1"
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Organization" dropdown
+	Then I should not see the "Organization Name 2" option
+	When I go to the zendesk homepage
+	And I create a request with the following values
+	| Product       | Liferay DXP                             | 7.1                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request1 Subject                        |                                       |
+	| Description   | Request1 Description                    |                                       |
+	| Attachments   | Document_1.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request1 Subject                                   |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Organization  | Organization Name 1                                |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+	And I should be able to view a request comment containing the text "Request1 Description" with the following details
+	| Author      | Zendesk User1                           |
+	| Comment     | Request1 Description                    |
+	| Attachments | Document_1.txt                          |
+	When I log out and log into zendesk as "zendesk.user2@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Organization" dropdown
+	Then I should not see the "Organization Name 1" option
+	When I go to the zendesk homepage
+	And I create a request with the following values
+	| Product       | Liferay DXP                             | 7.1                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request2 Subject                        |                                       |
+	| Description   | Request2 Description                    |                                       |
+	| Attachments   | Document_2.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request2 Subject                                   |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User2                                      |
+	| Priority      | Normal                                             |
+	| Organization  | Organization Name 2                                |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_2.txt                                     |
+	And I should be able to view a request comment containing the text "Request2 Description" with the following details
+	| Author      | Zendesk User2                           |
+	| Comment     | Request2 Description                    |
+	| Attachments | Document_2.txt                          |
+	When I log out and log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I go to the Organization requests tab
+	And I select the organization "Organization Name 2" from the search dropdown
+	Then I should see a request with the subject "Request2 Subject" in the index with the following details
+	| Subject       | Request2 Subject |
+	| Status        | OPEN             |
+	When I click on the request with the subject "Request2 Subject" in the index
+	Then I should not see the request comment field
+	When I log out and log into zendesk as "zendesk.user2@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I go to the Organization requests tab
+	And I select the organization "Organization Name 1" from the search dropdown
+	Then I should see a request with the subject "Request1 Subject" in the index with the following details
+	| Subject       | Request1 Subject |
+	| Status        | OPEN             |
+	When I click on the request with the subject "Request1 Subject" in the index
+	Then I should not see the request comment field
+
+Scenario: Ticket Form Validation for Developer Tools
+	End users should be able to see all available ticket fields when filing a Developer Tools request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| developer_tools |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Developer Tools"
+	Then the "Component" dropdown should not be visible
+	When I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Liferay Analytics Cloud
+	End users should be able to see all available ticket fields when filing a Liferay Analytics Cloud request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| liferay_analytics_cloud |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Liferay Analytics Cloud"
+	Then the "Component" dropdown should not be visible
+	And the "System Status" dropdown should not be visible
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Liferay Commerce
+	End users should be able to see all available ticket fields when filing a Liferay Commerce request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| liferay_commerce |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Liferay Commerce"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| APIs, Integrations and Extension Points |
+	| Commerce Insights                       |
+	| Configuration and Settings              |
+	| Digital Merchandise Management          |
+	| Digital Store Management                |
+	| Shopping Experience                     |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Liferay DXP
+	End users should be able to see all available ticket fields when filing a Liferay DXP request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Liferay DXP"
+	And I click the option "7.1"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| APIO Architect                          |
+	| Application Display Templates           |
+	| Audience Targeting                      |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Dynamic Data Mapping & Data Lists       |
+	| Forms                                   |
+	| Liferay API                             |
+	| Localization                            |
+	| Performance                             |
+	| Portal Configuration                    |
+	| Recycle Bin                             |
+	| Reporting                               |
+	| Search & Indexing                       |
+	| Search Engine Optimization, Analytics   |
+	| Security                                |
+	| Site Management                         |
+	| Social Networking                       |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+	When I click the option "Back"
+	And I click the option "-"
+	And I click on the "Product" dropdown
+	And I click the option "7.0"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| APIO Architect                          |
+	| Application Display Templates           |
+	| Audience Targeting                      |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Dynamic Data Mapping & Data Lists       |
+	| Forms                                   |
+	| Liferay API                             |
+	| Localization                            |
+	| Performance                             |
+	| Portal Configuration                    |
+	| Recycle Bin                             |
+	| Reporting                               |
+	| Search & Indexing                       |
+	| Search Engine Optimization, Analytics   |
+	| Security                                |
+	| Site Management                         |
+	| Social Networking                       |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Liferay DXP Cloud
+	End users should be able to see all available ticket fields when filing a Liferay DXP cloud request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| liferay_dxp_cloud |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Liferay DXP Cloud"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Backup / Recovery   |
+	| Connectivity        |
+	| Networking          |
+	| System Availability |
+	| VPN                 |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Liferay Portal
+	End users should be able to see all available ticket fields when filing a Liferay Portal request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Liferay Portal"
+	And I click the option "6.2"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Liferay API                             |
+	| Localization                            |
+	| Search & Indexing                       |
+	| Security                                |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	| Developer Tools                         |
+	| Liferay Sync                            |
+	| Patch Management                        |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+	When I click the option "Back"
+	And I click the option "-"
+	And I click on the "Product" dropdown
+	And I click the option "6.1"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Liferay API                             |
+	| Localization                            |
+	| Search & Indexing                       |
+	| Security                                |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	| Developer Tools                         |
+	| Liferay Sync                            |
+	| Patch Management                        |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+	When I click the option "Back"
+	And I click the option "-"
+	And I click on the "Product" dropdown
+	And I click the option "6.0"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Liferay API                             |
+	| Localization                            |
+	| Search & Indexing                       |
+	| Security                                |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	| Developer Tools                         |
+	| Liferay Sync                            |
+	| Patch Management                        |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+	When I click the option "Back"
+	And I click the option "-"
+	And I click on the "Product" dropdown
+	And I click the option "5.2"
+	And I click on the "Component" dropdown
+	Then I should see the following options
+	| Activation Key & Project Administration |
+	| Authentication                          |
+	| Caching & Clustering                    |
+	| Calendar                                |
+	| Collaboration Suite                     |
+	| Deployment, Environments                |
+	| Document Management                     |
+	| Liferay API                             |
+	| Localization                            |
+	| Search & Indexing                       |
+	| Security                                |
+	| Staging, Export/Import                  |
+	| UI Infrastructure, Accessibility        |
+	| Upgrade                                 |
+	| User, Membership, Role Management       |
+	| Web Content                             |
+	| Workflow, Workflow Forms                |
+	| Developer Tools                         |
+	| Liferay Sync                            |
+	| Patch Management                        |
+	When I click the option "-"
+	And I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Management Tools
+	End users should be able to see all available ticket fields when filing a Management Tools request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| management_tools_lcs |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Management Tools (LCS)"
+	Then the "Component" dropdown should not be visible
+	When I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Mobile Experience
+	End users should be able to see all available ticket fields when filing a Mobile Experience request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| mobile_experience |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Mobile Experience"
+	Then the "Component" dropdown should not be visible
+	When I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Productivity Tools
+	End users should be able to see all available ticket fields when filing a Productivity Tools (Sync) request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| productivity_tools_sync |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Product" dropdown
+	And I click the option "Productivity Tools (Sync)"
+	Then the "Component" dropdown should not be visible
+	When I click on the "System Status" dropdown
+	Then I should see the following options
+	| Production                         |
+	| Non-Production                     |
+	| General question about the product |
+	When I click the option "Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	When I click the option "Back"
+	And I click the option "Non-Production"
+	Then I should see the following options
+	| Completely shutdown                   |
+	| Severely impacted or inoperable       |
+	| Unstable with periodic interruptions  |
+	| Functioning with limited capabilities |
+	| Fully functional with observed errors |
+	And I should see the Subject text field
+	And I should see the Description text field
+
+Scenario: Ticket Form Validation for Multiple Organizations
+	End users should be able to see all available products in the Product dropdown field for a given organization when submitting a request.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" to an organization with organizationExternalId "Organization2"
+	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| developer_tools         |
+	| mobile_experience       |
+	| productivity_tools_sync |
+	| liferay_dxp_cloud       |
+	And I assign an organization with organizationExternalId "Organization2" with the following tags
+	| management_tools_lcs    |
+	| liferay_analytics_cloud |
+	| liferay_commerce        |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Organization" dropdown
+	And I click the option "Organization Name 1"
+	And I click on the "Product" dropdown
+	Then I should see the following options
+	| Developer Tools           |
+	| Liferay DXP               |
+	| Liferay DXP Cloud         |
+	| Liferay Portal            |
+	| Mobile Experience         |
+	| Productivity Tools (Sync) |
+	And the following options should not be visible
+	| Liferay Analytics Cloud   |
+	| Liferay Commerce          |
+	| Management Tools (LCS)    |
+	When I click the option "-"
+	And I click on the "Organization" dropdown
+	And I click the option "Organization Name 2"
+	And I click on the "Product" dropdown
+	Then I should see the following options
+	| Liferay Analytics Cloud   |
+	| Liferay Commerce          |
+	| Liferay DXP               |
+	| Liferay Portal            |
+	| Management Tools (LCS)    |
+	And the following options should not be visible
+	| Developer Tools           |
+	| Liferay DXP Cloud         |
+	| Mobile Experience         |
+	| Productivity Tools (Sync) |
