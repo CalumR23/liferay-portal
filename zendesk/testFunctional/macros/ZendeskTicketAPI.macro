@@ -3,6 +3,17 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
 
+	macro _getTicketGroupAssigneeIdById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var groupAssigneeId = JSONCurlUtil.get("${curl}", "$.ticket.group_id");
+
+		return "${groupAssigneeId}";
+	}
+
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
 		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
@@ -12,6 +23,24 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee}"
+	macro _viewMultipleTicketGroupAssignees {
+		for (var ticketId : list "${ticketIdList}") {
+			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
+
+			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
+
+			var groupAssigneeFromAPI = "${groupName}";
+
+			echo("Expected Assignee Name: ${groupAssignee}");
+			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+			if (!("${groupAssigneeFromAPI}" == "${groupAssignee}")) {
+				fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected value ${groupAssignee}");
+			}
 		}
 	}
 

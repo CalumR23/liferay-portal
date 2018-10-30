@@ -3,6 +3,70 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "I create several requests as a user with the email address ${requesterEmail} with the following product, component, and organizationExternalId values ${table}"
+	macro _createMultipleRequestsWithProductAndComponentAndOrganizationValues {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+			var component = "${row[1]}";
+			var organizationExternalId = "${row[2]}";
+
+			var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+			if (!(isSet(component))) {
+				var component = "";
+			}
+
+			var curl = '''
+				${zendeskURL}/api/v2/requests.json
+				-u ${requesterEmail}/token:${apiToken}
+				-H "Content-Type: application/json"
+				-d
+				{
+					"request":
+					{
+						"subject": "Subject",
+						"organization_id": "${organizationId}",
+						"comment":
+						{
+							"body": "Description"
+						},
+						"custom_fields":
+						[
+							{
+								"id": "360006041192",
+								"value": "${product}"
+							},
+							{
+								"id": "360011314571",
+								"value": "${component}"
+							},
+							{
+								"id": "360009385592",
+								"value": "production_functioning_with_limited_capabilities"
+							}
+						]
+					}
+				}
+				''';
+
+			static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
+
+			echo("Request ID: ${requestId}");
+
+			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+				static var staticRequestIdList = "${requestId}";
+			}
+			else {
+				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+			}
+			echo("Request ID List: ${staticRequestIdList}");
+		}
+
+		return "${staticRequestIdList}";
+	}
+
 	@prose = "I create a request as a user with the email address ${requesterEmail} with the following values ${table}"
 	macro _createRequest {
 		var RawTable rawTable = new RawTable("${table}");
