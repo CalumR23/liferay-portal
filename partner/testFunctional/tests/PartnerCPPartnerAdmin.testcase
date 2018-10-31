@@ -1,0 +1,164 @@
+<definition component-name="partner">
+	<property name="testray.main.component.name" value="partner" />
+
+	<var name="mdfRequestID" static="true" />
+
+	<var method="PropsUtil#get('partner.company')" name="partnerMDFRequestCompanyName" />
+	<var method="PropsUtil#get('partner.region')" name="partnerMDFRequestRegion" />
+	<var method="PropsUtil#get('partner.region.code')" name="partnerRegionCode" />
+
+	<set-up>
+		<execute macro="Partner#loginUser">
+			<var name="roleName" value="admin" />
+		</execute>
+	</set-up>
+
+	<tear-down>
+		<execute macro="PartnerWorkflow#deleteMDFRequest">
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+		</execute>
+	</tear-down>
+
+	<command name="AssignGlobalPartnerMarketing" priority="5">
+		<var name="partnerGlobalPartnerMarketing" value="security user" />
+		<var name="partnerGlobalPartnerMarketingEmail" value="security.user@liferay.com.broken" />
+		<var name="partnerGlobalPartnerMarketingUserID" value="nJH%2F%2BXKjKkuAblT4wwjitg%3D%3D" />
+		<var name="partnerMDFRequestAmountApproved" value="USD 0" />
+		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
+		<var name="partnerMDFRequestCurrencyCode" value="USD" />
+		<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
+		<var name="partnerMDFRequestPhoneNumber" value="123 456 7890" />
+		<var name="partnerMDFRequestStatus" value="Pending Manager Review" />
+		<var name="partnerMDFRequestTotalCost" value="USD 200" />
+
+		<execute macro="Partner#gotoCPPartnerAdmin" />
+
+		<execute macro="PartnerCPPartnerAdmin#addPartnerManagers">
+			<var name="partnerManagerType" value="Global Partner Marketing" />
+			<var name="partnerManagerUserEmailList" value="${partnerGlobalPartnerMarketingEmail}" />
+			<var name="partnerRegionCode" value="" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#createMDFRequest">
+			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
+			<var name="partnerMDFRequestCurrencyCode" value="${partnerMDFRequestCurrencyCode}" />
+			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
+			<var name="partnerMDFRequestPhoneNumber" value="${partnerMDFRequestPhoneNumber}" />
+			<var name="partnerMDFRequestRegion" value="${partnerMDFRequestRegion}" />
+			<return name="mdfRequestID" />
+		</execute>
+
+		<execute macro="Partner#impersonateUser">
+			<var name="appendUrl" value="home" />
+			<var name="userID" value="${partnerGlobalPartnerMarketingUserID}" />
+		</execute>
+
+		<execute macro="Partner#gotoManagement" />
+
+		<execute macro="PartnerManagement#clickMDFRequest">
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+		</execute>
+
+		<execute macro="Partner#clickApproveButton" />
+
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerComment" value="Approved by ${partnerGlobalPartnerMarketing}" />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="PartnerWorkflow#createMDFClaimFull">
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+			<return name="mdfClaimID" />
+		</execute>
+
+		<execute macro="Partner#impersonateUser">
+			<var name="appendUrl" value="home" />
+			<var name="userID" value="${partnerGlobalPartnerMarketingUserID}" />
+		</execute>
+
+		<execute macro="Partner#gotoManagementClaims" />
+
+		<execute macro="PartnerManagement#clickMDFClaim">
+			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
+		</execute>
+
+		<execute macro="Partner#clickApproveButton" />
+
+		<execute macro="Partner#typeCommentInModal">
+			<var name="partnerComment" value="Approved by ${partnerGlobalPartnerMarketing}." />
+		</execute>
+
+		<execute macro="Partner#clickSubmitButtonInModal" />
+
+		<execute macro="Partner#gotoCPPartnerAdmin" />
+
+		<execute macro="PartnerCPPartnerAdmin#deletePartnerManagers">
+			<var name="partnerManagerType" value="Global Partner Marketing" />
+			<var name="partnerManagerUserEmailList" value="${partnerGlobalPartnerMarketingEmail}" />
+			<var name="partnerRegionCode" value="" />
+		</execute>
+
+		<execute macro="Partner#impersonateUser">
+			<var name="appendUrl" value="home" />
+			<var name="userID" value="${partnerGlobalPartnerMarketingUserID}" />
+		</execute>
+
+		<execute macro="Partner#assertNoManagementView" />
+	</command>
+
+	<command name="AssignMultipleAllianceManagers" priority="5">
+		<var name="partnerAllianceManagerEmailList" value="jeffrey.handa@liferay.com.broken,charles.may@liferay.com.broken" />
+		<var name="partnerAllianceManagerList" value="Jeffrey Handa,Charles May" />
+		<var name="partnerMDFRequestAmountApproved" value="USD 0" />
+		<var name="partnerMDFRequestAmountRequested" value="USD 100" />
+		<var name="partnerMDFRequestCurrencyCode" value="USD" />
+		<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2019" />
+		<var name="partnerMDFRequestPhoneNumber" value="123 456 7890" />
+		<var name="partnerMDFRequestStatus" value="Pending Manager Review" />
+		<var name="partnerMDFRequestTotalCost" value="USD 200" />
+
+		<execute macro="Partner#gotoCPPartnerAdmin" />
+
+		<execute macro="PartnerCPPartnerAdmin#addPartnerManagers">
+			<var name="partnerManagerType" value="Alliance Manager" />
+			<var name="partnerManagerUserEmailList" value="${partnerAllianceManagerEmailList}" />
+			<var name="partnerRegionCode" value="${partnerRegionCode}" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#createMDFRequest">
+			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
+			<var name="partnerMDFRequestCurrencyCode" value="${partnerMDFRequestCurrencyCode}" />
+			<var name="partnerMDFRequestFundingPeriod" value="${partnerMDFRequestFundingPeriod}" />
+			<var name="partnerMDFRequestPhoneNumber" value="${partnerMDFRequestPhoneNumber}" />
+			<var name="partnerMDFRequestRegion" value="${partnerMDFRequestRegion}" />
+			<return name="mdfRequestID" />
+		</execute>
+
+		<execute macro="PartnerWorkflow#sendForManagerReviewMDFRequest">
+			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
+		</execute>
+
+		<execute macro="PartnerMDFRequest#assertAllianceManagerList">
+			<var name="partnerAllianceManagerList" value="${partnerAllianceManagerList}" />
+		</execute>
+
+		<execute macro="PartnerMockMock#gotoMockMock" />
+
+		<execute macro="PartnerMockMock#viewDuplicateMailFromInbox">
+			<var name="mockMockAsset" value="[Liferay Partner Portal] Request for Review: Partner MDF Proposal" />
+			<var name="mockMockRecipientList" value="${partnerAllianceManagerList}" />
+			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
+		</execute>
+
+		<execute macro="PartnerMockMock#deleteAllMail" />
+
+		<execute macro="Partner#gotoCPPartnerAdmin" />
+
+		<execute macro="PartnerCPPartnerAdmin#deletePartnerManagers">
+			<var name="partnerManagerType" value="Alliance Manager" />
+			<var name="partnerManagerUserEmailList" value="${partnerAllianceManagerEmailList}" />
+			<var name="partnerRegionCode" value="${partnerRegionCode}" />
+		</execute>
+	</command>
+</definition>

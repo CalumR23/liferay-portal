@@ -21,6 +21,10 @@
 		<execute function="AssertElementNotPresent" locator1="Partner#COMMENT_BOX" />
 	</command>
 
+	<command name="assertNoManagementView">
+		<execute function="AssertElementNotPresent" locator1="Partner#NAVBAR_MANAGEMENT" />
+	</command>
+
 	<command name="assertNoSendForManagerReviewButton">
 		<execute function="AssertElementNotPresent" locator1="Partner#SEND_FOR_MANAGER_REVIEW_BUTTON" />
 	</command>
@@ -143,17 +147,49 @@
 
 	<command name="formatRegionCode">
 		<if>
-			<equals arg1="${regionCode}" arg2="chpearurpa" />
+			<or>
+				<equals arg1="${regionCode}" arg2="anz" />
+				<equals arg1="${regionCode}" arg2="dach" />
+				<equals arg1="${regionCode}" arg2="uk" />
+				<equals arg1="${regionCode}" arg2="us" />
+			</or>
 			<then>
-				<var name="regionCodeFormatted" value="ChPeArUrPa" />
+				<var method="StringUtil#upperCase('${regionCode}')" name="regionCodeFormatted" />
 			</then>
 			<elseif>
-				<or>
-					<equals arg1="${regionCode}" arg2="benelux" />
-					<equals arg1="${regionCode}" arg2="japan" />
-				</or>
+				<equals arg1="${regionCode}" arg2="europe" />
 				<then>
-					<var method="StringUtil#upperCaseFirstLetter('${regionCode}')" name="regionCodeFormatted" />
+					<var name="regionCodeFormatted" value="Central and Eastern Europe" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${regionCode}" arg2="chpearurpa" />
+				<then>
+					<var name="regionCodeFormatted" value="ChPeArUrPa" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${regionCode}" arg2="coeccenam" />
+				<then>
+					<var name="regionCodeFormatted" value="CoEcCenAm" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${regionCode}" arg2="middleeast" />
+				<then>
+					<var name="regionCodeFormatted" value="Middle East" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${regionCode}" arg2="itgrcy" />
+				<then>
+					<var name="regionCodeFormatted" value="ItGrCy" />
+				</then>
+			</elseif>
+			<elseif>
+				<equals arg1="${regionCode}" arg2="latinamerica" />
+				<then>
+					<var name="regionCodeFormatted" value="Latin America" />
 				</then>
 			</elseif>
 			<elseif>
@@ -163,7 +199,7 @@
 				</then>
 			</elseif>
 			<else>
-				<var method="StringUtil#upperCase('${regionCode}')" name="regionCodeFormatted" />
+				<var method="StringUtil#upperCaseFirstLetter('${regionCode}')" name="regionCodeFormatted" />
 			</else>
 		</if>
 
@@ -175,6 +211,12 @@
 		<var method="StringUtil#upperCaseFirstLetter('${roleNameFormatted}')" name="roleNameFormatted" />
 
 		<return value="${roleNameFormatted}" />
+	</command>
+
+	<command name="gotoCPPartnerAdmin">
+		<execute macro="Partner#openURL">
+			<var name="appendUrl" value="/group/control_panel/manage?p_p_id=com_liferay_osb_partner_admin_web_PartnerAdminPortlet" />
+		</execute>
 	</command>
 
 	<command name="gotoCPServerAdministration">
@@ -215,7 +257,7 @@
 
 		<!--<execute macro="PartnerMarketing#gotoMarketingMDF" />-->
 
-		<execute macro="Partner#impersonateUser">
+		<execute macro="Partner#impersonateRoleUser">
 			<var name="appendUrl" value="mdf" />
 			<var name="roleName" value="${roleName}" />
 		</execute>
@@ -233,7 +275,7 @@
 
 		<!--<execute macro="PartnerSales#gotoBusinessPlans" />-->
 
-		<execute macro="Partner#impersonateUser">
+		<execute macro="Partner#impersonateRoleUser">
 			<var name="appendUrl" value="sales/business-plans" />
 			<var name="roleName" value="${roleName}" />
 		</execute>
@@ -247,7 +289,7 @@
 
 		<!--<execute macro="PartnerSales#gotoPartnerOpportunities" />-->
 
-		<execute macro="Partner#impersonateUser">
+		<execute macro="Partner#impersonateRoleUser">
 			<var name="appendUrl" value="sales/opportunities" />
 			<var name="roleName" value="${roleName}" />
 		</execute>
@@ -261,7 +303,7 @@
 
 		<!--<execute macro="PartnerSales#gotoRenewalOpportunities" />-->
 
-		<execute macro="Partner#impersonateUser">
+		<execute macro="Partner#impersonateRoleUser">
 			<var name="appendUrl" value="sales/renewals" />
 			<var name="roleName" value="${roleName}" />
 		</execute>
@@ -273,8 +315,7 @@
 		<execute function="Click" locator1="Partner#GENERAL_TAB" />
 	</command>
 
-	<command name="impersonateUser">
-		<var method="PropsUtil#get('portal.partner.url')" name="partnerUrl" />
+	<command name="impersonateRoleUser">
 		<var method="StringUtil#lowerCase('${roleName}')" name="roleName" />
 
 		<if>
@@ -291,6 +332,15 @@
 				<var method="PropsUtil#get('partner.${partnerRegionCode}.userID.${roleName}')" name="userID" />
 			</else>
 		</if>
+
+		<execute macro="Partner#impersonateUser">
+			<var name="appendUrl" value="${appendUrl}" />
+			<var name="userID" value="${userID}" />
+		</execute>
+	</command>
+
+	<command name="impersonateUser">
+		<var method="PropsUtil#get('portal.partner.url')" name="partnerUrl" />
 
 		<var method="StringUtil#add('${partnerUrl}', '/${appendUrl}', '')" name="partnerUrl" />
 
@@ -377,7 +427,7 @@
 			<var name="roleName" value="${roleName}" />
 		</execute>-->
 
-		<execute macro="Partner#impersonateUser">
+		<execute macro="Partner#impersonateRoleUser">
 			<var name="appendUrl" value="home" />
 			<var name="roleName" value="${roleName}" />
 		</execute>
