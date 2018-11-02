@@ -14,6 +14,17 @@ definition {
 		return "${groupAssigneeId}";
 	}
 
+	macro _getTicketPriorityById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var priority = JSONCurlUtil.get("${curl}", "$.ticket.priority");
+
+		return "${priority}";
+	}
+
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
 		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
@@ -40,6 +51,20 @@ definition {
 
 			if (!("${groupAssigneeFromAPI}" == "${groupAssignee}")) {
 				fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected value ${groupAssignee}");
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be given the priority level ${priority}"
+	macro _viewMultipleTicketPriorities {
+		for (var ticketId : list "${ticketIdList}") {
+			var priorityFromAPI = ZendeskTicketAPI._getTicketPriorityById(ticketId = "${ticketId}");
+
+			echo("Expected Priority Level: ${priority}");
+			echo("Actual Priority Level: ${priorityFromAPI}");
+
+			if (!("${priorityFromAPI}" == "${priority}")) {
+				fail("Actual value ${priorityFromAPI} given to ticket ID ${ticketId} does not match expected value ${priority}");
 			}
 		}
 	}
