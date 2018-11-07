@@ -3,6 +3,44 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
 
+	@prose = "I assign the ticket with the ID ${ticketId} to a user with the email address ${userEmailAddress}"
+	macro _assignTicket {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"assignee_id": "${userId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I change the status of the ticket with the ID ${ticketId} to ${ticketStatus}"
+	macro _changeTicketStatus {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"status": "${ticketStatus}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	macro _getTicketGroupAssigneeIdById {
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json
@@ -37,6 +75,150 @@ definition {
 		}
 	}
 
+	@prose = "emails regarding the reception of the following ${portalLegacyVersion} ticketIds ${ticketIdList} with the following parameters should be sent out ${table}"
+	macro _viewMultipleLegacyVersionTicketReceptionEmails {
+		for (var ticketId : list "${ticketIdList}") {
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var field = "${row[0]}";
+				var value = "${row[1]}";
+
+				if ("${field}" == "Recipients") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request and ${portalLegacyVersion} EOSL Policy')].recipients");
+
+					var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+					var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+					echo("Recipient IDs from API: ${recipientIds}");
+
+					var recipientsFromAPI = "";
+
+					for (var recipientId : list "${recipientIds}") {
+						var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+						if ("${recipientsFromAPI}" == "") {
+							var recipientsFromAPI = "${recipientFromAPI}";
+						}
+						else {
+							var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+						}
+					}
+					echo("Expected Recipients: ${value}");
+					echo("Actual Recipients: ${recipientsFromAPI}");
+
+					if (!("${recipientsFromAPI}" == "${value}")) {
+						fail("Actual recipients ${recipientsFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not match expected recipients ${value}");
+					}
+				}
+
+				if ("${field}" == "Subject") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request and ${portalLegacyVersion} EOSL Policy')].subject");
+
+					if (!(contains("${subjectFromAPI}", "${value}"))) {
+						fail("Actual subject ${subjectFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not contain the text ${value}");
+					}
+				}
+
+				if ("${field}" == "Body") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request and ${portalLegacyVersion} EOSL Policy')].body");
+
+					if (!(contains("${bodyFromAPI}", "${value}"))) {
+						fail("Actual body ${bodyFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not contain the text ${value}");
+					}
+				}
+			}
+		}
+	}
+
+	@prose = "emails regarding the reception of the following ticketIds ${ticketIdList} with the following parameters should be sent out ${table}"
+	macro _viewMultipleTicketReceptionEmails {
+		for (var ticketId : list "${ticketIdList}") {
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var field = "${row[0]}";
+				var value = "${row[1]}";
+
+				if ("${field}" == "Recipients") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request')].recipients");
+
+					var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+					var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+					echo("Recipient IDs from API: ${recipientIds}");
+
+					var recipientsFromAPI = "";
+
+					for (var recipientId : list "${recipientIds}") {
+						var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+						if ("${recipientsFromAPI}" == "") {
+							var recipientsFromAPI = "${recipientFromAPI}";
+						}
+						else {
+							var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+						}
+					}
+					echo("Expected Recipients: ${value}");
+					echo("Actual Recipients: ${recipientsFromAPI}");
+
+					if (!("${recipientsFromAPI}" == "${value}")) {
+						fail("Actual recipients ${recipientsFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not match expected recipients ${value}");
+					}
+				}
+
+				if ("${field}" == "Subject") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request')].subject");
+
+					if (!(contains("${subjectFromAPI}", "${value}"))) {
+						fail("Actual subject ${subjectFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not contain the text ${value}");
+					}
+				}
+
+				if ("${field}" == "Body") {
+					var curl = '''
+						${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+						-u ${zendeskAdminEmail}/token:${apiToken}
+						''';
+
+					var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request')].body");
+
+					if (!(contains("${bodyFromAPI}", "${value}"))) {
+						fail("Actual body ${bodyFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not contain the text ${value}");
+					}
+				}
+			}
+		}
+	}
+
 	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee}"
 	macro _viewMultipleTicketGroupAssignees {
 		for (var ticketId : list "${ticketIdList}") {
@@ -65,6 +247,330 @@ definition {
 
 			if (!("${priorityFromAPI}" == "${priority}")) {
 				fail("Actual value ${priorityFromAPI} given to ticket ID ${ticketId} does not match expected value ${priority}");
+			}
+		}
+	}
+
+	@prose = "${portalLegacyVersion} legacy ticket emails related to the following ticketIds ${ticketIdList} should not be sent out"
+	macro _viewNoMultipleLegacyVersionTicketReceptionEmails {
+		for (var ticketId : list "${ticketIdList}") {
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var legacyTicketEmailEvent = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request and ${portalLegacyVersion} EOSL Policy')]");
+
+			var legacyTicketEmailEvent = StringUtil.replace("${legacyTicketEmailEvent}", "[", "");
+
+			var legacyTicketEmailEvent = StringUtil.replace("${legacyTicketEmailEvent}", "]", "");
+
+			echo("Legacy ticket email event: ${legacyTicketEmailEvent}");
+
+			if (!("${legacyTicketEmailEvent}" == "")) {
+				fail("A ${portalLegacyVersion} legacy ticket email may have been sent out.");
+			}
+		}
+	}
+
+	@prose = "non-legacy ticket emails related to the following ticketIds ${ticketIdList} should not be sent out"
+	macro _viewNoMultipleTicketReceptionEmails {
+		for (var ticketId : list "${ticketIdList}") {
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var nonLegacyTicketEmailEvent = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.via.source.from.title=='Notify requester of received request')]");
+
+			var nonLegacyTicketEmailEvent = StringUtil.replace("${nonLegacyTicketEmailEvent}", "[", "");
+
+			var nonLegacyTicketEmailEvent = StringUtil.replace("${nonLegacyTicketEmailEvent}", "]", "");
+
+			echo("Non-legacy ticket email event: ${nonLegacyTicketEmailEvent}");
+
+			if (!("${nonLegacyTicketEmailEvent}" == "")) {
+				fail("A non-legacy ticket email may have been sent out.");
+			}
+		}
+	}
+
+	@prose = "an email regarding the reopening of ticketId ${ticketId} containing the following parameters should be sent out to the ticket assignee ${table}"
+	macro _viewReopenedTicketEmailToAssignee {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify assignee of reopened ticket')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!("${recipientsFromAPI}" == "${value}")) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify assignee of reopened ticket')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify assignee of reopened ticket')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
+	@prose = "an email regarding an assignment to ticketId ${ticketId} containing the following parameters should be sent out to the ticket assignee ${table}"
+	macro _viewTicketAssignmentEmailToAssignee {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify assignee of assignment')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!("${recipientsFromAPI}" == "${value}")) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify assignee of assignment')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify assignee of assignment')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
+	@prose = "an email regarding the comment with the body ${commentBody} added to a ticket with the ticketId ${ticketId} containing the following parameters should be sent out to the ticket assignee ${table}"
+	macro _viewTicketCommentEmailToAssignee {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify assignee of comment update')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!("${recipientsFromAPI}" == "${value}")) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify assignee of comment update')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify assignee of comment update')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
+	@prose = "an email regarding the comment with the body ${commentBody} added to a ticket with the ticketId ${ticketId} containing the following parameters should be sent out to the ticket requester ${table}"
+	macro _viewTicketCommentEmailToRequester {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify requester of comment update')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!("${recipientsFromAPI}" == "${value}")) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify requester of comment update')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify requester of comment update')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
 			}
 		}
 	}

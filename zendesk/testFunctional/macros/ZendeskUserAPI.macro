@@ -3,6 +3,51 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "I assign the user with the email address ${userEmailAddress} to the group ${groupName}"
+	macro _assignUserToGroup {
+		var groupId = ZendeskGroupAPI._getGroupIdByName(groupName = "${groupName}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/group_memberships.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"group_membership":
+				{
+					"default": true,
+					"user_id": "${userId}",
+					"group_id": "${groupId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign a user with the email address ${userEmailAddress} to an organization with organizationExternalId ${organizationExternalId}"
+	macro _assignUserToOrganization {
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/organization_memberships.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"organization_membership":
+				{
+					"user_id": "${userId}",
+					"organization_id": "${organizationId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I assign a user with the email address ${userEmailAddress} as a watcher on an organization with organizationExternalId ${organizationExternalId}"
 	macro _assignWatcherRole {
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
@@ -31,28 +76,6 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "I assign a user with the email address ${userEmailAddress} to an organization with organizationExternalId ${organizationExternalId}"
-	macro _assignUserToOrganization {
-		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
-		var curl = '''
-			${zendeskURL}/api/v2/organization_memberships.json
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			-H "Content-Type: application/json"
-			-d
-			{
-				"organization_membership":
-				{
-					"user_id": "${userId}",
-					"organization_id": "${organizationId}"
-				}
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@prose = "I create a user with the following values ${table}"
@@ -206,6 +229,17 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro _getUserNameById {
+		var curl = '''
+			${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userName = JSONCurlUtil.get("${curl}", "$.user.name");
+
+		return "${userName}";
 	}
 
 	@prose = "I teardown the user with userId ${staticUserID} from zendesk.liferay.com"
