@@ -333,7 +333,7 @@ definition {
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!("${recipientsFromAPI}" == "${value}")) {
-					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the reopening of ticket ${ticketId} does not match expected recipients ${value}");
 				}
 			}
 
@@ -346,7 +346,7 @@ definition {
 				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify assignee of reopened ticket')].subject");
 
 				if (!(contains("${subjectFromAPI}", "${value}"))) {
-					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+					fail("Actual subject ${subjectFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain the text ${value}");
 				}
 			}
 
@@ -359,7 +359,7 @@ definition {
 				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify assignee of reopened ticket')].body");
 
 				if (!(contains("${bodyFromAPI}", "${value}"))) {
-					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+					fail("Actual body ${bodyFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain the text ${value}");
 				}
 			}
 		}
@@ -403,7 +403,7 @@ definition {
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!("${recipientsFromAPI}" == "${value}")) {
-					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not match expected recipients ${value}");
 				}
 			}
 
@@ -416,7 +416,7 @@ definition {
 				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify assignee of assignment')].subject");
 
 				if (!(contains("${subjectFromAPI}", "${value}"))) {
-					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+					fail("Actual subject ${subjectFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not contain the text ${value}");
 				}
 			}
 
@@ -429,7 +429,7 @@ definition {
 				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify assignee of assignment')].body");
 
 				if (!(contains("${bodyFromAPI}", "${value}"))) {
-					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+					fail("Actual body ${bodyFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not contain the text ${value}");
 				}
 			}
 		}
@@ -674,6 +674,56 @@ definition {
 
 		if (!("${priorityFromAPI}" == "${priority}")) {
 			fail("Actual value ${priorityFromAPI} does not match expected value ${priority}");
+		}
+	}
+
+	@prose = "the ticket with the ticketId ${ticketId} should be set to the ${supportRegionAbbreviation} support schedule"
+	macro _viewTicketSupportSchedule {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var supportSchedule = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.type=='ScheduleAssignment')].via.source.from.title");
+
+		var supportSchedule = StringUtil.replace("${supportSchedule}", "[", "");
+
+		var supportSchedule = StringUtil.replace("${supportSchedule}", "]", "");
+
+		var supportSchedule = StringUtil.replace("${supportSchedule}", "&quot;", "");
+
+		var supportRegionAbbreviationFromAPI = StringUtil.replace("${supportSchedule}", "Set schedule to ", "");
+
+		echo("Expected Support Schedule: ${supportRegionAbbreviation}");
+		echo("Actual Support Schedule: ${supportRegionAbbreviationFromAPI}");
+
+		if (!("${supportRegionAbbreviation}" == "${supportRegionAbbreviationFromAPI}")) {
+			fail("Actual support schedule ${supportRegionAbbreviationFromAPI} does not match the expected support schedule ${supportRegionAbbreviation}");
+		}
+
+		var supportScheduleId = JSONCurlUtil.get("${curl}", "$.audits[0].events[?(@.type=='ScheduleAssignment')].new_schedule_id");
+
+		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "[", "");
+
+		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "]", "");
+
+		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "&quot;", "");
+
+		var supportScheduleName = ZendeskScheduleAPI._getScheduleNameById(scheduleId = "${supportScheduleId}");
+
+		var supportScheduleName = StringUtil.replace("${supportScheduleName}", "[", "");
+
+		var supportSchedule = StringUtil.replace("${supportScheduleName}", "]", "");
+
+		var supportSchedule = StringUtil.replace("${supportScheduleName}", "&quot;", "");
+
+		var supportRegionAbbreviationFromAPI = StringUtil.replace("${supportScheduleName}", " - Schedule", "");
+
+		echo("Expected Support Schedule in Trigger: ${supportRegionAbbreviation}");
+		echo("Actual Support Schedule in Trigger: ${supportRegionAbbreviationFromAPI}");
+
+		if (!("${supportRegionAbbreviation}" == "${supportRegionAbbreviationFromAPI}")) {
+			fail("The schedule trigger may be incorrect as it is setting ${supportRegionAbbreviationFromAPI} schedule to the ${supportRegionAbbreviation} trigger.");
 		}
 	}
 }
