@@ -27,6 +27,8 @@ It is recommended that `formatSource` be ran before submitting any source change
 
 There is a `test.properties` file within the root directory that sets the default test properties for all the projects within the repository. Each of the projects can have a `[project]/test.properties` file that overrides the root test properties. Local test properties can also be set by creating a `test.[user].properties` that overrides the existing project or root test properties. These local test properties needs to be specific to your instance and will not be added to source control.
 
+Here is the complete list of [test properties](https://github.com/liferay/com-liferay-poshi-runner/blob/master/poshi-properties.markdown)
+
 ## Updating POSHI Version
 
 The POSHI version is specified in `gradle.properties` with the property `poshiRunnerVersion=[version]`
@@ -45,4 +47,4 @@ There are a couple requirements for Jenkins continous integration to work with y
 	* Verify that `[project]/test.case.case.method.names.properties` exist and none of the `RUN_TEST_CASE_METHOD_NAME_GROUP` properties are empty. If it is empty, it means the testcase properties (called tags in POSHI prose) are not set correct or the POSHI query (PQL) located in the project test properties under the `test.batch.property.query` property is incorrect.
 * A corresponding trigger job needs to be setup on Jenkins. Contact the QA Engineering team if a new one need to be a added
 
-More information regarding Jenkins Continuous Integration is located [here](./JENKINS.markdown)
+All current automated projects is listed [here](./JENKINS.markdown)
