@@ -48,3 +48,16 @@ There are a couple requirements for Jenkins continous integration to work with y
 * A corresponding trigger job needs to be setup on Jenkins. Contact the QA Engineering team if a new one need to be a added
 
 All current automated projects is listed [here](./JENKINS.markdown).
+
+## Running Tests in Parallel on Jenkins Continuous Integration
+
+Running tests in parallel is a common way to speed up the tests on Jenkins continuous integration and here is the steps to accompish that:
+
+1. Add a group category name to the `test.case.available.property.names` property inside the project test properties
+	* This can be anything and up to the discretion of the QA tester. Recommended names are `group`, `test.group`, `batch` or `test.batch`
+2. Tag the testcases with appropriate group names. Those marked with the same group name will run in sequence
+	* For POSHI `.testcase` files, they can be marked like this `<property name="test.group" value="admin.tests" />` where `test.group` is the group category name and `admin.tests` is the group name
+	* For POSHI prose files, they can be marked like this `@test.group = "admin.tests"`
+3. Run `./gradlew :[project]:writePoshiProperties` and verify that `[project]/test.case.case.method.names.properties` generate the correct sets of `RUN_TEST_CASE_METHOD_NAME_GROUP`
+	* Each set of `RUN_TEST_CASE_METHOD_NAME_GROUP` indicates a set of tests that will run in __*sequence*__
+	* Each set of `RUN_TEST_CASE_METHOD_NAME_GROUP` will run in __*parallel*__ with other sets of `RUN_TEST_CASE_METHOD_NAME_GROUP`.
