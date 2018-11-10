@@ -59,6 +59,7 @@ Running tests in parallel is a common way to speed up the tests on Jenkins conti
 	* For POSHI `.testcase` files, they can be marked like this `<property name="test.group" value="admin.tests" />`
 	* For POSHI prose files, they can be marked like this `@test.group = "admin.tests"`
 	* Where `test.group` is the group category name and `admin.tests` is the group name
+	* Any unmarked testcases will be put into a separate group
 3. Run `./gradlew :[project]:writePoshiProperties`. Verify that it passes and the file `[project]/test.case.case.method.names.properties` contains the correct sets of `RUN_TEST_CASE_METHOD_NAME_GROUP`
 	* Each set of `RUN_TEST_CASE_METHOD_NAME_GROUP` indicates a set of tests that will run in __*sequence*__
 	* Each set of `RUN_TEST_CASE_METHOD_NAME_GROUP` will run in __*parallel*__ with other sets of `RUN_TEST_CASE_METHOD_NAME_GROUP`.
