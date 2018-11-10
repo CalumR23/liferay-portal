@@ -1,12 +1,12 @@
 # Liferay QA Websites
 
-This repository contains qa tests that runs against internal sites
+This repository contains qa tests that runs against internal sites.
 
 ## Overview
 
 The repository is setup as a [multi-project Gradle build](https://docs.gradle.org/current/userguide/multi_project_builds.html).
 
-If you are running Windows, Replace all the `./gradlew` in the examples below with `gradlew.bat`
+If you are running Windows, Replace all the `./gradlew` in the examples below with `gradlew.bat`.
 
 ## Running Tests
 
@@ -16,24 +16,24 @@ To run specific tests:
 
 ## Source Formatting
 
-The project uses the [Liferay Source Formatter plugin](https://dev.liferay.com/develop/reference/-/knowledge_base/7-0/source-formatter-gradle-plugin)
+The project uses the [Liferay Source Formatter plugin](https://dev.liferay.com/develop/reference/-/knowledge_base/7-0/source-formatter-gradle-plugin).
 
 To use it, run:
 `./gradlew formatSource`
 
-It is recommended that `formatSource` be ran before submitting any source changes
+It is recommended that `formatSource` be ran before submitting any source changes.
 
 ## Test Properties
 
 There is a `test.properties` file within the root directory that sets the default test properties for all the projects within the repository. Each of the projects can have a `[project]/test.properties` file that overrides the root test properties. Local test properties can also be set by creating a `test.[user].properties` that overrides the existing project or root test properties. These local test properties needs to be specific to your instance and will not be added to source control.
 
-Here is the complete list of [test properties](https://github.com/liferay/com-liferay-poshi-runner/blob/master/poshi-properties.markdown)
+Here is the complete list of [test properties](https://github.com/liferay/com-liferay-poshi-runner/blob/master/poshi-properties.markdown).
 
 ## Updating POSHI Version
 
-The POSHI version is specified in `gradle.properties` with the property `poshiRunnerVersion=[version]`
+The POSHI version is specified in `gradle.properties` with the property `poshiRunnerVersion=[version]`.
 
-It is recommended that all testcases within the repository are tested before pushing the version update to upstream
+It is recommended that all testcases within the repository are tested before pushing the version update to upstream.
 
 ## Reqirements for Jenkins Continuous Integration
 
@@ -47,4 +47,4 @@ There are a couple requirements for Jenkins continous integration to work with y
 	* Verify that `[project]/test.case.case.method.names.properties` exist and none of the `RUN_TEST_CASE_METHOD_NAME_GROUP` properties are empty. If it is empty, it means the testcase properties (called tags in POSHI prose) are not set correct or the POSHI query (PQL) located in the project test properties under the `test.batch.property.query` property is incorrect.
 * A corresponding trigger job needs to be setup on Jenkins. Contact the QA Engineering team if a new one need to be a added
 
-All current automated projects is listed [here](./JENKINS.markdown)
+All current automated projects is listed [here](./JENKINS.markdown).
