@@ -21,7 +21,7 @@ The project uses the [Liferay Source Formatter plugin](https://dev.liferay.com/d
 To use it, run:
 `./gradlew formatSource`
 
-It is recommended that `formatSource` be ran before submitting any source changes.
+It is recommended to run source formatting before submitting any source changes.
 
 ## Test Properties
 
