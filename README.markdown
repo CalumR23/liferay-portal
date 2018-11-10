@@ -33,7 +33,7 @@ Here is the complete list of [test properties](https://github.com/liferay/com-li
 
 The POSHI version is specified in `gradle.properties` with the property `poshiRunnerVersion=[version]`.
 
-It is recommended that all testcases within the repository are tested before pushing the version update to upstream.
+It is recommended that all testcases within the repository are tested with the new version before pushing the version update to upstream.
 
 ## Reqirements for Jenkins Continuous Integration
 
