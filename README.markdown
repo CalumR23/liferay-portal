@@ -6,7 +6,7 @@ This repository contains qa tests that runs against internal sites.
 
 The repository is setup as a [multi-project Gradle build](https://docs.gradle.org/current/userguide/multi_project_builds.html).
 
-If you are running Windows, Replace all the `./gradlew` in the examples below with `gradlew.bat`.
+If you are running Windows, replace all the `./gradlew` in the examples below with `gradlew.bat`.
 
 ## Running Tests
 
