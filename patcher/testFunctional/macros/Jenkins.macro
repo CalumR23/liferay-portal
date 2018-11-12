@@ -18,6 +18,12 @@
 		<execute function="Click" locator1="Jenkins#JENKINS_JOB_HEALTH_LINK" />
 	</command>
 
+	<command name="clickJobLink">
+		<var name="key_jobName" value="${jobName}" />
+
+		<execute function="Click" locator1="Jenkins#JENKINS_JOB_LINK" />
+	</command>
+
 	<command name="clickStopButtonLink">
 		<execute function="Click" locator1="Jenkins#STOP_JOB_BUTTON" />
 	</command>
@@ -28,10 +34,42 @@
 		</execute>
 	</command>
 
-	<command name="gotoConsoleOutput">
-		<execute macro="Jenkins#clickJobHealthLink">
+	<command name="getCurrentJobBuildNumber">
+		<execute macro="Jenkins#clickJobLink">
 			<var name="jobName" value="${jobName}" />
 		</execute>
+
+		<var method="selenium#getText(Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER)" name="jobBuildNumber" />
+
+		<return value="jobBuildNumber" />
+	</command>
+
+	<command name="getCurrentJobBuildNumberForShortJob">
+		<execute macro="Jenkins#clickJobLink">
+			<var name="jobName" value="${jobName}" />
+		</execute>
+
+		<if>
+			<condition function="IsElementPresent" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
+			<then>
+				<var method="selenium#getText(Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER)" name="jobBuildNumber" />
+			</then>
+			<else>
+				<var method="selenium#getText(Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER)" name="jobBuildNumber" />
+			</else>
+		</if>
+
+		<return value="jobBuildNumber" />
+	</command>
+
+	<command name="gotoConsoleOutput">
+		<var name="key_jobBuildNumber" value="${jobBuildNumber}" />
+
+		<execute macro="Jenkins#clickJobLink">
+			<var name="jobName" value="${jobName}" />
+		</execute>
+
+		<execute function="Click" locator1="Jenkins#JENKINS_JOB_BUILD_LINK" />
 
 		<execute macro="Jenkins#clickConsoleOutputLink" />
 	</command>
@@ -61,7 +99,7 @@
 		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
 
 		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy/build" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken}" />
+		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[originFilePath=${originFilePath}]CURL_DATA&gt; -d &lt;CURL_DATA[destinationFilePath=${destinationFilePath}]CURL_DATA&gt;" />
 
 		<execute macro="Jenkins#executeCurl">
 			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
@@ -157,9 +195,13 @@
 	</command>
 
 	<command name="viewJobStatusSuccess">
-		<var name="key_jobName" value="${jobName}" />
+		<var name="key_jobBuildNumber" value="${jobBuildNumber}" />
 
-		<execute function="AssertElementPresent" locator1="Jenkins#JENKINS_JOB_STATUS_SUCCESS" />
+		<execute macro="Jenkins#clickJobLink">
+			<var name="jobName" value="${jobName}" />
+		</execute>
+
+		<execute function="AssertElementPresent" locator1="Jenkins#JENKINS_JOB_BUILD_STATUS_SUCCESS" />
 	</command>
 
 	<command name="viewNoConsoleText">
