@@ -75,6 +75,33 @@ definition {
 		}
 	}
 
+	@prose = "the tickets with ticketIds ${ticketIdList} should have the environment ${environment}"
+	macro _viewMultipleTicketEnvironments {
+		for (var ticketId : list "${ticketIdList}") {
+			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
+
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/${ticketId}.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "[", "");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "]", "");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "&quot;", "");
+
+			echo("Expected Environment Name: ${environment}");
+			echo("Actual Environment Name: ${environmentFromAPI}");
+
+			if (!("${environmentFromAPI}" == "${environment}")) {
+				fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
+			}
+		}
+	}
+
 	@prose = "emails regarding the reception of the following ${portalLegacyVersion} ticketIds ${ticketIdList} with the following parameters should be sent out ${table}"
 	macro _viewMultipleLegacyVersionTicketReceptionEmails {
 		for (var ticketId : list "${ticketIdList}") {
@@ -579,12 +606,20 @@ definition {
 	macro _viewTicketEnvironment {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
 
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
+
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[10].value");
+		var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "[", "");
+
+		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "]", "");
+
+		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "&quot;", "");
 
 		echo("Expected Environment Name: ${environment}");
 		echo("Actual Environment Name: ${environmentFromAPI}");
