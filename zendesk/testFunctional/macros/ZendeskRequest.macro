@@ -113,6 +113,53 @@ definition {
 			key_requestSubject = "${requestSubject}");
 	}
 
+	@prose = "I mark the request as solved"
+	macro markAsSolved {
+		Click(locator1 = "ZendeskRequestView#MARK_AS_SOLVED_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your reply was successfully added.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+	}
+
+	@prose = "I mark the request as solved with a comment containing the following details ${table}"
+	macro markAsSolvedWithComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Comment") {
+				Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
+				Type(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Attachments") {
+				MakeVisible(locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD");
+
+				UploadCommonFile(
+					locator1 = "ZendeskRequestView#ATTACHMENTS_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+
+		Click(locator1 = "ZendeskRequestView#MARK_AS_SOLVED_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your reply was successfully added.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+	}
+
 	@prose = "I select the organization ${organization} from the search dropdown"
 	macro selectOrganizationFromSearchDropdown {
 		Select(
@@ -202,6 +249,11 @@ definition {
 			else if ("${field}" == "Last activity") {
 				AssertTextEquals(
 					locator1 = "ZendeskRequestView#REQUEST_DETAILS_LAST_ACTIVITY",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assigned to") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_DETAILS_ASSIGNED_TO",
 					value1 = "${value}");
 			}
 			else if ("${field}" == "Organization") {
