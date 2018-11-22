@@ -169,7 +169,7 @@ Scenario: Request Assignee
 	| System Status | Production > Functioning with limited capabilities |
 
 Scenario: Mark Request as Solved
-	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
+	Requesters should be able to mark a request as solved.
 
 	Given I create a user with the following values
 	| Name             | Zendesk User1                    |
@@ -217,7 +217,7 @@ Scenario: Mark Request as Solved
 	| System Status | Production > Functioning with limited capabilities |
 
 Scenario: Mark Request as Solved with Comment
-	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
+	Requesters should be able to mark a request as solved with a comment.
 
 	Given I create a user with the following values
 	| Name             | Zendesk User1                    |
@@ -270,6 +270,114 @@ Scenario: Mark Request as Solved with Comment
 	| Author      | Zendesk User1   |
 	| Comment     | Request Comment |
 	| Attachments | Document_1.txt  |
+
+Scenario: View Closed Request
+	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk Agent1                    |
+	| Password         | zendeskqauser                     |
+	| Role             | Agent                             |
+	| Email            | zendesk.agent1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                      |
+	| Language         | English                           |
+	| Time Zone        | Pacific Time (US & Canada)        |
+	| External ID      | Agent1                            |
+	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken"
+	And I change the status and sub-status of the ticket with the ID "${staticRequestIdList}" to "solved" and "completed" respectively
+	And I assign a ticket with the ID "${staticRequestIdList}" with the following tags
+	| auto_closed |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I click on the request with the subject "Request Subject" in the index
+	Then I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | SOLVED                                             |
+	| Requester     | Zendesk User1                                      |
+	| Assigned to   | Zendesk Agent1                                     |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | Completed                                          |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	And I should not see the request comment field
+	And I should see the closed comment message
+
+Scenario: Create Follow Up
+	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk Agent1                    |
+	| Password         | zendeskqauser                     |
+	| Role             | Agent                             |
+	| Email            | zendesk.agent1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                      |
+	| Language         | English                           |
+	| Time Zone        | Pacific Time (US & Canada)        |
+	| External ID      | Agent1                            |
+	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken"
+	And I change the status and sub-status of the ticket with the ID "${staticRequestIdList}" to "solved" and "completed" respectively
+	And I assign a ticket with the ID "${staticRequestIdList}" with the following tags
+	| auto_closed |
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I click on the request with the subject "Request Subject" in the index
+	And I create a follow-up request
+	Then I should be able to view a request with the following details
+	| Subject       | Re: Request Subject                                |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | Completed                                          |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	And I should see the request comment field
+	And I should not see the closed comment message
+	And I should be able to view a request comment containing the text "This is a follow-up to your previous request" with the following details
+	| Author          | Zendesk User1                                |
+	| Partial Comment | This is a follow-up to your previous request |
+	| Partial Comment | "Request Subject"                            |
 
 Scenario: Watcher Permissions
 	End users who are watchers in an organization should not be able to create a request for their organization or add comments on any request for their organization.
