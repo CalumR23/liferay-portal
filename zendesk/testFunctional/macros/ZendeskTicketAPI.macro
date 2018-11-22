@@ -3,6 +3,39 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
 
+	@prose = "I assign a ticket with the ID ${ticketId} with the following tags ${table}"
+	macro _assignTagsToTicket {
+		var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var tag = "${row[0]}";
+
+			if (contains("${tagList}", "{tagList}")) {
+				var tagList = "${tag}";
+			}
+			else {
+				var tagList = "${tagList},${tag}";
+			}
+		}
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"tags": "${tagList},${existingTags}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "I assign the ticket with the ID ${ticketId} to a user with the email address ${userEmailAddress}"
 	macro _assignTicket {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -34,6 +67,57 @@ definition {
 				"ticket":
 				{
 					"status": "${ticketStatus}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I change the status and sub-status of the ticket with the ID ${ticketId} to ${ticketStatus} and ${ticketSubStatus} respectively"
+	macro _changeTicketStatusAndSubStatus {
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"status": "${ticketStatus}",
+					"custom_fields": [
+						{
+							"id": "${fieldId}",
+							"value": "${ticketSubStatus}"
+						}
+					]
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I change the sub-status of the ticket with the ID ${ticketId} to ${ticketSubStatus}"
+	macro _changeTicketSubStatus {
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"custom_fields": [
+						{
+							"id": "${fieldId}",
+							"value": "${ticketSubStatus}"
+						}
+					]
 				}
 			}
 			''';
@@ -627,6 +711,23 @@ definition {
 		if (!("${environmentFromAPI}" == "${environment}")) {
 			fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
 		}
+	}
+
+	macro _viewTicketExistingTagsById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var existingTags = JSONCurlUtil.get("${curl}", "$.ticket.tags");
+
+		var existingTags = StringUtil.replace("${existingTags}", "[", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "]", "");
+
+		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+
+		return "${existingTags}";
 	}
 
 	@prose = "the ticket with ticket subject ${ticketSubject} should be assigned to the group ${assignee}"

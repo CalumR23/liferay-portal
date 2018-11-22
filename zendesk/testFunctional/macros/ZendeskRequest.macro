@@ -105,6 +105,35 @@ definition {
 		return "${staticRequestIdList}";
 	}
 
+	@prose = "I create a follow-up request"
+	macro createFollowUpRequest {
+		Click(locator1 = "ZendeskRequestView#CREATE_FOLLOW_UP_LINK");
+
+		Click(locator1 = "ZendeskRequestAdd#SUBMIT_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "ZendeskHomepage#MESSAGE",
+			value1 = "Your request was successfully submitted.");
+
+		Click(locator1 = "ZendeskHomepage#MESSAGE_DISMISS_LINK");
+
+		var requestId = selenium.getText("ZendeskRequestView#REQUEST_DETAILS_ID");
+
+		var requestId = StringUtil.replace("${requestId}", "#", "");
+
+		echo("Request ID: ${requestId}");
+
+		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			static var staticRequestIdList = "${requestId}";
+		}
+		else {
+			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+		}
+		echo("Request ID List: ${staticRequestIdList}");
+
+		return "${staticRequestIdList}";
+	}
+
 	@prose = "I click on the request with the subject ${requestSubject} in the index"
 	macro gotoViaIndex {
 		Click(
@@ -298,6 +327,17 @@ definition {
 		}
 	}
 
+	@prose = "I should see the closed comment message"
+	macro viewClosedCommentMessage {
+		AssertTextEquals(
+			locator1 = "ZendeskRequestView#REQUEST_CLOSED_COMMENT_MESSAGE",
+			value1 = "This request is closed for comments. You can create a follow-up.");
+
+		AssertTextEquals(
+			locator1 = "ZendeskRequestView#CREATE_FOLLOW_UP_LINK",
+			value1 = "create a follow-up");
+	}
+
 	@prose = "I should be able to view a request comment containing the text ${commentContent} with the following details ${table}"
 	macro viewComment {
 		var RawTable rawTable = new RawTable("${table}");
@@ -318,6 +358,12 @@ definition {
 					value1 = "${value}",
 					key_commentContent = "${commentContent}");
 			}
+			else if ("${field}" == "Partial Comment") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
 			else if ("${field}" == "Attachments") {
 				AssertTextEquals(
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT",
@@ -329,6 +375,14 @@ definition {
 				fail("No such request comment field ${field}");
 			}
 		}
+	}
+
+	@prose = "I should see the request comment field"
+	macro viewCommentField {
+		AssertVisible(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+		Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+		AssertVisible(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD_EXPANDED");
+		AssertVisible(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
 	}
 
 	@prose = "I should see the Description text field"
@@ -348,6 +402,12 @@ definition {
 		AssertNotVisible(
 			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
 			key_dropdownLabel = "${dropdownLabel}");
+	}
+
+	@prose = "I should not see the closed comment message"
+	macro viewNoClosedCommentMessage {
+		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_CLOSED_COMMENT_MESSAGE");
+		AssertElementNotPresent(locator1 = "ZendeskRequestView#CREATE_FOLLOW_UP_LINK");
 	}
 
 	@prose = "I should not see the request comment field"
