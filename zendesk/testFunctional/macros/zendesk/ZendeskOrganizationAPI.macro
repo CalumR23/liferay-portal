@@ -1,5 +1,7 @@
 definition {
 	var apiToken = PropsUtil.get("zendesk.api.token");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
@@ -303,5 +305,56 @@ definition {
 		var organizationID = JSONCurlUtil.get("${curl}", "$.organizations[0].id");
 
 		return "${organizationID}";
+	}
+
+	macro _viewOrganizationSearchResultsByName {
+		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
+
+		var curl = '''
+			${zendeskURL}/api/v2/search.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-G --data-urlencode "query=type:organization name:${organizationNameNoSpaces}"
+			''';
+
+		var results = JSONCurlUtil.get("${curl}", "$.results");
+
+		var results = StringUtil.replace("${existingTags}", "[", "");
+
+		var results = StringUtil.replace("${existingTags}", "]", "");
+
+		var results = StringUtil.replace("${existingTags}", "&quot;", "");
+
+		return "${results}";
+	} 
+
+	@prose = "the organization ${organizationName} should be present on zendesk.liferay.com"
+	macro _viewOrganizationSyncFromOsb {
+		var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+
+		if ("${results}" == "") {
+			var currentIteration = "0";
+
+			while ((!("${currentIteration}" == "${pollMaximumIterations}")) || ("${results}" == "")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+				var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+			}
+		}
+
+		if (!("${results}" == "")) {
+			var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.results[0].name");
+		}
+		else {
+			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for ${organizationName} appears to have been unsuccessful");
+		}
+
+		echo("Expected Organization Name: ${organizationName}");
+		echo("Actual Organization Name: ${organizationNameFromAPI}");
+
+		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}. There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
+		}
 	}
 }

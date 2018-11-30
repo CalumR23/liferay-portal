@@ -393,4 +393,52 @@ definition {
 			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
 		}
 	}
+
+	macro _viewUserSearchResultsByEmailAddress {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var results = JSONCurlUtil.get("${curl}", "$.results");
+
+		var results = StringUtil.replace("${existingTags}", "[", "");
+
+		var results = StringUtil.replace("${existingTags}", "]", "");
+
+		var results = StringUtil.replace("${existingTags}", "&quot;", "");
+
+		return "${results}";
+	} 
+
+	@prose = "the user with the email address ${userEmailAddress} should be present on zendesk.liferay.com"
+	macro _viewUserSyncFromOsb {
+		var results = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		if ("${results}" == "") {
+			var currentIteration = "0";
+
+			while ((!("${currentIteration}" == "${pollMaximumIterations}")) || ("${results}" == "")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+				var results = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+			}
+		}
+
+		if (!("${results}" == "")) {
+			var userEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.results[0].email");
+		}
+		else {
+			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for the user with the email ${userEmailAddress} appears to have been unsuccessful");
+		}
+
+		echo("Expected User Email Address: ${userEmailAddress}");
+		echo("Actual User Email Address: ${userEmailAddressFromAPI}");
+
+		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
+		}
+	}
 }
