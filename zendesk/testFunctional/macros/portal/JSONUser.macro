@@ -1,0 +1,98 @@
+definition {
+	var adminEmailAddress = PropsUtil.get("osb.admin.email.address");
+	var adminPassword = PropsUtil.get("osb.admin.password");
+	var portalInstanceName = PropsUtil.get("customer.liferay.portal.instance");
+	var supportURL = PropsUtil.get("customer.liferay.url");
+
+	@prose = "I create a user with the following parameters ${table}"
+	macro create {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such organization field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getCompanyId();
+
+		var openId = StringUtil.randomString(5);
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user
+			-u ${adminEmailAddress}:${adminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var userId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("User ID: ${userId}");
+
+		if (contains("${staticUserIdList}", "{staticUserIdList}")) {
+			static var staticUserIdList = "${userId}";
+		}
+		else {
+			static var staticUserIdList = "${staticUserIdList},${userId}";
+		}
+
+		echo("User ID List: ${staticUserIdList}");
+
+		return "${staticUserIdList}";
+	}
+
+	@prose = "I teardown the users with userIds ${userIdList} from customer.liferay.com"
+	macro tearDownUsers {
+		if (!(contains("${userIdList}", "{userIdList}"))) {
+
+			for (var userId : list "${userIdList}") {
+
+				var curl = '''
+					${supportURL}/api/jsonws/user/delete-user
+					-u ${adminEmailAddress}:${adminPassword}
+					-d userId=${userId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+}
