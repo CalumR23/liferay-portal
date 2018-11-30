@@ -171,6 +171,50 @@ definition {
 		return "${staticOrganizationID}";
 	}
 
+	@prose = "I obtain the external IDs of the following organizations from zendesk.liferay.com ${table}"
+	macro _getMultipleOrganizationExternalIdsByOrganizationName {
+		var organizationCount = "0";
+		var organizationExternalIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var organizationName = "${row[0]}";
+
+			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+			if("${organizationCount}" == "0") {
+				var organizationExternalIds = "${organizationExternalIds}${organizationExternalId}";
+			}
+			else {
+				var organizationExternalIds = "${organizationExternalIds},${organizationExternalId}";
+			}
+
+			var organizationCount = MathUtil.sum("${organizationCount}", "1");
+		}
+
+		static var staticOrganizationExternalIdList = "${organizationExternalIds}";
+
+		echo("Organization External IDs: ${staticOrganizationExternalIdList}");
+
+		return "${staticOrganizationExternalIdList}";
+	}
+
+	@prose = "I obtain the external ID of the organization ${organizationName} from zendesk.liferay.com"
+	macro _getOrganizationExternalIdByOrganizationName {
+		var organizationName = StringUtil.replace("${organizationName}", " ", "+");
+
+		var curl = '''
+			${zendeskURL}/api/v2/search.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-G --data-urlencode "query=type:organization name:${organizationName}"
+			''';
+
+		var organizationExternalId = JSONCurlUtil.get("${curl}", "$.results[0].external_id");
+
+		return "${organizationExternalId}";
+	}
+
 	@prose = "I teardown the organization with organizationId ${staticOrganizationId} from zendesk.liferay.com"
 	macro _tearDownOrganizationById {
 		var curl = '''
@@ -181,8 +225,20 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I teardown organizations with the following organizationExternalIds ${organizationExternalIds} from zendesk.liferay.com"
+	macro _tearDownOrganizationsByExternalIdList {
+		if (!(contains("${organizationExternalIds}", "{organizationExternalIds}"))) {
+			var curl = '''
+				${zendeskURL}/api/v2/organizations/destroy_many.json?external_ids=${organizationExternalIds}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
 	@prose = "I teardown organizations with the following organizationExternalIds from zendesk.liferay.com ${table}"
-	macro _tearDownOrganizationsByExternalId {
+	macro _tearDownOrganizationsByExternalIdTable {
 		var organizationCount = "0";
 		var organizationExternalIds = "";
 
@@ -201,12 +257,7 @@ definition {
 			var organizationCount = MathUtil.sum("${organizationCount}", "1");
 		}
 
-		var curl = '''
-			${zendeskURL}/api/v2/organizations/destroy_many.json?external_ids=${organizationExternalIds}
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		ZendeskOrganizationAPI._tearDownOrganizationsByExternalIdList(organizationExternalIds = "${organizationExternalIds}");
 	}
 
 	macro _viewOrganizationExistingTagsByExternalId {

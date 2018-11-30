@@ -231,6 +231,35 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I obtain the external IDs of the following user email addresses from zendesk.liferay.com ${table}"
+	macro _getMultipleUserExternalIdsByEmailAddress {
+		var userCount = "0";
+		var userExternalIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+			if("${userCount}" == "0") {
+				var userExternalIds = "${userExternalIds}${userExternalId}";
+			}
+			else {
+				var userExternalIds = "${userExternalIds},${userExternalId}";
+			}
+
+			var userCount = MathUtil.sum("${userCount}", "1");
+		}
+
+		static var staticUserExternalIdList = "${userExternalIds}";
+
+		echo("User External IDs: ${staticUserExternalIdList}");
+
+		return "${staticUserExternalIdList}";
+	}
+
 	macro _getUserNameById {
 		var curl = '''
 			${zendeskURL}/api/v2/users/${userId}.json
@@ -252,8 +281,20 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
+	macro _tearDownUsersByExternalIdList {
+		if (!(contains("${userExternalIds}", "{userExternalIds}"))) {
+			var curl = '''
+				${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
 	@prose = "I teardown users with the following userExternalIds from zendesk.liferay.com ${table}"
-	macro _tearDownUsersByExternalId {
+	macro _tearDownUsersByExternalIdTable {
 		var userCount = "0";
 		var userExternalIds = "";
 
@@ -272,12 +313,7 @@ definition {
 			var userCount = MathUtil.sum("${userCount}", "1");
 		}
 
-		var curl = '''
-			${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds}
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		ZendeskUserAPI._tearDownUsersByExternalIdList(userExternalIds = "${userExternalIds}");
 	}
 
 	macro _viewUserExistingTagsByEmailAddress {
@@ -306,6 +342,17 @@ definition {
 		var existingTags = JSONCurlUtil.get("${curl}", "$.users[0].tags");
 
 		return "${existingTags}";
+	}
+
+	macro _viewUserExternalIdByEmailAddress {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userExternalId = JSONCurlUtil.get("${curl}", "$.users[0].external_id");
+
+		return "${userExternalId}";
 	}
 
 	macro _viewUserIdByEmailAddress {
