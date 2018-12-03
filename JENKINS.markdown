@@ -4,6 +4,7 @@ The current automated jobs are as below
 
 Project | URL
 --- | ---
+Analytics Cloud | http://test-1-10/job/test-qa-websites-functional-daily
 LESA UAT | http://test-1-3/job/test-qa-websites-functional-daily
 LRDCOM Production | http://test-1-2/job/test-qa-websites-functional-daily
 LRDCOM UAT | http://test-1-2/job/test-qa-websites-functional-daily
