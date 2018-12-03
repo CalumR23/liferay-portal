@@ -241,9 +241,9 @@ definition {
 		for (var row : table "${rawTable}") {
 			var userEmailAddress = "${row[0]}";
 
-			var results = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-			if (!("${results}" == "")) {
+			if (!("${users}" == "[]")) {
 				var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 				if("${userCount}" == "0") {
@@ -434,35 +434,32 @@ definition {
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var results = JSONCurlUtil.get("${curl}", "$.results");
+		var users = JSONCurlUtil.get("${curl}", "$.users");
 
-		var results = StringUtil.replace("${existingTags}", "[", "");
-
-		var results = StringUtil.replace("${existingTags}", "]", "");
-
-		var results = StringUtil.replace("${existingTags}", "&quot;", "");
-
-		return "${results}";
+		return "${users}";
 	} 
 
 	@prose = "the user with the email address ${userEmailAddress} should be present on zendesk.liferay.com"
 	macro _viewUserSyncFromOsb {
-		var results = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-		if ("${results}" == "") {
-			var currentIteration = "0";
+		var currentIteration = "0";
 
-			while ((!("${currentIteration}" == "${pollMaximumIterations}")) || ("${results}" == "")) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
-				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
-				var results = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-			}
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 		}
 
-		if (!("${results}" == "")) {
-			var userEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.results[0].email");
+		if (!("${users}" == "[]")) {
+			var curl = '''
+				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var userEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].email");
 		}
 		else {
 			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for the user with the email ${userEmailAddress} appears to have been unsuccessful");
@@ -471,7 +468,7 @@ definition {
 		echo("Expected User Email Address: ${userEmailAddress}");
 		echo("Actual User Email Address: ${userEmailAddressFromAPI}");
 
-		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+		if (!("${userEmailAddressFromAPI}" == "${userEmailAddress}")) {
 			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}

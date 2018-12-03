@@ -185,7 +185,7 @@ definition {
 
 			var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
-			if (!("${results}" == "")) {
+			if (!("${results}" == "[]")) {
 				var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 				if("${organizationCount}" == "0") {
@@ -321,12 +321,6 @@ definition {
 
 		var results = JSONCurlUtil.get("${curl}", "$.results");
 
-		var results = StringUtil.replace("${existingTags}", "[", "");
-
-		var results = StringUtil.replace("${existingTags}", "]", "");
-
-		var results = StringUtil.replace("${existingTags}", "&quot;", "");
-
 		return "${results}";
 	} 
 
@@ -334,19 +328,25 @@ definition {
 	macro _viewOrganizationSyncFromOsb {
 		var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
-		if ("${results}" == "") {
-			var currentIteration = "0";
+		var currentIteration = "0";
 
-			while ((!("${currentIteration}" == "${pollMaximumIterations}")) || ("${results}" == "")) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${results}" == "[]")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
-				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
-				var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
-			}
+			var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 		}
 
-		if (!("${results}" == "")) {
+		if (!("${results}" == "[]")) {
+			var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
+
+			var curl = '''
+				${zendeskURL}/api/v2/search.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				-G --data-urlencode "query=type:organization name:${organizationName}"
+				''';
+
 			var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.results[0].name");
 		}
 		else {
