@@ -16,16 +16,27 @@ Setup:
 	| Support Language | English                    | 
 	| External ID      | Organization1              |
 	* I create an organization with the following values
-	| Status           | Approved                     |
-	| Name             | Organization Name 2          |
-	| Tags             | liferay_dxp,liferay_portal   |
-	| Shared Tickets   | true                         |
-	| Shared Comments  | true                         |
-	| SLA              | Gold                         |
-	| Tier             | Regular                      |
-	| Support Region   | Japan                        |
-	| Support Language | Japanese                     | 
-	| External ID      | Organization2                | 
+	| Status           | Approved                   |
+	| Name             | Organization Name 2        |
+	| Tags             | liferay_dxp,liferay_portal |
+	| Shared Tickets   | true                       |
+	| Shared Comments  | true                       |
+	| SLA              | Gold                       |
+	| Tier             | Regular                    |
+	| Support Region   | Japan                      |
+	| Support Language | Japanese                   | 
+	| External ID      | Organization2              |
+	* I create an organization with the following values
+	| Status           | Approved                   |
+	| Name             | Organization Name 3        |
+	| Tags             | liferay_dxp,liferay_portal |
+	| Shared Tickets   | true                       |
+	| Shared Comments  | true                       |
+	| SLA              | Gold                       |
+	| Tier             | Regular                    |
+	| Support Region   | Spain                      |
+	| Support Language | Spanish                    | 
+	| External ID      | Organization3              | 
 
 Teardown:
 	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
@@ -36,6 +47,7 @@ Teardown:
 	* I teardown organizations with the following organizationExternalIds from zendesk.liferay.com
 	| Organization1 |
 	| Organization2 |
+	| Organization3 |
 
 Scenario: Request Creation
 	End users should be able to create and view a request using the Zendesk frontend.
@@ -65,6 +77,57 @@ Scenario: Request Creation
 	| Status        | OPEN                                               |
 	| Requester     | Zendesk User1                                      |
 	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+	And I should be able to view a request comment containing the text "Request Description" with the following details
+	| Author      | Zendesk User1       |
+	| Comment     | Request Description |
+	| Attachments | Document_1.txt      |
+
+Scenario: Request Creation as User with Multiple Roles in Multiple Organizations
+	End users should be able to create and view a request using the Zendesk frontend on only the organizations they are not a watcher of.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" to an organization with organizationExternalId "Organization2"
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" to an organization with organizationExternalId "Organization3"
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" as a watcher on an organization with organizationExternalId "Organization1"
+	And I assign a user with the email address "zendesk.user1@liferay.com.broken" as a watcher on an organization with organizationExternalId "Organization2"	
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to the Submit a ticket form
+	And I click on the "Organization" dropdown
+	Then I should see the following options
+	| Organization Name 3 |
+	And the following options should not be present
+	| Organization Name 1 |
+	| Organization Name 2 |
+	When I go to the zendesk homepage
+	And I create a request with the following values
+	| Product       | Liferay DXP                             | 7.1                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request Subject                         |                                       |
+	| Description   | Request Description                     |                                       |
+	| Attachments   | Document_1.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Organization  | Organization Name 3                                |
 	| Product       | Liferay DXP > 7.1                                  |
 	| Sub-Status    | —                                                  |
 	| Component     | Activation Key & Project Administration            |
