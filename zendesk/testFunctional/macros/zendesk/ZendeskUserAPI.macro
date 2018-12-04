@@ -321,19 +321,29 @@ definition {
 	}
 
 	@prose = "the user with the email address ${userEmailAddress} should not have the ${tag} tag"
-	macro _viewNoUserTag {
+	macro _viewNoUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${existingTags}", "${tag}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
 
 		echo("Non-expected User Tag: ${tag}");
 		echo("Actual User Tags: ${existingTags}");
 
 		if (contains("${existingTags}", "${tag}")) {
-			fail("Actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} has the non-expected tag ${tag}");
+			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} has the non-expected tag ${tag}");
 		}
 	}
 
 	@prose = "the user with the email address ${userEmailAddress} should not be a watcher on an organization with the name ${organizationName}"
-	macro _viewNoUserWatcherTag {
+	macro _viewNoUserWatcherTagSync {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
@@ -342,11 +352,21 @@ definition {
 
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${existingTags}", "${watcherTag}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
 		echo("Non-expected User Watcher Tag: ${watcherTag}");
 		echo("Actual User Tags: ${existingTags}");
 
 		if (contains("${existingTags}", "${watcherTag}")) {
-			fail("Actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} has the non-expected watcher tag ${watcherTag}");
+			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} has the non-expected watcher tag ${watcherTag}");
 		}
 	}
 
@@ -474,19 +494,29 @@ definition {
 	}
 
 	@prose = "the user with the email address ${userEmailAddress} should have the ${tag} tag"
-	macro _viewUserTag {
+	macro _viewUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${existingTags}", "${tag}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
 
 		echo("Expected User Tag: ${tag}");
 		echo("Actual User Tags: ${existingTags}");
 
 		if (!(contains("${existingTags}", "${tag}"))) {
-			fail("Actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected tag ${tag}");
+			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected tag ${tag}");
 		}
 	}
 
 	@prose = "the user with the email address ${userEmailAddress} should be a watcher on an organization with the name ${organizationName}"
-	macro _viewUserWatcherTag {
+	macro _viewUserWatcherTagSync {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
@@ -495,11 +525,21 @@ definition {
 
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${existingTags}", "${watcherTag}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
 		echo("Expected User Watcher Tag: ${watcherTag}");
 		echo("Actual User Tags: ${existingTags}");
 
 		if (!(contains("${existingTags}", "${watcherTag}"))) {
-			fail("Actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected watcher tag ${watcherTag}");
+			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected watcher tag ${watcherTag}");
 		}
 	}
 }
