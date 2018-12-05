@@ -183,9 +183,9 @@ definition {
 		for (var row : table "${rawTable}") {
 			var organizationName = "${row[0]}";
 
-			var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
-			if (!("${results}" == "[]")) {
+			if (!("${organizations}" == "[]")) {
 				var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 				if("${organizationCount}" == "0") {
@@ -207,15 +207,14 @@ definition {
 
 	@prose = "I obtain the external ID of the organization ${organizationName} from zendesk.liferay.com"
 	macro _getOrganizationExternalIdByOrganizationName {
-		var organizationName = StringUtil.replace("${organizationName}", " ", "+");
+		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 
 		var curl = '''
-			${zendeskURL}/api/v2/search.json
+			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces}
 			-u ${zendeskAdminEmail}/token:${apiToken}
-			-G --data-urlencode "query=type:organization name:${organizationName}"
 			''';
 
-		var organizationExternalId = JSONCurlUtil.get("${curl}", "$.results[0].external_id");
+		var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations[0].external_id");
 
 		return "${organizationExternalId}";
 	}
@@ -314,40 +313,38 @@ definition {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 
 		var curl = '''
-			${zendeskURL}/api/v2/search.json
+			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces}
 			-u ${zendeskAdminEmail}/token:${apiToken}
-			-G --data-urlencode "query=type:organization name:${organizationNameNoSpaces}"
 			''';
 
-		var results = JSONCurlUtil.get("${curl}", "$.results");
+		var organizations = JSONCurlUtil.get("${curl}", "$.organizations");
 
-		return "${results}";
+		return "${organizations}";
 	} 
 
 	@prose = "the organization ${organizationName} should be present on zendesk.liferay.com"
 	macro _viewOrganizationSyncFromOsb {
-		var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${results}" == "[]")) {
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${organizations}" == "[]")) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
-			var results = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 		}
 
-		if (!("${results}" == "[]")) {
+		if (!("${organizations}" == "[]")) {
 			var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 
 			var curl = '''
-				${zendeskURL}/api/v2/search.json
+				${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces}
 				-u ${zendeskAdminEmail}/token:${apiToken}
-				-G --data-urlencode "query=type:organization name:${organizationName}"
 				''';
 
-			var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.results[0].name");
+			var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organizations[0].name");
 		}
 		else {
 			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for ${organizationName} appears to have been unsuccessful");
