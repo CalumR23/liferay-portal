@@ -1,5 +1,7 @@
 definition {
 	var apiToken = PropsUtil.get("zendesk.api.token");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
@@ -320,6 +322,32 @@ definition {
 		ZendeskUserAPI._tearDownUsersByExternalIdList(userExternalIds = "${userExternalIds}");
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should not be in the organization ${organizationName}"
+	macro _viewNoUserOrganizationIdSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var currentIteration = "0";
+
+		var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationIdFromAPI}", "${organizationId}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
+		echo("Non-expected User Organization: ${organizationId}");
+		echo("Actual User Organization: ${organizationIdFromAPI}");
+
+		if (contains("${organizationIdFromAPI}", "${organizationId}")) {
+			fail("After ${currentIteration} checks, the user still appears to be part of the organization with the ID ${organizationId}");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not have the ${tag} tag"
 	macro _viewNoUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -445,6 +473,47 @@ definition {
 
 		if (!("${userNameFromAPI}" == "${userName}")) {
 			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
+		}
+	}
+
+	macro _viewUserOrganizationIdByEmailAddress {
+		var curl = '''
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationId = JSONCurlUtil.get("${curl}", "$.users[0].organization_id");
+
+		return "${organizationId}";
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} should be in the organization ${organizationName}"
+	macro _viewUserOrganizationIdSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var currentIteration = "0";
+
+		var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationIdFromAPI}", "${organizationId}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
+		echo("Expected User Organization: ${organizationId}");
+		echo("Actual User Organization: ${organizationIdFromAPI}");
+
+		if ("${organizationIdFromAPI}" == "") {
+			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId} and is not part of any other organizations");
+		}
+
+		if (!(contains("${organizationIdFromAPI}", "${organizationId}"))) {
+			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId}, but rather is part of ${organizationIdFromAPI}");
 		}
 	}
 
