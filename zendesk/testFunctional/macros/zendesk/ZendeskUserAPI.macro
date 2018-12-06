@@ -327,23 +327,24 @@ definition {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var currentIteration = "0";
 
-		var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationIdFromAPI}", "${organizationId}"))) {
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationMemberships}", "${organizationId}"))) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
-			var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+			var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 		}
 
 		echo("Non-expected User Organization: ${organizationId}");
-		echo("Actual User Organization: ${organizationIdFromAPI}");
+		echo("Actual User Organization Memberships: ${organizationMemberships}");
 
-		if (contains("${organizationIdFromAPI}", "${organizationId}")) {
+		if (contains("${organizationMemberships}", "${organizationId}")) {
 			fail("After ${currentIteration} checks, the user still appears to be part of the organization with the ID ${organizationId}");
 		}
 	}
@@ -492,29 +493,37 @@ definition {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var currentIteration = "0";
 
-		var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationIdFromAPI}", "${organizationId}")))) {
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMemberships}", "${organizationId}")))) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
-			var organizationIdFromAPI = ZendeskUserAPI._viewUserOrganizationIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+			var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 		}
 
 		echo("Expected User Organization: ${organizationId}");
-		echo("Actual User Organization: ${organizationIdFromAPI}");
+		echo("Actual User Organization Memberships: ${organizationMemberships}");
 
-		if ("${organizationIdFromAPI}" == "") {
-			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId} and is not part of any other organizations");
+		if (!(contains("${organizationMemberships}", "${organizationId}"))) {
+			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId}");
 		}
+	}
 
-		if (!(contains("${organizationIdFromAPI}", "${organizationId}"))) {
-			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId}, but rather is part of ${organizationIdFromAPI}");
-		}
+	macro _viewUserOrganizationMembershipsById {
+		var curl = '''
+			${zendeskURL}/api/v2/users/${userId}/organization_memberships.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationMemberships = JSONCurlUtil.get("${curl}", "$.organization_memberships");
+
+		return "${organizationMemberships}";
 	}
 
 	macro _viewUserSearchResultsByEmailAddress {
