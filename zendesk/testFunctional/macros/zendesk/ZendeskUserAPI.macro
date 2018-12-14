@@ -322,6 +322,23 @@ definition {
 		ZendeskUserAPI._tearDownUsersByExternalIdList(userExternalIds = "${userExternalIds}");
 	}
 
+	@prose = "I update the user with the email address ${userEmailAddress} to use the password ${userPassword}"
+	macro _updateUserPasswordByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${zendeskURL}/api/v2/users/${userId}/password.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"password":"${userPassword}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not be in the organization ${organizationName}"
 	macro _viewNoUserOrganizationIdSync {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");

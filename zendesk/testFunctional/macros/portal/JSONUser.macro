@@ -2,7 +2,6 @@ definition {
 	var adminEmailAddress = PropsUtil.get("osb.admin.email.address");
 	var adminPassword = PropsUtil.get("osb.admin.password");
 	var supportURL = PropsUtil.get("customer.liferay.url");
-	var webId = PropsUtil.get("customer.liferay.web.id");
 	var webURL = PropsUtil.get("web.liferay.url");
 
 	@prose = "I create a user with the following parameters ${table}"
@@ -30,7 +29,7 @@ definition {
 			}
 		}
 
-		var companyId = JSONCompany.getCompanyId();
+		var companyId = JSONCompany.getWebCompanyId();
 
 		var openId = StringUtil.randomString("5");
 
@@ -95,5 +94,32 @@ definition {
 				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 			}
 		}
+	}
+
+	@prose = "I update the support password for user with the email address ${userEmailAddress} to ${userPassword}"
+	macro updateSupportPassword {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${adminEmailAddress}:${adminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/update-password
+			-u ${adminEmailAddress}:${adminPassword}
+			-d userId=${supportUserId}
+			-d password1=${userPassword}
+			-d password2=${userPassword}
+			-d passwordReset=false
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 }

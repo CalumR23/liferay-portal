@@ -242,6 +242,36 @@ definition {
 			value1 = "\RETURN");
 	}
 
+	@prose = "I upload a file using the large file uploader as a user with the email address ${userEmailAddress} with the support password ${userPassword} with the followng parameters ${table}"
+	macro uploadFileViaLargeFileUploader {
+		Click(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Attachment") {
+				MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
+
+				UploadCommonFile(
+					locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Comment") {
+				Type(
+					locator1 = "LargeFileUploader#COMMENT_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such large file uploader field ${field}");
+			}
+		}
+
+		Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
+	}
+
 	@prose = "I should be able to view a request with the following details ${table}"
 	macro view {
 		var RawTable rawTable = new RawTable("${table}");
@@ -402,6 +432,39 @@ definition {
 		AssertNotVisible(
 			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
 			key_dropdownLabel = "${dropdownLabel}");
+	}
+
+	@prose = "I should be able to view a large file comment containing the text ${commentContent} with the following details ${table}"
+	macro viewLargeFileComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_AUTHOR",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Comment") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_CONTENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Attachment") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_ATTACHMENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}",
+					key_fileName = "${value}");
+			}
+			else {
+				fail("No such large file request comment field ${field}");
+			}
+		}
 	}
 
 	@prose = "I should not see the closed comment message"
