@@ -266,6 +266,39 @@ definition {
 		return "${staticUserExternalIdList}";
 	}
 
+	@prose = "I obtain the IDs of the following user email addresses from zendesk.liferay.com ${table}"
+	macro _getMultipleUserIdsByEmailAddress {
+		var userCount = "0";
+		var userIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+			if (!("${users}" == "[]")) {
+				var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+				if("${userCount}" == "0") {
+					var userIds = "${userIds}${userId}";
+				}
+				else {
+					var userIds = "${userIds},${userId}";
+				}
+
+				var userCount = MathUtil.sum("${userCount}", "1");
+			}
+		}
+
+		static var staticUserIdList = "${userIds}";
+
+		echo("User IDs: ${staticUserIdList}");
+
+		return "${staticUserIdList}";
+	}
+
 	macro _getUserNameById {
 		var curl = '''
 			${zendeskURL}/api/v2/users/${userId}.json
@@ -320,6 +353,18 @@ definition {
 		}
 
 		ZendeskUserAPI._tearDownUsersByExternalIdList(userExternalIds = "${userExternalIds}");
+	}
+
+	@prose = "I teardown users with the following userIds ${userIds} from zendesk.liferay.com"
+	macro _tearDownUsersByIdList {
+		if (!(contains("${userIds}", "{userIds}"))) {
+			var curl = '''
+				${zendeskURL}/api/v2/users/destroy_many.json?ids=${userIds}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
 	}
 
 	@prose = "I update the user with the email address ${userEmailAddress} to use the password ${userPassword}"
