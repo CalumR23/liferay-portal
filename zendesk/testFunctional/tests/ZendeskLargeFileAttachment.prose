@@ -1,0 +1,77 @@
+@testray.main.component.name = "Support QA"
+@type = "frontend"
+
+Feature: Zendesk Large File Attachment
+	Testing the large file uploader in Zendesk.
+
+Teardown:
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I tear down the projects with the following project codes
+	| ZENOSBA |
+	* I teardown the users with userIds "${staticWebUserIdList}" from web.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Automotive |
+	* I obtain the external IDs of the following user email addresses from zendesk.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	* I teardown users with the following userExternalIds "${staticUserExternalIdList}" from zendesk.liferay.com
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+
+Scenario: Upload large file
+	Users should be able to upload large attachments to a ticket using the large file uploader
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	When I update the user with the email address "osb.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+	And I log into zendesk as "osb.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+	And I create a request with the following values
+	| Product       | Liferay Portal                          | 6.2                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request Subject                         |                                       |
+	| Description   | Request Description                     |                                       |
+	| Attachments   | Document_1.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | OSB Customer1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay Portal > 6.2                               |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+	And I should be able to view a request comment containing the text "Request Description" with the following details
+	| Author      | OSB Customer1       |
+	| Comment     | Request Description |
+	| Attachments | Document_1.txt      |
+	When I upload a file using the large file uploader as a user with the email address "osb.customer1@lrcustomer.com.broken" with the support password "osbadminqauser" with the followng parameters
+	| Attachment  | Document_2.txt      |
+	| Comment     | Large File Comment  |
+	Then I should be able to view a large file comment containing the text "Large File Comment" with the following details
+	| Author      | OSBAdmin Admin      |
+	| Comment     | Large File Comment  |
+	| Attachment  | Document_2.txt      |
+
