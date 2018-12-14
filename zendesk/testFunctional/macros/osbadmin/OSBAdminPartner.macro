@@ -1,0 +1,239 @@
+definition {
+	var popupTitle = PropsUtil.get("osb.admin.popup.title");
+	var supportURL = PropsUtil.get("customer.liferay.url");
+
+	@prose = "I assign a partner with the code ${partnerCode} to the project with the code ${projectCode}"
+	macro assignPartnerToProject {
+		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
+
+		OSBAdminProject.editPartner(partnerCode = "${partnerCode}");
+
+		AssertTextEquals(
+			locator1 = "OSBAdminProject#SELECTED_PARTNER",
+			value1 = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminProject#PARTNER_MANAGED_SUPPORT_CHECKBOX");
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I assign a user the email address ${emailAddress} as a worker with the role ${role} to the partner with the code ${partnerCode}"
+	macro assignWorker {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminPartner#ASSIGN_WORKERS_BUTTON");
+
+		Type(
+			locator1 = "OSBAdminPartnerAssignWorker#EMAIL_ADDRESS_FIELD",
+			value1 = "${emailAddress}");
+
+		Select(
+			locator1 = "OSBAdminPartnerAssignWorker#ROLE_SELECT",
+			value1 = "${role}");
+
+		Click(locator1 = "OSBAdminPartnerAssignWorker#ADD_BUTTON");
+
+		Message.success();
+
+		var key_email = "${emailAddress}";
+
+		AssertElementPresent(locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_EMAIL");
+	}
+
+	@prose = "I create a partner organization with the following values ${table}"
+	macro create {
+		Click(locator1 = "OSBAdmin#PARTNERS_TAB");
+		Click(locator1 = "OSBAdmin#ADD_PARTNER_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		var dossieraAccountKey = StringUtil.randomString("18");
+
+		Type(
+			locator1 = "OSBAdminPartnerAdd#DOSSIERA_ACCOUNT_KEY_FIELD",
+			value1 = "${dossieraAccountKey}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Code") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#CODE_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Additional Notes") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#ADDITIONAL_NOTES_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Region") {
+				Select(
+					locator1 = "OSBAdminPartnerAdd#SUPPORT_REGION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Phone Number") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#PHONE_NUMBER_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Street Address") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#STREET_1_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Country") {
+				Select(
+					locator1 = "OSBAdminPartnerAdd#COUNTRY_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Region") {
+				Select(
+					locator1 = "OSBAdminPartnerAdd#REGION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Postal Code") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#POSTAL_CODE_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "City") {
+				Type(
+					locator1 = "OSBAdminPartnerAdd#CITY_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I remove a user the email address ${emailAddress} as a worker from the partner with the code ${partnerCode}"
+	macro deleteWorker {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminPartner#ASSIGN_WORKERS_BUTTON");
+
+		var key_emailAddress = "${emailAddress}";
+
+		Click(locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON");
+		ClickNoError(locator1 = "OSBAdminPartnerAssignWorker#REMOVE_MENU_ITEM");
+
+		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+		Message.success();
+	}
+
+	macro deleteWorkers {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminPartner#ASSIGN_WORKERS_BUTTON");
+
+		OSBAdmin.pause(timeInSeconds = "5");
+
+		while (IsElementPresent(locator1 = "OSBAdminPartnerAssignWorker#ACTION_BUTTON")) {
+			Click(locator1 = "OSBAdminPartnerAssignWorker#ACTION_BUTTON");
+			ClickNoError(locator1 = "OSBAdminPartnerAssignWorker#REMOVE_MENU_ITEM");
+
+			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+			Message.success();
+
+			OSBAdmin.pause(timeInSeconds = "5");
+		}
+	}
+
+	macro gotoPartner {
+		OSBAdminSearch.searchBasicPartner(partnerCode = "${partnerCode}");
+
+		var key_code = "${partnerCode}";
+
+		Click(locator1 = "OSBAdmin#SEARCH_RESULT_CODE");
+	}
+
+	@prose = "I inactivate a partner with the code ${partnerCode}"
+	macro inactivatePartner {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Select(
+			locator1 = "OSBAdminPartnerAdd#STATUS_SELECT",
+			value1 = "Inactive");
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I remove a partner with the code ${partnerCode} to the project with the code ${projectCode}"
+	macro removePartnerFromProject {
+		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
+
+		Click(locator1 = "OSBAdminProjectAdd#PARTNER_REMOVE_BUTTON");
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I tear down the partners with the following partner codes ${table}"
+	macro tearDownPartner {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var partnerCode = "${row[0]}";
+	
+			OSBAdminPartner.deleteWorkers(partnerCode = "${partnerCode}");
+
+			OSBAdminSearch.searchBasicPartner(partnerCode = "${partnerCode}");
+
+			OSBAdminSearch.tearDownSearchResultRow(code = "${partnerCode}");
+		}
+	}
+
+	@prose = "I tear down the partner workers with the following email addresses for the partner with the code ${partnerCode} ${table}"
+	macro tearDownPartnerWorkers {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminPartner#ASSIGN_WORKERS_BUTTON");
+
+		OSBAdmin.pause(timeInSeconds = "5");
+		
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var key_emailAddress = "${row[0]}";
+
+			if (IsElementPresent(locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON")) {
+				Click(locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON");
+				ClickNoError(locator1 = "OSBAdminPartnerAssignWorker#REMOVE_MENU_ITEM");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				Message.success();
+			}
+		}
+	}
+
+	@prose = "I update a worker on the partner with the code ${partnerCode} with the email address ${emailAddress} to the role of ${role}"
+	macro updateWorkerRole {
+		OSBAdminPartner.gotoPartner(partnerCode = "${partnerCode}");
+
+		Click(locator1 = "OSBAdminPartner#ASSIGN_WORKERS_BUTTON");
+
+		var key_emailAddress = "${emailAddress}";
+
+		Select(
+			locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_ROLE_SELECT",
+			value1 = "${role}");
+
+		Click(locator1 = "OSBAdminPartnerAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON");
+		ClickNoError(locator1 = "OSBAdminPartnerAssignWorker#UPDATE_MENU_ITEM");
+
+		Message.success();
+	}
+}
