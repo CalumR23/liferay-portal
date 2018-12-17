@@ -110,8 +110,8 @@ definition {
 		}
 	}
 
-	@prose = "the trigger ${triggerName} should have the following properties ${table}"
-	macro _viewTriggerProperties {
+	@prose = "the trigger ${triggerName} should have the following properties under the all conditions ${table}"
+	macro _viewTriggerPropertiesUnderAllConditions {
 		var triggerId = ZendeskTriggerAPI._getTriggerIdByName(triggerName = "${triggerName}");
 
 		var RawTable rawTable = new RawTable("${table}");
@@ -296,6 +296,276 @@ definition {
 				var operator = StringUtil.replace("${operator}", " ", "_");
 
 				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.all[?(@.field=='organization.custom_fields.support_region' && @.value=='${supportRegionId}')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field with the ${value} value does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.all[?(@.field=='organization.custom_fields.support_region' && @.value=='${supportRegionId}')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				var valueFromAPI = ZendeskOrganizationFieldsAPI._getSupportRegionNameById(supportRegionId = "${valueFromAPI}");
+
+				echo("Support Region value from API: ${valueFromAPI}");
+
+				echo("Expected Support Region: ${value}");
+				echo("Actual Support Region: ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual Support Region value ${valueFromAPI} for ${field} field does not match expected Support Region value ${value}");
+				}
+			}
+			else if ("${field}" == "Group") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.all[?(@.field=='group_id')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.all[?(@.field=='group_id')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				if (!("${valueFromAPI}" == "")) {
+					var valueFromAPI = ZendeskGroupAPI._getGroupNameById(valueFromAPI = "${valueFromAPI}");
+				}
+				else {
+					var valueFromAPI = "";
+				}
+
+				echo("Group from API: ${valueFromAPI}");
+
+				echo("Expected Group: ${value}");
+				echo("Actual Group ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual Group value ${valueFromAPI} for ${field} field does not match expected Group value ${value}");
+				}
+			}
+			else {
+				fail("No such trigger field ${field}");
+			}
+		}
+	}
+
+	@prose = "the trigger ${triggerName} should have the following properties under the any conditions ${table}"
+	macro _viewTriggerPropertiesUnderAnyConditions {
+		var triggerId = ZendeskTriggerAPI._getTriggerIdByName(triggerName = "${triggerName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var operator = "${row[1]}";
+			var value = "${row[2]}";
+
+			if ("${field}" == "Update Type") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='update_type')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='update_type')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				echo("Update Type value from API: ${valueFromAPI}");
+
+				echo("Expected Update Type: ${value}");
+				echo("Actual Update Type: ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual Update Type value ${valueFromAPI} for ${field} field does not match expected Update Type value ${value}");
+				}
+			}
+			else if ("${field}" == "SLA") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='organization.custom_fields.sla')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='organization.custom_fields.sla')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				var valueFromAPI = ZendeskOrganizationFieldsAPI._getSLANameById(slaId = "${valueFromAPI}");
+
+				echo("SLA value from API: ${valueFromAPI}");
+
+				echo("Expected SLA: ${value}");
+				echo("Actual SLA: ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual SLA value ${valueFromAPI} for ${field} field does not match expected SLA value ${value}");
+				}
+			}
+			else if ("${field}" == "Priority") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='priority')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='priority')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				var valueFromAPI = StringUtil.upperCaseFirstLetter("${valueFromAPI}");
+
+				echo("Priority value from API: ${valueFromAPI}");
+
+				echo("Expected Priority: ${value}");
+				echo("Actual Priority: ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual Priority value ${valueFromAPI} for ${field} field does not match expected Priority value ${value}");
+				}
+			}
+			else if ("${field}" == "Within (schedule)") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var scheduleId = ZendeskScheduleAPI._getScheduleIdByName(scheduleName = "${value}");
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='within_schedule' && @.value=='${scheduleId}')].operator");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "]", "");
+
+				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "&quot;", "");
+
+				if (!("${operatorFromAPI}" == "${operator}")) {
+					fail("Actual operator value ${operatorFromAPI} for ${field} field does not match expected operator ${operator}");
+				}
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='within_schedule' && @.value=='${scheduleId}')].value");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				var valueFromAPI = ZendeskScheduleAPI._getScheduleNameById(scheduleId = "${valueFromAPI}");
+
+				echo("Support Region value from API: ${valueFromAPI}");
+
+				echo("Expected Support Region: ${value}");
+				echo("Actual Support Region: ${valueFromAPI}");
+
+				if (!("${valueFromAPI}" == "${value}")) {
+					fail("Actual Within (schedule) value ${valueFromAPI} for ${field} field does not match expected Within (schedule) value ${value}");
+				}
+			}
+			else if ("${field}" == "Support Region") {
+				var curl = '''
+					${zendeskURL}/api/v2/triggers/${triggerId}.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var supportRegionId = ZendeskOrganizationFieldsAPI._getSupportRegionIdByName(supportRegionName = "${value}");
+
+				var operator = StringUtil.lowerCaseFirstLetter("${operator}");
+
+				var operator = StringUtil.replace("${operator}", " ", "_");
+
+				var operatorFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.conditions.any[?(@.field=='organization.custom_fields.support_region' && @.value=='${supportRegionId}')].operator");
 
 				var operatorFromAPI = StringUtil.replace("${operatorFromAPI}", "[", "");
 
