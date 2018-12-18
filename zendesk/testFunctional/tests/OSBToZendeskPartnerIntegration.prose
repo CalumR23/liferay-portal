@@ -1,0 +1,489 @@
+@testray.main.component.name = "Support QA"
+
+Feature: OSB to Zendesk Partner Integration
+	Testing user partner updates in Zendesk caused by changes in OSB.
+
+Teardown:
+	* I wait for "30" seconds
+	* I log out and log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	* I tear down the partner workers with the following email addresses for the partner with the code "Zen OSB Partner"
+	| osb.partner1@lrpartner.com.broken |
+	| osb.partner2@lrpartner.com.broken |
+	| osb.partner3@lrpartner.com.broken |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| osb.partner1@lrpartner.com.broken |
+	| osb.partner2@lrpartner.com.broken |
+	| osb.partner3@lrpartner.com.broken |
+	* I tear down the projects with the following project codes
+	| ZENOSBA |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| osb.partner1@lrpartner.com.broken |
+	| osb.partner2@lrpartner.com.broken |
+	| osb.partner3@lrpartner.com.broken |
+	| no-reply@zenosba.com.broken       |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+
+Scenario: View new partner workers
+	New partner workers who are added to Zendesk via OSB sync should be in their appropriate organization with their appropriate tags.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner worker role updates
+	Partner workers who have their roles updated in OSB should be in their appropriate organization with their appropriate tags in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner1@lrpartner.com.broken" to the role of "Watcher"
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner2@lrpartner.com.broken" to the role of "Manager"
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner3@lrpartner.com.broken" to the role of "Member"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_partner" tag
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner1@lrpartner.com.broken" to the role of "Member"
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner2@lrpartner.com.broken" to the role of "Watcher"
+	When I update a worker on the partner with the code "Zen OSB Partner" with the email address "osb.partner3@lrpartner.com.broken" to the role of "Manager"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_partner" tag
+
+Scenario: View expired project partner worker updates
+	If a project's order becomes inactive in OSB, existing partner workers on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Portal Production"
+	And I edit the product "Portal Production" offering status from "Active" to "On Hold" for the project with the code "ZENOSBA"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner manager removal updates
+	If a manager is removed from a partner tied to a project in OSB, the manager's tags should be removed and the manager should also be removed from the organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove a user the email address "osb.partner1@lrpartner.com.broken" as a worker from the partner with the code "Zen OSB Partner"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner member removal updates
+	If a member is removed from a partner tied to a project in OSB, the member's tags should be removed and the member should also be removed from the organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove a user the email address "osb.partner2@lrpartner.com.broken" as a worker from the partner with the code "Zen OSB Partner"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner watcher removal updates
+	If a member is removed from a partner tied to a project in OSB, the member's tags should be removed and the member should also be removed from the organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove a user the email address "osb.partner3@lrpartner.com.broken" as a worker from the partner with the code "Zen OSB Partner"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner removal updates
+	If a project's order becomes inactive in OSB, existing partner workers on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove the partner for the project with the code "ZENOSBA"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner first line support removal updates
+	If a project's order becomes inactive in OSB, existing partner workers on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner2                      |
+	| Email Address | osb.partner2@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner2                          |
+	And I create a user with the following parameters
+	| Screen Name   | osb.partner3                      |
+	| Email Address | osb.partner3@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner3                          |
+	And I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner2@lrpartner.com.broken" as a worker with the role "Member" to the partner with the code "Zen OSB Partner"
+	And I assign a user the email address "osb.partner3@lrpartner.com.broken" as a worker with the role "Watcher" to the partner with the code "Zen OSB Partner"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove partner first line support for the project with the code "ZENOSBA"
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
