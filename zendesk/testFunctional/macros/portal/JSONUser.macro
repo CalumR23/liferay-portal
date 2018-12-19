@@ -4,6 +4,87 @@ definition {
 	var supportURL = PropsUtil.get("customer.liferay.url");
 	var webURL = PropsUtil.get("web.liferay.url");
 
+	@prose = "I assign the web user with the email address ${userEmailAddress} to the web organization ${organizationName}"
+	macro assignUserToWebOrganization {
+		var organizationId = JSONOrganization.getWebOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${adminEmailAddress}:${adminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-organization-users
+			-u ${adminEmailAddress}:${adminPassword}
+			-d userIds=${webUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the web user with the email address ${userEmailAddress} to the web group ${groupName}"
+	macro assignUserToWebGroup {
+		var groupId = JSONGroup.getWebGroupId(groupName = "${groupName}");
+
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${adminEmailAddress}:${adminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-group-users
+			-u ${adminEmailAddress}:${adminPassword}
+			-d groupId=${groupId}
+			-d userIds=${webUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the support user with the email address ${userEmailAddress} to the support user group ${userGroupName}"
+	macro assignUserToSupportUserGroup {
+		var userGroupId = JSONUserGroup.getSupportUserGroupId(userGroupName = "${userGroupName}");
+
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${adminEmailAddress}:${adminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user-group-users
+			-u ${adminEmailAddress}:${adminPassword}
+			-d userGroupId=${userGroupId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create a user with the following parameters ${table}"
 	macro create {
 		var RawTable rawTable = new RawTable("${table}");
