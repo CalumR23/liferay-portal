@@ -1,5 +1,7 @@
 definition {
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var apiToken = PropsUtil.get("zendesk.api.token");
 
@@ -145,6 +147,28 @@ definition {
 		var priority = JSONCurlUtil.get("${curl}", "$.ticket.priority");
 
 		return "${priority}";
+	}
+
+	macro _getTicketStatusById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var status = JSONCurlUtil.get("${curl}", "$.ticket.status");
+
+		return "${status}";
+	}
+
+	macro _getTicketRequesterIdById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var requesterId = JSONCurlUtil.get("${curl}", "$.ticket.requester_id");
+
+		return "${requesterId}";
 	}
 
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
@@ -810,6 +834,52 @@ definition {
 
 		if (!("${priorityFromAPI}" == "${priority}")) {
 			fail("Actual value ${priorityFromAPI} does not match expected value ${priority}");
+		}
+	}
+
+	@prose = "the ticket with ticketId ${ticketId} should have the status ${status}"
+	macro _viewTicketStatusSync {
+		var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${statusFromAPI}" == "${status}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
+		}
+
+		echo("Expected Status: ${status}");
+		echo("Actual Status: ${statusFromAPI}");
+
+		if (!("${statusFromAPI}" == "${status}")) {
+			fail("After ${currentIteration} checks, actual value ${statusFromAPI} status for ticket ID ${ticketId} does not match expected status value ${status}");
+		}
+	}
+
+	@prose = "the ticket with ticketId ${ticketId} should have the requester with the email address ${requesterEmailAddress}"
+	macro _viewTicketRequesterSync {
+		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
+
+		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${requesterId}" == "${requesterIdFromAPI}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
+		}
+
+		echo("Expected Requester ID: ${requesterId}");
+		echo("Actual Requester ID: ${requesterIdFromAPI}");
+
+		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
 		}
 	}
 
