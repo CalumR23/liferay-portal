@@ -1,0 +1,111 @@
+@testray.main.component.name = "Support QA"
+
+Feature: OSB to Zendesk Ticket Integration
+	Testing ticket sync updates in Zendesk caused by changes in OSB.
+
+Teardown:
+	* I wait for "30" seconds
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I log out and log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	* I tear down the projects with the following project codes
+	| ZENOSBA |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| no-reply@zenosba.com.broken         |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+
+Scenario: View ticket after project transition to no tickets
+	Zendesk tickets should be moved to closed status when its respective project is moved to no ticket support
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Zen OSB Automotive                               |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to not have support tickets for the product "Portal Production"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "no-reply@zenosba.com.broken"
+
+Scenario: View ticket after project offering expiration
+	Zendesk tickets should be moved to closed status when its respective project is expired
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Zen OSB Automotive                               |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Portal Production"
+	And I edit the product "Portal Production" offering status from "Active" to "On Hold" for the project with the code "ZENOSBA"	
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "no-reply@zenosba.com.broken"
+
+

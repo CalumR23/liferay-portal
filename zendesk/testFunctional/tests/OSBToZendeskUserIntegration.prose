@@ -247,3 +247,95 @@ Scenario: View watcher removal updates
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Zen OSB Automotive"
+
+Scenario: View no support ticket project user updates
+	If a project's order becomes inactive in OSB, existing users on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer2                       |
+	| Email Address | osb.customer2@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer2                           |
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	When I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to not have support tickets for the product "Portal Production"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Zen OSB Automotive"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Zen OSB Automotive"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+
+Scenario: View no support ticket project to expired project user updates
+	If a project's order becomes inactive in OSB, existing users on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I log into the support homepage as "osbadmin.admin@liferay.com.broken" with password "osbadminqauser"
+	And I go to the OSB admin main page
+	And I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer2                       |
+	| Email Address | osb.customer2@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer2                           |
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	When I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to not have support tickets for the product "Portal Production"
+	And I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Portal Production"
+	And I edit the product "Portal Production" offering status from "Active" to "On Hold" for the project with the code "ZENOSBA"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Zen OSB Automotive"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Zen OSB Automotive"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Zen OSB Automotive"
