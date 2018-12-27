@@ -338,6 +338,22 @@ definition {
 		Click(locator1 = "OSBAdmin#SEARCH_RESULT_CODE");
 	}
 
+	@prose = "the support account ID of the project with the code ${projectCode} should match the organization external ID on zendesk.liferay.com"
+	macro _matchOsbProjectIdWithZendeskOrganizationId {
+		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
+
+		var accountEntryName = JSONOSBAccount.getOSBAccountEntryName(accountCode = "${projectCode}");
+
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${accountEntryName}");
+
+		echo("Account ID from Support: ${accountEntryId}");
+		echo("Organization External ID from Zendesk: ${organizationExternalId}");
+
+		if (!("${accountEntryId}" == "${organizationExternalId}")) {
+			fail("Actual value ${accountEntryId} obtained from the support site and ${organizationExternalId} obtained from zendesk.liferay.com do not match");
+		}
+	}
+
 	@prose = "I remove the partner for the project with the code ${projectCode}"
 	macro removePartner {
 		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
