@@ -6,6 +6,31 @@ definition {
 	var webAdminPassword = PropsUtil.get("web.admin.password");
 	var webURL = PropsUtil.get("web.liferay.url");
 
+	@prose = "I have the web user with the email address ${userEmailAddress} agree to the web terms of use"
+	macro agreeToTermsOfUse {
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/update-agreed-to-terms-of-use
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			-d agreedToTermsOfUse=true
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I assign the web user with the email address ${userEmailAddress} to the web organization ${organizationName}"
 	macro assignUserToWebOrganization {
 		var organizationId = JSONOrganization.getWebOrganizationId(organizationName = "${organizationName}");
@@ -166,15 +191,6 @@ definition {
 		static var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
 		echo("Web User ID: ${webUserId}");
-
-		var curl = '''
-			${webURL}/api/secure/jsonws/user/update-agreed-to-terms-of-use
-			-u ${webAdminEmailAddress}:${webAdminPassword}
-			-d userId=${webUserId}
-			-d agreedToTermsOfUse=true
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 
 		if (contains("${staticWebUserIdList}", "{staticWebUserIdList}")) {
 			static var staticWebUserIdList = "${webUserId}";
