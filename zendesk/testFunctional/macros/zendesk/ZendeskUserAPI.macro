@@ -425,6 +425,33 @@ definition {
 		}
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should not be subscribed to the organization ${organizationName}"
+	macro _viewNoUserOrganizationSubscriptionSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationSubscriptions}", "${organizationId}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+		}
+
+		echo("Non-expected User Organization Subscription: ${organizationId}");
+		echo("Actual User Organization Subscriptions: ${organizationSubscriptions}");
+
+		if (contains("${organizationSubscriptions}", "${organizationId}")) {
+			fail("After ${currentIteration} checks, the user still appears to be subscribed to the organization with the ID ${organizationId}");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not have the ${tag} tag"
 	macro _viewNoUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -591,6 +618,33 @@ definition {
 		}
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should be subscribed to the organization ${organizationName}"
+	macro _viewUserOrganizationSubscriptionSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationSubscriptions}", "${organizationId}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+		}
+
+		echo("Expected User Organization Subscription: ${organizationId}");
+		echo("Actual User Organization Subscriptions: ${organizationSubscriptions}");
+
+		if (!(contains("${organizationSubscriptions}", "${organizationId}"))) {
+			fail("After ${currentIteration} checks, the user appears to not be subscribed to the organization with the ID ${organizationId}");
+		}
+	}
+
 	macro _viewUserOrganizationMembershipsById {
 		var curl = '''
 			${zendeskURL}/api/v2/users/${userId}/organization_memberships.json
@@ -600,6 +654,17 @@ definition {
 		var organizationMemberships = JSONCurlUtil.get("${curl}", "$.organization_memberships");
 
 		return "${organizationMemberships}";
+	}
+
+	macro _viewUserOrganizationSubscriptionsById {
+		var curl = '''
+			${zendeskURL}/api/v2/users/${userId}/organization_subscriptions.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationSubscriptions = JSONCurlUtil.get("${curl}", "$.organization_subscriptions");
+
+		return "${organizationSubscriptions}";
 	}
 
 	macro _viewUserSearchResultsByEmailAddress {
