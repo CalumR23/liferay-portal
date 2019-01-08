@@ -1,116 +1,104 @@
-<definition component-name="marketplace">
-	<property name="testray.main.component.name" value="MarketplaceRegistration" />
+@component-name = "marketplace"
+definition {
+	property testray.main.component.name = "MarketplaceRegistration";
+	static var companyNameStatic = "";
+	static var marketplaceRegisterDeveloperURL = "";
+	static var marketplaceURL = "";
 
-	<var name="companyNameStatic" static="true" value="" />
-	<var name="marketplaceRegisterDeveloperURL" static="true" value="" />
-	<var name="marketplaceURL" static="true" value="" />
+	setUp {
+		var marketplaceURL = PropsUtil.get("portal.marketplace.url");
+		var rndString = StringUtil.randomString("5");
+		var companyNameStatic = "QA.Company.${rndString}";
+		var marketplaceRegisterDeveloperURL = "${marketplaceURL}/become-a-developer";
 
-	<set-up>
-		<var method="PropsUtil#get('portal.marketplace.url')" name="marketplaceURL" />
-		<var method="StringUtil#randomString('5')" name="rndString" />
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.6"),
+			userPassword = PropsUtil.get("marketplace.email.password.6")
+		);
 
-		<var name="companyNameStatic" value="QA.Company.${rndString}" />
-		<var name="marketplaceRegisterDeveloperURL" value="${marketplaceURL}/become-a-developer" />
+		Open(locator1 = "${marketplaceRegisterDeveloperURL}");
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.6')" name="userPassword" />
-		</execute>
+		Click(locator1 = "MPRegistration#CREATE_COMPANY_ACCOUNT_BUTTON");
 
-		<execute function="Open" locator1="${marketplaceRegisterDeveloperURL}" />
-		<execute function="Click" locator1="MPRegistration#CREATE_COMPANY_ACCOUNT_BUTTON" />
+		MarketplaceRegistration.registerNewCompany(
+			companyAddress = "123 A St",
+			companyCity = "Los Angeles",
+			companyCountry = "United States",
+			companyDescription = "This is a test.",
+			companyEmail = PropsUtil.get("marketplace.email.address.6"),
+			companyIcon = "Document_3.png",
+			companyName = "${companyNameStatic}",
+			companyPhone = "555-555-5555",
+			companyPostalCode = "90210",
+			companyRegion = "California",
+			companyTaxDocument = "Document_1.pdf",
+			companyTaxType = "Other",
+			key_companyName = "${companyNameStatic}"
+		);
+	}
 
-		<execute macro="MarketplaceRegistration#registerNewCompany">
-			<var name="companyAddress" value="123 A St" />
-			<var name="companyCity" value="Los Angeles" />
-			<var name="companyCountry" value="United States" />
-			<var name="companyDescription" value="This is a test." />
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="companyEmail" />
-			<var name="companyIcon" value="Document_3.png" />
-			<var name="companyName" value="${companyNameStatic}" />
-			<var name="companyPhone" value="555-555-5555" />
-			<var name="companyPostalCode" value="90210" />
-			<var name="companyRegion" value="California" />
-			<var name="companyTaxDocument" value="Document_1.pdf" />
-			<var name="companyTaxType" value="Other" />
-			<var name="key_companyName" value="${companyNameStatic}" />
-		</execute>
-	</set-up>
+	tearDown {
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-	<tear-down>
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
 
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
+		MarketplaceAdmin.teardownCompany(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdmin#teardownCompany">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
+		MPUser.logout();
+	}
 
-		<execute macro="MPUser#logout" />
-	</tear-down>
+	@priority = "5"
+	test DenyCompany {
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-	<command name="DenyCompany" priority="5">
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
 
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
+		MarketplaceAdmin.denySubmission();
 
-		<execute macro="MarketplaceAdmin#denySubmission" />
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
+		AssertTextEquals(
+			locator1 = "MPAdminDevelopers#DEVELOPER_STATUS",
+			value1 = "Denied"
+		);
+	}
 
-		<execute function="AssertTextEquals" locator1="MPAdminDevelopers#DEVELOPER_STATUS" value1="Denied" />
-	</command>
+	@priority = "5"
+	test DisableCompany {
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-	<command name="DisableCompany" priority="5">
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
 
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
+		MarketplaceAdmin.workflowCompanyApprove(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdmin#workflowCompanyApprove">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
 
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
+		MarketplaceAdmin.disableCompany();
 
-		<execute macro="MarketplaceAdmin#disableCompany" />
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyNameStatic}");
 
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyNameStatic}" />
-		</execute>
-
-		<execute function="AssertTextEquals" locator1="MPAdminDevelopers#DEVELOPER_STATUS" value1="Expired" />
-	</command>
-</definition>
+		AssertTextEquals(
+			locator1 = "MPAdminDevelopers#DEVELOPER_STATUS",
+			value1 = "Expired"
+		);
+	}
+}

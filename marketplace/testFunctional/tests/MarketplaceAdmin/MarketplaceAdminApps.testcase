@@ -1,142 +1,142 @@
-<definition component-name="marketplace">
-	<property name="testray.main.component.name" value="Marketplace" />
+@component-name = "marketplace"
+definition {
+	property testray.main.component.name = "Marketplace";
+	static var appTitleStatic = "";
+	static var marketplaceRegisterDeveloperURL = "";
+	static var marketplaceURL = "";
 
-	<var name="appTitleStatic" static="true" value="" />
-	<var name="marketplaceRegisterDeveloperURL" static="true" value="" />
-	<var name="marketplaceURL" static="true" value="" />
+	setUp {
+		var marketplaceURL = PropsUtil.get("portal.marketplace.url");
+		var rndString = StringUtil.randomString("8");
+		var appTitleStatic = "QA.App.${rndString}";
 
-	<set-up>
-		<var method="PropsUtil#get('portal.marketplace.url')" name="marketplaceURL" />
-		<var method="StringUtil#randomString('8')" name="rndString" />
+		MPUser.login(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.6"),
+			userPassword = PropsUtil.get("marketplace.email.password.6")
+		);
+	}
 
-		<var name="appTitleStatic" value="QA.App.${rndString}" />
+	tearDown {
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MPUser#login">
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.6')" name="userPassword" />
-		</execute>
-	</set-up>
+		MarketplaceAdmin.teardownApp(appTitle = "${appTitleStatic}");
+	}
 
-	<tear-down>
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+	@priority = "5"
+	test ApproveAppFree {
+		Account.setupAndSubmitApp(
+			appCategory = "index=3",
+			appDescription = "Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes.",
+			appIconFile = "marketplace_icon.png",
+			appPackageList = "Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war",
+			appTitle = "${appTitleStatic}",
+			companyName = "Account Home",
+			developerWebsiteUrl = "http://www.liferay.com/developer",
+			isFreePaid = "free",
+			supportUrl = "http://www.liferay.com/support",
+			update = "true",
+			versionNumber = "1.0.0.0"
+		);
 
-		<execute macro="MarketplaceAdmin#teardownApp">
-			<var name="appTitle" value="${appTitleStatic}" />
-		</execute>
-	</tear-down>
+		Open(locator1 = "${marketplaceURL}");
 
-	<command name="ApproveAppFree" priority="5">
-		<execute macro="Account#setupAndSubmitApp">
-			<var name="appCategory" value="index=3" />
-			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
-			<var name="appIconFile" value="marketplace_icon.png" />
-			<var name="appPackageList" value="Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war" />
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="companyName" value="Account Home" />
-			<var name="developerWebsiteUrl" value="http://www.liferay.com/developer" />
-			<var name="isFreePaid" value="free" />
-			<var name="supportUrl" value="http://www.liferay.com/support" />
-			<var name="update" value="true" />
-			<var name="versionNumber" value="1.0.0.0" />
-		</execute>
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-		<execute function="Open" locator1="${marketplaceURL}" />
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdmin.workflowSubmittedApp(
+			appTitle = "${appTitleStatic}",
+			pendingQADenyOrApprove = "Approve",
+			requestDenyOrSendToQA = "Send to Manual and Auto QA"
+		);
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MarketplaceAdmin.reviewAppStatus(
+			appStatus = "Approved",
+			appTitle = "${appTitleStatic}"
+		);
+	}
 
-		<execute macro="MarketplaceAdmin#workflowSubmittedApp">
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="pendingQADenyOrApprove" value="Approve" />
-			<var name="requestDenyOrSendToQA" value="Send to Manual and Auto QA" />
-		</execute>
+	@priority = "5"
+	test ApproveAppPaid {
+		Account.setupAndSubmitApp(
+			addCountryList = "all",
+			appCategory = "index=3",
+			appDescription = "Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes.",
+			appIconFile = "marketplace_icon.png",
+			appPackageList = "Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war",
+			appTitle = "${appTitleStatic}",
+			companyName = "Account Home",
+			currency = "USD",
+			developerLicensePriceList = "10.00",
+			developerLicenseUnitsList = "1",
+			developerWebsiteUrl = "http://www.liferay.com/developer",
+			isFreePaid = "paid-license",
+			licenseTerm = "Perpetual",
+			standardLicensePriceList = "11.00",
+			standardLicenseUnitsList = "1",
+			supportUrl = "http://www.liferay.com/support",
+			update = "true",
+			versionNumber = "1.0.0.0"
+		);
 
-		<execute macro="MarketplaceAdmin#reviewAppStatus">
-			<var name="appStatus" value="Approved" />
-			<var name="appTitle" value="${appTitleStatic}" />
-		</execute>
-	</command>
+		Open(locator1 = "${marketplaceURL}");
 
-	<command name="ApproveAppPaid" priority="5">
-		<execute macro="Account#setupAndSubmitApp">
-			<var name="addCountryList" value="all" />
-			<var name="appCategory" value="index=3" />
-			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
-			<var name="appIconFile" value="marketplace_icon.png" />
-			<var name="appPackageList" value="Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war" />
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="companyName" value="Account Home" />
-			<var name="currency" value="USD" />
-			<var name="developerLicensePriceList" value="10.00" />
-			<var name="developerLicenseUnitsList" value="1" />
-			<var name="developerWebsiteUrl" value="http://www.liferay.com/developer" />
-			<var name="isFreePaid" value="paid-license" />
-			<var name="licenseTerm" value="Perpetual" />
-			<var name="standardLicensePriceList" value="11.00" />
-			<var name="standardLicenseUnitsList" value="1" />
-			<var name="supportUrl" value="http://www.liferay.com/support" />
-			<var name="update" value="true" />
-			<var name="versionNumber" value="1.0.0.0" />
-		</execute>
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-		<execute function="Open" locator1="${marketplaceURL}" />
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdmin.workflowSubmittedApp(
+			appTitle = "${appTitleStatic}",
+			pendingQADenyOrApprove = "Approve",
+			requestDenyOrSendToQA = "Send to Manual and Auto QA"
+		);
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MarketplaceAdmin.reviewAppStatus(
+			appStatus = "Approved",
+			appTitle = "${appTitleStatic}"
+		);
+	}
 
-		<execute macro="MarketplaceAdmin#workflowSubmittedApp">
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="pendingQADenyOrApprove" value="Approve" />
-			<var name="requestDenyOrSendToQA" value="Send to Manual and Auto QA" />
-		</execute>
+	@priority = "5"
+	test DenyAppViaQA {
+		Account.setupAndSubmitApp(
+			appCategory = "index=3",
+			appDescription = "Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes.",
+			appIconFile = "marketplace_icon.png",
+			appPackageList = "Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war",
+			appTitle = "${appTitleStatic}",
+			companyName = "Account Home",
+			developerWebsiteUrl = "http://www.liferay.com/developer",
+			isFreePaid = "free",
+			supportUrl = "http://www.liferay.com/support",
+			update = "true",
+			versionNumber = "1.0.0.0"
+		);
 
-		<execute macro="MarketplaceAdmin#reviewAppStatus">
-			<var name="appStatus" value="Approved" />
-			<var name="appTitle" value="${appTitleStatic}" />
-		</execute>
-	</command>
+		Open(locator1 = "${marketplaceURL}");
 
-	<command name="DenyAppViaQA" priority="5">
-		<execute macro="Account#setupAndSubmitApp">
-			<var name="appCategory" value="index=3" />
-			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
-			<var name="appIconFile" value="marketplace_icon.png" />
-			<var name="appPackageList" value="Liferay Portal 6.2 CE GA1~test-app2-portlet-6.2.0.3.war" />
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="companyName" value="Account Home" />
-			<var name="developerWebsiteUrl" value="http://www.liferay.com/developer" />
-			<var name="isFreePaid" value="free" />
-			<var name="supportUrl" value="http://www.liferay.com/support" />
-			<var name="update" value="true" />
-			<var name="versionNumber" value="1.0.0.0" />
-		</execute>
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-		<execute function="Open" locator1="${marketplaceURL}" />
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdmin.workflowSubmittedApp(
+			appTitle = "${appTitleStatic}",
+			pendingQADenyOrApprove = "Deny App",
+			requestDenyOrSendToQA = "Send to Manual and Auto QA"
+		);
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
-
-		<execute macro="MarketplaceAdmin#workflowSubmittedApp">
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="pendingQADenyOrApprove" value="Deny App" />
-			<var name="requestDenyOrSendToQA" value="Send to Manual and Auto QA" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#reviewAppStatus">
-			<var name="appStatus" value="Denied" />
-			<var name="appTitle" value="${appTitleStatic}" />
-		</execute>
-	</command>
-</definition>
+		MarketplaceAdmin.reviewAppStatus(
+			appStatus = "Denied",
+			appTitle = "${appTitleStatic}"
+		);
+	}
+}

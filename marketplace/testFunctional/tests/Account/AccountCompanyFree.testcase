@@ -1,85 +1,81 @@
-<definition component-name="marketplace">
-	<property name="testray.main.component.name" value="MarketplaceCompany" />
+@component-name = "marketplace"
+definition {
+	property testray.main.component.name = "MarketplaceCompany";
+	static var appTitleStatic = "";
 
-	<var name="appTitleStatic" static="true" value="" />
+	setUp {
+		var marketplaceURL = PropsUtil.get("portal.marketplace.url");
+		var rndString = StringUtil.randomString("8");
+		var appTitleStatic = "QA.App.${rndString}";
 
-	<set-up>
-		<var method="PropsUtil#get('portal.marketplace.url')" name="marketplaceURL" />
-		<var method="StringUtil#randomString('8')" name="rndString" />
+		MPUser.login(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.6"),
+			userPassword = PropsUtil.get("marketplace.email.password.6")
+		);
 
-		<var name="appTitleStatic" value="QA.App.${rndString}" />
+		Open(locator1 = "${marketplaceURL}");
 
-		<execute macro="MPUser#login">
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.6')" name="userPassword" />
-		</execute>
+		MarketplaceRegistration.setupCompany(
+			companyAddress = "123 A St",
+			companyCity = "Los Angeles",
+			companyCountry = "United States",
+			companyDescription = "This is a test.",
+			companyEmail = PropsUtil.get("marketplace.email.address.6"),
+			companyIcon = "Document_3.png",
+			companyName = "QA.Company",
+			companyPhone = "555-555-5555",
+			companyPostalCode = "90210",
+			companyRegion = "California",
+			companyTaxDocument = "Document_1.pdf",
+			companyTaxType = "Other",
+			key_companyName = "QA.Company"
+		);
 
-		<execute function="Open" locator1="${marketplaceURL}" />
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.6"),
+			userPassword = PropsUtil.get("marketplace.email.password.6")
+		);
 
-		<execute macro="MarketplaceRegistration#setupCompany">
-			<var name="companyAddress" value="123 A St" />
-			<var name="companyCity" value="Los Angeles" />
-			<var name="companyCountry" value="United States" />
-			<var name="companyDescription" value="This is a test." />
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="companyEmail" />
-			<var name="companyIcon" value="Document_3.png" />
-			<var name="companyName" value="QA.Company" />
-			<var name="companyPhone" value="555-555-5555" />
-			<var name="companyPostalCode" value="90210" />
-			<var name="companyRegion" value="California" />
-			<var name="companyTaxDocument" value="Document_1.pdf" />
-			<var name="companyTaxType" value="Other" />
-			<var name="key_companyName" value="QA.Company" />
-		</execute>
+		Account.setupAcceptDeveloperTermsOfService(companyName = "QA.Company");
+	}
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.6')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.6')" name="userPassword" />
-		</execute>
+	tearDown {
+		Account.tearDownSubmittedApp(
+			appTitleList = "${appTitleStatic}",
+			companyNameList = "QA.Company"
+		);
 
-		<execute macro="Account#setupAcceptDeveloperTermsOfService">
-			<var name="companyName" value="QA.Company" />
-		</execute>
-	</set-up>
+		MPUser.logout();
+	}
 
-	<tear-down>
-		<execute macro="Account#tearDownSubmittedApp">
-			<var name="appTitleList" value="${appTitleStatic}" />
-			<var name="companyNameList" value="QA.Company" />
-		</execute>
+	@priority = "5"
+	test AddFreeAppAsCompany {
+		AccountNavigator.gotoDevelopmentAppsViaAccount(companyName = "QA.Company");
 
-		<execute macro="MPUser#logout" />
-	</tear-down>
+		Account.addApp(
+			appCategory = "index=3",
+			appDescription = "Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes.",
+			appIconFile = "marketplace_icon.png",
+			appPackageList = "Liferay Portal 6.2 CE GA1~test-app1-portlet-6.2.0.3.war",
+			appTitle = "${appTitleStatic}",
+			developerWebsiteUrl = "http://www.liferay.com/developer",
+			isFreePaid = "free",
+			supportUrl = "http://www.liferay.com/support",
+			versionNumber = "1.0.0.0"
+		);
 
-	<command name="AddFreeAppAsCompany" priority="5">
-		<execute macro="AccountNavigator#gotoDevelopmentAppsViaAccount">
-			<var name="companyName" value="QA.Company" />
-		</execute>
+		AccountNavigator.gotoDevelopmentAppsAppTitleViaAccount(
+			appTitle = "${appTitleStatic}",
+			companyName = "QA.Company"
+		);
 
-		<execute macro="Account#addApp">
-			<var name="appCategory" value="index=3" />
-			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
-			<var name="appIconFile" value="marketplace_icon.png" />
-			<var name="appPackageList" value="Liferay Portal 6.2 CE GA1~test-app1-portlet-6.2.0.3.war" />
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="developerWebsiteUrl" value="http://www.liferay.com/developer" />
-			<var name="isFreePaid" value="free" />
-			<var name="supportUrl" value="http://www.liferay.com/support" />
-			<var name="versionNumber" value="1.0.0.0" />
-		</execute>
+		AccountApp.reviewAppDetails(
+			appDescription = "Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes.",
+			appTitle = "${appTitleStatic}",
+			companyName = "QA.Company",
+			versionNumber = "1.0.0.0"
+		);
 
-		<execute macro="AccountNavigator#gotoDevelopmentAppsAppTitleViaAccount">
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="companyName" value="QA.Company" />
-		</execute>
-
-		<execute macro="AccountApp#reviewAppDetails">
-			<var name="appDescription" value="Depth-first search (DFS) is an algorithm for traversing or searching tree or graph data structures. One starts at the root (selecting some arbitrary node as the root in the case of a graph) and explores as far as possible along each branch before backtracking. A version of depth-first search was investigated in the 19th century by French mathematician Charles Pierre Tremaux as a strategy for solving mazes." />
-			<var name="appTitle" value="${appTitleStatic}" />
-			<var name="companyName" value="QA.Company" />
-			<var name="versionNumber" value="1.0.0.0" />
-		</execute>
-
-		<execute macro="AccountAppAdd#clickSubmit" />
-	</command>
-</definition>
+		AccountAppAdd.clickSubmit();
+	}
+}

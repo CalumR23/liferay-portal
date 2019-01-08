@@ -1,78 +1,76 @@
-<definition component-name="marketplace">
-	<property name="testray.main.component.name" value="MarketplaceRegistration" />
+@component-name = "marketplace"
+definition {
+	property testray.main.component.name = "MarketplaceRegistration";
+	static var marketplaceRegisterDeveloperURL = "";
+	static var marketplaceURL = "";
 
-	<var name="marketplaceRegisterDeveloperURL" static="true" value="" />
-	<var name="marketplaceURL" static="true" value="" />
+	setUp {
+		var marketplaceURL = PropsUtil.get("portal.marketplace.url");
+		var marketplaceRegisterDeveloperURL = "${marketplaceURL}/become-a-developer";
 
-	<set-up>
-		<var method="PropsUtil#get('portal.marketplace.url')" name="marketplaceURL" />
+		MPUser.login(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.2"),
+			userPassword = PropsUtil.get("marketplace.email.password.2")
+		);
 
-		<var name="marketplaceRegisterDeveloperURL" value="${marketplaceURL}/become-a-developer" />
+		Open(locator1 = "${marketplaceURL}");
+	}
 
-		<execute macro="MPUser#login">
-			<var method="PropsUtil#get('marketplace.email.address.2')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.2')" name="userPassword" />
-		</execute>
+	tearDown {
+		Open(locator1 = "${marketplaceURL}");
 
-		<execute function="Open" locator1="${marketplaceURL}" />
-	</set-up>
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
 
-	<tear-down>
-		<execute function="Open" locator1="${marketplaceURL}" />
+		MarketplaceAdminNavigator.gotoMPAdmin();
 
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
+		MarketplaceAdmin.tearDownPaidRegistration(
+			developerName = "LiferayQA1 Marketplace",
+			developerType = "User",
+			searchKeywords = "QA"
+		);
 
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
+		MPUser.logout();
+	}
 
-		<execute macro="MarketplaceAdmin#tearDownPaidRegistration">
-			<var name="developerName" value="LiferayQA1 Marketplace" />
-			<var name="developerType" value="User" />
-			<var name="searchKeywords" value="QA" />
-		</execute>
+	@priority = "5"
+	test RegisterDeveloperFree {
+		Open(locator1 = "${marketplaceRegisterDeveloperURL}");
 
-		<execute macro="MPUser#logout" />
-	</tear-down>
+		MarketplaceRegistration.registerNewDeveloper(
+			developerCountry = "United States",
+			developerPhone = "555-555-5555"
+		);
+	}
 
-	<command name="RegisterDeveloperFree" priority="5">
-		<execute function="Open" locator1="${marketplaceRegisterDeveloperURL}" />
+	@priority = "5"
+	test RegisterDeveloperPaid {
+		Open(locator1 = "${marketplaceRegisterDeveloperURL}");
 
-		<execute macro="MarketplaceRegistration#registerNewDeveloper">
-			<var name="developerCountry" value="United States" />
-			<var name="developerPhone" value="555-555-5555" />
-		</execute>
-	</command>
+		MarketplaceRegistration.registerNewDeveloper(
+			developerCountry = "United States",
+			developerPhone = "555-555-5555"
+		);
 
-	<command name="RegisterDeveloperPaid" priority="5">
-		<execute function="Open" locator1="${marketplaceRegisterDeveloperURL}" />
+		Open(locator1 = "${marketplaceURL}");
 
-		<execute macro="MarketplaceRegistration#registerNewDeveloper">
-			<var name="developerCountry" value="United States" />
-			<var name="developerPhone" value="555-555-5555" />
-		</execute>
+		MarketplaceNavigationBar.gotoAccountHome();
 
-		<execute function="Open" locator1="${marketplaceURL}" />
+		AccountNavigator.gotoDevSidebar(devSidebarItem = "Apps");
 
-		<execute macro="MarketplaceNavigationBar#gotoAccountHome" />
+		Click(locator1 = "MPButton#ADD_NEW_APP_BUTTON");
 
-		<execute macro="AccountNavigator#gotoDevSidebar">
-			<var name="devSidebarItem" value="Apps" />
-		</execute>
+		MarketplaceRegistration.convertToPaidDeveloperAccount(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.3")
+		);
 
-		<execute function="Click" locator1="MPButton#ADD_NEW_APP_BUTTON" />
+		AccountAppAddEntry.checkPricing(isFreePaid = "paid-license");
 
-		<execute macro="MarketplaceRegistration#convertToPaidDeveloperAccount">
-			<var method="PropsUtil#get('marketplace.email.address.3')" name="userEmailAddress" />
-		</execute>
-
-		<execute macro="AccountAppAddEntry#checkPricing">
-			<var name="isFreePaid" value="paid-license" />
-		</execute>
-
-		<execute function="AssertChecked" locator1="MPDeveloperAppsAddDetails#PRICE_RADIO">
-			<var name="key_isFreePaid" value="paid-license" />
-		</execute>
-	</command>
-</definition>
+		AssertChecked(
+			locator1 = "MPDeveloperAppsAddDetails#PRICE_RADIO",
+			key_isFreePaid = "paid-license"
+		);
+	}
+}
