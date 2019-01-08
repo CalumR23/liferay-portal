@@ -1,309 +1,254 @@
-<definition>
-	<command name="addLicense">
-		<execute function="AssertClick" locator1="MPAdminCustomers#ADD_LICENSE_BUTTON" value1="Add License" />
-
-		<execute function="SelectWindow" locator1="title=Control Panel" />
-
-		<execute function="Pause" locator1="3000" />
-
-		<if>
-			<equals arg1="${licenseType}" arg2="Standard" />
-			<then>
-				<execute function="ClickNoError" locator1="MPAdminCustomers#STANDARD_INSTANCE" />
-			</then>
-			<elseif>
-				<equals arg1="${licenseType}" arg2="Developer" />
-				<then>
-					<execute function="ClickNoError" locator1="MPAdminCustomers#DEVELOPER_INSTANCE" />
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${licenseType}" arg2="Trial" />
-				<then>
-					<execute function="ClickNoError" locator1="MPAdminCustomers#TRIAL_INSTANCE" />
-				</then>
-			</elseif>
-		</if>
-
-		<execute function="SelectWindow" locator1="title=Control Panel - Liferay.com" />
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="approveSubmission">
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="Approve" />
-		</execute>
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="completeInvoicePayment">
-		<execute macro="MPUser#logoutAndLogin">
-			<var method="PropsUtil#get('marketplace.email.address.5')" name="userEmailAddress" />
-			<var method="PropsUtil#get('marketplace.email.password.5')" name="userPassword" />
-		</execute>
-
-		<execute macro="MarketplaceAdminNavigator#gotoEcommerce" />
-
-		<execute macro="MarketplaceAdminNavigator#gotoEcommerceDocumentByID">
-			<var name="purchaseID" value="${purchaseID}" />
-		</execute>
-
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="Create Invoice" />
-		</execute>
-
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="Paid" />
-		</execute>
-	</command>
-
-	<command name="customDenyOrApproveApp">
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="${denyOrApprove}" />
-		</execute>
-
-		<if>
-			<equals arg1="${denyOrApprove}" arg2="Deny App" />
-			<then>
-				<execute macro="MPButton#button1">
-					<var name="buttonName" value="Deny" />
-				</execute>
-			</then>
-		</if>
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="denySubmission">
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="Deny" />
-		</execute>
-
-		<execute macro="MPButton#button1">
-			<var name="buttonName" value="Deny" />
-		</execute>
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="disableCompany">
-		<execute function="AssertClick" locator1="MPAdminDevelopers#DISABLE_BUTTON" value1="Disable" />
-		<execute function="AssertClick" locator1="MPAdminDevelopers#DISABLE_BUTTON" value1="Disable" />
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="expirePaidStatus">
-		<execute function="Click" locator1="MPAdminDevelopers#EDIT_DEVELOPER_REGISTRATION" />
-
-		<execute function="Type" locator1="MPAdminDevelopers#DOMAIN_NAME" value1="www.google.com" />
-
-		<execute function="Select" locator1="MPAdminDevelopers#SUBSCRIPTION_EXPIRATION_DATE_YEAR" value1="2014" />
-
-		<execute function="Click" locator1="MPButton#SAVE_BUTTON" />
-
-		<execute macro="MPMessage#success" />
-	</command>
-
-	<command name="inputDossieraAccountKey">
-		<if>
-			<not>
-				<isset var="inputDossieraAccountKey" />
-			</not>
-			<then>
-				<var method="StringUtil#randomString('18')" name="dossieraAccountKey" />
-			</then>
-		</if>
-
-		<execute function="Type" locator1="MPAdminDevelopers#DOSSIERA_ACCOUNT_KEY_FIELD" value1="${dossieraAccountKey}" />
-	</command>
-
-	<command name="lookforCustomer">
-		<var name="key_appTitle" value="${appTitle}" />
-
-		<execute function="Type" locator1="MPAdminCustomers#EMAIL_ADDRESS_FIELD" value1="${userEmailAddress}" />
-
-		<execute function="AssertClick" locator1="MPAdminCustomers#LOOKUP_BUTTON" value1="Lookup" />
-
-		<execute function="AssertClick" locator1="MPAdminCustomers#APP_ENTRY_NAME" value1="${appTitle}" />
-	</command>
-
-	<command name="reviewAppStatus">
-		<execute macro="MarketplaceAdminNavigator#gotoApp">
-			<var name="appTitle" value="${appTitle}" />
-		</execute>
-
-		<execute function="AssertTextEquals" locator1="MPAdminReviewApps#STATUS_BAR" value1="${appStatus}" />
-	</command>
-
-	<command name="setupAppApprove">
-		<execute macro="MarketplaceAdminNavigator#gotoMPAdmin" />
-
-		<execute macro="MarketplaceAdmin#workflowSubmittedApp">
-			<var name="appTitle" value="${appTitle}" />
-			<var name="pendingQADenyOrApprove" value="Approve" />
-			<var name="requestDenyOrSendToQA" value="Send to Manual and Auto QA" />
-		</execute>
-	</command>
-
-	<command name="teardownApp">
-		<execute macro="MarketplaceAdminNavigator#gotoApp">
-			<var name="appTitle" value="${appTitle}" />
-		</execute>
-
-		<var method="selenium#getText('MPAdminReviewApps#STATUS_BAR')" name="status" />
-
-		<if>
-			<contains string="${status}" substring="Approved" />
-			<then>
-				<execute macro="MPButton#button1">
-					<var name="buttonName" value="Reject App" />
-				</execute>
-
-				<execute macro="MPButton#button1">
-					<var name="buttonName" value="Deny" />
-				</execute>
-			</then>
-		</if>
-	</command>
-
-	<command name="teardownCompany">
-		<execute macro="MarketplaceAdminNavigator#searchDeveloper">
-			<var name="companyName" value="${companyName}" />
-		</execute>
-
-		<while>
-			<condition function="IsElementPresent" locator1="MPAdminDevelopers#STATUS_APPROVED" />
-			<then>
-				<execute function="Click" locator1="MPAdminDevelopers#STATUS_APPROVED" />
-
-				<execute macro="MarketplaceAdmin#disableCompany" />
-
-				<execute macro="MarketplaceAdminNavigator#searchDeveloper">
-					<var name="companyName" value="${companyName}" />
-				</execute>
-			</then>
-		</while>
-
-		<while>
-			<condition function="IsElementPresent" locator1="MPAdminDevelopers#STATUS_PENDING" />
-			<then>
-				<execute function="Click" locator1="MPAdminDevelopers#STATUS_PENDING" />
-
-				<execute macro="MarketplaceAdmin#denySubmission" />
-
-				<execute macro="MarketplaceAdminNavigator#searchDeveloper">
-					<var name="companyName" value="${companyName}" />
-				</execute>
-			</then>
-		</while>
-
-		<while>
-			<condition function="IsElementPresent" locator1="MPAdminDevelopers#STATUS_DENIED" />
-			<then>
-				<execute function="Click" locator1="MPAdminDevelopers#STATUS_DENIED" />
-
-				<execute macro="MarketplaceAdmin#disableCompany" />
-
-				<execute macro="MarketplaceAdminNavigator#searchDeveloper">
-					<var name="companyName" value="${companyName}" />
-				</execute>
-			</then>
-		</while>
-	</command>
-
-	<command name="tearDownPaidRegistration">
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
-
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloperUser">
-			<var name="developerName" value="${developerName}" />
-			<var name="developerType" value="${developerType}" />
-			<var name="searchKeywords" value="${searchKeywords}" />
-		</execute>
-
-		<execute function="Click" locator1="MPAdminDevelopers#EDIT_DEVELOPER_REGISTRATION" />
-		<execute function="Select" locator1="MPAdminDevelopers#DOMAIN_STATUS" value1="Expired" />
-		<execute function="Select" locator1="MPAdminDevelopers#SUBSCRIPTION_STATUS" value1="Draft" />
-		<execute function="Click" locator1="MPAdminDevelopers#SAVE_BUTTON" />
-	</command>
-
-	<command name="workflowCompanyApprove">
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
-
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyName}" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#inputDossieraAccountKey">
-			<var name="dossieraAccountKey" value="${dossieraAccountKey}" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#approveSubmission" />
-	</command>
-
-	<command name="workflowCompanyApproveThenDisable">
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
-
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyName}" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#inputDossieraAccountKey">
-			<var name="dossieraAccountKey" value="${dossieraAccountKey}" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#approveSubmission" />
-
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Developers" />
-		</execute>
-
-		<execute macro="MarketplaceAdminNavigator#gotoDeveloper">
-			<var name="companyName" value="${companyName}" />
-		</execute>
-
-		<execute macro="MarketplaceAdmin#disableCompany" />
-	</command>
-
-	<command name="workflowSubmittedApp">
-		<execute macro="MarketplaceAdminNavigator#gotoApp">
-			<var name="appTitle" value="${appTitle}" />
-		</execute>
-
-		<if>
-			<condition function="IsElementPresent" locator1="MPAdminReviewApps#REVIEW_DEVELOPER_PAGE" />
-			<then>
-				<execute function="AssertClick" locator1="MPAdminReviewApps#REVIEW_DEVELOPER_PAGE" value1="Review Developer page" />
-
-				<execute function="AssertClick" locator1="MPAdminDevelopers#APPROVE_PAID_DEVELOPER_STATUS_BUTTON" value1="Approve Paid Developer Status" />
-
-				<execute macro="MPMessage#success" />
-			</then>
-		</if>
-
-		<execute macro="MarketplaceAdmin#customDenyOrApproveApp">
-			<var name="denyOrApprove" value="${requestDenyOrSendToQA}" />
-		</execute>
-
-		<if>
-			<equals arg1="${requestDenyOrSendToQA}" arg2="Send to Manual and Auto QA" />
-			<then>
-				<execute macro="MarketplaceAdminNavigator#gotoApp">
-					<var name="appTitle" value="${appTitle}" />
-				</execute>
-
-				<execute macro="MarketplaceAdmin#customDenyOrApproveApp">
-					<var name="denyOrApprove" value="${pendingQADenyOrApprove}" />
-				</execute>
-			</then>
-		</if>
-	</command>
-</definition>
+definition {
+	macro addLicense {
+		AssertClick(
+			locator1 = "MPAdminCustomers#ADD_LICENSE_BUTTON",
+			value1 = "Add License"
+		);
+
+		SelectWindow(locator1 = "title=Control Panel");
+
+		Pause(locator1 = "3000");
+
+		if ("${licenseType}" == "Standard") {
+			ClickNoError(locator1 = "MPAdminCustomers#STANDARD_INSTANCE");
+		}
+		else if ("${licenseType}" == "Developer") {
+			ClickNoError(locator1 = "MPAdminCustomers#DEVELOPER_INSTANCE");
+		}
+		else if ("${licenseType}" == "Trial") {
+			ClickNoError(locator1 = "MPAdminCustomers#TRIAL_INSTANCE");
+		}
+
+		SelectWindow(locator1 = "title=Control Panel - Liferay.com");
+
+		MPMessage.success();
+	}
+
+	macro approveSubmission {
+		MPButton.button1(buttonName = "Approve");
+
+		MPMessage.success();
+	}
+
+	macro completeInvoicePayment {
+		MPUser.logoutAndLogin(
+			userEmailAddress = PropsUtil.get("marketplace.email.address.5"),
+			userPassword = PropsUtil.get("marketplace.email.password.5")
+		);
+
+		MarketplaceAdminNavigator.gotoEcommerce();
+
+		MarketplaceAdminNavigator.gotoEcommerceDocumentByID(
+			purchaseID = "${purchaseID}"
+		);
+
+		MPButton.button1(buttonName = "Create Invoice");
+
+		MPButton.button1(buttonName = "Paid");
+	}
+
+	macro customDenyOrApproveApp {
+		MPButton.button1(buttonName = "${denyOrApprove}");
+
+		if ("${denyOrApprove}" == "Deny App") {
+			MPButton.button1(buttonName = "Deny");
+		}
+
+		MPMessage.success();
+	}
+
+	macro denySubmission {
+		MPButton.button1(buttonName = "Deny");
+
+		MPButton.button1(buttonName = "Deny");
+
+		MPMessage.success();
+	}
+
+	macro disableCompany {
+		AssertClick(locator1 = "MPAdminDevelopers#DISABLE_BUTTON", value1 = "Disable");
+
+		AssertClick(locator1 = "MPAdminDevelopers#DISABLE_BUTTON", value1 = "Disable");
+
+		MPMessage.success();
+	}
+
+	macro expirePaidStatus {
+		Click(locator1 = "MPAdminDevelopers#EDIT_DEVELOPER_REGISTRATION");
+
+		Type(locator1 = "MPAdminDevelopers#DOMAIN_NAME", value1 = "www.google.com");
+
+		Select(
+			locator1 = "MPAdminDevelopers#SUBSCRIPTION_EXPIRATION_DATE_YEAR",
+			value1 = "2014"
+		);
+
+		Click(locator1 = "MPButton#SAVE_BUTTON");
+
+		MPMessage.success();
+	}
+
+	macro inputDossieraAccountKey {
+		if (!(isSet(inputDossieraAccountKey))) {
+			var dossieraAccountKey = StringUtil.randomString("18");
+		}
+
+		Type(
+			locator1 = "MPAdminDevelopers#DOSSIERA_ACCOUNT_KEY_FIELD",
+			value1 = "${dossieraAccountKey}"
+		);
+	}
+
+	macro lookforCustomer {
+		var key_appTitle = "${appTitle}";
+
+		Type(
+			locator1 = "MPAdminCustomers#EMAIL_ADDRESS_FIELD",
+			value1 = "${userEmailAddress}"
+		);
+
+		AssertClick(locator1 = "MPAdminCustomers#LOOKUP_BUTTON", value1 = "Lookup");
+
+		AssertClick(
+			locator1 = "MPAdminCustomers#APP_ENTRY_NAME",
+			value1 = "${appTitle}"
+		);
+	}
+
+	macro reviewAppStatus {
+		MarketplaceAdminNavigator.gotoApp(appTitle = "${appTitle}");
+
+		AssertTextEquals(
+			locator1 = "MPAdminReviewApps#STATUS_BAR",
+			value1 = "${appStatus}"
+		);
+	}
+
+	macro setupAppApprove {
+		MarketplaceAdminNavigator.gotoMPAdmin();
+
+		MarketplaceAdmin.workflowSubmittedApp(
+			appTitle = "${appTitle}",
+			pendingQADenyOrApprove = "Approve",
+			requestDenyOrSendToQA = "Send to Manual and Auto QA"
+		);
+	}
+
+	macro teardownApp {
+		MarketplaceAdminNavigator.gotoApp(appTitle = "${appTitle}");
+
+		var status = selenium.getText("MPAdminReviewApps#STATUS_BAR");
+
+		if (contains("${status}", "Approved")) {
+			MPButton.button1(buttonName = "Reject App");
+
+			MPButton.button1(buttonName = "Deny");
+		}
+	}
+
+	macro teardownCompany {
+		MarketplaceAdminNavigator.searchDeveloper(companyName = "${companyName}");
+
+		while (IsElementPresent(locator1 = "MPAdminDevelopers#STATUS_APPROVED")) {
+			Click(locator1 = "MPAdminDevelopers#STATUS_APPROVED");
+
+			MarketplaceAdmin.disableCompany();
+
+			MarketplaceAdminNavigator.searchDeveloper(companyName = "${companyName}");
+		}
+
+		while (IsElementPresent(locator1 = "MPAdminDevelopers#STATUS_PENDING")) {
+			Click(locator1 = "MPAdminDevelopers#STATUS_PENDING");
+
+			MarketplaceAdmin.denySubmission();
+
+			MarketplaceAdminNavigator.searchDeveloper(companyName = "${companyName}");
+		}
+
+		while (IsElementPresent(locator1 = "MPAdminDevelopers#STATUS_DENIED")) {
+			Click(locator1 = "MPAdminDevelopers#STATUS_DENIED");
+
+			MarketplaceAdmin.disableCompany();
+
+			MarketplaceAdminNavigator.searchDeveloper(companyName = "${companyName}");
+		}
+	}
+
+	macro tearDownPaidRegistration {
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
+
+		MarketplaceAdminNavigator.gotoDeveloperUser(
+			developerName = "${developerName}",
+			developerType = "${developerType}",
+			searchKeywords = "${searchKeywords}"
+		);
+
+		Click(locator1 = "MPAdminDevelopers#EDIT_DEVELOPER_REGISTRATION");
+
+		Select(locator1 = "MPAdminDevelopers#DOMAIN_STATUS", value1 = "Expired");
+
+		Select(locator1 = "MPAdminDevelopers#SUBSCRIPTION_STATUS", value1 = "Draft");
+
+		Click(locator1 = "MPAdminDevelopers#SAVE_BUTTON");
+	}
+
+	macro workflowCompanyApprove {
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
+
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyName}");
+
+		MarketplaceAdmin.inputDossieraAccountKey(
+			dossieraAccountKey = "${dossieraAccountKey}"
+		);
+
+		MarketplaceAdmin.approveSubmission();
+	}
+
+	macro workflowCompanyApproveThenDisable {
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
+
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyName}");
+
+		MarketplaceAdmin.inputDossieraAccountKey(
+			dossieraAccountKey = "${dossieraAccountKey}"
+		);
+
+		MarketplaceAdmin.approveSubmission();
+
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Developers");
+
+		MarketplaceAdminNavigator.gotoDeveloper(companyName = "${companyName}");
+
+		MarketplaceAdmin.disableCompany();
+	}
+
+	macro workflowSubmittedApp {
+		MarketplaceAdminNavigator.gotoApp(appTitle = "${appTitle}");
+
+		if (IsElementPresent(locator1 = "MPAdminReviewApps#REVIEW_DEVELOPER_PAGE")) {
+			AssertClick(
+				locator1 = "MPAdminReviewApps#REVIEW_DEVELOPER_PAGE",
+				value1 = "Review Developer page"
+			);
+
+			AssertClick(
+				locator1 = "MPAdminDevelopers#APPROVE_PAID_DEVELOPER_STATUS_BUTTON",
+				value1 = "Approve Paid Developer Status"
+			);
+
+			MPMessage.success();
+		}
+
+		MarketplaceAdmin.customDenyOrApproveApp(
+			denyOrApprove = "${requestDenyOrSendToQA}"
+		);
+
+		if ("${requestDenyOrSendToQA}" == "Send to Manual and Auto QA") {
+			MarketplaceAdminNavigator.gotoApp(appTitle = "${appTitle}");
+
+			MarketplaceAdmin.customDenyOrApproveApp(
+				denyOrApprove = "${pendingQADenyOrApprove}"
+			);
+		}
+	}
+}
