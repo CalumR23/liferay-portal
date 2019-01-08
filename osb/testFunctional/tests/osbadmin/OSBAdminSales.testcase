@@ -1,134 +1,115 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var product = "Portal Non-Production";
+	var projectCode = "QAPROJECT2";
+	var projectName = "QA Test Project 2";
+	var support = "Gold";
+	static var staticTearDownOffering = "";
+	static var staticTearDownOfferingBundle = "";
+	static var staticTearDownOrder = "";
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var name="product" value="Portal Non-Production" />
-	<var name="projectCode" value="QAPROJECT2" />
-	<var name="projectName" value="QA Test Project 2" />
-	<var name="support" value="Gold" />
+	setUp {
+		var staticTearDownOffering = "";
+		var staticTearDownOfferingBundle = "";
+		var staticTearDownOrder = "";
 
-	<var name="staticTearDownOffering" static="true" value="" />
-	<var name="staticTearDownOfferingBundle" static="true" value="" />
-	<var name="staticTearDownOrder" static="true" value="" />
+		OSBAdminUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-	<set-up>
-		<var name="staticTearDownOffering" value="" />
-		<var name="staticTearDownOfferingBundle" value="" />
-		<var name="staticTearDownOrder" value="" />
+		OSBAdminNavigation.gotoOSBAdmin();
+	}
 
-		<execute macro="OSBAdminUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+	tearDown {
+		if (!("${staticTearDownOrder}" == "")) {
+			var projectCode = StringUtil.extractFirst("${staticTearDownOrder}", ",");
+			var projectName = StringUtil.extractLast("${staticTearDownOrder}", ",");
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-	</set-up>
+			OSBAdminSales.tearDownOrder(
+				projectCode = "${projectCode}",
+				projectName = "${projectName}"
+			);
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownOrder}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractFirst('${staticTearDownOrder}', ',')" name="projectCode" />
-				<var method="StringUtil#extractLast('${staticTearDownOrder}', ',')" name="projectName" />
+		if (!("${staticTearDownOffering}" == "")) {
+			var product = StringUtil.extractFirst("${staticTearDownOffering}", ",");
+			var support = StringUtil.extractLast("${staticTearDownOffering}", ",");
 
-				<execute macro="OSBAdminSales#tearDownOrder">
-					<var name="projectCode" value="${projectCode}" />
-					<var name="projectName" value="${projectName}" />
-				</execute>
-			</then>
-		</if>
+			OSBAdminSales.tearDownOffering(
+				description = "QA Test",
+				product = "${product}",
+				support = "${support}"
+			);
+		}
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownOffering}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractFirst('${staticTearDownOffering}', ',')" name="product" />
+		if (!("${staticTearDownOfferingBundle}" == "")) {
+			OSBAdminSales.tearDownOfferingBundle(
+				bundleName = "${staticTearDownOfferingBundle}"
+			);
+		}
 
-				<var method="StringUtil#extractLast('${staticTearDownOffering}', ',')" name="support" />
+		OSBAdminUser.logout();
+	}
 
-				<execute macro="OSBAdminSales#tearDownOffering">
-					<var name="description" value="QA Test" />
-					<var name="product" value="${product}" />
-					<var name="support" value="${support}" />
-				</execute>
-			</then>
-		</if>
+	test AddOffering {
+		property lesa.acceptance = "true";
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownOfferingBundle}" arg2="" />
-			</not>
-			<then>
-				<execute macro="OSBAdminSales#tearDownOfferingBundle">
-					<var name="bundleName" value="${staticTearDownOfferingBundle}" />
-				</execute>
-			</then>
-		</if>
+		OSBAdminSales.addOffering(
+			description = "QA Test",
+			licenses = "yes",
+			product = "Portal Non-Production",
+			support = "Gold",
+			supportTickets = "yes"
+		);
 
-		<execute macro="OSBAdminUser#logout" />
-	</tear-down>
+		var staticTearDownOffering = "${product},${support}";
+	}
 
-	<command name="AddOffering">
-		<property name="lesa.acceptance" value="true" />
+	test AddOrder {
+		OSBAdminSales.addOrder(
+			product = "${product}",
+			projectCode = "${projectCode}",
+			support = "${support}"
+		);
 
-		<execute macro="OSBAdminSales#addOffering">
-			<var name="description" value="QA Test" />
-			<var name="licenses" value="yes" />
-			<var name="product" value="Portal Non-Production" />
-			<var name="support" value="Gold" />
-			<var name="supportTickets" value="yes" />
-		</execute>
+		var staticTearDownOrder = "${projectCode},${projectName}";
+	}
 
-		<var name="staticTearDownOffering" value="${product},${support}" />
-	</command>
+	test AddOrderWithOfferingBundle {
+		OSBAdminSales.addOfferingBundle(
+			bundleName = "1AAA QA Bundle",
+			offeringProductList = "Portal Production,Portal Backup,Portal Non-Production,Developer Tools,Productivity Tools (Sync)"
+		);
 
-	<command name="AddOrder">
-		<execute macro="OSBAdminSales#addOrder">
-			<var name="product" value="${product}" />
-			<var name="projectCode" value="${projectCode}" />
-			<var name="support" value="${support}" />
-		</execute>
+		var staticTearDownOfferingBundle = "1AAA QA Bundle";
 
-		<var name="staticTearDownOrder" value="${projectCode},${projectName}" />
-	</command>
+		OSBAdminSales.addOrderWithOfferingBundle(
+			bundleName = "1AAA QA Bundle",
+			offeringProductList = "Portal Production,Portal Backup,Portal Non-Production,Developer Tools,Productivity Tools (Sync)",
+			projectCode = "${projectCode}"
+		);
 
-	<command name="AddOrderWithOfferingBundle">
-		<execute macro="OSBAdminSales#addOfferingBundle">
-			<var name="bundleName" value="1AAA QA Bundle" />
-			<var name="offeringProductList" value="Portal Production,Portal Backup,Portal Non-Production,Developer Tools,Productivity Tools (Sync)" />
-		</execute>
+		var staticTearDownOrder = "${projectCode},${projectName}";
+	}
 
-		<var name="staticTearDownOfferingBundle" value="1AAA QA Bundle" />
+	test RenewSupport {
+		OSBAdminSales.addOrder(
+			product = "Digital Enterprise Non-Production",
+			projectCode = "${projectCode}",
+			support = "${support}"
+		);
 
-		<execute macro="OSBAdminSales#addOrderWithOfferingBundle">
-			<var name="bundleName" value="1AAA QA Bundle" />
-			<var name="offeringProductList" value="Portal Production,Portal Backup,Portal Non-Production,Developer Tools,Productivity Tools (Sync)" />
-			<var name="projectCode" value="${projectCode}" />
-		</execute>
+		var staticTearDownOrder = "${projectCode},${projectName}";
 
-		<var name="staticTearDownOrder" value="${projectCode},${projectName}" />
-	</command>
+		OSBAdminSales.gotoOrderDetailCreatedByMe(
+			project = "${projectName}",
+			projectCode = "${projectCode}"
+		);
 
-	<command name="RenewSupport">
-		<execute macro="OSBAdminSales#addOrder">
-			<var name="product" value="Digital Enterprise Non-Production" />
-			<var name="projectCode" value="${projectCode}" />
-			<var name="support" value="${support}" />
-		</execute>
-
-		<var name="staticTearDownOrder" value="${projectCode},${projectName}" />
-
-		<execute macro="OSBAdminSales#gotoOrderDetailCreatedByMe">
-			<var name="project" value="${projectName}" />
-			<var name="projectCode" value="${projectCode}" />
-		</execute>
-
-		<execute macro="OSBAdminSales#renewSupport">
-			<var name="product" value="Digital Enterprise Non-Production" />
-		</execute>
-	</command>
-</definition>
+		OSBAdminSales.renewSupport(product = "Digital Enterprise Non-Production");
+	}
+}

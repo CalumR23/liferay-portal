@@ -1,142 +1,123 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	static var staticTearDownPartner = "";
+	static var staticTearDownProject = "";
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
+	setUp {
+		var staticTearDownPartner = "";
+		var staticTearDownProject = "";
 
-	<var name="staticTearDownPartner" static="true" value="" />
-	<var name="staticTearDownProject" static="true" value="" />
+		OSBAdminUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-	<set-up>
-		<var name="staticTearDownPartner" value="" />
-		<var name="staticTearDownProject" value="" />
+		OSBAdminNavigation.gotoOSBAdmin();
+	}
 
-		<execute macro="OSBAdminUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+	tearDown {
+		if (!("${staticTearDownProject}" == "")) {
+			OSBAdminProject.tearDownProject(projectCode = "${staticTearDownProject}");
+		}
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-	</set-up>
+		if (!("${staticTearDownPartner}" == "")) {
+			OSBAdminPartner.tearDownPartner(partnerCode = "${staticTearDownPartner}");
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownProject}" arg2="" />
-			</not>
-			<then>
-				<execute macro="OSBAdminProject#tearDownProject">
-					<var name="projectCode" value="${staticTearDownProject}" />
-				</execute>
-			</then>
-		</if>
+		OSBAdminUser.logout();
+	}
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownPartner}" arg2="" />
-			</not>
-			<then>
-				<execute macro="OSBAdminPartner#tearDownPartner">
-					<var name="partnerCode" value="${staticTearDownPartner}" />
-				</execute>
-			</then>
-		</if>
+	test AddPartner {
+		OSBAdminPartner.addPartner(
+			additionalNotes = "This is a test.",
+			city = "Diamond Bar",
+			country = "United States",
+			partnerCode = "QAPARTNER1",
+			phoneNumber = "7145555555",
+			postalCode = "91765",
+			region = "California",
+			streetAddress = "123 Main St.",
+			supportRegion = "US"
+		);
 
-		<execute macro="OSBAdminUser#logout" />
-	</tear-down>
+		var staticTearDownPartner = "QAPARTNER1";
+	}
 
-	<command name="AddPartner">
-		<execute macro="OSBAdminPartner#addPartner">
-			<var name="additionalNotes" value="This is a test." />
-			<var name="city" value="Diamond Bar" />
-			<var name="country" value="United States" />
-			<var name="partnerCode" value="QAPARTNER1" />
-			<var name="phoneNumber" value="7145555555" />
-			<var name="postalCode" value="91765" />
-			<var name="region" value="California" />
-			<var name="streetAddress" value="123 Main St." />
-			<var name="supportRegion" value="US" />
-		</execute>
+	test AddPartnerManagedAccount {
+		OSBAdminPartner.addPartner(
+			additionalNotes = "This is a test.",
+			city = "Diamond Bar",
+			country = "United States",
+			partnerCode = "QAPARTNER2",
+			phoneNumber = "7145555555",
+			postalCode = "91765",
+			region = "California",
+			streetAddress = "123 Main St.",
+			supportRegion = "US"
+		);
 
-		<var name="staticTearDownPartner" value="QAPARTNER1" />
-	</command>
+		var staticTearDownPartner = "QAPARTNER2";
 
-	<command name="AddPartnerManagedAccount">
-		<execute macro="OSBAdminPartner#addPartner">
-			<var name="additionalNotes" value="This is a test." />
-			<var name="city" value="Diamond Bar" />
-			<var name="country" value="United States" />
-			<var name="partnerCode" value="QAPARTNER2" />
-			<var name="phoneNumber" value="7145555555" />
-			<var name="postalCode" value="91765" />
-			<var name="region" value="California" />
-			<var name="streetAddress" value="123 Main St." />
-			<var name="supportRegion" value="US" />
-		</execute>
+		OSBAdminProject.addProject(
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test Project 4",
+			city = "Augusta",
+			code = "QATEST4",
+			country = "United States",
+			industry = "Manufacturing",
+			projectName = "QA Project 4",
+			state = "Maine",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownPartner" value="QAPARTNER2" />
+		var staticTearDownProject = "QATEST4";
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test Project 4" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST4" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="projectName" value="QA Project 4" />
-			<var name="state" value="Maine" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminPartner.addPartnerToAccount(
+			partnerCode = "QAPARTNER2",
+			projectCode = "QATEST4"
+		);
+	}
 
-		<var name="staticTearDownProject" value="QATEST4" />
+	test RemovePartnerFromProject {
+		OSBAdminPartner.addPartner(
+			additionalNotes = "This is a test.",
+			city = "Diamond Bar",
+			country = "United States",
+			partnerCode = "QAPARTNER3",
+			phoneNumber = "7145555555",
+			postalCode = "91765",
+			region = "California",
+			streetAddress = "123 Main St.",
+			supportRegion = "US"
+		);
 
-		<execute macro="OSBAdminPartner#addPartnerToAccount">
-			<var name="partnerCode" value="QAPARTNER2" />
-			<var name="projectCode" value="QATEST4" />
-		</execute>
-	</command>
+		var staticTearDownPartner = "QAPARTNER3";
 
-	<command name="RemovePartnerFromProject">
-		<execute macro="OSBAdminPartner#addPartner">
-			<var name="additionalNotes" value="This is a test." />
-			<var name="city" value="Diamond Bar" />
-			<var name="country" value="United States" />
-			<var name="partnerCode" value="QAPARTNER3" />
-			<var name="phoneNumber" value="7145555555" />
-			<var name="postalCode" value="91765" />
-			<var name="region" value="California" />
-			<var name="streetAddress" value="123 Main St." />
-			<var name="supportRegion" value="US" />
-		</execute>
+		OSBAdminProject.addProject(
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test Project 9",
+			city = "Augusta",
+			code = "QATEST9",
+			country = "United States",
+			industry = "Manufacturing",
+			projectName = "QA Project 9",
+			state = "Maine",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownPartner" value="QAPARTNER3" />
+		var staticTearDownProject = "QATEST9";
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test Project 9" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST9" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="projectName" value="QA Project 9" />
-			<var name="state" value="Maine" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminPartner.addPartnerToAccount(
+			partnerCode = "QAPARTNER3",
+			projectCode = "QATEST9"
+		);
 
-		<var name="staticTearDownProject" value="QATEST9" />
+		OSBAdminPartner.inactivatePartnerAccount(partnerCode = "QAPARTNER3");
 
-		<execute macro="OSBAdminPartner#addPartnerToAccount">
-			<var name="partnerCode" value="QAPARTNER3" />
-			<var name="projectCode" value="QATEST9" />
-		</execute>
-
-		<execute macro="OSBAdminPartner#inactivatePartnerAccount">
-			<var name="partnerCode" value="QAPARTNER3" />
-		</execute>
-
-		<execute macro="OSBAdminPartner#removePartnerFromProject">
-			<var name="projectCode" value="QATEST9" />
-		</execute>
-	</command>
-</definition>
+		OSBAdminPartner.removePartnerFromProject(projectCode = "QATEST9");
+	}
+}

@@ -1,74 +1,61 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
+	setUp {
+		OSBAdminUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
+	}
 
-	<set-up>
-		<execute macro="OSBAdminUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
-	</set-up>
+	tearDown {
+		var testName = PropsUtil.get("test.name");
+		var testName = RegexUtil.replace("${testName}", "[^\.]*\.(.*)", "1");
+		var testCaseName = StringUtil.extractLast("${testName}", "#");
 
-	<tear-down>
-		<var method="PropsUtil#get('test.name')" name="testName" />
+		if ("${testCaseName}" == "AddAndEditSupportWorker") {
+			OSBAdminNavigation.gotoOSBAdminSupportTeam(teamName = "Platinum Critical US");
 
-		<var method="RegexUtil#replace('${testName}', '[^\.]*\.(.*)', '1')" name="testName" />
+			OSBAdminSupport.removeWorkerFromTeam(email = "lesa.qa.cse.2@liferay.com.broken");
+		}
+	}
 
-		<var method="StringUtil#extractLast('${testName}', '#')" name="testCaseName" />
+	@priority = "5"
+	test AddAndDeleteSupportRegion {
+		OSBAdminNavigation.gotoOSBAdminSupportRegions();
 
-		<if>
-			<equals arg1="${testCaseName}" arg2="AddAndEditSupportWorker" />
-			<then>
-				<execute macro="OSBAdminNavigation#gotoOSBAdminSupportTeam">
-					<var name="teamName" value="Platinum Critical US" />
-				</execute>
+		OSBAdminSupport.addSupportRegion(
+			description = "for QA test",
+			name = "US-QA",
+			timeZone = "Pacific Standard Time"
+		);
 
-				<execute macro="OSBAdminSupport#removeWorkerFromTeam">
-					<var name="email" value="lesa.qa.cse.2@liferay.com.broken" />
-				</execute>
-			</then>
-		</if>
-	</tear-down>
+		OSBAdminSupport.viewSupportRegionInfo(
+			description = "for QA test",
+			name = "US-QA",
+			timeZone = "Pacific Standard Time"
+		);
 
-	<command name="AddAndDeleteSupportRegion" priority="5">
-		<execute macro="OSBAdminNavigation#gotoOSBAdminSupportRegions" />
+		OSBAdminSupport.deleteSupportRegion(name = "US-QA");
+	}
 
-		<execute macro="OSBAdminSupport#addSupportRegion">
-			<var name="description" value="for QA test" />
-			<var name="name" value="US-QA" />
-			<var name="timeZone" value="Pacific Standard Time" />
-		</execute>
+	@priority = "5"
+	test AddAndEditSupportWorker {
+		OSBAdminNavigation.gotoOSBAdminSupportTeam(teamName = "Platinum Critical US");
 
-		<execute macro="OSBAdminSupport#viewSupportRegionInfo">
-			<var name="description" value="for QA test" />
-			<var name="name" value="US-QA" />
-			<var name="timeZone" value="Pacific Standard Time" />
-		</execute>
+		OSBAdminSupport.addWorkerToSupportTeam(
+			email = "lesa.qa.cse.2@liferay.com.broken",
+			role = "Watcher"
+		);
 
-		<execute macro="OSBAdminSupport#deleteSupportRegion">
-			<var name="name" value="US-QA" />
-		</execute>
-	</command>
+		OSBAdminNavigation.gotoOSBAdminSupportTeam(teamName = "Platinum Critical US");
 
-	<command name="AddAndEditSupportWorker" priority="5">
-		<execute macro="OSBAdminNavigation#gotoOSBAdminSupportTeam">
-			<var name="teamName" value="Platinum Critical US" />
-		</execute>
-
-		<execute macro="OSBAdminSupport#addWorkerToSupportTeam">
-			<var name="email" value="lesa.qa.cse.2@liferay.com.broken" />
-			<var name="role" value="Watcher" />
-		</execute>
-
-		<execute macro="OSBAdminNavigation#gotoOSBAdminSupportTeam">
-			<var name="teamName" value="Platinum Critical US" />
-		</execute>
-
-		<execute macro="OSBAdminSupport#editWorkerRole">
-			<var name="email" value="lesa.qa.cse.2@liferay.com.broken" />
-			<var name="role" value="Developer" />
-		</execute>
-	</command>
-</definition>
+		OSBAdminSupport.editWorkerRole(
+			email = "lesa.qa.cse.2@liferay.com.broken",
+			role = "Developer"
+		);
+	}
+}

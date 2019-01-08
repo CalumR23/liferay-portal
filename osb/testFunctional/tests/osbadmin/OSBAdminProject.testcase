@@ -1,315 +1,288 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var casEmailAddress = PropsUtil.get("lesa.email.address.3");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerName = PropsUtil.get("lesa.customer.name.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var cwatcherEmailAddress = PropsUtil.get("lesa.email.address.8");
+	static var staticTearDownOffering = "";
+	static var staticTearDownOrder = "";
+	static var staticTearDownProject = "";
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var method="PropsUtil#get('lesa.email.address.3')" name="casEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.customer.name.4')" name="customerName" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.8')" name="cwatcherEmailAddress" />
+	setUp {
+		var staticTearDownOffering = "";
+		var staticTearDownOrder = "";
+		var staticTearDownProject = "";
 
-	<var name="staticTearDownOffering" static="true" value="" />
-	<var name="staticTearDownOrder" static="true" value="" />
-	<var name="staticTearDownProject" static="true" value="" />
+		OSBAdminUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-	<set-up>
-		<var name="staticTearDownOffering" value="" />
-		<var name="staticTearDownOrder" value="" />
-		<var name="staticTearDownProject" value="" />
+		OSBAdminNavigation.gotoOSBAdmin();
+	}
 
-		<execute macro="OSBAdminUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+	tearDown {
+		if (!("${staticTearDownOrder}" == "")) {
+			var projectCode = StringUtil.extractFirst("${staticTearDownOrder}", ",");
+			var projectName = StringUtil.extractLast("${staticTearDownOrder}", ",");
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-	</set-up>
+			OSBAdminSales.tearDownOrder(
+				projectCode = "${projectCode}",
+				projectName = "${projectName}"
+			);
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownOrder}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractFirst('${staticTearDownOrder}', ',')" name="projectCode" />
-				<var method="StringUtil#extractLast('${staticTearDownOrder}', ',')" name="projectName" />
+		if (!("${staticTearDownOffering}" == "")) {
+			var product = StringUtil.extractFirst("${staticTearDownOffering}", ",");
+			var support = StringUtil.extractLast("${staticTearDownOffering}", ",");
 
-				<execute macro="OSBAdminSales#tearDownOrder">
-					<var name="projectCode" value="${projectCode}" />
-					<var name="projectName" value="${projectName}" />
-				</execute>
-			</then>
-		</if>
+			OSBAdminSales.tearDownOffering(
+				description = "QA Test",
+				product = "${product}",
+				support = "${support}"
+			);
+		}
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownOffering}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractFirst('${staticTearDownOffering}', ',')" name="product" />
+		if (!("${staticTearDownProject}" == "")) {
+			OSBAdminProject.tearDownProject(projectCode = "${staticTearDownProject}");
+		}
 
-				<var method="StringUtil#extractLast('${staticTearDownOffering}', ',')" name="support" />
+		OSBAdminUser.logout();
+	}
 
-				<execute macro="OSBAdminSales#tearDownOffering">
-					<var name="description" value="QA Test" />
-					<var name="product" value="${product}" />
-					<var name="support" value="${support}" />
-				</execute>
-			</then>
-		</if>
+	test AddProject {
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 1",
+			city = "Augusta",
+			code = "QATEST1",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 1",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownProject}" arg2="" />
-			</not>
-			<then>
-				<execute macro="OSBAdminProject#tearDownProject">
-					<var name="projectCode" value="${staticTearDownProject}" />
-				</execute>
-			</then>
-		</if>
+		var staticTearDownProject = "QATEST1";
+	}
 
-		<execute macro="OSBAdminUser#logout" />
-	</tear-down>
+	test AddProjectWithOffering {
+		property lesa.acceptance = "true";
 
-	<command name="AddProject">
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 1" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST1" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 1" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 5",
+			city = "Augusta",
+			code = "QATEST5",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 5",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownProject" value="QATEST1" />
-	</command>
+		var staticTearDownProject = "QATEST5";
 
-	<command name="AddProjectWithOffering">
-		<property name="lesa.acceptance" value="true" />
+		OSBAdminProject.viewProjectStatus(projectCode = "QATEST5", status = "Closed");
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 5" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST5" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 5" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminSales.addOrder(
+			product = "Portal Non-Production",
+			projectCode = "QATEST5",
+			support = "Gold"
+		);
 
-		<var name="staticTearDownProject" value="QATEST5" />
+		var staticTearDownOrder = "QATEST5,QA Test 5";
 
-		<execute macro="OSBAdminProject#viewProjectStatus">
-			<var name="projectCode" value="QATEST5" />
-			<var name="status" value="Closed" />
-		</execute>
+		OSBAdminProject.viewProjectStatus(projectCode = "QATEST5", status = "Approved");
+	}
 
-		<execute macro="OSBAdminSales#addOrder">
-			<var name="product" value="Portal Non-Production" />
-			<var name="projectCode" value="QATEST5" />
-			<var name="support" value="Gold" />
-		</execute>
+	test AssignCustomer {
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 2",
+			city = "Augusta",
+			code = "QATEST2",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 2",
+			state = "Maine",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownOrder" value="QATEST5,QA Test 5" />
+		var staticTearDownProject = "QATEST2";
 
-		<execute macro="OSBAdminProject#viewProjectStatus">
-			<var name="projectCode" value="QATEST5" />
-			<var name="status" value="Approved" />
-		</execute>
-	</command>
+		OSBAdminProject.assignCustomer(
+			emailAddress = "${cwatcherEmailAddress}",
+			projectCode = "QATEST2",
+			role = "Watcher"
+		);
+	}
 
-	<command name="AssignCustomer">
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 2" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST2" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 2" />
-			<var name="state" value="Maine" />
-			<var name="zip" value="04330" />
-		</execute>
+	test AssignWorker {
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 3",
+			city = "Augusta",
+			code = "QATEST3",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 3",
+			state = "Maine",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownProject" value="QATEST2" />
+		var staticTearDownProject = "QATEST3";
 
-		<execute macro="OSBAdminProject#assignCustomer">
-			<var name="emailAddress" value="${cwatcherEmailAddress}" />
-			<var name="projectCode" value="QATEST2" />
-			<var name="role" value="Watcher" />
-		</execute>
-	</command>
+		OSBAdminProject.assignWorker(
+			emailAddress = "${casEmailAddress}",
+			projectCode = "QATEST3",
+			role = "Advocacy Specialist"
+		);
+	}
 
-	<command name="AssignWorker">
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 3" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST3" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 3" />
-			<var name="state" value="Maine" />
-			<var name="zip" value="04330" />
-		</execute>
+	test EditProject {
+		property lesa.acceptance = "true";
 
-		<var name="staticTearDownProject" value="QATEST3" />
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 12",
+			city = "Augusta",
+			code = "QATEST12",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 12",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<execute macro="OSBAdminProject#assignWorker">
-			<var name="emailAddress" value="${casEmailAddress}" />
-			<var name="projectCode" value="QATEST3" />
-			<var name="role" value="Advocacy Specialist" />
-		</execute>
-	</command>
+		var staticTearDownProject = "QATEST12";
 
-	<command name="EditProject">
-		<property name="lesa.acceptance" value="true" />
+		OSBAdminProject.gotoAccount(projectCode = "QATEST12");
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 12" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST12" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 12" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminProject.editProject(
+			additionalNotes = "This is a test for editing a project.",
+			addressLine = "123 ABC Street",
+			businessAccountName = "QA Test 12 Edited",
+			city = "Vancouver",
+			code = "QATEST12EDITED",
+			country = "Canada",
+			industry = "Agriculture",
+			language = "Japanese",
+			maxContacts = "15",
+			partnerCode = "QA Test Partner",
+			projectName = "QA Test 12 Edited",
+			specialInstructions = "test",
+			state = "Alberta",
+			tier = "Strategic",
+			type = "Individual",
+			zip = "11111"
+		);
 
-		<var name="staticTearDownProject" value="QATEST12" />
+		var staticTearDownProject = "QATEST12EDITED";
 
-		<execute macro="OSBAdminProject#gotoAccount">
-			<var name="projectCode" value="QATEST12" />
-		</execute>
+		OSBAdminProject.viewProjectDetails(
+			additionalNotes = "This is a test for editing a project.",
+			addressLine = "123 ABC Street",
+			businessAccountName = "QA Test 12 Edited",
+			city = "Vancouver",
+			code = "QATEST12EDITED",
+			country = "Canada",
+			industry = "Agriculture",
+			language = "Japanese",
+			maxContacts = "15",
+			partnerCode = "QA Test Partner",
+			projectCode = "QATEST12EDITED",
+			projectName = "QA Test 12 Edited",
+			specialInstructions = "test",
+			state = "Alberta",
+			tier = "Strategic",
+			type = "Individual",
+			zip = "11111"
+		);
+	}
 
-		<execute macro="OSBAdminProject#editProject">
-			<var name="additionalNotes" value="This is a test for editing a project." />
-			<var name="addressLine" value="123 ABC Street" />
-			<var name="businessAccountName" value="QA Test 12 Edited" />
-			<var name="city" value="Vancouver" />
-			<var name="code" value="QATEST12EDITED" />
-			<var name="country" value="Canada" />
-			<var name="industry" value="Agriculture" />
-			<var name="language" value="Japanese" />
-			<var name="maxContacts" value="15" />
-			<var name="partnerCode" value="QA Test Partner" />
-			<var name="projectName" value="QA Test 12 Edited" />
-			<var name="specialInstructions" value="test" />
-			<var name="state" value="Alberta" />
-			<var name="tier" value="Strategic" />
-			<var name="type" value="Individual" />
-			<var name="zip" value="11111" />
-		</execute>
+	test RemoveSupportLanguage {
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 11",
+			city = "Augusta",
+			code = "QATEST11",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 11",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<var name="staticTearDownProject" value="QATEST12EDITED" />
+		var staticTearDownProject = "QATEST11";
 
-		<execute macro="OSBAdminProject#viewProjectDetails">
-			<var name="additionalNotes" value="This is a test for editing a project." />
-			<var name="addressLine" value="123 ABC Street" />
-			<var name="businessAccountName" value="QA Test 12 Edited" />
-			<var name="city" value="Vancouver" />
-			<var name="code" value="QATEST12EDITED" />
-			<var name="country" value="Canada" />
-			<var name="industry" value="Agriculture" />
-			<var name="language" value="Japanese" />
-			<var name="maxContacts" value="15" />
-			<var name="partnerCode" value="QA Test Partner" />
-			<var name="projectCode" value="QATEST12EDITED" />
-			<var name="projectName" value="QA Test 12 Edited" />
-			<var name="specialInstructions" value="test" />
-			<var name="state" value="Alberta" />
-			<var name="tier" value="Strategic" />
-			<var name="type" value="Individual" />
-			<var name="zip" value="11111" />
-		</execute>
-	</command>
+		OSBAdminProject.addSupportLanguageToProject(
+			projectCode = "QATEST11",
+			supportLanguage = "Chinese"
+		);
 
-	<command name="RemoveSupportLanguage">
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 11" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST11" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 11" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		OSBAdminProject.removeSupportLanguage(
+			projectCode = "QATEST11",
+			supportLanguage = "Chinese"
+		);
+	}
 
-		<var name="staticTearDownProject" value="QATEST11" />
+	test RemoveSupportRegion {
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test 10",
+			city = "Augusta",
+			code = "QATEST10",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Test 10",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<execute macro="OSBAdminProject#addSupportLanguageToProject">
-			<var name="projectCode" value="QATEST11" />
-			<var name="supportLanguage" value="Chinese" />
-		</execute>
+		var staticTearDownProject = "QATEST10";
 
-		<execute macro="OSBAdminProject#removeSupportLanguage">
-			<var name="projectCode" value="QATEST11" />
-			<var name="supportLanguage" value="Chinese" />
-		</execute>
-	</command>
+		OSBAdminProject.addSupportRegionToProject(
+			projectCode = "QATEST10",
+			supportRegion = "Brazil"
+		);
 
-	<command name="RemoveSupportRegion">
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test 10" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST10" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Test 10" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
-
-		<var name="staticTearDownProject" value="QATEST10" />
-
-		<execute macro="OSBAdminProject#addSupportRegionToProject">
-			<var name="projectCode" value="QATEST10" />
-			<var name="supportRegion" value="Brazil" />
-		</execute>
-
-		<execute macro="OSBAdminProject#removeSupportRegion">
-			<var name="projectCode" value="QATEST10" />
-			<var name="supportRegion" value="Brazil" />
-		</execute>
-	</command>
-</definition>
+		OSBAdminProject.removeSupportRegion(
+			projectCode = "QATEST10",
+			supportRegion = "Brazil"
+		);
+	}
+}
