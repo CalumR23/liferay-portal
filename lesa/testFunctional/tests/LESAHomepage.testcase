@@ -1,47 +1,45 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="2" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "2";
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var partnerEmailAddress = PropsUtil.get("lesa.email.address.6");
+	var partnerPassword = PropsUtil.get("lesa.email.password.6");
 
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	tearDown {
+		LESAUser.logout();
+	}
 
-	<tear-down>
-		<execute macro="LESAUser#logout" />
-	</tear-down>
+	test ViewCustomerHomepage {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-	<command name="ViewCustomerHomepage">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESAHomepage.viewAllInProgressTickets();
 
-		<execute macro="LESAHomepage#viewAllInProgressTickets" />
+		LESAHomepage.viewNeedsResponse();
 
-		<execute macro="LESAHomepage#viewNeedsResponse" />
+		LESAHomepage.viewWatching(customer = "true");
+	}
 
-		<execute macro="LESAHomepage#viewWatching">
-			<var name="customer" value="true" />
-		</execute>
-	</command>
+	test ViewPartnerHomepage {
+		LESAUser.login(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
 
-	<command name="ViewPartnerHomepage">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESAHomepage.viewPrimaryAssignments();
 
-		<execute macro="LESAHomepage#viewPrimaryAssignments" />
+		LESAHomepage.viewNeedsResponse();
 
-		<execute macro="LESAHomepage#viewNeedsResponse" />
+		LESAHomepage.viewAuxiliaryAssignments();
 
-		<execute macro="LESAHomepage#viewAuxiliaryAssignments" />
-
-		<execute macro="LESAHomepage#viewWatching" />
-	</command>
-</definition>
+		LESAHomepage.viewWatching();
+	}
+}

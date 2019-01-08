@@ -1,63 +1,55 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="2" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "2";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var cseEmailAddress = PropsUtil.get("lesa.email.address.1");
+	var csePassword = PropsUtil.get("lesa.email.password.1");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var partnerEmailAddress = PropsUtil.get("lesa.email.address.6");
+	var partnerPassword = PropsUtil.get("lesa.email.password.6");
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var method="PropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.1')" name="csePassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	tearDown {
+		LESAUser.logout();
+	}
 
-	<tear-down>
-		<execute macro="LESAUser#logout" />
-	</tear-down>
+	test ViewUserGuide {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-	<command name="ViewUserGuide">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+		LESANavigation.gotoHelp();
 
-		<execute macro="LESANavigation#gotoHelp" />
+		LESAHelp.viewUserGuide(role = "CSE");
 
-		<execute macro="LESAHelp#viewUserGuide">
-			<var name="role" value="CSE" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESANavigation.gotoHelp();
 
-		<execute macro="LESANavigation#gotoHelp" />
+		LESAHelp.viewUserGuide(role = "Customer");
 
-		<execute macro="LESAHelp#viewUserGuide">
-			<var name="role" value="Customer" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
+		LESANavigation.gotoHelp();
 
-		<execute macro="LESANavigation#gotoHelp" />
+		LESAHelp.viewUserGuide(role = "Partner");
 
-		<execute macro="LESAHelp#viewUserGuide">
-			<var name="role" value="Partner" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+		LESANavigation.gotoHelp();
 
-		<execute macro="LESANavigation#gotoHelp" />
-
-		<execute macro="LESAHelp#viewUserGuide">
-			<var name="role" value="Admin" />
-		</execute>
-	</command>
-</definition>
+		LESAHelp.viewUserGuide(role = "Admin");
+	}
+}

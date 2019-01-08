@@ -1,214 +1,193 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="1" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "1";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	static var staticTearDownCallLog = "";
+	static var staticTearDownProject = "";
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
+	setUp {
+		var staticTearDownCallLog = "";
+		var staticTearDownProject = "";
 
-	<var name="staticTearDownCallLog" static="true" value="" />
-	<var name="staticTearDownProject" static="true" value="" />
+		LESAUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
+	}
 
-	<set-up>
-		<var name="staticTearDownCallLog" value="" />
-		<var name="staticTearDownProject" value="" />
+	tearDown {
+		if (!("${staticTearDownCallLog}" == "")) {
+			var projectCode = StringUtil.extractFirst("${staticTearDownCallLog}", ",");
+			var summary = StringUtil.extractLast("${staticTearDownCallLog}", ",");
 
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
-	</set-up>
+			LESAProjectEdit.tearDownCallLog(
+				projectCode = "${projectCode}",
+				summary = "${summary}"
+			);
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownCallLog}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractFirst('${staticTearDownCallLog}', ',')" name="projectCode" />
-				<var method="StringUtil#extractLast('${staticTearDownCallLog}', ',')" name="summary" />
+		if (!("${staticTearDownProject}" == "")) {
+			OSBAdminNavigation.gotoOSBAdmin();
 
-				<execute macro="LESAProjectEdit#tearDownCallLog">
-					<var name="projectCode" value="${projectCode}" />
-					<var name="summary" value="${summary}" />
-				</execute>
-			</then>
-		</if>
+			OSBAdminProject.tearDownProject(projectCode = "${staticTearDownProject}");
+		}
 
-		<if>
-			<not>
-				<equals arg1="${staticTearDownProject}" arg2="" />
-			</not>
-			<then>
-				<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
+		LESAUser.logout();
+	}
 
-				<execute macro="OSBAdminProject#tearDownProject">
-					<var name="projectCode" value="${staticTearDownProject}" />
-				</execute>
-			</then>
-		</if>
+	test AddCallLogAsCAS {
+		var staticTearDownCallLog = "QAPROJECT1,QA Test call log";
 
-		<execute macro="LESAUser#logout" />
-	</tear-down>
+		LESANavigation.gotoLESA();
 
-	<command name="AddCallLogAsCAS">
-		<var name="staticTearDownCallLog" value="QAPROJECT1,QA Test call log" />
+		LESASearch.searchProject(projectCode = "QAPROJECT1");
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESAProjectEdit.addCallLog(
+			actionItems = "Test action items.",
+			callDateDay = "6",
+			callDateMonth = "January",
+			callDateYear = "2016",
+			callLengthHours = "0",
+			callLengthMinutes = "45",
+			callLengthSeconds = "10",
+			callType = "Incoming",
+			clientsPresent = "Client A, Client B",
+			notes = "This is a QA test.",
+			summary = "QA Test call log"
+		);
 
-		<execute macro="LESASearch#searchProject">
-			<var name="projectCode" value="QAPROJECT1" />
-		</execute>
+		LESAProjectView.viewCallLog(
+			actionItems = "Test action items.",
+			callDate = "2016-01-06",
+			callLength = "00:45:10",
+			callType = "incoming",
+			clientsPresent = "Client A, Client B",
+			notes = "This is a QA test.",
+			summary = "QA Test call log"
+		);
+	}
 
-		<execute macro="LESAProjectEdit#addCallLog">
-			<var name="actionItems" value="Test action items." />
-			<var name="callDateDay" value="6" />
-			<var name="callDateMonth" value="January" />
-			<var name="callDateYear" value="2016" />
-			<var name="callLengthHours" value="0" />
-			<var name="callLengthMinutes" value="45" />
-			<var name="callLengthSeconds" value="10" />
-			<var name="callType" value="Incoming" />
-			<var name="clientsPresent" value="Client A, Client B" />
-			<var name="notes" value="This is a QA test." />
-			<var name="summary" value="QA Test call log" />
-		</execute>
+	test EditCASInformation {
+		var staticTearDownProject = "QATEST6";
 
-		<execute macro="LESAProjectView#viewCallLog">
-			<var name="actionItems" value="Test action items." />
-			<var name="callDate" value="2016-01-06" />
-			<var name="callLength" value="00:45:10" />
-			<var name="callType" value="incoming" />
-			<var name="clientsPresent" value="Client A, Client B" />
-			<var name="notes" value="This is a QA test." />
-			<var name="summary" value="QA Test call log" />
-		</execute>
-	</command>
+		OSBAdminNavigation.gotoOSBAdmin();
 
-	<command name="EditCASInformation">
-		<var name="staticTearDownProject" value="QATEST6" />
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test Project 6",
+			city = "Augusta",
+			code = "QATEST6",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Project 6",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test Project 6" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST6" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Project 6" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		LESASearch.searchProject(projectCode = "QATEST6");
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESAProjectEdit.editCASInformation(
+			contactOverview = "Contact QA Test",
+			majorMilestones = "Building a Death Star by 2020",
+			projectOverview = "Liferay Version: 6.2.10 EE",
+			reasonsForStrategic = "QA Test"
+		);
 
-		<execute macro="LESASearch#searchProject">
-			<var name="projectCode" value="QATEST6" />
-		</execute>
+		LESAProjectView.viewCASInformation(
+			contactOverview = "Contact QA Test",
+			majorMilestones = "Building a Death Star by 2020",
+			projectOverview = "Liferay Version: 6.2.10 EE",
+			reasonsForStrategic = "QA Test"
+		);
+	}
 
-		<execute macro="LESAProjectEdit#editCASInformation">
-			<var name="contactOverview" value="Contact QA Test" />
-			<var name="majorMilestones" value="Building a Death Star by 2020" />
-			<var name="projectOverview" value="Liferay Version: 6.2.10 EE" />
-			<var name="reasonsForStrategic" value="QA Test" />
-		</execute>
+	test EditProjectDetails {
+		var staticTearDownProject = "QATEST8";
 
-		<execute macro="LESAProjectView#viewCASInformation">
-			<var name="contactOverview" value="Contact QA Test" />
-			<var name="majorMilestones" value="Building a Death Star by 2020" />
-			<var name="projectOverview" value="Liferay Version: 6.2.10 EE" />
-			<var name="reasonsForStrategic" value="QA Test" />
-		</execute>
-	</command>
+		OSBAdminNavigation.gotoOSBAdmin();
 
-	<command name="EditProjectDetails">
-		<var name="staticTearDownProject" value="QATEST8" />
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test Project 8",
+			city = "Augusta",
+			code = "QATEST8",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Project 8",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test Project 8" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST8" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Project 8" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		LESASearch.searchProject(projectCode = "QATEST8");
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESANavigation.gotoEditProject();
 
-		<execute macro="LESASearch#searchProject">
-			<var name="projectCode" value="QATEST8" />
-		</execute>
+		LESAProjectEdit.editProjectDetail(
+			additionalNotes = "Test additional notes - edited.",
+			specialInstructions = "Test special instructions - edited."
+		);
 
-		<execute macro="LESANavigation#gotoEditProject" />
+		LESAProjectView.viewSupportInstructions(
+			supportInstructions = "Test special instructions - edited."
+		);
 
-		<execute macro="LESAProjectEdit#editProjectDetail">
-			<var name="additionalNotes" value="Test additional notes - edited." />
-			<var name="specialInstructions" value="Test special instructions - edited." />
-		</execute>
+		LESAProjectView.viewProjectNotes(
+			projectNotes = "Test additional notes - edited."
+		);
+	}
 
-		<execute macro="LESAProjectView#viewSupportInstructions">
-			<var name="supportInstructions" value="Test special instructions - edited." />
-		</execute>
+	test EditSalesInformation {
+		var staticTearDownProject = "QATEST7";
 
-		<execute macro="LESAProjectView#viewProjectNotes">
-			<var name="projectNotes" value="Test additional notes - edited." />
-		</execute>
-	</command>
+		OSBAdminNavigation.gotoOSBAdmin();
 
-	<command name="EditSalesInformation">
-		<var name="staticTearDownProject" value="QATEST7" />
+		OSBAdminProject.addProject(
+			additionalNotes = "This is a test",
+			addressLine = "123 Main Street",
+			businessAccountName = "QA Test Project 7",
+			city = "Augusta",
+			code = "QATEST7",
+			country = "United States",
+			industry = "Manufacturing",
+			maxContacts = "10",
+			projectName = "QA Project 7",
+			specialInstructions = "none",
+			state = "Maine",
+			tier = "Premier",
+			type = "Group",
+			zip = "04330"
+		);
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="OSBAdminProject#addProject">
-			<var name="additionalNotes" value="This is a test" />
-			<var name="addressLine" value="123 Main Street" />
-			<var name="businessAccountName" value="QA Test Project 7" />
-			<var name="city" value="Augusta" />
-			<var name="code" value="QATEST7" />
-			<var name="country" value="United States" />
-			<var name="industry" value="Manufacturing" />
-			<var name="maxContacts" value="10" />
-			<var name="projectName" value="QA Project 7" />
-			<var name="specialInstructions" value="none" />
-			<var name="state" value="Maine" />
-			<var name="tier" value="Premier" />
-			<var name="type" value="Group" />
-			<var name="zip" value="04330" />
-		</execute>
+		LESASearch.searchProject(projectCode = "QATEST7");
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESAProjectEdit.editSalesInformation(
+			licenseInformation = "Platinum Prod (5); Non-Prod (2)",
+			salesforceURL = "Insert Salesforce link here.",
+			trainingsAttended = "Liferay Certification"
+		);
 
-		<execute macro="LESASearch#searchProject">
-			<var name="projectCode" value="QATEST7" />
-		</execute>
-
-		<execute macro="LESAProjectEdit#editSalesInformation">
-			<var name="licenseInformation" value="Platinum Prod (5); Non-Prod (2)" />
-			<var name="salesforceURL" value="Insert Salesforce link here." />
-			<var name="trainingsAttended" value="Liferay Certification" />
-		</execute>
-
-		<execute macro="LESAProjectView#viewSalesInformation">
-			<var name="licenseInformation" value="Platinum Prod (5); Non-Prod (2)" />
-			<var name="salesforceURL" value="Insert Salesforce link here." />
-			<var name="trainingsAttended" value="Liferay Certification" />
-		</execute>
-	</command>
-</definition>
+		LESAProjectView.viewSalesInformation(
+			licenseInformation = "Platinum Prod (5); Non-Prod (2)",
+			salesforceURL = "Insert Salesforce link here.",
+			trainingsAttended = "Liferay Certification"
+		);
+	}
+}

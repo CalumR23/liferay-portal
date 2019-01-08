@@ -1,612 +1,478 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="3" />
-
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var method="PropsUtil#get('lesa.cas.name.3')" name="casName" />
-	<var method="PropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.1')" name="csePassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.2')" name="managerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.2')" name="managerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
-	<var method="PropsUtil#get('lesa.partner.name.6')" name="partnerName" />
-	<var method="PropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
-
-	<tear-down>
-		<var method="PropsUtil#get('test.name')" name="testName" />
-
-		<var method="RegexUtil#replace('${testName}', '[^\.]*\.(.*)', '1')" name="testName" />
-
-		<var method="StringUtil#extractLast('${testName}', '#')" name="testCaseName" />
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="CreateTicketAsCustomerAndViewWithPartnerFilter" />
-			<then>
-				<execute macro="LESAUser#logoutAndLogin">
-					<var name="userEmailAddress" value="${adminEmailAddress}" />
-					<var name="userPassword" value="${adminPassword}" />
-				</execute>
-
-				<execute macro="OSBAdminProject#tearDownAssignedCustomer">
-					<var name="emailAddress" value="${partnerEmailAddress}" />
-					<var name="projectCode" value="QAPROJECT2" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="FilterTicketsByProjectAsCustomer" />
-			<then>
-				<execute macro="LESAUser#logoutAndLogin">
-					<var name="userEmailAddress" value="${adminEmailAddress}" />
-					<var name="userPassword" value="${adminPassword}" />
-				</execute>
-
-				<execute macro="OSBAdminProject#tearDownAssignedCustomer">
-					<var name="emailAddress" value="${customerEmailAddress}" />
-					<var name="projectCode" value="QAPROJECT2" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="CreateCustomFilter" />
-			<then>
-				<execute macro="LESASearch#deleteCustomFilter">
-					<var name="filterName" value="QA Test Filter 1" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="CreateDuplicateCustomFilter" />
-			<then>
-				<execute macro="LESASearch#deleteCustomFilter">
-					<var name="filterName" value="QA Test Filter 2" />
-				</execute>
-
-				<execute macro="LESASearch#deleteCustomFilter">
-					<var name="filterName" value="QA Test Filter 3" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="UpdateCustomFilter" />
-			<then>
-				<execute macro="LESASearch#deleteCustomFilter">
-					<var name="filterName" value="QA Test Filter 4" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${testCaseName}" arg2="ViewPartnerSupportProjects" />
-			<then>
-				<execute macro="LESAUser#logoutAndLogin">
-					<var name="userEmailAddress" value="${adminEmailAddress}" />
-					<var name="userPassword" value="${adminPassword}" />
-				</execute>
-
-				<execute macro="OSBAdminPartner#removePartnerFromProject">
-					<var name="projectCode" value="QAPROJECT2" />
-				</execute>
-			</then>
-		</if>
-
-		<execute macro="LESAUser#logout" />
-	</tear-down>
-
-	<command name="BulkEditAssignee">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
-
-		<execute macro="LESATicket#createTicketBasicForm">
-			<var name="appServer" value="Weblogic 12c R1" />
-			<var name="browser" value="Chrome" />
-			<var name="component" value="Security" />
-			<var name="configType" value="new" />
-			<var name="database" value="Oracle 11g Release 2" />
-			<var name="description" value="QA Test for bulk editing assignee." />
-			<var name="javaVM" value="Oracle Sun JDK 6" />
-			<var name="liferayVersion" value="6.2 EE (Limited)" />
-			<var name="operatingSystem" value="Ubuntu 12" />
-			<var name="product" value="Portal" />
-			<var name="project" value="QA Test Project 2" />
-			<var name="server" value="Production" />
-			<var name="summary" value="QA Test Bulk Edit Assignee" />
-			<var name="systemStatus" value="Functioning with Limited Capabilities" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#searchByKeyword">
-			<var name="keyword" value="&quot;QA Test Bulk Edit Assignee&quot;" />
-		</execute>
-
-		<execute macro="LESASearch#getTicketCount">
-			<return name="firstTicketCount" />
-		</execute>
-
-		<execute macro="LESASearch#bulkEditAssignee">
-			<var name="assignee" value="QATest CSE2 (lesa.qa.cse.2@liferay.com.broken)" />
-		</execute>
-
-		<execute macro="LESASearch#searchByKeyword">
-			<var name="keyword" value="&quot;QA Test Bulk Edit Assignee&quot;" />
-		</execute>
-
-		<execute macro="LESASearch#selectFilterTicketsAssignee">
-			<var name="assigneeList" value="QATest CSE2" />
-		</execute>
-
-		<execute macro="LESASearch#assertTicketCountEqual">
-			<var name="ticketCount" value="${firstTicketCount}" />
-		</execute>
-	</command>
-
-	<command name="BulkEditViewManagerMode">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#checkManagerMode" />
-
-		<execute macro="LESASearch#viewManagerModeFilters" />
-	</command>
-
-	<command name="BulkEditViewValidationMessages">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#searchByKeyword">
-			<var name="keyword" value="QAPROJECT2" />
-		</execute>
-
-		<execute macro="LESASearch#checkManagerMode" />
-
-		<execute macro="LESASearch#bulkEditSelectAll" />
-
-		<execute macro="LESASearch#bulkEditViewDisclaimer" />
-
-		<execute macro="LESASearch#bulkEditViewValidationMessages" />
-	</command>
-
-	<command name="CreateCustomFilter">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterTicketsByProject">
-			<var name="projectCode" value="QAPROJECT1" />
-			<var name="projectName" value="QA Test Project 1" />
-		</execute>
-
-		<execute macro="LESASearch#filterTicketsByStatusAndResolution">
-			<var name="status" value="Solution Proposed" />
-		</execute>
-
-		<execute macro="LESASearch#sortByTicketNumberDescending" />
-
-		<execute macro="LESASearch#createCustomFilter">
-			<var name="filterName" value="QA Test Filter 1" />
-		</execute>
-
-		<execute macro="LESASearch#selectCustomFilter">
-			<var name="menuItem" value="QA Test Filter 1" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedProjects">
-			<var name="projectList" value="QA Test Project 1" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedStatus">
-			<var name="statusList" value="Solution Proposed" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedSort">
-			<var name="column" value="Ticket Number" />
-			<var name="sort" value="down" />
-		</execute>
-	</command>
-
-	<command name="CreateDuplicateCustomFilter">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#createCustomFilter">
-			<var name="filterName" value="QA Test Filter 2" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#createDuplicateCustomFilter">
-			<var name="filterName" value="QA Test Filter 2" />
-			<var name="newFilterName" value="QA Test Filter 3" />
-		</execute>
-
-		<execute macro="LESASearch#viewCustomFilters">
-			<var name="filterNames" value="QA Test Filter 2,QA Test Filter 3" />
-		</execute>
-	</command>
-
-	<command name="CreateTicketAsCustomerAndViewWithPartnerFilter">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
-
-		<execute macro="OSBAdminProject#assignCustomer">
-			<var name="emailAddress" value="${partnerEmailAddress}" />
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="role" value="Developer" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESATicket#createTicketBasicForm">
-			<return name="ticketNumber" />
-			<var name="appServer" value="Weblogic 12c R1" />
-			<var name="browser" value="Chrome" />
-			<var name="component" value="Security" />
-			<var name="configType" value="new" />
-			<var name="database" value="Oracle 11g Release 2" />
-			<var name="description" value="QA Test for creating a ticket as a customer and viewing it with the partner." />
-			<var name="javaVM" value="Oracle Sun JDK 6" />
-			<var name="liferayVersion" value="6.2 EE (Limited)" />
-			<var name="operatingSystem" value="Ubuntu 12" />
-			<var name="product" value="Portal" />
-			<var name="project" value="QA Test Project 2" />
-			<var name="server" value="Production" />
-			<var name="summary" value="QA Test Create Ticket As Customer And View With Partner Filter" />
-			<var name="systemStatus" value="Functioning with Limited Capabilities" />
-		</execute>
-
-		<execute macro="LESATicketView#assertNotAssignedTo">
-			<var name="name" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#searchPartnersViaTicketsChooseAssignee">
-			<var name="code" value="QA Test Partner" />
-		</execute>
-
-		<execute macro="LESASearch#sortByTicketNumberDescending" />
-
-		<execute macro="LESASearch#assertTicketNotInResult">
-			<var name="ticketNumber" value="${ticketNumber}" />
-		</execute>
-	</command>
-
-	<command name="FilterTicketsByProjectAsCustomer">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#viewSelectedProjectSingle">
-			<var name="project" value="QA Test Project 1" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
-
-		<execute macro="OSBAdminProject#assignCustomer">
-			<var name="emailAddress" value="${customerEmailAddress}" />
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="role" value="Developer" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterTicketsByProject">
-			<var name="projectCode" value="QAPROJECT1" />
-			<var name="projectName" value="QA Test Project 1" />
-		</execute>
-
-		<execute macro="LESASearch#filterTicketsByProject">
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="projectName" value="QA Test Project 2" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedProjects">
-			<var name="projectList" value="QA Test Project 1,QA Test Project 2" />
-		</execute>
-	</command>
-
-	<command name="FilterTicketsByProjectAsPartner">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterTicketsByProject">
-			<var name="projectCode" value="QAPROJECT1" />
-			<var name="projectName" value="QA Test Project 1" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedProjects">
-			<var name="projectList" value="QA Test Project 1" />
-		</execute>
-	</command>
-
-	<command name="RemoveTicketAssigneeFilters">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#selectFilterTicketsAccountWorker">
-			<var name="accountWorkerList" value="${casName}" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedAccountWorkers">
-			<var name="accountWorkerList" value="${casName}" />
-		</execute>
-
-		<execute macro="LESASearch#removeFilterTicketsAccountWorker">
-			<var name="accountWorkerList" value="${casName}" />
-		</execute>
-
-		<execute macro="LESASearch#selectFilterTicketsAssignee">
-			<var name="assigneeList" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedAssignees">
-			<var name="assigneeList" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESASearch#removeFilterTicketsAssignee">
-			<var name="assigneeList" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESASearch#selectFilterTicketsAccountWorker">
-			<var name="accountWorkerList" value="${casName}" />
-		</execute>
-
-		<execute macro="LESASearch#selectFilterTicketsAssignee">
-			<var name="assigneeList" value="${partnerName}" />
-		</execute>
-
-		<execute function="Refresh" />
-
-		<execute macro="LESASearch#removeFilterTicketsAssignee">
-			<var name="assigneeList" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESASearch#removeFilterTicketsAccountWorker">
-			<var name="accountWorkerList" value="${casName}" />
-		</execute>
-	</command>
-
-	<command name="ReturnToSearchResults">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#search">
-			<var name="keyword" value="QAPROJECT1" />
-		</execute>
-
-		<execute macro="LESASearch#getTicketCount">
-			<return name="firstTicketCount" />
-		</execute>
-
-		<execute macro="LESASearch#gotoSearchResultTicket">
-			<var name="ticketNumber" value="QAPROJECT1" />
-		</execute>
-
-		<execute macro="LESANavigation#back" />
-
-		<execute macro="LESASearch#assertTicketCountEqual">
-			<var name="ticketCount" value="${firstTicketCount}" />
-		</execute>
-	</command>
-
-	<command name="SearchInvalidTicket">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoTicket">
-			<var name="ticketNumber" value="CALCAS-60" />
-		</execute>
-
-		<execute macro="LESAMessage#error">
-			<var name="errorMessage" value="Invalid ticket search, please try again." />
-		</execute>
-
-		<execute macro="LESASearch#search">
-			<var name="keyword" value="QAPROJECT1-123456" />
-		</execute>
-
-		<execute macro="LESAMessage#error">
-			<var name="errorMessage" value="Invalid ticket search, please try again." />
-		</execute>
-	</command>
-
-	<command name="SearchPartnerFeedback">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterFeedbackByAssignee">
-			<var name="partner" value="${partnerName}" />
-		</execute>
-
-		<execute macro="LESASearch#searchByKeyword">
-			<var name="keyword" value="negative" />
-		</execute>
-
-		<execute macro="LESAMessage#assertNoErrorMessage">
-			<var name="message" value="An error occurred while searching.  Please try again." />
-		</execute>
-	</command>
-
-	<command name="SearchPartnersViaTicketsChooseAssignee">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#searchPartnersViaTicketsChooseAssignee">
-			<var name="managingSupport" value="Yes" />
-		</execute>
-	</command>
-
-	<command name="UpdateCustomFilter">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterTicketsByProject">
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="projectName" value="QA Test Project 2" />
-		</execute>
-
-		<execute macro="LESASearch#createCustomFilter">
-			<var name="filterName" value="QA Test Filter 4" />
-		</execute>
-
-		<execute macro="LESASearch#selectCustomFilter">
-			<var name="menuItem" value="QA Test Filter 4" />
-		</execute>
-
-		<execute macro="LESASearch#filterTicketsByStatusAndResolution">
-			<var name="status" value="On Hold" />
-		</execute>
-
-		<execute macro="LESASearch#updateCustomFilter">
-			<var name="filterName" value="QA Test Filter 4" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedProjects">
-			<var name="projectList" value="QA Test Project 2" />
-		</execute>
-
-		<execute macro="LESASearch#viewSelectedStatus">
-			<var name="statusList" value="On Hold" />
-		</execute>
-	</command>
-
-	<command name="ViewPartnerSupportProjects">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
-
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-
-		<execute macro="OSBAdminPartner#addPartnerToAccount">
-			<var name="partnerCode" value="QA Test Partner" />
-			<var name="projectCode" value="QAPROJECT2" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#viewProjectsInProjectsTab">
-			<var name="projectList" value="QAPROJECT1,QAPROJECT2" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#viewPartnerFLSProjectsFilter">
-			<var name="projectList" value="QAPROJECT1,QAPROJECT2" />
-		</execute>
-	</command>
-
-	<command name="ViewPartnerTicketSearchFilters">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#viewPartnerTicketSearchFilters" />
-	</command>
-
-	<command name="ViewTicketCountWithStatusAndResolutionFilters">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESASearch" />
-
-		<execute macro="LESASearch#filterTicketsByStatusAndResolution">
-			<var name="resolution" value="Completed" />
-			<var name="status" value="Closed" />
-		</execute>
-
-		<execute macro="LESASearch#getTicketCount">
-			<return name="firstTicketCount" />
-		</execute>
-
-		<execute macro="LESASearch#checkTicketStatus">
-			<var name="status" value="Open" />
-		</execute>
-
-		<execute macro="LESASearch#assertTicketCountNotEqual">
-			<var name="ticketCount" value="${firstTicketCount}" />
-		</execute>
-	</command>
-</definition>
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "3";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var casName = PropsUtil.get("lesa.cas.name.3");
+	var cseEmailAddress = PropsUtil.get("lesa.email.address.1");
+	var csePassword = PropsUtil.get("lesa.email.password.1");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var managerEmailAddress = PropsUtil.get("lesa.email.address.2");
+	var managerPassword = PropsUtil.get("lesa.email.password.2");
+	var partnerEmailAddress = PropsUtil.get("lesa.email.address.6");
+	var partnerName = PropsUtil.get("lesa.partner.name.6");
+	var partnerPassword = PropsUtil.get("lesa.email.password.6");
+
+	tearDown {
+		var testName = PropsUtil.get("test.name");
+		var testName = RegexUtil.replace("${testName}", "[^\.]*\.(.*)", "1");
+		var testCaseName = StringUtil.extractLast("${testName}", "#");
+
+		if ("${testCaseName}" == "CreateTicketAsCustomerAndViewWithPartnerFilter") {
+			LESAUser.logoutAndLogin(
+				userEmailAddress = "${adminEmailAddress}",
+				userPassword = "${adminPassword}"
+			);
+
+			OSBAdminProject.tearDownAssignedCustomer(
+				emailAddress = "${partnerEmailAddress}",
+				projectCode = "QAPROJECT2"
+			);
+		}
+
+		if ("${testCaseName}" == "FilterTicketsByProjectAsCustomer") {
+			LESAUser.logoutAndLogin(
+				userEmailAddress = "${adminEmailAddress}",
+				userPassword = "${adminPassword}"
+			);
+
+			OSBAdminProject.tearDownAssignedCustomer(
+				emailAddress = "${customerEmailAddress}",
+				projectCode = "QAPROJECT2"
+			);
+		}
+
+		if ("${testCaseName}" == "CreateCustomFilter") {
+			LESASearch.deleteCustomFilter(filterName = "QA Test Filter 1");
+		}
+
+		if ("${testCaseName}" == "CreateDuplicateCustomFilter") {
+			LESASearch.deleteCustomFilter(filterName = "QA Test Filter 2");
+
+			LESASearch.deleteCustomFilter(filterName = "QA Test Filter 3");
+		}
+
+		if ("${testCaseName}" == "UpdateCustomFilter") {
+			LESASearch.deleteCustomFilter(filterName = "QA Test Filter 4");
+		}
+
+		if ("${testCaseName}" == "ViewPartnerSupportProjects") {
+			LESAUser.logoutAndLogin(
+				userEmailAddress = "${adminEmailAddress}",
+				userPassword = "${adminPassword}"
+			);
+
+			OSBAdminPartner.removePartnerFromProject(projectCode = "QAPROJECT2");
+		}
+
+		LESAUser.logout();
+	}
+
+	test BulkEditAssignee {
+		LESAUser.login(
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
+
+		LESATicket.createTicketBasicForm(
+			appServer = "Weblogic 12c R1",
+			browser = "Chrome",
+			component = "Security",
+			configType = "new",
+			database = "Oracle 11g Release 2",
+			description = "QA Test for bulk editing assignee.",
+			javaVM = "Oracle Sun JDK 6",
+			liferayVersion = "6.2 EE (Limited)",
+			operatingSystem = "Ubuntu 12",
+			product = "Portal",
+			project = "QA Test Project 2",
+			server = "Production",
+			summary = "QA Test Bulk Edit Assignee",
+			systemStatus = "Functioning with Limited Capabilities"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.searchByKeyword(keyword = "&quot;QA Test Bulk Edit Assignee&quot;");
+
+		var firstTicketCount = LESASearch.getTicketCount();
+
+		LESASearch.bulkEditAssignee(
+			assignee = "QATest CSE2 (lesa.qa.cse.2@liferay.com.broken)"
+		);
+
+		LESASearch.searchByKeyword(keyword = "&quot;QA Test Bulk Edit Assignee&quot;");
+
+		LESASearch.selectFilterTicketsAssignee(assigneeList = "QATest CSE2");
+
+		LESASearch.assertTicketCountEqual(ticketCount = "${firstTicketCount}");
+	}
+
+	test BulkEditViewManagerMode {
+		LESAUser.login(
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.checkManagerMode();
+
+		LESASearch.viewManagerModeFilters();
+	}
+
+	test BulkEditViewValidationMessages {
+		LESAUser.login(
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.searchByKeyword(keyword = "QAPROJECT2");
+
+		LESASearch.checkManagerMode();
+
+		LESASearch.bulkEditSelectAll();
+
+		LESASearch.bulkEditViewDisclaimer();
+
+		LESASearch.bulkEditViewValidationMessages();
+	}
+
+	test CreateCustomFilter {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterTicketsByProject(
+			projectCode = "QAPROJECT1",
+			projectName = "QA Test Project 1"
+		);
+
+		LESASearch.filterTicketsByStatusAndResolution(status = "Solution Proposed");
+
+		LESASearch.sortByTicketNumberDescending();
+
+		LESASearch.createCustomFilter(filterName = "QA Test Filter 1");
+
+		LESASearch.selectCustomFilter(menuItem = "QA Test Filter 1");
+
+		LESASearch.viewSelectedProjects(projectList = "QA Test Project 1");
+
+		LESASearch.viewSelectedStatus(statusList = "Solution Proposed");
+
+		LESASearch.viewSelectedSort(column = "Ticket Number", sort = "down");
+	}
+
+	test CreateDuplicateCustomFilter {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.createCustomFilter(filterName = "QA Test Filter 2");
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.createDuplicateCustomFilter(
+			filterName = "QA Test Filter 2",
+			newFilterName = "QA Test Filter 3"
+		);
+
+		LESASearch.viewCustomFilters(filterNames = "QA Test Filter 2,QA Test Filter 3");
+	}
+
+	test CreateTicketAsCustomerAndViewWithPartnerFilter {
+		LESAUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
+
+		OSBAdminProject.assignCustomer(
+			emailAddress = "${partnerEmailAddress}",
+			projectCode = "QAPROJECT2",
+			role = "Developer"
+		);
+
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
+
+		var ticketNumber = LESATicket.createTicketBasicForm(
+			appServer = "Weblogic 12c R1",
+			browser = "Chrome",
+			component = "Security",
+			configType = "new",
+			database = "Oracle 11g Release 2",
+			description = "QA Test for creating a ticket as a customer and viewing it with the partner.",
+			javaVM = "Oracle Sun JDK 6",
+			liferayVersion = "6.2 EE (Limited)",
+			operatingSystem = "Ubuntu 12",
+			product = "Portal",
+			project = "QA Test Project 2",
+			server = "Production",
+			summary = "QA Test Create Ticket As Customer And View With Partner Filter",
+			systemStatus = "Functioning with Limited Capabilities"
+		);
+
+		LESATicketView.assertNotAssignedTo(name = "${partnerName}");
+
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.searchPartnersViaTicketsChooseAssignee(code = "QA Test Partner");
+
+		LESASearch.sortByTicketNumberDescending();
+
+		LESASearch.assertTicketNotInResult(ticketNumber = "${ticketNumber}");
+	}
+
+	test FilterTicketsByProjectAsCustomer {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.viewSelectedProjectSingle(project = "QA Test Project 1");
+
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
+
+		OSBAdminProject.assignCustomer(
+			emailAddress = "${customerEmailAddress}",
+			projectCode = "QAPROJECT2",
+			role = "Developer"
+		);
+
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterTicketsByProject(
+			projectCode = "QAPROJECT1",
+			projectName = "QA Test Project 1"
+		);
+
+		LESASearch.filterTicketsByProject(
+			projectCode = "QAPROJECT2",
+			projectName = "QA Test Project 2"
+		);
+
+		LESASearch.viewSelectedProjects(
+			projectList = "QA Test Project 1,QA Test Project 2"
+		);
+	}
+
+	test FilterTicketsByProjectAsPartner {
+		LESAUser.login(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterTicketsByProject(
+			projectCode = "QAPROJECT1",
+			projectName = "QA Test Project 1"
+		);
+
+		LESASearch.viewSelectedProjects(projectList = "QA Test Project 1");
+	}
+
+	test RemoveTicketAssigneeFilters {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.selectFilterTicketsAccountWorker(accountWorkerList = "${casName}");
+
+		LESASearch.viewSelectedAccountWorkers(accountWorkerList = "${casName}");
+
+		LESASearch.removeFilterTicketsAccountWorker(accountWorkerList = "${casName}");
+
+		LESASearch.selectFilterTicketsAssignee(assigneeList = "${partnerName}");
+
+		LESASearch.viewSelectedAssignees(assigneeList = "${partnerName}");
+
+		LESASearch.removeFilterTicketsAssignee(assigneeList = "${partnerName}");
+
+		LESASearch.selectFilterTicketsAccountWorker(accountWorkerList = "${casName}");
+
+		LESASearch.selectFilterTicketsAssignee(assigneeList = "${partnerName}");
+
+		Refresh();
+
+		LESASearch.removeFilterTicketsAssignee(assigneeList = "${partnerName}");
+
+		LESASearch.removeFilterTicketsAccountWorker(accountWorkerList = "${casName}");
+	}
+
+	test ReturnToSearchResults {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.search(keyword = "QAPROJECT1");
+
+		var firstTicketCount = LESASearch.getTicketCount();
+
+		LESASearch.gotoSearchResultTicket(ticketNumber = "QAPROJECT1");
+
+		LESANavigation.back();
+
+		LESASearch.assertTicketCountEqual(ticketCount = "${firstTicketCount}");
+	}
+
+	test SearchInvalidTicket {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
+
+		LESANavigation.gotoTicket(ticketNumber = "CALCAS-60");
+
+		LESAMessage.error(errorMessage = "Invalid ticket search, please try again.");
+
+		LESASearch.search(keyword = "QAPROJECT1-123456");
+
+		LESAMessage.error(errorMessage = "Invalid ticket search, please try again.");
+	}
+
+	test SearchPartnerFeedback {
+		LESAUser.login(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterFeedbackByAssignee(partner = "${partnerName}");
+
+		LESASearch.searchByKeyword(keyword = "negative");
+
+		LESAMessage.assertNoErrorMessage(
+			message = "An error occurred while searching.  Please try again."
+		);
+	}
+
+	test SearchPartnersViaTicketsChooseAssignee {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.searchPartnersViaTicketsChooseAssignee(managingSupport = "Yes");
+	}
+
+	test UpdateCustomFilter {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterTicketsByProject(
+			projectCode = "QAPROJECT2",
+			projectName = "QA Test Project 2"
+		);
+
+		LESASearch.createCustomFilter(filterName = "QA Test Filter 4");
+
+		LESASearch.selectCustomFilter(menuItem = "QA Test Filter 4");
+
+		LESASearch.filterTicketsByStatusAndResolution(status = "On Hold");
+
+		LESASearch.updateCustomFilter(filterName = "QA Test Filter 4");
+
+		LESASearch.viewSelectedProjects(projectList = "QA Test Project 2");
+
+		LESASearch.viewSelectedStatus(statusList = "On Hold");
+	}
+
+	test ViewPartnerSupportProjects {
+		LESAUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
+
+		OSBAdminNavigation.gotoOSBAdmin();
+
+		OSBAdminPartner.addPartnerToAccount(
+			partnerCode = "QA Test Partner",
+			projectCode = "QAPROJECT2"
+		);
+
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.viewProjectsInProjectsTab(projectList = "QAPROJECT1,QAPROJECT2");
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.viewPartnerFLSProjectsFilter(projectList = "QAPROJECT1,QAPROJECT2");
+	}
+
+	test ViewPartnerTicketSearchFilters {
+		LESAUser.login(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.viewPartnerTicketSearchFilters();
+	}
+
+	test ViewTicketCountWithStatusAndResolutionFilters {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
+
+		LESANavigation.gotoLESASearch();
+
+		LESASearch.filterTicketsByStatusAndResolution(
+			resolution = "Completed",
+			status = "Closed"
+		);
+
+		var firstTicketCount = LESASearch.getTicketCount();
+
+		LESASearch.checkTicketStatus(status = "Open");
+
+		LESASearch.assertTicketCountNotEqual(ticketCount = "${firstTicketCount}");
+	}
+}

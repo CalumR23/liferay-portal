@@ -1,220 +1,203 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="1" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "1";
+	var cseEmailAddress = PropsUtil.get("lesa.email.address.1");
+	var csePassword = PropsUtil.get("lesa.email.password.1");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var partnerEmailAddress = PropsUtil.get("lesa.email.address.6");
+	var partnerPassword = PropsUtil.get("lesa.email.password.6");
+	static var staticTearDownEnvironmentConfig = "";
 
-	<var method="PropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.1')" name="csePassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	setUp {
+		var staticTearDownEnvironmentConfig = "";
+	}
 
-	<var name="staticTearDownEnvironmentConfig" static="true" value="" />
+	tearDown {
+		if (!("${staticTearDownEnvironmentConfig}" == "")) {
+			var name = StringUtil.extractLast("${staticTearDownEnvironmentConfig}", ",");
+			var product = StringUtil.extractFirst("${staticTearDownEnvironmentConfig}", ",");
 
-	<set-up>
-		<var name="staticTearDownEnvironmentConfig" value="" />
-	</set-up>
+			LESAPreferences.tearDownEnvironmentConfiguration(
+				name = "${name}",
+				product = "${product}"
+			);
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownEnvironmentConfig}" arg2="" />
-			</not>
-			<then>
-				<var method="StringUtil#extractLast('${staticTearDownEnvironmentConfig}', ',')" name="name" />
-				<var method="StringUtil#extractFirst('${staticTearDownEnvironmentConfig}', ',')" name="product" />
+		LESAUser.logout();
+	}
 
-				<execute macro="LESAPreferences#tearDownEnvironmentConfiguration">
-					<var name="name" value="${name}" />
-					<var name="product" value="${product}" />
-				</execute>
-			</then>
-		</if>
+	@priority = "5"
+	test CreateAndUpdateEnvironment {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESAUser#logout" />
-	</tear-down>
+		LESANavigation.gotoLESA();
 
-	<command name="CreateAndUpdateEnvironment" priority="5">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESAPreferences.createEnvironmentConfiguration(
+			as = "Wildfly 10.0",
+			db = "MySQL 5.6",
+			jvm = "IBM JDK 8",
+			liferayVersion = "7.0",
+			name = "QA Test Environment 1",
+			os = "CentOS 6",
+			patchLevelFile = "patchinfo.txt",
+			portalExtFile = "portal-ext.properties",
+			product = "Developer Tools"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		var staticTearDownEnvironmentConfig = "Developer Tools,QA Test Environment 1";
 
-		<execute macro="LESAPreferences#createEnvironmentConfiguration">
-			<var name="as" value="Wildfly 10.0" />
-			<var name="db" value="MySQL 5.6" />
-			<var name="jvm" value="IBM JDK 8" />
-			<var name="liferayVersion" value="7.0" />
-			<var name="name" value="QA Test Environment 1" />
-			<var name="os" value="CentOS 6" />
-			<var name="patchLevelFile" value="patchinfo.txt" />
-			<var name="portalExtFile" value="portal-ext.properties" />
-			<var name="product" value="Developer Tools" />
-		</execute>
+		LESAPreferences.viewEnvironmentConfiguration(
+			contentList = "Product: Developer Tools,LR: 7.0,OS: CentOS 6,JVM: IBM JDK 8,AS: Wildfly 10.0,DB: MySQL 5.6,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt",
+			name = "QA Test Environment 1",
+			product = "Developer Tools"
+		);
 
-		<var name="staticTearDownEnvironmentConfig" value="Developer Tools,QA Test Environment 1" />
+		LESAPreferences.updateEnvironmentConfiguration(
+			as = "Tomcat 8.0",
+			db = "MySQL 5.7",
+			jvm = "OpenJDK 8",
+			liferayVersion = "7.0",
+			name = "QA Test Environment 1",
+			newName = "QA Updated Test Environment 1",
+			os = "CentOS 7",
+			patchLevelFile = "Document_1.txt",
+			portalExtFile = "Document_2.txt",
+			product = "Developer Tools"
+		);
 
-		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
-			<var name="contentList" value="Product: Developer Tools,LR: 7.0,OS: CentOS 6,JVM: IBM JDK 8,AS: Wildfly 10.0,DB: MySQL 5.6,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt" />
-			<var name="name" value="QA Test Environment 1" />
-			<var name="product" value="Developer Tools" />
-		</execute>
+		var staticTearDownEnvironmentConfig = "Developer Tools,QA Updated Test Environment 1";
 
-		<execute macro="LESAPreferences#updateEnvironmentConfiguration">
-			<var name="as" value="Tomcat 8.0" />
-			<var name="db" value="MySQL 5.7" />
-			<var name="jvm" value="OpenJDK 8" />
-			<var name="liferayVersion" value="7.0" />
-			<var name="name" value="QA Test Environment 1" />
-			<var name="newName" value="QA Updated Test Environment 1" />
-			<var name="os" value="CentOS 7" />
-			<var name="patchLevelFile" value="Document_1.txt" />
-			<var name="portalExtFile" value="Document_2.txt" />
-			<var name="product" value="Developer Tools" />
-		</execute>
+		LESAPreferences.viewEnvironmentConfiguration(
+			contentList = "Product: Developer Tools,LR: 7.0,OS: CentOS 7,JVM: OpenJDK 8,AS: Tomcat 8.0,DB: MySQL 5.7,Portal-Ext:  Document_2.txt,Patch Level:  Document_1.txt",
+			name = "QA Updated Test Environment 1",
+			product = "Developer Tools"
+		);
+	}
 
-		<var name="staticTearDownEnvironmentConfig" value="Developer Tools,QA Updated Test Environment 1" />
+	@priority = "5"
+	test CreatePortalEnvironmentViaCreateTicket {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
-			<var name="contentList" value="Product: Developer Tools,LR: 7.0,OS: CentOS 7,JVM: OpenJDK 8,AS: Tomcat 8.0,DB: MySQL 5.7,Portal-Ext:  Document_2.txt,Patch Level:  Document_1.txt" />
-			<var name="name" value="QA Updated Test Environment 1" />
-			<var name="product" value="Developer Tools" />
-		</execute>
-	</command>
+		LESANavigation.gotoLESA();
 
-	<command name="CreatePortalEnvironmentViaCreateTicket" priority="5">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESATicketCreate.newTicket();
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESATicketCreateEntry.selectProject(project = "QA Test Project 1");
 
-		<execute macro="LESATicketCreate#newTicket" />
+		LESATicketCreateEntry.selectProduct(product = "Portal");
 
-		<execute macro="LESATicketCreateEntry#selectProject">
-			<var name="project" value="QA Test Project 1" />
-		</execute>
+		LESATicketCreateEntry.selectServer(server = "Production");
 
-		<execute macro="LESATicketCreateEntry#selectProduct">
-			<var name="product" value="Portal" />
-		</execute>
+		LESATicketCreateEntry.selectComponent(component = "Upgrade");
 
-		<execute macro="LESATicketCreateEntry#selectServer">
-			<var name="server" value="Production" />
-		</execute>
+		LESATicketCreate.createEnvironmentConfiguration(
+			appServer = "Glassfish 3.1",
+			database = "Hypersonic",
+			envName = "QA Test Environment 2",
+			javaVM = "Oracle Sun JDK 6",
+			liferayVersion = "6.1 GA3 (Limited)",
+			operatingSystem = "CentOS 6"
+		);
 
-		<execute macro="LESATicketCreateEntry#selectComponent">
-			<var name="component" value="Upgrade" />
-		</execute>
+		var staticTearDownEnvironmentConfig = "Portal,QA Test Environment 2";
 
-		<execute macro="LESATicketCreate#createEnvironmentConfiguration">
-			<var name="appServer" value="Glassfish 3.1" />
-			<var name="database" value="Hypersonic" />
-			<var name="envName" value="QA Test Environment 2" />
-			<var name="javaVM" value="Oracle Sun JDK 6" />
-			<var name="liferayVersion" value="6.1 GA3 (Limited)" />
-			<var name="operatingSystem" value="CentOS 6" />
-		</execute>
+		LESANavigation.gotoEnvironmentConfigurations();
 
-		<var name="staticTearDownEnvironmentConfig" value="Portal,QA Test Environment 2" />
+		LESATicketCreateEntry.selectProject(project = "QA Test Project 1");
 
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+		LESAPreferences.viewEnvironmentConfiguration(
+			contentList = "Product: Portal Production,LR: 6.1 GA3,OS: CentOS 6,JVM: Oracle Sun JDK 6,AS: Glassfish 3.1,DB: Hypersonic,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt",
+			name = "QA Test Environment 2",
+			product = "Portal"
+		);
+	}
 
-		<execute macro="LESATicketCreateEntry#selectProject">
-			<var name="project" value="QA Test Project 1" />
-		</execute>
+	@priority = "5"
+	test UpdateEnvironmentViaCreateTicket {
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
-			<var name="contentList" value="Product: Portal Production,LR: 6.1 GA3,OS: CentOS 6,JVM: Oracle Sun JDK 6,AS: Glassfish 3.1,DB: Hypersonic,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt" />
-			<var name="name" value="QA Test Environment 2" />
-			<var name="product" value="Portal" />
-		</execute>
-	</command>
+		LESANavigation.gotoLESA();
 
-	<command name="UpdateEnvironmentViaCreateTicket" priority="5">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESAPreferences.createEnvironmentConfiguration(
+			as = "Tomcat 8.5",
+			db = "DB2 9.7",
+			jvm = "IBM JDK 8",
+			liferayVersion = "7.0",
+			name = "QA Test Environment 3",
+			os = "Oracle Linux 6",
+			patchLevelFile = "patchinfo.txt",
+			portalExtFile = "portal-ext.properties",
+			product = "Management Tools (LCS)"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		var staticTearDownEnvironmentConfig = "Management Tools (LCS),QA Test Environment 3";
 
-		<execute macro="LESAPreferences#createEnvironmentConfiguration">
-			<var name="as" value="Tomcat 8.5" />
-			<var name="db" value="DB2 9.7" />
-			<var name="jvm" value="IBM JDK 8" />
-			<var name="liferayVersion" value="7.0" />
-			<var name="name" value="QA Test Environment 3" />
-			<var name="os" value="Oracle Linux 6" />
-			<var name="patchLevelFile" value="patchinfo.txt" />
-			<var name="portalExtFile" value="portal-ext.properties" />
-			<var name="product" value="Management Tools (LCS)" />
-		</execute>
+		LESATicketCreate.newTicket();
 
-		<var name="staticTearDownEnvironmentConfig" value="Management Tools (LCS),QA Test Environment 3" />
+		LESATicketCreateEntry.selectProduct(product = "Management Tools (LCS)");
 
-		<execute macro="LESATicketCreate#newTicket" />
+		LESATicketCreateEntry.selectComponent(component = "LCS Client");
 
-		<execute macro="LESATicketCreateEntry#selectProduct">
-			<var name="product" value="Management Tools (LCS)" />
-		</execute>
+		LESATicketCreateEntry.selectSavedConfig(
+			savedEnvConfigName = "QA Test Environment 3"
+		);
 
-		<execute macro="LESATicketCreateEntry#selectComponent">
-			<var name="component" value="LCS Client" />
-		</execute>
+		LESATicketCreateEntry.updateEnvironment(
+			appServer = "Tomcat 8.0",
+			database = "MySQL 5.7",
+			envName = "QA Test Environment 3",
+			javaVM = "OpenJDK 8",
+			liferayVersion = "7.0",
+			operatingSystem = "Debian 8"
+		);
 
-		<execute macro="LESATicketCreateEntry#selectSavedConfig">
-			<var name="savedEnvConfigName" value="QA Test Environment 3" />
-		</execute>
+		LESANavigation.gotoEnvironmentConfigurations();
 
-		<execute macro="LESATicketCreateEntry#updateEnvironment">
-			<var name="appServer" value="Tomcat 8.0" />
-			<var name="database" value="MySQL 5.7" />
-			<var name="envName" value="QA Test Environment 3" />
-			<var name="javaVM" value="OpenJDK 8" />
-			<var name="liferayVersion" value="7.0" />
-			<var name="operatingSystem" value="Debian 8" />
-		</execute>
+		LESAPreferences.viewEnvironmentConfiguration(
+			contentList = "Product: Management Tools (LCS),LR: 7.0,OS: Debian 8,JVM: OpenJDK 8,AS: Tomcat 8.0,DB: MySQL 5.7,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt",
+			name = "QA Test Environment 3",
+			product = "Management Tools (LCS)"
+		);
+	}
 
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+	@priority = "4"
+	test ViewNoSavedEnvironmentMessage {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-		<execute macro="LESAPreferences#viewEnvironmentConfiguration">
-			<var name="contentList" value="Product: Management Tools (LCS),LR: 7.0,OS: Debian 8,JVM: OpenJDK 8,AS: Tomcat 8.0,DB: MySQL 5.7,Portal-Ext:  portal-ext.properties,Patch Level:  patchinfo.txt" />
-			<var name="name" value="QA Test Environment 3" />
-			<var name="product" value="Management Tools (LCS)" />
-		</execute>
-	</command>
+		LESANavigation.gotoLESA();
 
-	<command name="ViewNoSavedEnvironmentMessage" priority="4">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+		LESANavigation.gotoEnvironmentConfigurations();
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESATicketCreateEntry.selectProject(project = "QA Test Project 2");
 
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+		LESAMessage.info(
+			message = "There are no saved environment configurations for this product."
+		);
+	}
 
-		<execute macro="LESATicketCreateEntry#selectProject">
-			<var name="project" value="QA Test Project 2" />
-		</execute>
+	@priority = "5"
+	test ViewNoSavedEnvironmentTab {
+		LESAUser.login(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
 
-		<execute macro="LESAMessage#info">
-			<var name="message" value="There are no saved environment configurations for this product." />
-		</execute>
-	</command>
+		LESANavigation.gotoLESA();
 
-	<command name="ViewNoSavedEnvironmentTab" priority="5">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESA" />
-
-		<execute macro="LESAPreferences#assertNoEnvironmentConfigurationsTab" />
-	</command>
-</definition>
+		LESAPreferences.assertNoEnvironmentConfigurationsTab();
+	}
+}

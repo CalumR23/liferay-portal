@@ -1,196 +1,176 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="2" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "2";
+	var cseEmailAddress = PropsUtil.get("lesa.email.address.1");
+	var csePassword = PropsUtil.get("lesa.email.password.1");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var managerEmailAddress = PropsUtil.get("lesa.email.address.2");
+	var managerName = PropsUtil.get("lesa.manager.name.2");
+	var managerPassword = PropsUtil.get("lesa.email.password.2");
+	var browser = "Firefox";
+	var component = "Document Library";
+	var product = "Portal";
+	var project = "QA Test Project 1";
+	var savedEnvConfigName = "QA Config 6.2";
+	var server = "Production";
+	var systemStatus = "Completely Inoperable/Shutdown";
 
-	<var method="PropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.1')" name="csePassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.2')" name="managerEmailAddress" />
-	<var method="PropsUtil#get('lesa.manager.name.2')" name="managerName" />
-	<var method="PropsUtil#get('lesa.email.password.2')" name="managerPassword" />
+	test CompleteAllWorkflowSteps {
+		property lesa.acceptance = "true";
 
-	<var name="browser" value="Firefox" />
-	<var name="component" value="Document Library" />
-	<var name="product" value="Portal" />
-	<var name="project" value="QA Test Project 1" />
-	<var name="savedEnvConfigName" value="QA Config 6.2" />
-	<var name="server" value="Production" />
-	<var name="systemStatus" value="Completely Inoperable/Shutdown" />
+		LESAUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-	<command name="CompleteAllWorkflowSteps">
-		<property name="lesa.acceptance" value="true" />
+		var ticketNumber = LESATicket.createTicketBasicForm(
+			appServer = "Weblogic 12c R1",
+			browser = "${browser}",
+			component = "Security",
+			configType = "new",
+			database = "Oracle 11g Release 2",
+			description = "QA Test for transitioning a ticket through every step of workflow.",
+			javaVM = "Oracle Sun JDK 6",
+			liferayVersion = "6.2 EE (Limited)",
+			operatingSystem = "Ubuntu 12",
+			product = "${product}",
+			project = "${project}",
+			server = "${server}",
+			summary = "QA Test Complete All Workflow Steps",
+			systemStatus = "${systemStatus}"
+		);
 
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESATicketView.viewTicketStatus(status = "Open");
 
-		<execute macro="LESATicket#createTicketBasicForm">
-			<return name="ticketNumber" />
-			<var name="appServer" value="Weblogic 12c R1" />
-			<var name="browser" value="${browser}" />
-			<var name="component" value="Security" />
-			<var name="configType" value="new" />
-			<var name="database" value="Oracle 11g Release 2" />
-			<var name="description" value="QA Test for transitioning a ticket through every step of workflow." />
-			<var name="javaVM" value="Oracle Sun JDK 6" />
-			<var name="liferayVersion" value="6.2 EE (Limited)" />
-			<var name="operatingSystem" value="Ubuntu 12" />
-			<var name="product" value="${product}" />
-			<var name="project" value="${project}" />
-			<var name="server" value="${server}" />
-			<var name="summary" value="QA Test Complete All Workflow Steps" />
-			<var name="systemStatus" value="${systemStatus}" />
-		</execute>
+		LESANavigation.gotoTicketAsDifferentUser(
+			ticketNumber = "${ticketNumber}",
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="Open" />
-		</execute>
+		LESATicketTransition.workflowTicket(workflowStep = "Diagnose");
 
-		<execute macro="LESANavigation#gotoTicketAsDifferentUser">
-			<var name="ticketNumber" value="${ticketNumber}" />
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
+		LESATicketView.viewTicketStatus(status = "In Diagnosis");
 
-		<execute macro="LESATicketTransition#workflowTicket">
-			<var name="workflowStep" value="Diagnose" />
-		</execute>
+		LESATicketTransition.changeTicketStatus(
+			currentStatus = "In Diagnosis",
+			newStatus = "On Hold"
+		);
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="In Diagnosis" />
-		</execute>
+		LESATicketTransition.workflowTicket(workflowStep = "Resume");
 
-		<execute macro="LESATicketTransition#changeTicketStatus">
-			<var name="currentStatus" value="In Diagnosis" />
-			<var name="newStatus" value="On Hold" />
-		</execute>
+		LESATicketTransition.reproduceSteps(steps = "Ticket reproduction steps here...");
 
-		<execute macro="LESATicketTransition#workflowTicket">
-			<var name="workflowStep" value="Resume" />
-		</execute>
+		LESATicketView.viewTicketStatus(status = "Resolution Planning");
 
-		<execute macro="LESATicketTransition#reproduceSteps">
-			<var name="steps" value="Ticket reproduction steps here..." />
-		</execute>
+		LESATicketTransition.workflowTicket(workflowStep = "Propose Solution");
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="Resolution Planning" />
-		</execute>
+		LESATicketSolution.proposeSolution(
+			solutionDescription = "Test solution",
+			subcomponent = "Cookies"
+		);
 
-		<execute macro="LESATicketTransition#workflowTicket">
-			<var name="workflowStep" value="Propose Solution" />
-		</execute>
+		LESATicketView.viewTicketStatus(status = "Solution Proposed");
 
-		<execute macro="LESATicketSolution#proposeSolution">
-			<var name="solutionDescription" value="Test solution" />
-			<var name="subcomponent" value="Cookies" />
-		</execute>
+		LESATicketTransition.changeTicketStatus(
+			currentStatus = "Solution Proposed",
+			newStatus = "Solution Delivered"
+		);
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="Solution Proposed" />
-		</execute>
+		LESANavigation.gotoTicketAsDifferentUser(
+			ticketNumber = "${ticketNumber}",
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESATicketTransition#changeTicketStatus">
-			<var name="currentStatus" value="Solution Proposed" />
-			<var name="newStatus" value="Solution Delivered" />
-		</execute>
+		LESATicketSolution.acceptSolution();
+	}
 
-		<execute macro="LESANavigation#gotoTicketAsDifferentUser">
-			<var name="ticketNumber" value="${ticketNumber}" />
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+	test CompleteTicketClosedPendingCustomer {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-		<execute macro="LESATicketSolution#acceptSolution" />
-	</command>
+		var ticketNumber = LESATicket.createTicketBasicForm(
+			browser = "${browser}",
+			component = "${component}",
+			configType = "saved",
+			description = "QA Test for completing a ticket with status Closed (Pending Customer).",
+			product = "${product}",
+			project = "${project}",
+			savedEnvConfigName = "${savedEnvConfigName}",
+			server = "${server}",
+			summary = "QA Test Complete Ticket Closed Pending Customer",
+			systemStatus = "${systemStatus}"
+		);
 
-	<command name="CompleteTicketClosedPendingCustomer">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+		LESANavigation.gotoTicketAsDifferentUser(
+			ticketNumber = "${ticketNumber}",
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
 
-		<execute macro="LESATicket#createTicketBasicForm">
-			<return name="ticketNumber" />
-			<var name="browser" value="${browser}" />
-			<var name="component" value="${component}" />
-			<var name="configType" value="saved" />
-			<var name="description" value="QA Test for completing a ticket with status Closed (Pending Customer)." />
-			<var name="product" value="${product}" />
-			<var name="project" value="${project}" />
-			<var name="savedEnvConfigName" value="${savedEnvConfigName}" />
-			<var name="server" value="${server}" />
-			<var name="summary" value="QA Test Complete Ticket Closed Pending Customer" />
-			<var name="systemStatus" value="${systemStatus}" />
-		</execute>
+		LESATicketTransition.changeTicketStatus(
+			currentStatus = "Open",
+			newStatus = "Closed",
+			resolution = "Pending Customer"
+		);
 
-		<execute macro="LESANavigation#gotoTicketAsDifferentUser">
-			<var name="ticketNumber" value="${ticketNumber}" />
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
+		LESANavigation.gotoTicketAsDifferentUser(
+			ticketNumber = "${ticketNumber}",
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESATicketTransition#changeTicketStatus">
-			<var name="currentStatus" value="Open" />
-			<var name="newStatus" value="Closed" />
-			<var name="resolution" value="Pending Customer" />
-		</execute>
+		LESATicketTransition.completeTicket();
 
-		<execute macro="LESANavigation#gotoTicketAsDifferentUser">
-			<var name="ticketNumber" value="${ticketNumber}" />
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESAUser.logout();
+	}
 
-		<execute macro="LESATicketTransition#completeTicket" />
+	test ForwardTicket {
+		property lesa.acceptance = "true";
 
-		<execute macro="LESAUser#logout" />
-	</command>
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-	<command name="ForwardTicket">
-		<property name="lesa.acceptance" value="true" />
+		var ticketNumber = LESATicket.createTicketBasicForm(
+			browser = "${browser}",
+			component = "${component}",
+			configType = "saved",
+			description = "QA Test for forwarding a ticket.",
+			product = "${product}",
+			project = "${project}",
+			savedEnvConfigName = "${savedEnvConfigName}",
+			server = "${server}",
+			summary = "QA Test Forward Ticket",
+			systemStatus = "${systemStatus}"
+		);
 
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+		LESANavigation.gotoTicketAsDifferentUser(
+			ticketNumber = "${ticketNumber}",
+			userEmailAddress = "${managerEmailAddress}",
+			userPassword = "${managerPassword}"
+		);
 
-		<execute macro="LESATicket#createTicketBasicForm">
-			<return name="ticketNumber" />
-			<var name="browser" value="${browser}" />
-			<var name="component" value="${component}" />
-			<var name="configType" value="saved" />
-			<var name="description" value="QA Test for forwarding a ticket." />
-			<var name="product" value="${product}" />
-			<var name="project" value="${project}" />
-			<var name="savedEnvConfigName" value="${savedEnvConfigName}" />
-			<var name="server" value="${server}" />
-			<var name="summary" value="QA Test Forward Ticket" />
-			<var name="systemStatus" value="${systemStatus}" />
-		</execute>
+		LESATicketTransition.assignWorker(
+			emailAddress = "${managerEmailAddress}",
+			name = "${managerName}",
+			role = "Manager"
+		);
 
-		<execute macro="LESANavigation#gotoTicketAsDifferentUser">
-			<var name="ticketNumber" value="${ticketNumber}" />
-			<var name="userEmailAddress" value="${managerEmailAddress}" />
-			<var name="userPassword" value="${managerPassword}" />
-		</execute>
+		LESATicketTransition.forwardTicket(
+			customerNextSteps = "Customer next steps.",
+			mainGoal = "Main goal.",
+			name = "${managerName}",
+			nextRegionNextSteps = "Next region next steps.",
+			workDone = "Work done."
+		);
 
-		<execute macro="LESATicketTransition#assignWorker">
-			<var name="emailAddress" value="${managerEmailAddress}" />
-			<var name="name" value="${managerName}" />
-			<var name="role" value="Manager" />
-		</execute>
-
-		<execute macro="LESATicketTransition#forwardTicket">
-			<var name="customerNextSteps" value="Customer next steps." />
-			<var name="mainGoal" value="Main goal." />
-			<var name="name" value="${managerName}" />
-			<var name="nextRegionNextSteps" value="Next region next steps." />
-			<var name="workDone" value="Work done." />
-		</execute>
-
-		<execute macro="LESAUser#logout" />
-	</command>
-</definition>
+		LESAUser.logout();
+	}
+}

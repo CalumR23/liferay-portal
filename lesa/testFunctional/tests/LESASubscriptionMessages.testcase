@@ -1,185 +1,169 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
-	<property name="group" value="3" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	property group = "3";
+	var adminEmailAddress = PropsUtil.get("lesa.email.address.7");
+	var adminPassword = PropsUtil.get("lesa.email.password.7");
+	var cseEmailAddress = PropsUtil.get("lesa.email.address.1");
+	var csePassword = PropsUtil.get("lesa.email.password.1");
+	var customerEmailAddress = PropsUtil.get("lesa.email.address.4");
+	var customerName = PropsUtil.get("lesa.customer.name.4");
+	var customerPassword = PropsUtil.get("lesa.email.password.4");
+	var partnerEmailAddress = PropsUtil.get("lesa.email.address.6");
+	var partnerPassword = PropsUtil.get("lesa.email.password.6");
 
-	<var method="PropsUtil#get('lesa.email.address.7')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.7')" name="adminPassword" />
-	<var method="PropsUtil#get('lesa.email.address.1')" name="cseEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.1')" name="csePassword" />
-	<var method="PropsUtil#get('lesa.email.address.4')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('lesa.customer.name.4')" name="customerName" />
-	<var method="PropsUtil#get('lesa.email.password.4')" name="customerPassword" />
-	<var method="PropsUtil#get('lesa.email.address.6')" name="partnerEmailAddress" />
-	<var method="PropsUtil#get('lesa.email.password.6')" name="partnerPassword" />
+	tearDown {
+		var testName = PropsUtil.get("test.name");
+		var testName = RegexUtil.replace("${testName}", "[^\.]*\.(.*)", "1");
+		var testCaseName = StringUtil.extractLast("${testName}", "#");
 
-	<tear-down>
-		<var method="PropsUtil#get('test.name')" name="testName" />
+		if ("${testCaseName}" == "AddAndViewProjectMessage") {
+			LESAUser.logoutAndLogin(
+				userEmailAddress = "${adminEmailAddress}",
+				userPassword = "${adminPassword}"
+			);
 
-		<var method="RegexUtil#replace('${testName}', '[^\.]*\.(.*)', '1')" name="testName" />
+			ProjectAdminMessage.tearDownProjectMessage(
+				message = "This is a test QA message.",
+				projectCode = "QAPROJECT1"
+			);
+		}
 
-		<var method="StringUtil#extractLast('${testName}', '#')" name="testCaseName" />
+		if ("${testCaseName}" == "ViewMessageIcon") {
+			LESAUser.logoutAndLogin(
+				userEmailAddress = "${adminEmailAddress}",
+				userPassword = "${adminPassword}"
+			);
 
-		<if>
-			<equals arg1="${testCaseName}" arg2="AddAndViewProjectMessage" />
-			<then>
-				<execute macro="LESAUser#logoutAndLogin">
-					<var name="userEmailAddress" value="${adminEmailAddress}" />
-					<var name="userPassword" value="${adminPassword}" />
-				</execute>
+			OSBAdminProject.deleteCustomers(projectCode = "QAPROJECT2");
+		}
+	}
 
-				<execute macro="ProjectAdminMessage#tearDownProjectMessage">
-					<var name="message" value="This is a test QA message." />
-					<var name="projectCode" value="QAPROJECT1" />
-				</execute>
-			</then>
-		</if>
+	test AddAndViewProjectMessage {
+		LESAUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-		<if>
-			<equals arg1="${testCaseName}" arg2="ViewMessageIcon" />
-			<then>
-				<execute macro="LESAUser#logoutAndLogin">
-					<var name="userEmailAddress" value="${adminEmailAddress}" />
-					<var name="userPassword" value="${adminPassword}" />
-				</execute>
+		LESANavigation.gotoProjectAdminMessages(projectCode = "QAPROJECT1");
 
-				<execute macro="OSBAdminProject#deleteCustomers">
-					<var name="projectCode" value="QAPROJECT2" />
-				</execute>
-			</then>
-		</if>
-	</tear-down>
+		ProjectAdminMessage.addProjectMessage(
+			message = "This is a test QA message.",
+			severity = "Urgent",
+			title = "QA Test"
+		);
 
-	<command name="AddAndViewProjectMessage">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoProjectAdminMessages">
-			<var name="projectCode" value="QAPROJECT1" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="ProjectAdminMessage#addProjectMessage">
-			<var name="message" value="This is a test QA message." />
-			<var name="severity" value="Urgent" />
-			<var name="title" value="QA Test" />
-		</execute>
+		LESASubscriptionMessages.viewProjectMessage(
+			message = "This is a test QA message.",
+			projectName = "QA Test Project 1",
+			severity = "urgent",
+			title = "QA Test"
+		);
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESANavigation.gotoProjectAdminMessages(projectCode = "QAPROJECT1");
 
-		<execute macro="LESASubscriptionMessages#viewProjectMessage">
-			<var name="message" value="This is a test QA message." />
-			<var name="projectName" value="QA Test Project 1" />
-			<var name="severity" value="urgent" />
-			<var name="title" value="QA Test" />
-		</execute>
+		ProjectAdminMessage.deleteProjectMessage(message = "This is a test QA message.");
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoProjectAdminMessages">
-			<var name="projectCode" value="QAPROJECT1" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="ProjectAdminMessage#deleteProjectMessage">
-			<var name="message" value="This is a test QA message." />
-		</execute>
+		LESASubscriptionMessages.viewProjectMessageNotPresent(
+			projectName = "QA Test Project 1",
+			title = "QA Test"
+		);
+	}
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+	test ViewMessageIcon {
+		LESAUser.login(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="LESASubscriptionMessages#viewProjectMessageNotPresent">
-			<var name="projectName" value="QA Test Project 1" />
-			<var name="title" value="QA Test" />
-		</execute>
-	</command>
+		LESASubscriptionMessages.viewMessageIconNotPresent();
 
-	<command name="ViewMessageIcon">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="LESASubscriptionMessages#viewMessageIconNotPresent" />
+		LESASubscriptionMessages.viewMessageIconNotPresent();
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		OSBAdminNavigation.gotoOSBAdmin();
 
-		<execute macro="LESASubscriptionMessages#viewMessageIconNotPresent" />
+		OSBAdminProject.assignCustomer(
+			emailAddress = "${partnerEmailAddress}",
+			projectCode = "QAPROJECT2",
+			role = "Developer"
+		);
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+		OSBAdminProject.assignCustomer(
+			emailAddress = "${cseEmailAddress}",
+			projectCode = "QAPROJECT2",
+			role = "Watcher"
+		);
 
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${partnerEmailAddress}",
+			userPassword = "${partnerPassword}"
+		);
 
-		<execute macro="OSBAdminProject#assignCustomer">
-			<var name="emailAddress" value="${partnerEmailAddress}" />
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="role" value="Developer" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="OSBAdminProject#assignCustomer">
-			<var name="emailAddress" value="${cseEmailAddress}" />
-			<var name="projectCode" value="QAPROJECT2" />
-			<var name="role" value="Watcher" />
-		</execute>
+		LESASubscriptionMessages.viewMessageIcon();
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${partnerEmailAddress}" />
-			<var name="userPassword" value="${partnerPassword}" />
-		</execute>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${cseEmailAddress}",
+			userPassword = "${csePassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		LESANavigation.gotoLESA();
 
-		<execute macro="LESASubscriptionMessages#viewMessageIcon" />
+		LESASubscriptionMessages.viewMessageIcon();
+	}
 
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${cseEmailAddress}" />
-			<var name="userPassword" value="${csePassword}" />
-		</execute>
+	test ViewNoProjectMessages {
+		LESAUser.login(
+			userEmailAddress = "${adminEmailAddress}",
+			userPassword = "${adminPassword}"
+		);
 
-		<execute macro="LESANavigation#gotoLESA" />
+		ProjectAdminMessage.tearDownProjectMessage(
+			message = "",
+			projectCode = "QAPROJECT1"
+		);
 
-		<execute macro="LESASubscriptionMessages#viewMessageIcon" />
-	</command>
+		LESAUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-	<command name="ViewNoProjectMessages">
-		<execute macro="LESAUser#login">
-			<var name="userEmailAddress" value="${adminEmailAddress}" />
-			<var name="userPassword" value="${adminPassword}" />
-		</execute>
+		LESANavigation.gotoLESA();
 
-		<execute macro="ProjectAdminMessage#tearDownProjectMessage">
-			<var name="message" value="" />
-			<var name="projectCode" value="QAPROJECT1" />
-		</execute>
-
-		<execute macro="LESAUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
-
-		<execute macro="LESANavigation#gotoLESA" />
-
-		<execute macro="LESASubscriptionMessages#viewNoProjectMessages" />
-	</command>
-</definition>
+		LESASubscriptionMessages.viewNoProjectMessages();
+	}
+}
