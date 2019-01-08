@@ -1,94 +1,89 @@
-<definition>
-	<command name="assertMDFRequest">
-		<var name="key_mdfRequest" value="${partnerMDFRequestID}" />
-		<var method="StringUtil#upperCase('${partnerMDFRequestStatus}')" name="partnerMDFRequestStatus" />
+definition {
+	macro assertMDFRequest {
+		var key_mdfRequest = "${partnerMDFRequestID}";
+		var partnerMDFRequestStatus = StringUtil.upperCase("${partnerMDFRequestStatus}");
 
-		<execute macro="Partner#findRowID">
-			<var name="rowID" value="${partnerMDFRequestID}" />
-		</execute>
+		Partner.findRowID(rowID = "${partnerMDFRequestID}");
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerMarketingMDF#MDF_REQUEST_STATUS" value1="${partnerMDFRequestStatus}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerMarketingMDF#MDF_REQUEST_FUNDING_PERIOD" value1="${partnerMDFRequestFundingPeriod}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerMarketingMDF#MDF_REQUEST_TOTAL_COST" value1="${partnerMDFRequestTotalCost}" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="PartnerMarketingMDF#MDF_REQUEST_AMOUNT_REQUESTED" value1="${partnerMDFRequestAmountRequested}" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "PartnerMarketingMDF#MDF_REQUEST_STATUS",
+			value1 = "${partnerMDFRequestStatus}"
+		);
 
-		<if>
-			<and>
-				<isset var="partnerMDFClaimID" />
-				<isset var="partnerMDFClaimStatus" />
-			</and>
-			<then>
-				<execute function="AssertTextEquals#assertPartialText" locator1="PartnerMarketingMDF#MDF_REQUEST_REIMBURSEMENT_CLAIMS" value1="Claim-${partnerMDFClaimID}: ${partnerMDFClaimStatus}" />
-			</then>
-		</if>
-	</command>
+		AssertTextEquals.assertPartialText(
+			locator1 = "PartnerMarketingMDF#MDF_REQUEST_FUNDING_PERIOD",
+			value1 = "${partnerMDFRequestFundingPeriod}"
+		);
 
-	<command name="clickMDFRequest">
-		<var name="key_mdfRequest" value="${partnerMDFRequestID}" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "PartnerMarketingMDF#MDF_REQUEST_TOTAL_COST",
+			value1 = "${partnerMDFRequestTotalCost}"
+		);
 
-		<execute macro="Partner#findRowID">
-			<var name="rowID" value="${partnerMDFRequestID}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "PartnerMarketingMDF#MDF_REQUEST_AMOUNT_REQUESTED",
+			value1 = "${partnerMDFRequestAmountRequested}"
+		);
 
-		<execute function="Click" locator1="PartnerMarketingMDF#MDF_REQUEST_ID" />
-	</command>
+		if ((isSet(partnerMDFClaimID)) && (isSet(partnerMDFClaimStatus))) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "PartnerMarketingMDF#MDF_REQUEST_REIMBURSEMENT_CLAIMS",
+				value1 = "Claim-${partnerMDFClaimID}: ${partnerMDFClaimStatus}"
+			);
+		}
+	}
 
-	<command name="clickNewMDFRequestButton">
-		<execute function="Click" locator1="PartnerMarketingMDF#NEW_MDF_REQUEST_BUTTON" />
-	</command>
+	macro clickMDFRequest {
+		var key_mdfRequest = "${partnerMDFRequestID}";
 
-	<command name="deleteMDFRequestConflict">
-		<var name="key_mdfRequest" value="${partnerMDFRequestFundingPeriod}" />
+		Partner.findRowID(rowID = "${partnerMDFRequestID}");
 
-		<execute macro="Partner#gotoMarketingMDF">
-			<var name="roleName" value="${roleName}" />
-		</execute>
+		Click(locator1 = "PartnerMarketingMDF#MDF_REQUEST_ID");
+	}
 
-		<execute macro="Partner#gotoTab">
-			<var name="tabName" value="Active" />
-		</execute>
+	macro clickNewMDFRequestButton {
+		Click(locator1 = "PartnerMarketingMDF#NEW_MDF_REQUEST_BUTTON");
+	}
 
-		<if>
-			<condition function="IsElementNotPresent" locator1="PartnerMarketingMDF#MDF_REQUEST_ID" />
-			<then>
-				<execute macro="Partner#gotoMarketingMDF">
-					<var name="roleName" value="${roleName}" />
-				</execute>
+	macro deleteMDFRequestConflict {
+		var key_mdfRequest = "${partnerMDFRequestFundingPeriod}";
 
-				<execute macro="Partner#gotoTab">
-					<var name="tabName" value="Completed" />
-				</execute>
-			</then>
-		</if>
+		Partner.gotoMarketingMDF(roleName = "${roleName}");
 
-		<execute function="AssertElementPresent" locator1="PartnerMarketingMDF#MDF_REQUEST_ID" />
+		Partner.gotoTab(tabName = "Active");
 
-		<var method="selenium#getText('PartnerMarketingMDF#MDF_REQUEST_ID')" name="conflictID" />
+		if (IsElementNotPresent(locator1 = "PartnerMarketingMDF#MDF_REQUEST_ID")) {
+			Partner.gotoMarketingMDF(roleName = "${roleName}");
 
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${conflictID}" />
-		</execute>
-	</command>
+			Partner.gotoTab(tabName = "Completed");
+		}
 
-	<command name="duplicateMDFRequest">
-		<var name="key_mdfRequest" value="${partnerMDFRequestID}" />
-		<var name="key_option" value="Duplicate" />
+		AssertElementPresent(locator1 = "PartnerMarketingMDF#MDF_REQUEST_ID");
 
-		<execute function="Click" locator1="PartnerMarketingMDF#MDF_REQUEST_OPTIONS" />
+		var conflictID = selenium.getText("PartnerMarketingMDF#MDF_REQUEST_ID");
 
-		<execute function="Click" locator1="Partner#DROPDOWN_OPTION" />
-	</command>
+		PartnerWorkflow.deleteMDFRequest(partnerMDFRequestID = "${conflictID}");
+	}
 
-	<command name="viewMDFRequestOptions">
-		<var name="key_mdfRequest" value="${partnerMDFRequestID}" />
+	macro duplicateMDFRequest {
+		var key_mdfRequest = "${partnerMDFRequestID}";
+		var key_option = "Duplicate";
 
-		<execute function="Click" locator1="PartnerMarketingMDF#MDF_REQUEST_OPTIONS" />
+		Click(locator1 = "PartnerMarketingMDF#MDF_REQUEST_OPTIONS");
 
-		<execute macro="Partner#viewDropdownOptions">
-			<var name="partnerNoOptionsList" value="${partnerNoOptionsList}" />
-			<var name="partnerOptionsList" value="${partnerOptionsList}" />
-		</execute>
+		Click(locator1 = "Partner#DROPDOWN_OPTION");
+	}
 
-		<execute function="Click" locator1="PartnerMarketingMDF#MDF_REQUEST_OPTIONS" />
-	</command>
-</definition>
+	macro viewMDFRequestOptions {
+		var key_mdfRequest = "${partnerMDFRequestID}";
+
+		Click(locator1 = "PartnerMarketingMDF#MDF_REQUEST_OPTIONS");
+
+		Partner.viewDropdownOptions(
+			partnerNoOptionsList = "${partnerNoOptionsList}",
+			partnerOptionsList = "${partnerOptionsList}"
+		);
+
+		Click(locator1 = "PartnerMarketingMDF#MDF_REQUEST_OPTIONS");
+	}
+}

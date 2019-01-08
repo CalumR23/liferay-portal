@@ -1,107 +1,96 @@
-<definition>
-	<command name="deleteActivityPOPs">
-		<var name="key_mdfClaimActivity" value="${partnerMDFClaimActivity}" />
+definition {
+	macro deleteActivityPOPs {
+		var key_mdfClaimActivity = "${partnerMDFClaimActivity}";
 
-		<for list="${partnerMDFClaimLabels}" param="partnerMDFClaimLabel">
-			<var name="key_mdfClaimPOP" value="" />
-			<var name="key_mdfClaimPOPLabel" value="${partnerMDFClaimLabel}" />
+		for (var partnerMDFClaimLabel : list "${partnerMDFClaimLabels}") {
+			var key_mdfClaimPOP = "";
+			var key_mdfClaimPOPLabel = "${partnerMDFClaimLabel}";
 
-			<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_DELETE_UPLOAD" />
-		</for>
-	</command>
+			Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_DELETE_UPLOAD");
+		}
+	}
 
-	<command name="deleteInvoiceUpload">
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_INVOICE_DELETE_UPLOAD" />
-	</command>
+	macro deleteInvoiceUpload {
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_INVOICE_DELETE_UPLOAD");
+	}
 
-	<command name="fillGeneralInformation">
-		<var name="key_mdfClaimType" value="${partnerMDFClaimType}" />
+	macro fillGeneralInformation {
+		var key_mdfClaimType = "${partnerMDFClaimType}";
 
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_TYPE" />
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_TYPE");
 
-		<execute macro="PartnerMDFClaimForm#uploadInvoice">
-			<var name="partnerMDFClaimInvoice" value="${partnerMDFClaimInvoice}" />
-		</execute>
+		PartnerMDFClaimForm.uploadInvoice(
+			partnerMDFClaimInvoice = "${partnerMDFClaimInvoice}"
+		);
 
-		<if>
-			<and>
-				<isset var="partnerMDFClaimActivities" />
-				<not>
-					<contains string="${partnerMDFClaimActivities}" substring="{partnerMDFClaimActivities}" />
-				</not>
-			</and>
-			<then>
-				<for list="${partnerMDFClaimActivities}" param="mdfClaimActivity">
-					<var method="StringUtil#trim('${mdfClaimActivity}')" name="mdfClaimActivity" />
+		if ((isSet(partnerMDFClaimActivities)) && (!(contains("${partnerMDFClaimActivities}", "{partnerMDFClaimActivities}")))) {
+			for (var mdfClaimActivity : list "${partnerMDFClaimActivities}") {
+				var mdfClaimActivity = StringUtil.trim("${mdfClaimActivity}");
+				var key_mdfClaimActivity = "${mdfClaimActivity}";
 
-					<var name="key_mdfClaimActivity" value="${mdfClaimActivity}" />
+				Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_CHECKBOX");
+			}
+		}
+	}
 
-					<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_CHECKBOX" />
-				</for>
-			</then>
-		</if>
-	</command>
+	macro uploadActivityPOP {
+		var key_mdfClaimActivity = "${partnerMDFClaimActivity}";
+		var key_mdfClaimPOPLabel = "${partnerMDFClaimLabel}";
 
-	<command name="uploadActivityPOP">
-		<var name="key_mdfClaimActivity" value="${partnerMDFClaimActivity}" />
-		<var name="key_mdfClaimPOPLabel" value="${partnerMDFClaimLabel}" />
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_UPLOAD");
 
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_UPLOAD" />
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_SELECT_FILE_BUTTON" />
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_SELECT_FILE_BUTTON");
 
-		<execute function="SikuliUploadCommonFile" locator1="OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG" value1="${partnerMDFClaimPOPDocument}" />
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			value1 = "${partnerMDFClaimPOPDocument}"
+		);
 
-		<execute macro="Partner#pause">
-			<var name="pauseTime" value="5000" />
-		</execute>
-	</command>
+		Partner.pause(pauseTime = "5000");
+	}
 
-	<command name="uploadActivityPOPs">
-		<var name="partnerMDFClaimPOPdoc" value="Document_1.doc" />
-		<var name="partnerMDFClaimPOPjpeg" value="Document_1.jpeg" />
-		<var name="partnerMDFClaimPOPjpg" value="Document_1.jpg" />
-		<var name="partnerMDFClaimPOPleads" value="Partner_Leads.xlsx" />
-		<var name="partnerMDFClaimPOPpdf" value="Document_1.pdf" />
+	macro uploadActivityPOPs {
+		var partnerMDFClaimPOPdoc = "Document_1.doc";
+		var partnerMDFClaimPOPjpeg = "Document_1.jpeg";
+		var partnerMDFClaimPOPjpg = "Document_1.jpg";
+		var partnerMDFClaimPOPleads = "Partner_Leads.xlsx";
+		var partnerMDFClaimPOPpdf = "Document_1.pdf";
+		var key_mdfClaimActivity = "${partnerMDFClaimActivity}";
 
-		<var name="key_mdfClaimActivity" value="${partnerMDFClaimActivity}" />
+		for (var label : list "${partnerMDFClaimLabels}") {
+			var key_mdfClaimPOPLabel = "${label}";
 
-		<for list="${partnerMDFClaimLabels}" param="label">
-			<var name="key_mdfClaimPOPLabel" value="${label}" />
+			if (("${label}" == "Metrics") || ("${label}" == "Telemarketing Metrics") || ("${label}" == "Video Links")) {
+				Type.sendKeys(
+					locator1 = "PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_TEXTBOX",
+					value1 = "${label} Test"
+				);
+			}
+			else if ("${label}" == "List of Qualified Leads") {
+				PartnerMDFClaimForm.uploadActivityPOP(
+					partnerMDFClaimActivity = "${partnerMDFClaimActivity}",
+					partnerMDFClaimLabel = "${label}",
+					partnerMDFClaimPOPDocument = "${partnerMDFClaimPOPleads}"
+				);
+			}
+			else {
+				PartnerMDFClaimForm.uploadActivityPOP(
+					partnerMDFClaimActivity = "${partnerMDFClaimActivity}",
+					partnerMDFClaimLabel = "${label}",
+					partnerMDFClaimPOPDocument = "${partnerMDFClaimPOPpdf}"
+				);
+			}
+		}
+	}
 
-			<if>
-				<or>
-					<equals arg1="${label}" arg2="Metrics" />
-					<equals arg1="${label}" arg2="Telemarketing Metrics" />
-					<equals arg1="${label}" arg2="Video Links" />
-				</or>
-				<then>
-					<execute function="Type#sendKeys" locator1="PartnerMDFClaimForm#MDF_CLAIM_ACTIVITY_POP_TEXTBOX" value1="${label} Test" />
-				</then>
-				<elseif>
-					<equals arg1="${label}" arg2="List of Qualified Leads" />
-					<then>
-						<execute macro="PartnerMDFClaimForm#uploadActivityPOP">
-							<var name="partnerMDFClaimActivity" value="${partnerMDFClaimActivity}" />
-							<var name="partnerMDFClaimLabel" value="${label}" />
-							<var name="partnerMDFClaimPOPDocument" value="${partnerMDFClaimPOPleads}" />
-						</execute>
-					</then>
-				</elseif>
-				<else>
-					<execute macro="PartnerMDFClaimForm#uploadActivityPOP">
-						<var name="partnerMDFClaimActivity" value="${partnerMDFClaimActivity}" />
-						<var name="partnerMDFClaimLabel" value="${label}" />
-						<var name="partnerMDFClaimPOPDocument" value="${partnerMDFClaimPOPpdf}" />
-					</execute>
-				</else>
-			</if>
-		</for>
-	</command>
+	macro uploadInvoice {
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_INVOICE_UPLOAD");
 
-	<command name="uploadInvoice">
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_INVOICE_UPLOAD" />
-		<execute function="Click" locator1="PartnerMDFClaimForm#MDF_CLAIM_SELECT_FILE_BUTTON" />
+		Click(locator1 = "PartnerMDFClaimForm#MDF_CLAIM_SELECT_FILE_BUTTON");
 
-		<execute function="SikuliUploadCommonFile" locator1="OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG" value1="${partnerMDFClaimInvoice}" />
-	</command>
-</definition>
+		SikuliUploadCommonFile(
+			locator1 = "OS#FILE_DIALOG_BOX_FILE_NAME_FIELD_PNG",
+			value1 = "${partnerMDFClaimInvoice}"
+		);
+	}
+}

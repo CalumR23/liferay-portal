@@ -1,37 +1,39 @@
-<definition>
-	<command name="deleteBusinessPlan">
-		<var name="partnerScript"><![CDATA[import com.liferay.osb.partner.business.plan.model.BusinessPlan;import com.liferay.osb.partner.business.plan.service.BusinessPlanLocalServiceUtil;BusinessPlan businessPlan = BusinessPlanLocalServiceUtil.fetchBusinessPlan(ID_NUMBER);if (businessPlan != null) {BusinessPlanLocalServiceUtil.deleteBusinessPlan(businessPlan.getBusinessPlanId());}]]></var>
+definition {
 
-		<var method="StringUtil#replace('${partnerScript}', 'ID_NUMBER', '${partnerBusinessPlanID}')" name="partnerScript" />
+	macro deleteBusinessPlan {
 
-		<execute macro="PartnerCPServerAdministration#executeScript">
-			<var name="partnerScript" value="${partnerScript}" />
-		</execute>
-	</command>
+		var partnerScript = '''import com.liferay.osb.partner.business.plan.model.BusinessPlan;import com.liferay.osb.partner.business.plan.service.BusinessPlanLocalServiceUtil;BusinessPlan businessPlan = BusinessPlanLocalServiceUtil.fetchBusinessPlan(ID_NUMBER);if (businessPlan != null) {BusinessPlanLocalServiceUtil.deleteBusinessPlan(businessPlan.getBusinessPlanId());}''';
+		var partnerScript = StringUtil.replace("${partnerScript}", "ID_NUMBER", "${partnerBusinessPlanID}");
 
-	<command name="deleteMDFRequest">
-		<var name="partnerScript"><![CDATA[import com.liferay.osb.partner.mdf.model.MDFRequest;import com.liferay.osb.partner.mdf.service.MDFRequestLocalServiceUtil;MDFRequest mdfRequest = MDFRequestLocalServiceUtil.fetchMDFRequest(ID_NUMBER);if (mdfRequest != null) {MDFRequestLocalServiceUtil.deleteMDFRequest(mdfRequest.getMdfRequestId());}]]></var>
+		PartnerCPServerAdministration.executeScript(partnerScript = "${partnerScript}");
+	}
 
-		<var method="StringUtil#replace('${partnerScript}', 'ID_NUMBER', '${partnerMDFRequestID}')" name="partnerScript" />
+	macro deleteMDFRequest {
 
-		<execute macro="PartnerCPServerAdministration#executeScript">
-			<var name="partnerScript" value="${partnerScript}" />
-		</execute>
-	</command>
+		var partnerScript = '''import com.liferay.osb.partner.mdf.model.MDFRequest;import com.liferay.osb.partner.mdf.service.MDFRequestLocalServiceUtil;MDFRequest mdfRequest = MDFRequestLocalServiceUtil.fetchMDFRequest(ID_NUMBER);if (mdfRequest != null) {MDFRequestLocalServiceUtil.deleteMDFRequest(mdfRequest.getMdfRequestId());}''';
+		var partnerScript = StringUtil.replace("${partnerScript}", "ID_NUMBER", "${partnerMDFRequestID}");
 
-	<command name="executeResourcesAction">
-		<var name="key_action" value="${partnerCPAction}" />
+		PartnerCPServerAdministration.executeScript(partnerScript = "${partnerScript}");
+	}
 
-		<execute function="Click" locator1="PartnerCPServerAdministration#EXECUTE_ACTION_BUTTON" />
-	</command>
+	macro executeResourcesAction {
+		var key_action = "${partnerCPAction}";
 
-	<command name="executeScript">
-		<execute function="SelectFieldText" locator1="PartnerCPServerAdministration#SCRIPT_TEXTBOX" />
-		<execute function="Type#sendKeys" locator1="PartnerCPServerAdministration#SCRIPT_TEXTBOX" value1="${partnerScript}" />
+		Click(locator1 = "PartnerCPServerAdministration#EXECUTE_ACTION_BUTTON");
+	}
 
-		<execute function="Click" locator1="PartnerCPServerAdministration#EXECUTE_BUTTON" />
+	macro executeScript {
+		SelectFieldText(locator1 = "PartnerCPServerAdministration#SCRIPT_TEXTBOX");
 
-		<execute function="AssertElementPresent" locator1="Partner#SUCCESS_MESSAGE" />
-		<execute function="Click" locator1="Partner#SUCCESS_MESSAGE_CLOSE" />
-	</command>
-</definition>
+		Type.sendKeys(
+			locator1 = "PartnerCPServerAdministration#SCRIPT_TEXTBOX",
+			value1 = "${partnerScript}"
+		);
+
+		Click(locator1 = "PartnerCPServerAdministration#EXECUTE_BUTTON");
+
+		AssertElementPresent(locator1 = "Partner#SUCCESS_MESSAGE");
+
+		Click(locator1 = "Partner#SUCCESS_MESSAGE_CLOSE");
+	}
+}
