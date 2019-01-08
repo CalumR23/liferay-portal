@@ -1,118 +1,100 @@
-<definition component-name="partner">
-	<property name="testray.main.component.name" value="partner" />
+@component-name = "partner"
+definition {
+	property testray.main.component.name = "partner";
+	static var businessPlanID = "";
+	static var mdfRequestID = "";
+	var partnerBusinessPlanRegionCode = PropsUtil.get("partner.region.code");
+	var partnerCompany = PropsUtil.get("partner.company");
+	var partnerRegion = PropsUtil.get("partner.region");
 
-	<var name="businessPlanID" static="true" value="" />
-	<var name="mdfRequestID" static="true" value="" />
+	setUp {
+		Partner.loginUser(roleName = "admin");
+	}
 
-	<var method="PropsUtil#get('partner.region.code')" name="partnerBusinessPlanRegionCode" />
-	<var method="PropsUtil#get('partner.company')" name="partnerCompany" />
-	<var method="PropsUtil#get('partner.region')" name="partnerRegion" />
+	tearDown {
+		PartnerWorkflow.deleteMDFRequest(partnerMDFRequestID = "${mdfRequestID}");
 
-	<set-up>
-		<execute macro="Partner#loginUser">
-			<var name="roleName" value="admin" />
-		</execute>
-	</set-up>
+		PartnerWorkflow.deleteBusinessPlan(partnerBusinessPlanID = "${businessPlanID}");
+	}
 
-	<tear-down>
-		<execute macro="PartnerWorkflow#deleteMDFRequest">
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-		</execute>
+	@priority = "5"
+	test BusinessPlan {
+		property test.group = "businessPlan";
+		var partnerBusinessPlanCompany = "${partnerCompany}";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanRegion = "${partnerRegion}";
 
-		<execute macro="PartnerWorkflow#deleteBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-		</execute>
-	</tear-down>
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "USD",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "2019"
+		);
 
-	<command name="BusinessPlan" priority="5">
-		<property name="test.group" value="businessPlan" />
-		<var name="partnerBusinessPlanCompany" value="${partnerCompany}" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanRegion" value="${partnerRegion}" />
+		PartnerWorkflow.requestMoreInfoBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "2019"
+		);
 
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="2019" />
-		</execute>
+		PartnerWorkflow.editAndSubmitBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "GBP",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "2019",
+			roleName = "alliance_manager"
+		);
 
-		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="2019" />
-		</execute>
+		PartnerWorkflow.approveBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "2019"
+		);
+	}
 
-		<execute macro="PartnerWorkflow#editAndSubmitBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="GBP" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="2019" />
-			<var name="roleName" value="alliance_manager" />
-		</execute>
+	@priority = "5"
+	test MDFRequestAndClaim {
+		property test.group = "mdfRequest";
+		var partnerMDFRequestCompanyName = "${partnerCompany}";
+		var partnerMDFRequestRegion = "${partnerRegion}";
 
-		<execute macro="PartnerWorkflow#approveBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="2019" />
-		</execute>
-	</command>
+		var mdfRequestID = PartnerWorkflow.createMDFRequest(
+			partnerMDFRequestCompanyName = "${partnerMDFRequestCompanyName}",
+			partnerMDFRequestCurrencyCode = "USD",
+			partnerMDFRequestFundingPeriod = "Q1-Q2 2020",
+			partnerMDFRequestPhoneNumber = "123 456 7890",
+			partnerMDFRequestRegion = "${partnerMDFRequestRegion}"
+		);
 
-	<command name="MDFRequestAndClaim" priority="5">
-		<property name="test.group" value="mdfRequest" />
-		<var name="partnerMDFRequestCompanyName" value="${partnerCompany}" />
-		<var name="partnerMDFRequestRegion" value="${partnerRegion}" />
+		PartnerWorkflow.requestMoreInfoMDFRequest(
+			partnerMDFRequestID = "${mdfRequestID}"
+		);
 
-		<execute macro="PartnerWorkflow#createMDFRequest">
-			<return name="mdfRequestID" />
-			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
-			<var name="partnerMDFRequestCurrencyCode" value="USD" />
-			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2020" />
-			<var name="partnerMDFRequestPhoneNumber" value="123 456 7890" />
-			<var name="partnerMDFRequestRegion" value="${partnerMDFRequestRegion}" />
-		</execute>
+		PartnerWorkflow.editAndSubmitMDFRequest(
+			partnerMDFRequestCompanyName = "${partnerMDFRequestCompanyName}",
+			partnerMDFRequestCurrencyCode = "USD",
+			partnerMDFRequestFundingPeriod = "Q1-Q2 2020",
+			partnerMDFRequestID = "${mdfRequestID}",
+			partnerMDFRequestPhoneNumber = "123 456 7891",
+			partnerMDFRequestRegion = "${partnerMDFRequestRegion}",
+			roleName = "partner"
+		);
 
-		<execute macro="PartnerWorkflow#requestMoreInfoMDFRequest">
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-		</execute>
+		PartnerWorkflow.approveMDFRequest(partnerMDFRequestID = "${mdfRequestID}");
 
-		<execute macro="PartnerWorkflow#editAndSubmitMDFRequest">
-			<var name="partnerMDFRequestCompanyName" value="${partnerMDFRequestCompanyName}" />
-			<var name="partnerMDFRequestCurrencyCode" value="USD" />
-			<var name="partnerMDFRequestFundingPeriod" value="Q1-Q2 2020" />
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-			<var name="partnerMDFRequestPhoneNumber" value="123 456 7891" />
-			<var name="partnerMDFRequestRegion" value="${partnerMDFRequestRegion}" />
-			<var name="roleName" value="partner" />
-		</execute>
+		var mdfClaimID = PartnerWorkflow.createMDFClaimFull(partnerMDFRequestID = "${mdfRequestID}");
 
-		<execute macro="PartnerWorkflow#approveMDFRequest">
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-		</execute>
+		PartnerWorkflow.requestMoreInfoMDFClaim(partnerMDFClaimID = "${mdfClaimID}");
 
-		<execute macro="PartnerWorkflow#createMDFClaimFull">
-			<return name="mdfClaimID" />
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-		</execute>
+		PartnerWorkflow.editAndSubmitMDFClaim(
+			partnerMDFClaimID = "${mdfClaimID}",
+			partnerMDFRequestID = "${mdfRequestID}"
+		);
 
-		<execute macro="PartnerWorkflow#requestMoreInfoMDFClaim">
-			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
-		</execute>
+		PartnerWorkflow.approveMDFClaim(partnerMDFClaimID = "${mdfClaimID}");
 
-		<execute macro="PartnerWorkflow#editAndSubmitMDFClaim">
-			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
-			<var name="partnerMDFRequestID" value="${mdfRequestID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveMDFClaim">
-			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#payoutMDFClaim">
-			<var name="partnerMDFClaimID" value="${mdfClaimID}" />
-		</execute>
-	</command>
-</definition>
+		PartnerWorkflow.payoutMDFClaim(partnerMDFClaimID = "${mdfClaimID}");
+	}
+}

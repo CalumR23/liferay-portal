@@ -1,491 +1,463 @@
-<definition component-name="partner">
-	<property name="testray.main.component.name" value="partner" />
-	<property name="test.group" value="sales" />
-
-	<var method="PropsUtil#get('partner.company')" name="partnerCompany" />
-	<var method="PropsUtil#get('partner.region')" name="partnerOpportunityProspectCountry" />
-	<var method="PropsUtil#get('partner.region.code')" name="partnerRegionCode" />
-
-	<set-up>
-		<execute macro="Partner#loginUser">
-			<var name="roleName" value="admin" />
-		</execute>
-	</set-up>
-
-	<command name="AddPartnerOpportunity" priority="5">
-		<property name="inactive" value="true" />
-		<var name="partnerOpportunityCustomerEmailAddress" value="test@liferay.com" />
-		<var name="partnerOpportunityCustomerFirstName" value="Test" />
-		<var name="partnerOpportunityCustomerLastName" value="Test" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerOpportunityOwner" />
-		<var name="partnerOpportunityPartnerAccount" value="${partnerCompany}" />
-		<var name="partnerOpportunityProspectAccountName" value="Deathray Inc - Test" />
-		<var name="partnerOpportunityProspectIndustry" value="Aerospace &amp; Defense" />
-		<var name="salesforceAccountName" value="Deathray Inc - Test" />
-		<var name="salesforceOpportunityName" value="Deathray Inc - Test" />
-		<var name="salesforceProjectName" value="Deathray Project" />
-
-		<execute macro="PartnerWorkflow#createPartnerOpportunity">
-			<var name="partnerOpportunityCustomerEmailAddress" value="${partnerOpportunityCustomerEmailAddress}" />
-			<var name="partnerOpportunityCustomerFirstName" value="${partnerOpportunityCustomerFirstName}" />
-			<var name="partnerOpportunityCustomerLastName" value="${partnerOpportunityCustomerLastName}" />
-			<var name="partnerOpportunityPartnerAccount" value="${partnerOpportunityPartnerAccount}" />
-			<var name="partnerOpportunityProspectAccountName" value="${partnerOpportunityProspectAccountName}" />
-			<var name="partnerOpportunityProspectCountry" value="${partnerOpportunityProspectCountry}" />
-			<var name="partnerOpportunityProspectIndustry" value="${partnerOpportunityProspectIndustry}" />
-		</execute>
-
-		<execute macro="PartnerOpportunities#assertOpportunity">
-			<var name="partnerOpportunityAccountName" value="${partnerOpportunityProspectAccountName}" />
-			<var name="partnerOpportunityOwner" value="${partnerOpportunityOwner}" />
-			<var name="partnerOpportunityStage" value="Pending Review" />
-		</execute>
-
-		<execute macro="SalesforceLogin#loginUser">
-			<var name="roleName" value="sales3" />
-		</execute>
-
-		<execute macro="SalesforceNavigation#gotoLeads" />
-
-		<execute macro="SalesforceLeads#selectView">
-			<var name="salesforceLeadsView" value="Partner Registered Leads Queue" />
-		</execute>
-
-		<execute macro="SalesforceLeads#clickFirstRecentLead" />
-
-		<execute macro="SalesforceLeads#convertLead">
-			<var name="salesforceAccountName" value="Deathray Inc - Test" />
-			<var name="salesforceLeadPriority" value="Normal" />
-			<var name="salesforceLeadStatus" value="In Progress" />
-			<var name="salesforceTaskActivityCurrency" value="USD - U.S. Dollar" />
-			<var name="salesforceTaskSubject" value="Call" />
-		</execute>
-
-		<execute macro="SalesforceAccount#viewAccountDetails">
-			<var name="salesforceAccountName" value="Deathray Inc - Test" />
-			<var name="salesforceAccountOwner" value="Sales QA" />
-		</execute>
-
-		<execute macro="Salesforce#addAndSyncProductsViaPartnerOpportunity">
-			<var name="salesforceAccountName" value="${salesforceAccountName}" />
-			<var name="salesforceOpportunityKeyword" value="Justification / Vendor Selection" />
-			<var name="salesforceOpportunityName" value="${salesforceOpportunityName}" />
-			<var name="salesforcePriceBook" value="[Current] USD - DXP Subscription and Services" />
-			<var name="salesforceProductDate" value="1/1/2019" />
-			<var name="salesforceProductEndDate" value="12/31/2019" />
-			<var name="salesforceProductName" value="Liferay DXP Subscription - Gold Backup Sizing 1" />
-			<var name="salesforceProductSalesPrice" value="11,750.00" />
-			<var name="salesforceProductTermType" value="Annual" />
-			<var name="salesforceProductType" value="New" />
-		</execute>
-
-		<execute macro="SalesforceNavigation#gotoOpportunityWithinAccount">
-			<var name="salesforceAccountName" value="${salesforceAccountName}" />
-			<var name="salesforceOpportunityKeyword" value="Justification / Vendor Selection" />
-		</execute>
-
-		<execute macro="SalesforceOpportunity#editItemNoSave">
-			<var name="salesforceOpportunityItemLabel" value="Type" />
-			<var name="salesforceOpportunityItemValue" value="Existing Business" />
-		</execute>
-
-		<execute macro="SalesforceOpportunity#editItemNoSave">
-			<var name="salesforceOpportunityItemLabel" value="Sold By [*]" />
-			<var name="salesforceOpportunityItemValue" value="Liferay US" />
-		</execute>
-
-		<execute macro="SalesforceOpportunity#editStage">
-			<var name="salesforceOpportunityStage" value="Justification / Vendor Selection" />
-			<var name="salesforceOpportunityStageDetail" value="Competing Against CE" />
-		</execute>
-
-		<execute macro="SalesforceOpportunity#assignProject">
-			<var name="salesforceOpportunityProject" value="${salesforceProjectName}" />
-		</execute>
+@component-name = "partner"
+definition {
+	property testray.main.component.name = "partner";
+	property test.group = "sales";
+	var partnerCompany = PropsUtil.get("partner.company");
+	var partnerOpportunityProspectCountry = PropsUtil.get("partner.region");
+	var partnerRegionCode = PropsUtil.get("partner.region.code");
+
+	setUp {
+		Partner.loginUser(roleName = "admin");
+	}
+
+	@priority = "5"
+	test AddPartnerOpportunity {
+		property inactive = "true";
+		var partnerOpportunityCustomerEmailAddress = "test@liferay.com";
+		var partnerOpportunityCustomerFirstName = "Test";
+		var partnerOpportunityCustomerLastName = "Test";
+		var partnerOpportunityOwner = PropsUtil.get("partner.${partnerRegionCode}.name.partner");
+		var partnerOpportunityPartnerAccount = "${partnerCompany}";
+		var partnerOpportunityProspectAccountName = "Deathray Inc - Test";
+		var partnerOpportunityProspectIndustry = "Aerospace &amp; Defense";
+		var salesforceAccountName = "Deathray Inc - Test";
+		var salesforceOpportunityName = "Deathray Inc - Test";
+		var salesforceProjectName = "Deathray Project";
+
+		PartnerWorkflow.createPartnerOpportunity(
+			partnerOpportunityCustomerEmailAddress = "${partnerOpportunityCustomerEmailAddress}",
+			partnerOpportunityCustomerFirstName = "${partnerOpportunityCustomerFirstName}",
+			partnerOpportunityCustomerLastName = "${partnerOpportunityCustomerLastName}",
+			partnerOpportunityPartnerAccount = "${partnerOpportunityPartnerAccount}",
+			partnerOpportunityProspectAccountName = "${partnerOpportunityProspectAccountName}",
+			partnerOpportunityProspectCountry = "${partnerOpportunityProspectCountry}",
+			partnerOpportunityProspectIndustry = "${partnerOpportunityProspectIndustry}"
+		);
+
+		PartnerOpportunities.assertOpportunity(
+			partnerOpportunityAccountName = "${partnerOpportunityProspectAccountName}",
+			partnerOpportunityOwner = "${partnerOpportunityOwner}",
+			partnerOpportunityStage = "Pending Review"
+		);
+
+		SalesforceLogin.loginUser(roleName = "sales3");
+
+		SalesforceNavigation.gotoLeads();
+
+		SalesforceLeads.selectView(
+			salesforceLeadsView = "Partner Registered Leads Queue"
+		);
+
+		SalesforceLeads.clickFirstRecentLead();
+
+		SalesforceLeads.convertLead(
+			salesforceAccountName = "Deathray Inc - Test",
+			salesforceLeadPriority = "Normal",
+			salesforceLeadStatus = "In Progress",
+			salesforceTaskActivityCurrency = "USD - U.S. Dollar",
+			salesforceTaskSubject = "Call"
+		);
+
+		SalesforceAccount.viewAccountDetails(
+			salesforceAccountName = "Deathray Inc - Test",
+			salesforceAccountOwner = "Sales QA"
+		);
+
+		Salesforce.addAndSyncProductsViaPartnerOpportunity(
+			salesforceAccountName = "${salesforceAccountName}",
+			salesforceOpportunityKeyword = "Justification / Vendor Selection",
+			salesforceOpportunityName = "${salesforceOpportunityName}",
+			salesforcePriceBook = "[Current] USD - DXP Subscription and Services",
+			salesforceProductDate = "1/1/2019",
+			salesforceProductEndDate = "12/31/2019",
+			salesforceProductName = "Liferay DXP Subscription - Gold Backup Sizing 1",
+			salesforceProductSalesPrice = "11,750.00",
+			salesforceProductTermType = "Annual",
+			salesforceProductType = "New"
+		);
+
+		SalesforceNavigation.gotoOpportunityWithinAccount(
+			salesforceAccountName = "${salesforceAccountName}",
+			salesforceOpportunityKeyword = "Justification / Vendor Selection"
+		);
+
+		SalesforceOpportunity.editItemNoSave(
+			salesforceOpportunityItemLabel = "Type",
+			salesforceOpportunityItemValue = "Existing Business"
+		);
+
+		SalesforceOpportunity.editItemNoSave(
+			salesforceOpportunityItemLabel = "Sold By [*]",
+			salesforceOpportunityItemValue = "Liferay US"
+		);
+
+		SalesforceOpportunity.editStage(
+			salesforceOpportunityStage = "Justification / Vendor Selection",
+			salesforceOpportunityStageDetail = "Competing Against CE"
+		);
+
+		SalesforceOpportunity.assignProject(
+			salesforceOpportunityProject = "${salesforceProjectName}"
+		);
 
-		<execute macro="SalesforceOpportunity#clickPartnerOpportunity">
-			<var name="salesforcePartnerOpportunityKeyword" value="Open" />
-		</execute>
+		SalesforceOpportunity.clickPartnerOpportunity(
+			salesforcePartnerOpportunityKeyword = "Open"
+		);
 
-		<execute macro="SalesforcePartnerOpportunity#editStage">
-			<var name="salesforcePartnerOpportunityStage" value="Closed Won" />
-		</execute>
+		SalesforcePartnerOpportunity.editStage(
+			salesforcePartnerOpportunityStage = "Closed Won"
+		);
 
-		<execute macro="SalesforceNavigation#gotoOpportunityWithinAccount">
-			<var name="salesforceAccountName" value="${salesforceAccountName}" />
-			<var name="salesforceOpportunityKeyword" value="Justification / Vendor Selection" />
-		</execute>
-
-		<execute macro="SalesforceOpportunity#editStage">
-			<var name="salesforceOpportunityStage" value="Closed Won" />
-			<var name="salesforceOpportunityTermType" value="Single Year" />
-		</execute>
-
-		<execute macro="Partner#openURL" />
+		SalesforceNavigation.gotoOpportunityWithinAccount(
+			salesforceAccountName = "${salesforceAccountName}",
+			salesforceOpportunityKeyword = "Justification / Vendor Selection"
+		);
 
-		<execute macro="Partner#gotoSalesPartnerOpportunities">
-			<var name="roleName" value="partner" />
-		</execute>
+		SalesforceOpportunity.editStage(
+			salesforceOpportunityStage = "Closed Won",
+			salesforceOpportunityTermType = "Single Year"
+		);
 
-		<execute macro="Partner#gotoTab">
-			<var name="tabName" value="Closed" />
-		</execute>
+		Partner.openURL();
 
-		<execute macro="PartnerOpportunities#selectAccountClosed">
-			<var name="partnerOpportunityAccountName" value="Deathray Inc - Test" />
-		</execute>
+		Partner.gotoSalesPartnerOpportunities(roleName = "partner");
 
-		<execute macro="PartnerOpportunities#assertOpportunity">
-			<var name="partnerOpportunityAccountName" value="${partnerOpportunityProspectAccountName}" />
-			<var name="partnerOpportunityOwner" value="${partnerOpportunityOwner}" />
-			<var name="partnerOpportunityStage" value="Closed" />
-		</execute>
+		Partner.gotoTab(tabName = "Closed");
 
-		<execute macro="PartnerMockMock#gotoMockMock" />
+		PartnerOpportunities.selectAccountClosed(
+			partnerOpportunityAccountName = "Deathray Inc - Test"
+		);
 
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="Partner Opportunity Registration" />
-			<var name="mockMockRecipient" value="Partners Internal" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Partner Opportunity;${partnerOpportunityPartnerAccount};${partnerOpportunityProspectAccountName};${partnerOpportunityCustomerFirstName} ${partnerOpportunityCustomerLastName};${partnerOpportunityCustomerEmailAddress};${partnerOpportunityProspectCountry}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-	</command>
-
-	<command name="RenewalOpportunityRequests" priority="5">
-		<property name="inactive" value="true" />
-		<var name="partnerOpportunityAllianceManager" value="Salesforce Integration" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerOpportunityOwner" />
-		<var name="partnerRenewalOpportunityAccount" value="Deathray Inc - Test" />
-		<var name="partnerRenewalOpportunityComment" value="Test" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="Partner#gotoSalesRenewalOpportunities">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunities#clickRenewalOpportunity">
-			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunity#assertAccountName">
-			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunity#clickRequestOrderForm" />
-
-		<execute macro="Partner#gotoSalesRenewalOpportunities">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunities#assertRenewalOpportunity">
-			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
-			<var name="partnerRenewalOpportunityStage" value="Order Form Requested" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunities#clickRenewalOpportunity">
-			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunity#clickRequestChange">
-			<var name="partnerRenewalOpportunityComment" value="${partnerRenewalOpportunityComment}" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunity#assertTimelineActivity">
-			<var name="partnerRenewalOpportunityOrder" value="2" />
-			<var name="partnerRenewalOpportunityTimelineActivity" value="Stage updated from Order Form Requested to Change Requested." />
-		</execute>
-
-		<execute macro="Partner#gotoSalesRenewalOpportunities">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerRenewalOpportunities#assertRenewalOpportunity">
-			<var name="partnerRenewalOpportunityAccount" value="${partnerRenewalOpportunityAccount}" />
-			<var name="partnerRenewalOpportunityStage" value="Change Requested" />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="Reseller Order Form Requested" />
-			<var name="mockMockRecipient" value="${partnerOpportunityAllianceManager}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="${partnerOpportunityOwner} has requested a reseller order form for the Partner Opportunity associated with ${partnerRenewalOpportunityAccount};Please review the Partner Opportunity and generate the order form on Salesforce.com" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="Change Requested" />
-			<var name="mockMockRecipient" value="${partnerOpportunityAllianceManager}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="${partnerOpportunityOwner} has submitted a request to make changes for the Partner Opportunity associated with ${partnerRenewalOpportunityAccount};Please review the Partner Opportunity activity feed and make the appropriate adjustments on Salesforce.com" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-	</command>
-
-	<command name="UpdateRebatePayment" priority="5">
-		<var name="partnerRebatePaymentBankAccountName" value="Test Account" />
-		<var name="partnerRebatePaymentBankAccountNumber" value="1234567890" />
-		<var name="partnerRebatePaymentBankCity" value="Diamond Bar" />
-		<var name="partnerRebatePaymentBankCode" value="TB" />
-		<var name="partnerRebatePaymentBankCountry" value="United States" />
-		<var name="partnerRebatePaymentBankName" value="Test Bank" />
-		<var name="partnerRebatePaymentBankRegion" value="California" />
-		<var name="partnerRebatePaymentBankStreet" value="1400 Montefino Ave" />
-		<var name="partnerRebatePaymentBankZip" value="91765" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner')" name="partnerRebatePaymentLeadContactUser1" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.partner2')" name="partnerRebatePaymentLeadContactUser2" />
-		<var name="partnerRebatePaymentPartnerCity" value="Diamond Bar" />
-		<var name="partnerRebatePaymentPartnerCountry" value="United States" />
-		<var name="partnerRebatePaymentPartnerRegion" value="California" />
-		<var name="partnerRebatePaymentPartnerStreet" value="1400 Montefino Ave" />
-		<var name="partnerRebatePaymentPartnerZip" value="91765" />
-		<var name="partnerRebatePaymentRebateMethod1" value="Liferay Credit Note" />
-		<var name="partnerRebatePaymentRebateMethod2" value="Partner Invoice" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.name.regional_finance')" name="partnerRegionalFinance" />
-
-		<execute macro="Partner#gotoSalesRebatePayment">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertRebatePaymentPartner">
-			<var name="partnerRebatePaymentPartner" value="${partnerCompany}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#fillPartnerInformation">
-			<var name="partnerRebatePaymentPartnerCity" value="${partnerRebatePaymentPartnerCity}" />
-			<var name="partnerRebatePaymentPartnerCountry" value="${partnerRebatePaymentPartnerCountry}" />
-			<var name="partnerRebatePaymentPartnerRegion" value="${partnerRebatePaymentPartnerRegion}" />
-			<var name="partnerRebatePaymentPartnerStreet" value="${partnerRebatePaymentPartnerStreet}" />
-			<var name="partnerRebatePaymentPartnerZip" value="${partnerRebatePaymentPartnerZip}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#selectLeadContactUser">
-			<var name="partnerRebatePaymentLeadContactUser" value="${partnerRebatePaymentLeadContactUser1}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#clickRebateMethod">
-			<var name="partnerRebatePaymentRebateMethod" value="${partnerRebatePaymentRebateMethod1}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#fillPartnerBankAccount">
-			<var name="partnerRebatePaymentBankAccountName" value="${partnerRebatePaymentBankAccountName}" />
-			<var name="partnerRebatePaymentBankAccountNumber" value="${partnerRebatePaymentBankAccountNumber}" />
-			<var name="partnerRebatePaymentBankCity" value="${partnerRebatePaymentBankCity}" />
-			<var name="partnerRebatePaymentBankCode" value="${partnerRebatePaymentBankCode}" />
-			<var name="partnerRebatePaymentBankCountry" value="${partnerRebatePaymentBankCountry}" />
-			<var name="partnerRebatePaymentBankName" value="${partnerRebatePaymentBankName}" />
-			<var name="partnerRebatePaymentBankRegion" value="${partnerRebatePaymentBankRegion}" />
-			<var name="partnerRebatePaymentBankStreet" value="${partnerRebatePaymentBankStreet}" />
-			<var name="partnerRebatePaymentBankZip" value="${partnerRebatePaymentBankZip}" />
-		</execute>
-
-		<execute macro="Partner#clickSubmitButton" />
-
-		<execute macro="Partner#assertSuccess" />
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Rebate Payment Form Updated" />
-			<var name="mockMockRecipient" value="${partnerRegionalFinance}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="${partnerCompany};updated their Rebate Payment Form;You can view their changes at the following link:;https://partner.liferay.com/sales/rebate-payment/-/rebate-payment-account/" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#gotoSalesRebatePayment">
-			<var name="roleName" value="regional_finance" />
-		</execute>
-
-		<execute macro="PartnerRebatePayments#assertRebatePaymentPartner">
-			<var name="partnerRebatePaymentPartner" value="${partnerCompany}" />
-		</execute>
-
-		<execute macro="PartnerRebatePayments#clickRebatePaymentPartner">
-			<var name="partnerRebatePaymentPartner" value="${partnerCompany}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertRebatePaymentPartner">
-			<var name="partnerRebatePaymentPartner" value="${partnerCompany}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertPartnerInformation">
-			<var name="partnerRebatePaymentPartnerCity" value="${partnerRebatePaymentPartnerCity}" />
-			<var name="partnerRebatePaymentPartnerCountry" value="${partnerRebatePaymentPartnerCountry}" />
-			<var name="partnerRebatePaymentPartnerRegion" value="${partnerRebatePaymentPartnerRegion}" />
-			<var name="partnerRebatePaymentPartnerStreet" value="${partnerRebatePaymentPartnerStreet}" />
-			<var name="partnerRebatePaymentPartnerZip" value="${partnerRebatePaymentPartnerZip}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertRebateMethod">
-			<var name="partnerRebatePaymentRebateMethod" value="${partnerRebatePaymentRebateMethod1}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertLeadContactUser">
-			<var name="partnerRebatePaymentLeadContactUser" value="${partnerRebatePaymentLeadContactUser1}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertPartnerBankAccount">
-			<var name="partnerRebatePaymentBankAccountName" value="${partnerRebatePaymentBankAccountName}" />
-			<var name="partnerRebatePaymentBankAccountNumber" value="${partnerRebatePaymentBankAccountNumber}" />
-			<var name="partnerRebatePaymentBankCity" value="${partnerRebatePaymentBankCity}" />
-			<var name="partnerRebatePaymentBankCode" value="${partnerRebatePaymentBankCode}" />
-			<var name="partnerRebatePaymentBankCountry" value="${partnerRebatePaymentBankCountry}" />
-			<var name="partnerRebatePaymentBankName" value="${partnerRebatePaymentBankName}" />
-			<var name="partnerRebatePaymentBankRegion" value="${partnerRebatePaymentBankRegion}" />
-			<var name="partnerRebatePaymentBankStreet" value="${partnerRebatePaymentBankStreet}" />
-			<var name="partnerRebatePaymentBankZip" value="${partnerRebatePaymentBankZip}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#fillPartnerInformation">
-			<var name="partnerRebatePaymentPartnerCity" value="${partnerRebatePaymentPartnerCity}" />
-			<var name="partnerRebatePaymentPartnerCountry" value="${partnerRebatePaymentPartnerCountry}" />
-			<var name="partnerRebatePaymentPartnerRegion" value="${partnerRebatePaymentPartnerRegion}" />
-			<var name="partnerRebatePaymentPartnerStreet" value="${partnerRebatePaymentPartnerStreet} Edit" />
-			<var name="partnerRebatePaymentPartnerZip" value="${partnerRebatePaymentPartnerZip}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#clickRebateMethod">
-			<var name="partnerRebatePaymentRebateMethod" value="${partnerRebatePaymentRebateMethod2}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#selectLeadContactUser">
-			<var name="partnerRebatePaymentLeadContactUser" value="${partnerRebatePaymentLeadContactUser2}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#fillPartnerBankAccount">
-			<var name="partnerRebatePaymentBankAccountName" value="${partnerRebatePaymentBankAccountName}" />
-			<var name="partnerRebatePaymentBankAccountNumber" value="${partnerRebatePaymentBankAccountNumber}" />
-			<var name="partnerRebatePaymentBankCity" value="${partnerRebatePaymentBankCity}" />
-			<var name="partnerRebatePaymentBankCode" value="${partnerRebatePaymentBankCode}" />
-			<var name="partnerRebatePaymentBankCountry" value="${partnerRebatePaymentBankCountry}" />
-			<var name="partnerRebatePaymentBankName" value="${partnerRebatePaymentBankName} Edit" />
-			<var name="partnerRebatePaymentBankRegion" value="${partnerRebatePaymentBankRegion}" />
-			<var name="partnerRebatePaymentBankStreet" value="${partnerRebatePaymentBankStreet} Edit" />
-			<var name="partnerRebatePaymentBankZip" value="${partnerRebatePaymentBankZip}" />
-		</execute>
-
-		<execute macro="Partner#clickSubmitButton" />
-
-		<execute macro="Partner#assertSuccess" />
-
-		<execute macro="Partner#gotoSalesRebatePayment">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertRebatePaymentPartner">
-			<var name="partnerRebatePaymentPartner" value="${partnerCompany}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertPartnerInformation">
-			<var name="partnerRebatePaymentPartnerCity" value="${partnerRebatePaymentPartnerCity}" />
-			<var name="partnerRebatePaymentPartnerCountry" value="${partnerRebatePaymentPartnerCountry}" />
-			<var name="partnerRebatePaymentPartnerRegion" value="${partnerRebatePaymentPartnerRegion}" />
-			<var name="partnerRebatePaymentPartnerStreet" value="${partnerRebatePaymentPartnerStreet} Edit" />
-			<var name="partnerRebatePaymentPartnerZip" value="${partnerRebatePaymentPartnerZip}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertRebateMethod">
-			<var name="partnerRebatePaymentRebateMethod" value="${partnerRebatePaymentRebateMethod2}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertLeadContactUser">
-			<var name="partnerRebatePaymentLeadContactUser" value="${partnerRebatePaymentLeadContactUser2}" />
-		</execute>
-
-		<execute macro="PartnerRebatePaymentForm#assertPartnerBankAccount">
-			<var name="partnerRebatePaymentBankAccountName" value="${partnerRebatePaymentBankAccountName}" />
-			<var name="partnerRebatePaymentBankAccountNumber" value="${partnerRebatePaymentBankAccountNumber}" />
-			<var name="partnerRebatePaymentBankCity" value="${partnerRebatePaymentBankCity}" />
-			<var name="partnerRebatePaymentBankCode" value="${partnerRebatePaymentBankCode}" />
-			<var name="partnerRebatePaymentBankCountry" value="${partnerRebatePaymentBankCountry}" />
-			<var name="partnerRebatePaymentBankName" value="${partnerRebatePaymentBankName} Edit" />
-			<var name="partnerRebatePaymentBankRegion" value="${partnerRebatePaymentBankRegion}" />
-			<var name="partnerRebatePaymentBankStreet" value="${partnerRebatePaymentBankStreet} Edit" />
-			<var name="partnerRebatePaymentBankZip" value="${partnerRebatePaymentBankZip}" />
-		</execute>
-	</command>
-
-	<command name="ViewOpportunitiesAsManager" priority="5">
-		<property name="inactive" value="true" />
-		<var name="partnerOpportunityAccountName" value="Base22" />
-		<var method="PropsUtil#get('partner.${partnerRegionCode}.email.address.partner2')" name="partnerOpportunityEmailAddress2" />
-
-		<execute macro="OSBAdminUser#login">
-			<var name="liferayURL" value="https://web-uat.liferay.com" />
-			<var name="userEmailAddress" value="ryan.park@liferay.com.broken" />
-			<var name="userPassword" value="test" />
-		</execute>
-
-		<execute macro="Partner#openSpecificURL">
-			<var name="url" value="https://web-uat.liferay.com/group/control_panel" />
-		</execute>
-
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-
-		<execute macro="OSBAdminPartner#assignWorker">
-			<var name="emailAddress" value="${partnerOpportunityEmailAddress2}" />
-			<var name="partnerCode" value="${partnerOpportunityAccountName}" />
-			<var name="role" value="Watcher" />
-		</execute>
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="partner2" />
-		</execute>
-
-		<execute macro="Partner#gotoSalesPartnerOpportunities">
-			<var name="roleName" value="partner2" />
-		</execute>
-
-		<execute macro="PartnerOpportunities#assertNoAccountDropdown" />
-
-		<execute macro="Partner#openSpecificURL">
-			<var name="url" value="https://web-uat.liferay.com/group/control_panel" />
-		</execute>
-
-		<execute macro="OSBAdminNavigation#gotoOSBAdmin" />
-
-		<execute macro="OSBAdminPartner#assignWorker">
-			<var name="emailAddress" value="${partnerOpportunityEmailAddress2}" />
-			<var name="partnerCode" value="${partnerOpportunityAccountName}" />
-			<var name="role" value="Manager" />
-		</execute>
-
-		<execute macro="Partner#gotoSalesPartnerOpportunities">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerOpportunities#assertAccountDropdown" />
-
-		<execute macro="PartnerOpportunities#selectAccount">
-			<var name="partnerOpportunityAccountName" value="${partnerOpportunityAccountName}" />
-		</execute>
-	</command>
-</definition>
+		PartnerOpportunities.assertOpportunity(
+			partnerOpportunityAccountName = "${partnerOpportunityProspectAccountName}",
+			partnerOpportunityOwner = "${partnerOpportunityOwner}",
+			partnerOpportunityStage = "Closed"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "Partner Opportunity Registration",
+			mockMockRecipient = "Partners Internal",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "Partner Opportunity;${partnerOpportunityPartnerAccount};${partnerOpportunityProspectAccountName};${partnerOpportunityCustomerFirstName} ${partnerOpportunityCustomerLastName};${partnerOpportunityCustomerEmailAddress};${partnerOpportunityProspectCountry}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+	}
+
+	@priority = "5"
+	test RenewalOpportunityRequests {
+		property inactive = "true";
+		var partnerOpportunityAllianceManager = "Salesforce Integration";
+		var partnerOpportunityOwner = PropsUtil.get("partner.${partnerRegionCode}.name.partner");
+		var partnerRenewalOpportunityAccount = "Deathray Inc - Test";
+		var partnerRenewalOpportunityComment = "Test";
+
+		Partner.logoutAndLoginUser(roleName = "partner");
+
+		Partner.gotoSalesRenewalOpportunities(roleName = "partner");
+
+		PartnerRenewalOpportunities.clickRenewalOpportunity(
+			partnerRenewalOpportunityAccount = "${partnerRenewalOpportunityAccount}"
+		);
+
+		PartnerRenewalOpportunity.assertAccountName(
+			partnerRenewalOpportunityAccount = "${partnerRenewalOpportunityAccount}"
+		);
+
+		PartnerRenewalOpportunity.clickRequestOrderForm();
+
+		Partner.gotoSalesRenewalOpportunities(roleName = "partner");
+
+		PartnerRenewalOpportunities.assertRenewalOpportunity(
+			partnerRenewalOpportunityAccount = "${partnerRenewalOpportunityAccount}",
+			partnerRenewalOpportunityStage = "Order Form Requested"
+		);
+
+		PartnerRenewalOpportunities.clickRenewalOpportunity(
+			partnerRenewalOpportunityAccount = "${partnerRenewalOpportunityAccount}"
+		);
+
+		PartnerRenewalOpportunity.clickRequestChange(
+			partnerRenewalOpportunityComment = "${partnerRenewalOpportunityComment}"
+		);
+
+		PartnerRenewalOpportunity.assertTimelineActivity(
+			partnerRenewalOpportunityOrder = "2",
+			partnerRenewalOpportunityTimelineActivity = "Stage updated from Order Form Requested to Change Requested."
+		);
+
+		Partner.gotoSalesRenewalOpportunities(roleName = "partner");
+
+		PartnerRenewalOpportunities.assertRenewalOpportunity(
+			partnerRenewalOpportunityAccount = "${partnerRenewalOpportunityAccount}",
+			partnerRenewalOpportunityStage = "Change Requested"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "Reseller Order Form Requested",
+			mockMockRecipient = "${partnerOpportunityAllianceManager}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "${partnerOpportunityOwner} has requested a reseller order form for the Partner Opportunity associated with ${partnerRenewalOpportunityAccount};Please review the Partner Opportunity and generate the order form on Salesforce.com"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "Change Requested",
+			mockMockRecipient = "${partnerOpportunityAllianceManager}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "${partnerOpportunityOwner} has submitted a request to make changes for the Partner Opportunity associated with ${partnerRenewalOpportunityAccount};Please review the Partner Opportunity activity feed and make the appropriate adjustments on Salesforce.com"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+	}
+
+	@priority = "5"
+	test UpdateRebatePayment {
+		var partnerRebatePaymentBankAccountName = "Test Account";
+		var partnerRebatePaymentBankAccountNumber = "1234567890";
+		var partnerRebatePaymentBankCity = "Diamond Bar";
+		var partnerRebatePaymentBankCode = "TB";
+		var partnerRebatePaymentBankCountry = "United States";
+		var partnerRebatePaymentBankName = "Test Bank";
+		var partnerRebatePaymentBankRegion = "California";
+		var partnerRebatePaymentBankStreet = "1400 Montefino Ave";
+		var partnerRebatePaymentBankZip = "91765";
+		var partnerRebatePaymentLeadContactUser1 = PropsUtil.get("partner.${partnerRegionCode}.name.partner");
+		var partnerRebatePaymentLeadContactUser2 = PropsUtil.get("partner.${partnerRegionCode}.name.partner2");
+		var partnerRebatePaymentPartnerCity = "Diamond Bar";
+		var partnerRebatePaymentPartnerCountry = "United States";
+		var partnerRebatePaymentPartnerRegion = "California";
+		var partnerRebatePaymentPartnerStreet = "1400 Montefino Ave";
+		var partnerRebatePaymentPartnerZip = "91765";
+		var partnerRebatePaymentRebateMethod1 = "Liferay Credit Note";
+		var partnerRebatePaymentRebateMethod2 = "Partner Invoice";
+		var partnerRegionalFinance = PropsUtil.get("partner.${partnerRegionCode}.name.regional_finance");
+
+		Partner.gotoSalesRebatePayment(roleName = "partner");
+
+		PartnerRebatePaymentForm.assertRebatePaymentPartner(
+			partnerRebatePaymentPartner = "${partnerCompany}"
+		);
+
+		PartnerRebatePaymentForm.fillPartnerInformation(
+			partnerRebatePaymentPartnerCity = "${partnerRebatePaymentPartnerCity}",
+			partnerRebatePaymentPartnerCountry = "${partnerRebatePaymentPartnerCountry}",
+			partnerRebatePaymentPartnerRegion = "${partnerRebatePaymentPartnerRegion}",
+			partnerRebatePaymentPartnerStreet = "${partnerRebatePaymentPartnerStreet}",
+			partnerRebatePaymentPartnerZip = "${partnerRebatePaymentPartnerZip}"
+		);
+
+		PartnerRebatePaymentForm.selectLeadContactUser(
+			partnerRebatePaymentLeadContactUser = "${partnerRebatePaymentLeadContactUser1}"
+		);
+
+		PartnerRebatePaymentForm.clickRebateMethod(
+			partnerRebatePaymentRebateMethod = "${partnerRebatePaymentRebateMethod1}"
+		);
+
+		PartnerRebatePaymentForm.fillPartnerBankAccount(
+			partnerRebatePaymentBankAccountName = "${partnerRebatePaymentBankAccountName}",
+			partnerRebatePaymentBankAccountNumber = "${partnerRebatePaymentBankAccountNumber}",
+			partnerRebatePaymentBankCity = "${partnerRebatePaymentBankCity}",
+			partnerRebatePaymentBankCode = "${partnerRebatePaymentBankCode}",
+			partnerRebatePaymentBankCountry = "${partnerRebatePaymentBankCountry}",
+			partnerRebatePaymentBankName = "${partnerRebatePaymentBankName}",
+			partnerRebatePaymentBankRegion = "${partnerRebatePaymentBankRegion}",
+			partnerRebatePaymentBankStreet = "${partnerRebatePaymentBankStreet}",
+			partnerRebatePaymentBankZip = "${partnerRebatePaymentBankZip}"
+		);
+
+		Partner.clickSubmitButton();
+
+		Partner.assertSuccess();
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Rebate Payment Form Updated",
+			mockMockRecipient = "${partnerRegionalFinance}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "${partnerCompany};updated their Rebate Payment Form;You can view their changes at the following link:;https://partner.liferay.com/sales/rebate-payment/-/rebate-payment-account/"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.gotoSalesRebatePayment(roleName = "regional_finance");
+
+		PartnerRebatePayments.assertRebatePaymentPartner(
+			partnerRebatePaymentPartner = "${partnerCompany}"
+		);
+
+		PartnerRebatePayments.clickRebatePaymentPartner(
+			partnerRebatePaymentPartner = "${partnerCompany}"
+		);
+
+		PartnerRebatePaymentForm.assertRebatePaymentPartner(
+			partnerRebatePaymentPartner = "${partnerCompany}"
+		);
+
+		PartnerRebatePaymentForm.assertPartnerInformation(
+			partnerRebatePaymentPartnerCity = "${partnerRebatePaymentPartnerCity}",
+			partnerRebatePaymentPartnerCountry = "${partnerRebatePaymentPartnerCountry}",
+			partnerRebatePaymentPartnerRegion = "${partnerRebatePaymentPartnerRegion}",
+			partnerRebatePaymentPartnerStreet = "${partnerRebatePaymentPartnerStreet}",
+			partnerRebatePaymentPartnerZip = "${partnerRebatePaymentPartnerZip}"
+		);
+
+		PartnerRebatePaymentForm.assertRebateMethod(
+			partnerRebatePaymentRebateMethod = "${partnerRebatePaymentRebateMethod1}"
+		);
+
+		PartnerRebatePaymentForm.assertLeadContactUser(
+			partnerRebatePaymentLeadContactUser = "${partnerRebatePaymentLeadContactUser1}"
+		);
+
+		PartnerRebatePaymentForm.assertPartnerBankAccount(
+			partnerRebatePaymentBankAccountName = "${partnerRebatePaymentBankAccountName}",
+			partnerRebatePaymentBankAccountNumber = "${partnerRebatePaymentBankAccountNumber}",
+			partnerRebatePaymentBankCity = "${partnerRebatePaymentBankCity}",
+			partnerRebatePaymentBankCode = "${partnerRebatePaymentBankCode}",
+			partnerRebatePaymentBankCountry = "${partnerRebatePaymentBankCountry}",
+			partnerRebatePaymentBankName = "${partnerRebatePaymentBankName}",
+			partnerRebatePaymentBankRegion = "${partnerRebatePaymentBankRegion}",
+			partnerRebatePaymentBankStreet = "${partnerRebatePaymentBankStreet}",
+			partnerRebatePaymentBankZip = "${partnerRebatePaymentBankZip}"
+		);
+
+		PartnerRebatePaymentForm.fillPartnerInformation(
+			partnerRebatePaymentPartnerCity = "${partnerRebatePaymentPartnerCity}",
+			partnerRebatePaymentPartnerCountry = "${partnerRebatePaymentPartnerCountry}",
+			partnerRebatePaymentPartnerRegion = "${partnerRebatePaymentPartnerRegion}",
+			partnerRebatePaymentPartnerStreet = "${partnerRebatePaymentPartnerStreet} Edit",
+			partnerRebatePaymentPartnerZip = "${partnerRebatePaymentPartnerZip}"
+		);
+
+		PartnerRebatePaymentForm.clickRebateMethod(
+			partnerRebatePaymentRebateMethod = "${partnerRebatePaymentRebateMethod2}"
+		);
+
+		PartnerRebatePaymentForm.selectLeadContactUser(
+			partnerRebatePaymentLeadContactUser = "${partnerRebatePaymentLeadContactUser2}"
+		);
+
+		PartnerRebatePaymentForm.fillPartnerBankAccount(
+			partnerRebatePaymentBankAccountName = "${partnerRebatePaymentBankAccountName}",
+			partnerRebatePaymentBankAccountNumber = "${partnerRebatePaymentBankAccountNumber}",
+			partnerRebatePaymentBankCity = "${partnerRebatePaymentBankCity}",
+			partnerRebatePaymentBankCode = "${partnerRebatePaymentBankCode}",
+			partnerRebatePaymentBankCountry = "${partnerRebatePaymentBankCountry}",
+			partnerRebatePaymentBankName = "${partnerRebatePaymentBankName} Edit",
+			partnerRebatePaymentBankRegion = "${partnerRebatePaymentBankRegion}",
+			partnerRebatePaymentBankStreet = "${partnerRebatePaymentBankStreet} Edit",
+			partnerRebatePaymentBankZip = "${partnerRebatePaymentBankZip}"
+		);
+
+		Partner.clickSubmitButton();
+
+		Partner.assertSuccess();
+
+		Partner.gotoSalesRebatePayment(roleName = "partner");
+
+		PartnerRebatePaymentForm.assertRebatePaymentPartner(
+			partnerRebatePaymentPartner = "${partnerCompany}"
+		);
+
+		PartnerRebatePaymentForm.assertPartnerInformation(
+			partnerRebatePaymentPartnerCity = "${partnerRebatePaymentPartnerCity}",
+			partnerRebatePaymentPartnerCountry = "${partnerRebatePaymentPartnerCountry}",
+			partnerRebatePaymentPartnerRegion = "${partnerRebatePaymentPartnerRegion}",
+			partnerRebatePaymentPartnerStreet = "${partnerRebatePaymentPartnerStreet} Edit",
+			partnerRebatePaymentPartnerZip = "${partnerRebatePaymentPartnerZip}"
+		);
+
+		PartnerRebatePaymentForm.assertRebateMethod(
+			partnerRebatePaymentRebateMethod = "${partnerRebatePaymentRebateMethod2}"
+		);
+
+		PartnerRebatePaymentForm.assertLeadContactUser(
+			partnerRebatePaymentLeadContactUser = "${partnerRebatePaymentLeadContactUser2}"
+		);
+
+		PartnerRebatePaymentForm.assertPartnerBankAccount(
+			partnerRebatePaymentBankAccountName = "${partnerRebatePaymentBankAccountName}",
+			partnerRebatePaymentBankAccountNumber = "${partnerRebatePaymentBankAccountNumber}",
+			partnerRebatePaymentBankCity = "${partnerRebatePaymentBankCity}",
+			partnerRebatePaymentBankCode = "${partnerRebatePaymentBankCode}",
+			partnerRebatePaymentBankCountry = "${partnerRebatePaymentBankCountry}",
+			partnerRebatePaymentBankName = "${partnerRebatePaymentBankName} Edit",
+			partnerRebatePaymentBankRegion = "${partnerRebatePaymentBankRegion}",
+			partnerRebatePaymentBankStreet = "${partnerRebatePaymentBankStreet} Edit",
+			partnerRebatePaymentBankZip = "${partnerRebatePaymentBankZip}"
+		);
+	}
+
+	@priority = "5"
+	test ViewOpportunitiesAsManager {
+		property inactive = "true";
+		var partnerOpportunityAccountName = "Base22";
+		var partnerOpportunityEmailAddress2 = PropsUtil.get("partner.${partnerRegionCode}.email.address.partner2");
+
+		OSBAdminUser.login(
+			liferayURL = "https://web-uat.liferay.com",
+			userEmailAddress = "ryan.park@liferay.com.broken",
+			userPassword = "test"
+		);
+
+		Partner.openSpecificURL(url = "https://web-uat.liferay.com/group/control_panel");
+
+		OSBAdminNavigation.gotoOSBAdmin();
+
+		OSBAdminPartner.assignWorker(
+			emailAddress = "${partnerOpportunityEmailAddress2}",
+			partnerCode = "${partnerOpportunityAccountName}",
+			role = "Watcher"
+		);
+
+		Partner.logoutAndLoginUser(roleName = "partner2");
+
+		Partner.gotoSalesPartnerOpportunities(roleName = "partner2");
+
+		PartnerOpportunities.assertNoAccountDropdown();
+
+		Partner.openSpecificURL(url = "https://web-uat.liferay.com/group/control_panel");
+
+		OSBAdminNavigation.gotoOSBAdmin();
+
+		OSBAdminPartner.assignWorker(
+			emailAddress = "${partnerOpportunityEmailAddress2}",
+			partnerCode = "${partnerOpportunityAccountName}",
+			role = "Manager"
+		);
+
+		Partner.gotoSalesPartnerOpportunities(roleName = "partner");
+
+		PartnerOpportunities.assertAccountDropdown();
+
+		PartnerOpportunities.selectAccount(
+			partnerOpportunityAccountName = "${partnerOpportunityAccountName}"
+		);
+	}
+}

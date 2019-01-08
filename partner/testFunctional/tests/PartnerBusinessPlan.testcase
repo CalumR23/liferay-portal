@@ -1,890 +1,853 @@
-<definition component-name="partner">
-	<property name="testray.main.component.name" value="partner" />
-	<property name="test.group" value="businessPlan" />
-
-	<var name="businessPlanID" static="true" value="" />
-
-	<var method="PropsUtil#get('partner.company')" name="partnerBusinessPlanCompany" />
-	<var method="PropsUtil#get('partner.region')" name="partnerBusinessPlanRegion" />
-	<var method="PropsUtil#get('partner.region.code')" name="partnerBusinessPlanRegionCode" />
-
-	<set-up>
-		<execute macro="Partner#loginUser">
-			<var name="roleName" value="admin" />
-		</execute>
-	</set-up>
-
-	<tear-down>
-		<execute macro="PartnerWorkflow#deleteBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-		</execute>
-	</tear-down>
-
-	<command name="ApproveBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="Approved" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#approveBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Business Plan Approved" />
-			<var name="mockMockRecipient" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Your Business Plan ${businessPlanID} was approved by your General Manager.;Your approved plan can be found at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Approved by General Manager." />
-		</execute>
-	</command>
-
-	<command name="CheckFilterByBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="Pending" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2020" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-	</command>
-
-	<command name="CreateBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.general_manager')" name="partnerBusinessPlanGeneralManager" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="Test MP Owner" />
-		<var name="partnerBusinessPlanStatus" value="Pending" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="US Dollar" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="${partnerBusinessPlanPartnerMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertNoComments" />
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Business Plan Submitted" />
-			<var name="mockMockRecipient" value="${partnerBusinessPlanGeneralManager}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="general_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="US Dollar" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="${partnerBusinessPlanPartnerMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertNoComments" />
-	</command>
-
-	<command name="EditAndSubmitBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.general_manager')" name="partnerBusinessPlanGeneralManager" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="Pending" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#editAndSubmitBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="BRL" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact Edit" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="2" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="BRL 600" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="Brazilian Real" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact Edit" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="Test MP Owner Edit" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Adding an Edit as Alliance manager." />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Business Plan Submitted" />
-			<var name="mockMockRecipient" value="${partnerBusinessPlanGeneralManager}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="general_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact Edit" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="2" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="BRL 600" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="Brazilian Real" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact Edit" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="Test MP Owner Edit" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Adding an Edit as Alliance manager." />
-		</execute>
-	</command>
-
-	<command name="RequestMoreInfoBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="More Info Requested" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Business Plan Request for More Information" />
-			<var name="mockMockRecipient" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="Your General Manager has requested more information about your Business Plan ${businessPlanID}.;The General Manager's comment was:;Requesting for More Info by General Manager.;Please revise the business plan, and then resubmit it at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-	</command>
-
-	<command name="ResendForReviewBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.general_manager')" name="partnerBusinessPlanGeneralManager" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="Test MP Owner" />
-		<var name="partnerBusinessPlanStatus" value="Pending" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="PartnerWorkflow#requestMoreInfoBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerWorkflow#resendForReviewBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="US Dollar" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="${partnerBusinessPlanPartnerMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Resending for Review by Alliance Manager." />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#gotoMockMock" />
-
-		<execute macro="PartnerMockMock#viewAndClickMail">
-			<var name="mockMockAsset" value="[Liferay Partner Portal] Business Plan Submitted" />
-			<var name="mockMockRecipient" value="${partnerBusinessPlanGeneralManager}" />
-			<var name="mockMockSender" value="Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;" />
-		</execute>
-
-		<execute macro="PartnerMockMock#viewMailMessage">
-			<var name="mockMockAsset" value="An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}" />
-		</execute>
-
-		<execute macro="PartnerMockMock#backtoInbox" />
-
-		<execute macro="PartnerMockMock#deleteAllMail" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="general_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="US Dollar" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="${partnerBusinessPlanPartnerMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Requesting for More Info by General Manager." />
-		</execute>
-
-		<execute macro="Partner#assertComment">
-			<var name="partnerComment" value="Resending for Review by Alliance Manager." />
-		</execute>
-	</command>
-
-	<command name="SaveAsDraftBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="Draft" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#clickNewBusinessPlanButton" />
-
-		<execute macro="PartnerBusinessPlanForm#fillPartner">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#clickSaveDraftButton" />
-
-		<execute macro="Partner#assertSuccess" />
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="Partner#gotoTab">
-			<var name="tabName" value="Drafts" />
-		</execute>
-
-		<execute macro="PartnerManagement#filterBusinessPlanByYear">
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#readLastRowID">
-			<return name="businessPlanID" />
-		</execute>
-
-		<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="0" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-	</command>
-
-	<command name="SaveIncompleteBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanStatus" value="Incomplete" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="alliance_manager" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#clickNewBusinessPlanButton" />
-
-		<execute macro="PartnerBusinessPlanForm#fillPartner">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#clickSaveAndContinueButton" />
-
-		<execute macro="PartnerBusinessPlanForm#deleteBusinessPlanConflict">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="Partner#gotoTab">
-			<var name="tabName" value="Drafts" />
-		</execute>
-
-		<execute macro="PartnerManagement#filterBusinessPlanByYear">
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#readLastRowID">
-			<return name="businessPlanID" />
-		</execute>
-
-		<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="0" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-	</command>
-
-	<command name="ValidateBusinessPlan" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#gotoManagementBusinessPlans" />
-
-		<execute macro="PartnerManagement#clickNewBusinessPlanButton" />
-
-		<execute macro="PartnerBusinessPlanForm#fillPartner">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#clickSaveAndContinueButton" />
-
-		<execute macro="PartnerBusinessPlanForm#assertConflict" />
-	</command>
-
-	<command name="ViewBusinessPlanAsPartner" priority="5">
-		<var name="partnerBusinessPlanCurrencyCode" value="USD" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.alliance_manager')" name="partnerBusinessPlanLiferayBusinessPlanOwner" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing')" name="partnerBusinessPlanLiferayMarketingPlanOwner" />
-		<var name="partnerBusinessPlanLiferayRenewalContact" value="Test Renewal Contact" />
-		<var method="PropsUtil#get('partner.${partnerBusinessPlanRegionCode}.name.partner')" name="partnerBusinessPlanPartnerBusinessPlanOwner" />
-		<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="Test MP Owner" />
-		<var name="partnerBusinessPlanStatus" value="Pending" />
-		<var name="partnerBusinessPlanTotalRevenueProjections" value="USD 300" />
-		<var name="partnerBusinessPlanYear" value="2019" />
-
-		<execute macro="PartnerWorkflow#createBusinessPlan">
-			<return name="businessPlanID" />
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrencyCode" value="${partnerBusinessPlanCurrencyCode}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanRegion" value="${partnerBusinessPlanRegion}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="Partner#logoutAndLoginUser">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="Partner#gotoSalesBusinessPlans">
-			<var name="roleName" value="partner" />
-		</execute>
-
-		<execute macro="PartnerManagement#assertBusinessPlan">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerManagement#clickBusinessPlan">
-			<var name="partnerBusinessPlanID" value="${businessPlanID}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertSummary">
-			<var name="partnerBusinessPlanNumberOfGoals" value="1" />
-			<var name="partnerBusinessPlanStatus" value="${partnerBusinessPlanStatus}" />
-			<var name="partnerBusinessPlanTotalRevenueProjections" value="${partnerBusinessPlanTotalRevenueProjections}" />
-			<var name="partnerBusinessPlanYear" value="${partnerBusinessPlanYear}" />
-		</execute>
-
-		<execute macro="PartnerBusinessPlan#assertAccountInformation">
-			<var name="partnerBusinessPlanCompany" value="${partnerBusinessPlanCompany}" />
-			<var name="partnerBusinessPlanCurrency" value="US Dollar" />
-			<var name="partnerBusinessPlanLiferayBusinessPlanOwner" value="${partnerBusinessPlanLiferayBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayMarketingPlanOwner" value="${partnerBusinessPlanLiferayMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanLiferayRenewalContact" value="${partnerBusinessPlanLiferayRenewalContact}" />
-			<var name="partnerBusinessPlanPartnerBusinessPlanOwner" value="${partnerBusinessPlanPartnerBusinessPlanOwner}" />
-			<var name="partnerBusinessPlanPartnerMarketingPlanOwner" value="${partnerBusinessPlanPartnerMarketingPlanOwner}" />
-			<var name="partnerBusinessPlanRegionCode" value="${partnerBusinessPlanRegionCode}" />
-		</execute>
-
-		<execute macro="Partner#assertNoCommentSection" />
-	</command>
-</definition>
+@component-name = "partner"
+definition {
+	property testray.main.component.name = "partner";
+	property test.group = "businessPlan";
+	static var businessPlanID = "";
+	var partnerBusinessPlanCompany = PropsUtil.get("partner.company");
+	var partnerBusinessPlanRegion = PropsUtil.get("partner.region");
+	var partnerBusinessPlanRegionCode = PropsUtil.get("partner.region.code");
+
+	setUp {
+		Partner.loginUser(roleName = "admin");
+	}
+
+	tearDown {
+		PartnerWorkflow.deleteBusinessPlan(partnerBusinessPlanID = "${businessPlanID}");
+	}
+
+	@priority = "5"
+	test ApproveBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "Approved";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerWorkflow.approveBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Business Plan Approved",
+			mockMockRecipient = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "Your Business Plan ${businessPlanID} was approved by your General Manager.;Your approved plan can be found at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.logoutAndLoginUser(roleName = "alliance_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.assertComment(partnerComment = "Approved by General Manager.");
+	}
+
+	@priority = "5"
+	test CheckFilterByBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "Pending";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2020";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.logoutAndLoginUser(roleName = "alliance_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+	}
+
+	@priority = "5"
+	test CreateBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanGeneralManager = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.general_manager");
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanPartnerMarketingPlanOwner = "Test MP Owner";
+		var partnerBusinessPlanStatus = "Pending";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "US Dollar",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "${partnerBusinessPlanPartnerMarketingPlanOwner}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertNoComments();
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Business Plan Submitted",
+			mockMockRecipient = "${partnerBusinessPlanGeneralManager}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.logoutAndLoginUser(roleName = "general_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "US Dollar",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "${partnerBusinessPlanPartnerMarketingPlanOwner}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertNoComments();
+	}
+
+	@priority = "5"
+	test EditAndSubmitBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanGeneralManager = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.general_manager");
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "Pending";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerWorkflow.requestMoreInfoBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerWorkflow.editAndSubmitBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "BRL",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}",
+			roleName = "alliance_manager"
+		);
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact Edit",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "2",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "BRL 600",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "Brazilian Real",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact Edit",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "Test MP Owner Edit",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+
+		Partner.assertComment(partnerComment = "Adding an Edit as Alliance manager.");
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Business Plan Submitted",
+			mockMockRecipient = "${partnerBusinessPlanGeneralManager}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.logoutAndLoginUser(roleName = "general_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact Edit",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "2",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "BRL 600",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "Brazilian Real",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact Edit",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "Test MP Owner Edit",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+
+		Partner.assertComment(partnerComment = "Adding an Edit as Alliance manager.");
+	}
+
+	@priority = "5"
+	test RequestMoreInfoBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "More Info Requested";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerWorkflow.requestMoreInfoBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Business Plan Request for More Information",
+			mockMockRecipient = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "Your General Manager has requested more information about your Business Plan ${businessPlanID}.;The General Manager&apos;s comment was:;Requesting for More Info by General Manager.;Please revise the business plan, and then resubmit it at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.logoutAndLoginUser(roleName = "alliance_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+	}
+
+	@priority = "5"
+	test ResendForReviewBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanGeneralManager = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.general_manager");
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanPartnerMarketingPlanOwner = "Test MP Owner";
+		var partnerBusinessPlanStatus = "Pending";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.deleteAllMail();
+
+		PartnerWorkflow.requestMoreInfoBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerWorkflow.resendForReviewBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "US Dollar",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "${partnerBusinessPlanPartnerMarketingPlanOwner}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+
+		Partner.assertComment(
+			partnerComment = "Resending for Review by Alliance Manager."
+		);
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerMockMock.gotoMockMock();
+
+		PartnerMockMock.viewAndClickMail(
+			mockMockAsset = "[Liferay Partner Portal] Business Plan Submitted",
+			mockMockRecipient = "${partnerBusinessPlanGeneralManager}",
+			mockMockSender = "Partner Portal Admin &lt;partner-portal-admin@liferay.com&gt;"
+		);
+
+		PartnerMockMock.viewMailMessage(
+			mockMockAsset = "An Alliance Manager has (re)submitted a business plan for your review.;Please review the plan at the following link:;https://partner.liferay.com/business-plan-manager/-/business-plan-manager/${businessPlanID}"
+		);
+
+		PartnerMockMock.backtoInbox();
+
+		PartnerMockMock.deleteAllMail();
+
+		Partner.logoutAndLoginUser(roleName = "general_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "US Dollar",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "${partnerBusinessPlanPartnerMarketingPlanOwner}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertComment(
+			partnerComment = "Requesting for More Info by General Manager."
+		);
+
+		Partner.assertComment(
+			partnerComment = "Resending for Review by Alliance Manager."
+		);
+	}
+
+	@priority = "5"
+	test SaveAsDraftBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "Draft";
+		var partnerBusinessPlanYear = "2019";
+
+		Partner.logoutAndLoginUser(roleName = "alliance_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.clickNewBusinessPlanButton();
+
+		PartnerBusinessPlanForm.fillPartner(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.clickSaveDraftButton();
+
+		Partner.assertSuccess();
+
+		Partner.gotoManagementBusinessPlans();
+
+		Partner.gotoTab(tabName = "Drafts");
+
+		PartnerManagement.filterBusinessPlanByYear(
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		var businessPlanID = Partner.readLastRowID();
+
+		var partnerBusinessPlanID = "${businessPlanID}";
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "0",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+	}
+
+	@priority = "5"
+	test SaveIncompleteBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanStatus = "Incomplete";
+		var partnerBusinessPlanYear = "2019";
+
+		Partner.logoutAndLoginUser(roleName = "alliance_manager");
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.clickNewBusinessPlanButton();
+
+		PartnerBusinessPlanForm.fillPartner(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.clickSaveAndContinueButton();
+
+		PartnerBusinessPlanForm.deleteBusinessPlanConflict(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.gotoManagementBusinessPlans();
+
+		Partner.gotoTab(tabName = "Drafts");
+
+		PartnerManagement.filterBusinessPlanByYear(
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		var businessPlanID = Partner.readLastRowID();
+
+		var partnerBusinessPlanID = "${businessPlanID}";
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "0",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+	}
+
+	@priority = "5"
+	test ValidateBusinessPlan {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.gotoManagementBusinessPlans();
+
+		PartnerManagement.clickNewBusinessPlanButton();
+
+		PartnerBusinessPlanForm.fillPartner(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.clickSaveAndContinueButton();
+
+		PartnerBusinessPlanForm.assertConflict();
+	}
+
+	@priority = "5"
+	test ViewBusinessPlanAsPartner {
+		var partnerBusinessPlanCurrencyCode = "USD";
+		var partnerBusinessPlanLiferayBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.alliance_manager");
+		var partnerBusinessPlanLiferayMarketingPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.regional_field_marketing");
+		var partnerBusinessPlanLiferayRenewalContact = "Test Renewal Contact";
+		var partnerBusinessPlanPartnerBusinessPlanOwner = PropsUtil.get("partner.${partnerBusinessPlanRegionCode}.name.partner");
+		var partnerBusinessPlanPartnerMarketingPlanOwner = "Test MP Owner";
+		var partnerBusinessPlanStatus = "Pending";
+		var partnerBusinessPlanTotalRevenueProjections = "USD 300";
+		var partnerBusinessPlanYear = "2019";
+
+		var businessPlanID = PartnerWorkflow.createBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrencyCode = "${partnerBusinessPlanCurrencyCode}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanRegion = "${partnerBusinessPlanRegion}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		Partner.logoutAndLoginUser(roleName = "partner");
+
+		Partner.gotoSalesBusinessPlans(roleName = "partner");
+
+		PartnerManagement.assertBusinessPlan(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerManagement.clickBusinessPlan(
+			partnerBusinessPlanID = "${businessPlanID}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertSummary(
+			partnerBusinessPlanNumberOfGoals = "1",
+			partnerBusinessPlanStatus = "${partnerBusinessPlanStatus}",
+			partnerBusinessPlanTotalRevenueProjections = "${partnerBusinessPlanTotalRevenueProjections}",
+			partnerBusinessPlanYear = "${partnerBusinessPlanYear}"
+		);
+
+		PartnerBusinessPlan.assertAccountInformation(
+			partnerBusinessPlanCompany = "${partnerBusinessPlanCompany}",
+			partnerBusinessPlanCurrency = "US Dollar",
+			partnerBusinessPlanLiferayBusinessPlanOwner = "${partnerBusinessPlanLiferayBusinessPlanOwner}",
+			partnerBusinessPlanLiferayMarketingPlanOwner = "${partnerBusinessPlanLiferayMarketingPlanOwner}",
+			partnerBusinessPlanLiferayRenewalContact = "${partnerBusinessPlanLiferayRenewalContact}",
+			partnerBusinessPlanPartnerBusinessPlanOwner = "${partnerBusinessPlanPartnerBusinessPlanOwner}",
+			partnerBusinessPlanPartnerMarketingPlanOwner = "${partnerBusinessPlanPartnerMarketingPlanOwner}",
+			partnerBusinessPlanRegionCode = "${partnerBusinessPlanRegionCode}"
+		);
+
+		Partner.assertNoCommentSection();
+	}
+}
