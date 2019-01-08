@@ -1,123 +1,149 @@
-<definition>
-	<command name="assignWorker">
-		<execute macro="LESANavigation#gotoAssignWorkers" />
+definition {
+	macro assignWorker {
+		LESANavigation.gotoAssignWorkers();
 
-		<var name="key_emailAddress" value="${emailAddress}" />
+		var key_emailAddress = "${emailAddress}";
 
-		<execute function="AssertClick" locator1="LESATicketWorkersEdit#AVAILABLE_TAB" value1="Available" />
+		AssertClick(
+			locator1 = "LESATicketWorkersEdit#AVAILABLE_TAB",
+			value1 = "Available"
+		);
 
-		<execute macro="OSBAdminSearch#toggleSearch">
-			<var name="searchType" value="Advanced" />
-		</execute>
+		OSBAdminSearch.toggleSearch(searchType = "Advanced");
 
-		<execute function="Type" locator1="LESATicketWorkersEdit#EMAIL_ADDRESS_FIELD" value1="${emailAddress}" />
+		Type(
+			locator1 = "LESATicketWorkersEdit#EMAIL_ADDRESS_FIELD",
+			value1 = "${emailAddress}"
+		);
 
-		<execute macro="LESAButton#searchAdvanced" />
+		LESAButton.searchAdvanced();
 
-		<execute function="Check" locator1="LESATicketWorkersEdit#RESULT_ROW_CHECKBOX" />
-		<execute function="Select" locator1="LESATicketWorkersEdit#RESULT_ROW_ROLE_SELECT" value1="${role}" />
-		<execute function="Click" locator1="LESATicketWorkersEdit#RESULT_ROW_PRIMARY_RADIO" />
-		<execute function="Click" locator1="LESATicketWorkersEdit#UPDATE_ASSOCIATIONS_BUTTON" />
+		Check(locator1 = "LESATicketWorkersEdit#RESULT_ROW_CHECKBOX");
 
-		<execute macro="LESAMessage#success" />
+		Select(
+			locator1 = "LESATicketWorkersEdit#RESULT_ROW_ROLE_SELECT",
+			value1 = "${role}"
+		);
 
-		<execute function="AssertClick#assertPartialTextClickAt" locator1="LESATicketWorkersEdit#BACK_TO_PREVIOUS_PAGE_BUTTON" value1="BACK TO PREVIOUS PAGE" />
+		Click(locator1 = "LESATicketWorkersEdit#RESULT_ROW_PRIMARY_RADIO");
 
-		<execute function="AssertTextEquals" locator1="LESATicketDetails#ASSIGNEE_NAME" value1="${name}" />
-	</command>
+		Click(locator1 = "LESATicketWorkersEdit#UPDATE_ASSOCIATIONS_BUTTON");
 
-	<command name="changeTicketStatus">
-		<execute macro="LESATicketTransition#selectTicketStatus">
-			<var name="status" value="${newStatus}" />
-		</execute>
+		LESAMessage.success();
 
-		<if>
-			<equals arg1="${newStatus}" arg2="Closed" />
-			<then>
-				<execute function="SelectNoError" locator1="LESATicketDetails#RESOLUTION_SELECT" value1="${resolution}" />
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "LESATicketWorkersEdit#BACK_TO_PREVIOUS_PAGE_BUTTON",
+			value1 = "BACK TO PREVIOUS PAGE"
+		);
 
-				<execute function="Confirm" value1="Are you sure you want to modify the status from (${currentStatus}) to (Closed - ${resolution})?" />
+		AssertTextEquals(
+			locator1 = "LESATicketDetails#ASSIGNEE_NAME",
+			value1 = "${name}"
+		);
+	}
 
-				<execute macro="LESATicketView#viewTicketResolution">
-					<var name="resolution" value="(${resolution})" />
-				</execute>
-			</then>
-			<else>
-				<execute function="Confirm" value1="Are you sure you want to modify the status from (${currentStatus}) to (${newStatus})?" />
-			</else>
-		</if>
+	macro changeTicketStatus {
+		LESATicketTransition.selectTicketStatus(status = "${newStatus}");
 
-		<execute macro="LESAMessage#success" />
+		if ("${newStatus}" == "Closed") {
+			SelectNoError(
+				locator1 = "LESATicketDetails#RESOLUTION_SELECT",
+				value1 = "${resolution}"
+			);
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="${newStatus}" />
-		</execute>
-	</command>
+			Confirm(
+				value1 = "Are you sure you want to modify the status from (${currentStatus}) to (Closed - ${resolution})?"
+			);
 
-	<command name="completeTicket">
-		<execute function="Click" locator1="LESATicketDetails#COMPLETE_TICKET_BUTTON" />
+			LESATicketView.viewTicketResolution(resolution = "(${resolution})");
+		}
+		else {
+			Confirm(
+				value1 = "Are you sure you want to modify the status from (${currentStatus}) to (${newStatus})?"
+			);
+		}
 
-		<execute macro="LESAMessage#success" />
+		LESAMessage.success();
 
-		<execute macro="LESATicketView#viewTicketStatus">
-			<var name="status" value="Closed" />
-		</execute>
+		LESATicketView.viewTicketStatus(status = "${newStatus}");
+	}
 
-		<execute macro="LESATicketView#viewTicketResolution">
-			<var name="resolution" value="(Completed)" />
-		</execute>
-	</command>
+	macro completeTicket {
+		Click(locator1 = "LESATicketDetails#COMPLETE_TICKET_BUTTON");
 
-	<command name="escalateTicket">
-		<execute macro="LESANavigation#gotoTicketThreeDotMenuItem">
-			<var name="menuItem" value="Escalate" />
-		</execute>
+		LESAMessage.success();
 
-		<execute function="SelectWindow" locator1="title=Support" />
+		LESATicketView.viewTicketStatus(status = "Closed");
 
-		<execute function="ClickNoError" locator1="LESAButton#ESCALATE_BUTTON" />
+		LESATicketView.viewTicketResolution(resolution = "(Completed)");
+	}
 
-		<execute function="SelectWindow" locator1="null" />
-	</command>
+	macro escalateTicket {
+		LESANavigation.gotoTicketThreeDotMenuItem(menuItem = "Escalate");
 
-	<command name="forwardTicket">
-		<execute macro="LESANavigation#gotoForwardTicket" />
+		SelectWindow(locator1 = "title=Support");
 
-		<execute function="Type" locator1="LESATicketForward#MAIN_GOAL_FIELD" value1="${mainGoal}" />
-		<execute function="Type" locator1="LESATicketForward#WORK_DONE_FIELD" value1="${workDone}" />
-		<execute function="Type" locator1="LESATicketForward#CUSTOMER_NEXT_STEPS_FIELD" value1="${customerNextSteps}" />
-		<execute function="Type" locator1="LESATicketForward#NEXT_REGION_NEXT_STEPS_FIELD" value1="${nextRegionNextSteps}" />
-		<execute function="Click" locator1="LESATicketForward#FORWARD_BUTTON" />
+		ClickNoError(locator1 = "LESAButton#ESCALATE_BUTTON");
 
-		<execute macro="LESAMessage#success" />
+		SelectWindow(locator1 = "null");
+	}
 
-		<execute function="AssertTextNotEquals" locator1="LESATicketDetails#ASSIGNEE_NAME" value1="${name}" />
-	</command>
+	macro forwardTicket {
+		LESANavigation.gotoForwardTicket();
 
-	<command name="reproduceSteps">
-		<execute macro="LESATicketTransition#workflowTicket">
-			<var name="workflowStep" value="Plan Resolution" />
-		</execute>
+		Type(locator1 = "LESATicketForward#MAIN_GOAL_FIELD", value1 = "${mainGoal}");
 
-		<execute function="SelectWindow" locator1="title=Support" />
+		Type(locator1 = "LESATicketForward#WORK_DONE_FIELD", value1 = "${workDone}");
 
-		<execute function="Type" locator1="LESATicketReproductionSteps#REPRODUCTION_STEPS_FIELD" value1="${steps}" />
+		Type(
+			locator1 = "LESATicketForward#CUSTOMER_NEXT_STEPS_FIELD",
+			value1 = "${customerNextSteps}"
+		);
 
-		<execute function="ClickNoError" locator1="LESAButton#SAVE_BUTTON" />
+		Type(
+			locator1 = "LESATicketForward#NEXT_REGION_NEXT_STEPS_FIELD",
+			value1 = "${nextRegionNextSteps}"
+		);
 
-		<execute function="SelectWindow" locator1="null" />
+		Click(locator1 = "LESATicketForward#FORWARD_BUTTON");
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		LESAMessage.success();
 
-	<command name="selectTicketStatus">
-		<execute function="Click" locator1="LESATicketDetails#STATUS" />
-		<execute function="SelectNoError" locator1="LESATicketDetails#STATUS_SELECT" value1="${status}" />
-	</command>
+		AssertTextNotEquals(
+			locator1 = "LESATicketDetails#ASSIGNEE_NAME",
+			value1 = "${name}"
+		);
+	}
 
-	<command name="workflowTicket">
-		<var name="key_workflowStep" value="${workflowStep}" />
+	macro reproduceSteps {
+		LESATicketTransition.workflowTicket(workflowStep = "Plan Resolution");
 
-		<execute function="Click" locator1="LESATicketDetails#WORKFLOW_STEP_BUTTON" />
-	</command>
-</definition>
+		SelectWindow(locator1 = "title=Support");
+
+		Type(
+			locator1 = "LESATicketReproductionSteps#REPRODUCTION_STEPS_FIELD",
+			value1 = "${steps}"
+		);
+
+		ClickNoError(locator1 = "LESAButton#SAVE_BUTTON");
+
+		SelectWindow(locator1 = "null");
+
+		LESAMessage.success();
+	}
+
+	macro selectTicketStatus {
+		Click(locator1 = "LESATicketDetails#STATUS");
+
+		SelectNoError(
+			locator1 = "LESATicketDetails#STATUS_SELECT",
+			value1 = "${status}"
+		);
+	}
+
+	macro workflowTicket {
+		var key_workflowStep = "${workflowStep}";
+
+		Click(locator1 = "LESATicketDetails#WORKFLOW_STEP_BUTTON");
+	}
+}

@@ -1,193 +1,160 @@
-<definition>
-	<command name="cancel">
-		<execute macro="LESAHomepage#closeAllBanners" />
+definition {
+	macro cancel {
+		LESAHomepage.closeAllBanners();
 
-		<execute function="Click" locator1="LESATicketCreate#CANCEL_BUTTON" />
-	</command>
+		Click(locator1 = "LESATicketCreate#CANCEL_BUTTON");
+	}
 
-	<command name="createEnvironmentConfiguration">
-		<execute macro="LESATicketCreateEntry#selectNewConfig">
-			<var name="appServer" value="${appServer}" />
-			<var name="database" value="${database}" />
-			<var name="javaVM" value="${javaVM}" />
-			<var name="liferayVersion" value="${liferayVersion}" />
-			<var name="operatingSystem" value="${operatingSystem}" />
-		</execute>
+	macro createEnvironmentConfiguration {
+		LESATicketCreateEntry.selectNewConfig(
+			appServer = "${appServer}",
+			database = "${database}",
+			javaVM = "${javaVM}",
+			liferayVersion = "${liferayVersion}",
+			operatingSystem = "${operatingSystem}"
+		);
 
-		<execute function="ClickNoError" locator1="LESAEnvironmentConfigurations#CREATE_ENVIRONMENT_BUTTON" />
+		ClickNoError(
+			locator1 = "LESAEnvironmentConfigurations#CREATE_ENVIRONMENT_BUTTON"
+		);
 
-		<execute function="Confirm#assertPrompt" locator1="Please enter a valid name for this environment configuration:" value1="${envName}" />
-	</command>
+		Confirm.assertPrompt(
+			locator1 = "Please enter a valid name for this environment configuration:",
+			value1 = "${envName}"
+		);
+	}
 
-	<command name="createTicket">
-		<execute macro="LESAHomepage#closeAllBanners" />
+	macro createTicket {
+		LESAHomepage.closeAllBanners();
 
-		<execute function="ScrollWebElementIntoView" locator1="LESATicketCreate#CREATE_BUTTON" />
-		<execute function="Click" locator1="LESATicketCreate#CREATE_BUTTON" />
-	</command>
+		ScrollWebElementIntoView(locator1 = "LESATicketCreate#CREATE_BUTTON");
 
-	<command name="createTicketAndGetTicketNumber">
-		<execute macro="LESATicketCreate#createTicket" />
+		Click(locator1 = "LESATicketCreate#CREATE_BUTTON");
+	}
 
-		<execute macro="LESAMessage#success" />
+	macro createTicketAndGetTicketNumber {
+		LESATicketCreate.createTicket();
 
-		<var method="selenium#getText('LESATicketDetails#TICKET_NUMBER')" name="newTicketNumber" />
+		LESAMessage.success();
 
-		<return value="${newTicketNumber}" />
-	</command>
+		var newTicketNumber = selenium.getText("LESATicketDetails#TICKET_NUMBER");
 
-	<command name="inputActivationKeyDetails">
-		<if>
-			<isset var="typeOfKey" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#TYPE_OF_KEY_SELECT" value1="${typeOfKey}" />
-			</then>
-		</if>
+		return "${newTicketNumber}";
+	}
 
-		<if>
-			<isset var="purpose" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#PURPOSE_SELECT" value1="${purpose}" />
-			</then>
-		</if>
-	</command>
+	macro inputActivationKeyDetails {
+		if (isSet(typeOfKey)) {
+			Select(
+				locator1 = "LESATicketCreate#TYPE_OF_KEY_SELECT",
+				value1 = "${typeOfKey}"
+			);
+		}
 
-	<command name="inputBasicForm">
-		<execute macro="LESATicketCreate#newTicket" />
+		if (isSet(purpose)) {
+			Select(locator1 = "LESATicketCreate#PURPOSE_SELECT", value1 = "${purpose}");
+		}
+	}
 
-		<execute macro="LESATicketCreateEntry#selectProject">
-			<var name="project" value="${project}" />
-		</execute>
+	macro inputBasicForm {
+		LESATicketCreate.newTicket();
 
-		<execute macro="LESATicketCreateEntry#selectProduct">
-			<var name="product" value="${product}" />
-		</execute>
+		LESATicketCreateEntry.selectProject(project = "${project}");
 
-		<if>
-			<or>
-				<equals arg1="${product}" arg2="Portal" />
-				<equals arg1="${product}" arg2="Digital Experience Platform" />
-			</or>
-			<then>
-				<execute macro="LESATicketCreateEntry#selectServer">
-					<var name="server" value="${server}" />
-				</execute>
-			</then>
-			<else>
-				<execute function="AssertElementNotPresent" locator1="LESATicketCreate#SERVER_SELECT" />
-			</else>
-		</if>
+		LESATicketCreateEntry.selectProduct(product = "${product}");
 
-		<if>
-			<isset var="component" />
-			<then>
-				<execute macro="LESATicketCreateEntry#selectComponent">
-					<var name="component" value="${component}" />
-				</execute>
-			</then>
-		</if>
+		if (("${product}" == "Portal") || ("${product}" == "Digital Experience Platform")) {
+			LESATicketCreateEntry.selectServer(server = "${server}");
+		}
+		else {
+			AssertElementNotPresent(locator1 = "LESATicketCreate#SERVER_SELECT");
+		}
 
-		<if>
-			<isset var="subcomponent" />
-			<then>
-				<execute macro="LESATicketCreateEntry#selectSubcomponent">
-					<var name="subcomponent" value="${subcomponent}" />
-				</execute>
-			</then>
-		</if>
+		if (isSet(component)) {
+			LESATicketCreateEntry.selectComponent(component = "${component}");
+		}
 
-		<if>
-			<equals arg1="${configType}" arg2="saved" />
-			<then>
-				<execute macro="LESATicketCreateEntry#selectSavedConfig">
-					<var name="savedEnvConfigName" value="${savedEnvConfigName}" />
-				</execute>
-			</then>
-			<elseif>
-				<equals arg1="${configType}" arg2="new" />
-				<then>
-					<execute macro="LESATicketCreateEntry#selectNewConfig">
-						<var name="appServer" value="${appServer}" />
-						<var name="database" value="${database}" />
-						<var name="javaVM" value="${javaVM}" />
-						<var name="liferayVersion" value="${liferayVersion}" />
-						<var name="operatingSystem" value="${operatingSystem}" />
-					</execute>
-				</then>
-			</elseif>
-		</if>
+		if (isSet(subcomponent)) {
+			LESATicketCreateEntry.selectSubcomponent(subcomponent = "${subcomponent}");
+		}
 
-		<if>
-			<isset var="browser" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#BROWSER_SELECT" value1="${browser}" />
-			</then>
-		</if>
+		if ("${configType}" == "saved") {
+			LESATicketCreateEntry.selectSavedConfig(
+				savedEnvConfigName = "${savedEnvConfigName}"
+			);
+		}
+		else if ("${configType}" == "new") {
+			LESATicketCreateEntry.selectNewConfig(
+				appServer = "${appServer}",
+				database = "${database}",
+				javaVM = "${javaVM}",
+				liferayVersion = "${liferayVersion}",
+				operatingSystem = "${operatingSystem}"
+			);
+		}
 
-		<if>
-			<isset var="systemStatus" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#SYSTEM_STATUS_SELECT" value1="${systemStatus}" />
-			</then>
-		</if>
+		if (isSet(browser)) {
+			Select(locator1 = "LESATicketCreate#BROWSER_SELECT", value1 = "${browser}");
+		}
 
-		<execute function="Type" locator1="LESATicketCreate#SUMMARY_FIELD" value1="${summary}" />
-		<execute function="Type" locator1="LESATicketCreate#DESCRIPTION_FIELD" value1="${description}" />
-	</command>
+		if (isSet(systemStatus)) {
+			Select(
+				locator1 = "LESATicketCreate#SYSTEM_STATUS_SELECT",
+				value1 = "${systemStatus}"
+			);
+		}
 
-	<command name="inputClusteringDetails">
-		<execute function="Select" locator1="LESATicketCreate#SERVER_COMMUNICATION_TYPE_SELECT" value1="${serverCommunicationType}" />
+		Type(locator1 = "LESATicketCreate#SUMMARY_FIELD", value1 = "${summary}");
 
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON" />
-			<then>
-				<execute macro="LESATicketCreateEntry#uploadToPatchLevel" />
+		Type(locator1 = "LESATicketCreate#DESCRIPTION_FIELD", value1 = "${description}");
+	}
 
-				<execute macro="LESATicketCreateEntry#uploadToPortalExt" />
-			</then>
-		</if>
-	</command>
+	macro inputClusteringDetails {
+		Select(
+			locator1 = "LESATicketCreate#SERVER_COMMUNICATION_TYPE_SELECT",
+			value1 = "${serverCommunicationType}"
+		);
 
-	<command name="inputUpgradeDetails">
-		<if>
-			<isset var="fromLiferayVersion" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#FROM_LIFERAY_VERSION_SELECT" value1="${fromLiferayVersion}" />
-			</then>
-		</if>
+		if (IsElementPresent(locator1 = "LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON")) {
+			LESATicketCreateEntry.uploadToPatchLevel();
 
-		<if>
-			<isset var="toLiferayVersion" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#TO_LIFERAY_VERSION_SELECT" value1="${toLiferayVersion}" />
-			</then>
-		</if>
+			LESATicketCreateEntry.uploadToPortalExt();
+		}
+	}
 
-		<if>
-			<isset var="documentPersistence" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#DL_PERSISTENCE_SELECT" value1="${documentPersistence}" />
-			</then>
-		</if>
+	macro inputUpgradeDetails {
+		if (isSet(fromLiferayVersion)) {
+			Select(
+				locator1 = "LESATicketCreate#FROM_LIFERAY_VERSION_SELECT",
+				value1 = "${fromLiferayVersion}"
+			);
+		}
 
-		<if>
-			<isset var="upgradeSteps" />
-			<then>
-				<execute function="Type" locator1="LESATicketCreate#STEPS_USED_FIELD" value1="${upgradeSteps}" />
-			</then>
-		</if>
+		if (isSet(toLiferayVersion)) {
+			Select(
+				locator1 = "LESATicketCreate#TO_LIFERAY_VERSION_SELECT",
+				value1 = "${toLiferayVersion}"
+			);
+		}
 
-		<if>
-			<equals arg1="${upload}" arg2="yes" />
-			<then>
-				<execute macro="LESATicketCreateEntry#uploadToPatchLevel" />
+		if (isSet(documentPersistence)) {
+			Select(
+				locator1 = "LESATicketCreate#DL_PERSISTENCE_SELECT",
+				value1 = "${documentPersistence}"
+			);
+		}
 
-				<execute macro="LESATicketCreateEntry#uploadToPortalExt" />
-			</then>
-		</if>
-	</command>
+		if (isSet(upgradeSteps)) {
+			Type(locator1 = "LESATicketCreate#STEPS_USED_FIELD", value1 = "${upgradeSteps}");
+		}
 
-	<command name="newTicket">
-		<execute function="Click" locator1="LESALeftNavigation#NEW_TICKET_BUTTON" />
-	</command>
-</definition>
+		if ("${upload}" == "yes") {
+			LESATicketCreateEntry.uploadToPatchLevel();
+
+			LESATicketCreateEntry.uploadToPortalExt();
+		}
+	}
+
+	macro newTicket {
+		Click(locator1 = "LESALeftNavigation#NEW_TICKET_BUTTON");
+	}
+}

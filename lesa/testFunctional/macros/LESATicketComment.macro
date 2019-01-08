@@ -1,259 +1,293 @@
-<definition>
-	<command name="addComment">
-		<execute macro="LESAHomepage#closeAllBanners" />
+definition {
+	macro addComment {
+		LESAHomepage.closeAllBanners();
 
-		<if>
-			<isset var="commentType" />
-			<then>
-				<execute macro="LESATicketComment#clickCommentTab">
-					<var name="commentType" value="${commentType}" />
-				</execute>
-			</then>
-		</if>
+		if (isSet(commentType)) {
+			LESATicketComment.clickCommentTab(commentType = "${commentType}");
+		}
 
-		<execute macro="LESATicketComment#inputCommentText">
-			<var name="comment" value="${comment}" />
-			<var name="commentLines" value="${commentLines}" />
-		</execute>
+		LESATicketComment.inputCommentText(
+			comment = "${comment}",
+			commentLines = "${commentLines}"
+		);
 
-		<if>
-			<isset var="fileName" />
-			<then>
-				<execute macro="LESATicketComment#inputCommentAttachment">
-					<var name="fileName" value="${fileName}" />
-				</execute>
-			</then>
-		</if>
+		if (isSet(fileName)) {
+			LESATicketComment.inputCommentAttachment(fileName = "${fileName}");
+		}
 
-		<execute function="Click" locator1="LESATicketComment#POST_BUTTON" />
+		Click(locator1 = "LESATicketComment#POST_BUTTON");
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		LESAMessage.success();
+	}
 
-	<command name="addCommentWithDuplicateAttachment">
-		<execute macro="LESATicketComment#inputCommentText">
-			<var name="comment" value="${comment}." />
-		</execute>
+	macro addCommentWithDuplicateAttachment {
+		LESATicketComment.inputCommentText(comment = "${comment}.");
 
-		<execute macro="LESATicketComment#inputCommentAttachment">
-			<var name="fileName" value="${fileName}" />
-		</execute>
+		LESATicketComment.inputCommentAttachment(fileName = "${fileName}");
 
-		<execute function="Click" locator1="LESATicketComment#POST_BUTTON" />
+		Click(locator1 = "LESATicketComment#POST_BUTTON");
 
-		<execute macro="LESAMessage#error">
-			<var name="errorMessage" value="Your request failed to complete." />
-		</execute>
+		LESAMessage.error(errorMessage = "Your request failed to complete.");
 
-		<execute macro="LESAMessage#error">
-			<var name="errorMessage" value="Please enter a unique document name." />
-		</execute>
+		LESAMessage.error(errorMessage = "Please enter a unique document name.");
 
-		<var name="key_comment" value="${comment}" />
+		var key_comment = "${comment}";
 
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-	</command>
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+	}
 
-	<command name="assertCommentNotEditable">
-		<var name="key_comment" value="${comment}" />
+	macro assertCommentNotEditable {
+		var key_comment = "${comment}";
 
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_THREE_DOT_MENU" />
-	</command>
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_THREE_DOT_MENU");
+	}
 
-	<command name="autoSaveComment">
-		<if>
-			<isset var="commentType" />
-			<then>
-				<execute macro="LESATicketComment#clickCommentTab">
-					<var name="commentType" value="${commentType}" />
-				</execute>
-			</then>
-		</if>
+	macro autoSaveComment {
+		if (isSet(commentType)) {
+			LESATicketComment.clickCommentTab(commentType = "${commentType}");
+		}
 
-		<execute macro="LESATicketComment#inputCommentText">
-			<var name="comment" value="${comment}" />
-		</execute>
+		LESATicketComment.inputCommentText(comment = "${comment}");
 
-		<execute function="Pause" locator1="10000" />
+		Pause(locator1 = "10000");
 
-		<execute function="AssertElementPresent" locator1="LESATicketComment#SAVED_AS_DRAFT_MESSAGE" />
+		AssertElementPresent(locator1 = "LESATicketComment#SAVED_AS_DRAFT_MESSAGE");
 
-		<execute function="Refresh" />
+		Refresh();
 
-		<execute macro="LESATicketComment#viewDraftComment">
-			<var name="comment" value="${comment}" />
-		</execute>
-	</command>
+		LESATicketComment.viewDraftComment(comment = "${comment}");
+	}
 
-	<command name="clickCommentTab">
-		<if>
-			<equals arg1="${commentType}" arg2="Public" />
-			<then>
-				<execute function="Click" locator1="LESATicketDetails#PUBLIC_TAB" />
-			</then>
-			<elseif>
-				<equals arg1="${commentType}" arg2="Worker" />
-				<then>
-					<execute function="Click" locator1="LESATicketDetails#WORKERS_TAB" />
-				</then>
-			</elseif>
-			<elseif>
-				<equals arg1="${commentType}" arg2="Liferay" />
-				<then>
-					<execute function="Click" locator1="LESATicketDetails#LIFERAY_TAB" />
-				</then>
-			</elseif>
-		</if>
-	</command>
+	macro clickCommentTab {
+		if ("${commentType}" == "Public") {
+			Click(locator1 = "LESATicketDetails#PUBLIC_TAB");
+		}
+		else if ("${commentType}" == "Worker") {
+			Click(locator1 = "LESATicketDetails#WORKERS_TAB");
+		}
+		else if ("${commentType}" == "Liferay") {
+			Click(locator1 = "LESATicketDetails#LIFERAY_TAB");
+		}
+	}
 
-	<command name="deleteDraftComment">
-		<var name="key_comment" value="${comment}" />
-		<var name="key_item" value="Delete" />
+	macro deleteDraftComment {
+		var key_comment = "${comment}";
+		var key_item = "Delete";
 
-		<execute function="Click" locator1="LESATicketComment#COMMENT_THREE_DOT_MENU" />
-		<execute function="ClickNoError" locator1="LESATicketComment#COMMENT_THREE_DOT_MENU_ITEM" />
-		<execute function="Confirm" value1="Are you sure you want to delete this?" />
+		Click(locator1 = "LESATicketComment#COMMENT_THREE_DOT_MENU");
 
-		<execute macro="LESAMessage#success" />
+		ClickNoError(locator1 = "LESATicketComment#COMMENT_THREE_DOT_MENU_ITEM");
 
-		<execute function="AssertElementNotPresent" locator1="DRAFT_COMMENT_TEXT" />
-	</command>
+		Confirm(value1 = "Are you sure you want to delete this?");
 
-	<command name="editComment">
-		<execute macro="LESAHomepage#closeAllBanners" />
+		LESAMessage.success();
 
-		<var name="key_comment" value="${originalComment}" />
-		<var name="key_item" value="Edit" />
+		AssertElementNotPresent(locator1 = "DRAFT_COMMENT_TEXT");
+	}
 
-		<execute function="Click" locator1="LESATicketComment#COMMENT_THREE_DOT_MENU" />
-		<execute function="Click" locator1="LESATicketComment#COMMENT_THREE_DOT_MENU_ITEM" />
-		<execute function="Type" locator1="LESATicketComment#EDIT_COMMENT_FIELD" value1="${newComment}" />
-		<execute function="Click" locator1="LESATicketComment#UPDATE_BUTTON" />
+	macro editComment {
+		LESAHomepage.closeAllBanners();
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		var key_comment = "${originalComment}";
+		var key_item = "Edit";
 
-	<command name="inputCommentAttachment">
-		<execute function="Click" locator1="LESATicketComment#ADD_ATTACHMENTS_BUTTON" />
-		<execute function="UploadCommonFile" locator1="LESATicketComment#BROWSE_1_BUTTON" value1="${fileName}" />
-	</command>
+		Click(locator1 = "LESATicketComment#COMMENT_THREE_DOT_MENU");
 
-	<command name="inputCommentText">
-		<if>
-			<isset var="commentLines" />
-			<then>
-				<for list="${commentLines}" param="line">
-					<execute function="KeyPress" locator1="LESATicketComment#NEW_COMMENT_FIELD" value1="${line}" />
-					<execute function="KeyPress" locator1="LESATicketComment#NEW_COMMENT_FIELD" value1="\RETURN" />
-				</for>
-			</then>
-			<else>
-				<execute function="Type" locator1="LESATicketComment#NEW_COMMENT_FIELD" value1="${comment}" />
-			</else>
-		</if>
-	</command>
+		Click(locator1 = "LESATicketComment#COMMENT_THREE_DOT_MENU_ITEM");
 
-	<command name="viewComment">
-		<execute macro="LESATicketComment#clickCommentTab">
-			<var name="commentType" value="${commentType}" />
-		</execute>
+		Type(
+			locator1 = "LESATicketComment#EDIT_COMMENT_FIELD",
+			value1 = "${newComment}"
+		);
 
-		<var name="key_comment" value="${comment}" />
+		Click(locator1 = "LESATicketComment#UPDATE_BUTTON");
 
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_TEXT" value1="${comment}" />
-	</command>
+		LESAMessage.success();
+	}
 
-	<command name="viewCommentAsCustomer">
-		<execute macro="LESANavigation#gotoTicket">
-			<var name="ticketNumber" value="${ticketNumber}" />
-		</execute>
+	macro inputCommentAttachment {
+		Click(locator1 = "LESATicketComment#ADD_ATTACHMENTS_BUTTON");
 
-		<var name="key_comment" value="${comment}" />
+		UploadCommonFile(
+			locator1 = "LESATicketComment#BROWSE_1_BUTTON",
+			value1 = "${fileName}"
+		);
+	}
 
-		<if>
-			<equals arg1="${commentType}" arg2="Public" />
-			<then>
-				<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_TEXT" value1="${comment}" />
-				<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_CREATOR" value1="${commentCreator}" />
-			</then>
-			<else>
-				<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-			</else>
-		</if>
-	</command>
+	macro inputCommentText {
+		if (isSet(commentLines)) {
+			for (var line : list "${commentLines}") {
+				KeyPress(locator1 = "LESATicketComment#NEW_COMMENT_FIELD", value1 = "${line}");
 
-	<command name="viewCommentAttachment">
-		<execute macro="LESATicketComment#clickCommentTab">
-			<var name="commentType" value="${commentType}" />
-		</execute>
+				KeyPress(locator1 = "LESATicketComment#NEW_COMMENT_FIELD", value1 = "\RETURN");
+			}
+		}
+		else {
+			Type(locator1 = "LESATicketComment#NEW_COMMENT_FIELD", value1 = "${comment}");
+		}
+	}
 
-		<var name="key_comment" value="${comment}" />
+	macro viewComment {
+		LESATicketComment.clickCommentTab(commentType = "${commentType}");
 
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_ATTACHMENT" value1="${fileName}" />
-	</command>
+		var key_comment = "${comment}";
 
-	<command name="viewCommentWithReturns">
-		<execute macro="LESATicketComment#clickCommentTab">
-			<var name="commentType" value="${commentType}" />
-		</execute>
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_TEXT",
+			value1 = "${comment}"
+		);
+	}
 
-		<for list="${commentLines}" param="line">
-			<var name="key_comment" value="${line}" />
+	macro viewCommentAsCustomer {
+		LESANavigation.gotoTicket(ticketNumber = "${ticketNumber}");
 
-			<execute function="AssertTextEquals#assertPartialText" locator1="LESATicketComment#COMMENT_TEXT" value1="${line}" />
-			<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_CREATOR" value1="${commentCreator}" />
-		</for>
-	</command>
+		var key_comment = "${comment}";
 
-	<command name="viewDraftComment">
-		<var name="key_comment" value="${comment}" />
+		if ("${commentType}" == "Public") {
+			AssertTextEquals(
+				locator1 = "LESATicketComment#COMMENT_TEXT",
+				value1 = "${comment}"
+			);
 
-		<execute function="AssertTextEquals" locator1="LESATicketComment#DRAFT_COMMENT_TEXT" value1="${comment}" />
-	</command>
+			AssertTextEquals(
+				locator1 = "LESATicketComment#COMMENT_CREATOR",
+				value1 = "${commentCreator}"
+			);
+		}
+		else {
+			AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+		}
+	}
 
-	<command name="viewLiferayComment">
-		<var name="key_comment" value="${comment}" />
+	macro viewCommentAttachment {
+		LESATicketComment.clickCommentTab(commentType = "${commentType}");
 
-		<execute function="Click" locator1="LESATicketDetails#PUBLIC_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#WORKERS_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#LIFERAY_TAB" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_TEXT" value1="${comment}" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_CREATOR" value1="${commentCreator}" />
-		<execute function="Click" locator1="LESATicketDetails#ALL_COMMENTS_TAB" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_VISIBILITY" value1="Visible to Liferay." />
-	</command>
+		var key_comment = "${comment}";
 
-	<command name="viewPublicComment">
-		<var name="key_comment" value="${comment}" />
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_ATTACHMENT",
+			value1 = "${fileName}"
+		);
+	}
 
-		<execute function="Click" locator1="LESATicketDetails#PUBLIC_TAB" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_TEXT" value1="${comment}" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_CREATOR" value1="${commentCreator}" />
-		<execute function="Click" locator1="LESATicketDetails#WORKERS_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#LIFERAY_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#ALL_COMMENTS_TAB" />
-		<execute function="AssertElementPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-	</command>
+	macro viewCommentWithReturns {
+		LESATicketComment.clickCommentTab(commentType = "${commentType}");
 
-	<command name="viewWorkerComment">
-		<var name="key_comment" value="${comment}" />
+		for (var line : list "${commentLines}") {
+			var key_comment = "${line}";
 
-		<execute function="Click" locator1="LESATicketDetails#PUBLIC_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#WORKERS_TAB" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_TEXT" value1="${comment}" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_CREATOR" value1="${commentCreator}" />
-		<execute function="Click" locator1="LESATicketDetails#LIFERAY_TAB" />
-		<execute function="AssertElementNotPresent" locator1="LESATicketComment#COMMENT_TEXT" />
-		<execute function="Click" locator1="LESATicketDetails#ALL_COMMENTS_TAB" />
-		<execute function="AssertTextEquals" locator1="LESATicketComment#COMMENT_VISIBILITY" value1="Visible to Workers." />
-	</command>
+			AssertTextEquals.assertPartialText(
+				locator1 = "LESATicketComment#COMMENT_TEXT",
+				value1 = "${line}"
+			);
 
-	<command name="viewWorkerTabNotPresent">
-		<execute function="AssertElementNotPresent" locator1="LESATicketDetails#WORKERS_TAB" />
-	</command>
-</definition>
+			AssertTextEquals(
+				locator1 = "LESATicketComment#COMMENT_CREATOR",
+				value1 = "${commentCreator}"
+			);
+		}
+	}
+
+	macro viewDraftComment {
+		var key_comment = "${comment}";
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#DRAFT_COMMENT_TEXT",
+			value1 = "${comment}"
+		);
+	}
+
+	macro viewLiferayComment {
+		var key_comment = "${comment}";
+
+		Click(locator1 = "LESATicketDetails#PUBLIC_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#WORKERS_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#LIFERAY_TAB");
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_TEXT",
+			value1 = "${comment}"
+		);
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_CREATOR",
+			value1 = "${commentCreator}"
+		);
+
+		Click(locator1 = "LESATicketDetails#ALL_COMMENTS_TAB");
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_VISIBILITY",
+			value1 = "Visible to Liferay."
+		);
+	}
+
+	macro viewPublicComment {
+		var key_comment = "${comment}";
+
+		Click(locator1 = "LESATicketDetails#PUBLIC_TAB");
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_TEXT",
+			value1 = "${comment}"
+		);
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_CREATOR",
+			value1 = "${commentCreator}"
+		);
+
+		Click(locator1 = "LESATicketDetails#WORKERS_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#LIFERAY_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#ALL_COMMENTS_TAB");
+
+		AssertElementPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+	}
+
+	macro viewWorkerComment {
+		var key_comment = "${comment}";
+
+		Click(locator1 = "LESATicketDetails#PUBLIC_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#WORKERS_TAB");
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_TEXT",
+			value1 = "${comment}"
+		);
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_CREATOR",
+			value1 = "${commentCreator}"
+		);
+
+		Click(locator1 = "LESATicketDetails#LIFERAY_TAB");
+
+		AssertElementNotPresent(locator1 = "LESATicketComment#COMMENT_TEXT");
+
+		Click(locator1 = "LESATicketDetails#ALL_COMMENTS_TAB");
+
+		AssertTextEquals(
+			locator1 = "LESATicketComment#COMMENT_VISIBILITY",
+			value1 = "Visible to Workers."
+		);
+	}
+
+	macro viewWorkerTabNotPresent {
+		AssertElementNotPresent(locator1 = "LESATicketDetails#WORKERS_TAB");
+	}
+}

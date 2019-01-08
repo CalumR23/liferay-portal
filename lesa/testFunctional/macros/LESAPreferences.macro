@@ -1,156 +1,196 @@
-<definition>
-	<command name="assertNoEnvironmentConfigurationsTab">
-		<execute function="Click" locator1="LESALeftNavigation#PREFERENCES_BUTTON" />
+definition {
+	macro assertNoEnvironmentConfigurationsTab {
+		Click(locator1 = "LESALeftNavigation#PREFERENCES_BUTTON");
 
-		<execute function="AssertElementNotPresent" locator1="LESAPreferences#ENVIRONMENT_CONFIGURATIONS_TAB" />
-	</command>
+		AssertElementNotPresent(
+			locator1 = "LESAPreferences#ENVIRONMENT_CONFIGURATIONS_TAB"
+		);
+	}
 
-	<command name="changeStatusViaManagerDashboard">
-		<execute macro="LESANavigation#gotoManagerDashboard" />
+	macro changeStatusViaManagerDashboard {
+		LESANavigation.gotoManagerDashboard();
 
-		<var name="key_cseName" value="${cseName}" />
+		var key_cseName = "${cseName}";
 
-		<if>
-			<condition function="IsElementPresent" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_IN" />
-			<then>
-				<echo message="status= in" />
-				<execute function="Click" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_TOGGLE" />
-				<execute function="MouseOver" locator1="LESAPreferences#MANAGER_DASHBOARD_TAB" />
+		if (IsElementPresent(locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_IN")) {
+			echo("status= in");
 
-				<execute function="Pause" locator1="1000" />
+			Click(locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_TOGGLE");
 
-				<execute function="AssertElementNotPresent" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_IN" />
-				<execute function="AssertElementPresent" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_ON_PTO" />
-			</then>
-			<else>
-				<echo message="status = on pto" />
-				<execute function="Click" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_TOGGLE" />
-				<execute function="MouseOver" locator1="LESAPreferences#MANAGER_DASHBOARD_TAB" />
+			MouseOver(locator1 = "LESAPreferences#MANAGER_DASHBOARD_TAB");
 
-				<execute function="Pause" locator1="1000" />
+			Pause(locator1 = "1000");
 
-				<execute function="AssertElementPresent" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_IN" />
-				<execute function="AssertElementNotPresent" locator1="LESAPreferences#MANAGER_DASHBOARD_STATUS_ON_PTO" />
-			</else>
-		</if>
+			AssertElementNotPresent(
+				locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_IN"
+			);
 
-		<execute macro="LESAMessage#success" />
-	</command>
+			AssertElementPresent(
+				locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_ON_PTO"
+			);
+		}
+		else {
+			echo("status = on pto");
 
-	<command name="createEnvironmentConfiguration">
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+			Click(locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_TOGGLE");
 
-		<execute function="Click" locator1="LESAEnvironmentConfigurations#CREATE_ENVIRONMENT_BUTTON" />
+			MouseOver(locator1 = "LESAPreferences#MANAGER_DASHBOARD_TAB");
 
-		<execute macro="LESAPreferences#inputEnvironmentConfigurationFields">
-			<var name="as" value="${as}" />
-			<var name="db" value="${db}" />
-			<var name="jvm" value="${jvm}" />
-			<var name="liferayVersion" value="${liferayVersion}" />
-			<var name="name" value="${name}" />
-			<var name="os" value="${os}" />
-			<var name="patchLevelFile" value="${patchLevelFile}" />
-			<var name="portalExtFile" value="${portalExtFile}" />
-			<var name="product" value="${product}" />
-		</execute>
+			Pause(locator1 = "1000");
 
-		<execute function="Click" locator1="LESAEnvironmentConfigurations#CREATE_BUTTON" />
+			AssertElementPresent(locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_IN");
 
-		<execute function="SelectWindow" locator1="null" />
-	</command>
+			AssertElementNotPresent(
+				locator1 = "LESAPreferences#MANAGER_DASHBOARD_STATUS_ON_PTO"
+			);
+		}
 
-	<command name="inputEnvironmentConfigurationFields">
-		<execute function="SelectFrame" locator1="LESAEnvironmentConfigurations#ENVIRONMENT_CONFIGURATION_IFRAME" />
-		<execute function="Type" locator1="LESAEnvironmentConfigurations#NAME_FIELD" value1="${name}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#SERVER_SELECT" value1="${product}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#LIFERAY_VERSION_SELECT" value1="${liferayVersion}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#OPERATING_SYSTEM_SELECT" value1="${os}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#JAVA_VIRTUAL_MACHINE_SELECT" value1="${jvm}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#APPLICATION_SERVER_SELECT" value1="${as}" />
-		<execute function="Select" locator1="LESAEnvironmentConfigurations#DATABASE_SELECT" value1="${db}" />
-		<execute function="UploadCommonFile" locator1="LESAEnvironmentConfigurations#PORTAL_EXT_FILE" value1="${portalExtFile}" />
-		<execute function="UploadCommonFile" locator1="LESAEnvironmentConfigurations#PATCH_LEVEL_FILE" value1="${patchLevelFile}" />
-	</command>
+		LESAMessage.success();
+	}
 
-	<command name="tearDownEnvironmentConfiguration">
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+	macro createEnvironmentConfiguration {
+		LESANavigation.gotoEnvironmentConfigurations();
 
-		<var name="key_name" value="${name}" />
-		<var name="key_product" value="${product}" />
+		Click(locator1 = "LESAEnvironmentConfigurations#CREATE_ENVIRONMENT_BUTTON");
 
-		<if>
-			<or>
-				<equals arg1="${product}" arg2="Digital Experience Platform" />
-				<equals arg1="${product}" arg2="Portal" />
-			</or>
-			<then>
-				<execute function="ClickNoError" locator1="LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_DELETE_BUTTON" />
-			</then>
-			<else>
-				<execute function="ClickNoError" locator1="LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_DELETE_BUTTON" />
-			</else>
-		</if>
+		LESAPreferences.inputEnvironmentConfigurationFields(
+			as = "${as}",
+			db = "${db}",
+			jvm = "${jvm}",
+			liferayVersion = "${liferayVersion}",
+			name = "${name}",
+			os = "${os}",
+			patchLevelFile = "${patchLevelFile}",
+			portalExtFile = "${portalExtFile}",
+			product = "${product}"
+		);
 
-		<execute function="Confirm" value1="Are you sure you want to delete your saved environment configuration &quot;${name}&quot; permanently? This change cannot be undone." />
+		Click(locator1 = "LESAEnvironmentConfigurations#CREATE_BUTTON");
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		SelectWindow(locator1 = "null");
+	}
 
-	<command name="updateEnvironmentConfiguration">
-		<execute macro="LESANavigation#gotoEnvironmentConfigurations" />
+	macro inputEnvironmentConfigurationFields {
+		SelectFrame(
+			locator1 = "LESAEnvironmentConfigurations#ENVIRONMENT_CONFIGURATION_IFRAME"
+		);
 
-		<var name="key_name" value="${name}" />
-		<var name="key_product" value="${product}" />
+		Type(locator1 = "LESAEnvironmentConfigurations#NAME_FIELD", value1 = "${name}");
 
-		<if>
-			<or>
-				<equals arg1="${product}" arg2="Digital Experience Platform" />
-				<equals arg1="${product}" arg2="Portal" />
-			</or>
-			<then>
-				<execute function="Click" locator1="LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_EDIT_BUTTON" />
-			</then>
-			<else>
-				<execute function="Click" locator1="LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_EDIT_BUTTON" />
-			</else>
-		</if>
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#SERVER_SELECT",
+			value1 = "${product}"
+		);
 
-		<execute macro="LESAPreferences#inputEnvironmentConfigurationFields">
-			<var name="as" value="${as}" />
-			<var name="db" value="${db}" />
-			<var name="jvm" value="${jvm}" />
-			<var name="liferayVersion" value="${liferayVersion}" />
-			<var name="name" value="${newName}" />
-			<var name="os" value="${os}" />
-			<var name="patchLevelFile" value="${patchLevelFile}" />
-			<var name="portalExtFile" value="${portalExtFile}" />
-			<var name="product" value="${product}" />
-		</execute>
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#LIFERAY_VERSION_SELECT",
+			value1 = "${liferayVersion}"
+		);
 
-		<execute function="Click" locator1="LESAButton#UPDATE_BUTTON" />
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#OPERATING_SYSTEM_SELECT",
+			value1 = "${os}"
+		);
 
-		<execute function="SelectWindow" locator1="null" />
-	</command>
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#JAVA_VIRTUAL_MACHINE_SELECT",
+			value1 = "${jvm}"
+		);
 
-	<command name="viewEnvironmentConfiguration">
-		<var name="key_name" value="${name}" />
-		<var name="key_product" value="${product}" />
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#APPLICATION_SERVER_SELECT",
+			value1 = "${as}"
+		);
 
-		<for list="${contentList}" param="content">
-			<var name="key_content" value="${content}" />
+		Select(
+			locator1 = "LESAEnvironmentConfigurations#DATABASE_SELECT",
+			value1 = "${db}"
+		);
 
-			<if>
-				<or>
-					<equals arg1="${product}" arg2="Digital Experience Platform" />
-					<equals arg1="${product}" arg2="Portal" />
-				</or>
-				<then>
-					<execute function="AssertElementPresent" locator1="LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_CONTENT" />
-				</then>
-				<else>
-					<execute function="AssertElementPresent" locator1="LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_CONTENT" />
-				</else>
-			</if>
-		</for>
-	</command>
-</definition>
+		UploadCommonFile(
+			locator1 = "LESAEnvironmentConfigurations#PORTAL_EXT_FILE",
+			value1 = "${portalExtFile}"
+		);
+
+		UploadCommonFile(
+			locator1 = "LESAEnvironmentConfigurations#PATCH_LEVEL_FILE",
+			value1 = "${patchLevelFile}"
+		);
+	}
+
+	macro tearDownEnvironmentConfiguration {
+		LESANavigation.gotoEnvironmentConfigurations();
+
+		var key_name = "${name}";
+		var key_product = "${product}";
+
+		if (("${product}" == "Digital Experience Platform") || ("${product}" == "Portal")) {
+			ClickNoError(
+				locator1 = "LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_DELETE_BUTTON"
+			);
+		}
+		else {
+			ClickNoError(
+				locator1 = "LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_DELETE_BUTTON"
+			);
+		}
+
+		Confirm(
+			value1 = "Are you sure you want to delete your saved environment configuration &quot;${name}&quot; permanently? This change cannot be undone."
+		);
+
+		LESAMessage.success();
+	}
+
+	macro updateEnvironmentConfiguration {
+		LESANavigation.gotoEnvironmentConfigurations();
+
+		var key_name = "${name}";
+		var key_product = "${product}";
+
+		if (("${product}" == "Digital Experience Platform") || ("${product}" == "Portal")) {
+			Click(
+				locator1 = "LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_EDIT_BUTTON"
+			);
+		}
+		else {
+			Click(locator1 = "LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_EDIT_BUTTON");
+		}
+
+		LESAPreferences.inputEnvironmentConfigurationFields(
+			as = "${as}",
+			db = "${db}",
+			jvm = "${jvm}",
+			liferayVersion = "${liferayVersion}",
+			name = "${newName}",
+			os = "${os}",
+			patchLevelFile = "${patchLevelFile}",
+			portalExtFile = "${portalExtFile}",
+			product = "${product}"
+		);
+
+		Click(locator1 = "LESAButton#UPDATE_BUTTON");
+
+		SelectWindow(locator1 = "null");
+	}
+
+	macro viewEnvironmentConfiguration {
+		var key_name = "${name}";
+		var key_product = "${product}";
+
+		for (var content : list "${contentList}") {
+			var key_content = "${content}";
+
+			if (("${product}" == "Digital Experience Platform") || ("${product}" == "Portal")) {
+				AssertElementPresent(
+					locator1 = "LESAEnvironmentConfigurations#DE_OR_PORTAL_SAVED_ENVIRONMENT_CONTENT"
+				);
+			}
+			else {
+				AssertElementPresent(
+					locator1 = "LESAEnvironmentConfigurations#SAVED_ENVIRONMENT_CONTENT"
+				);
+			}
+		}
+	}
+}

@@ -1,177 +1,223 @@
-<definition>
-	<command name="selectComponent">
-		<execute function="Select" locator1="LESATicketCreate#COMPONENT_SELECT" value1="${component}" />
-	</command>
+definition {
+	macro selectComponent {
+		Select(locator1 = "LESATicketCreate#COMPONENT_SELECT", value1 = "${component}");
+	}
 
-	<command name="selectEnvironmentConfiguration">
-		<execute function="Select" locator1="LESATicketCreate#SAVED_ENV_CONFIG_SELECT" value1="${configuration}" />
-	</command>
+	macro selectEnvironmentConfiguration {
+		Select(
+			locator1 = "LESATicketCreate#SAVED_ENV_CONFIG_SELECT",
+			value1 = "${configuration}"
+		);
+	}
 
-	<command name="selectEnvironmentFields">
-		<execute function="Select" locator1="LESATicketCreate#LIFERAY_VERSION_SELECT" value1="${liferayVersion}" />
-		<execute function="Select" locator1="LESATicketCreate#APPLICATION_SERVER_SELECT" value1="${appServer}" />
-		<execute function="Select" locator1="LESATicketCreate#OPERATING_SYSTEM_SELECT" value1="${operatingSystem}" />
-		<execute function="Select" locator1="LESATicketCreate#DATABASE_SELECT" value1="${database}" />
-		<execute function="Select" locator1="LESATicketCreate#JAVA_VIRTUAL_MACHINE_SELECT" value1="${javaVM}" />
-	</command>
+	macro selectEnvironmentFields {
+		Select(
+			locator1 = "LESATicketCreate#LIFERAY_VERSION_SELECT",
+			value1 = "${liferayVersion}"
+		);
 
-	<command name="selectLiferayVersion">
-		<execute function="Select" locator1="LESATicketCreate#LIFERAY_VERSION_SELECT" value1="${liferayVersion}" />
-	</command>
+		Select(
+			locator1 = "LESATicketCreate#APPLICATION_SERVER_SELECT",
+			value1 = "${appServer}"
+		);
 
-	<command name="selectNewConfig">
-		<execute macro="LESATicketCreateEntry#selectEnvironmentConfiguration">
-			<var name="configuration" value="Select New Configuration" />
-		</execute>
+		Select(
+			locator1 = "LESATicketCreate#OPERATING_SYSTEM_SELECT",
+			value1 = "${operatingSystem}"
+		);
 
-		<execute macro="LESATicketCreateEntry#selectEnvironmentFields">
-			<var name="appServer" value="${appServer}" />
-			<var name="database" value="${database}" />
-			<var name="javaVM" value="${javaVM}" />
-			<var name="liferayVersion" value="${liferayVersion}" />
-			<var name="operatingSystem" value="${operatingSystem}" />
-		</execute>
+		Select(locator1 = "LESATicketCreate#DATABASE_SELECT", value1 = "${database}");
 
-		<execute macro="LESATicketCreateEntry#uploadPatchLevel" />
+		Select(
+			locator1 = "LESATicketCreate#JAVA_VIRTUAL_MACHINE_SELECT",
+			value1 = "${javaVM}"
+		);
+	}
 
-		<execute macro="LESATicketCreateEntry#uploadPortalExt" />
-	</command>
+	macro selectLiferayVersion {
+		Select(
+			locator1 = "LESATicketCreate#LIFERAY_VERSION_SELECT",
+			value1 = "${liferayVersion}"
+		);
+	}
 
-	<command name="selectProduct">
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#PRODUCT_SELECT" />
-			<then>
-				<var name="key_item" value="${product}" />
+	macro selectNewConfig {
+		LESATicketCreateEntry.selectEnvironmentConfiguration(
+			configuration = "Select New Configuration"
+		);
 
-				<execute function="AssertElementPresent" locator1="LESATicketCreate#PRODUCT_SELECT_ITEM" />
-				<execute function="Select" locator1="LESATicketCreate#PRODUCT_SELECT" value1="${product}" />
-			</then>
-			<else>
-				<execute function="AssertTextEquals" locator1="LESATicketCreate#PRODUCT" value1="${product}" />
-			</else>
-		</if>
-	</command>
+		LESATicketCreateEntry.selectEnvironmentFields(
+			appServer = "${appServer}",
+			database = "${database}",
+			javaVM = "${javaVM}",
+			liferayVersion = "${liferayVersion}",
+			operatingSystem = "${operatingSystem}"
+		);
 
-	<command name="selectProject">
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#PROJECT_SELECT" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#PROJECT_SELECT" value1="${project}" />
-			</then>
-			<else>
-				<if>
-					<condition function="IsElementPresent" locator1="LESATicketCreate#PROJECT_NAME" />
-					<then>
-						<execute function="AssertTextEquals" locator1="LESATicketCreate#PROJECT_NAME" value1="${project}" />
-					</then>
-					<else>
-						<execute function="AssertTextEquals" locator1="LESAEnvironmentConfigurations#PROJECT_NAME" value1="${project}" />
-					</else>
-				</if>
-			</else>
-		</if>
-	</command>
+		LESATicketCreateEntry.uploadPatchLevel();
 
-	<command name="selectSavedConfig">
-		<execute macro="LESATicketCreateEntry#selectEnvironmentConfiguration">
-			<var name="configuration" value="${savedEnvConfigName}" />
-		</execute>
+		LESATicketCreateEntry.uploadPortalExt();
+	}
 
-		<!-- Temporary workaround for LRIS-21152.  Remove this when issue is resolved. -->
+	macro selectProduct {
+		if (IsElementPresent(locator1 = "LESATicketCreate#PRODUCT_SELECT")) {
+			var key_item = "${product}";
 
-		<var method="StringUtil#extractLast('${savedEnvConfigName}', ' ')" name="liferayVersion" />
+			AssertElementPresent(locator1 = "LESATicketCreate#PRODUCT_SELECT_ITEM");
 
-		<if>
-			<equals arg1="${liferayVersion}" arg2="6.2" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#LIFERAY_VERSION_SELECT" value1="6.2 EE (Limited)" />
-			</then>
-			<else>
-				<execute function="Select" locator1="LESATicketCreate#LIFERAY_VERSION_SELECT" value1="7.0" />
-			</else>
-		</if>
+			Select(locator1 = "LESATicketCreate#PRODUCT_SELECT", value1 = "${product}");
+		}
+		else {
+			AssertTextEquals(locator1 = "LESATicketCreate#PRODUCT", value1 = "${product}");
+		}
+	}
 
-		<!-- End temp workaround -->
+	macro selectProject {
+		if (IsElementPresent(locator1 = "LESATicketCreate#PROJECT_SELECT")) {
+			Select(locator1 = "LESATicketCreate#PROJECT_SELECT", value1 = "${project}");
+		}
+		else {
+			if (IsElementPresent(locator1 = "LESATicketCreate#PROJECT_NAME")) {
+				AssertTextEquals(
+					locator1 = "LESATicketCreate#PROJECT_NAME",
+					value1 = "${project}"
+				);
+			}
+			else {
+				AssertTextEquals(
+					locator1 = "LESAEnvironmentConfigurations#PROJECT_NAME",
+					value1 = "${project}"
+				);
+			}
+		}
+	}
 
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#PATCH_LEVEL_FILE_NAME" />
-			<then>
-				<execute function="Check" locator1="LESATicketCreate#PATCH_LEVEL_CHECKBOX" />
-			</then>
-			<else>
-				<execute macro="LESATicketCreateEntry#uploadPatchLevel" />
-			</else>
-		</if>
+	macro selectSavedConfig {
+		LESATicketCreateEntry.selectEnvironmentConfiguration(
+			configuration = "${savedEnvConfigName}"
+		);
 
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#PORTAL_EXT_FILE_NAME" />
-			<then>
-				<execute function="Check" locator1="LESATicketCreate#PORTAL_EXT_CHECKBOX" />
-			</then>
-			<else>
-				<execute macro="LESATicketCreateEntry#uploadPortalExt" />
-			</else>
-		</if>
-	</command>
+		// Temporary workaround for LRIS-21152.  Remove this when issue is resolved.
 
-	<command name="selectServer">
-		<if>
-			<condition function="IsElementPresent" locator1="LESATicketCreate#SERVER_SELECT" />
-			<then>
-				<execute function="Select" locator1="LESATicketCreate#SERVER_SELECT" value1="${server}" />
-			</then>
-		</if>
-	</command>
+		var liferayVersion = StringUtil.extractLast("${savedEnvConfigName}", " ");
 
-	<command name="selectSubcomponent">
-		<execute function="Select" locator1="LESATicketCreate#SUBCOMPONENT_SELECT" value1="${subcomponent}" />
-	</command>
+		if ("${liferayVersion}" == "6.2") {
+			Select(
+				locator1 = "LESATicketCreate#LIFERAY_VERSION_SELECT",
+				value1 = "6.2 EE (Limited)"
+			);
+		}
+		else {
+			Select(locator1 = "LESATicketCreate#LIFERAY_VERSION_SELECT", value1 = "7.0");
+		}
 
-	<command name="updateEnvironment">
-		<execute macro="LESATicketCreateEntry#selectEnvironmentFields">
-			<var name="appServer" value="${appServer}" />
-			<var name="database" value="${database}" />
-			<var name="javaVM" value="${javaVM}" />
-			<var name="liferayVersion" value="${liferayVersion}" />
-			<var name="operatingSystem" value="${operatingSystem}" />
-		</execute>
+		// End temp workaround
 
-		<execute function="ClickNoError" locator1="LESATicketCreate#UPDATE_ENVIRONMENT_BUTTON" />
-		<execute function="Confirm" value1="Are you sure you want to update your saved environment configuration &quot;${envName}&quot;?" />
-	</command>
+		if (IsElementPresent(locator1 = "LESATicketCreate#PATCH_LEVEL_FILE_NAME")) {
+			Check(locator1 = "LESATicketCreate#PATCH_LEVEL_CHECKBOX");
+		}
+		else {
+			LESATicketCreateEntry.uploadPatchLevel();
+		}
 
-	<command name="uploadPatchLevel">
-		<execute function="ScrollWebElementIntoView" locator1="LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON" />
-		<execute function="MouseDown" locator1="LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON" />
-		<execute function="MouseUp" locator1="LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON" />
+		if (IsElementPresent(locator1 = "LESATicketCreate#PORTAL_EXT_FILE_NAME")) {
+			Check(locator1 = "LESATicketCreate#PORTAL_EXT_CHECKBOX");
+		}
+		else {
+			LESATicketCreateEntry.uploadPortalExt();
+		}
+	}
 
-		<execute function="SikuliUploadCommonFile" locator1="LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2" value1="patchinfo.txt" />
-	</command>
+	macro selectServer {
+		if (IsElementPresent(locator1 = "LESATicketCreate#SERVER_SELECT")) {
+			Select(locator1 = "LESATicketCreate#SERVER_SELECT", value1 = "${server}");
+		}
+	}
 
-	<command name="uploadPortalExt">
-		<execute function="ScrollWebElementIntoView" locator1="LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON" />
-		<execute function="MouseDown" locator1="LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON" />
-		<execute function="MouseUp" locator1="LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON" />
+	macro selectSubcomponent {
+		Select(
+			locator1 = "LESATicketCreate#SUBCOMPONENT_SELECT",
+			value1 = "${subcomponent}"
+		);
+	}
 
-		<execute function="SikuliUploadCommonFile" locator1="LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2" value1="portal-ext.properties" />
-	</command>
+	macro updateEnvironment {
+		LESATicketCreateEntry.selectEnvironmentFields(
+			appServer = "${appServer}",
+			database = "${database}",
+			javaVM = "${javaVM}",
+			liferayVersion = "${liferayVersion}",
+			operatingSystem = "${operatingSystem}"
+		);
 
-	<command name="uploadToPatchLevel">
-		<execute function="ScrollWebElementIntoView" locator1="LESATicketCreate#CREATE_BUTTON" />
-		<execute function="MouseDown" locator1="LESATicketCreate#UPLOAD_TO_PATCH_LEVEL_BUTTON" />
-		<execute function="MouseUp" locator1="LESATicketCreate#UPLOAD_TO_PATCH_LEVEL_BUTTON" />
+		ClickNoError(locator1 = "LESATicketCreate#UPDATE_ENVIRONMENT_BUTTON");
 
-		<execute function="SikuliUploadCommonFile" locator1="LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2" value1="Document_2.txt" />
+		Confirm(
+			value1 = "Are you sure you want to update your saved environment configuration &quot;${envName}&quot;?"
+		);
+	}
 
-		<execute function="AssertTextEquals" locator1="LESATicketCreate#TO_PATCH_LEVEL_FILE_NAME" value1="Document_2.txt" />
-	</command>
+	macro uploadPatchLevel {
+		ScrollWebElementIntoView(
+			locator1 = "LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON"
+		);
 
-	<command name="uploadToPortalExt">
-		<execute function="MouseDown" locator1="LESATicketCreate#UPLOAD_TO_PORTAL_EXT_BUTTON" />
-		<execute function="MouseUp" locator1="LESATicketCreate#UPLOAD_TO_PORTAL_EXT_BUTTON" />
+		MouseDown(locator1 = "LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON");
 
-		<execute function="SikuliUploadCommonFile" locator1="LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2" value1="Document_1.txt" />
+		MouseUp(locator1 = "LESATicketCreate#UPLOAD_NEW_PATCH_LEVEL_BUTTON");
 
-		<execute function="AssertTextEquals" locator1="LESATicketCreate#TO_PORTAL_EXT_FILE_NAME" value1="Document_1.txt" />
-	</command>
-</definition>
+		SikuliUploadCommonFile(
+			locator1 = "LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2",
+			value1 = "patchinfo.txt"
+		);
+	}
+
+	macro uploadPortalExt {
+		ScrollWebElementIntoView(
+			locator1 = "LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON"
+		);
+
+		MouseDown(locator1 = "LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON");
+
+		MouseUp(locator1 = "LESATicketCreate#UPLOAD_NEW_PORTAL_EXT_BUTTON");
+
+		SikuliUploadCommonFile(
+			locator1 = "LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2",
+			value1 = "portal-ext.properties"
+		);
+	}
+
+	macro uploadToPatchLevel {
+		ScrollWebElementIntoView(locator1 = "LESATicketCreate#CREATE_BUTTON");
+
+		MouseDown(locator1 = "LESATicketCreate#UPLOAD_TO_PATCH_LEVEL_BUTTON");
+
+		MouseUp(locator1 = "LESATicketCreate#UPLOAD_TO_PATCH_LEVEL_BUTTON");
+
+		SikuliUploadCommonFile(
+			locator1 = "LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2",
+			value1 = "Document_2.txt"
+		);
+
+		AssertTextEquals(
+			locator1 = "LESATicketCreate#TO_PATCH_LEVEL_FILE_NAME",
+			value1 = "Document_2.txt"
+		);
+	}
+
+	macro uploadToPortalExt {
+		MouseDown(locator1 = "LESATicketCreate#UPLOAD_TO_PORTAL_EXT_BUTTON");
+
+		MouseUp(locator1 = "LESATicketCreate#UPLOAD_TO_PORTAL_EXT_BUTTON");
+
+		SikuliUploadCommonFile(
+			locator1 = "LESAOS#FILE_DIALOG_BOX_TYPE_FILE_NAME_ICON_PNG_2",
+			value1 = "Document_1.txt"
+		);
+
+		AssertTextEquals(
+			locator1 = "LESATicketCreate#TO_PORTAL_EXT_FILE_NAME",
+			value1 = "Document_1.txt"
+		);
+	}
+}

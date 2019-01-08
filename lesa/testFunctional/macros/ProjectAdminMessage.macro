@@ -1,55 +1,60 @@
-<definition>
-	<command name="addProjectMessage">
-		<var method="selenium#getText('ProjectAdminEdit#SALESFORCE_PROJECT_KEY')" name="salesforceProjectKey" />
+definition {
+	macro addProjectMessage {
+		var salesforceProjectKey = selenium.getText("ProjectAdminEdit#SALESFORCE_PROJECT_KEY");
 
-		<if>
-			<equals arg1="${salesforceProjectKey}" arg2="" />
-			<then>
-				<execute function="Click" locator1="ProjectAdminEdit#EDIT_BUTTON" />
-				<execute function="Type" locator1="ProjectAdminEdit#SALESFORCE_PROJECT_KEY_FIELD" value1="12345" />
+		if ("${salesforceProjectKey}" == "") {
+			Click(locator1 = "ProjectAdminEdit#EDIT_BUTTON");
 
-				<execute macro="LESAButton#save" />
+			Type(
+				locator1 = "ProjectAdminEdit#SALESFORCE_PROJECT_KEY_FIELD",
+				value1 = "12345"
+			);
 
-				<execute macro="LESAMessage#success" />
+			LESAButton.save();
 
-				<execute function="Click" locator1="LESAButton#CANCEL_BUTTON" />
-			</then>
-		</if>
+			LESAMessage.success();
 
-		<execute function="Click" locator1="ProjectAdminMessage#ADD_MESSAGE_BUTTON" />
-		<execute function="Type" locator1="ProjectAdminMessage#CORP_PROJECT_MESSAGE_TITLE_FIELD" value1="${title}" />
-		<execute function="Type" locator1="ProjectAdminMessage#CORP_PROJECT_MESSAGE_FIELD" value1="${message}" />
-		<execute function="Select" locator1="ProjectAdminMessage#SEVERITY_SELECT" value1="${severity}" />
-		<execute function="Check" locator1="ProjectAdminMessage#DISPLAY_LESA_CHECKBOX" />
+			Click(locator1 = "LESAButton#CANCEL_BUTTON");
+		}
 
-		<execute macro="LESAButton#save" />
+		Click(locator1 = "ProjectAdminMessage#ADD_MESSAGE_BUTTON");
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		Type(
+			locator1 = "ProjectAdminMessage#CORP_PROJECT_MESSAGE_TITLE_FIELD",
+			value1 = "${title}"
+		);
 
-	<command name="deleteProjectMessage">
-		<var name="key_code" value="${message}" />
+		Type(
+			locator1 = "ProjectAdminMessage#CORP_PROJECT_MESSAGE_FIELD",
+			value1 = "${message}"
+		);
 
-		<execute function="Click" locator1="OSBAdmin#SEARCH_RESULT_ACTION_BUTTON" />
-		<execute function="Click" locator1="OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE" />
+		Select(locator1 = "ProjectAdminMessage#SEVERITY_SELECT", value1 = "${severity}");
 
-		<execute macro="LESAMessage#success" />
-	</command>
+		Check(locator1 = "ProjectAdminMessage#DISPLAY_LESA_CHECKBOX");
 
-	<command name="tearDownProjectMessage">
-		<execute macro="LESANavigation#gotoProjectAdminMessages">
-			<var name="projectCode" value="${projectCode}" />
-		</execute>
+		LESAButton.save();
 
-		<var name="key_code" value="${message}" />
+		LESAMessage.success();
+	}
 
-		<while>
-			<condition function="IsElementPresent" locator1="OSBAdmin#SEARCH_RESULT_ACTION_BUTTON" />
-			<then>
-				<execute macro="ProjectAdminMessage#deleteProjectMessage">
-					<var name="message" value="${message}" />
-				</execute>
-			</then>
-		</while>
-	</command>
-</definition>
+	macro deleteProjectMessage {
+		var key_code = "${message}";
+
+		Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON");
+
+		Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
+
+		LESAMessage.success();
+	}
+
+	macro tearDownProjectMessage {
+		LESANavigation.gotoProjectAdminMessages(projectCode = "${projectCode}");
+
+		var key_code = "${message}";
+
+		while (IsElementPresent(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON")) {
+			ProjectAdminMessage.deleteProjectMessage(message = "${message}");
+		}
+	}
+}
