@@ -1,104 +1,86 @@
-<definition>
-	<command name="purchaseFreeApp">
-		<execute macro="MPButton#button2">
-			<var name="buttonName" value="Free" />
-		</execute>
+definition {
+	macro purchaseFreeApp {
+		MPButton.button2(buttonName = "Free");
 
-		<execute macro="MarketplacePurchaseApp#purchaseAccountTabFreeOrTrial">
-			<var name="legalEntityName" value="${legalEntityName}" />
-			<var name="projectName" value="${projectName}" />
-		</execute>
-	</command>
+		MarketplacePurchaseApp.purchaseAccountTabFreeOrTrial(
+			legalEntityName = "${legalEntityName}",
+			projectName = "${projectName}"
+		);
+	}
 
-	<command name="purchasePaidApp">
-		<execute macro="MPButton#button2">
-			<var name="buttonName" value="Buy" />
-		</execute>
+	macro purchasePaidApp {
+		MPButton.button2(buttonName = "Buy");
 
-		<execute macro="MarketplacePurchaseApp#purchaseAccountTabPaid">
-			<var name="legalEntityName" value="${legalEntityName}" />
-			<var name="projectName" value="${projectName}" />
-		</execute>
+		MarketplacePurchaseApp.purchaseAccountTabPaid(
+			legalEntityName = "${legalEntityName}",
+			projectName = "${projectName}"
+		);
 
-		<if>
-			<equals arg1="${licensePurchaseType}" arg2="add" />
-			<then>
-				<execute macro="MarketplacePurchaseApp#purchaseExtendedLicense">
-					<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
-					<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
-				</execute>
-			</then>
-			<elseif>
-				<equals arg1="${licensePurchaseType}" arg2="renew" />
-				<then>
-					<execute macro="MarketplacePurchaseApp#purchaseRenewLicense">
-						<var name="changeRenewLicenseQuantities" value="${changeRenewLicenseQuantities}" />
-						<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
-						<var name="renewSubscriptionTypeList" value="${renewSubscriptionTypeList}" />
-						<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
-					</execute>
-				</then>
-			</elseif>
-			<else>
-				<execute macro="MarketplacePurchaseApp#purchaseLicense">
-					<var name="developerLicenseQuantityList" value="${developerLicenseQuantityList}" />
-					<var name="standardLicenseQuantityList" value="${standardLicenseQuantityList}" />
-				</execute>
-			</else>
-		</if>
+		if ("${licensePurchaseType}" == "add") {
+			MarketplacePurchaseApp.purchaseExtendedLicense(
+				developerLicenseQuantityList = "${developerLicenseQuantityList}",
+				standardLicenseQuantityList = "${standardLicenseQuantityList}"
+			);
+		}
+		else if ("${licensePurchaseType}" == "renew") {
+			MarketplacePurchaseApp.purchaseRenewLicense(
+				changeRenewLicenseQuantities = "${changeRenewLicenseQuantities}",
+				developerLicenseQuantityList = "${developerLicenseQuantityList}",
+				renewSubscriptionTypeList = "${renewSubscriptionTypeList}",
+				standardLicenseQuantityList = "${standardLicenseQuantityList}"
+			);
+		}
+		else {
+			MarketplacePurchaseApp.purchaseLicense(
+				developerLicenseQuantityList = "${developerLicenseQuantityList}",
+				standardLicenseQuantityList = "${standardLicenseQuantityList}"
+			);
+		}
 
-		<execute macro="MarketplacePurchaseApp#purchaseDestinationTab">
-			<var name="destinationAddressName" value="${destinationAddressName}" />
-		</execute>
+		MarketplacePurchaseApp.purchaseDestinationTab(
+			destinationAddressName = "${destinationAddressName}"
+		);
 
-		<execute macro="MarketplacePurchaseApp#purchaseSummaryTab">
-			<var name="developerSummaryQuantityList" value="${developerSummaryQuantityList}" />
-			<var name="invoiceEmailAddress" value="${invoiceEmailAddress}" />
-			<var name="paymentMethod" value="${paymentMethod}" />
-			<var name="standardSummaryQuantityList" value="${standardSummaryQuantityList}" />
-		</execute>
+		MarketplacePurchaseApp.purchaseSummaryTab(
+			developerSummaryQuantityList = "${developerSummaryQuantityList}",
+			invoiceEmailAddress = "${invoiceEmailAddress}",
+			paymentMethod = "${paymentMethod}",
+			standardSummaryQuantityList = "${standardSummaryQuantityList}"
+		);
 
-		<var method="selenium#getText('MPPurchaseSummary#YOUR_TRANSACTION_ID_NUMBER')" name="purchaseID" />
+		var purchaseID = selenium.getText("MPPurchaseSummary#YOUR_TRANSACTION_ID_NUMBER");
+		var purchaseID = StringUtil.replace("${purchaseID}", "Your transaction ID number is ", "");
+		var purchaseID = StringUtil.replace("${purchaseID}", ".", "");
 
-		<var method="StringUtil#replace('${purchaseID}', 'Your transaction ID number is ', '')" name="purchaseID" />
-		<var method="StringUtil#replace('${purchaseID}', '.', '')" name="purchaseID" />
+		MarketplaceAdmin.completeInvoicePayment(purchaseID = "${purchaseID}");
+	}
 
-		<execute macro="MarketplaceAdmin#completeInvoicePayment">
-			<var name="purchaseID" value="${purchaseID}" />
-		</execute>
-	</command>
+	macro purchaseTrialApp {
+		MPButton.button2(buttonName = "30-Day Trial");
 
-	<command name="purchaseTrialApp">
-		<execute macro="MPButton#button2">
-			<var name="buttonName" value="30-Day Trial" />
-		</execute>
+		MarketplacePurchaseApp.purchaseAccountTabFreeOrTrial(
+			legalEntityName = "${legalEntityName}",
+			projectName = "${projectName}"
+		);
+	}
 
-		<execute macro="MarketplacePurchaseApp#purchaseAccountTabFreeOrTrial">
-			<var name="legalEntityName" value="${legalEntityName}" />
-			<var name="projectName" value="${projectName}" />
-		</execute>
-	</command>
+	macro tearDownPurchase {
+		MarketplaceAdminNavigator.gotoAdminTab(adminTab = "Customers");
 
-	<command name="tearDownPurchase">
-		<execute macro="MarketplaceAdminNavigator#gotoAdminTab">
-			<var name="adminTab" value="Customers" />
-		</execute>
+		Type(locator1 = "MPAdminCustomers#KEYWORDS_FIELD", value1 = "${appTitle}");
 
-		<execute function="Type" locator1="MPAdminCustomers#KEYWORDS_FIELD" value1="${appTitle}" />
+		MPButton.search();
 
-		<execute macro="MPButton#search" />
+		while (IsElementPresent(locator1 = "MPAdminCustomers#DELETE")) {
+			var key_appTitle = "${appTitle}";
 
-		<while>
-			<condition function="IsElementPresent" locator1="MPAdminCustomers#DELETE" />
-			<then>
-				<var name="key_appTitle" value="${appTitle}" />
+			Click(locator1 = "MPAdminCustomers#APP_ENTRY_NAME");
 
-				<execute function="Click" locator1="MPAdminCustomers#APP_ENTRY_NAME" />
-				<execute function="ClickNoError" locator1="MPAdminCustomers#DELETE_BUTTON" />
-				<execute function="Confirm" value1="Are you sure you want to delete this order?" />
+			ClickNoError(locator1 = "MPAdminCustomers#DELETE_BUTTON");
 
-				<execute macro="MPMessage#success" />
-			</then>
-		</while>
-	</command>
-</definition>
+			Confirm(value1 = "Are you sure you want to delete this order?");
+
+			MPMessage.success();
+		}
+	}
+}
