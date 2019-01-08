@@ -1,55 +1,118 @@
-<definition>
-	<command name="addContactRole">
-		<var name="key_contactRolePositionValue" value="1" />
+definition {
+	macro addContactRole {
+		var key_contactRolePositionValue = "1";
 
-		<if>
-			<equals arg1="${salesforceContactRolePrimary}" arg2="true" />
-			<then>
-				<var method="MathUtil#sum('${key_contactRolePositionValue}', '1')" name="key_contactRolePrimaryPositionValue" />
+		if ("${salesforceContactRolePrimary}" == "true") {
+			var key_contactRolePrimaryPositionValue = MathUtil.sum("${key_contactRolePositionValue}", "1");
 
-				<execute function="Click" locator1="SalesforceContactRoleAdd#CONTACT_ROLE_PRIMARY" />
-			</then>
-		</if>
+			Click(locator1 = "SalesforceContactRoleAdd#CONTACT_ROLE_PRIMARY");
+		}
 
-		<execute function="Type" locator1="SalesforceContactRoleAdd#CONTACT_ROLE_CONTACT" value1="${salesforceContactName}" />
-		<execute function="Select" locator1="SalesforceContactRoleAdd#CONTACT_ROLE_ROLE" value1="${salesforceContactRole}" />
+		Type(
+			locator1 = "SalesforceContactRoleAdd#CONTACT_ROLE_CONTACT",
+			value1 = "${salesforceContactName}"
+		);
 
-		<execute macro="SalesforceButton#save" />
-	</command>
+		Select(
+			locator1 = "SalesforceContactRoleAdd#CONTACT_ROLE_ROLE",
+			value1 = "${salesforceContactRole}"
+		);
 
-	<command name="fillContact">
-		<var method="StringUtil#replace('${salesforceContactEmail}', ' ', '_')" name="salesforceContactEmail" />
+		SalesforceButton.save();
+	}
 
-		<execute function="Type" locator1="SalesforceContactCreate#CONTACT_FIRST_NAME" value1="${salesforceContactFirstName}" />
-		<execute function="Type" locator1="SalesforceContactCreate#CONTACT_LAST_NAME" value1="${salesforceContactLastName}" />
-		<execute function="Type" locator1="SalesforceContactCreate#CONTACT_ACCOUNT_NAME" value1="${salesforceAccountName}" />
-		<execute function="Type" locator1="SalesforceContactCreate#CONTACT_TITLE" value1="${salesforceContactTitle}" />
-		<execute function="Select" locator1="SalesforceContactCreate#CONTACT_PURCHASE_DECISION_INVOLVEMENT" value1="${salesforceContactPurchaseDecisionInvolvement}" />
-		<execute function="Select" locator1="SalesforceContactCreate#CONTACT_CURRENCY" value1="${salesforceContactCurrency}" />
+	macro fillContact {
+		var salesforceContactEmail = StringUtil.replace("${salesforceContactEmail}", " ", "_");
 
-		<for list="${salesforceContactType}" param="salesforceContactType">
-			<execute function="Select" locator1="SalesforceContactCreate#CONTACT_CONTACT_TYPE" value1="${salesforceContactType}" />
-			<execute macro="SalesforceButton#addFromList" />
-		</for>
+		Type(
+			locator1 = "SalesforceContactCreate#CONTACT_FIRST_NAME",
+			value1 = "${salesforceContactFirstName}"
+		);
 
-		<execute function="Type" locator1="SalesforceContactCreate#CONTACT_EMAIL" value1="${salesforceContactEmail}" />
-		<execute function="Select" locator1="SalesforceContactCreate#CONTACT_MAILING_COUNTRY" value1="${salesforceContactMailingCountry}" />
-	</command>
+		Type(
+			locator1 = "SalesforceContactCreate#CONTACT_LAST_NAME",
+			value1 = "${salesforceContactLastName}"
+		);
 
-	<command name="viewContactDetails">
-		<var method="StringUtil#replace('${salesforceContactEmail}', ' ', '_')" name="salesforceContactEmail" />
-		<var method="StringUtil#lowerCase('${salesforceContactEmail}')" name="salesforceContactEmail" />
+		Type(
+			locator1 = "SalesforceContactCreate#CONTACT_ACCOUNT_NAME",
+			value1 = "${salesforceAccountName}"
+		);
 
-		<execute function="AssertTextEquals" locator1="SalesforceContact#CONTACT_DETAILS_NAME" value1="${salesforceContactFirstName} ${salesforceContactLastName}" />
-		<execute function="AssertTextEquals" locator1="SalesforceContact#CONTACT_DETAILS_ACCOUNT_NAME" value1="${salesforceAccountName}" />
-		<execute function="AssertTextEquals" locator1="SalesforceContact#CONTACT_DETAILS_TITLE" value1="${salesforceContactTitle}" />
-		<execute function="AssertTextEquals" locator1="SalesforceContact#CONTACT_DETAILS_PURCHASE_DECISION_INVOLVEMENT" value1="${salesforceContactPurchaseDecisionInvolvement}" />
+		Type(
+			locator1 = "SalesforceContactCreate#CONTACT_TITLE",
+			value1 = "${salesforceContactTitle}"
+		);
 
-		<for list="${salesforceContactType}" param="salesforceContactType">
-			<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceContact#CONTACT_DETAILS_CONTACT_TYPE" value1="${salesforceContactType}" />
-		</for>
+		Select(
+			locator1 = "SalesforceContactCreate#CONTACT_PURCHASE_DECISION_INVOLVEMENT",
+			value1 = "${salesforceContactPurchaseDecisionInvolvement}"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="SalesforceContact#CONTACT_DETAILS_EMAIL" value1="${salesforceContactEmail}" />
-		<execute function="AssertTextEquals" locator1="SalesforceContact#CONTACT_DETAILS_MAILING_COUNTRY" value1="${salesforceContactMailingCountry}" />
-	</command>
-</definition>
+		Select(
+			locator1 = "SalesforceContactCreate#CONTACT_CURRENCY",
+			value1 = "${salesforceContactCurrency}"
+		);
+
+		for (var salesforceContactType : list "${salesforceContactType}") {
+			Select(
+				locator1 = "SalesforceContactCreate#CONTACT_CONTACT_TYPE",
+				value1 = "${salesforceContactType}"
+			);
+
+			SalesforceButton.addFromList();
+		}
+
+		Type(
+			locator1 = "SalesforceContactCreate#CONTACT_EMAIL",
+			value1 = "${salesforceContactEmail}"
+		);
+
+		Select(
+			locator1 = "SalesforceContactCreate#CONTACT_MAILING_COUNTRY",
+			value1 = "${salesforceContactMailingCountry}"
+		);
+	}
+
+	macro viewContactDetails {
+		var salesforceContactEmail = StringUtil.replace("${salesforceContactEmail}", " ", "_");
+		var salesforceContactEmail = StringUtil.lowerCase("${salesforceContactEmail}");
+
+		AssertTextEquals(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_NAME",
+			value1 = "${salesforceContactFirstName} ${salesforceContactLastName}"
+		);
+
+		AssertTextEquals(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_ACCOUNT_NAME",
+			value1 = "${salesforceAccountName}"
+		);
+
+		AssertTextEquals(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_TITLE",
+			value1 = "${salesforceContactTitle}"
+		);
+
+		AssertTextEquals(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_PURCHASE_DECISION_INVOLVEMENT",
+			value1 = "${salesforceContactPurchaseDecisionInvolvement}"
+		);
+
+		for (var salesforceContactType : list "${salesforceContactType}") {
+			AssertTextEquals.assertPartialText(
+				locator1 = "SalesforceContact#CONTACT_DETAILS_CONTACT_TYPE",
+				value1 = "${salesforceContactType}"
+			);
+		}
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_EMAIL",
+			value1 = "${salesforceContactEmail}"
+		);
+
+		AssertTextEquals(
+			locator1 = "SalesforceContact#CONTACT_DETAILS_MAILING_COUNTRY",
+			value1 = "${salesforceContactMailingCountry}"
+		);
+	}
+}

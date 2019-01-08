@@ -1,40 +1,34 @@
-<definition>
-	<command name="loginUser">
-		<if>
-			<and>
-				<isset var="roleName" />
-				<not>
-					<contains string="${roleName}" substring="{roleName}" />
-				</not>
-			</and>
-			<then>
-				<var method="StringUtil#lowerCase('${roleName}')" name="roleName" />
-			</then>
-			<else>
-				<var name="roleName" value="qa" />
-			</else>
-		</if>
+definition {
+	macro loginUser {
+		if ((isSet(roleName)) && (!(contains("${roleName}", "{roleName}")))) {
+			var roleName = StringUtil.lowerCase("${roleName}");
+		}
+		else {
+			var roleName = "qa";
+		}
 
-		<var method="PropsUtil#get('salesforce.email.address.${roleName}')" name="userEmailAddress" />
-		<var method="PropsUtil#get('salesforce.email.password.${roleName}')" name="userPassword" />
+		var userEmailAddress = PropsUtil.get("salesforce.email.address.${roleName}");
+		var userPassword = PropsUtil.get("salesforce.email.password.${roleName}");
 
-		<execute macro="SalesforceNavigation#openURL" />
+		SalesforceNavigation.openURL();
 
-		<execute function="Type" locator1="SalesforceLogin#EMAIL_ADDRESS_FIELD" value1="${userEmailAddress}" />
-		<execute function="Type" locator1="SalesforceLogin#PASSWORD_FIELD" value1="${userPassword}" />
+		Type(
+			locator1 = "SalesforceLogin#EMAIL_ADDRESS_FIELD",
+			value1 = "${userEmailAddress}"
+		);
 
-		<execute function="Click" locator1="SalesforceLogin#LOGIN_BUTTON" />
-	</command>
+		Type(locator1 = "SalesforceLogin#PASSWORD_FIELD", value1 = "${userPassword}");
 
-	<command name="logoutUser">
-		<execute macro="SalesforceNavigation#openURL" />
+		Click(locator1 = "SalesforceLogin#LOGIN_BUTTON");
+	}
 
-		<if>
-			<condition function="IsElementPresent" locator1="SalesforceNavigation#USER_PROFILE_DROPDOWN_LINK" />
-			<then>
-				<execute function="Click" locator1="SalesforceNavigation#USER_PROFILE_DROPDOWN_LINK" />
-				<execute function="Click" locator1="SalesforceNavigation#USER_LOGOUT_LINK" />
-			</then>
-		</if>
-	</command>
-</definition>
+	macro logoutUser {
+		SalesforceNavigation.openURL();
+
+		if (IsElementPresent(locator1 = "SalesforceNavigation#USER_PROFILE_DROPDOWN_LINK")) {
+			Click(locator1 = "SalesforceNavigation#USER_PROFILE_DROPDOWN_LINK");
+
+			Click(locator1 = "SalesforceNavigation#USER_LOGOUT_LINK");
+		}
+	}
+}

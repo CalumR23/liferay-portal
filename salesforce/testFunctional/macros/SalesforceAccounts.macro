@@ -1,51 +1,49 @@
-<definition>
-	<command name="clickFirstRecentAccount">
-		<execute function="Click" locator1="SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME" />
-	</command>
+definition {
+	macro clickFirstRecentAccount {
+		Click(locator1 = "SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME");
+	}
 
-	<command name="createAccount">
-		<execute macro="SalesforceButton#new" />
+	macro createAccount {
+		SalesforceButton.new();
 
-		<execute macro="SalesforceButton#continue" />
+		SalesforceButton.continue();
 
-		<execute macro="SalesforceAccount#fillAccount">
-			<var name="salesforceAccountCurrency" value="${salesforceAccountCurrency}" />
-			<var name="salesforceAccountIndustry" value="${salesforceAccountIndustry}" />
-			<var name="salesforceAccountName" value="${salesforceAccountName}" />
-			<var name="salesforceAccountPartnerLevel" value="${salesforceAccountPartnerLevel}" />
-		</execute>
+		SalesforceAccount.fillAccount(
+			salesforceAccountCurrency = "${salesforceAccountCurrency}",
+			salesforceAccountIndustry = "${salesforceAccountIndustry}",
+			salesforceAccountName = "${salesforceAccountName}",
+			salesforceAccountPartnerLevel = "${salesforceAccountPartnerLevel}"
+		);
 
-		<execute macro="SalesforceButton#save" />
-	</command>
+		SalesforceButton.save();
+	}
 
-	<command name="deleteAllAccounts">
-		<while>
-			<condition function="IsElementPresent" locator1="SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME" />
-			<then>
-				<execute macro="SalesforceAccounts#getFirstRecentAccountName">
-					<return name="salesforceAccountName" />
-				</execute>
+	macro deleteAllAccounts {
+		while (IsElementPresent(locator1 = "SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME")) {
+			var salesforceAccountName = SalesforceAccounts.getFirstRecentAccountName();
 
-				<execute macro="SalesforceAccounts#clickFirstRecentAccount" />
+			SalesforceAccounts.clickFirstRecentAccount();
 
-				<execute macro="SalesforceAccount#deleteAccount">
-					<var name="salesforceAccountName" value="${salesforceAccountName}" />
-				</execute>
+			SalesforceAccount.deleteAccount(
+				salesforceAccountName = "${salesforceAccountName}"
+			);
 
-				<execute macro="SalesforceNavigation#gotoAccounts" />
-			</then>
-		</while>
-	</command>
+			SalesforceNavigation.gotoAccounts();
+		}
+	}
 
-	<command name="getFirstRecentAccountName">
-		<var method="selenium#getText('SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME')" name="salesforceAccountName" />
+	macro getFirstRecentAccountName {
+		var salesforceAccountName = selenium.getText("SalesforceAccounts#FIRST_RECENT_ACCOUNT_NAME");
 
-		<return value="${salesforceAccountName}" />
-	</command>
+		return "${salesforceAccountName}";
+	}
 
-	<command name="viewNoRecentAccount">
-		<var name="key_accountName" value="${salesforceAccountName}" />
+	macro viewNoRecentAccount {
+		var key_accountName = "${salesforceAccountName}";
 
-		<execute function="AssertElementNotPresent" locator1="SalesforceAccounts#RECENT_ACCOUNT_NAME" value1="${salesforceAccountName}" />
-	</command>
-</definition>
+		AssertElementNotPresent(
+			locator1 = "SalesforceAccounts#RECENT_ACCOUNT_NAME",
+			value1 = "${salesforceAccountName}"
+		);
+	}
+}
