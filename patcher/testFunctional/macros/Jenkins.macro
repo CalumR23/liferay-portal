@@ -1,285 +1,224 @@
-<definition>
-	<command name="clickConsoleOutputLink">
-		<execute function="AssertClick" locator1="Jenkins#CONSOLE_OUTPUT_LINK" value1="Console Output" />
-	</command>
-
-	<command name="clickFullLogLink">
-		<if>
-			<condition function="IsElementPresent" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
-			<then>
-				<execute function="Click" locator1="Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK" />
-			</then>
-		</if>
-	</command>
-
-	<command name="clickJobHealthLink">
-		<var name="key_jobName" value="${jobName}" />
-
-		<execute function="Click" locator1="Jenkins#JENKINS_JOB_HEALTH_LINK" />
-	</command>
-
-	<command name="clickJobLink">
-		<var name="key_jobName" value="${jobName}" />
-
-		<execute function="Click" locator1="Jenkins#JENKINS_JOB_LINK" />
-	</command>
-
-	<command name="clickStopButtonLink">
-		<execute function="Click" locator1="Jenkins#STOP_JOB_BUTTON" />
-	</command>
-
-	<command name="executeCurl">
-		<execute class="com.liferay.poshi.runner.util.JSONCurlUtil" method="post">
-			<arg value="${curlArgs}" />
-		</execute>
-	</command>
-
-	<command name="getCurrentJobBuildNumber">
-		<execute macro="Jenkins#clickJobLink">
-			<var name="jobName" value="${jobName}" />
-		</execute>
-
-		<execute function="AssertElementPresent" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
-		<execute function="AssertVisible" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
-
-		<var method="selenium#getText('Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER')" name="jobBuildNumber" />
-
-		<return value="${jobBuildNumber}" />
-	</command>
+definition {
+	macro clickConsoleOutputLink {
+		AssertClick(locator1 = "Jenkins#CONSOLE_OUTPUT_LINK", value1 = "Console Output");
+	}
 
-	<command name="getCurrentJobBuildNumberForShortJob">
-		<execute macro="Jenkins#clickJobLink">
-			<var name="jobName" value="${jobName}" />
-		</execute>
-
-		<if>
-			<condition function="IsElementPresent" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
-			<then>
-				<execute function="AssertElementPresent" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
-				<execute function="AssertVisible" locator1="Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER" />
-
-				<var method="selenium#getText('Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER')" name="jobBuildNumber" />
-			</then>
-			<else>
-				<execute function="AssertElementPresent" locator1="Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER" />
-				<execute function="AssertVisible" locator1="Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER" />
-
-				<var method="selenium#getText('Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER')" name="jobBuildNumber" />
-			</else>
-		</if>
-
-		<return value="${jobBuildNumber}" />
-	</command>
-
-	<command name="gotoConsoleOutput">
-		<var name="key_jobBuildNumber" value="${jobBuildNumber}" />
-
-		<execute macro="Jenkins#clickJobLink">
-			<var name="jobName" value="${jobName}" />
-		</execute>
+	macro clickFullLogLink {
+		if (IsElementPresent(locator1 = "Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK")) {
+			Click(locator1 = "Jenkins#CONSOLE_OUTPUT_FULL_LOG_LINK");
+		}
+	}
 
-		<execute function="Click" locator1="Jenkins#JENKINS_JOB_BUILD_LINK" />
+	macro clickJobHealthLink {
+		var key_jobName = "${jobName}";
 
-		<execute macro="Jenkins#clickConsoleOutputLink" />
-	</command>
+		Click(locator1 = "Jenkins#JENKINS_JOB_HEALTH_LINK");
+	}
 
-	<command name="openJenkinsURL">
-		<execute function="Open" locator1="/view/All" />
-	</command>
+	macro clickJobLink {
+		var key_jobName = "${jobName}";
 
-	<command name="pause">
-		<execute function="Pause" locator1="${pauseTime}" />
-	</command>
+		Click(locator1 = "Jenkins#JENKINS_JOB_LINK");
+	}
 
-	<command name="startFixPackBuilderHotfix7xJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
-
-		<var name="curlURL" value="${portalUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[fix.pack.customer.ticket=${fixPackCustomerTicket}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.fixed.issues=${fixPackFixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.hotfixed.issues=${fixPackHotfixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.id=${fixPackId}]CURL_DATA&gt; -d &lt;CURL_DATA[git.revision=${gitRevision}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.build.id=${patcherBuildId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.user.id=${patcherUserId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.fix.delivery.method=${patcherFixDeliveryMethod}]CURL_DATA&gt;" />
-
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
-
-	<command name="startTestFixPackBuilderHotfixCopyJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
-
-		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy/buildWithParameters" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[originFilePath=${originFilePath}]CURL_DATA&gt; -d &lt;CURL_DATA[destinationFilePath=${destinationFilePath}]CURL_DATA&gt;" />
-
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
-
-	<command name="startTestFixPackBuilderInstallJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
-
-		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[bundle=${bundle}]CURL_DATA&gt; -d &lt;CURL_DATA[fixPack=${fixPack}]CURL_DATA&gt; -d &lt;CURL_DATA[hotfix=${hotfix}]CURL_DATA&gt; -d &lt;CURL_DATA[patchingTool=${patchingTool}]CURL_DATA&gt;" />
-
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
+	macro clickStopButtonLink {
+		Click(locator1 = "Jenkins#STOP_JOB_BUTTON");
+	}
 
-	<command name="startTestFixPackBuilderMainSmokeJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
+	macro executeCurl {
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curlArgs}");
+	}
 
-		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-main-smoke/buildWithParameters" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[github.username=${githubUsername}]CURL_DATA&gt; -d &lt;CURL_DATA[git.branch=${gitBranch}]CURL_DATA&gt;" />
+	macro getCurrentJobBuildNumber {
+		Jenkins.clickJobLink(jobName = "${jobName}");
 
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
+		AssertElementPresent(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-	<command name="startTestFixPackBuilderPatchDifferenceJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
-
-		<var name="curlURL" value="${portalUrl}/view/All/job/test-fixpack-builder-patch-difference/buildWithParameters" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[alphaPath=${alphaPath}]CURL_DATA&gt; -d &lt;CURL_DATA[betaPath=${betaPath}]CURL_DATA&gt;" />
-
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
+		AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-	<command name="stopJob">
-		<var method="PropsUtil#get('jenkins.admin.user.name')" name="jenkinsAdminUserName" />
-		<var method="PropsUtil#get('jenkins.admin.user.token')" name="jenkinsAdminUserToken" />
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('portal.url')" name="portalUrl" />
-
-		<var name="curlURL" value="${portalUrl}/view/All/job/${jobName}/lastBuild/stop" />
-		<var name="curlURLParameters" value="?token=${jenkinsAuthenticationToken} --user ${jenkinsAdminUserName}:${jenkinsAdminUserToken}" />
-
-		<execute macro="Jenkins#executeCurl">
-			<var name="curlArgs" value="${curlURL}${curlURLParameters}" />
-		</execute>
-	</command>
-
-	<command name="viewConsoleText">
-		<execute function="AssertTextEquals#assertPartialText" locator1="Jenkins#CONSOLE_OUTPUT_TEXT" value1="${consoleOutputText}" />
-	</command>
-
-	<command name="viewInstallConsoleText">
-		<execute macro="Jenkins#clickFullLogLink" />
-
-		<var method="selenium#getText('Jenkins#CONSOLE_OUTPUT_TEXT')" name="consoleOutputText" />
-
-		<var method="StringUtil#count('${consoleOutputText}', 'ERROR')" name="errorCount" />
-
-		<echo message="Number of errors: ${errorCount}" />
-
-		<if>
-			<not>
-				<equals arg1="${fileAddedCount}" arg2="0" />
-			</not>
-			<then>
-				<var method="StringUtil#count('${consoleOutputText}', 'ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found')" name="acceptableErrorCount" />
-
-				<echo message="Number of acceptable errors: ${acceptableErrorCount}" />
-
-				<if>
-					<not>
-						<equals arg1="${errorCount}" arg2="${acceptableErrorCount}" />
-					</not>
-					<then>
-						<fail message="Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack install and either apply fixes to the builder or update the test case as needed." />
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<execute macro="Jenkins#viewConsoleText">
-			<var name="consoleOutputText" value="Server startup in" />
-		</execute>
-	</command>
-
-	<command name="viewJobStatusSuccess">
-		<var name="key_jobBuildNumber" value="${jobBuildNumber}" />
-
-		<execute macro="Jenkins#clickJobLink">
-			<var name="jobName" value="${jobName}" />
-		</execute>
-
-		<execute function="AssertElementPresent" locator1="Jenkins#JENKINS_JOB_BUILD_STATUS_SUCCESS" />
-	</command>
-
-	<command name="viewNoConsoleText">
-		<execute function="AssertTextNotEquals#assertNotPartialText" locator1="Jenkins#CONSOLE_OUTPUT_TEXT" value1="${consoleOutputText}" />
-	</command>
-
-	<command name="viewPatchDifferenceConsoleText">
-		<execute macro="Jenkins#clickFullLogLink" />
-
-		<var method="selenium#getText('Jenkins#CONSOLE_OUTPUT_TEXT')" name="consoleOutputText" />
-
-		<var method="StringUtil#count('${consoleOutputText}', 'Added:')" name="fileAddedCount" />
-
-		<echo message="Number of files added: ${fileAddedCount}" />
-
-		<if>
-			<not>
-				<equals arg1="${fileAddedCount}" arg2="0" />
-			</not>
-			<then>
-				<var method="StringUtil#count('${consoleOutputText}', 'Added: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes')" name="acceptableFileAddedCount" />
-
-				<echo message="Number of acceptable files added: ${acceptableFileAddedCount}" />
-
-				<if>
-					<not>
-						<equals arg1="${fileAddedCount}" arg2="${acceptableFileAddedCount}" />
-					</not>
-					<then>
-						<fail message="Unexpected files may have been added.  The test counted ${fileAddedCount} added files but ${acceptableFileAddedCount} acceptable added files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed." />
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<var method="StringUtil#count('${consoleOutputText}', 'Removed:')" name="fileRemovedCount" />
-
-		<echo message="Number of files removed: ${fileRemovedCount}" />
-
-		<if>
-			<not>
-				<equals arg1="${fileRemovedCount}" arg2="0" />
-			</not>
-			<then>
-				<var method="StringUtil#count('${consoleOutputText}', 'Removed: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes')" name="acceptableFileRemovedCount" />
-
-				<echo message="Number of acceptable files removed: ${acceptableFileRemovedCount}" />
-
-				<if>
-					<not>
-						<equals arg1="${fileRemovedCount}" arg2="${acceptableFileRemovedCount}" />
-					</not>
-					<then>
-						<fail message="Unexpected files may have been removed.  The test counted ${fileRemovedCount} removed files but ${acceptableFileRemovedCount} acceptable removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed." />
-					</then>
-				</if>
-			</then>
-		</if>
-
-		<execute macro="Jenkins#viewConsoleText">
-			<var name="consoleOutputText" value="Modified 79" />
-		</execute>
-
-		<execute macro="Jenkins#viewNoConsoleText">
-			<var name="consoleOutputText" value="-Liferay-Portal-Server-Info: Liferay DXP Digital Enterprise" />
-		</execute>
-
-		<execute macro="Jenkins#viewNoConsoleText">
-			<var name="consoleOutputText" value="+Liferay-Portal-Server-Info: Liferay Community Edition Portal" />
-		</execute>
-	</command>
-</definition>
+		var jobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+
+		return "${jobBuildNumber}";
+	}
+
+	macro getCurrentJobBuildNumberForShortJob {
+		Jenkins.clickJobLink(jobName = "${jobName}");
+
+		if (IsElementPresent(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER")) {
+			AssertElementPresent(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+
+			AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+
+			var jobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+		}
+		else {
+			AssertElementPresent(locator1 = "Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
+
+			AssertVisible(locator1 = "Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
+
+			var jobBuildNumber = selenium.getText("Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
+		}
+
+		return "${jobBuildNumber}";
+	}
+
+	macro gotoConsoleOutput {
+		var key_jobBuildNumber = "${jobBuildNumber}";
+
+		Jenkins.clickJobLink(jobName = "${jobName}");
+
+		Click(locator1 = "Jenkins#JENKINS_JOB_BUILD_LINK");
+
+		Jenkins.clickConsoleOutputLink();
+	}
+
+	macro openJenkinsURL {
+		Open(locator1 = "/view/All");
+	}
+
+	macro pause {
+		Pause(locator1 = "${pauseTime}");
+	}
+
+	macro startFixPackBuilderHotfix7xJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[fix.pack.customer.ticket=${fixPackCustomerTicket}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.fixed.issues=${fixPackFixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.hotfixed.issues=${fixPackHotfixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.id=${fixPackId}]CURL_DATA&gt; -d &lt;CURL_DATA[git.revision=${gitRevision}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.build.id=${patcherBuildId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.user.id=${patcherUserId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.fix.delivery.method=${patcherFixDeliveryMethod}]CURL_DATA&gt;";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro startTestFixPackBuilderHotfixCopyJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy/buildWithParameters";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[originFilePath=${originFilePath}]CURL_DATA&gt; -d &lt;CURL_DATA[destinationFilePath=${destinationFilePath}]CURL_DATA&gt;";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro startTestFixPackBuilderInstallJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[bundle=${bundle}]CURL_DATA&gt; -d &lt;CURL_DATA[fixPack=${fixPack}]CURL_DATA&gt; -d &lt;CURL_DATA[hotfix=${hotfix}]CURL_DATA&gt; -d &lt;CURL_DATA[patchingTool=${patchingTool}]CURL_DATA&gt;";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro startTestFixPackBuilderMainSmokeJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-main-smoke/buildWithParameters";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[github.username=${githubUsername}]CURL_DATA&gt; -d &lt;CURL_DATA[git.branch=${gitBranch}]CURL_DATA&gt;";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro startTestFixPackBuilderPatchDifferenceJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-patch-difference/buildWithParameters";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[alphaPath=${alphaPath}]CURL_DATA&gt; -d &lt;CURL_DATA[betaPath=${betaPath}]CURL_DATA&gt;";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro stopJob {
+		var jenkinsAdminUserName = PropsUtil.get("jenkins.admin.user.name");
+		var jenkinsAdminUserToken = PropsUtil.get("jenkins.admin.user.token");
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+		var curlURL = "${portalUrl}/view/All/job/${jobName}/lastBuild/stop";
+		var curlURLParameters = "?token=${jenkinsAuthenticationToken} --user ${jenkinsAdminUserName}:${jenkinsAdminUserToken}";
+
+		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+	}
+
+	macro viewConsoleText {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Jenkins#CONSOLE_OUTPUT_TEXT",
+			value1 = "${consoleOutputText}"
+		);
+	}
+
+	macro viewInstallConsoleText {
+		Jenkins.clickFullLogLink();
+
+		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
+		var errorCount = StringUtil.count("${consoleOutputText}", "ERROR");
+
+		echo("Number of errors: ${errorCount}");
+
+		if (!("${fileAddedCount}" == "0")) {
+			var acceptableErrorCount = StringUtil.count("${consoleOutputText}", "ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found");
+
+			echo("Number of acceptable errors: ${acceptableErrorCount}");
+
+			if (!("${errorCount}" == "${acceptableErrorCount}")) {
+				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack install and either apply fixes to the builder or update the test case as needed.");
+			}
+		}
+
+		Jenkins.viewConsoleText(consoleOutputText = "Server startup in");
+	}
+
+	macro viewJobStatusSuccess {
+		var key_jobBuildNumber = "${jobBuildNumber}";
+
+		Jenkins.clickJobLink(jobName = "${jobName}");
+
+		AssertElementPresent(locator1 = "Jenkins#JENKINS_JOB_BUILD_STATUS_SUCCESS");
+	}
+
+	macro viewNoConsoleText {
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "Jenkins#CONSOLE_OUTPUT_TEXT",
+			value1 = "${consoleOutputText}"
+		);
+	}
+
+	macro viewPatchDifferenceConsoleText {
+		Jenkins.clickFullLogLink();
+
+		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
+		var fileAddedCount = StringUtil.count("${consoleOutputText}", "Added:");
+
+		echo("Number of files added: ${fileAddedCount}");
+
+		if (!("${fileAddedCount}" == "0")) {
+			var acceptableFileAddedCount = StringUtil.count("${consoleOutputText}", "Added: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
+
+			echo("Number of acceptable files added: ${acceptableFileAddedCount}");
+
+			if (!("${fileAddedCount}" == "${acceptableFileAddedCount}")) {
+				fail("Unexpected files may have been added.  The test counted ${fileAddedCount} added files but ${acceptableFileAddedCount} acceptable added files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
+			}
+		}
+
+		var fileRemovedCount = StringUtil.count("${consoleOutputText}", "Removed:");
+
+		echo("Number of files removed: ${fileRemovedCount}");
+
+		if (!("${fileRemovedCount}" == "0")) {
+			var acceptableFileRemovedCount = StringUtil.count("${consoleOutputText}", "Removed: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
+
+			echo("Number of acceptable files removed: ${acceptableFileRemovedCount}");
+
+			if (!("${fileRemovedCount}" == "${acceptableFileRemovedCount}")) {
+				fail("Unexpected files may have been removed.  The test counted ${fileRemovedCount} removed files but ${acceptableFileRemovedCount} acceptable removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
+			}
+		}
+
+		Jenkins.viewConsoleText(consoleOutputText = "Modified 79");
+
+		Jenkins.viewNoConsoleText(
+			consoleOutputText = "-Liferay-Portal-Server-Info: Liferay DXP Digital Enterprise"
+		);
+
+		Jenkins.viewNoConsoleText(
+			consoleOutputText = "+Liferay-Portal-Server-Info: Liferay Community Edition Portal"
+		);
+	}
+}

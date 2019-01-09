@@ -1,29 +1,23 @@
-<definition>
-	<command name="executeCurl">
-		<echo message="curl ${curlArgs}" />
+definition {
+	macro executeCurl {
+		echo("curl ${curlArgs}");
 
-		<var method="JSONCurlUtil#post('${curlArgs}', '$[\'status\']')" name="status" />
-	</command>
+		var status = JSONCurlUtil.post("${curlArgs}", "$['status']");
+	}
 
-	<command name="startFixPackBuilderHotfix7xJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('jenkins.url')" name="jenkinsUrl" />
+	macro startFixPackBuilderHotfix7xJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var jenkinsUrl = PropsUtil.get("jenkins.url");
+		var curlArgs = "${jenkinsUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters?token=${jenkinsAuthenticationToken} -d fix.pack.customer.ticket=${fixPackCustomerTicket} -d fix.pack.fixed.issues=${fixPackFixedIssues} -d fix.pack.hotfixed.issues=${fixPackHotfixedIssues} -d fix.pack.id=${fixPackId} -d git.revision=${gitRevision} -d patcher.build.id=${patcherBuildId} -d patcher.user.id=${patcherUserId}";
 
-		<var name="curlArgs" value="${jenkinsUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters?token=${jenkinsAuthenticationToken} -d fix.pack.customer.ticket=${fixPackCustomerTicket} -d fix.pack.fixed.issues=${fixPackFixedIssues} -d fix.pack.hotfixed.issues=${fixPackHotfixedIssues} -d fix.pack.id=${fixPackId} -d git.revision=${gitRevision} -d patcher.build.id=${patcherBuildId} -d patcher.user.id=${patcherUserId}" />
+		JenkinsJson.executeCurl(curlArgs = "${curlArgs}");
+	}
 
-		<execute macro="JenkinsJson#executeCurl">
-			<var name="curlArgs" value="${curlArgs}" />
-		</execute>
-	</command>
+	macro startFixPackBuilderInstallJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var jenkinsUrl = PropsUtil.get("jenkins.url");
+		var curlArgs = "${jenkinsUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters?token=${jenkinsAuthenticationToken} -d bundle=${bundle} -d fixPack=${fixPack} -d patchingTool=${patchingTool}";
 
-	<command name="startFixPackBuilderInstallJob">
-		<var method="PropsUtil#get('jenkins.authentication.token')" name="jenkinsAuthenticationToken" />
-		<var method="PropsUtil#get('jenkins.url')" name="jenkinsUrl" />
-
-		<var name="curlArgs" value="${jenkinsUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters?token=${jenkinsAuthenticationToken} -d bundle=${bundle} -d fixPack=${fixPack} -d patchingTool=${patchingTool}" />
-
-		<execute macro="JenkinsJson#executeCurl">
-			<var name="curlArgs" value="${curlArgs}" />
-		</execute>
-	</command>
-</definition>
+		JenkinsJson.executeCurl(curlArgs = "${curlArgs}");
+	}
+}
