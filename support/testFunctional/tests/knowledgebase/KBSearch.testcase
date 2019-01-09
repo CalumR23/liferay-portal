@@ -1,240 +1,170 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var kbAdminEmailAddress = PropsUtil.get("kb.email.address.6");
+	var kbAdminPassword = PropsUtil.get("kb.email.password.6");
+	var liferayEmailAddress = PropsUtil.get("kb.email.address.1");
+	var liferayPassword = PropsUtil.get("kb.email.password.1");
 
-	<var method="PropsUtil#get('kb.email.address.6')" name="kbAdminEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.6')" name="kbAdminPassword" />
-	<var method="PropsUtil#get('kb.email.address.1')" name="liferayEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.1')" name="liferayPassword" />
+	tearDown {
+		var testName = PropsUtil.get("test.name");
+		var testName = RegexUtil.replace("${testName}", "[^\.]*\.(.*)", "1");
+		var testCaseName = StringUtil.extractLast("${testName}", "#");
 
-	<tear-down>
-		<var method="PropsUtil#get('test.name')" name="testName" />
+		if ("${testCaseName}" == "SearchInJapaneseLocale") {
+			KBUser.setLocale(language = "English");
+		}
 
-		<var method="RegexUtil#replace('${testName}', '[^\.]*\.(.*)', '1')" name="testName" />
+		KBUser.logout();
+	}
 
-		<var method="StringUtil#extractLast('${testName}', '#')" name="testCaseName" />
+	@priority = "5"
+	test AddAndRemoveFilterCategory {
+		var category = "QA Test Article Type Filter";
+		var group = "Article Type";
 
-		<if>
-			<equals arg1="${testCaseName}" arg2="SearchInJapaneseLocale" />
-			<then>
-				<execute macro="KBUser#setLocale">
-					<var name="language" value="English" />
-				</execute>
-			</then>
-		</if>
+		KBUser.login(
+			userEmailAddress = "${kbAdminEmailAddress}",
+			userPassword = "${kbAdminPassword}"
+		);
 
-		<execute macro="KBUser#logout" />
-	</tear-down>
+		KBNavigation.gotoKBCategories();
 
-	<command name="AddAndRemoveFilterCategory" priority="5">
-		<var name="category" value="QA Test Article Type Filter" />
-		<var name="group" value="Article Type" />
+		KBCategories.addCategory(name = "${category}", vocabulary = "${group}");
 
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${kbAdminEmailAddress}" />
-			<var name="userPassword" value="${kbAdminPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBSearch.viewFilter(filter = "${category}", group = "${group}");
 
-		<execute macro="KBCategories#addCategory">
-			<var name="name" value="${category}" />
-			<var name="vocabulary" value="${group}" />
-		</execute>
+		KBNavigation.gotoKBCategories();
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBCategories.deleteCategory(title = "${category}", vocabulary = "${group}");
 
-		<execute macro="KBSearch#viewFilter">
-			<var name="filter" value="${category}" />
-			<var name="group" value="${group}" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBSearch.viewFilterNotPresent(key_filter = "${category}");
+	}
 
-		<execute macro="KBCategories#deleteCategory">
-			<var name="title" value="${category}" />
-			<var name="vocabulary" value="${group}" />
-		</execute>
+	@priority = "5"
+	test AddAndRemoveFilterVocabulary {
+		var category = "QA Test Category";
+		var vocabulary = "QA Test Vocabulary";
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBUser.login(
+			userEmailAddress = "${kbAdminEmailAddress}",
+			userPassword = "${kbAdminPassword}"
+		);
 
-		<execute macro="KBSearch#viewFilterNotPresent">
-			<var name="key_filter" value="${category}" />
-		</execute>
-	</command>
+		KBNavigation.gotoKBCategories();
 
-	<command name="AddAndRemoveFilterVocabulary" priority="5">
-		<var name="category" value="QA Test Category" />
-		<var name="vocabulary" value="QA Test Vocabulary" />
+		KBCategories.addVocabulary(name = "${vocabulary}");
 
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${kbAdminEmailAddress}" />
-			<var name="userPassword" value="${kbAdminPassword}" />
-		</execute>
+		KBNavigation.gotoKBCategories();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBCategories.addCategory(name = "${category}", vocabulary = "${vocabulary}");
 
-		<execute macro="KBCategories#addVocabulary">
-			<var name="name" value="${vocabulary}" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBSearch.viewFilter(filter = "${category}", group = "${vocabulary}");
 
-		<execute macro="KBCategories#addCategory">
-			<var name="name" value="${category}" />
-			<var name="vocabulary" value="${vocabulary}" />
-		</execute>
+		KBNavigation.gotoKBCategories();
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBCategories.deleteCategory(title = "${category}", vocabulary = "${vocabulary}");
 
-		<execute macro="KBSearch#viewFilter">
-			<var name="filter" value="${category}" />
-			<var name="group" value="${vocabulary}" />
-		</execute>
+		KBNavigation.gotoKBCategories();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBSiteAdminHelper.deleteRowWithSearch(title = "${vocabulary}");
 
-		<execute macro="KBCategories#deleteCategory">
-			<var name="title" value="${category}" />
-			<var name="vocabulary" value="${vocabulary}" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBNavigation#gotoKBCategories" />
+		KBSearch.viewFilterNotPresent(key_filter = "${vocabulary}");
+	}
 
-		<execute macro="KBSiteAdminHelper#deleteRowWithSearch">
-			<var name="title" value="${vocabulary}" />
-		</execute>
+	@priority = "5"
+	test SearchInJapaneseLocale {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBSearch#viewFilterNotPresent">
-			<var name="key_filter" value="${vocabulary}" />
-		</execute>
-	</command>
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-	<command name="SearchInJapaneseLocale" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
+		KBSearch.expandFilterGroup(group = "Language");
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBSearch.checkLanguageFilter(filter = "日本語");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		var count = KBSearch.getSearchResultCount();
 
-		<execute macro="KBSearch#expandFilterGroup">
-			<var name="group" value="Language" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBSearch#checkLanguageFilter">
-			<var name="filter" value="日本語" />
-		</execute>
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBSearch#getSearchResultCount">
-			<return name="count" />
-		</execute>
+		KBUser.setLocale(language = "日本語");
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBSearch.viewFirstNResultsJapanese(count = "${count}");
+	}
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+	@priority = "5"
+	test ViewOfficialDocumentationNotRankedAtBottom {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
 
-		<execute macro="KBUser#setLocale">
-			<var name="language" value="日本語" />
-		</execute>
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBSearch#viewFirstNResultsJapanese">
-			<var name="count" value="${count}" />
-		</execute>
-	</command>
+		KBSearch.checkFilter(filter = "Official Documentation");
 
-	<command name="ViewOfficialDocumentationNotRankedAtBottom" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBSearch.searchByKeyword(keyword = "Clustering");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Official Documentation" />
-		</execute>
+		KBSearch.viewOfficialDocOnFirstPageResults();
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		KBSearch.viewKBArticleOnFirstPageResults();
+	}
 
-		<execute macro="KBSearch#searchByKeyword">
-			<var name="keyword" value="Clustering" />
-		</execute>
+	@priority = "4"
+	test ViewPagination {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
 
-		<execute macro="KBSearch#viewOfficialDocOnFirstPageResults" />
+		KBNavigation.gotoKBSearchViaURL();
 
-		<execute macro="KBSearch#viewKBArticleOnFirstPageResults" />
-	</command>
+		KBSearch.viewSearchResultEmpty();
 
-	<command name="ViewPagination" priority="4">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBNavigation#gotoKBSearchViaURL" />
+		KBSearchPagination.viewPaginationDropdownLabel(numItems = "20");
 
-		<execute macro="KBSearch#viewSearchResultEmpty" />
+		KBSearchPagination.viewPaginationDropdownList(list = "5,10,20,30,50,75");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		KBSearchPagination.viewPaginationButtonsDisabled(buttons = "First,Previous");
 
-		<execute macro="KBSearchPagination#viewPaginationDropdownLabel">
-			<var name="numItems" value="20" />
-		</execute>
+		KBSearchPagination.viewPaginationButtonsEnabled(buttons = "Next,Last");
 
-		<execute macro="KBSearchPagination#viewPaginationDropdownList">
-			<var name="list" value="5,10,20,30,50,75" />
-		</execute>
+		KBSearchPagination.selectPage(page = "10");
 
-		<execute macro="KBSearchPagination#viewPaginationButtonsDisabled">
-			<var name="buttons" value="First,Previous" />
-		</execute>
+		KBSearchPagination.viewPaginationButtonsEnabled(
+			buttons = "First,Previous,Next,Last"
+		);
 
-		<execute macro="KBSearchPagination#viewPaginationButtonsEnabled">
-			<var name="buttons" value="Next,Last" />
-		</execute>
+		KBSearchPagination.clickPaginationButton(button = "Last");
 
-		<execute macro="KBSearchPagination#selectPage">
-			<var name="page" value="10" />
-		</execute>
+		KBSearchPagination.viewPaginationButtonsDisabled(buttons = "Next,Last");
 
-		<execute macro="KBSearchPagination#viewPaginationButtonsEnabled">
-			<var name="buttons" value="First,Previous,Next,Last" />
-		</execute>
+		KBSearchPagination.viewPaginationButtonsEnabled(buttons = "First,Previous");
 
-		<execute macro="KBSearchPagination#clickPaginationButton">
-			<var name="button" value="Last" />
-		</execute>
+		KBSearch.checkFilter(filter = "Internal Training");
 
-		<execute macro="KBSearchPagination#viewPaginationButtonsDisabled">
-			<var name="buttons" value="Next,Last" />
-		</execute>
+		KBSearchPagination.selectItemsPerPage(numItems = "50");
 
-		<execute macro="KBSearchPagination#viewPaginationButtonsEnabled">
-			<var name="buttons" value="First,Previous" />
-		</execute>
-
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Internal Training" />
-		</execute>
-
-		<execute macro="KBSearchPagination#selectItemsPerPage">
-			<var name="numItems" value="50" />
-		</execute>
-
-		<execute macro="KBSearchPagination#viewPaginationButtonsDisabled">
-			<var name="buttons" value="First,Previous,Next,Last" />
-		</execute>
-	</command>
-</definition>
+		KBSearchPagination.viewPaginationButtonsDisabled(
+			buttons = "First,Previous,Next,Last"
+		);
+	}
+}

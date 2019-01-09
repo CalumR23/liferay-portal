@@ -1,98 +1,88 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var customerEmailAddress = PropsUtil.get("kb.email.address.2");
+	var customerPassword = PropsUtil.get("kb.email.password.2");
+	var liferayEmailAddress = PropsUtil.get("kb.email.address.1");
+	var liferayPassword = PropsUtil.get("kb.email.password.1");
 
-	<var method="PropsUtil#get('kb.email.address.2')" name="customerEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.2')" name="customerPassword" />
-	<var method="PropsUtil#get('kb.email.address.1')" name="liferayEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.1')" name="liferayPassword" />
+	tearDown {
+		KBUser.logout();
+	}
 
-	<tear-down>
-		<execute macro="KBUser#logout" />
-	</tear-down>
+	@priority = "5"
+	test CannotCreateOrEditArticle {
+		KBUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-	<command name="CannotCreateOrEditArticle" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearch();
 
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.viewSuggestAnEditLinkNotPresent();
+	}
 
-		<execute macro="KBSearch#viewSuggestAnEditLinkNotPresent" />
-	</command>
+	@priority = "5"
+	test CannotViewInternalArticle {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
 
-	<command name="CannotViewInternalArticle" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearch();
 
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.filterInternalArticle();
 
-		<execute macro="KBSearch#filterInternalArticle" />
+		var title = KBSearch.getFirstArticleTitle();
 
-		<execute macro="KBSearch#getFirstArticleTitle">
-			<return name="title" />
-		</execute>
+		KBUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="KBUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearch();
 
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		KBSearch.searchByKeyword(keyword = "&quot;${title}&quot;");
 
-		<execute macro="KBSearch#searchByKeyword">
-			<var name="keyword" value="&quot;${title}&quot;" />
-		</execute>
+		KBSearch.viewSearchResultEmpty();
+	}
 
-		<execute macro="KBSearch#viewSearchResultEmpty" />
-	</command>
+	@priority = "5"
+	test ViewExternalArticle {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
 
-	<command name="ViewExternalArticle" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearch();
 
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.filterExternalArticle();
 
-		<execute macro="KBSearch#filterExternalArticle" />
+		var title = KBSearch.getFirstArticleTitle();
 
-		<execute macro="KBSearch#getFirstArticleTitle">
-			<return name="title" />
-		</execute>
+		KBUser.logoutAndLogin(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-		<execute macro="KBUser#logoutAndLogin">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
+		KBNavigation.gotoKBSearch();
 
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		KBSearch.searchByKeyword(keyword = "&quot;${title}&quot;");
 
-		<execute macro="KBSearch#searchByKeyword">
-			<var name="keyword" value="&quot;${title}&quot;" />
-		</execute>
+		KBSearch.viewFirstSearchResultTitle(title = "${title}");
+	}
 
-		<execute macro="KBSearch#viewFirstSearchResultTitle">
-			<var name="title" value="${title}" />
-		</execute>
-	</command>
+	@priority = "5"
+	test ViewOfficialDocumentation {
+		KBUser.login(
+			userEmailAddress = "${customerEmailAddress}",
+			userPassword = "${customerPassword}"
+		);
 
-	<command name="ViewOfficialDocumentation" priority="5">
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${customerEmailAddress}" />
-			<var name="userPassword" value="${customerPassword}" />
-		</execute>
-
-		<execute macro="KBPermissions#viewOfficialDocumentation" />
-	</command>
-</definition>
+		KBPermissions.viewOfficialDocumentation();
+	}
+}

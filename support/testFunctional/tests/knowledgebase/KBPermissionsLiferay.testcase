@@ -1,65 +1,60 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var liferayEmailAddress = PropsUtil.get("kb.email.address.1");
+	var liferayPassword = PropsUtil.get("kb.email.password.1");
 
-	<var method="PropsUtil#get('kb.email.address.1')" name="liferayEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.1')" name="liferayPassword" />
+	setUp {
+		KBUser.login(
+			userEmailAddress = "${liferayEmailAddress}",
+			userPassword = "${liferayPassword}"
+		);
+	}
 
-	<set-up>
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${liferayEmailAddress}" />
-			<var name="userPassword" value="${liferayPassword}" />
-		</execute>
-	</set-up>
+	tearDown {
+		KBUser.logout();
+	}
 
-	<tear-down>
-		<execute macro="KBUser#logout" />
-	</tear-down>
+	@priority = "5"
+	test CannotCreateOrEditArticle {
+		KBNavigation.gotoKBSearch();
 
-	<command name="CannotCreateOrEditArticle" priority="5">
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.viewSuggestAnEditLinkNotPresent();
+	}
 
-		<execute macro="KBSearch#viewSuggestAnEditLinkNotPresent" />
-	</command>
+	@priority = "5"
+	test ViewExternalArticle {
+		KBNavigation.gotoKBSearch();
 
-	<command name="ViewExternalArticle" priority="5">
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.filterExternalArticle();
 
-		<execute macro="KBSearch#filterExternalArticle" />
+		KBSearch.viewSearchResultNotEmpty();
 
-		<execute macro="KBSearch#viewSearchResultNotEmpty" />
+		KBSearch.viewSearchResultKBArticle(permission = "External");
+	}
 
-		<execute macro="KBSearch#viewSearchResultKBArticle">
-			<var name="permission" value="External" />
-		</execute>
-	</command>
+	@priority = "5"
+	test ViewInternalArticle {
+		KBNavigation.gotoKBSearch();
 
-	<command name="ViewInternalArticle" priority="5">
-		<execute macro="KBNavigation#gotoKBSearch" />
+		KBSearch.checkFilter(filter = "Knowledge Base");
 
-		<execute macro="KBSearch#checkFilter">
-			<var name="filter" value="Knowledge Base" />
-		</execute>
+		KBSearch.expandFilterGroup(group = "Permission");
 
-		<execute macro="KBSearch#expandFilterGroup">
-			<var name="group" value="Permission" />
-		</execute>
+		KBSearch.checkPermissionFilter(filter = "Internal");
 
-		<execute macro="KBSearch#checkPermissionFilter">
-			<var name="filter" value="Internal" />
-		</execute>
+		KBSearch.viewSearchResultNotEmpty();
 
-		<execute macro="KBSearch#viewSearchResultNotEmpty" />
+		KBSearch.viewSearchResultKBArticle(permission = "Internal");
+	}
 
-		<execute macro="KBSearch#viewSearchResultKBArticle">
-			<var name="permission" value="Internal" />
-		</execute>
-	</command>
+	@priority = "5"
+	test ViewNoRSMSiteAccess {
+		KBPermissions.viewNoRSMSiteAccess();
+	}
 
-	<command name="ViewNoRSMSiteAccess" priority="5">
-		<execute macro="KBPermissions#viewNoRSMSiteAccess" />
-	</command>
-
-	<command name="ViewOfficialDocumentation" priority="5">
-		<execute macro="KBPermissions#viewOfficialDocumentation" />
-	</command>
-</definition>
+	@priority = "5"
+	test ViewOfficialDocumentation {
+		KBPermissions.viewOfficialDocumentation();
+	}
+}

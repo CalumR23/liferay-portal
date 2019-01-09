@@ -1,122 +1,106 @@
-<definition component-name="support-qa">
-	<property name="testray.main.component.name" value="Support QA" />
+@component-name = "support-qa"
+definition {
+	property testray.main.component.name = "Support QA";
+	var kbAdminEmailAddress = PropsUtil.get("kb.email.address.6");
+	var kbAdminPassword = PropsUtil.get("kb.email.password.6");
+	static var staticTearDownWebContent = "";
 
-	<var method="PropsUtil#get('kb.email.address.6')" name="kbAdminEmailAddress" />
-	<var method="PropsUtil#get('kb.email.password.6')" name="kbAdminPassword" />
+	setUp {
+		KBUser.login(
+			userEmailAddress = "${kbAdminEmailAddress}",
+			userPassword = "${kbAdminPassword}"
+		);
+	}
 
-	<var name="staticTearDownWebContent" static="true" value="" />
+	tearDown {
+		if (!("${staticTearDownWebContent}" == "")) {
+			KBWebContent.closePermissionsIFrame();
 
-	<set-up>
-		<execute macro="KBUser#login">
-			<var name="userEmailAddress" value="${kbAdminEmailAddress}" />
-			<var name="userPassword" value="${kbAdminPassword}" />
-		</execute>
-	</set-up>
+			KBWebContent.delete(title = "${staticTearDownWebContent}");
+		}
 
-	<tear-down>
-		<if>
-			<not>
-				<equals arg1="${staticTearDownWebContent}" arg2="" />
-			</not>
-			<then>
-				<execute macro="KBWebContent#closePermissionsIFrame" />
+		KBUser.logout();
+	}
 
-				<execute macro="KBWebContent#delete">
-					<var name="title" value="${staticTearDownWebContent}" />
-				</execute>
-			</then>
-		</if>
+	@priority = "5"
+	test NewExternalArticle {
+		KBNavigation.gotoKBWebContent();
 
-		<execute macro="KBUser#logout" />
-	</tear-down>
+		KBWebContent.addArticleDisplay(
+			permissions = "External",
+			title = "QA Test KB Article 2"
+		);
 
-	<command name="NewExternalArticle" priority="5">
-		<execute macro="KBNavigation#gotoKBWebContent" />
+		var staticTearDownWebContent = "QA Test KB Article 2";
 
-		<execute macro="KBWebContent#addArticleDisplay">
-			<var name="permissions" value="External" />
-			<var name="title" value="QA Test KB Article 2" />
-		</execute>
+		KBWebContent.gotoArticlePermissions(title = "QA Test KB Article 2");
 
-		<var name="staticTearDownWebContent" value="QA Test KB Article 2" />
+		KBWebContent.viewCheckedPermissions(checkedColumns = "view", role = "Customer");
 
-		<execute macro="KBWebContent#gotoArticlePermissions">
-			<var name="title" value="QA Test KB Article 2" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Customer",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion"
+		);
 
-		<execute macro="KBWebContent#viewCheckedPermissions">
-			<var name="checkedColumns" value="view" />
-			<var name="role" value="Customer" />
-		</execute>
+		KBWebContent.viewCheckedPermissions(
+			checkedColumns = "view",
+			role = "Liferay Employee"
+		);
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Customer" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Liferay Employee",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion"
+		);
 
-		<execute macro="KBWebContent#viewCheckedPermissions">
-			<var name="checkedColumns" value="view" />
-			<var name="role" value="Liferay Employee" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Guest",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion"
+		);
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Liferay Employee" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion" />
-		</execute>
+		KBWebContent.viewCheckedPermissions(checkedColumns = "view", role = "Partner");
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Guest" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Partner",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion"
+		);
+	}
 
-		<execute macro="KBWebContent#viewCheckedPermissions">
-			<var name="checkedColumns" value="view" />
-			<var name="role" value="Partner" />
-		</execute>
+	@priority = "5"
+	test NewInternalArticle {
+		KBNavigation.gotoKBWebContent();
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Partner" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion" />
-		</execute>
-	</command>
+		KBWebContent.addArticleDisplay(
+			permissions = "Internal",
+			title = "QA Test KB Article 3"
+		);
 
-	<command name="NewInternalArticle" priority="5">
-		<execute macro="KBNavigation#gotoKBWebContent" />
+		var staticTearDownWebContent = "QA Test KB Article 3";
 
-		<execute macro="KBWebContent#addArticleDisplay">
-			<var name="permissions" value="Internal" />
-			<var name="title" value="QA Test KB Article 3" />
-		</execute>
+		KBWebContent.gotoArticlePermissions(title = "QA Test KB Article 3");
 
-		<var name="staticTearDownWebContent" value="QA Test KB Article 3" />
+		KBWebContent.viewUncheckedPermissions(
+			role = "Customer",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion"
+		);
 
-		<execute macro="KBWebContent#gotoArticlePermissions">
-			<var name="title" value="QA Test KB Article 3" />
-		</execute>
+		KBWebContent.viewCheckedPermissions(
+			checkedColumns = "view",
+			role = "Liferay Employee"
+		);
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Customer" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Liferay Employee",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion"
+		);
 
-		<execute macro="KBWebContent#viewCheckedPermissions">
-			<var name="checkedColumns" value="view" />
-			<var name="role" value="Liferay Employee" />
-		</execute>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Guest",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion"
+		);
 
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Liferay Employee" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,add-discussion" />
-		</execute>
-
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Guest" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion" />
-		</execute>
-
-		<execute macro="KBWebContent#viewUncheckedPermissions">
-			<var name="role" value="Partner" />
-			<var name="uncheckedColumns" value="update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion" />
-		</execute>
-	</command>
-</definition>
+		KBWebContent.viewUncheckedPermissions(
+			role = "Partner",
+			uncheckedColumns = "update-discussion,delete,permissions,expire,delete-discussion,update,view,add-discussion"
+		);
+	}
+}
