@@ -1,90 +1,67 @@
-<definition>
-	<command name="clickSocialIcon">
-		<var name="key_title" value="${iconTitle}" />
+definition {
+	macro clickSocialIcon {
+		var key_title = "${iconTitle}";
 
-		<execute function="ScrollWebElementIntoView" locator1="LRDCOMIcon#ICON_SOCIAL" />
+		ScrollWebElementIntoView(locator1 = "LRDCOMIcon#ICON_SOCIAL");
 
-		<execute function="Click" locator1="LRDCOMIcon#ICON_SOCIAL" />
-	</command>
+		Click(locator1 = "LRDCOMIcon#ICON_SOCIAL");
+	}
 
-	<command name="verifySocialWindowTitle">
-		<var method="selenium#getTitle()" name="windowTitle" />
+	macro verifySocialWindowTitle {
+		var windowTitle = selenium.getTitle();
 
-		<echo message="Window Title: ${windowTitle}" />
+		echo("Window Title: ${windowTitle}");
 
-		<var method="StringUtil#startsWith('${windowTitle}', 'Liferay')" name="argA" />
-		<var method="StringUtil#contains('${windowTitle}', '${iconTitle}', ' ')" name="argB" />
-		<var method="StringUtil#contains('${windowTitle}', 'Liferay,', ' ')" name="argC" />
+		var argA = StringUtil.startsWith("${windowTitle}", "Liferay");
+		var argB = StringUtil.contains("${windowTitle}", "${iconTitle}", " ");
+		var argC = StringUtil.contains("${windowTitle}", "Liferay,", " ");
 
-		<if>
-			<or>
-				<and>
-					<equals arg1="${argA}" arg2="true" />
-					<equals arg1="${argB}" arg2="true" />
-				</and>
-				<and>
-					<equals arg1="${argB}" arg2="true" />
-					<equals arg1="${argC}" arg2="true" />
-				</and>
-			</or>
-			<then>
-				<execute function="Close#closeWindow" locator1="title=${windowTitle}" />
+		if ((("${argA}" == "true") && ("${argB}" == "true")) || (("${argB}" == "true") && ("${argC}" == "true"))) {
+			Close.closeWindow(locator1 = "title=${windowTitle}");
 
-				<execute function="SelectWindow#selectWindowTop" />
-			</then>
-			<else>
-				<fail message="ERROR: Check Liferay ${iconTitle} URL link" />
-			</else>
-		</if>
-	</command>
+			SelectWindow.selectWindowTop();
+		}
+		else {
+			fail("ERROR: Check Liferay ${iconTitle} URL link");
+		}
+	}
 
-	<command name="viewLiferayLinkedInWindow">
-		<var method="selenium#getTitle()" name="windowTitle" />
+	macro viewLiferayLinkedInWindow {
+		var windowTitle = selenium.getTitle();
 
-		<echo message="Window Title: ${windowTitle}" />
+		echo("Window Title: ${windowTitle}");
 
-		<var method="StringUtil#startsWith('${windowTitle}', 'Liferay')" name="argA" />
-		<var method="StringUtil#contains('${windowTitle}', 'LinkedIn', ' ')" name="argB" />
+		var argA = StringUtil.startsWith("${windowTitle}", "Liferay");
+		var argB = StringUtil.contains("${windowTitle}", "LinkedIn", " ");
 
-		<if>
-			<and>
-				<equals arg1="${argA}" arg2="true" />
-				<equals arg1="${argB}" arg2="true" />
-			</and>
-			<then>
-				<execute function="Close#closeWindow" locator1="title=${socialWindowTitle}" />
+		if (("${argA}" == "true") && ("${argB}" == "true")) {
+			Close.closeWindow(locator1 = "title=${socialWindowTitle}");
 
-				<execute function="SelectWindow#selectWindowTop" />
-			</then>
-			<else>
-				<var method="PropsUtil#get('lrdcom.email.address.2')" name="userEmailAddress" />
-				<var method="PropsUtil#get('lrdcom.email.password.2')" name="userPassword" />
+			SelectWindow.selectWindowTop();
+		}
+		else {
+			var userEmailAddress = PropsUtil.get("lrdcom.email.address.2");
+			var userPassword = PropsUtil.get("lrdcom.email.password.2");
 
-				<execute function="Click" locator1="LinkedInLogin#SIGN_IN" />
+			Click(locator1 = "LinkedInLogin#SIGN_IN");
 
-				<execute function="Type" locator1="LinkedInLogin#EMAIL_ADDRESS" value1="${userEmailAddress}" />
-				<execute function="Type" locator1="LinkedInLogin#PASSWORD" value1="${userPassword}" />
+			Type(locator1 = "LinkedInLogin#EMAIL_ADDRESS", value1 = "${userEmailAddress}");
 
-				<execute function="Click" locator1="LinkedInLogin#SUBMIT_BUTTON" />
+			Type(locator1 = "LinkedInLogin#PASSWORD", value1 = "${userPassword}");
 
-				<execute function="AssertElementNotPresent" locator1="LinkedInLogin#SUBMIT_BUTTON" />
+			Click(locator1 = "LinkedInLogin#SUBMIT_BUTTON");
 
-				<execute macro="LRDCOMFooter#verifySocialWindowTitle">
-					<var name="iconTitle" value="LinkedIn" />
-				</execute>
-			</else>
-		</if>
-	</command>
+			AssertElementNotPresent(locator1 = "LinkedInLogin#SUBMIT_BUTTON");
 
-	<command name="viewSocialIconLinkWindow">
-		<execute macro="LRDCOMFooter#clickSocialIcon">
-			<var name="iconTitle" value="${iconTitle}" />
-		</execute>
+			LRDCOMFooter.verifySocialWindowTitle(iconTitle = "LinkedIn");
+		}
+	}
 
-		<execute function="SelectWindow#selectPopUp" locator1="null" />
+	macro viewSocialIconLinkWindow {
+		LRDCOMFooter.clickSocialIcon(iconTitle = "${iconTitle}");
 
-		<execute macro="LRDCOMFooter#verifySocialWindowTitle">
-			<var name="iconTitle" value="${iconTitle}" />
-		</execute>
-	</command>
-</definition>
+		SelectWindow.selectPopUp(locator1 = "null");
+
+		LRDCOMFooter.verifySocialWindowTitle(iconTitle = "${iconTitle}");
+	}
+}
