@@ -550,6 +550,65 @@ Scenario: Developer Permissions
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 
+Scenario: Partner Permissions
+	End users who are partners in an organization should be able to add comments to any request for their organization.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk User2                    |
+	| Tags             | osb_partner,osb_kb               |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user2@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User2                            |
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                               |
+	| Component                | activation_key_project_administration             |
+	| System Status            | production_functioning_with_limited_capabilities  |
+	| Subject                  | Request Subject                                   |
+	| Description              | Request Description                               |
+	| Organization External ID | Organization1                                     |
+	When I log into zendesk as "zendesk.user2@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	And I go to the Organization requests tab
+	Then I should see a request with the subject "Request Subject" in the index with the following details
+	| Subject       | Request Subject |
+	| Status        | OPEN            |
+	When I click on the request with the subject "Request Subject" in the index
+	And I submit a comment containing the following details
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	Then I should be able to view a request comment containing the text "Request Comment" with the following details
+	| Author      | Zendesk User2   |
+	| Comment     | Request Comment |
+	| Attachments | Document_1.txt  |
+	And I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+
 Scenario: Organizational Permissions
 	End users who are developers in an organization but watchers in another should be only be able to submit a request and add comments on a request for the organization that they are a developer on.
 
