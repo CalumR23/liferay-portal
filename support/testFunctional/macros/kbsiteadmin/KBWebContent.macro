@@ -1,132 +1,110 @@
-<definition>
-	<command name="addArticleDisplay">
-		<execute function="Click" locator1="KBWebContent#ADD_BUTTON" />
+definition {
+	macro addArticleDisplay {
+		Click(locator1 = "KBWebContent#ADD_BUTTON");
 
-		<var name="key_menu_item" value="Article Display" />
+		var key_menu_item = "Article Display";
 
-		<execute function="Click" locator1="KBWebContent#ADD_MENU_ITEM" />
-		<execute function="AssertElementPresent" locator1="KBWebContent#TITLE_FIELD" />
-		<execute function="Type" locator1="KBWebContent#TITLE_FIELD" value1="${title}" />
+		Click(locator1 = "KBWebContent#ADD_MENU_ITEM");
 
-		<if>
-			<isset var="permissions" />
-			<then>
-				<execute function="Select" locator1="KBWebContent#PERMISSIONS_SELECT" value1="${permissions}" />
-			</then>
-		</if>
+		AssertElementPresent(locator1 = "KBWebContent#TITLE_FIELD");
 
-		<execute function="Click" locator1="KBWebContent#PUBLISH_BUTTON" />
+		Type(locator1 = "KBWebContent#TITLE_FIELD", value1 = "${title}");
 
-		<execute macro="KBMessage#success" />
-	</command>
+		if (isSet(permissions)) {
+			Select(locator1 = "KBWebContent#PERMISSIONS_SELECT", value1 = "${permissions}");
+		}
 
-	<command name="closePermissionsIFrame">
-		<if>
-			<condition function="IsElementPresent" locator1="KBWebContentPermissions#CANCEL_BUTTON" />
-			<then>
-				<execute function="Click" locator1="KBWebContentPermissions#CANCEL_BUTTON" />
-				<execute function="SelectWindow" locator1="null" />
-			</then>
-		</if>
-	</command>
+		Click(locator1 = "KBWebContent#PUBLISH_BUTTON");
 
-	<command name="delete">
-		<execute macro="KBSiteAdminHelper#searchByKeyword">
-			<var name="keyword" value="&quot;${title}&quot;" />
-		</execute>
+		KBMessage.success();
+	}
 
-		<execute macro="KBSiteAdminHelper#selectEllipsisMenuItem">
-			<var name="item" value="Move to the Recycle Bin" />
-			<var name="title" value="${title}" />
-		</execute>
+	macro closePermissionsIFrame {
+		if (IsElementPresent(locator1 = "KBWebContentPermissions#CANCEL_BUTTON")) {
+			Click(locator1 = "KBWebContentPermissions#CANCEL_BUTTON");
 
-		<execute function="AssertClick" locator1="KBWebContent#RECYCLE_BIN_LINK" value1="the Recycle Bin" />
+			SelectWindow(locator1 = "null");
+		}
+	}
 
-		<execute macro="KBSiteAdminHelper#deleteRow">
-			<var name="title" value="${title}" />
-		</execute>
-	</command>
+	macro delete {
+		KBSiteAdminHelper.searchByKeyword(keyword = "&quot;${title}&quot;");
 
-	<command name="editArticle">
-		<execute macro="KBSiteAdminHelper#searchByKeyword">
-			<var name="keyword" value="&quot;${title}&quot;" />
-		</execute>
+		KBSiteAdminHelper.selectEllipsisMenuItem(
+			item = "Move to the Recycle Bin",
+			title = "${title}"
+		);
 
-		<execute macro="KBSiteAdminHelper#selectEllipsisMenuItem">
-			<var name="item" value="Edit" />
-			<var name="title" value="${title}" />
-		</execute>
+		AssertClick(
+			locator1 = "KBWebContent#RECYCLE_BIN_LINK",
+			value1 = "the Recycle Bin"
+		);
 
-		<execute function="Type" locator1="KBWebContent#TITLE_FIELD" value1="${newTitle}" />
-		<execute function="Click" locator1="KBWebContent#PUBLISH_BUTTON" />
+		KBSiteAdminHelper.deleteRow(title = "${title}");
+	}
 
-		<execute macro="KBMessage#success" />
-	</command>
+	macro editArticle {
+		KBSiteAdminHelper.searchByKeyword(keyword = "&quot;${title}&quot;");
 
-	<command name="gotoArticlePermissions">
-		<execute macro="KBMessage#closeSuccessMessage" />
+		KBSiteAdminHelper.selectEllipsisMenuItem(item = "Edit", title = "${title}");
 
-		<execute macro="KBSiteAdminHelper#searchByKeyword">
-			<var name="keyword" value="&quot;${title}&quot;" />
-		</execute>
+		Type(locator1 = "KBWebContent#TITLE_FIELD", value1 = "${newTitle}");
 
-		<execute macro="KBSiteAdminHelper#selectEllipsisMenuItem">
-			<var name="item" value="Permissions" />
-			<var name="title" value="${title}" />
-		</execute>
+		Click(locator1 = "KBWebContent#PUBLISH_BUTTON");
 
-		<execute function="SelectFrame" locator1="KBWebContentPermissions#PERMISSIONS_IFRAME" />
-	</command>
+		KBMessage.success();
+	}
 
-	<command name="viewCheckedPermissions">
-		<var name="key_role" value="${role}" />
-		<var name="roleFound" value="false" />
+	macro gotoArticlePermissions {
+		KBMessage.closeSuccessMessage();
 
-		<while>
-			<equals arg1="${roleFound}" arg2="false" />
-			<then>
-				<if>
-					<condition function="IsElementPresent" locator1="KBWebContentPermissions#PERMISSION_ROLE" />
-					<then>
-						<var name="roleFound" value="true" />
+		KBSiteAdminHelper.searchByKeyword(keyword = "&quot;${title}&quot;");
 
-						<for list="${checkedColumns}" param="column">
-							<var name="key_column" value="${column}" />
+		KBSiteAdminHelper.selectEllipsisMenuItem(
+			item = "Permissions",
+			title = "${title}"
+		);
 
-							<execute function="AssertChecked" locator1="KBWebContentPermissions#PERMISSION_CHECKBOX" />
-						</for>
-					</then>
-					<else>
-						<execute function="Click" locator1="KBWebContentPermissions#NEXT_PAGE_ICON_ENABLED" />
-					</else>
-				</if>
-			</then>
-		</while>
-	</command>
+		SelectFrame(locator1 = "KBWebContentPermissions#PERMISSIONS_IFRAME");
+	}
 
-	<command name="viewUncheckedPermissions">
-		<var name="key_role" value="${role}" />
-		<var name="roleFound" value="false" />
+	macro viewCheckedPermissions {
+		var key_role = "${role}";
+		var roleFound = "false";
 
-		<while>
-			<equals arg1="${roleFound}" arg2="false" />
-			<then>
-				<if>
-					<condition function="IsElementPresent" locator1="KBWebContentPermissions#PERMISSION_ROLE" />
-					<then>
-						<var name="roleFound" value="true" />
+		while ("${roleFound}" == "false") {
+			if (IsElementPresent(locator1 = "KBWebContentPermissions#PERMISSION_ROLE")) {
+				var roleFound = "true";
 
-						<for list="${uncheckedColumns}" param="column">
-							<var name="key_column" value="${column}" />
+				for (var column : list "${checkedColumns}") {
+					var key_column = "${column}";
 
-							<execute function="AssertNotChecked" locator1="KBWebContentPermissions#PERMISSION_CHECKBOX" />
-						</for>
-					</then>
-					<else>
-						<execute function="Click" locator1="KBWebContentPermissions#NEXT_PAGE_ICON_ENABLED" />
-					</else>
-				</if>
-			</then>
-		</while>
-	</command>
-</definition>
+					AssertChecked(locator1 = "KBWebContentPermissions#PERMISSION_CHECKBOX");
+				}
+			}
+			else {
+				Click(locator1 = "KBWebContentPermissions#NEXT_PAGE_ICON_ENABLED");
+			}
+		}
+	}
+
+	macro viewUncheckedPermissions {
+		var key_role = "${role}";
+		var roleFound = "false";
+
+		while ("${roleFound}" == "false") {
+			if (IsElementPresent(locator1 = "KBWebContentPermissions#PERMISSION_ROLE")) {
+				var roleFound = "true";
+
+				for (var column : list "${uncheckedColumns}") {
+					var key_column = "${column}";
+
+					AssertNotChecked(locator1 = "KBWebContentPermissions#PERMISSION_CHECKBOX");
+				}
+			}
+			else {
+				Click(locator1 = "KBWebContentPermissions#NEXT_PAGE_ICON_ENABLED");
+			}
+		}
+	}
+}
