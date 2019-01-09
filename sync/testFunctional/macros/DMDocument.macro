@@ -1,297 +1,316 @@
-<definition>
-	<var name="assetType" value="Document" />
-	<var name="dmDocumentTypeName" value="Basic Document" />
-
-	<command name="addPG">
-		<if>
-			<equals arg1="${stagingActivated}" arg2="true" />
-			<then>
-				<execute function="AssertElementNotPresent" locator1="Message#WORKFLOW_UNAPPROVED" />
-			</then>
-		</if>
-
-		<execute macro="Portlet#clickPortletPlusIconPG">
-			<var name="portletName" value="Documents and Media" />
-		</execute>
-
-		<if>
-			<isset var="dmDocumentTypeName" />
-			<then>
-				<var name="key_dmDocumentTypeName" value="${dmDocumentTypeName}" />
-
-				<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="${dmDocumentTypeName}">
-					<var name="key_menuItem" value="${dmDocumentTypeName}" />
-				</execute>
-			</then>
-			<else>
-				<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Basic Document">
-					<var name="key_menuItem" value="Basic Document" />
-				</execute>
-			</else>
-		</if>
-
-		<execute macro="DMDocument#editDocument">
-			<var name="dmDocumentDescription" value="${dmDocumentDescription}" />
-			<var name="dmDocumentFile" value="${dmDocumentFile}" />
-			<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		</execute>
-
-		<execute function="AssertClick" locator1="Button#PUBLISH" value1="Publish" />
-
-		<if>
-			<equals arg1="${dmDocument}" arg2="Duplicate" />
-			<then>
-				<execute macro="Alert#viewRequestFailedToComplete" />
-
-				<execute function="AssertTextEquals#assertPartialText" locator1="DocumentsAndMediaEditDocument#UNIQUE_DOCUMENT_ERROR_MESSAGE" value1="Please enter a unique document name." />
-			</then>
-			<elseif>
-				<equals arg1="${dmDocument}" arg2="Invalid" />
-				<then>
-					<execute macro="Alert#viewRequestFailedToComplete" />
-
-					<execute function="AssertTextEquals#assertPartialText" locator1="Message#ERROR_2" value1="Please enter a file with a valid file name." />
-				</then>
-			</elseif>
-			<else>
-				<execute macro="Alert#viewSuccessMessage" />
-			</else>
-		</if>
-	</command>
-
-	<command name="deletePG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute macro="DMDocument#viewDocumentTitleCmdPG">
-			<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		</execute>
-
-		<execute function="AssertClick#assertTextClick" locator1="Button#MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
-
-		<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
-	</command>
-
-	<command name="deleteViaActionsPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute function="AssertTextEquals" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="Check" locator1="DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX" />
-
-		<execute function="Click" locator1="Icon#MOVE_TO_RECYCLE_BIN" />
-
-		<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
-	</command>
-
-	<command name="editCmd">
-		<if>
-			<not>
-				<contains string="${dmDocumentFileEdit}" substring="{dmDocumentFileEdit}" />
-			</not>
-			<then>
-				<execute function="UploadCommonFile" locator1="TextInput#FILE" value1="${dmDocumentFileEdit}" />
-			</then>
-		</if>
-
-		<if>
-			<not>
-				<contains string="${dmDocumentTitleEdit}" substring="{dmDocumentTitleEdit}" />
-			</not>
-			<then>
-				<execute macro="PortletEntry#inputTitle">
-					<var name="title" value="${dmDocumentTitleEdit}" />
-				</execute>
-			</then>
-		</if>
-
-		<if>
-			<not>
-				<contains string="${dmDocumentDescriptionEdit}" substring="{dmDocumentDescriptionEdit}" />
-			</not>
-			<then>
-				<execute macro="PortletEntry#inputDescription">
-					<var name="description" value="${dmDocumentDescriptionEdit}" />
-				</execute>
-			</then>
-		</if>
-	</command>
-
-	<command name="editDocument">
-		<execute function="UploadCommonFile" locator1="TextInput#FILE" value1="${dmDocumentFile}" />
-
-		<execute macro="PortletEntry#inputTitle">
-			<var name="title" value="${dmDocumentTitle}" />
-		</execute>
-
-		<if>
-			<isset var="dmDocumentDescription" />
-			<then>
-				<execute macro="PortletEntry#inputDescription">
-					<var name="description" value="${dmDocumentDescription}" />
-				</execute>
-			</then>
-		</if>
-	</command>
-
-	<command name="editPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="Click" locator1="Button#EDIT" />
-
-		<execute macro="DMDocument#editCmd">
-			<var name="dmDocumentDescriptionEdit" value="${dmDocumentDescriptionEdit}" />
-			<var name="dmDocumentFileEdit" value="${dmDocumentFileEdit}" />
-			<var name="dmDocumentTitleEdit" value="${dmDocumentTitleEdit}" />
-		</execute>
-
-		<execute macro="PortletEntry#publish" />
-	</command>
-
-	<command name="tearDownPG">
-		<execute macro="Navigator#openSiteURL">
-			<var name="siteName" value="${siteName}" />
-		</execute>
-
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="List" />
-		</execute>
-
-		<if>
-			<condition function="IsElementPresent" locator1="DocumentsAndMedia#LIST_DOCUMENT_GENERIC" />
-			<then>
-				<execute function="Check#checkAll" locator1="Checkbox#SELECT_ALL" />
-
-				<execute function="Click" locator1="Button#RECYCLE_BIN" />
-
-				<execute function="AssertElementPresent" locator1="Message#SUCCESS" />
-			</then>
-		</if>
-
-		<execute macro="Navigator#openSiteURL">
-			<var name="siteName" value="${siteName}" />
-		</execute>
-
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Content" />
-			<var name="panel" value="Site Administration" />
-			<var name="portlet" value="Recycle Bin" />
-		</execute>
-
-		<execute macro="RecycleBin#emptyCP" />
-	</command>
-
-	<command name="viewDocumentTitleCmdPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
-	</command>
-
-	<command name="viewDocumentToolbarCmdAsAdminPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
-		</execute>
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="Click" locator1="Button#INFO" />
-
-		<execute function="AssertTextEquals#assertPartialText" locator1="Link#DOWNLOAD" value1="Download" />
-		<execute function="AssertElementPresent" locator1="Button#EDIT" value1="Edit" />
-		<execute function="AssertElementPresent" locator1="Button#MOVE" value1="Move" />
-		<execute function="AssertElementPresent" locator1="Button#CHECKOUT" value1="Checkout" />
-		<execute function="AssertElementPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
-		<execute function="AssertElementPresent" locator1="Button#MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
-	</command>
-
-	<command name="viewDocumentToolbarCmdAsGuestPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
-		</execute>
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="Click" locator1="Button#INFO" />
-
-		<execute function="AssertTextEquals#assertPartialText" locator1="Link#DOWNLOAD" value1="Download" />
-		<execute function="AssertElementNotPresent" locator1="Button#EDIT" value1="Edit" />
-		<execute function="AssertElementNotPresent" locator1="Button#MOVE" value1="Move" />
-		<execute function="AssertElementNotPresent" locator1="Button#CHECKOUT" value1="Checkout" />
-		<execute function="AssertElementNotPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
-		<execute function="AssertElementNotPresent" locator1="Button#MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
-	</command>
-
-	<command name="viewDocumentToolbarCmdAsSyncDocumentEditorPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
-		</execute>
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute function="Click" locator1="Button#INFO" />
-
-		<execute function="AssertTextEquals#assertPartialText" locator1="Link#DOWNLOAD" value1="Download" />
-		<execute function="AssertElementPresent" locator1="Button#EDIT" value1="Edit" />
-		<execute function="AssertElementPresent" locator1="Button#MOVE" value1="Move" />
-		<execute function="AssertElementPresent" locator1="Button#CHECKOUT" value1="Checkout" />
-		<execute function="AssertElementNotPresent" locator1="Button#PERMISSIONS" value1="Permissions" />
-		<execute function="AssertElementPresent" locator1="Button#MOVE_TO_THE_RECYCLE_BIN" value1="Move to the Recycle Bin" />
-	</command>
-
-	<command name="viewDocumentToolbarCmdAsSyncDocumentLibraryManagerPG">
-		<execute macro="DMDocument#viewDocumentToolbarCmdAsAdminPG">
-			<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		</execute>
-	</command>
-
-	<command name="viewOwnDocumentToolbarCmdAsSyncDocumentEditorPG">
-		<execute macro="DMDocument#viewDocumentToolbarCmdAsAdminPG">
-			<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		</execute>
-	</command>
-
-	<command name="viewPG">
-		<var name="key_dmDocumentTitle" value="${dmDocumentTitle}" />
-
-		<execute macro="Portlet#changeDisplayStyle">
-			<var name="displayStyle" value="Descriptive" />
-		</execute>
-
-		<execute function="AssertClick" locator1="DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE" value1="${dmDocumentTitle}" />
-
-		<execute macro="DMDocument#viewDocumentTitleCmdPG">
-			<var name="dmDocumentTitle" value="${dmDocumentTitle}" />
-		</execute>
-
-		<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL" />
-
-		<if>
-			<isset var="dmDocumentDescription" />
-			<then>
-				<execute function="AssertTextEquals" locator1="DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION" value1="${dmDocumentDescription}" />
-			</then>
-		</if>
-
-		<if>
-			<equals arg1="${dmDocumentFileType}" arg2="Image" />
-			<then>
-				<execute function="AssertElementPresent" locator1="DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW" />
-			</then>
-		</if>
-	</command>
-</definition>
+definition {
+	var assetType = "Document";
+	var dmDocumentTypeName = "Basic Document";
+
+	macro addPG {
+		if ("${stagingActivated}" == "true") {
+			AssertElementNotPresent(locator1 = "Message#WORKFLOW_UNAPPROVED");
+		}
+
+		Portlet.clickPortletPlusIconPG(portletName = "Documents and Media");
+
+		if (isSet(dmDocumentTypeName)) {
+			var key_dmDocumentTypeName = "${dmDocumentTypeName}";
+
+			AssertClick(
+				locator1 = "MenuItem#ANY_MENU_ITEM",
+				value1 = "${dmDocumentTypeName}",
+				key_menuItem = "${dmDocumentTypeName}"
+			);
+		}
+		else {
+			AssertClick(
+				locator1 = "MenuItem#ANY_MENU_ITEM",
+				value1 = "Basic Document",
+				key_menuItem = "Basic Document"
+			);
+		}
+
+		DMDocument.editDocument(
+			dmDocumentDescription = "${dmDocumentDescription}",
+			dmDocumentFile = "${dmDocumentFile}",
+			dmDocumentTitle = "${dmDocumentTitle}"
+		);
+
+		AssertClick(locator1 = "Button#PUBLISH", value1 = "Publish");
+
+		if ("${dmDocument}" == "Duplicate") {
+			Alert.viewRequestFailedToComplete();
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "DocumentsAndMediaEditDocument#UNIQUE_DOCUMENT_ERROR_MESSAGE",
+				value1 = "Please enter a unique document name."
+			);
+		}
+		else if ("${dmDocument}" == "Invalid") {
+			Alert.viewRequestFailedToComplete();
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR_2",
+				value1 = "Please enter a file with a valid file name."
+			);
+		}
+		else {
+			Alert.viewSuccessMessage();
+		}
+	}
+
+	macro deletePG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
+
+		AssertClick.assertTextClick(
+			locator1 = "Button#MOVE_TO_THE_RECYCLE_BIN",
+			value1 = "Move to the Recycle Bin"
+		);
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+	}
+
+	macro deleteViaActionsPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		Check(locator1 = "DocumentsAndMedia#ICON_DOCUMENT_CHECKBOX");
+
+		Click(locator1 = "Icon#MOVE_TO_RECYCLE_BIN");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");
+	}
+
+	macro editCmd {
+		if (!(contains("${dmDocumentFileEdit}", "{dmDocumentFileEdit}"))) {
+			UploadCommonFile(locator1 = "TextInput#FILE", value1 = "${dmDocumentFileEdit}");
+		}
+
+		if (!(contains("${dmDocumentTitleEdit}", "{dmDocumentTitleEdit}"))) {
+			PortletEntry.inputTitle(title = "${dmDocumentTitleEdit}");
+		}
+
+		if (!(contains("${dmDocumentDescriptionEdit}", "{dmDocumentDescriptionEdit}"))) {
+			PortletEntry.inputDescription(description = "${dmDocumentDescriptionEdit}");
+		}
+	}
+
+	macro editDocument {
+		UploadCommonFile(locator1 = "TextInput#FILE", value1 = "${dmDocumentFile}");
+
+		PortletEntry.inputTitle(title = "${dmDocumentTitle}");
+
+		if (isSet(dmDocumentDescription)) {
+			PortletEntry.inputDescription(description = "${dmDocumentDescription}");
+		}
+	}
+
+	macro editPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		Click(locator1 = "Button#EDIT");
+
+		DMDocument.editCmd(
+			dmDocumentDescriptionEdit = "${dmDocumentDescriptionEdit}",
+			dmDocumentFileEdit = "${dmDocumentFileEdit}",
+			dmDocumentTitleEdit = "${dmDocumentTitleEdit}"
+		);
+
+		PortletEntry.publish();
+	}
+
+	macro tearDownPG {
+		Navigator.openSiteURL(siteName = "${siteName}");
+
+		Portlet.changeDisplayStyle(displayStyle = "List");
+
+		if (IsElementPresent(locator1 = "DocumentsAndMedia#LIST_DOCUMENT_GENERIC")) {
+			Check.checkAll(locator1 = "Checkbox#SELECT_ALL");
+
+			Click(locator1 = "Button#RECYCLE_BIN");
+
+			AssertElementPresent(locator1 = "Message#SUCCESS");
+		}
+
+		Navigator.openSiteURL(siteName = "${siteName}");
+
+		ProductMenu.gotoPortlet(
+			category = "Content",
+			panel = "Site Administration",
+			portlet = "Recycle Bin"
+		);
+
+		RecycleBin.emptyCP();
+	}
+
+	macro viewDocumentTitleCmdPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+	}
+
+	macro viewDocumentToolbarCmdAsAdminPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		Portlet.changeDisplayStyle(displayStyle = "Descriptive");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		Click(locator1 = "Button#INFO");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Link#DOWNLOAD",
+			value1 = "Download"
+		);
+
+		AssertElementPresent(locator1 = "Button#EDIT", value1 = "Edit");
+
+		AssertElementPresent(locator1 = "Button#MOVE", value1 = "Move");
+
+		AssertElementPresent(locator1 = "Button#CHECKOUT", value1 = "Checkout");
+
+		AssertElementPresent(locator1 = "Button#PERMISSIONS", value1 = "Permissions");
+
+		AssertElementPresent(
+			locator1 = "Button#MOVE_TO_THE_RECYCLE_BIN",
+			value1 = "Move to the Recycle Bin"
+		);
+	}
+
+	macro viewDocumentToolbarCmdAsGuestPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		Portlet.changeDisplayStyle(displayStyle = "Descriptive");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		Click(locator1 = "Button#INFO");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Link#DOWNLOAD",
+			value1 = "Download"
+		);
+
+		AssertElementNotPresent(locator1 = "Button#EDIT", value1 = "Edit");
+
+		AssertElementNotPresent(locator1 = "Button#MOVE", value1 = "Move");
+
+		AssertElementNotPresent(locator1 = "Button#CHECKOUT", value1 = "Checkout");
+
+		AssertElementNotPresent(locator1 = "Button#PERMISSIONS", value1 = "Permissions");
+
+		AssertElementNotPresent(
+			locator1 = "Button#MOVE_TO_THE_RECYCLE_BIN",
+			value1 = "Move to the Recycle Bin"
+		);
+	}
+
+	macro viewDocumentToolbarCmdAsSyncDocumentEditorPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		Portlet.changeDisplayStyle(displayStyle = "Descriptive");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		Click(locator1 = "Button#INFO");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Link#DOWNLOAD",
+			value1 = "Download"
+		);
+
+		AssertElementPresent(locator1 = "Button#EDIT", value1 = "Edit");
+
+		AssertElementPresent(locator1 = "Button#MOVE", value1 = "Move");
+
+		AssertElementPresent(locator1 = "Button#CHECKOUT", value1 = "Checkout");
+
+		AssertElementNotPresent(locator1 = "Button#PERMISSIONS", value1 = "Permissions");
+
+		AssertElementPresent(
+			locator1 = "Button#MOVE_TO_THE_RECYCLE_BIN",
+			value1 = "Move to the Recycle Bin"
+		);
+	}
+
+	macro viewDocumentToolbarCmdAsSyncDocumentLibraryManagerPG {
+		DMDocument.viewDocumentToolbarCmdAsAdminPG(
+			dmDocumentTitle = "${dmDocumentTitle}"
+		);
+	}
+
+	macro viewOwnDocumentToolbarCmdAsSyncDocumentEditorPG {
+		DMDocument.viewDocumentToolbarCmdAsAdminPG(
+			dmDocumentTitle = "${dmDocumentTitle}"
+		);
+	}
+
+	macro viewPG {
+		var key_dmDocumentTitle = "${dmDocumentTitle}";
+
+		Portlet.changeDisplayStyle(displayStyle = "Descriptive");
+
+		AssertClick(
+			locator1 = "DocumentsAndMedia#DESCRIPTIVE_LIST_DOCUMENT_TITLE",
+			value1 = "${dmDocumentTitle}"
+		);
+
+		DMDocument.viewDocumentTitleCmdPG(dmDocumentTitle = "${dmDocumentTitle}");
+
+		AssertElementPresent(
+			locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_THUMBNAIL"
+		);
+
+		if (isSet(dmDocumentDescription)) {
+			AssertTextEquals(
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_INFO_DESCRIPTION",
+				value1 = "${dmDocumentDescription}"
+			);
+		}
+
+		if ("${dmDocumentFileType}" == "Image") {
+			AssertElementPresent(
+				locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW"
+			);
+		}
+	}
+}

@@ -1,37 +1,30 @@
-<definition>
-	<var method="PropsUtil#get('admin.email.address')" name="adminEmailAddress" />
-	<var method="PropsUtil#get('admin.password')" name="adminPassword" />
+definition {
+	var adminEmailAddress = PropsUtil.get("admin.email.address");
+	var adminPassword = PropsUtil.get("admin.password");
 
-	<command name="_addGroup">
-		<if>
-			<isset var="groupDescription" />
-			<then>
-				<var name="groupDescriptionEncoded" method="URLUtil#encode('${groupDescription}', 'UTF-8')"/>
+	macro _addGroup {
 
-				<var name="groupDescriptionMap"><![CDATA[{"en_US":"${groupDescriptionEncoded}"}]]></var>
-			</then>
-			<else>
-				<var name="groupDescriptionMap" value="{}" />
-			</else>
-		</if>
+		if (isSet(groupDescription)) {
+			var groupDescriptionEncoded = URLUtil.encode("${groupDescription}", "UTF-8");
 
-		<if>
-			<isset var="groupName" />
-			<then>
-				<var name="groupNameEncoded" method="URLUtil#encode('${groupName}', 'UTF-8')"/>
+			var groupDescriptionMap = '''{"en_US":"${groupDescriptionEncoded}"}''';
+		}
+		else {
+			var groupDescriptionMap = "{}";
+		}
 
-				<var name="groupNameMap"><![CDATA[{"en_US":"${groupNameEncoded}"}]]></var>
-			</then>
-			<else>
-				<fail message="Please set 'groupName'." />
-			</else>
-		</if>
+		if (isSet(groupName)) {
+			var groupNameEncoded = URLUtil.encode("${groupName}", "UTF-8");
 
-		<execute macro="JSONCompany#getPortalURL">
-			<return name="portalURL" />
-		</execute>
+			var groupNameMap = '''{"en_US":"${groupNameEncoded}"}''';
+		}
+		else {
+			fail("Please set 'groupName'.");
+		}
 
-		<var name="curl"><![CDATA[
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
 			${portalURL}/api/jsonws/group/add-group \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d parentGroupId=0 \
@@ -45,115 +38,87 @@
 				-d site=true \
 				-d inheritContent=false \
 				-d active=true
-		]]></var>
+		''';
 
-		<echo message="## Adding a 'Group' with the following info using JSONWS:" />
+		echo("## Adding a 'Group' with the following info using JSONWS:");
 
-		<if>
-			<isset var="groupDescription" />
-			<then>
-				<echo message="## * Group Description: ${groupDescription}" />
-			</then>
-		</if>
+		if (isSet(groupDescription)) {
+			echo("## * Group Description: ${groupDescription}");
+		}
 
-		<echo message="## * Group Name: ${groupName}" />
+		echo("## * Group Name: ${groupName}");
 
-		<var name="groupId" method="JSONCurlUtil#post('${curl}', '$[\'groupId\']')"/>
-	</command>
+		var groupId = JSONCurlUtil.post("${curl}", "$['groupId']");
+	}
 
-	<command name="_addUserGroup">
-		<if>
-			<isset var="userGroupDescription" />
-			<then>
-				<var name="userGroupDescriptionEncoded" method="URLUtil#encode('${userGroupDescription}', 'UTF-8')"/>
+	macro _addUserGroup {
 
-				<var name="userGroupDescription"><![CDATA[${userGroupDescriptionEncoded}]]></var>
-			</then>
-			<else>
-				<var name="userGroupDescription" value="" />
-			</else>
-		</if>
+		if (isSet(userGroupDescription)) {
+			var userGroupDescriptionEncoded = URLUtil.encode("${userGroupDescription}", "UTF-8");
 
-		<if>
-			<isset var="userGroupName" />
-			<then>
-				<var name="userGroupNameEncoded" method="URLUtil#encode('${userGroupName}', 'UTF-8')"/>
+			var userGroupDescription = '''${userGroupDescriptionEncoded}''';
+		}
+		else {
+			var userGroupDescription = "";
+		}
 
-				<var name="userGroupName"><![CDATA[${userGroupNameEncoded}]]></var>
-			</then>
-			<else>
-				<fail message="Please set 'userGroupName'." />
-			</else>
-		</if>
+		if (isSet(userGroupName)) {
+			var userGroupNameEncoded = URLUtil.encode("${userGroupName}", "UTF-8");
 
-		<execute macro="JSONCompany#getPortalURL">
-			<return name="portalURL" />
-		</execute>
+			var userGroupName = '''${userGroupNameEncoded}''';
+		}
+		else {
+			fail("Please set 'userGroupName'.");
+		}
 
-		<var name="curl"><![CDATA[
+		var portalURL = JSONCompany.getPortalURL();
+
+		var curl = '''
 			${portalURL}/api/jsonws/usergroup/add-user-group \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d name=${userGroupName} \
 				-d description=${userGroupDescription}
-		]]></var>
+		''';
 
-		<echo message="## Adding a 'User Group' with the following info using JSONWS:" />
+		echo("## Adding a 'User Group' with the following info using JSONWS:");
 
-		<if>
-			<isset var="userGroupDescription" />
-			<then>
-				<echo message="## * User Group Description: ${userGroupDescription}" />
-			</then>
-		</if>
+		if (isSet(userGroupDescription)) {
+			echo("## * User Group Description: ${userGroupDescription}");
+		}
 
-		<echo message="## * User Group Name: ${userGroupName}" />
+		echo("## * User Group Name: ${userGroupName}");
 
-		<var name="userGroupId" method="JSONCurlUtil#post('${curl}', '$[\'userGroupId\']')"/>
+		var userGroupId = JSONCurlUtil.post("${curl}", "$['userGroupId']");
 
-		<return value="${userGroupId}" />
-	</command>
+		return "${userGroupId}";
+	}
 
-	<command name="_assignGroupRoleToUser">
-		<if>
-			<not>
-				<isset var="groupId" />
-			</not>
-			<then>
-				<fail message="Please set 'groupId'." />
-			</then>
-		</if>
+	macro _assignGroupRoleToUser {
+		if (!(isSet(groupId))) {
+			fail("Please set 'groupId'.");
+		}
 
-		<if>
-			<not>
-				<isset var="roleId" />
-			</not>
-			<then>
-				<fail message="Please set 'roleId'." />
-			</then>
-		</if>
+		if (!(isSet(roleId))) {
+			fail("Please set 'roleId'.");
+		}
 
-		<if>
-			<not>
-				<isset var="userId" />
-			</not>
-			<then>
-				<fail message="Please set 'userId'." />
-			</then>
-		</if>
+		if (!(isSet(userId))) {
+			fail("Please set 'userId'.");
+		}
 
-		<!--<execute macro="JSONCompany#getPortalURL">
+		/*<execute macro="JSONCompany#getPortalURL">
 			<return name="portalURL" />
-		</execute>-->
+		</execute>*/
 
-		<var name="curl"><![CDATA[
+		var curl = '''
 			${portalURL}/api/jsonws/usergrouprole/add-user-group-roles \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d roleId=${roleId} \
 				-d groupId=${groupId} \
 				-d userIds=${userId}
-		]]></var>
+		''';
 
-		<!--<execute macro="JSONGroup#getGroupName">
+		/*<execute macro="JSONGroup#getGroupName">
 			<var name="groupId" value="${groupId}" />
 			<return name="groupName" />
 		</execute>
@@ -174,42 +139,32 @@
 
 		<echo message="## * Role Name: ${roleName}" />
 
-		<echo message="## * User Email Address: ${userEmailAddress}" />-->
+		<echo message="## * User Email Address: ${userEmailAddress}" />*/
 
-		<var name="temp" method="JSONCurlUtil#post('${curl}', '$')"/>
-	</command>
+		var temp = JSONCurlUtil.post("${curl}", "$");
+	}
 
-	<command name="_assignUserToGroup">
-		<if>
-			<not>
-				<isset var="groupId" />
-			</not>
-			<then>
-				<fail message="Please set 'groupId'." />
-			</then>
-		</if>
+	macro _assignUserToGroup {
+		if (!(isSet(groupId))) {
+			fail("Please set 'groupId'.");
+		}
 
-		<if>
-			<not>
-				<isset var="userId" />
-			</not>
-			<then>
-				<fail message="Please set 'userId'." />
-			</then>
-		</if>
+		if (!(isSet(userId))) {
+			fail("Please set 'userId'.");
+		}
 
-		<!--<execute macro="JSONCompany#getPortalURL">
+		/*<execute macro="JSONCompany#getPortalURL">
 			<return name="portalURL" />
-		</execute>-->
+		</execute>*/
 
-		<var name="curl"><![CDATA[
+		var curl = '''
 			${portalURL}/api/jsonws/user/add-group-users \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d groupId=${groupId} \
 				-d userIds=${userId}
-		]]></var>
+		''';
 
-		<!--<execute macro="JSONGroup#getGroupName">
+		/*<execute macro="JSONGroup#getGroupName">
 			<var name="groupId" value="${groupId}" />
 			<return name="groupName" />
 		</execute>
@@ -223,225 +178,143 @@
 
 		<echo message="## * Group Name: ${groupName}" />
 
-		<echo message="## * User Email Address: ${userEmailAddress}" />-->
+		<echo message="## * User Email Address: ${userEmailAddress}" />*/
 
-		<var name="temp" method="JSONCurlUtil#post('${curl}', '$')"/>
-	</command>
+		var temp = JSONCurlUtil.post("${curl}", "$");
+	}
 
-	<command name="_deleteGroup">
-		<if>
-			<not>
-				<isset var="groupId" />
-			</not>
-			<then>
-				<fail message="Please set 'groupId'." />
-			</then>
-		</if>
+	macro _deleteGroup {
+		if (!(isSet(groupId))) {
+			fail("Please set 'groupId'.");
+		}
 
-		<execute macro="JSONGroup#getGroupName">
-			<return name="groupName" />
-			<var name="groupId" value="${groupId}" />
-		</execute>
+		var groupName = JSONGroup.getGroupName(groupId = "${groupId}");
 
-		<echo message="## Deleting a 'Group' with the following info using JSONWS:" />
+		echo("## Deleting a 'Group' with the following info using JSONWS:");
 
-		<echo message="## * Group Name: ${groupName}" />
+		echo("## * Group Name: ${groupName}");
 
-		<execute macro="JSONCompany#getPortalURL">
-			<return name="portalURL" />
-		</execute>
+		var portalURL = JSONCompany.getPortalURL();
 
-		<var name="curl"><![CDATA[
+		var curl = '''
 			${portalURL}/api/jsonws/group/delete-group \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d groupId=${groupId}
-		]]></var>
+		''';
+		var temp = JSONCurlUtil.post("${curl}", "$");
+	}
 
-		<var name="temp" method="JSONCurlUtil#post('${curl}', '$')"/>
-	</command>
+	macro addGroup {
+		if (!(isSet(groupName))) {
+			fail("Please set 'groupName'.");
+		}
 
-	<command name="addGroup">
-		<if>
-			<not>
-				<isset var="groupName" />
-			</not>
-			<then>
-				<fail message="Please set 'groupName'." />
-			</then>
-		</if>
+		JSONGroup._addGroup(
+			groupDescription = "${groupDescription}",
+			groupName = "${groupName}"
+		);
+	}
 
-		<execute macro="JSONGroup#_addGroup">
-			<var name="groupDescription" value="${groupDescription}" />
-			<var name="groupName" value="${groupName}" />
-		</execute>
-	</command>
+	macro assignGroupRoleToUser {
+		if (!(isSet(groupName))) {
+			fail("Please set 'groupName'.");
+		}
 
-	<command name="assignGroupRoleToUser">
-		<if>
-			<not>
-				<isset var="groupName" />
-			</not>
-			<then>
-				<fail message="Please set 'groupName'." />
-			</then>
-		</if>
+		if (!(isSet(roleName))) {
+			fail("Please set 'roleName'.");
+		}
 
-		<if>
-			<not>
-				<isset var="roleName" />
-			</not>
-			<then>
-				<fail message="Please set 'roleName'." />
-			</then>
-		</if>
+		if (!(isSet(userEmailAddress))) {
+			fail("Please set 'userEmailAddress'.");
+		}
 
-		<if>
-			<not>
-				<isset var="userEmailAddress" />
-			</not>
-			<then>
-				<fail message="Please set 'userEmailAddress'." />
-			</then>
-		</if>
-
-		<!--<execute macro="JSONGroup#getGroupIdByName">
+		/*<execute macro="JSONGroup#getGroupIdByName">
 			<var name="groupName" value="${groupName}" />
 			<return name="groupId" />
-		</execute>-->
+		</execute>*/
 
-		<!--<execute macro="JSONRole#getRoleIdByName">
+		/*<execute macro="JSONRole#getRoleIdByName">
 			<var name="roleName" value="${roleName}" />
 			<return name="roleId" />
-		</execute>-->
+		</execute>*/
 
-		<!--<execute macro="JSONUser#getUserIdByEmailAddress">
+		/*<execute macro="JSONUser#getUserIdByEmailAddress">
 			<var name="userEmailAddress" value="${userEmailAddress}" />
 			<return name="userId" />
-		</execute>-->
+		</execute>*/
 
-		<execute macro="JSONGroup#_assignGroupRoleToUser">
-			<var name="groupId" value="${groupId}" />
-			<var name="roleId" value="${roleId}" />
-			<var name="userId" value="${userId}" />
-		</execute>
-	</command>
+		JSONGroup._assignGroupRoleToUser(
+			groupId = "${groupId}",
+			roleId = "${roleId}",
+			userId = "${userId}"
+		);
+	}
 
-	<command name="assignUserToGroup">
-		<if>
-			<not>
-				<isset var="groupName" />
-			</not>
-			<then>
-				<fail message="Please set 'groupName'." />
-			</then>
-		</if>
+	macro assignUserToGroup {
+		if (!(isSet(groupName))) {
+			fail("Please set 'groupName'.");
+		}
 
-		<if>
-			<not>
-				<isset var="userEmailAddress" />
-			</not>
-			<then>
-				<fail message="Please set 'userEmailAddress'." />
-			</then>
-		</if>
+		if (!(isSet(userEmailAddress))) {
+			fail("Please set 'userEmailAddress'.");
+		}
 
-		<execute macro="JSONGroup#getGroupIdByName">
-			<return name="groupId" />
-			<var name="groupName" value="${groupName}" />
-		</execute>
+		var groupId = JSONGroup.getGroupIdByName(groupName = "${groupName}");
 
-		<execute macro="JSONUser#getUserIdByEmailAddress">
-			<return name="userId" />
-			<var name="userEmailAddress" value="${userEmailAddress}" />
-		</execute>
+		var userId = JSONUser.getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-		<execute macro="JSONGroup#_assignUserToGroup">
-			<var name="groupId" value="${groupId}" />
-			<var name="userId" value="${userId}" />
-		</execute>
-	</command>
+		JSONGroup._assignUserToGroup(groupId = "${groupId}", userId = "${userId}");
+	}
 
-	<command name="deleteGroupByName">
-		<if>
-			<not>
-				<isset var="groupName" />
-			</not>
-			<then>
-				<fail message="Please set 'groupName'." />
-			</then>
-		</if>
+	macro deleteGroupByName {
+		if (!(isSet(groupName))) {
+			fail("Please set 'groupName'.");
+		}
 
-		<execute macro="JSONGroup#getGroupIdByName">
-			<return name="groupId" />
-			<var name="groupName" value="${groupName}" />
-		</execute>
+		var groupId = JSONGroup.getGroupIdByName(groupName = "${groupName}");
 
-		<execute macro="JSONGroup#_deleteGroup">
-			<var name="groupId" value="${groupId}" />
-		</execute>
-	</command>
+		JSONGroup._deleteGroup(groupId = "${groupId}");
+	}
 
-	<command name="getGroupIdByName">
-		<if>
-			<not>
-				<isset var="groupName" />
-			</not>
-			<then>
-				<fail message="Please set 'groupName'." />
-			</then>
-		</if>
+	macro getGroupIdByName {
+		if (!(isSet(groupName))) {
+			fail("Please set 'groupName'.");
+		}
 
-		<execute macro="JSONCompany#getCompanyId">
-			<return name="companyId" />
-		</execute>
+		var companyId = JSONCompany.getCompanyId();
 
-		<execute macro="JSONCompany#getPortalURL">
-			<return name="portalURL" />
-		</execute>
+		var portalURL = JSONCompany.getPortalURL();
 
-		<var name="curl"><![CDATA[
+		var curl = '''
 			${portalURL}/api/jsonws/group/get-groups \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d companyId=${companyId} \
 				-d parentGroupId=0 \
 				-d site=true
-		]]></var>
+		''';
+		var groupId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${groupName}')]['groupId']");
+		var groupId = StringUtil.replace("${groupId}", "[&quot;", "");
+		var groupId = StringUtil.replace("${groupId}", "&quot;]", "");
 
-		<var name="groupId" method="JSONCurlUtil#post('${curl}', '$.[?(@[\'nameCurrentValue\'] == \'${groupName}\')][\'groupId\']')"/>
+		return "${groupId}";
+	}
 
-		<var name="groupId" method="StringUtil#replace('${groupId}', '[&quot;', '')"/>
+	macro getGroupName {
+		if (!(isSet(groupId))) {
+			fail("Please set 'groupId'.");
+		}
 
-		<var name="groupId" method="StringUtil#replace('${groupId}', '&quot;]', '')"/>
+		var companyId = JSONCompany.getCompanyId();
 
-		<return value="${groupId}" />
-	</command>
+		var portalURL = JSONCompany.getPortalURL();
 
-	<command name="getGroupName">
-		<if>
-			<not>
-				<isset var="groupId" />
-			</not>
-			<then>
-				<fail message="Please set 'groupId'." />
-			</then>
-		</if>
-
-		<execute macro="JSONCompany#getCompanyId">
-			<return name="companyId" />
-		</execute>
-
-		<execute macro="JSONCompany#getPortalURL">
-			<return name="portalURL" />
-		</execute>
-
-		<var name="curl"><![CDATA[
+		var curl = '''
 			${portalURL}/api/jsonws/group/get-group \
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d groupId=${groupId}
-		]]></var>
+		''';
+		var groupName = JSONCurlUtil.post("${curl}", "$['nameCurrentValue']");
 
-		<var name="groupName" method="JSONCurlUtil#post('${curl}', '$[\'nameCurrentValue\']')"/>
-
-		<return value="${groupName}" />
-	</command>
-</definition>
+		return "${groupName}";
+	}
+}
