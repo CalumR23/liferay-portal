@@ -1,302 +1,250 @@
-<definition component-name="lrdcom">
-	<property name="testray.main.component.name" value="lrdcom-www" />
+@component-name = "lrdcom"
+definition {
+	property testray.main.component.name = "lrdcom-www";
+	var childPageName = "Resource Library";
+	var pageName = "Resources";
 
-	<var name="childPageName" value="Resource Library" />
-	<var name="pageName" value="Resources" />
+	setUp {
+		LRDCOMNavigation.openHomeURL();
 
-	<set-up>
-		<execute macro="LRDCOMNavigation#openHomeURL" />
+		LRDCOM.acceptCookies();
 
-		<execute macro="LRDCOM#acceptCookies" />
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
+	}
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
-	</set-up>
+	@priority = "5"
+	test CheckMultipleBackgroundImagesVisible {
+		var key_imageNumber = "1";
 
-	<command name="CheckMultipleBackgroundImagesVisible" priority="5">
-		<var name="key_imageNumber" value="1" />
+		AssertElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE");
 
-		<execute function="AssertElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE" />
+		while (IsElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE_N")) {
+			var url = LRDCOM.getBackgroundImageURL(key_imageNumber = "${key_imageNumber}");
 
-		<while>
-			<condition function="IsElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE_N" />
-			<then>
-				<execute macro="LRDCOM#getBackgroundImageURL">
-					<return name="url" />
-					<var name="key_imageNumber" value="${key_imageNumber}" />
-				</execute>
+			LRDCOM.checkURLNotBroken(url = "${url}");
 
-				<execute macro="LRDCOM#checkURLNotBroken">
-					<var name="url" value="${url}" />
-				</execute>
+			LRDCOMNavigation.openHomeURL();
 
-				<execute macro="LRDCOMNavigation#openHomeURL" />
+			LRDCOMNavigation.gotoPage(
+				childPageName = "${childPageName}",
+				pageName = "${pageName}"
+			);
 
-				<execute macro="LRDCOMNavigation#gotoPage">
-					<var name="childPageName" value="${childPageName}" />
-					<var name="pageName" value="${pageName}" />
-				</execute>
+			var key_imageNumber = MathUtil.sum("${key_imageNumber}", "1");
+		}
+	}
 
-				<var method="MathUtil#sum('${key_imageNumber}', '1')" name="key_imageNumber" />
-			</then>
-		</while>
-	</command>
+	@priority = "4"
+	test SearchAsset {
+		var key_entryNumber = "150";
 
-	<command name="SearchAsset" priority="4">
-		<var name="key_entryNumber" value="150" />
+		while (IsElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
+		}
 
-		<while max-iterations="50">
-			<condition function="IsElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
-			</then>
-		</while>
+		while (IsElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "1");
+		}
 
-		<while max-iterations="50">
-			<condition function="IsElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '1')" name="key_entryNumber" />
-			</then>
-		</while>
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
+		echo("Number of all resource page assets: ${key_entryNumber}");
 
-		<echo message="Number of all resource page assets: ${key_entryNumber}" />
+		ScrollWebElementIntoView(locator1 = "TextInput#SEARCH_2");
 
-		<execute function="ScrollWebElementIntoView" locator1="TextInput#SEARCH_2" />
+		Type(locator1 = "TextInput#SEARCH_2", value1 = "Fashion");
 
-		<execute function="Type" locator1="TextInput#SEARCH_2" value1="Fashion" />
+		LRDCOMAssetEntry.view(assetName = "coach");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="coach" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "May Fair");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="May Fair" />
-		</execute>
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-2");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '-2')" name="key_entryNumber" />
+		echo("Number of hidden page assets: ${key_entryNumber}");
 
-		<echo message="Number of hidden page assets: ${key_entryNumber}" />
+		LRDCOMAssetEntry.verifyHidden(lastHiddenAssetIndex = "${key_entryNumber}");
+	}
 
-		<execute macro="LRDCOMAssetEntry#verifyHidden">
-			<var name="lastHiddenAssetIndex" value="${key_entryNumber}" />
-		</execute>
-	</command>
+	@priority = "4"
+	test SearchInFilteredAssets {
+		LRDCOMFilter.selectFilter(
+			categoryName = "Financial Services",
+			vocabularyName = "Industries"
+		);
 
-	<command name="SearchInFilteredAssets" priority="4">
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Financial Services" />
-			<var name="vocabularyName" value="Industries" />
-		</execute>
+		var key_entryNumber = "21";
 
-		<var name="key_entryNumber" value="21" />
+		while (IsElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
+		}
 
-		<while max-iterations="50">
-			<condition function="IsElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
-			</then>
-		</while>
+		while (IsElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "1");
+		}
 
-		<while max-iterations="50">
-			<condition function="IsElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '1')" name="key_entryNumber" />
-			</then>
-		</while>
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
+		echo("Number of filtered resource page assets: ${key_entryNumber}");
 
-		<echo message="Number of filtered resource page assets: ${key_entryNumber}" />
+		LRDCOMAssetEntry.view(assetName = "britam");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="britam" />
-		</execute>
+		ScrollWebElementIntoView(locator1 = "TextInput#SEARCH_2");
 
-		<execute function="ScrollWebElementIntoView" locator1="TextInput#SEARCH_2" />
+		Type(locator1 = "TextInput#SEARCH_2", value1 = "Liferay");
 
-		<execute function="Type" locator1="TextInput#SEARCH_2" value1="Liferay" />
+		LRDCOMAssetEntry.verifyHidden(assetName = "britam");
 
-		<execute macro="LRDCOMAssetEntry#verifyHidden">
-			<var name="assetName" value="britam" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "apicil");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="apicil" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "lgt");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="lgt" />
-		</execute>
+		var lastHiddenAssetIndex = MathUtil.sum("${key_entryNumber}", "-8");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '-8')" name="lastHiddenAssetIndex" />
+		LRDCOMAssetEntry.verifyHidden(lastHiddenAssetIndex = "${lastHiddenAssetIndex}");
+	}
 
-		<execute macro="LRDCOMAssetEntry#verifyHidden">
-			<var name="lastHiddenAssetIndex" value="${lastHiddenAssetIndex}" />
-		</execute>
-	</command>
+	@priority = "4"
+	test ViewFilteredAssets {
+		AssertElementNotPresent(locator1 = "ASSET_CATEGORY_TITLE_ANY");
 
-	<command name="ViewFilteredAssets" priority="4">
-		<execute function="AssertElementNotPresent" locator1="ASSET_CATEGORY_TITLE_ANY" />
-		<execute function="AssertElementNotPresent" locator1="ASSET_VOCABULARY_TITLE_ANY" />
+		AssertElementNotPresent(locator1 = "ASSET_VOCABULARY_TITLE_ANY");
 
-		<var name="key_entryNumber" value="150" />
+		var key_entryNumber = "150";
 
-		<while max-iterations="50">
-			<condition function="IsElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
-			</then>
-		</while>
+		while (IsElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
+		}
 
-		<while max-iterations="50">
-			<condition function="IsElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-			<then>
-				<var method="MathUtil#sum('${key_entryNumber}', '1')" name="key_entryNumber" />
-			</then>
-		</while>
+		while (IsElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X") && (maxIterations = "50")) {
+			var key_entryNumber = MathUtil.sum("${key_entryNumber}", "1");
+		}
 
-		<var method="MathUtil#sum('${key_entryNumber}', '-1')" name="key_entryNumber" />
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "-1");
 
-		<echo message="Number of all resource page assets: ${key_entryNumber}" />
+		echo("Number of all resource page assets: ${key_entryNumber}");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Manufacturing" />
-			<var name="vocabularyName" value="Industries" />
-		</execute>
+		LRDCOMFilter.selectFilter(
+			categoryName = "Manufacturing",
+			vocabularyName = "Industries"
+		);
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="advanced-energy" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "advanced-energy");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="cristal-union" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "cristal-union");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="huhtamaki" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "huhtamaki");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="saint-gobain" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "saint-gobain");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="schott" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "schott");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="thales" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "thales");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_7" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_7");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="United States" />
-			<var name="vocabularyName" value="Locations" />
-		</execute>
+		LRDCOMFilter.selectFilter(
+			categoryName = "United States",
+			vocabularyName = "Locations"
+		);
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="advanced-energy" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "advanced-energy");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="huhtamaki" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "huhtamaki");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_3" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_3");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Case Studies" />
-			<var name="vocabularyName" value="Resource Types" />
-		</execute>
+		LRDCOMFilter.selectFilter(
+			categoryName = "Case Studies",
+			vocabularyName = "Resource Types"
+		);
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="advanced-energy" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "advanced-energy");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="huhtamaki" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "huhtamaki");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_3" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_3");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Mobile" />
-			<var name="vocabularyName" value="Solutions" />
-		</execute>
+		LRDCOMFilter.selectFilter(categoryName = "Mobile", vocabularyName = "Solutions");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_1" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_1");
 
-		<execute macro="LRDCOMFilter#removeFilter">
-			<var name="categoryName" value="Manufacturing" />
-		</execute>
+		LRDCOMFilter.removeFilter(categoryName = "Manufacturing");
 
-		<execute function="AssertElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_7" />
+		AssertElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_7");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_8" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_8");
 
-		<execute function="AssertClick" locator1="LRDCOMFilter#RESET_FILTERS" value1="Reset Filters" />
+		AssertClick(locator1 = "LRDCOMFilter#RESET_FILTERS", value1 = "Reset Filters");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMFilter#ASSET_CATEGORY_TITLE_ANY" />
-		<execute function="AssertElementNotPresent" locator1="LRDCOMFilter#ASSET_VOCABULARY_TITLE_ANY" />
-		<execute function="AssertElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
+		AssertElementNotPresent(locator1 = "LRDCOMFilter#ASSET_CATEGORY_TITLE_ANY");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '1')" name="key_entryNumber" />
+		AssertElementNotPresent(locator1 = "LRDCOMFilter#ASSET_VOCABULARY_TITLE_ANY");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-	</command>
+		AssertElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
 
-	<command name="ViewGartnerReport" priority="3">
-		<var name="key_articleTitle" value="Gartner Magic Quadrant" />
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "1");
 
-		<execute function="ScrollWebElementIntoView" locator1="LRDCOMButton#GET_THE_REPORT" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
+	}
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#ARTICLE_H1" value1="2018 Gartner Magic Quadrant for Digital Experience Platforms" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#SECTION_PARAGRAPH" value1="Receive independent analysis of Liferay and the important role of DXPs in digital strategy." />
+	@priority = "3"
+	test ViewGartnerReport {
+		var key_articleTitle = "Gartner Magic Quadrant";
 
-		<execute function="AssertClick" locator1="LRDCOMButton#GET_THE_REPORT" value1="Get the Report" />
+		ScrollWebElementIntoView(locator1 = "LRDCOMButton#GET_THE_REPORT");
 
-		<execute function="AssertTextEquals" locator1="LRDCOM#HEADING_H1" value1="Liferay named a Leader in the 2018 Gartner Magic Quadrant for Digital Experience Platforms" />
-	</command>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#ARTICLE_H1",
+			value1 = "2018 Gartner Magic Quadrant for Digital Experience Platforms"
+		);
 
-	<command name="ViewResourceCTALinks" priority="2">
-		<execute macro="LRDCOMArticle#viewResourceCTALinkQuote">
-			<var name="linkName" value="Watch the Case Study" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#SECTION_PARAGRAPH",
+			value1 = "Receive independent analysis of Liferay and the important role of DXPs in digital strategy."
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		AssertClick(locator1 = "LRDCOMButton#GET_THE_REPORT", value1 = "Get the Report");
 
-		<execute macro="LRDCOMArticle#viewResourceCTALinkQuote">
-			<var name="linkName" value="Read the Case Study" />
-		</execute>
+		AssertTextEquals(
+			locator1 = "LRDCOM#HEADING_H1",
+			value1 = "Liferay named a Leader in the 2018 Gartner Magic Quadrant for Digital Experience Platforms"
+		);
+	}
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+	@priority = "2"
+	test ViewResourceCTALinks {
+		LRDCOMArticle.viewResourceCTALinkQuote(linkName = "Watch the Case Study");
 
-		<execute macro="LRDCOMArticle#viewResourceCTALinkHeader">
-			<var name="linkName" value="Read the Whitepaper" />
-		</execute>
-	</command>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-	<command name="ViewSectionNavigationCaseStudies" priority="2">
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="Case Studies" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMArticle.viewResourceCTALinkQuote(linkName = "Read the Case Study");
 
-		<var name="key_categoryName" value="Case Studies" />
-		<var name="key_vocabularyName" value="Resource Types" />
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute function="AssertVisible" locator1="LRDCOMFilter#ASSET_CATEGORY_TITLE" />
-		<execute function="AssertVisible" locator1="LRDCOMFilter#ASSET_VOCABULARY_TITLE" />
-	</command>
-</definition>
+		LRDCOMArticle.viewResourceCTALinkHeader(linkName = "Read the Whitepaper");
+	}
+
+	@priority = "2"
+	test ViewSectionNavigationCaseStudies {
+		LRDCOMNavigation.gotoPage(
+			childPageName = "Case Studies",
+			pageName = "${pageName}"
+		);
+
+		var key_categoryName = "Case Studies";
+		var key_vocabularyName = "Resource Types";
+
+		AssertVisible(locator1 = "LRDCOMFilter#ASSET_CATEGORY_TITLE");
+
+		AssertVisible(locator1 = "LRDCOMFilter#ASSET_VOCABULARY_TITLE");
+	}
+}

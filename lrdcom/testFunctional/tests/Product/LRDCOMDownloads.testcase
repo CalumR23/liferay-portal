@@ -1,129 +1,132 @@
-<definition component-name="lrdcom">
-	<property name="testray.main.component.name" value="lrdcom-www" />
+@component-name = "lrdcom"
+definition {
+	property testray.main.component.name = "lrdcom-www";
+	var childPageName = "Downloads";
+	var pageName = "Product";
 
-	<var name="childPageName" value="Downloads" />
-	<var name="pageName" value="Product" />
+	setUp {
+		LRDCOMNavigation.openHomeURL();
 
-	<set-up>
-		<execute macro="LRDCOMNavigation#openHomeURL" />
+		LRDCOM.acceptCookies();
 
-		<execute macro="LRDCOM#acceptCookies" />
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
+	}
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
-	</set-up>
+	@priority = "5"
+	test CheckMultipleBackgroundImagesVisible {
+		var key_imageNumber = "1";
 
-	<command name="CheckMultipleBackgroundImagesVisible" priority="5">
-		<var name="key_imageNumber" value="1" />
+		AssertElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE");
 
-		<execute function="AssertElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE" />
+		while (IsElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE_N")) {
+			var url = LRDCOM.getBackgroundImageURL(key_imageNumber = "${key_imageNumber}");
 
-		<while>
-			<condition function="IsElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE_N" />
-			<then>
-				<execute macro="LRDCOM#getBackgroundImageURL">
-					<return name="url" />
-					<var name="key_imageNumber" value="${key_imageNumber}" />
-				</execute>
+			LRDCOM.checkURLNotBroken(url = "${url}");
 
-				<execute macro="LRDCOM#checkURLNotBroken">
-					<var name="url" value="${url}" />
-				</execute>
+			LRDCOMNavigation.openHomeURL();
 
-				<execute macro="LRDCOMNavigation#openHomeURL" />
+			LRDCOMNavigation.gotoPage(
+				childPageName = "${childPageName}",
+				pageName = "${pageName}"
+			);
 
-				<execute macro="LRDCOMNavigation#gotoPage">
-					<var name="childPageName" value="${childPageName}" />
-					<var name="pageName" value="${pageName}" />
-				</execute>
+			var key_imageNumber = MathUtil.sum("${key_imageNumber}", "1");
+		}
+	}
 
-				<var method="MathUtil#sum('${key_imageNumber}', '1')" name="key_imageNumber" />
-			</then>
-		</while>
-	</command>
+	@priority = "4"
+	test SearchAssets {
+		ScrollWebElementIntoView(locator1 = "TextInput#SEARCH_2");
 
-	<command name="SearchAssets" priority="4">
-		<execute function="ScrollWebElementIntoView" locator1="TextInput#SEARCH_2" />
+		Type.sendKeys(locator1 = "TextInput#SEARCH_2", value1 = "to");
 
-		<execute function="Type#sendKeys" locator1="TextInput#SEARCH_2" value1="to" />
+		LRDCOMAssetEntry.view(assetName = "Liferay Portal Tools for 7.0 GA5");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay Portal Tools for 7.0 GA5" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay Portal 7.0 GA5 Bundled with Tomcat");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay Portal 7.0 GA5 Bundled with Tomcat" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay IDE");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay IDE" />
-		</execute>
+		var key_entryNumber = "4";
 
-		<var name="key_entryNumber" value="4" />
+		AssertNotVisible(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
 
-		<execute function="AssertNotVisible" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
+		Type.sendKeys(locator1 = "TextInput#SEARCH_2", value1 = "o");
 
-		<execute function="Type#sendKeys" locator1="TextInput#SEARCH_2" value1="o" />
+		AssertNotVisible(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_3");
+	}
 
-		<execute function="AssertNotVisible" locator1="LRDCOMAssetEntry#ASSET_ENTRY_3" />
-	</command>
+	@priority = "4"
+	test StartYourEnterpriseTrial {
+		Click(locator1 = "LRDCOMButton#START_YOUR_ENTERPRISE_TRIAL");
 
-	<command name="StartYourEnterpriseTrial" priority="4">
-		<execute function="Click" locator1="LRDCOMButton#START_YOUR_ENTERPRISE_TRIAL" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOM#HEADING_H1",
+			value1 = "Try Liferay DXP Free For 30 Days"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOM#HEADING_H1" value1="Try Liferay DXP Free For 30 Days" />
+		AssertElementPresent(locator1 = "TextInput#EMAIL_ADDRESS");
 
-		<execute function="AssertElementPresent" locator1="TextInput#EMAIL_ADDRESS" />
+		AssertElementPresent(locator1 = "TextInput#PASSWORD");
 
-		<execute function="AssertElementPresent" locator1="TextInput#PASSWORD" />
+		AssertElementPresent(locator1 = "Button#SUBMIT");
 
-		<execute function="AssertElementPresent" locator1="Button#SUBMIT" />
+		LRDCOMUserSignIn.signInDXPFreeTrial(
+			userEmailAddress = PropsUtil.get("lrdcom.email.address.2"),
+			userPassword = PropsUtil.get("lrdcom.email.password.2")
+		);
 
-		<execute macro="LRDCOMUserSignIn#signInDXPFreeTrial">
-			<var method="PropsUtil#get('lrdcom.email.address.2')" name="userEmailAddress" />
-			<var method="PropsUtil#get('lrdcom.email.password.2')" name="userPassword" />
-		</execute>
+		if (IsElementPresent(locator1 = "//div[@id='ee-trial']")) {
+			AssertTextEquals.assertPartialText(
+				locator1 = "//div[@id='ee-trial']",
+				value1 = "30-Day Trial"
+			);
 
-		<if>
-			<condition function="IsElementPresent" locator1="//div[@id='ee-trial']" />
-			<then>
-				<execute function="AssertTextEquals#assertPartialText" locator1="//div[@id='ee-trial']" value1="30-Day Trial" />
+			AssertClick(locator1 = "LRDCOMButton#DOWNLOAD_BUTTON", value1 = "Download");
+		}
+		else {
+			AssertTextEquals.assertPartialText(
+				locator1 = "LRDCOMArticle#ARTICLE_H2",
+				value1 = "Trial has expired"
+			);
 
-				<execute function="AssertClick" locator1="LRDCOMButton#DOWNLOAD_BUTTON" value1="Download" />
-			</then>
-			<else>
-				<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#ARTICLE_H2" value1="Trial has expired" />
+			Click(locator1 = "LRDCOMLink#LINK_ACTIVATION_LICENSE");
 
-				<execute function="Click" locator1="LRDCOMLink#LINK_ACTIVATION_LICENSE" />
+			AssertTextEquals.assertPartialText(
+				locator1 = "LRDCOM#SECTION_HEADING_H1",
+				value1 = "License Management"
+			);
+		}
+	}
 
-				<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOM#SECTION_HEADING_H1" value1="License Management" />
-			</else>
-		</if>
-	</command>
+	@priority = "4"
+	test ViewCTALinks {
+		LRDCOMArticle.clickCTALink(linkName = "View the license");
 
-	<command name="ViewCTALinks" priority="4">
-		<execute macro="LRDCOMArticle#clickCTALink">
-			<var name="linkName" value="View the license" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOM#HEADING_H1",
+			value1 = "Liferay Portal CE License"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOM#HEADING_H1" value1="Liferay Portal CE License" />
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMArticle.clickCTALink(linkName = "Getting started");
 
-		<execute macro="LRDCOMArticle#clickCTALink">
-			<var name="linkName" value="Getting started" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOM#HEADING_H1",
+			value1 = "Community"
+		);
+	}
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOM#HEADING_H1" value1="Community" />
-	</command>
+	@priority = "4"
+	test ViewDownloadButtons {
 
-	<command name="ViewDownloadButtons" priority="4">
-		<!-- Blocked by LRQA-39201 and need to update test login permissions to access Liferay Connected Services
+		/* Blocked by LRQA-39201 and need to update test login permissions to access Liferay Connected Services
 		<execute macro="LRDCOMArticle#download">
 			<var name="title" value="AlloyUI" />
 		</execute>
@@ -141,213 +144,208 @@
 		<execute macro="LRDCOMNavigation#gotoPage">
 			<var name="childPageName" value="${childPageName}" />
 			<var name="pageName" value="${pageName}" />
-		</execute>-->
+		</execute>*/
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Liferay Developer Tools" />
-		</execute>
+		LRDCOMArticle.download(title = "Liferay Developer Tools");
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#H1_SECTION_HEADING" value1="Liferay IDE" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#H1_SECTION_HEADING_2" value1="Liferay Developer Studio" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#H1_SECTION_HEADING",
+			value1 = "Liferay IDE"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoHome">
-			<var name="childPageName" value="${childPageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#H1_SECTION_HEADING_2",
+			value1 = "Liferay Developer Studio"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMNavigation.gotoHome(childPageName = "${childPageName}");
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Liferay Faces" />
-		</execute>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#H1_SECTION_HEADING" value1="Liferay Faces" />
+		LRDCOMArticle.download(title = "Liferay Faces");
 
-		<execute macro="LRDCOMNavigation#gotoHome">
-			<var name="childPageName" value="${childPageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#H1_SECTION_HEADING",
+			value1 = "Liferay Faces"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMNavigation.gotoHome(childPageName = "${childPageName}");
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Liferay Push" />
-		</execute>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOM#HEADING_H1" value1="Liferay CE Push" />
+		LRDCOMArticle.download(title = "Liferay Push");
 
-		<execute macro="LRDCOMNavigation#gotoHome">
-			<var name="childPageName" value="${childPageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOM#HEADING_H1",
+			value1 = "Liferay CE Push"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMNavigation.gotoHome(childPageName = "${childPageName}");
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Liferay Screens" />
-		</execute>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="GitHub#ARTICLE_H1" value1="Liferay Screens" />
+		LRDCOMArticle.download(title = "Liferay Screens");
 
-		<execute macro="LRDCOMNavigation#gotoHome">
-			<var name="childPageName" value="${childPageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "GitHub#ARTICLE_H1",
+			value1 = "Liferay Screens"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMNavigation.gotoHome(childPageName = "${childPageName}");
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Liferay Sync" />
-		</execute>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-		<execute macro="LRDCOMUserSignIn#signIn">
-			<var method="PropsUtil#get('lrdcom.email.address.2')" name="userEmailAddress" />
-			<var method="PropsUtil#get('lrdcom.email.password.2')" name="userPassword" />
-		</execute>
+		LRDCOMArticle.download(title = "Liferay Sync");
 
-		<if>
-			<condition function="IsElementPresent" locator1="Checkbox#AGREED_TO_TERMS_OF_USE_CHECKBOX" />
-			<then>
-				<execute macro="LRDCOMUserSignIn#agreeToTermsOfUse" />
-			</then>
-		</if>
+		LRDCOMUserSignIn.signIn(
+			userEmailAddress = PropsUtil.get("lrdcom.email.address.2"),
+			userPassword = PropsUtil.get("lrdcom.email.password.2")
+		);
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#H1_SECTION_HEADING" value1="Liferay Sync" />
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#H1_SECTION_HEADING_2" value1="Liferay Sync for Mobile" />
+		if (IsElementPresent(locator1 = "Checkbox#AGREED_TO_TERMS_OF_USE_CHECKBOX")) {
+			LRDCOMUserSignIn.agreeToTermsOfUse();
+		}
 
-		<execute macro="LRDCOMNavigation#gotoHome">
-			<var name="childPageName" value="${childPageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#H1_SECTION_HEADING",
+			value1 = "Liferay Sync"
+		);
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="childPageName" value="${childPageName}" />
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#H1_SECTION_HEADING_2",
+			value1 = "Liferay Sync for Mobile"
+		);
 
-		<execute macro="LRDCOMArticle#download">
-			<var name="title" value="Mobile SDK" />
-		</execute>
+		LRDCOMNavigation.gotoHome(childPageName = "${childPageName}");
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="GitHub#REPO_PATH_H1" value1="liferay-mobile-sdk" />
-	</command>
+		LRDCOMNavigation.gotoPage(
+			childPageName = "${childPageName}",
+			pageName = "${pageName}"
+		);
 
-	<command name="ViewFilteredAssets" priority="4">
-		<execute function="AssertElementNotPresent" locator1="ASSET_CATEGORY_TITLE_ANY" />
-		<execute function="AssertElementNotPresent" locator1="ASSET_VOCABULARY_TITLE_ANY" />
+		LRDCOMArticle.download(title = "Mobile SDK");
 
-		<var name="key_entryNumber" value="12" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "GitHub#REPO_PATH_H1",
+			value1 = "liferay-mobile-sdk"
+		);
+	}
 
-		<echo message="Number of all filterable assets on Downloads page: ${key_entryNumber}" />
+	@priority = "4"
+	test ViewFilteredAssets {
+		AssertElementNotPresent(locator1 = "ASSET_CATEGORY_TITLE_ANY");
 
-		<execute function="AssertElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
+		AssertElementNotPresent(locator1 = "ASSET_VOCABULARY_TITLE_ANY");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Products" />
-			<var name="vocabularyName" value="Download Types" />
-		</execute>
+		var key_entryNumber = "12";
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_1" />
+		echo("Number of all filterable assets on Downloads page: ${key_entryNumber}");
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Tools" />
-			<var name="vocabularyName" value="Download Types" />
-		</execute>
+		AssertElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay IDE" />
-		</execute>
+		LRDCOMFilter.selectFilter(
+			categoryName = "Products",
+			vocabularyName = "Download Types"
+		);
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay Portal Tools for 7.0 GA5" />
-		</execute>
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_1");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_3" />
+		LRDCOMFilter.selectFilter(
+			categoryName = "Tools",
+			vocabularyName = "Download Types"
+		);
 
-		<execute macro="LRDCOMFilter#selectFilter">
-			<var name="categoryName" value="Dependencies" />
-			<var name="vocabularyName" value="Download Types" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay IDE");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Dependencies for 7.0 GA5" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay Portal Tools for 7.0 GA5");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="OSGi Dependencies" />
-		</execute>
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_3");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay IDE" />
-		</execute>
+		LRDCOMFilter.selectFilter(
+			categoryName = "Dependencies",
+			vocabularyName = "Download Types"
+		);
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Liferay Portal Tools for 7.0 GA5" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Dependencies for 7.0 GA5");
 
-		<execute macro="LRDCOMFilter#removeFilter">
-			<var name="categoryName" value="Tools" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "OSGi Dependencies");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="Dependencies for 7.0 GA5" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay IDE");
 
-		<execute macro="LRDCOMAssetEntry#view">
-			<var name="assetName" value="OSGi Dependencies" />
-		</execute>
+		LRDCOMAssetEntry.view(assetName = "Liferay Portal Tools for 7.0 GA5");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_3" />
+		LRDCOMFilter.removeFilter(categoryName = "Tools");
 
-		<execute function="AssertClick" locator1="LRDCOMFilter#RESET_FILTERS" value1="Reset Filters" />
+		LRDCOMAssetEntry.view(assetName = "Dependencies for 7.0 GA5");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMFilter#ASSET_CATEGORY_TITLE_ANY" />
-		<execute function="AssertElementNotPresent" locator1="LRDCOMFilter#ASSET_VOCABULARY_TITLE_ANY" />
-		<execute function="AssertElementPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
+		LRDCOMAssetEntry.view(assetName = "OSGi Dependencies");
 
-		<var method="MathUtil#sum('${key_entryNumber}', '1')" name="key_entryNumber" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_3");
 
-		<execute function="AssertElementNotPresent" locator1="LRDCOMAssetEntry#ASSET_ENTRY_X" />
-	</command>
+		AssertClick(locator1 = "LRDCOMFilter#RESET_FILTERS", value1 = "Reset Filters");
 
-	<command name="ViewKBLink" priority="3">
-		<var name="key_link" value="Visit the Liferay Developer Network for more information" />
-		<var name="linkName" value="${key_link}" />
-		<var name="viewHeadingName" value="WHAT IS LIFERAY PORTAL?" />
+		AssertElementNotPresent(locator1 = "LRDCOMFilter#ASSET_CATEGORY_TITLE_ANY");
 
-		<execute function="ScrollWebElementIntoView" locator1="LRDCOMLink#LINK_CTA" />
+		AssertElementNotPresent(locator1 = "LRDCOMFilter#ASSET_VOCABULARY_TITLE_ANY");
 
-		<execute function="AssertClick" locator1="LRDCOMLink#LINK_CTA" value1="${linkName}" />
+		AssertElementPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
 
-		<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#ARTICLE_H1" value1="${viewHeadingName}" />
-	</command>
+		var key_entryNumber = MathUtil.sum("${key_entryNumber}", "1");
 
-	<command name="ViewLearnMoreCTALinks" priority="3">
-		<var name="linkIndexNumber" value="0" />
+		AssertElementNotPresent(locator1 = "LRDCOMAssetEntry#ASSET_ENTRY_X");
+	}
 
-		<for list="AlloyUI,Liferay Connected Services,Liferay IDE,Liferay Faces,Liferay Screens,Liferay Sync,Mobile SDK" param="viewHeadingTitle">
-			<var method="MathUtil#sum('${linkIndexNumber}', '1')" name="linkIndexNumber" />
+	@priority = "3"
+	test ViewKBLink {
+		var key_link = "Visit the Liferay Developer Network for more information";
+		var linkName = "${key_link}";
+		var viewHeadingName = "WHAT IS LIFERAY PORTAL?";
 
-			<execute macro="LRDCOMArticle#clickCTALink">
-				<var name="linkIndexNumber" value="${linkIndexNumber}" />
-				<var name="linkName" value="Learn More" />
-			</execute>
+		ScrollWebElementIntoView(locator1 = "LRDCOMLink#LINK_CTA");
 
-			<execute function="AssertTextEquals#assertPartialText" locator1="LRDCOMArticle#ARTICLE_H1" value1="${viewHeadingTitle}" />
+		AssertClick(locator1 = "LRDCOMLink#LINK_CTA", value1 = "${linkName}");
 
-			<execute macro="LRDCOMNavigation#gotoHome" />
+		AssertTextEquals.assertPartialText(
+			locator1 = "LRDCOMArticle#ARTICLE_H1",
+			value1 = "${viewHeadingName}"
+		);
+	}
 
-			<execute macro="LRDCOMNavigation#gotoPage">
-				<var name="childPageName" value="${childPageName}" />
-				<var name="pageName" value="${pageName}" />
-			</execute>
-		</for>
-	</command>
-</definition>
+	@priority = "3"
+	test ViewLearnMoreCTALinks {
+		var linkIndexNumber = "0";
+
+		for (var viewHeadingTitle : list "AlloyUI,Liferay Connected Services,Liferay IDE,Liferay Faces,Liferay Screens,Liferay Sync,Mobile SDK") {
+			var linkIndexNumber = MathUtil.sum("${linkIndexNumber}", "1");
+
+			LRDCOMArticle.clickCTALink(
+				linkIndexNumber = "${linkIndexNumber}",
+				linkName = "Learn More"
+			);
+
+			AssertTextEquals.assertPartialText(
+				locator1 = "LRDCOMArticle#ARTICLE_H1",
+				value1 = "${viewHeadingTitle}"
+			);
+
+			LRDCOMNavigation.gotoHome();
+
+			LRDCOMNavigation.gotoPage(
+				childPageName = "${childPageName}",
+				pageName = "${pageName}"
+			);
+		}
+	}
+}

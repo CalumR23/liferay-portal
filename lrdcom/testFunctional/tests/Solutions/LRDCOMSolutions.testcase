@@ -1,94 +1,67 @@
-<definition component-name="lrdcom">
-	<property name="testray.main.component.name" value="lrdcom-www" />
+@component-name = "lrdcom"
+definition {
+	property testray.main.component.name = "lrdcom-www";
+	var pageName = "Solutions";
 
-	<var name="pageName" value="Solutions" />
+	setUp {
+		LRDCOMNavigation.openHomeURL();
 
-	<set-up>
-		<execute macro="LRDCOMNavigation#openHomeURL" />
+		LRDCOM.acceptCookies();
 
-		<execute macro="LRDCOM#acceptCookies" />
+		LRDCOMNavigation.gotoPage(pageName = "${pageName}");
+	}
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="pageName" value="${pageName}" />
-		</execute>
-	</set-up>
+	@priority = "5"
+	test CheckMultipleBackgroundImagesVisible {
+		var key_imageNumber = "1";
 
-	<command name="CheckMultipleBackgroundImagesVisible" priority="5">
-		<var name="key_imageNumber" value="1" />
+		AssertElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE");
 
-		<execute function="AssertElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE" />
+		while (IsElementPresent(locator1 = "LRDCOM#BACKGROUND_IMAGE_N")) {
+			var url = LRDCOM.getBackgroundImageURL(key_imageNumber = "${key_imageNumber}");
 
-		<while>
-			<condition function="IsElementPresent" locator1="LRDCOM#BACKGROUND_IMAGE_N" />
-			<then>
-				<execute macro="LRDCOM#getBackgroundImageURL">
-					<return name="url" />
-					<var name="key_imageNumber" value="${key_imageNumber}" />
-				</execute>
+			LRDCOM.checkURLNotBroken(url = "${url}");
 
-				<execute macro="LRDCOM#checkURLNotBroken">
-					<var name="url" value="${url}" />
-				</execute>
+			LRDCOMNavigation.openHomeURL();
 
-				<execute macro="LRDCOMNavigation#openHomeURL" />
+			LRDCOMNavigation.gotoPage(
+				childPageName = "${childPageName}",
+				pageName = "${pageName}"
+			);
 
-				<execute macro="LRDCOMNavigation#gotoPage">
-					<var name="childPageName" value="${childPageName}" />
-					<var name="pageName" value="${pageName}" />
-				</execute>
+			var key_imageNumber = MathUtil.sum("${key_imageNumber}", "1");
+		}
+	}
 
-				<var method="MathUtil#sum('${key_imageNumber}', '1')" name="key_imageNumber" />
-			</then>
-		</while>
-	</command>
+	@priority = "3"
+	test ViewIndustryIconPageLinks {
+		for (var iconTitle : list "banking,healthcare,government,retail,manufacturing,insurance") {
+			LRDCOMNavigation.gotoPage(pageName = "${pageName}");
 
-	<command name="ViewIndustryIconPageLinks" priority="3">
-		<for list="banking,healthcare,government,retail,manufacturing,insurance" param="iconTitle">
-			<execute macro="LRDCOMNavigation#gotoPage">
-				<var name="pageName" value="${pageName}" />
-			</execute>
+			LRDCOMNavigation.gotoIcon(iconTitle = "${iconTitle}");
 
-			<execute macro="LRDCOMNavigation#gotoIcon">
-				<var name="iconTitle" value="${iconTitle}" />
-			</execute>
+			var iconTitle = StringUtil.upperCase("${iconTitle}");
 
-			<var method="StringUtil#upperCase('${iconTitle}')" name="iconTitle" />
+			LRDCOMPage.viewActivePage(pageName = "${pageName}");
 
-			<execute macro="LRDCOMPage#viewActivePage">
-				<var name="pageName" value="${pageName}" />
-			</execute>
+			LRDCOMPage.viewBannerContent(bannerContent = "${iconTitle}");
+		}
+	}
 
-			<execute macro="LRDCOMPage#viewBannerContent">
-				<var name="bannerContent" value="${iconTitle}" />
-			</execute>
-		</for>
-	</command>
+	@priority = "4"
+	test ViewSolutionsIconPageLinks {
+		for (var iconTitle : list "Intranet,Portal,Create") {
+			LRDCOMNavigation.gotoPage(pageName = "${pageName}");
 
-	<command name="ViewSolutionsIconPageLinks" priority="4">
-		<for list="Intranet,Portal,Create" param="iconTitle">
-			<execute macro="LRDCOMNavigation#gotoPage">
-				<var name="pageName" value="${pageName}" />
-			</execute>
+			LRDCOMNavigation.gotoIcon(iconTitle = "${iconTitle}");
 
-			<execute macro="LRDCOMNavigation#gotoIcon">
-				<var name="iconTitle" value="${iconTitle}" />
-			</execute>
+			LRDCOMPage.viewBannerContent(bannerContent = "${iconTitle}");
+		}
 
-			<execute macro="LRDCOMPage#viewBannerContent">
-				<var name="bannerContent" value="${iconTitle}" />
-			</execute>
-		</for>
+		LRDCOMNavigation.gotoPage(pageName = "${pageName}");
 
-		<execute macro="LRDCOMNavigation#gotoPage">
-			<var name="pageName" value="${pageName}" />
-		</execute>
+		LRDCOMNavigation.gotoIcon(iconTitle = "mobile");
 
-		<execute macro="LRDCOMNavigation#gotoIcon">
-			<var name="iconTitle" value="mobile" />
-		</execute>
-
-		<execute macro="LRDCOMPage#viewBannerContent">
-			<var name="bannerContent" value="Mobile Strategy" />
-		</execute>
-	</command>
-</definition>
+		LRDCOMPage.viewBannerContent(bannerContent = "Mobile Strategy");
+	}
+}
