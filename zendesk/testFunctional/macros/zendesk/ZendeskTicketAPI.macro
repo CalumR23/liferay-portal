@@ -421,6 +421,33 @@ definition {
 		}
 	}
 
+	@prose = "the tickets with ticketIds ${ticketIdList} should have the sub-status ${subStatus}"
+	macro _viewMultipleTicketSubStatuses {
+		for (var ticketId : list "${ticketIdList}") {
+			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
+
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/${ticketId}.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var subStatusFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "[", "");
+
+			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "]", "");
+
+			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "&quot;", "");
+
+			echo("Expected Sub-Status: ${subStatus}");
+			echo("Actual Sub-Status: ${subStatusFromAPI}");
+
+			if (!("${subStatusFromAPI}" == "${subStatus}")) {
+				fail("Actual value ${subStatusFromAPI} does not match expected value ${subStatus}");
+			}
+		}
+	}
+
 	@prose = "${portalLegacyVersion} legacy ticket emails related to the following ticketIds ${ticketIdList} for the support language ${supportLanguage} should not be sent out"
 	macro _viewNoMultipleLegacyVersionTicketReceptionEmails {
 		for (var ticketId : list "${ticketIdList}") {
@@ -461,6 +488,20 @@ definition {
 
 			if (!("${nonLegacyTicketEmailEvent}" == "")) {
 				fail("A non-legacy ticket email may have been sent out.");
+			}
+		}
+	}
+
+	@prose = "the tickets with the ticketIds ${ticketIdList} should not contain the tag ${tagName}"
+	macro _viewNoSpecificTagForMultipleTickets {
+		for (var ticketId : list "${ticketIdList}") {
+			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
+
+			echo("Expected Tag Value: ${tagName}");
+			echo("Actual Existing Tags: ${existingTags}");
+
+			if (contains("${existingTags}", "${tagName}")) {
+				fail("Actual tag values ${existingTags} in the ticket with ID value ${ticketId} contains the unexpected tag ${tagName}");
 			}
 		}
 	}
@@ -601,6 +642,20 @@ definition {
 				if (!(contains("${bodyFromAPI}", "${value}"))) {
 					fail("Actual body ${bodyFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain the text ${value}");
 				}
+			}
+		}
+	}
+
+	@prose = "the tickets with the ticketIds ${ticketIdList} should contain the tag ${tagName}"
+	macro _viewSpecificTagForMultipleTickets {
+		for (var ticketId : list "${ticketIdList}") {
+			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
+
+			echo("Expected Tag Value: ${tagName}");
+			echo("Actual Existing Tags: ${existingTags}");
+
+			if (!(contains("${existingTags}", "${tagName}"))) {
+				fail("Actual tag values ${existingTags} in the ticket with ID value ${ticketId} does not contain the expected tag ${tagName}");
 			}
 		}
 	}
@@ -1082,28 +1137,6 @@ definition {
 		}
 	}
 
-	@prose = "the ticket with ticketId ${ticketId} should have the status ${status}"
-	macro _viewTicketStatusSync {
-		var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
-
-		var currentIteration = "0";
-
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${statusFromAPI}" == "${status}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
-			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-
-			var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
-		}
-
-		echo("Expected Status: ${status}");
-		echo("Actual Status: ${statusFromAPI}");
-
-		if (!("${statusFromAPI}" == "${status}")) {
-			fail("After ${currentIteration} checks, actual value ${statusFromAPI} status for ticket ID ${ticketId} does not match expected status value ${status}");
-		}
-	}
-
 	@prose = "the ticket with ticketId ${ticketId} should have the requester with the email address ${requesterEmailAddress}"
 	macro _viewTicketRequesterSync {
 		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
@@ -1128,17 +1161,52 @@ definition {
 		}
 	}
 
-	@prose = "the tickets with the ticketIds ${ticketIdList} should contain the tag ${tagName}"
-	macro _viewTicketsSpecificTag {
-		for (var ticketId : list "${ticketIdList}") {
-			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
+	@prose = "the ticket with ticketId ${ticketId} should have the status ${status}"
+	macro _viewTicketStatusSync {
+		var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
 
-			echo("Expected Tag Value: ${tagName}");
-			echo("Actual Existing Tags: ${existingTags}");
+		var currentIteration = "0";
 
-			if (!(contains("${existingTags}", "${tagName}"))) {
-				fail("Actual tag values ${existingTags} in the ticket with ID value ${ticketId} does not contain the expected tag ${tagName}");
-			}
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${statusFromAPI}" == "${status}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
+		}
+
+		echo("Expected Status: ${status}");
+		echo("Actual Status: ${statusFromAPI}");
+
+		if (!("${statusFromAPI}" == "${status}")) {
+			fail("After ${currentIteration} checks, actual value ${statusFromAPI} status for ticket ID ${ticketId} does not match expected status value ${status}");
+		}
+	}
+
+	@prose = "the ticket with ticket subject ${ticketSubject} should have the sub-status ${subStatus}"
+	macro _viewTicketSubStatus{
+		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
+
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var subStatusFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "[", "");
+
+		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "]", "");
+
+		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "&quot;", "");
+
+		echo("Expected Environment Name: ${subStatus}");
+		echo("Actual Environment Name: ${subStatusFromAPI}");
+
+		if (!("${subStatusFromAPI}" == "${subStatus}")) {
+			fail("Actual value ${subStatusFromAPI} does not match expected value ${subStatus}");
 		}
 	}
 
