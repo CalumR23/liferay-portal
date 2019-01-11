@@ -576,6 +576,76 @@ definition {
 		}
 	}
 
+	@prose = "an email regarding the reopening of ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to CAS ${supportRegion} ${table}"
+	macro _viewReopenedTicketEmailToCAS {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of reopened ticket (${supportLanguage})')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!(contains("${recipientsFromAPI}", "${value}"))) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of reopened ticket (${supportLanguage})')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.previous_value=='solved')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of reopened ticket (${supportLanguage})')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the reopening of ticket ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
 	@prose = "an email regarding the reopening of ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to the leads ${table}"
 	macro _viewReopenedTicketEmailToLeads {
 		var RawTable rawTable = new RawTable("${table}");
@@ -730,6 +800,76 @@ definition {
 		}
 	}
 
+	@prose = "an email regarding an assignment to ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to CAS ${supportRegion} ${table}"
+	macro _viewTicketAssignmentEmailToCAS {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of new ticket (${supportLanguage})')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!(contains("${recipientsFromAPI}", "${value}"))) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not contain the expected recipient ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of new ticket (${supportLanguage})')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.field_name=='assignee_id')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of new ticket (${supportLanguage})')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
 	@prose = "an email regarding an assignment to ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to the leads ${table}"
 	macro _viewTicketAssignmentEmailToLeads {
 		var RawTable rawTable = new RawTable("${table}");
@@ -862,6 +1002,76 @@ definition {
 					''';
 
 				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify assignee of comment update (${supportLanguage})')].body");
+
+				if (!(contains("${bodyFromAPI}", "${value}"))) {
+					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+		}
+	}
+
+	@prose = "an email regarding the comment with the body ${commentBody} added to a ticket with the ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to CAS ${supportRegion} ${table}"
+	macro _viewTicketCommentEmailToCAS {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Recipients") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var recipientIds = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of comment update (${supportLanguage})')].recipients");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "[", "");
+
+				var recipientIds = StringUtil.replace("${recipientIds}", "]", "");
+
+				echo("Recipient IDs from API: ${recipientIds}");
+
+				var recipientsFromAPI = "";
+
+				for (var recipientId : list "${recipientIds}") {
+					var recipientFromAPI = ZendeskUserAPI._getUserNameById(userId = "${recipientId}");
+
+					if ("${recipientsFromAPI}" == "") {
+						var recipientsFromAPI = "${recipientFromAPI}";
+					}
+					else {
+						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
+					}
+				}
+				echo("Expected Recipients: ${value}");
+				echo("Actual Recipients: ${recipientsFromAPI}");
+
+				if (!(contains("${recipientsFromAPI}", "${value}"))) {
+					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the expected recipients ${value}");
+				}
+			}
+
+			if ("${field}" == "Subject") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of comment update (${supportLanguage})')].subject");
+
+				if (!(contains("${subjectFromAPI}", "${value}"))) {
+					fail("Actual subject ${subjectFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
+				}
+			}
+
+			if ("${field}" == "Body") {
+				var curl = '''
+					${zendeskURL}/api/v2/tickets/${ticketId}/audits.json
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				var bodyFromAPI = JSONCurlUtil.get("${curl}", "$.audits[?(@.events[?(@.plain_body=='${commentBody}')])].events[?(@.via.source.from.title=='Notify CAS-${supportRegion} of comment update (${supportLanguage})')].body");
 
 				if (!(contains("${bodyFromAPI}", "${value}"))) {
 					fail("Actual body ${bodyFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not contain the text ${value}");
