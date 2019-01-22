@@ -580,6 +580,37 @@ definition {
 		}
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should not be present on zendesk.liferay.com"
+	macro _viewUserNoSyncFromOsb {
+		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${users}" == "[]"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
+		echo("Non-expected User Email Address: ${userEmailAddress}");
+		echo("Actual User Search Results: ${users}");
+
+		if (!("${users}" == "[]")) {
+			var curl = '''
+				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var userEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].email");
+
+			if ("${userEmailAddressFromAPI}" == "${userEmailAddress}") {
+				fail("The user with the email address ${userEmailAddress} appears to have been added to zendesk in spite of there not being an expectation to do so.");
+			}
+		}
+	}
+
 	macro _viewUserOrganizationIdByEmailAddress {
 		var curl = '''
 			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}

@@ -356,6 +356,39 @@ definition {
 		return "${organizationID}";
 	}
 
+	@prose = "the organization ${organizationName} should not be present on zendesk.liferay.com"
+	macro _viewOrganizationNoSyncFromOsb {
+		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${organizations}" == "[]"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+		}
+
+		echo("Non-expected Organization Name: ${organizationName}");
+		echo("Actual Organization Search Results: ${organizations}");
+
+		if (!("${organizations}" == "[]")) {
+			var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
+
+			var curl = '''
+				${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organizations[0].name");
+
+			if ("${organizationNameFromAPI}" == "${organizationName}") {
+				fail("The organization ${organizationName} appears to have been added to zendesk in spite of there not being an expectation to do so.");
+			}
+		}
+	}
+
 	@prose = "the organization ${organizationName} should not have the tag ${tag}"
 	macro _viewOrganizationNoTagSync {
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
