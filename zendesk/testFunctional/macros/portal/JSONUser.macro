@@ -31,6 +31,33 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I assign the support user with the email address ${userEmailAddress} to the support organization ${organizationName}"
+	macro assignUserToSupportOrganization {
+		var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userIds=${supportUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I assign the web user with the email address ${userEmailAddress} to the web organization ${organizationName}"
 	macro assignUserToWebOrganization {
 		var organizationId = JSONOrganization.getWebOrganizationId(organizationName = "${organizationName}");
@@ -204,6 +231,81 @@ definition {
 		return "${staticWebUserIdList}";
 	}
 
+	@prose = "I create a support user with the following parameters ${table}"
+	macro createViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${supportUserId}");
+
+		if (contains("${staticWebUserIdList}", "{staticSupportUserIdList}")) {
+			static var staticSupportUserIdList = "${supportUserId}";
+		}
+		else {
+			static var staticSupportUserIdList = "${staticSupportUserIdList},${supportUserId}";
+		}
+
+		echo("Support User ID List: ${staticSupportUserIdList}");
+
+		return "${staticSupportUserIdList}";
+	}
+
 	@prose = "I tear down the users with the following email addresses from web.liferay.com ${table}"
 	macro tearDownUsers {
 		var RawTable rawTable = new RawTable("${table}");
@@ -228,6 +330,36 @@ definition {
 				${webURL}/api/secure/jsonws/user/delete-user
 				-u ${webAdminEmailAddress}:${webAdminPassword}
 				-d userId=${webUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the users with the following email addresses from customer.liferay.com ${table}"
+	macro tearDownUsersViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompany.getSupportCompanyId();
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-user-by-email-address
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d companyId=${companyId}
+				-d emailAddress=${userEmailAddress}
+				''';
+
+			var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Support User ID: ${supportUserId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/delete-user
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d userId=${supportUserId}
 				''';
 
 			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");

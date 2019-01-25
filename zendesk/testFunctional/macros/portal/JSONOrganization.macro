@@ -1,4 +1,6 @@
 definition {
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
 	var supportWebId = PropsUtil.get("support.liferay.web.id");
 	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
@@ -12,6 +14,27 @@ definition {
 		var curl = '''
 			${webURL}/api/secure/jsonws/organization/get-organization-id
 			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d name=${organizationName}
+			''';
+
+		var organizationId = JSONCurlUtil.post("${curl}");
+
+		var organizationId = StringUtil.replace("${organizationId}", "&quot;", "");
+
+		var organizationId = StringUtil.replace("${organizationId}", "Finished executing commands.", "");
+
+		echo("Organization ID: ${organizationId}");
+
+		return "${organizationId}";
+	}
+
+	macro getSupportOrganizationId {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-organization-id
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
 			-d companyId=${companyId}
 			-d name=${organizationName}
 			''';
