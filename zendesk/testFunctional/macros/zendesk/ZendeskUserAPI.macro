@@ -324,6 +324,35 @@ definition {
 		}
 	}
 
+	@prose = "I remove a user with the email address ${userEmailAddress} from an organization with the name ${organizationName}"
+	macro _removeUserFromOrganization {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_memberships.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationMembershipId = JSONCurlUtil.get("${curl}", "$.organization_memberships[?(@.organization_id==${organizationId})].id");
+
+		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "[", "");
+
+		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "]", "");
+
+		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "&quot;", "");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_memberships/${organizationMembershipId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I teardown the user with userId ${staticUserID} from zendesk.liferay.com"
 	macro _tearDownUserById {
 		var curl = '''
