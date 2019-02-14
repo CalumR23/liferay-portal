@@ -218,38 +218,46 @@ definition {
 		}
 	}
 
-	@prose = "the tickets with ticketIds ${ticketIdList} should have their accountCode and externalId fields empty"
-	macro _viewEmptyAccountCodeAndExternalId {
+	@prose = "the tickets with ticketIds ${ticketIdList} should have the proper account code and externalId value of the organization ${organizationName}"
+	macro _viewAccountCodeAndExternalId {
 		for (var ticketId : list "${ticketIdList}") {
-			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
+			var organizationAccountCode = ZendeskOrganizationAPI._getOrganizationAccountCodeByOrganizationName(organizationName = "${organizationName}");
+
+			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 			var curl = '''
 				--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
-			var organizationExternalId = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==360013377532)].value");
+			var organizationExternalIdFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==360013377532)].value");
 
-			var organizationExternalId = StringUtil.replace("${organizationExternalId}", "[", "");
+			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "[", "");
 
-			var organizationExternalId = StringUtil.replace("${organizationExternalId}", "]", "");
+			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "]", "");
 
-			var organizationExternalId = StringUtil.replace("${organizationExternalId}", "&quot;", "");
+			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "&quot;", "");
 
-			var accountEntryCode = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==360013425231)].value");
+			var organizationAccountCodeFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==360013425231)].value");
 
-			var accountEntryCode = StringUtil.replace("${accountEntryCode}", "[", "");
+			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "[", "");
 
-			var accountEntryCode = StringUtil.replace("${accountEntryCode}", "]", "");
+			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "]", "");
 
-			var accountEntryCode = StringUtil.replace("${accountEntryCode}", "&quot;", "");
+			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "&quot;", "");
 
-			if (!("${organizationExternalId}" == "")) {
-				fail("Actual value ${organizationExternalId} shows that the the field with the field ID 360013377532 is not empty");
+			echo("Expected Organization External ID: ${organizationExternalId}");
+			echo("Actual Organization External ID: ${organizationExternalIdFromAPI}");
+
+			if (!("${organizationExternalIdFromAPI}" == "${organizationExternalId}")) {
+				fail("Actual value ${organizationExternalIdFromAPI} does not match the expected value of ${organizationExternalId}");
 			}
 
-			if (!("${accountEntryCode}" == "")) {
-				fail("Actual value ${accountEntryCode} shows that the the field with the field ID 360013425231 is not empty");
+			echo("Expected Account Code: ${organizationAccountCode}");
+			echo("Actual Account Code: ${organizationAccountCodeFromAPI}");
+
+			if (!("${organizationAccountCodeFromAPI}" == "${organizationAccountCode}")) {
+				fail("Actual value ${organizationAccountCodeFromAPI} does not match the expected value of ${organizationAccountCode}");
 			}
 		}
 	}

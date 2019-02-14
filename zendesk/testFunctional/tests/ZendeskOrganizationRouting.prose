@@ -1,7 +1,7 @@
 @testray.main.component.name = "Support QA"
 
-Feature: Zendesk Ticket Routing when Organization is unset
-	Testing Zendesk tickets that have their organization removed.
+Feature: Zendesk Ticket Routing when Organization is set
+	Testing Zendesk ticket organization information.
 
 Teardown:
 	* I wait for "10" seconds
@@ -9,16 +9,18 @@ Teardown:
 	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "supportforlife"
 	* I tear down the projects with the following project codes
 	| ZENOSBA |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
 	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
-	| zendesk.user1@liferay.com.broken |
-	| no-reply@zenosba.com.broken      |
+	| osb.customer1@lrcustomer.com.broken |
+	| no-reply@zenosba.com.broken         |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com
 	| Zen OSB Automotive |
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 
-Scenario: View empty fields
-	Zendesk tickets that have their organization removed should have their accountCode and organizationExternalId fields emptied
+Scenario: View account code and external id fields
+	Zendesk tickets should have proper values for their accountCode and organizationExternalId fields
 
 	Given I wait for "10" seconds
 	And I log into the support homepage as "amos.fong@liferay.com.broken" with password "supportforlife"
@@ -37,28 +39,21 @@ Scenario: View empty fields
 	| Zip          | 91765              |
 	| Region       | US                 |
 	| Language     | English            |
+	And I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	And I assign the web user with the email address "osb.customer1@lrcustomer.com.broken" to the web organization "Customer"
+	And I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
 	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
 	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
-	When I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@liferay.com.broken |
-	| Phone Number     | 555-555-5555                     |
-	| Organization     | Zen OSB Automotive               |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I wait for "60" seconds
-	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
 	| Product           | prd_liferay_portal_6_2                           |
 	| Component         | activation_key_project_administration            |
 	| System Status     | production_functioning_with_limited_capabilities |
 	| Subject           | Request Subject                                  |
 	| Description       | Request Description                              |
 	| Organization Name | Zen OSB Automotive                               |
-	And I remove a user with the email address "zendesk.user1@liferay.com.broken" from an organization with the name "Zen OSB Automotive"
-	And I remove a user with the email address "no-reply@zenosba.com.broken" from an organization with the name "Zen OSB Automotive"
-	Then the tickets with ticketIds "${staticRequestIdList}" should have their accountCode and externalId fields empty
+	Then the tickets with ticketIds "${staticRequestIdList}" should have the proper account code and externalId value of the organization "Zen OSB Automotive"
