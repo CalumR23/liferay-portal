@@ -218,6 +218,28 @@ definition {
 		}
 	}
 
+	@prose = "I update the ticket with ticketId ${ticketId} to have the organization ${organizationName}"
+	macro _updateTicketOrganization {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"organization_id": "${organizationId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "the tickets with ticketIds ${ticketIdList} should have the proper account code and externalId value of the organization ${organizationName}"
 	macro _viewAccountCodeAndExternalId {
 		for (var ticketId : list "${ticketIdList}") {
