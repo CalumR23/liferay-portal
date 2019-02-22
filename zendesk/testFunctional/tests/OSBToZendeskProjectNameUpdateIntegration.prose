@@ -1,0 +1,92 @@
+@testray.main.component.name = "Support QA"
+
+Feature: OSB to Zendesk Project Name Update Integration
+	Testing project sync updates in Zendesk caused by name and code changes in OSB.
+
+Setup:
+	* I wait for "10" seconds
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "supportforlife"
+	* I go to the OSB admin main page
+
+Teardown:
+	* I wait for "10" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "supportforlife"
+	* I tear down the projects with the following project codes
+	| ZENOSBE |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| no-reply@zenosba.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Engineering |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+
+Scenario: Update project name and code
+	Project name and code updates should reflect in zendesk.liferay.com.
+
+	Given I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Regular            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	When I update a project with the code "ZENOSBA" using the following values
+	| Name         | Zen OSB Engineering |
+	| Code         | ZENOSBE             |
+	| Industry     | Engineering         | 
+	Then the organization "Zen OSB Engineering" should have the following parameters
+	| Name         | Zen OSB Engineering |
+	| Account Code | ZENOSBE             |
+	And the support account ID of the project with the code "ZENOSBE" should match the organization external ID on zendesk.liferay.com
+	And the organization "Zen OSB Engineering" should have the tag "liferay_portal"
+	And the organization "Zen OSB Engineering" should have the tag "regular"
+	And the organization "Zen OSB Engineering" should have the tag "us"
+	And the organization "Zen OSB Engineering" should have the tag "gold"
+	And the organization "Zen OSB Engineering" should have the tag "english"
+	And the organization "Zen OSB Engineering" should have the tag "approved"
+
+Scenario: Update project name and code on expired project
+	Project name and code updates should reflect in zendesk.liferay.com when the project is expired.
+
+	Given I create a project with the following values
+	| Name         | Zen OSB Automotive |
+	| Code         | ZENOSBA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Regular            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	When I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Portal Production"
+	And I automatically have all expired projects moved to on hold status
+	And I update a project with the code "ZENOSBA" using the following values
+	| Name         | Zen OSB Engineering |
+	| Code         | ZENOSBE             |
+	| Industry     | Engineering         | 
+	Then the organization "Zen OSB Engineering" should have the following parameters
+	| Name         | Zen OSB Engineering |
+	| Account Code | ZENOSBE             |
+	And the support account ID of the project with the code "ZENOSBE" should match the organization external ID on zendesk.liferay.com
+	And the organization "Zen OSB Engineering" should not have the tag "liferay_portal"
+	And the organization "Zen OSB Engineering" should have the tag "regular"
+	And the organization "Zen OSB Engineering" should have the tag "us"
+	And the organization "Zen OSB Engineering" should not have the tag "gold"
+	And the organization "Zen OSB Engineering" should have the tag "english"
+	And the organization "Zen OSB Engineering" should have the tag "closed"
+	And the organization "Zen OSB Engineering" should not have the tag "approved"
