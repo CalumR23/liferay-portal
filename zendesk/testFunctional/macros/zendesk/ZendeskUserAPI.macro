@@ -592,6 +592,25 @@ definition {
 		return "${userID}";
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the name ${userName}"
+	macro _viewUserNameByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userNameFromAPI = JSONCurlUtil.get("${curl}", "$.user.name");
+
+		echo("Expected User Name: ${userName}");
+		echo("Actual User Name: ${userNameFromAPI}");
+
+		if (!("${userNameFromAPI}" == "${userName}")) {
+			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
+		}
+	}
+
 	@prose = "the user with userExternalId ${userExternalId} on zendesk.liferay.com should have the name ${userName}"
 	macro _viewUserNameByExternalId {
 		var curl = '''
@@ -725,6 +744,25 @@ definition {
 		var organizationSubscriptions = JSONCurlUtil.get("${curl}", "$.organization_subscriptions");
 
 		return "${organizationSubscriptions}";
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the phone number ${userPhoneNumber}"
+	macro _viewUserPhoneNumberByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userNameFromAPI = JSONCurlUtil.get("${curl}", "$.user.phone");
+
+		echo("Expected User Name: ${userPhoneNumber}");
+		echo("Actual User Name: ${userPhoneNumberFromAPI}");
+
+		if (!("${userPhoneNumberFromAPI}" == "${userPhoneNumber}")) {
+			fail("Actual value ${userPhoneNumberFromAPI} does not match expected value ${userPhoneNumber}");
+		}
 	}
 
 	macro _viewUserSearchResultsByEmailAddress {
