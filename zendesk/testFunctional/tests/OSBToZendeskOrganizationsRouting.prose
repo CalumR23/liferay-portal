@@ -1,6 +1,6 @@
 @testray.main.component.name = "Support QA"
 
-Feature: Zendesk Ticket Routing when Organization is updated
+Feature: OSB to Zendesk Ticket Routing when Organization is updated
 	Testing Zendesk ticket organization information specifically from ticket updates.
 
 Teardown:
@@ -70,12 +70,28 @@ Scenario: View account code and external id fields after organization update
 	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
 	And the organization "Zen OSB Engineering" should be present on zendesk.liferay.com
 	When I wait for "60" seconds
-	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
-	| Product           | prd_liferay_portal_6_2                           |
-	| Component         | activation_key_project_administration            |
-	| System Status     | production_functioning_with_limited_capabilities |
-	| Subject           | Request Subject                                  |
-	| Description       | Request Description                              |
-	| Organization Name | Zen OSB Automotive                               |
-	And I update the ticket with ticketId "${staticRequestIdList}" to have the organization "Zen OSB Engineering"
+	And I update the user with the email address "osb.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+	And I log into zendesk as "osb.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+	And I create a request with the following values
+	| Product       | Liferay Portal                          | 6.2                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request Subject                         |                                       |
+	| Description   | Request Description                     |                                       |
+	| Attachments   | Document_1.txt                          |                                       |
+	Then I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | OSB Customer1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay Portal > 6.2                               |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+	And I should be able to view a request comment containing the text "Request Description" with the following details
+	| Author      | OSB Customer1       |
+	| Comment     | Request Description |
+	| Attachments | Document_1.txt      |
+	When I update the ticket with ticketId "${staticRequestIdList}" to have the organization "Zen OSB Engineering"
 	Then the tickets with ticketIds "${staticRequestIdList}" should have the proper account code and externalId value of the organization "Zen OSB Engineering"
