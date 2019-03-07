@@ -5,6 +5,40 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "I assign an organization ${organizationName} with the following tags while replacing existing tags ${table}"
+	macro _assignAndReplaceTagsToOrganization {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var tag = "${row[0]}";
+
+			if (contains("${tagList}", "{tagList}")) {
+				var tagList = "${tag}";
+			}
+			else {
+				var tagList = "${tagList},${tag}";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/organizations/${organizationId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"organization":
+				{
+					"tags": "${tagList}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "I assign an organization with organizationExternalId ${organizationExternalId} with the following tags ${table}"
 	macro _assignTagsToOrganization {
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByExternalId(organizationExternalId = "${organizationExternalId}");
