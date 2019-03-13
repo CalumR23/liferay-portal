@@ -315,11 +315,43 @@ definition {
 
 			var companyId = JSONCompany.getWebCompanyId();
 
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
 			var curl = '''
-				${webURL}/api/secure/jsonws/user/get-user-by-email-address
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
 				-u ${webAdminEmailAddress}:${webAdminPassword}
 				-d companyId=${companyId}
-				-d emailAddress=${userEmailAddress}
+				-d screenName=${userScreenName}
+				''';
+
+			var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Web User ID: ${webUserId}");
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/delete-user
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d userId=${webUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the users with the following screen names from web.liferay.com ${table}"
+	macro tearDownUsersByScreenName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userScreenName = "${row[0]}";
+
+			var companyId = JSONCompany.getWebCompanyId();
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
 				''';
 
 			var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
@@ -345,11 +377,13 @@ definition {
 
 			var companyId = JSONCompany.getSupportCompanyId();
 
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
 			var curl = '''
-				${supportURL}/api/jsonws/user/get-user-by-email-address
-				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
 				-d companyId=${companyId}
-				-d emailAddress=${userEmailAddress}
+				-d screenName=${userScreenName}
 				''';
 
 			var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
