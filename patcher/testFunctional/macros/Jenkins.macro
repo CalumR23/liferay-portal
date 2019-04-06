@@ -25,10 +25,7 @@ definition {
 		Click(locator1 = "Jenkins#STOP_JOB_BUTTON");
 	}
 
-	macro executeCurl {
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curlArgs}");
-	}
-
+	@prose = "I get the current build number for the job titled ${jobName}"
 	macro getCurrentJobBuildNumber {
 		Jenkins.clickJobLink(jobName = "${jobName}");
 
@@ -36,11 +33,12 @@ definition {
 
 		AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-		var jobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+		static var staticJobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-		return "${jobBuildNumber}";
+		return "${staticJobBuildNumber}";
 	}
 
+	@prose = "I get the current build number for the short job titled ${jobName}"
 	macro getCurrentJobBuildNumberForShortJob {
 		Jenkins.clickJobLink(jobName = "${jobName}");
 
@@ -49,19 +47,20 @@ definition {
 
 			AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-			var jobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+			static var staticJobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 		}
 		else {
 			AssertElementPresent(locator1 = "Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
 
 			AssertVisible(locator1 = "Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
 
-			var jobBuildNumber = selenium.getText("Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
+			static var staticJobBuildNumber = selenium.getText("Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
 		}
 
-		return "${jobBuildNumber}";
+		return "${staticJobBuildNumber}";
 	}
 
+	@prose = "I go to the console output for the job with the name ${jobName} and build number ${jobBuildNumber}"
 	macro gotoConsoleOutput {
 		var key_jobBuildNumber = "${jobBuildNumber}";
 
@@ -72,77 +71,408 @@ definition {
 		Jenkins.clickConsoleOutputLink();
 	}
 
+	@prose = "I go to the Patcher Builder Jenkins homepage"
 	macro openJenkinsURL {
 		Open(locator1 = "/view/All");
 	}
 
+	@prose = "I wait for ${timeInSeconds} seconds"
 	macro pause {
-		Pause(locator1 = "${pauseTime}");
+		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+
+		Pause(locator1 = "${timeInMilliseconds}");
 	}
 
+	@prose = "I wait for ${timeInMinutes} minutes"
+	macro pauseInMinutes {
+		var timeInSeconds = MathUtil.product("${timeInMinutes}", "60");
+
+		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+
+		Pause(locator1 = "${timeInMilliseconds}");
+	}
+
+	@prose = "I start the fixpack-builder-agent job with the following parameters ${table}"
 	macro startFixPackBuilderAgentJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/fixpack-builder-agent\(sandbox-5\)/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[osb.patcher.baseCommittish=${osbPatcherBaseCommittish}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.committish=${osbPatcherCommittish}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.fixIds=${osbPatcherFixIds}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.gitRemoteURL=${osbPatcherGitRemoteUrl}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.patcherFixId=${osbPatcherPatcherFixId}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.productVersion=${osbPatcherProductVersion}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.rebase=${osbPatcherRebase}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.repository=${osbPatcherRepository}]CURL_DATA&gt; -d &lt;CURL_DATA[osb.patcher.type=${osbPatcherType}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.fix.delivery.method=${patcherFixDeliveryMethod}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.request.key=${patcherRequestKey}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.user.id=${patcherUserId}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "osb.patcher.baseCommittish") {
+				var osbPatcherBaseCommittish = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.committish") {
+				var osbPatcherCommittish = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.fixIds") {
+				var osbPatcherFixIds = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.gitRemoteURL") {
+				var osbPatcherGitRemoteUrl = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.patcherFixId") {
+				var osbPatcherPatcherFixId = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.productVersion") {
+				var osbPatcherProductVersion = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.rebase") {
+				var osbPatcherRebase = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.repository") {
+				var osbPatcherRepository = "${value}";
+			}
+			else if ("${field}" == "osb.patcher.type") {
+				var osbPatcherType = "${value}";
+			}
+			else if ("${field}" == "patcher.fix.delivery.method") {
+				var patcherFixDeliveryMethod = "${value}";
+			}
+			else if ("${field}" == "patcher.request.key") {
+				var patcherRequestKey = "${value}";
+			}
+			else if ("${field}" == "patcher.user.id") {
+				var patcherUserId = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for fixpack-builder-agent");
+			}
+		}
+
+		if (!(isSet(osbPatcherBaseCommittish))) {
+			var osbPatcherBaseCommittish = "";
+		}
+		if (!(isSet(osbPatcherCommittish))) {
+			var osbPatcherCommittish = "";
+		}
+		if (!(isSet(osbPatcherFixIds))) {
+			var osbPatcherFixIds = "";
+		}
+		if (!(isSet(osbPatcherGitRemoteUrl))) {
+			var osbPatcherGitRemoteUrl = "";
+		}
+		if (!(isSet(osbPatcherPatcherFixId))) {
+			var osbPatcherPatcherFixId = "";
+		}
+		if (!(isSet(osbPatcherProductVersion))) {
+			var osbPatcherProductVersion = "";
+		}
+		if (!(isSet(osbPatcherRebase))) {
+			var osbPatcherRebase = "";
+		}
+		if (!(isSet(osbPatcherRepository))) {
+			var osbPatcherRepository = "";
+		}
+		if (!(isSet(osbPatcherType))) {
+			var osbPatcherType = "";
+		}
+		if (!(isSet(patcherFixDeliveryMethod))) {
+			var patcherFixDeliveryMethod = "";
+		}
+		if (!(isSet(patcherRequestKey))) {
+			var patcherRequestKey = "";
+		}
+		if (!(isSet(patcherUserId))) {
+			var patcherUserId = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/fixpack-builder-agent\(sandbox-5\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d osb.patcher.baseCommittish=${osbPatcherBaseCommittish}
+			-d osb.patcher.committish=${osbPatcherCommittish}
+			-d osb.patcher.fixIds=${osbPatcherFixIds}
+			-d osb.patcher.gitRemoteURL=${osbPatcherGitRemoteUrl}
+			-d osb.patcher.patcherFixId=${osbPatcherPatcherFixId}
+			-d osb.patcher.productVersion=${osbPatcherProductVersion}
+			-d osb.patcher.rebase=${osbPatcherRebase}
+			-d osb.patcher.repository=${osbPatcherRepository}
+			-d osb.patcher.type=${osbPatcherType}
+			-d patcher.fix.delivery.method=${patcherFixDeliveryMethod}
+			-d patcher.request.key=${patcherRequestKey}
+			-d patcher.user.id=${patcherUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the fixpack-builder-hotfix-7x job with the following parameters ${table}"
 	macro startFixPackBuilderHotfix7xJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[fix.pack.customer.ticket=${fixPackCustomerTicket}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.fixed.issues=${fixPackFixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.hotfixed.issues=${fixPackHotfixedIssues}]CURL_DATA&gt; -d &lt;CURL_DATA[fix.pack.id=${fixPackId}]CURL_DATA&gt; -d &lt;CURL_DATA[git.revision=${gitRevision}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.build.id=${patcherBuildId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.user.id=${patcherUserId}]CURL_DATA&gt; -d &lt;CURL_DATA[patcher.fix.delivery.method=${patcherFixDeliveryMethod}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "fix.pack.customer.ticket") {
+				var fixPackCustomerTicket = "${value}";
+			}
+			else if ("${field}" == "fix.pack.fixed.issues") {
+				var fixPackFixedIssues = "${value}";
+			}
+			else if ("${field}" == "fix.pack.hotfixed.issues") {
+				var fixPackHotfixedIssues = "${value}";
+			}
+			else if ("${field}" == "fix.pack.id") {
+				var fixPackId = "${value}";
+			}
+			else if ("${field}" == "git.revision") {
+				var gitRevision = "${value}";
+			}
+			else if ("${field}" == "patcher.build.id") {
+				var patcherBuildId = "${value}";
+			}
+			else if ("${field}" == "patcher.user.id") {
+				var patcherUserId = "${value}";
+			}
+			else if ("${field}" == "patcher.fix.delivery.method") {
+				var patcherFixDeliveryMethod = "${value}";
+			}
+			else if ("${field}" == "release.tool.git.remote.username") {
+				var releaseToolGitRemoteUserName = "${value}";
+			}
+			else if ("${field}" == "release.tool.git.branch") {
+				var releaseToolGitBranch = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for fixpack-builder-hotfix-7x");
+			}
+		}
+
+		if (!(isSet(fixPackCustomerTicket))) {
+			var fixPackCustomerTicket = "";
+		}
+		if (!(isSet(fixPackFixedIssues))) {
+			var fixPackFixedIssues = "";
+		}
+		if (!(isSet(fixPackHotfixedIssues))) {
+			var fixPackHotfixedIssues = "";
+		}
+		if (!(isSet(fixPackId))) {
+			var fixPackId = "";
+		}
+		if (!(isSet(gitRevision))) {
+			var gitRevision = "";
+		}
+		if (!(isSet(patcherBuildId))) {
+			var patcherBuildId = "";
+		}
+		if (!(isSet(patcherUserId))) {
+			var patcherUserId = "";
+		}
+		if (!(isSet(patcherFixDeliveryMethod))) {
+			var patcherFixDeliveryMethod = "";
+		}
+		if (!(isSet(releaseToolGitRemoteUserName))) {
+			var releaseToolGitRemoteUserName = "";
+		}
+		if (!(isSet(releaseToolGitBranch))) {
+			var releaseToolGitBranch = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/fixpack-builder-hotfix-7x/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d fix.pack.customer.ticket=${fixPackCustomerTicket}
+			-d fix.pack.fixed.issues=${fixPackFixedIssues}
+ 			-d fix.pack.hotfixed.issues=${fixPackHotfixedIssues}
+			-d fix.pack.id=${fixPackId}
+			-d git.revision=${gitRevision}
+			-d patcher.build.id=${patcherBuildId}
+			-d patcher.user.id=${patcherUserId}
+			-d patcher.fix.delivery.method=${patcherFixDeliveryMethod}
+			-d release.tool.git.remote.username=${releaseToolGitRemoteUserName}
+			-d release.tool.git.branch=${releaseToolGitBranch}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the test-fixpack-builder-hotfix-copy job with the following parameters ${table}"
 	macro startTestFixPackBuilderHotfixCopyJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[originFilePath=${originFilePath}]CURL_DATA&gt; -d &lt;CURL_DATA[destinationFilePath=${destinationFilePath}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "destinationFilePath") {
+				var destinationFilePath = "${value}";
+			}
+			else if ("${field}" == "originFilePath") {
+				var originFilePath = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for test-fixpack-builder-hotfix-copy");
+			}
+		}
+
+		if (!(isSet(destinationFilePath))) {
+			var destinationFilePath = "";
+		}
+		if (!(isSet(originFilePath))) {
+			var originFilePath = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d originFilePath=${originFilePath}
+			-d destinationFilePath=${destinationFilePath}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the test-fixpack-builder-install job with the following parameters ${table}"
 	macro startTestFixPackBuilderInstallJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[bundle=${bundle}]CURL_DATA&gt; -d &lt;CURL_DATA[fixPack=${fixPack}]CURL_DATA&gt; -d &lt;CURL_DATA[hotfix=${hotfix}]CURL_DATA&gt; -d &lt;CURL_DATA[patchingTool=${patchingTool}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "bundle") {
+				var bundle = "${value}";
+			}
+			else if ("${field}" == "fixPack") {
+				var fixPack = "${value}";
+			}
+			else if ("${field}" == "hotfix") {
+				var hotfix = "${value}";
+			}
+			else if ("${field}" == "patchingTool") {
+				var patchingTool = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for test-fixpack-builder-install");
+			}
+		}
+
+		if (!(isSet(bundle))) {
+			var bundle = "";
+		}
+		if (!(isSet(fixPack))) {
+			var fixPack = "";
+		}
+		if (!(isSet(hotfix))) {
+			var hotfix = "";
+		}
+		if (!(isSet(patchingTool))) {
+			var patchingTool = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/test-fixpack-builder-install/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d bundle=${bundle}
+			-d fixPack=${fixPack}
+			-d hotfix=${hotfix}
+			-d patchingTool=${patchingTool}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the test-fixpack-builder-main-smoke job with the following parameters ${table}"
 	macro startTestFixPackBuilderMainSmokeJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-main-smoke/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[github.username=${githubUsername}]CURL_DATA&gt; -d &lt;CURL_DATA[git.branch=${gitBranch}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "github.username") {
+				var githubUsername = "${value}";
+			}
+			else if ("${field}" == "git.branch") {
+				var gitBranch = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for test-fixpack-builder-main-smoke");
+			}
+		}
+
+		if (!(isSet(githubUsername))) {
+			var githubUsername = "";
+		}
+		if (!(isSet(gitBranch))) {
+			var gitBranch = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/test-fixpack-builder-main-smoke/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d github.username=${githubUsername}
+			-d git.branch=${gitBranch}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the test-fixpack-builder-patch-difference job with the following parameters ${table}"
 	macro startTestFixPackBuilderPatchDifferenceJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/test-fixpack-builder-patch-difference/buildWithParameters";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} -d &lt;CURL_DATA[alphaPath=${alphaPath}]CURL_DATA&gt; -d &lt;CURL_DATA[betaPath=${betaPath}]CURL_DATA&gt;";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "alphaPath") {
+				var alphaPath = "${value}";
+			}
+			else if ("${field}" == "betaPath") {
+				var betaPath = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for test-fixpack-builder-patch-difference");
+			}
+		}
+
+		if (!(isSet(alphaPath))) {
+			var alphaPath = "";
+		}
+		if (!(isSet(betaPath))) {
+			var betaPath = "";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/test-fixpack-builder-patch-difference/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d alphaPath=${alphaPath}
+			-d betaPath=${betaPath}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I stop the job titled ${jobName}"
 	macro stopJob {
 		var jenkinsAdminUserName = PropsUtil.get("jenkins.admin.user.name");
 		var jenkinsAdminUserToken = PropsUtil.get("jenkins.admin.user.token");
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-		var curlURL = "${portalUrl}/view/All/job/${jobName}/lastBuild/stop";
-		var curlURLParameters = "?token=${jenkinsAuthenticationToken} --user ${jenkinsAdminUserName}:${jenkinsAdminUserToken}";
 
-		Jenkins.executeCurl(curlArgs = "${curlURL}${curlURLParameters}");
+		var curl = '''
+			${portalUrl}/view/All/job/${jobName}/lastBuild/stop?token=${jenkinsAuthenticationToken}
+			--user ${jenkinsAdminUserName}:${jenkinsAdminUserToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	macro viewConsoleText {
@@ -152,6 +482,7 @@ definition {
 		);
 	}
 
+	@prose = "the test-fixpack-builder-install console log should not have any visible errors"
 	macro viewInstallConsoleText {
 		Jenkins.clickFullLogLink();
 
@@ -173,6 +504,7 @@ definition {
 		Jenkins.viewConsoleText(consoleOutputText = "Server startup in");
 	}
 
+	@prose = "the job with the name ${jobName} and build number ${jobBuildNumber} should have been successful"
 	macro viewJobStatusSuccess {
 		var key_jobBuildNumber = "${jobBuildNumber}";
 
@@ -188,6 +520,7 @@ definition {
 		);
 	}
 
+	@prose = "the test-fixpack-builder-patch-difference console log should not have any visible errors"
 	macro viewPatchDifferenceConsoleText {
 		Jenkins.clickFullLogLink();
 
