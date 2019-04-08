@@ -1,0 +1,209 @@
+definition {
+	var fixCompletionPollIntervalInSeconds = PropsUtil.get("fix.completion.poll.interval.in.seconds");
+	var fixCompletionPollMaximumIterations = PropsUtil.get("fix.completion.poll.maximum.iterations");
+
+	@prose = "I check the Patcher fix containing the content ${fixContent} for add completion"
+	macro checkForAddCompletion {
+		Patcher.gotoFixes();
+
+		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+
+		var key_fixContent = "${fixContent}";
+
+		var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && ("${fixPatcherStatus}" == "Adding")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			Patcher.pause(timeInSeconds = "${fixCompletionPollIntervalInSeconds}");
+
+			Patcher.gotoFixes();
+
+			PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+
+			var key_fixContent = "${fixContent}";
+
+			var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+		}
+
+		if ("${fixPatcherStatus}" == "Adding") {
+			fail("After ${currentIteration} attempts while waiting at ${fixCompletionPollIntervalInSeconds} seconds in between each attempt, the Patcher fix is still in Adding status.");
+		}
+	}
+
+	@prose = "I create a Patcher fix with the following values ${table}"
+	macro create {
+		Patcher.gotoFixes();
+
+		AssertClick(
+			locator1 = "Patcher#CREATE_BUTTON",
+			value1 = "Create Fix");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Product") {
+				Select(
+					locator1 = "PatcherFixAdd#PRODUCT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				Select(
+					locator1 = "PatcherFixAdd#PROJECT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				Type(
+					locator1 = "PatcherFixAdd#CONTENT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Branch Name") {
+				Type(
+					locator1 = "PatcherFixAdd#BRANCH_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Github URL") {
+				Type(
+					locator1 = "PatcherFixAdd#GITHUB_URL_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Workaround") {
+				if ("${value}" == "true") {
+					Check(locator1 = "PatcherFixAdd#WORKAROUND_CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "PatcherFixAdd#WORKAROUND_CHECKBOX");			
+				}
+			}
+			else {
+				fail("No such Patcher fix field ${field}");
+			}
+		}
+
+		AssertClick(
+			locator1 = "PatcherFixAdd#ADD_BUTTON",
+			value1 = "Add");
+
+		Message.success();
+	}
+
+	@prose = "I generate random fix content"
+	macro generateRandomFixContent {
+		var randomNumber = MathUtil.randomNumber("100000");
+
+		static var staticFixContent = "LPQA-${randomNumber}";
+
+		return "${staticFixContent}";
+	}
+
+	@prose = "I generate random fix content for the first fix"
+	macro generateRandomFixContentForFix1 {
+		var randomNumber = MathUtil.randomNumber("100000");
+
+		static var staticFixContent1 = "LPQAA-${randomNumber}";
+
+		return "${staticFixContent1}";
+	}
+
+	@prose = "I generate random fix content for the second fix"
+	macro generateRandomFixContentForFix2 {
+		var randomNumber = MathUtil.randomNumber("100000");
+
+		static var staticFixContent2 = "LPQAB-${randomNumber}";
+
+		return "${staticFixContent2}";
+	}
+
+	@prose = "I generate random fix content for the third fix"
+	macro generateRandomFixContentForFix3 {
+		var randomNumber = MathUtil.randomNumber("100000");
+
+		static var staticFixContent3 = "LPQAC-${randomNumber}";
+
+		return "${staticFixContent3}";
+	}
+
+	@prose = "I generate random fix content for the fourth fix"
+	macro generateRandomFixContentForFix4 {
+		var randomNumber = MathUtil.randomNumber("100000");
+
+		static var staticFixContent4 = "LPQAD-${randomNumber}";
+
+		return "${staticFixContent4}";
+	}
+
+	@prose = "I should be able to view a Patcher fix containing the content ${fixContent} with the following values ${table}"
+	macro view {
+		Patcher.gotoFixes();
+
+		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+
+		var key_fixContent = "${fixContent}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Fix ID") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_ID",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_CONTENT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PRODUCT_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PROJECT_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Git Hash") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_GIT_HASH",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Patcher Status") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PATCHER_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Engineer Comments") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_ENGINEER_COMMENTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Jenkins") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Patcher#FIX_JENKINS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_TYPE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Patcher fix field ${field}");
+			}
+		}
+	}
+}

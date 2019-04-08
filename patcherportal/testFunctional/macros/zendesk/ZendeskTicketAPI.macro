@@ -1,0 +1,50 @@
+definition {
+	var apiToken = PropsUtil.get("zendesk.api.token");
+	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+
+	macro _getTicketId {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-G --data-urlencode "query=type:ticket subject:${subject}"
+			''';
+
+		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
+
+		return "${ticketId}";
+	}
+
+	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
+	macro _tearDownTicketByIds {
+		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "the ticket with the ticketId ${ticketId} should have the comment ${comment}"
+	macro _verifyRecentTicketComment {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}/comments.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
+
+		var commentArrayValue = MathUtil.difference("${commentCount}", "1");
+
+		var commentFromAPI = JSONCurlUtil.get("${curl}", "$.comments[${commentArrayValue}].body");
+
+		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "&quot;", "");
+
+		if(!("${comment}" == "${commentFromAPI}")) {
+			fail("Actual ${commentFromAPI} as the most recent comment body does not match the expected comment body ${comment}.");
+		}
+
+	}
+}

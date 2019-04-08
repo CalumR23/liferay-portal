@@ -1,0 +1,403 @@
+definition {
+	var buildCompileCompletionPollIntervalInMinutes = PropsUtil.get("build.compile.completion.poll.interval.in.minutes");
+	var buildMergeCompletionPollIntervalInSeconds = PropsUtil.get("build.merge.completion.poll.interval.in.seconds");
+	var buildRebaseCompletionPollIntervalInSeconds = PropsUtil.get("build.rebase.completion.poll.interval.in.seconds");
+	var buildCompletionPollMaximumIterations = PropsUtil.get("build.completion.poll.maximum.iterations");
+
+	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion"
+	macro checkForCompileCompletion {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			var key_supportTicket = "${supportTicket}";
+
+			var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+		}
+
+		if ("${buildPatcherStatus}" == "Compiling") {
+			fail("After ${currentIteration} attempts while waiting at ${buildCompletionPollIntervalInMinutes} minutes in between each attempt, the Patcher build is still in Compiling status.");
+		}
+	}
+
+	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for merge completion"
+	macro checkForMergeCompletion {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Merging")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			Patcher.pause(timeInSeconds = "${buildMergeCompletionPollIntervalInSeconds}");
+
+			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			var key_supportTicket = "${supportTicket}";
+
+			var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+		}
+
+		if ("${buildPatcherStatus}" == "Merging") {
+			fail("After ${currentIteration} attempts while waiting at ${buildCompletionPollIntervalInMinutes} minutes in between each attempt, the Patcher build is still in Merging status.");
+		}
+	}
+
+	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for rebase completion"
+	macro checkForRebaseCompletion {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Rebasing")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			Patcher.pause(timeInSeconds = "${buildRebaseCompletionPollIntervalInSeconds}");
+
+			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			var key_supportTicket = "${supportTicket}";
+
+			var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+		}
+
+		if ("${buildPatcherStatus}" == "Rebasing") {
+			fail("After ${currentIteration} attempts while waiting at ${buildCompletionPollIntervalInMinutes} minutes in between each attempt, the Patcher build is still in Rebasing status.");
+		}
+	}
+
+	macro clickActions {
+		var key_supportTicket = "${supportTicket}";
+
+		AssertClick(
+			locator1 = "Patcher#BUILD_ACTIONS_MENU",
+			value1 = "Actions");
+	}
+
+	@prose = "I create a Patcher build for a new account with the following values ${table}"
+	macro createForNewAccount {
+		Patcher.gotoAccounts();
+
+		AssertClick(
+			locator1 = "Patcher#CREATE_BUTTON",
+			value1 = "Create Build for New Account");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Product") {
+				Select(
+					locator1 = "PatcherBuildAdd#PRODUCT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				Select(
+					locator1 = "PatcherBuildAdd#PROJECT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Tickets List") {
+				Type(
+					locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Account Code") {
+				Type(
+					locator1 = "PatcherBuildAdd#ACCOUNT_CODE_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Ticket") {
+				Type(
+					locator1 = "PatcherBuildAdd#SUPPORT_TICKET_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				Select(
+					locator1 = "PatcherBuildAdd#TYPE_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Merge Only") {
+				if ("${value}" == "true") {
+					Check(locator1 = "PatcherBuildAdd#MERGE_ONLY_CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "PatcherBuildAdd#MERGE_ONLY_CHECKBOX");			
+				}
+			}
+			else if ("${field}" == "Smoke Test Only") {
+				if ("${value}" == "true") {
+					Check(locator1 = "PatcherBuildAdd#SMOKE_TEST_CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "PatcherBuildAdd#SMOKE_TEST_CHECKBOX");			
+				}
+			}
+			else {
+				fail("No such Patcher build field ${field}");
+			}
+		}
+
+		AssertClick(
+			locator1 = "PatcherBuildAdd#ADD_BUTTON",
+			value1 = "Add");
+
+		Message.success();
+	}
+
+	@prose = "I release a Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
+	macro releaseBuild {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherBuild.clickActions(supportTicket = "${supportTicket}");
+
+		AssertClick(
+			locator1 = "Patcher#MENULIST_RELEASE",
+			value1 = "Release");
+
+		Confirm(value1 = "Are you sure you want to release this patch to the customer?");
+
+		Message.success();
+	}
+
+	@prose = "I should be able to view a Patcher build for the ticket ${supportTicket} on the account ${accountCode} with the following values ${table}"
+	macro view {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Obsolete") {
+				if ("${value}" == "true") {
+					AssertElementPresent(locator1 = "Patcher#BUILD_OBSOLETE_ICON");
+				}
+				else {
+					AssertElementNotPresent(locator1 = "Patcher#BUILD_OBSOLETE_ICON");			
+				}
+			}
+			else if ("${field}" == "Build ID") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_ID",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_TYPE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Ticket") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_SUPPORT_TICKET",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_PROJECT_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_CONTENT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Patcher Status") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_PATCHER_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Jenkins") {
+				var key_jenkinsValue = "${value}";
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "Patcher#BUILD_JENKINS_SPECIFIC",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Engineer Comments") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_ENGINEER_COMMENTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "QA Status") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_QA_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "QA Comments") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_QA_COMMENTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Hotfix") {
+				AssertTextEquals(
+					locator1 = "Patcher#BUILD_HOTFIX",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Patcher build field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a Patcher child build with the name ${childBuildName} for the ticket ${supportTicket} on the account ${accountCode} with the following values ${table}"
+	macro viewChildBuild {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherBuild.clickActions(supportTicket = "${supportTicket}");
+
+		AssertClick(
+			locator1 = "Patcher#MENULIST_VIEW_CHILD_BUILDS",
+			value1 = "View Child Builds");
+
+		SelectFrame(locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_IFRAME");
+
+		var key_childBuildName = "${childBuildName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Build ID") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_BUILD_ID",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_VERSION_NUMBER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_PROJECT_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Patcher Status") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_PATCHER_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Jenkins") {
+				var key_jenkinsValue = "${value}";
+
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_JENKINS_SPECIFIC",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Patcher child build field ${field}");
+			}
+		}
+
+		SelectFrameTop();
+
+		Navigator.closeIframe();
+	}
+
+	@prose = "I should be able to view a Patcher child build fix with the name ${fixName} for the child build with the name ${childBuildName} for the ticket ${supportTicket} on the account ${accountCode} with the following values ${table}"
+	macro viewChildBuildFix {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherBuild.clickActions(supportTicket = "${supportTicket}");
+
+		AssertClick(
+			locator1 = "Patcher#MENULIST_VIEW_CHILD_BUILDS",
+			value1 = "View Child Builds");
+
+		SelectFrame(locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_IFRAME");
+
+		var key_childBuildName = "${childBuildName}";
+
+		AssertClick(
+			locator1 = "PatcherBuildViewChildBuilds#VIEW_CHILD_BUILDS_VIEW_FIXES_LINK",
+			value1 = "View Fixes");
+
+		var key_fixName = "${fixName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Fix ID") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_ID",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Git Hash") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_GIT_HASH",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Engineer Comments") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_ENGINEER_COMMENTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "PatcherBuildViewFixes#VIEW_FIXES_FIX_TYPE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Patcher child build field ${field}");
+			}
+		}
+
+		SelectFrameTop();
+
+		Navigator.closeIframe();
+	}
+}
