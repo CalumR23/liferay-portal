@@ -3,6 +3,9 @@ definition {
 	var buildMergeCompletionPollIntervalInSeconds = PropsUtil.get("build.merge.completion.poll.interval.in.seconds");
 	var buildRebaseCompletionPollIntervalInSeconds = PropsUtil.get("build.rebase.completion.poll.interval.in.seconds");
 	var buildCompletionPollMaximumIterations = PropsUtil.get("build.completion.poll.maximum.iterations");
+	var patcherAdminEmailAddress = PropsUtil.get("patcher.admin.email.address");
+	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
+	var portalURL = PropsUtil.get("portal.url");
 
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion"
 	macro checkForCompileCompletion {
@@ -165,6 +168,16 @@ definition {
 		Message.success();
 	}
 
+	macro getBuildId {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var buildId = selenium.getText("Patcher#BUILD_ID");
+
+		return "${buildId}";
+	}
+
 	@prose = "I release a Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
 	macro releaseBuild {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -178,6 +191,29 @@ definition {
 		Confirm(value1 = "Are you sure you want to release this patch to the customer?");
 
 		Message.success();
+	}
+
+	@prose = "I set the account code ${accountCode} as a static variable"
+	macro setAccountCodeAsStaticVariable {
+		static var staticAccountCode = "${accountCode}";
+
+		return "${staticAccountCode}";
+	}
+
+	@prose = "I tear down the Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
+	macro tearDownBuild {
+		if ((!(contains("${supportTicket}", "{supportTicket}"))) && (!("${supportTicket}" == "")) && (!(contains("${accountCode}", "{accountCode}"))) && (!("${accountCode}" == ""))) {
+			var buildId = PatcherBuild.getBuildId(
+				accountCode = "${accountCode}",
+				supportTicket = "${supportTicket}");
+
+			var curl = '''
+				${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
+				-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
 	}
 
 	@prose = "I should be able to view a Patcher build for the ticket ${supportTicket} on the account ${accountCode} with the following values ${table}"

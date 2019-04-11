@@ -1,6 +1,9 @@
 definition {
 	var fixCompletionPollIntervalInSeconds = PropsUtil.get("fix.completion.poll.interval.in.seconds");
 	var fixCompletionPollMaximumIterations = PropsUtil.get("fix.completion.poll.maximum.iterations");
+	var patcherAdminEmailAddress = PropsUtil.get("patcher.admin.email.address");
+	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
+	var portalURL = PropsUtil.get("portal.url");
 
 	@prose = "I check the Patcher fix containing the content ${fixContent} for add completion"
 	macro checkForAddCompletion {
@@ -135,6 +138,32 @@ definition {
 		static var staticFixContent4 = "LPQAD-${randomNumber}";
 
 		return "${staticFixContent4}";
+	}
+
+	macro getFixId {
+		Patcher.gotoFixes();
+
+		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+
+		var key_fixContent = "${fixContent}";
+
+		var fixId = selenium.getText("Patcher#FIX_ID");
+
+		return "${fixId}";
+	}
+
+	@prose = "I tear down the Patcher fix containing the content ${fixContent}"
+	macro tearDownFix {
+		if ((!(contains("${fixContent}", "{fixContent}"))) && (!("${fixContent}" == ""))) {
+			var fixId = PatcherFix.getFixId(fixContent = "${fixContent}");
+
+			var curl = '''
+				${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
+				-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
 	}
 
 	@prose = "I should be able to view a Patcher fix containing the content ${fixContent} with the following values ${table}"
