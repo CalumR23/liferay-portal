@@ -1,4 +1,44 @@
 definition {
+	var jobCompletionPollIntervalInMinutes = PropsUtil.get("job.completion.poll.interval.in.minutes");
+	var jobCompletionPollMaximumIterations = PropsUtil.get("job.completion.poll.maximum.iterations");
+
+	@prose = "I check the job with the name ${jobName} and build number ${jobBuildNumber} for completion"
+	macro checkForJobCompletion {
+		var currentIteration = "0";
+		var jobInProgress = "true";
+
+		while ((!("${currentIteration}" == "${jobCompletionPollMaximumIterations}")) && ("${jobInProgress}" == "true")) {
+			Jenkins.openJenkinsURL();
+
+			var key_jobBuildNumber = "${jobBuildNumber}";
+
+			Jenkins.clickJobLink(jobName = "${jobName}");
+
+			if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_BUILD_STATUS_IN_PROGRESS")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				var jobInProgress = "true";
+
+				Jenkins.pauseInMinutes(timeInMinutes = "${jobCompletionPollIntervalInMinutes}");
+			}
+			else {
+				var jobInProgress = "false";
+			}
+		}
+
+		if ("${jobInProgress}" == "true") {
+			Jenkins.openJenkinsURL();
+
+			var key_jobBuildNumber = "${jobBuildNumber}";
+
+			Jenkins.clickJobLink(jobName = "${jobName}");
+
+			if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_BUILD_STATUS_IN_PROGRESS")) {
+				fail("After ${currentIteration} attempts while waiting at ${jobCompletionPollIntervalInMinutes} minutes in between each attempt, the Jenkins job still appears to be in progress.");
+			}
+		}
+	}
+
 	macro clickConsoleOutputLink {
 		AssertClick(locator1 = "Jenkins#CONSOLE_OUTPUT_LINK", value1 = "Console Output");
 	}
