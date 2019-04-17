@@ -186,6 +186,66 @@ Scenario: Request Comment
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 
+Scenario: Request Comment Positioning
+	Request comments should be ordered from most recent to least.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create a request as a user with the email address "zendesk.user1@liferay.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_1                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |  
+	When I log into zendesk as "zendesk.user1@liferay.com.broken" with password "zendeskqauser"
+	And I go to My activities
+	Then I should see a request with the subject "Request Subject" in the index with the following details
+	| Subject       | Request Subject |
+	| Status        | OPEN            |
+	When I click on the request with the subject "Request Subject" in the index
+	And I submit a comment containing the following details
+	| Comment     | Request Comment 1 |
+	| Attachments | Document_1.txt    |
+	And I submit a comment containing the following details
+	| Comment     | Request Comment 2 |
+	| Attachments | Document_2.txt    |
+	And I submit a comment containing the following details
+	| Comment     | Request Comment 3 |
+	| Attachments | Document_3.txt    |
+	Then I should be able to view a request comment in position number "1" with the following details
+	| Author      | Zendesk User1     |
+	| Comment     | Request Comment 3 |
+	| Attachments | Document_3.txt    |
+	And I should be able to view a request comment in position number "2" with the following details
+	| Author      | Zendesk User1     |
+	| Comment     | Request Comment 2 |
+	| Attachments | Document_2.txt    |
+	And I should be able to view a request comment in position number "3" with the following details
+	| Author      | Zendesk User1     |
+	| Comment     | Request Comment 1 |
+	| Attachments | Document_1.txt    |
+	And I should be able to view a request with the following details
+	| Subject       | Request Subject                                    |
+	| Status        | OPEN                                               |
+	| Requester     | Zendesk User1                                      |
+	| Priority      | Normal                                             |
+	| Product       | Liferay DXP > 7.1                                  |
+	| Sub-Status    | —                                                  |
+	| Component     | Activation Key & Project Administration            |
+	| System Status | Production > Functioning with limited capabilities |
+	| Attachments   | Document_1.txt                                     |
+
 Scenario: Request Assignee
 	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
 
