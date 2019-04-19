@@ -36,6 +36,14 @@ definition {
 		}
 	}
 
+	macro clickActions {
+		var key_fixContent = "${fixContent}";
+
+		AssertClick(
+			locator1 = "Patcher#FIX_ACTIONS_MENU",
+			value1 = "Actions");
+	}
+
 	@prose = "I create a Patcher fix with the following values ${table}"
 	macro create {
 		Patcher.gotoFixes();
@@ -150,6 +158,43 @@ definition {
 		var fixId = selenium.getText("Patcher#FIX_ID");
 
 		return "${fixId}";
+	}
+
+	@prose = "I incorporate the fix pack ${fixPackName} to the fix ${fixContent}"
+	macro incorporateFixPackToFix {
+		Patcher.gotoFixes();
+
+		PatcherFix.clickActions(fixContent = "${fixContent}");
+
+		AssertClick(
+			locator1 = "Patcher#MENULIST_EDIT_FIX_PACKS",
+			value1 = "Edit Fix Packs");
+
+		var key_fixPackName = "${fixPackName}";
+
+		SelectFrame(locator1 = "PatcherFixEditFixPacks#EDIT_FIX_PACKS_IFRAME");
+
+		AssertSelectedLabel(
+			locator1 = "PatcherFixEditFixPacks#FIX_PACK_STATUS_SELECT",
+			value1 = "Fix Pack Ready");
+
+		AssertClick(
+			locator1 = "PatcherFixEditFixPacks#AVAILABLE_FIX_PACK",
+			value1 = "${fixPackName}");
+
+		Click(locator1 = "PatcherFixEditFixPacks#MOVE_AVAILABLE_TO_CURRENT_BUTTON");
+
+		AssertTextEquals(
+			locator1 = "PatcherFixEditFixPacks#CURRENT_FIX_PACK",
+			value1 = "${fixPackName}");
+
+		AssertClick(
+			locator1 = "PatcherFixEditFixPacks#UPDATE_BUTTON",
+			value1 = "Update");
+
+		SelectFrameTop();
+
+		Message.success();
 	}
 
 	@prose = "I tear down the Patcher fix containing the content ${fixContent}"

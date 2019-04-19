@@ -1,0 +1,217 @@
+definition {
+	var buildCompileCompletionPollIntervalInMinutes = PropsUtil.get("build.compile.completion.poll.interval.in.minutes");
+	var buildMergeCompletionPollIntervalInSeconds = PropsUtil.get("build.merge.completion.poll.interval.in.seconds");
+	var buildRebaseCompletionPollIntervalInSeconds = PropsUtil.get("build.rebase.completion.poll.interval.in.seconds");
+	var buildCompletionPollMaximumIterations = PropsUtil.get("build.completion.poll.maximum.iterations");
+	var patcherAdminEmailAddress = PropsUtil.get("patcher.admin.email.address");
+	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
+	var portalURL = PropsUtil.get("portal.url");
+
+	macro clickEditLink {
+		var key_fixPackName = "${fixPackName}";
+
+		AssertClick(
+			locator1 = "Patcher#FIX_PACK_EDIT_LINK",
+			value1 = "Edit");
+	}
+
+	@prose = "I create a new fix pack"
+	macro create {
+		Patcher.gotoFixPacks();
+
+		AssertClick(
+			locator1 = "Patcher#CREATE_BUTTON",
+			value1 = "Create Fix Pack");
+
+		var fixPackProjectVersionId = PatcherFixPack.getLatestFixPackProjectVersionId();
+
+		var projectVersionName = PatcherProjectVersion.getProjectVersionNameById(projectVersionId = "${fixPackProjectVersionId}");
+
+		Select(
+			locator1 = "PatcherFixPackAdd#PROJECT_VERSION_SELECT",
+			value1 = "${projectVersionName}");
+
+		Select(
+			locator1 = "PatcherFixPackAdd#COMPONENT_SELECT",
+			value1 = "portal");
+
+		AssertClick(
+			locator1 = "PatcherFixPackAdd#ADD_BUTTON",
+			value1 = "Add");
+
+		Message.success();
+	}
+
+	macro getLatestFixPackNumber {
+		var curl = '''
+			${portalURL}/api/jsonws/osb-patcher-portlet.fix_packs/viewLatestPortalFixPack
+			-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+			''';
+
+		var fixPackNumber = JSONCurlUtil.post("${curl}", "$.data.version");
+
+		return "${fixPackNumber}";
+	}
+
+	macro getLatestFixPackProjectVersionId {
+		var curl = '''
+			${portalURL}/api/jsonws/osb-patcher-portlet.fix_packs/viewLatestPortalFixPack
+			-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+			''';
+
+		var fixPackProjectVersionId = JSONCurlUtil.post("${curl}", "$.data.patcherProjectVersionId");
+
+		return "${fixPackProjectVersionId}";
+	}
+
+	@prose = "I get the latest fix pack ID value on Patcher"
+	macro getLatestStaticFixPackId {
+		var curl = '''
+			${portalURL}/api/jsonws/osb-patcher-portlet.fix_packs/viewLatestPortalFixPack
+			-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+			''';
+
+		static var staticFixPackId = JSONCurlUtil.post("${curl}", "$.data.patcherFixPackId");
+
+		return "${staticFixPackId}";
+	}
+
+	@prose = "I get the latest fix pack name value on Patcher"
+	macro getLatestStaticFixPackName {
+		var fixPackNumber = PatcherFixPack.getLatestFixPackNumber();
+
+		static var staticFixPackName = "portal-${fixPackNumber}";
+
+		return "${staticFixPackName}";
+	}
+
+	@prose = "I get the latest fix pack version number value on Patcher"
+	macro getLatestStaticFixPackNumber {
+		var curl = '''
+			${portalURL}/api/jsonws/osb-patcher-portlet.fix_packs/viewLatestPortalFixPack
+			-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+			''';
+
+		static var staticFixPackNumber = JSONCurlUtil.post("${curl}", "$.data.version");
+
+		return "${staticFixPackNumber}";
+	}
+
+	@prose = "I get the latest fix pack project version name value on Patcher"
+	macro getLatestStaticFixPackProjectVersionName {
+		var fixPackProjectVersionId = PatcherFixPack.getLatestFixPackProjectVersionId();
+
+		var projectVersionName = PatcherProjectVersion.getProjectVersionNameById(projectVersionId = "${fixPackProjectVersionId}");
+
+		static var staticProjectVersionName = "${projectVersionName}";
+
+		return "${staticProjectVersionName}";
+	}
+
+	@prose = "I merge a fix pack with the name ${fixPackName}"
+	macro merge {
+		Patcher.gotoFixPacks();
+
+		PatcherFixPack.clickEditLink(fixPackName = "${fixPackName}");
+
+		Select(
+			locator1 = "PatcherFixPackUpdate#STATUS_SELECT",
+			value1 = "${fixPackStatus}");
+
+		AssertClick(
+			locator1 = "PatcherFixPackUpdate#MERGE_BUTTON",
+			value1 = "Merge");
+	}
+
+	@prose = "I tear down the fix pack with the ID value ${fixPackId}"
+	macro tearDownFixPack {
+		if ((!(contains("${fixPackId}", "{fixPackId}"))) && (!("${fixPackId}" == ""))) {
+			var curl = '''
+				${portalURL}/group/guest/patching/-/osb_patcher/fix_packs/${fixPackId}/delete.json
+				-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I update a fix pack with the name ${fixPackName} to the status ${fixPackStatus}"
+	macro updateStatus {
+		Patcher.gotoFixPacks();
+
+		PatcherFixPack.clickEditLink(fixPackName = "${fixPackName}");
+
+		Select(
+			locator1 = "PatcherFixPackUpdate#STATUS_SELECT",
+			value1 = "${fixPackStatus}");
+
+		AssertClick(
+			locator1 = "PatcherFixPackUpdate#UPDATE_BUTTON",
+			value1 = "Update");
+
+		Message.success();
+	}
+
+	@prose = "I should be able to view a Patcher fix pack with the name ${fixPackName} and the following values ${table}"
+	macro view {
+		Patcher.gotoFixPacks();
+
+		var key_fixPackName = "${fixPackName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Component") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_COMPONENT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_PROJECT_VERSION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "QA Status") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_QA_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Released Date") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_RELEASED_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "New Issues") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_NEW_ISSUES",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Overidden Issues") {
+				AssertTextEquals(
+					locator1 = "Patcher#FIX_PACK_OVERRIDDEN_ISSUES",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Patcher fix pack field ${field}");
+			}
+		}
+	}
+}
