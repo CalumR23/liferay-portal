@@ -11,6 +11,10 @@ definition {
 	macro checkForCompileCompletion {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
 
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
 		var key_supportTicket = "${supportTicket}";
 
 		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
@@ -23,6 +27,10 @@ definition {
 			Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
 
 			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			PatcherSearch.searchAdvanced(
+				accountCodeKeyword = "${accountCode}",
+				supportTicketKeyword = "${supportTicket}");
 
 			var key_supportTicket = "${supportTicket}";
 
@@ -38,6 +46,10 @@ definition {
 	macro checkForMergeCompletion {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
 
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
 		var key_supportTicket = "${supportTicket}";
 
 		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
@@ -50,6 +62,10 @@ definition {
 			Patcher.pause(timeInSeconds = "${buildMergeCompletionPollIntervalInSeconds}");
 
 			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			PatcherSearch.searchAdvanced(
+				accountCodeKeyword = "${accountCode}",
+				supportTicketKeyword = "${supportTicket}");
 
 			var key_supportTicket = "${supportTicket}";
 
@@ -65,6 +81,10 @@ definition {
 	macro checkForRebaseCompletion {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
 
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
 		var key_supportTicket = "${supportTicket}";
 
 		var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
@@ -77,6 +97,10 @@ definition {
 			Patcher.pause(timeInSeconds = "${buildRebaseCompletionPollIntervalInSeconds}");
 
 			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			PatcherSearch.searchAdvanced(
+				accountCodeKeyword = "${accountCode}",
+				supportTicketKeyword = "${supportTicket}");
 
 			var key_supportTicket = "${supportTicket}";
 
@@ -218,11 +242,22 @@ definition {
 	macro getBuildId {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
 
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
 		var key_supportTicket = "${supportTicket}";
 
-		var buildId = selenium.getText("Patcher#BUILD_ID");
+		if (IsElementPresent(locator1 = "Patcher#BUILD_ID")) {
+			var buildId = selenium.getText("Patcher#BUILD_ID");
 
-		return "${buildId}";
+			return "${buildId}";
+		}
+		else {
+			var buildId = "";
+
+			return "${buildId}";
+		}
 	}
 
 	@prose = "I release a Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
@@ -249,23 +284,29 @@ definition {
 
 	@prose = "I tear down the Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
 	macro tearDownBuild {
-		if ((!(contains("${supportTicket}", "{supportTicket}"))) && (!("${supportTicket}" == "")) && (!(contains("${accountCode}", "{accountCode}"))) && (!("${accountCode}" == ""))) {
+		if ((!(contains("${supportTicket}", "{"))) && (!(contains("${supportTicket}", "}"))) && (!("${supportTicket}" == "")) && (!(contains("${accountCode}", "{"))) && (!(contains("${accountCode}", "}"))) && (!("${accountCode}" == ""))) {
 			var buildId = PatcherBuild.getBuildId(
 				accountCode = "${accountCode}",
 				supportTicket = "${supportTicket}");
 
-			var curl = '''
-				${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
-				-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
-				''';
+			if ((!(contains("${buildId}", "{buildId}"))) && (!("${buildId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
 
-			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
 		}
 	}
 
 	@prose = "I should be able to view a Patcher build for the ticket ${supportTicket} on the account ${accountCode} with the following values ${table}"
 	macro view {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
 
 		var key_supportTicket = "${supportTicket}";
 

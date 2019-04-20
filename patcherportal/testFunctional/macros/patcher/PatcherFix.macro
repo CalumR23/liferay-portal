@@ -5,11 +5,13 @@ definition {
 	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
 	var portalURL = PropsUtil.get("portal.url");
 
-	@prose = "I check the Patcher fix containing the content ${fixContent} for add completion"
+	@prose = "I check the Patcher fix containing the content ${fixContent} and type ${fixType} for add completion"
 	macro checkForAddCompletion {
 		Patcher.gotoFixes();
 
-		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+		PatcherSearch.searchAdvanced(
+			fixContentKeyword = "${fixContent}",
+			typeKeyword = "${fixType}");
 
 		var key_fixContent = "${fixContent}";
 
@@ -24,7 +26,9 @@ definition {
 
 			Patcher.gotoFixes();
 
-			PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+			PatcherSearch.searchAdvanced(
+				fixContentKeyword = "${fixContent}",
+				typeKeyword = "${fixType}");
 
 			var key_fixContent = "${fixContent}";
 
@@ -151,13 +155,22 @@ definition {
 	macro getFixId {
 		Patcher.gotoFixes();
 
-		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+		PatcherSearch.searchAdvanced(
+			fixContentKeyword = "${fixContent}",
+			typeKeyword = "${fixType}");
 
 		var key_fixContent = "${fixContent}";
 
-		var fixId = selenium.getText("Patcher#FIX_ID");
+		if (IsElementPresent(locator1 = "Patcher#FIX_ID")) {
+			var fixId = selenium.getText("Patcher#FIX_ID");
 
-		return "${fixId}";
+			return "${fixId}";
+		}
+		else {
+			var fixId = "";
+
+			return "${fixId}";
+		}
 	}
 
 	@prose = "I incorporate the fix pack ${fixPackName} to the fix ${fixContent}"
@@ -197,25 +210,31 @@ definition {
 		Message.success();
 	}
 
-	@prose = "I tear down the Patcher fix containing the content ${fixContent}"
+	@prose = "I tear down the Patcher fix containing the content ${fixContent} and type ${fixType}"
 	macro tearDownFix {
-		if ((!(contains("${fixContent}", "{fixContent}"))) && (!("${fixContent}" == ""))) {
-			var fixId = PatcherFix.getFixId(fixContent = "${fixContent}");
+		if ((!(contains("${fixContent}", "{"))) && (!(contains("${fixContent}", "}"))) && (!("${fixContent}" == ""))) {
+			var fixId = PatcherFix.getFixId(
+				fixContent = "${fixContent}",
+				fixType = "${fixType}");
 
-			var curl = '''
-				${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
-				-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
-				''';
+			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
 
-			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
 		}
 	}
 
-	@prose = "I should be able to view a Patcher fix containing the content ${fixContent} with the following values ${table}"
+	@prose = "I should be able to view a Patcher fix containing the content ${fixContent} and type ${fixType} with the following values ${table}"
 	macro view {
 		Patcher.gotoFixes();
 
-		PatcherSearch.typeKeywordsAndClickSearch(keyword = "${fixContent}");
+		PatcherSearch.searchAdvanced(
+			fixContentKeyword = "${fixContent}",
+			typeKeyword = "${fixType}");
 
 		var key_fixContent = "${fixContent}";
 
