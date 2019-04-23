@@ -521,6 +521,26 @@ definition {
 			OSBAdminSearch.searchBasicProject(projectCode = "${projectCode}");
 
 			if (IsElementPresent.isElementPresentAfterWait(locator1 = "OSBAdmin#SEARCH_RESULT_CODE")) {
+				// Workaround start until LHC-607 is fixed
+				var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
+
+				OSBAdminProject.unlinkProject(accountEntryId = "${accountEntryId}");
+
+				if ("${projectCode}" == "ZENOSBA") {
+					var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "Zen OSB Automotive");
+
+					var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+					ZendeskOrganizationAPI._tearDownOrganizationById(staticOrganizationID = "${organizationId}");
+				}
+				else if ("${projectCode}" == "ZENOSBE") {
+					var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "Zen OSB Engineering");
+
+					var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+					ZendeskOrganizationAPI._tearDownOrganizationById(staticOrganizationID = "${organizationId}");
+				}
+				// Workaround end until LHC-607 is fixed
 				OSBAdminProject.deleteCustomers(projectCode = "${projectCode}");
 
 				OSBAdminProject.deleteWorkers(projectCode = "${projectCode}");
@@ -535,6 +555,42 @@ definition {
 				Message.success();
 			}
 		}
+	}
+
+	macro unlinkProject {
+		var script = '''
+			import com.liferay.portal.kernel.dao.db.DB;
+			import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+			import com.liferay.portal.kernel.cache.CacheRegistryUtil;
+
+			long accounEntryId = ${accountEntryId};
+
+			DB db = DBManagerUtil.getDB();
+
+			db.runSQL("delete from OSB_ExternalIdMapper where classPK = " + accounEntryId);
+
+			CacheRegistryUtil.clear();
+			''';
+
+		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+		OSBAdmin.pause(timeInSeconds = "3");
+
+		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			Click(locator1 = "ProductMenu#TOGGLE");
+		}
+
+		Select(
+			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+			value1 = "Groovy");
+
+		Type(
+			locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+			value1 = "${script}");
+
+		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
+
+		Message.success();
 	}
 
 	@prose = "I update a project with the code ${projectCode} using the following values ${table}"
