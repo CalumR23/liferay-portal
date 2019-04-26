@@ -582,3 +582,79 @@ Scenario: Create a 71 build with a rebased child build
 	| Project Version | fix-pack-dxp-8-7110        |
 	| Patcher Status  | Complete Merging Only      |
 	| Jenkins         | fixpack-builder-agent(uat) |
+
+Scenario: Create a 70 build with a public child build
+	As a TSE, I should be able to create and release a 7.0 build that contains a public child build
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0                                             |
+	| Project Version | fix-pack-de-76-7010                                 |
+	| Content         | ${staticFixContent}                                 |
+	| Branch Name     | LPP-33319                                           |
+	| Github URL      | git@github.com:rodrigopaulino/liferay-portal-ee.git |
+	| Workaround      | true                                                |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Product         | DXP 7.0             |
+	| Project Version | fix-pack-de-76-7010 |
+	| Patcher Status  | Adding              |
+	| Type            | Workaround          |
+	When I check the Patcher fix containing the content "${staticFixContent}" and type "Workaround" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent}        |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.0                    |
+	| Project Version | fix-pack-de-76-7010        |
+	| Git Hash        | a43b41451d                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Workaround                 |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.0               |
+	| Project Version | fix-pack-de-76-7010   |
+	| Tickets List    | ${staticFixContent}   |
+	| Account Code    | HITACHIGP             |
+	| Support Ticket  | ${staticTicketNumber} |
+	And I set the account code "HITACHIGP" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-de-76-7010     |
+	| Content         | 0 Fix Packs + 1 Tickets |
+	| Patcher Status  | Merging                 |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+	| Version         | 1.0                 |
+	| Name            | ${staticFixContent} |
+	| Project Version | fix-pack-de-76-7010 |
+	| Patcher Status  | Merging Only        |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+	| Name            | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Git Hash        | a43b41451d          |
+	| Status          | Complete            |
+	| Type            | Workaround          |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for compile completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-de-76-7010            |
+	| Content         | 0 Fix Packs + 1 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+	| Version         | 1.0                                   |
+	| Name            | ${staticFixContent}                   |
+	| Project Version | fix-pack-de-76-7010                   |
+	| Patcher Status  | Complete Merging Only                 |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat)        |
+	| Jenkins         | fixpack-builder-agent(uat)            |
