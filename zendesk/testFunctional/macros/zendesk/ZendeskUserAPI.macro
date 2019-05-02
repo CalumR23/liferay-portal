@@ -447,6 +447,74 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "the default user should be in the organization ${organizationName}"
+	macro _viewDefaultUserOrganizationIdSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+
+		var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
+
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMemberships}", "${organizationId}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
+		}
+
+		echo("Expected User Organization: ${organizationId}");
+		echo("Actual User Organization Memberships: ${organizationMemberships}");
+
+		if (!(contains("${organizationMemberships}", "${organizationId}"))) {
+			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId}");
+		}
+	}
+
+	@prose = "the default user on the organization ${organizationName} should be on zendesk.liferay.com"
+	macro _viewDefaultUserSyncFromOsb {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
+
+		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		}
+
+		if (!("${users}" == "[]")) {
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var userEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].email");
+		}
+		else {
+			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for the user with the email ${userEmailAddress} appears to have been unsuccessful");
+		}
+
+		echo("Expected User Email Address: ${userEmailAddress}");
+		echo("Actual User Email Address: ${userEmailAddressFromAPI}");
+
+		if (!("${userEmailAddressFromAPI}" == "${userEmailAddress}")) {
+			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not be in the organization ${organizationName}"
 	macro _viewNoUserOrganizationIdSync {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");

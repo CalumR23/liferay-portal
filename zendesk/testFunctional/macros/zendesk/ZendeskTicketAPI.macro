@@ -284,6 +284,36 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with ticketId ${ticketId} should have the default user from the organization with the project code ${projectCode} as the requester"
+	macro _viewDefaultUserTicketRequester {
+		var accountEntryName = JSONOSBAccount.getOSBAccountEntryName(accountCode = "${projectCode}");
+
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${accountEntryName}");
+
+		var requesterEmailAddress = "no-reply@${organizationExternalId}.com.broken";
+
+		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
+
+		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${requesterId}" == "${requesterIdFromAPI}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
+		}
+
+		echo("Expected Requester ID: ${requesterId}");
+		echo("Actual Requester ID: ${requesterIdFromAPI}");
+
+		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
+		}
+	}
+
 	@prose = "the tickets with ticketIds ${ticketIdList} should have the environment ${environment}"
 	macro _viewMultipleTicketEnvironments {
 		for (var ticketId : list "${ticketIdList}") {
