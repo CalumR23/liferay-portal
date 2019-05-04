@@ -34,6 +34,25 @@ definition {
 		return "${triggerId}";
 	}
 
+	macro _getTriggerIdByNameWithoutNameVerification {
+		var triggerNameEditNoSpace = StringUtil.replace("${triggerName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/triggers/search.json?query=${triggerNameEditNoSpace}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[0].id");
+
+		var triggerId = StringUtil.replace("${triggerId}", "[", "");
+
+		var triggerId = StringUtil.replace("${triggerId}", "]", "");
+
+		var triggerId = StringUtil.replace("${triggerId}", "&quot;", "");
+
+		return "${triggerId}";
+	}
+
 	@prose = "the trigger ${triggerName} should have ${numberOfConditions} conditions"
 	macro _viewNumberOfTriggerProperties {
 		var triggerId = ZendeskTriggerAPI._getTriggerIdByName(triggerName = "${triggerName}");
@@ -805,6 +824,22 @@ definition {
 			else {
 				fail("No such trigger field ${field}");
 			}
+		}
+	}
+
+	@prose = "the trigger ${triggerName} should have ${updateDate} as its update date"
+	macro _viewTriggerUpdateDate {
+		var triggerId = ZendeskTriggerAPI._getTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var updateDateFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.updated_at");
+
+		if (!("${updateDateFromAPI}" == "${updateDate}")) {
+			fail("Actual update date ${updateDateFromAPI} for ${triggerName} does not match expected update date ${updateDate}. This trigger may have been changed. Please check the trigger ${triggerName} and update test after verifying trigger changes.");
 		}
 	}
 }
