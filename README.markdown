@@ -12,7 +12,7 @@ If you are running Windows, replace all the `./gradlew` in the examples below wi
 
 To run specific tests:
 
-`./gradlew :[project]:runPoshi -DposhiTestNames=[test names]`
+`./gradlew :[project]:runPoshi -PposhiTestName=[test names]`
 
 ## Source Formatting
 
