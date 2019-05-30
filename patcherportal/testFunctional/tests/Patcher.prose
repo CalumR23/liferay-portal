@@ -661,7 +661,7 @@ Scenario: Create a 70 build with a public child build
 	| Jenkins         | fixpack-builder-agent(uat)            |
 
 Scenario: Create an elasticsearch MP build
-	As a TSE, I should be able to create a private MP build
+	As a TSE, I should be able to create an elastic search MP build
 
 	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
 	And I generate random fix content
@@ -734,3 +734,78 @@ Scenario: Create an elasticsearch MP build
 	| Patcher Status  | Complete Merging Only                               |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)                      |
 	| Jenkins         | fixpack-builder-agent(uat)                          |
+
+Scenario: Create a sync connector MP build
+	As a TSE, I should be able to create a sync connector MP build
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0 Liferay Sync Connector               |
+	| Project Version | marketplace-sync-4.1.4-7010                  |
+	| Content         | ${staticFixContent}                          |
+	| Branch Name     | SYNC-1802-marketplace-sync-4.1.4-7010        |
+	| Github URL      | git@github.com:IstvanD/liferay-portal-ee.git |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+	| Content         | ${staticFixContent}            |
+	| Version         | 1.0                            |
+	| Product         | DXP 7.0 Liferay Sync Connector |
+	| Project Version | marketplace-sync-4.1.4-7010    |
+	| Patcher Status  | Adding                         |
+	| Type            | Patch                          |
+	When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+	| Content         | ${staticFixContent}            |
+	| Version         | 1.0                            |
+	| Product         | DXP 7.0 Liferay Sync Connector |
+	| Project Version | marketplace-sync-4.1.4-7010    |
+	| Git Hash        | 0ebf6e516e                     |
+	| Patcher Status  | Complete                       |
+	| Type            | Patch                          |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.0 Liferay Sync Connector |
+	| Project Version | marketplace-sync-4.1.4-7010	   |
+	| Tickets List    | ${staticFixContent}            |
+	| Account Code    | INDIAPIPPBDX                   |
+	| Support Ticket  | ${staticTicketNumber}          |
+	And I set the account code "INDIAPIPPBDX" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" with the following values
+	| Type            | Official                    |
+	| Support Ticket  | ${staticTicketNumber}       |
+	| Version         | 1.0                         |
+	| Project Version | marketplace-sync-4.1.4-7010 |
+	| Content         | 0 Fix Packs + 1 Tickets     |
+	| Patcher Status  | Merging                     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" with the following values
+	| Version         | 1.0                          |
+	| Name            | ${staticFixContent}          |
+	| Project Version | marketplace-sync-4.1.4-7010	 |
+	| Patcher Status  | Merging Only                 |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" with the following values
+	| Name            | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Git Hash        | 0ebf6e516e          |
+	| Status          | Complete            |
+	| Type            | Patch               |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" for compile completion	
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | marketplace-sync-4.1.4-7010    |
+	| Content         | 0 Fix Packs + 1 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "INDIAPIPPBDX" with the following values
+	| Version         | 1.0                            |
+	| Name            | ${staticFixContent}            |
+	| Project Version | marketplace-sync-4.1.4-7010    |
+	| Patcher Status  | Complete Merging Only          |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
