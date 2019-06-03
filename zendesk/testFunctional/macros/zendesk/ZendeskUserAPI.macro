@@ -233,6 +233,43 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I get the ID of the default user belonging to the organization ${organizationName} from zendesk.liferay.com"
+	macro _getDefaultUserId {
+		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+
+		if (!("${organizations}" == "[]")) {
+			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+			var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+			if (!("${users}" == "[]")) {
+				var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+				static var staticDefaultUserId = "${userId}";
+
+				echo("Default User ID of ${organizationName}: ${staticDefaultUserId}");
+
+				return "${staticDefaultUserId}";
+			}
+			else {
+				static var staticDefaultUserId = "";
+
+				echo("Default User ID of ${organizationName}: ${staticDefaultUserId}");
+
+				return "${staticDefaultUserId}";				
+			}
+		}
+		else {
+			static var staticDefaultUserId = "";
+
+			echo("Default User ID of ${organizationName}: ${staticDefaultUserId}");
+
+			return "${staticDefaultUserId}";				
+		}
+	}
+
 	@prose = "I obtain the external IDs of the following user email addresses from zendesk.liferay.com ${table}"
 	macro _getMultipleUserExternalIdsByEmailAddress {
 		var userCount = "0";
@@ -373,14 +410,16 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I teardown the user with userId ${staticUserID} from zendesk.liferay.com"
+	@prose = "I teardown the user with userId ${userId} from zendesk.liferay.com"
 	macro _tearDownUserById {
-		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${staticUserID}.json
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
+		if ((!(contains("${userId}", "{userId}"))) && (!("${userId}" == ""))) {
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/users/destroy_many.json?ids=${userId}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
 	}
 
 	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
