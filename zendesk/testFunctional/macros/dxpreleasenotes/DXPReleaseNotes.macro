@@ -1,0 +1,266 @@
+definition {
+	var supportURL = PropsUtil.get("support.liferay.url");
+
+	@prose = "I clear all search refinements"
+	macro clearAllRefinements {
+		AssertClick(
+			locator1 = "DXPReleaseNotes#REFINE_BY_CLEAR_ALL_LINK",
+			value1 = "Clear All");
+	}
+
+	@prose = "I go to the Changelog tab"
+	macro gotoChangelog {
+		AssertClick(
+			locator1 = "DXPReleaseNotes#CHANGELOG_TAB",
+			value1 = "Changelog");
+	}
+
+	@prose = "I go to the DXP Release Notes page"
+	macro gotoDXPReleaseNotes {
+		Open(locator1 = "${supportURL}/release-notes");
+
+		AssertVisible(locator1 = "DXPReleaseNotes#DXP_RELEASE_NOTES_HEADER");
+	}
+
+	@prose = "I go to the Highlights tab"
+	macro gotoHighlights {
+		AssertClick(
+			locator1 = "DXPReleaseNotes#HIGHLIGHTS_TAB",
+			value1 = "Highlights");
+	}
+
+	@prose = "I go to the Module Changes tab"
+	macro gotoModuleChanges {
+		AssertClick(
+			locator1 = "DXPReleaseNotes#MODULE_CHANGES_TAB",
+			value1 = "Module Changes");
+	}
+
+	@prose = "I refine the current search using the following refinement criteria ${table}"
+	macro refineFilters {
+		if (IsElementPresent(locator1 = "DXPReleaseNotes#REFINE_BY_SEE_MORE_LINK")) {
+			if (IsTextEqual(locator1 = "DXPReleaseNotes#REFINE_BY_SEE_MORE_LINK", value1 = "See More")) {
+				Click(locator1 = "DXPReleaseNotes#REFINE_BY_SEE_MORE_LINK");
+
+				AssertTextEquals(
+					locator1 = "DXPReleaseNotes#REFINE_BY_SEE_MORE_LINK",
+					value1 = "See Less");
+			}
+		}
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if (("${field}" == "Contains Text") || ("${field}" == "Name")) {
+				Type(
+					locator1 = "DXPReleaseNotes#REFINE_BY_TEXT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Only Show Changes") {
+				if ("${value}" == "true") {
+					Check(locator1 = "DXPReleaseNotes#REFINE_BY_TOGGLE_SWITCH");
+				}
+				else {
+					Uncheck(locator1 = "DXPReleaseNotes#REFINE_BY_TOGGLE_SWITCH");
+				}
+			}
+			else {
+				var key_filterName = "${field}";
+
+				if ("${value}" == "true") {					
+					Check(locator1 = "DXPReleaseNotes#REFINE_BY_CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "DXPReleaseNotes#REFINE_BY_CHECKBOX");
+				}
+			}
+		}
+	}
+
+	@prose = "I set the search filters to the ${productName} product from ${fixPackName1} to ${fixPackName2}"
+	macro setSearchFilters {
+		Select(
+			locator1 = "DXPReleaseNotes#PRODUCT_SELECT",
+			value1 = "${productName}");
+
+		Select(
+			locator1 = "DXPReleaseNotes#FROM_SELECT",
+			value1 = "${fixPackName1}");
+
+		Select(
+			locator1 = "DXPReleaseNotes#TO_SELECT",
+			value1 = "${fixPackName2}");
+	}
+
+	@prose = "I sort the results in ascending order"
+	macro sortResultsInAscendingOrder {
+		if (IsElementPresent(locator1 = "DXPReleaseNotes#RELEASED_COLUMN_DESCENDING_ORDER_ARROW")) {
+			Click(locator1 = "DXPReleaseNotes#RELEASED_COLUMN_DESCENDING_ORDER_ARROW");
+		}
+	}
+
+	@prose = "I sort the results in descending order"
+	macro sortResultsInDescendingOrder {
+		if (IsElementPresent(locator1 = "DXPReleaseNotes#RELEASED_COLUMN_ASCENDING_ORDER_ARROW")) {
+			Click(locator1 = "DXPReleaseNotes#RELEASED_COLUMN_ASCENDING_ORDER_ARROW");
+		}
+	}
+
+	@prose = "the highlights for ${fixPackName} for ${productName} should be visible"
+	macro viewFixPackHighlights {
+		var key_fixPackName = "${fixPackName}";
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#FIX_PACK_HEADER",
+			value1 = "${fixPackName}");
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#FIX_PACK_PRODUCT_NAME",
+			value1 = "${productName}");
+
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_DATE");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_DETAILS");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_DETAILS");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_DETAILS");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER");
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_DETAILS");
+	}
+
+	@prose = "the highlights for ${fixPackName} should be in position number ${positionValue}"
+	macro viewFixPackHighlightsByPosition {
+		var key_positionValue = "${positionValue}";
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#FIX_PACK_HEADER_POSITION",
+			value1 = "${fixPackName}");
+	}
+
+	@prose = "the highlights for ${fixPackName} for ${productName} should be visible with the following filter refinements ${table}"
+	macro viewFixPackHighlightsWithRefinedFilters {
+		var key_fixPackName = "${fixPackName}";
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#FIX_PACK_HEADER",
+			value1 = "${fixPackName}");
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#FIX_PACK_PRODUCT_NAME",
+			value1 = "${productName}");
+
+		AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_DATE");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Key Highlights") {
+				if ("${value}" == "true") {					
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER");
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_DETAILS");
+				}
+				else {
+					if (IsElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER")) {
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER");
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_DETAILS");
+					}
+					else {
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER");
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_DETAILS");
+					}
+				}
+			}
+			else if ("${field}" == "Important Changes") {
+				if ("${value}" == "true") {					
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER");
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_DETAILS");
+				}
+				else {
+					if (IsElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER")) {
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER");
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_DETAILS");
+					}
+					else {
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER");
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_DETAILS");
+					}
+				}
+			}
+			else if ("${field}" == "Known Issues") {
+				if ("${value}" == "true") {					
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER");
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_DETAILS");
+				}
+				else {
+					if (IsElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER")) {
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER");
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_DETAILS");
+					}
+					else {
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER");
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_DETAILS");
+					}
+				}
+			}
+			else if ("${field}" == "Security") {
+				if ("${value}" == "true") {					
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER");
+					AssertElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_DETAILS");
+				}
+				else {
+					if (IsElementPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER")) {
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER");
+						AssertNotVisible(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_DETAILS");
+					}
+					else {
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER");
+						AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_DETAILS");
+					}
+				}
+			}
+			else {
+				fail("No such fix pack highlight field ${field}");
+			}
+		}
+	}
+
+	@prose = "a link to Get ${fixPackName} should be visible next to the search filter"
+	macro viewGetLatestFixPackLink {
+		var key_fixPackName = "${fixPackName}";
+
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#GET_LATEST_FIX_PACK_LINK",
+			value1 = "Get ${fixPackName}");
+	}
+
+	@prose = "the highlights for ${fixPackName} should not be visible"
+	macro viewNoFixPackHighlights {
+		var key_fixPackName = "${fixPackName}";
+
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_HEADER");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_PRODUCT_NAME");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_DATE");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_HEADER");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KEY_HIGHLIGHTS_DETAILS");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_HEADER");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_IMPORTANT_CHANGES_DETAILS");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_HEADER");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_KNOWN_ISSUES_DETAILS");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_HEADER");
+		AssertElementNotPresent(locator1 = "DXPReleaseNotes#FIX_PACK_SECURITY_DETAILS");
+	}
+
+	@prose = "the results count should say that there are ${resultsCount} results"
+	macro viewResultsCount {
+		AssertTextEquals(
+			locator1 = "DXPReleaseNotes#RESULTS_COUNT",
+			value1 = "${resultsCount} Results");
+	}
+}
