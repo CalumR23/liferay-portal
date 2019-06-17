@@ -1,0 +1,81 @@
+definition {
+	var supportURL = PropsUtil.get("support.liferay.url");
+
+	@prose = "I go the download with the name ${downloadName}"
+	macro gotoDownload {
+		var key_downloadName = "${downloadName}";
+
+		AssertClick(
+			locator1 = "Downloads#DOWNLOAD_HEADER",
+			value1 = "${downloadName}");
+	}
+
+	@prose = "I go to the Downloads page"
+	macro gotoDownloadsPage {
+		Open(locator1 = "${supportURL}/downloads");
+
+		AssertVisible(locator1 = "Downloads#DOWNLOADS_HEADER");
+	}
+
+	@prose = "I set the search filters to the ${productName} product and ${fileType} file type"
+	macro setSearchFilters {
+		Select(
+			locator1 = "Downloads#PRODUCT_SELECT",
+			value1 = "${productName}");
+
+		Select(
+			locator1 = "Downloads#FILE_TYPE_SELECT",
+			value1 = "${fileType}");
+	}
+
+	@prose = "the download with the name ${downloadName} should be visible with the following values ${table}"
+	macro viewDownload {
+		var key_downloadName = "${downloadName}";
+
+		AssertVisible(locator1 = "Downloads#DOWNLOAD_SELECT");
+		AssertVisible(locator1 = "Downloads#DOWNLOAD_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Date") {
+				AssertTextEquals(
+					locator1 = "Downloads#DOWNLOAD_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Downloads#DOWNLOAD_HEADER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Link") {
+				var key_linkValue = "${value}";
+
+				AssertTextEquals(
+					locator1 = "Downloads#DOWNLOAD_LINK",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Info Message") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Downloads#DOWNLOAD_INFO_MESSAGE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Size") {
+				AssertTextEquals(
+					locator1 = "Downloads#DOWNLOAD_SIZE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "MD5") {
+				AssertTextEquals(
+					locator1 = "Downloads#DOWNLOAD_MD5",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such download field ${field}");
+			}
+		}
+	}
+}
