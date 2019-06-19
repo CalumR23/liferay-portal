@@ -1,0 +1,286 @@
+@testray.main.component.name = "Support QA"
+
+Feature: Project Details
+	Testing the Project Details portlet.
+
+Setup:
+	* I wait for "10" seconds
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer2                       |
+	| Email Address | osb.customer2@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer2                           |
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I go to the OSB admin main page
+	* I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	* I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	* I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENOSBA"
+	* I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+
+Teardown:
+	* I wait for "10" seconds
+	* I tear down the users with the following email addresses from web.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes
+	| ZENOSBA |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+
+Scenario: View project
+	New projects created in OSB should be visible in the project details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	Then the project details with the following values should be visible
+	| Project Code    | ZENOSBA         |
+	| Status          | APPROVED        |
+	| Level           | Gold            |
+	| Support Region  | US              |
+	| Partner         | Zen OSB Partner |
+	| Partner Support | Yes             |
+	| Tier            | Premier         |
+	| Industry        | Automotive      |
+	| Last Modified   | Today           |
+	| Modified By     | Amos Fong       |
+	When I go to the Team Members tab
+	Then the team member with the name "OSB Customer1" should be visible with the following values
+	| Name  | OSB Customer1                       |
+	| Role  | Developer                           |
+	| Email | osb.customer1@lrcustomer.com.broken |
+	And the team member with the name "OSB Customer2" should be visible with the following values
+	| Name  | OSB Customer2                       |
+	| Role  | Watcher                             |
+	| Email | osb.customer2@lrcustomer.com.broken |
+	When I go to the Offerings tab
+	Then the offering with the product name "Portal Production" should be visible with the following values
+	| Product          | Portal Production |
+	| SLA              | Gold              |
+	| Start Date       | Today             |
+	| Support End Date | 1 year from now   |
+	| Licenses         | 0 / 10000         |
+	| Tickets          | Unlimited         |
+	| Version          | 6                 |
+	| Instance Size    | Sizing 1          |
+	| Status           | ACTIVE            |
+	When I go to the History tab
+	Then the history entry in position number "1" with the field value "Role" should be visible with the following values
+	| Updater Name                | Amos Fong         |
+	| Update Summary              | Assigned Customer |
+	| Update Date                 | Today             |
+	| Update Field Name           | Role              |
+	| Update Field Original Value | N/A               |
+	| Update Field New Value      | Developer         |
+	And the history entry in position number "1" with the field value "User" should be visible with the following values
+	| Updater Name                | Amos Fong         |
+	| Update Summary              | Assigned Customer |
+	| Update Date                 | Today             |
+	| Update Field Name           | User              |
+	| Update Field Original Value | N/A               |
+	| Update Field New Value      | OSB Customer1     |
+	And the history entry in position number "2" with the field value "Role" should be visible with the following values
+	| Updater Name                | Amos Fong         |
+	| Update Summary              | Assigned Customer |
+	| Update Date                 | Today             |
+	| Update Field Name           | Role              |
+	| Update Field Original Value | N/A               |
+	| Update Field New Value      | Watcher           |
+	And the history entry in position number "2" with the field value "User" should be visible with the following values
+	| Updater Name                | Amos Fong         |
+	| Update Summary              | Assigned Customer |
+	| Update Date                 | Today             |
+	| Update Field Name           | User              |
+	| Update Field Original Value | N/A               |
+	| Update Field New Value      | OSB Customer2     |
+
+Scenario: Add environment details
+	Users should be able to add environment details via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add an environment configuration with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	Then the environment configuration with the name "Zen Portal Environment One" should be visible with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+
+Scenario: Add multiple environment details
+	Users should be able to add multiple environment details via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add an environment configuration with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	And I add an environment configuration with the following values
+	| Name               | Zen Portal Environment Two |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.1 GA3                    |
+	| Operating System   | CentOS 6                   |
+	| Java Version       | Oracle JDK 6               |
+	| Application Server | JBoss AS 7.1               |
+	| Database           | SQL Server 2008            |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	Then the environment configuration with the name "Zen Portal Environment One" should be visible with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	And the environment configuration with the name "Zen Portal Environment Two" should be visible with the following values
+	| Name               | Zen Portal Environment Two |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.1 GA3                    |
+	| Operating System   | CentOS 6                   |
+	| Java Version       | Oracle JDK 6               |
+	| Application Server | JBoss AS 7.1               |
+	| Database           | SQL Server 2008            |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+
+Scenario: Edit environment details
+	Users should be able to edit environment details via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add an environment configuration with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	And I edit the environment configuration with the name "Zen Portal Environment One" with the following values
+	| Name               | Zen Portal Environment Two |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.1 GA3                    |
+	| Operating System   | CentOS 6                   |
+	| Java Version       | Oracle JDK 6               |
+	| Application Server | JBoss AS 7.1               |
+	| Database           | SQL Server 2008            |
+	| Browser            | Chrome                     |
+	Then the environment configuration with the name "Zen Portal Environment Two" should be visible with the following values
+	| Name               | Zen Portal Environment Two |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.1 GA3                    |
+	| Operating System   | CentOS 6                   |
+	| Java Version       | Oracle JDK 6               |
+	| Application Server | JBoss AS 7.1               |
+	| Database           | SQL Server 2008            |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	And the environment configuration with the name "Zen Portal Environment One" should not be visible
+
+Scenario: Delete environment details
+	Users should be able to delete environment details via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add an environment configuration with the following values
+	| Name               | Zen Portal Environment One |
+	| Product            | Portal Production          |
+	| Liferay Version    | 6.2 EE                     |
+	| Operating System   | Windows Server 2012        |
+	| Java Version       | Oracle JDK 7               |
+	| Application Server | Tomcat 7.0                 |
+	| Database           | MariaDB 10.0               |
+	| Cloud Services     | Azure SQL Databases        |
+	| Browser            | Chrome                     |
+	| Portal EXT         | portal-ext.properties      |
+	| Patch Info         | patchinfo.txt              |
+	And I delete the environment configuration with the name "Zen Portal Environment One"
+	Then the environment configuration with the name "Zen Portal Environment One" should not be visible
+
+Scenario: Add support instructions
+	Users should be able to add support instructions via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add support instructions with the content "Support Instructions Content"
+	Then the support instructions with the content "Support Instructions Content" should be visible
+
+Scenario: Edit support instructions
+	Users should be able to edit support instructions via the Project Details page.
+
+	Given I go to the Project Details page
+	And I search for the project with the name "Zen OSB Automotive"
+	And I go to the project with the name "Zen OSB Automotive"
+	And I add support instructions with the content "Support Instructions Content"
+	And I edit support instructions with the content " Edit"
+	Then the support instructions with the content "Support Instructions Content Edit" should be visible
