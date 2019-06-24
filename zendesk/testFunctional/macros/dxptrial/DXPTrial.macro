@@ -104,8 +104,8 @@ definition {
 		return "${staticEmailAddress}";
 	}
 
-	@prose = "I get the web trial organziation id value with the name ${companyName} belonging to the user with the email address ${userEmailAddress}"
-	macro getWebTrialOrganizationId {
+	@prose = "I get the web corporate trial organziation id value with the name ${companyName} belonging to the user with the email address ${userEmailAddress}"
+	macro getWebCorporateTrialOrganizationId {
 		var companyId = JSONCompany.getWebCompanyId();
 
 		var curl = '''
@@ -143,8 +143,8 @@ definition {
 		}
 	}
 
-	@prose = "I tear down the trial organization with the ID value ${trialOrganizationId}"
-	macro tearDownTrialOrganization {
+	@prose = "I tear down the web corporate trial organization with the ID value ${trialOrganizationId}"
+	macro tearDownWebCorporateTrialOrganization {
 		if ((!(contains("${trialOrganizationId}", "{trialOrganizationId}"))) && (!("${trialOrganizationId}" == ""))) {
 			var curl = '''
 				${webURL}/api/secure/jsonws/organization/delete-organization
@@ -177,5 +177,57 @@ definition {
 
 		AssertVisible(locator1 = "DXPTrialHomepage#DEVELOPER_TOOLS_SECTION_HEADER");
 		AssertVisible(locator1 = "DXPTrialHomepage#DEVELOPER_TOOLS_LEARN_MORE_BUTTON");
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} should be part of the web corporate trial organization for the company ${companyName}"
+	macro viewUserWebCorporateTrialOrganization {
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/organization/get-user-organizations
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			''';
+
+		var trialOrganizationNameValue = JSONCurlUtil.post("${curl}", "$[0].name");
+
+		if (!(contains("${trialOrganizationNameValue}", "${companyName}"))) {
+			fail("The trial appears to not be in the trial organization for ${companyName}");
+		}
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} should be part of the web Trial organization"
+	macro viewUserWebTrialOrganization {
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/organization/get-user-organizations
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			''';
+
+		var trialOrganizationNameValue = JSONCurlUtil.post("${curl}", "$[1].name");
+
+		if (!("${trialOrganizationNameValue}" == "Trial")) {
+			fail("The trial appears to not be in the Trial organization");
+		}
 	}
 }
