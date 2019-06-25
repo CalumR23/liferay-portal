@@ -274,6 +274,25 @@ definition {
 		}
 	}
 
+	macro deleteCustomersViaName {
+		OSBAdminProject.gotoProjectViaName(projectName = "${projectName}");
+
+		Click(locator1 = "OSBAdminProject#ASSIGN_CUSTOMERS_BUTTON");
+
+		OSBAdmin.pause(timeInSeconds = "5");
+
+		while (IsElementPresent(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON")) {
+			Click(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON");
+			ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#REMOVE_MENU_ITEM");
+
+			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+			OSBAdmin.pause(timeInSeconds = "5");
+
+			Refresh();
+		}
+	}
+
 	@prose = "I attempt to remove a user with the email address ${emailAddress} as a customer from the project with the code ${projectCode} who still has an open Zendesk ticket"
 	macro deleteCustomerWithOpenZendeskTicket {
 		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
@@ -329,6 +348,25 @@ definition {
 
 	macro deleteWorkers {
 		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
+
+		Click(locator1 = "OSBAdminProject#ASSIGN_WORKERS_BUTTON");
+
+		OSBAdmin.pause(timeInSeconds = "5");
+
+		while (IsElementPresent(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON")) {
+			Click(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON");
+			ClickNoError(locator1 = "OSBAdminProjectAssignWorker#REMOVE_MENU_ITEM");
+
+			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+			OSBAdmin.pause(timeInSeconds = "5");
+
+			Refresh();
+		}
+	}
+
+	macro deleteWorkersViaName {
+		OSBAdminProject.gotoProjectViaName(projectName = "${projectName}");
 
 		Click(locator1 = "OSBAdminProject#ASSIGN_WORKERS_BUTTON");
 
@@ -430,6 +468,14 @@ definition {
 		var key_code = "${projectCode}";
 
 		Click(locator1 = "OSBAdmin#SEARCH_RESULT_CODE");
+	}
+
+	macro gotoProjectViaName {
+		OSBAdminSearch.searchBasicProjectViaName(projectName = "${projectName}");
+
+		var key_name = "${projectName}";
+
+		Click(locator1 = "OSBAdmin#SEARCH_RESULT_NAME");
 	}
 
 	@prose = "I mark a user the email address ${emailAddress} as a closed watcher on the project with the code ${projectCode}"
@@ -544,6 +590,34 @@ definition {
 				OSBAdminSearch.searchBasicProject(projectCode = "${projectCode}");
 
 				Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON");
+				ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				Message.success();
+			}
+		}
+	}
+
+	@prose = "I tear down the projects with the following project names ${table}"
+	macro tearDownProjectsViaName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var projectName = "${row[0]}";
+
+			var key_name = "${projectName}";
+
+			OSBAdminSearch.searchBasicProjectViaName(projectName = "${projectName}");
+
+			if (IsElementPresent.isElementPresentAfterWait(locator1 = "OSBAdmin#SEARCH_RESULT_NAME")) {
+				OSBAdminProject.deleteCustomersViaName(projectName = "${projectName}");
+
+				OSBAdminProject.deleteWorkersViaName(projectName = "${projectName}");
+
+				OSBAdminSearch.searchBasicProjectViaName(projectName = "${projectName}");
+
+				Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON_VIA_NAME");
 				ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
 
 				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
