@@ -117,6 +117,43 @@ definition {
 		OSBAdmin.pause(timeInSeconds = "10");
 	}
 
+	@prose = "I edit a project with the name ${project} to have a support lifetime of ${supportLifetime} starting ${numDays} days ago for the product ${product}"
+	macro editSupportLifetimeToPastStartDateViaProjectNameOnly {
+		OSBAdminSales.gotoOrderDetailsViaProjectName(
+			project = "${project}",
+			projectName = "${project}");
+
+		var day = DateUtil.getDate("-${numDays}");
+		var month = DateUtil.getMonth("-${numDays}");
+		var year = DateUtil.getYear("-${numDays}");
+
+		var startDate = "${month}/${day}/${year}";
+
+		Type(
+			locator1 = "OSBAdminSalesOrderDetail#START_DATE_FIELD",
+			value1 = "${startDate}");
+
+		KeyPress(
+			locator1 = "OSBAdminSalesOrderDetail#START_DATE_FIELD",
+			value1 = "\TAB");
+
+		Click(locator1 = "OSBAdminSalesOrderDetail#START_DATE_FIELD");
+
+		Click(locator1 = "OSBAdminSalesOrderDetail#RENEWED_COUNT");
+
+		var key_product = "${product}";
+
+		Select(
+			locator1 = "OSBAdminSalesOrderDetail#RESULT_ROW_SUPPORT_LIFETIME_SELECT",
+			value1 = "${supportLifetime}");
+
+		Button.save();
+
+		Message.success();
+
+		OSBAdmin.pause(timeInSeconds = "10");
+	}
+
 	@prose = "I edit a project with the name ${project} and code ${projectCode} to have support tickets for the product ${product}"
 	macro editSupportTicketsFlagged {
 		OSBAdminSales.gotoOrderDetails(
@@ -153,6 +190,14 @@ definition {
 
 	macro gotoOrderDetails {
 		OSBAdminSearch.searchAdvancedOrders(projectCode = "${projectCode}");
+
+		var key_project = "${project}";
+
+		Click(locator1 = "OSBAdminSalesOrders#SEARCH_RESULT_PROJECT");
+	}
+
+	macro gotoOrderDetailsViaProjectName {
+		OSBAdminSearch.searchAdvancedOrdersViaProjectName(projectName = "${projectName}");
 
 		var key_project = "${project}";
 

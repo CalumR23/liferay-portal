@@ -230,4 +230,30 @@ definition {
 			fail("The trial appears to not be in the Trial organization");
 		}
 	}
+
+	@prose = "the user with the email address ${userEmailAddress} should not be part of the web Trial organization"
+	macro viewNoUserWebTrialOrganization {
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/organization/get-user-organizations
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			''';
+
+		var trialOrganizationNameValues = JSONCurlUtil.post("${curl}", "$[]");
+
+		if (!(contains("${trialOrganizationNameValues}", ",Trial"))) {
+			fail("The trial user appears to be in the Trial organization");
+		}
+	}
 }
