@@ -24,6 +24,82 @@ Teardown:
 	* I tear down the Patcher fix containing the content "${staticFixContent3}" and type "Patch"
 	* I tear down the Patcher fix containing the content "${staticFixContent4}" and type "Patch"
 
+Scenario: Create a 72 build
+	@ test.group = "0"
+	As a TSE, I should be able to create a 7.1 build containing private child builds
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.2                                          |
+	| Project Version | fix-pack-base-7210	                             |
+	| Content         | ${staticFixContent}                              |
+	| Branch Name     | LPP-34242                                        |
+	| Github URL      | git@github.com:JavierMoral/liferay-portal-ee.git |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+	| Content         | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Product         | DXP 7.2             |        
+	| Project Version | fix-pack-base-7210  |
+	| Patcher Status  | Adding              |
+	| Type            | Patch               |
+	When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+	| Content         | ${staticFixContent}         |
+	| Version         | 1.0                         |
+	| Product         | DXP 7.2                     |
+	| Project Version | fix-pack-base-7210          |
+	| Git Hash        | bcb7100e49                  |
+	| Patcher Status  | Complete                    |
+	| Type            | Patch                       |
+	| Jenkins         | fixpack-builder-agent(uat)  |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.2               |
+	| Project Version | fix-pack-base-7210    |
+	| Tickets List    | ${staticFixContent}   |
+	| Account Code    | STVINTRA              |
+	| Support Ticket  | ${staticTicketNumber} |
+	And I set the account code "STVINTRA" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-base-7210      |
+	| Content         | 0 Fix Packs + 1 Tickets |
+	| Patcher Status  | Merging                 |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+	| Version         | 1.0                 |
+	| Name            | ${staticFixContent} |
+	| Project Version | fix-pack-base-7210  |
+	| Patcher Status  | Merging Only        |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+	| Name            | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Git Hash        | bcb7100e49          |
+	| Status          | Complete            |
+	| Type            | Patch               |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for compile completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-base-7210             |
+	| Content         | 0 Fix Packs + 1 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+	| Version         | 1.0                            |
+	| Name            | ${staticFixContent}            |
+	| Project Version | fix-pack-base-7210             |
+	| Patcher Status  | Complete Merging Only          |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+
 Scenario: Create and release a 71 build with public child build
 	@ test.group = "0"
 	As a TSE, I should be able to create and release a 7.1 build that contains a public child build
