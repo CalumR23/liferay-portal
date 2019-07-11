@@ -304,6 +304,57 @@ Scenario: Notify requester of comment update
 	| Body       | {{ticket.id}}) has been updated                       |
 	| Body       | {{ticket.latest_public_comment_formatted}}            |
 
+Scenario: Notify requester of comment update on organization with no language
+	Requesters on an organization with no language should receive email updates when a comment has been added to their ticket.
+
+	Given I create an organization with the following values
+	| Status           | Approved            |
+	| Name             | Organization Name 1 |
+	| Tags             | liferay_dxp         |
+	| Shared Tickets   | true                |
+	| Shared Comments  | true                |
+	| SLA              | Gold                |
+	| Tier             | Regular             |
+	| Support Region   | US                  |
+	| External ID      | Organization1       |
+	And I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@zendesk.com.broken |
+	| Phone Number     | 555-555-5555                     |
+	| Organization     | Organization Name 1              |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       |
+	| External ID      | User1                            |
+	And I create a user with the following values
+	| Name             | Zendesk Agent1                    |
+	| Password         | zendeskqauser                     |
+	| Role             | Agent                             |
+	| Email            | zendesk.agent1@liferay.com.broken |
+	| Phone Number     | 555-555-5555                      |
+	| Language         | English                           |
+	| Time Zone        | Pacific Time (US & Canada)        |
+	| External ID      | Agent1                            |
+	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CSE - US - General"
+	When I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_2                              |
+	| Component                | apio_architect                                   |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | Organization1                                    |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken"
+	And I create a comment with the content "Comment Body" on a request with the ID "${staticRequestIdList}" as a user with the email address "zendesk.agent1@liferay.com.broken"
+	Then an email regarding the comment with the body "Comment Body" added to a ticket with the ticketId "${staticRequestIdList}" for the support language "English" containing the following parameters should be sent out to the ticket requester
+	| Recipients | Zendesk User1                                         |
+	| Subject    | Re: [Liferay Support] {{ticket.id}}: {{ticket.title}} |
+	| Body       | Your ticket                                           |
+	| Body       | {{ticket.id}}) has been updated                       |
+	| Body       | {{ticket.latest_public_comment_formatted}}            |
+
 Scenario: Notify assignee of comment update
 	Assignees should receive email updates when a comment has been added to their ticket.
 
