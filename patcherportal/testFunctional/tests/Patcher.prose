@@ -8,6 +8,9 @@ Teardown:
 	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
 	* I tear down the Patcher build for the ticket "${staticTicketNumber}" on the account "${staticAccountCode}"
 	* I tear down the Patcher build for the ticket "${staticRequestIdList}" on the account "${staticAccountCode}"
+	* I tear down the Patcher fix containing the content "${staticFixContent1}, ${staticFixContent3}" and type "Generated"
+	* I tear down the Patcher fix containing the content "${staticFixContent1}, ${staticFixContent3}" and type "Generated Private Public"
+	* I tear down the Patcher fix containing the content "${staticFixContent1}, ${staticFixContent3}" and type "Patch"
 	* I tear down the Patcher fix containing the content "${staticFixContent}" and type "Rebase"
 	* I tear down the Patcher fix containing the content "${staticFixContent1}" and type "Rebase"
 	* I tear down the Patcher fix containing the content "${staticFixContent2}" and type "Rebase"
@@ -1103,3 +1106,146 @@ Scenario: Create a sync connector 414 MP build
 	| Patcher Status  | Complete Merging Only          |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
 	| Jenkins         | fixpack-builder-agent(uat)     |
+
+Scenario: Resolve a build conflict
+	@ test.group = "6"
+	As a TSE, I should be able to resolve a build conflict
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
+	And I generate random fix content for the third fix
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0                                          |
+	| Project Version | fix-pack-de-73-7010                              |
+	| Content         | ${staticFixContent1}                             |
+	| Branch Name     | LPP-33650-0708-1                                 |
+	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0                                          |
+	| Project Version | fix-pack-de-73-7010                              |
+	| Content         | ${staticFixContent2}                             |
+	| Branch Name     | LPP-33650-0708-2                                 |
+	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0                                          |
+	| Project Version | fix-pack-de-73-7010                              |
+	| Content         | ${staticFixContent3}                             |
+	| Branch Name     | LPP-33650-0708-3                                 |
+	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+	| Content         | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.0              |
+	| Project Version | fix-pack-de-73-7010  |
+	| Patcher Status  | Adding               |
+	| Type            | Patch                |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.0              |
+	| Project Version | fix-pack-de-73-7010  |
+	| Patcher Status  | Adding               |
+	| Type            | Patch                |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent3}" and type "Patch" with the following values
+	| Content         | ${staticFixContent3} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.0              |
+	| Project Version | fix-pack-de-73-7010  |
+	| Patcher Status  | Adding               |
+	| Type            | Patch                |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Patch" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent3}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+	| Content         | ${staticFixContent1}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.0                    |
+	| Project Version | fix-pack-de-73-7010        |
+	| Git Hash        | 6713a5f64f                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Patch                      |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.0                    |
+	| Project Version | fix-pack-de-73-7010        |
+	| Git Hash        | 6713a5f64f                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Patch                      |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent3}" and type "Patch" with the following values
+	| Content         | ${staticFixContent3}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.0                    |
+	| Project Version | fix-pack-de-73-7010        |
+	| Git Hash        | ed67e97e0a                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Patch                      |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.0                                   |
+	| Project Version | fix-pack-de-73-7010	                      |
+	| Tickets List    | ${staticFixContent1},${staticFixContent3} |
+	| Account Code    | EXCELLUS                                  |
+	| Support Ticket  | ${staticTicketNumber}                     |
+	And I set the account code "EXCELLUS" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-de-73-7010     |
+	| Content         | 0 Fix Packs + 2 Tickets |
+	| Patcher Status  | Merging                 |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" for merge completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-de-73-7010            |
+	| Content         | 0 Fix Packs + 2 Tickets        |
+	| Patcher Status  | Conflict                       |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}, ${staticFixContent3}" for the child build with the name "${staticFixContent1}, ${staticFixContent3}" for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Name     | ${staticFixContent1}, ${staticFixContent3} |
+	| Version  | 1.0                                        |
+	| Status   | Conflict                                   |
+	| Type     | Generated                                  |
+	When I edit a Patcher child build fix with the name "${staticFixContent1}, ${staticFixContent3}" for the child build with the name "${staticFixContent1}, ${staticFixContent3}" for the ticket "${staticTicketNumber}" on the account "EXCELLUS" to have the following values
+	| Branch Name | LPP-33650-0708-2                                 |
+	| Github URL  | git@github.com:kenduenwald/liferay-portal-ee.git |
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-de-73-7010     |
+	| Content         | 0 Fix Packs + 2 Tickets |
+	| Patcher Status  | Merging                 |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" for compile completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-de-73-7010            |
+	| Content         | 0 Fix Packs + 2 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent3}" for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Version         | 1.0                                        |
+	| Name            | ${staticFixContent1}, ${staticFixContent3} |
+	| Project Version | fix-pack-de-73-7010	                       |
+	| Patcher Status  | Complete Merging Only                      |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat)             |
+	| Jenkins         | fixpack-builder-agent(uat)                 |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}, ${staticFixContent3}" for the child build with the name "${staticFixContent1}, ${staticFixContent3}" for the ticket "${staticTicketNumber}" on the account "EXCELLUS" with the following values
+	| Name     | ${staticFixContent1}, ${staticFixContent3} |
+	| Version  | 1.0                                        |
+	| Git Hash | 6713a5f64f                                 |
+	| Status   | Complete                                   |
+	| Type     | Patch                                      |
