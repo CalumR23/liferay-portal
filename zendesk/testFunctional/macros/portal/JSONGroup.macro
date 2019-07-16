@@ -1,10 +1,31 @@
 definition {
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
 	var supportWebId = PropsUtil.get("support.liferay.web.id");
 	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
 	var webAdminPassword = PropsUtil.get("web.admin.password");
 	var webWebId = PropsUtil.get("web.liferay.web.id");
 	var webURL = PropsUtil.get("web.liferay.url");
+
+	macro getSupportGroupId {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var groupKey = StringUtil.replace("${groupName}", " ", "%20");
+
+		var curl = '''
+			${supportURL}/api/jsonws/group/get-group
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d groupKey=${groupKey}
+			''';
+
+		var groupId = JSONCurlUtil.post("${curl}", "$.groupId");
+
+		echo("Group ID: ${groupId}");
+
+		return "${groupId}";
+	}
 
 	macro getWebGroupId {
 		var companyId = JSONCompany.getWebCompanyId();

@@ -85,6 +85,33 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I assign the support user with the email address ${userEmailAddress} to the support group ${groupName}"
+	macro assignUserToSupportGroup {
+		var groupId = JSONGroup.getSupportGroupId(groupName = "${groupName}");
+
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-group-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d groupId=${groupId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I assign the web user with the email address ${userEmailAddress} to the web group ${groupName}"
 	macro assignUserToWebGroup {
 		var groupId = JSONGroup.getWebGroupId(groupName = "${groupName}");
