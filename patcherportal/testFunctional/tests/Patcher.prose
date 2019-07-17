@@ -1249,3 +1249,129 @@ Scenario: Resolve a build conflict
 	| Git Hash | 6713a5f64f                                 |
 	| Status   | Complete                                   |
 	| Type     | Patch                                      |
+
+Scenario: Resolve a rebase conflict
+	@ test.group = "0"
+	As a TSE, I should be able to resolve a rebase conflict
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1                                            |
+	| Project Version | fix-pack-dxp-9-7110                                |
+	| Content         | ${staticFixContent1}                               |
+	| Branch Name     | LPS-92793                                          |
+	| Github URL      | git@github.com:NorbertKocsis/liferay-portal-ee.git |
+	| Workaround      | true                                               |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1                                           |
+	| Project Version | fix-pack-dxp-11-7110	                          |
+	| Content         | ${staticFixContent2}                              |
+	| Branch Name     | LPP-33829                                         |
+	| Github URL      | git@github.com:ryannealeigh/liferay-portal-ee.git |
+	| Workaround      | true                                              |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.1              |
+	| Project Version | fix-pack-dxp-9-7110  |
+	| Patcher Status  | Adding               |
+	| Type            | Workaround           |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.1              |
+	| Project Version | fix-pack-dxp-11-7110 |
+	| Patcher Status  | Adding               |
+	| Type            | Workaround           |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Workaround" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent2}" and type "Workaround" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.1                    |
+	| Project Version | fix-pack-dxp-9-7110        |
+	| Git Hash        | d38c60582d                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Workaround                 |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent2}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.1                    |
+	| Project Version | fix-pack-dxp-11-7110       |
+	| Git Hash        | 680931df58                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Workaround                 |
+	| Jenkins         | fixpack-builder-agent(uat) |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.1               |
+	| Project Version | fix-pack-dxp-11-7110  |
+	| Tickets List    | ${staticFixContent1}  |
+	| Account Code    | AGORAMSA              |
+	| Support Ticket  | ${staticTicketNumber} |
+	And I set the account code "AGORAMSA" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-dxp-11-7110    |
+	| Content         | 0 Fix Packs + 1 Tickets |
+	| Patcher Status  | Rebasing                |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" for rebase completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-dxp-11-7110           |
+	| Content         | 0 Fix Packs + 1 Tickets        |
+	| Patcher Status  | Rebase Conflict                |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Version         | 1.0                          |
+	| Name            | ${staticFixContent1}         |
+	| Project Version | fix-pack-dxp-11-7110         |
+	| Patcher Status  | Rebase Conflict Merging Only |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Name     | ${staticFixContent1} |
+	| Version  | 1.0                  |
+	| Status   | Rebase Conflict      |
+	| Type     | Rebase               |
+	When I update a Patcher fix containing the content "${staticFixContent1}" and type "Rebase" with the following values
+	| Branch Name | LPP-33829                                         |
+	| Github URL  | git@github.com:ryannealeigh/liferay-portal-ee.git |
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Type            | Official                |
+	| Support Ticket  | ${staticTicketNumber}   |
+	| Version         | 1.0                     |
+	| Project Version | fix-pack-dxp-11-7110    |
+	| Content         | 0 Fix Packs + 1 Tickets |
+	| Patcher Status  | Rebasing                |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" for rebase completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" for compile completion
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-dxp-11-7110           |
+	| Content         | 0 Fix Packs + 1 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Version         | 1.0                            |
+	| Name            | ${staticFixContent1}           |
+	| Project Version | fix-pack-dxp-11-7110	       |
+	| Patcher Status  | Complete Merging Only          |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "AGORAMSA" with the following values
+	| Name     | ${staticFixContent1} |
+	| Version  | 1.0                  |
+	| Git Hash | 680931df58           |
+	| Status   | Complete             |
+	| Type     | Rebase               |

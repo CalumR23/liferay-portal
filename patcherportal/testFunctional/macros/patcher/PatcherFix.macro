@@ -244,6 +244,81 @@ definition {
 		}
 	}
 
+	@prose = "I update a Patcher fix containing the content ${fixContent} and type ${fixType} with the following values ${table}"
+	macro update {
+		Patcher.gotoFixes();
+
+		PatcherSearch.searchAdvanced(
+			fixContentKeyword = "${fixContent}",
+			typeKeyword = "${fixType}");
+
+		var key_fixContent = "${fixContent}";
+
+		while (IsElementNotPresent(locator1 = "Patcher#FIX_ID")) {
+			Refresh();
+
+			PatcherSearch.searchAdvanced(
+				fixContentKeyword = "${fixContent}",
+				typeKeyword = "${fixType}");
+		}
+
+		PatcherFix.clickActions(fixContent = "${fixContent}");
+
+		AssertClick(
+			locator1 = "Patcher#MENULIST_EDIT",
+			value1 = "Edit");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Product") {
+				Select(
+					locator1 = "PatcherFixUpdate#PRODUCT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Version") {
+				Select(
+					locator1 = "PatcherFixUpdate#PROJECT_VERSION_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				Type(
+					locator1 = "PatcherFixUpdate#CONTENT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Branch Name") {
+				Type(
+					locator1 = "PatcherFixUpdate#BRANCH_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Github URL") {
+				Type(
+					locator1 = "PatcherFixUpdate#GITHUB_URL_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Workaround") {
+				if ("${value}" == "true") {
+					Check(locator1 = "PatcherFixUpdate#WORKAROUND_CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "PatcherFixUpdate#WORKAROUND_CHECKBOX");
+				}
+			}
+			else {
+				fail("No such Patcher fix field ${field}");
+			}
+		}
+
+		AssertClick(
+			locator1 = "PatcherFixUpdate#UPDATE_BUTTON",
+			value1 = "Update");
+
+		Message.success();
+	}
+
 	@prose = "I should be able to view a Patcher fix containing the content ${fixContent} and type ${fixType} with the following values ${table}"
 	macro view {
 		Patcher.gotoFixes();
