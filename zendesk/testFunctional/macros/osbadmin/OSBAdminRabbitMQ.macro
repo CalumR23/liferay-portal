@@ -1,0 +1,196 @@
+definition {
+	var supportURL = PropsUtil.get("support.liferay.url");
+
+	macro createDXPProjectMessage {
+		var dossieraAccountKey = StringUtil.randomString("18");
+		var dossieraAddressKey1 = MathUtil.randomNumber("30000000");
+		var dossieraAddressKey2 = MathUtil.randomNumber("30000000");
+		var dossieraContactKey = MathUtil.randomNumber("30000000");
+		var dossieraProjectKey = MathUtil.randomNumber("30000000");
+		var salesforceOpportunityKey = StringUtil.randomString("18");
+		var salesforceOpportunityLineItemKey1 = StringUtil.randomString("18");
+		var salesforceOpportunityLineItemKey2 = StringUtil.randomString("18");
+		var salesforceOwnerUserKey = StringUtil.randomString("18");
+		var salesforceProjectKey = StringUtil.randomString("18");
+
+		var startDay = DateUtil.getDate("0");
+		var startMonth = DateUtil.getMonth("0");
+		var startYear = DateUtil.getYear("0");
+
+		var endDay = DateUtil.getDate("335");
+		var endMonth = DateUtil.getMonth("335");
+		var endYear = DateUtil.getYear("335");
+
+		var message = '''
+		{
+			"_account": {
+				"_dossieraAccountKey": "${dossieraAccountKey}",
+				"_industry": "${industry}",
+				"_name": "${accountName}"
+			},
+			"_billingAddress": {
+				"_city": "Diamond Bar",
+				"_country": "United States",
+				"_dossieraAddressKey": "${dossieraAddressKey1}",
+				"_postalCode": "91765",
+				"_region": "California",
+				"_street": "456 Fake Street",
+				"_type": "Shipping"
+			},
+			"_bundledProducts": [
+				{
+					"_currencyIsoCode": "USD",
+					"_endDay": ${endDay},
+					"_endMonth": ${endMonth},
+					"_endYear": ${endYear},
+					"_name": "Liferay DXP Subscription - Platinum Prod Sizing 1",
+					"_purchasedProducts": [
+						{
+							"_dossieraPurchasedProductKey": "25115912",
+							"_endDay": ${endDay},
+							"_endMonth": ${endMonth},
+							"_endYear": ${endYear},
+							"_environment": "Production",
+							"_name": "Liferay Digital Enterprise - Prod Sizing 1",
+							"_productType": "New",
+							"_quantity": 1,
+							"_sizing": "Sizing 1",
+							"_startDay": ${startDay},
+							"_startMonth": ${startMonth},
+							"_startYear": ${startYear}
+						},
+						{
+							"_dossieraPurchasedProductKey": "25116158",
+							"_endDay": ${endDay},
+							"_endMonth": ${endMonth},
+							"_endYear": ${endYear},
+							"_name": "Platinum Support",
+							"_productType": "New",
+							"_startDay": ${startDay},
+							"_startMonth": ${startMonth},
+							"_startYear": ${startYear}
+						}
+					],
+					"_quantity": 1,
+					"_salesforceOpportunityLineItemKey": "${salesforceOpportunityLineItemKey1}",
+					"_startDay": ${startDay},
+					"_startMonth": ${startMonth},
+					"_startYear": ${startYear},
+					"_totalPrice": 33000.0
+				}
+			],
+			"_contacts": [
+				{
+					"_dossieraContactKey": "${dossieraContactKey}",
+					"_emailAddress": "amos.fong@liferay.com.broken",
+					"_firstName": "Amos",
+					"_lastName": "Fong",
+					"_role": "Support Contact Manager"
+				}
+			],
+			"_owner": {
+				"_emailAddress": "amos.fong@liferay.com.broken",
+				"_firstName": "Amos",
+				"_lastName": "Fong"
+			},
+			"_partnerFirstLineSupport": ${partnerFirstLineSupport},
+			"_project": {
+				"_dossieraAccountKey": "${dossieraAccountKey}",
+				"_dossieraProjectKey": "${dossieraProjectKey}",
+				"_liferayVersion": "DXP ${versionNumber}",
+				"_name": "${projectName}"
+			},
+			"_renewal": false,
+			"_salesforceAccountKey": "${dossieraAccountKey}",
+			"_salesforceOpportunityKey": "${salesforceOpportunityKey}",
+			"_salesforceOpportunityProductFamily": "S",
+			"_salesforceOpportunitySoldBy": "Liferay US",
+			"_salesforceOpportunityStageName": "Closed Won",
+			"_salesforceOpportunityTerritory": "United States",
+			"_salesforceOpportunityType": "New Business",
+			"_salesforceOwnerUserKey": "${salesforceOwnerUserKey}",
+			"_salesforceProjectKey": "${salesforceProjectKey}",
+			"_shippingAddress": {
+				"_city": "Diamond Bar",
+				"_country": "United States",
+				"_dossieraAddressKey": "${dossieraAddressKey2}",
+				"_postalCode": "91765",
+				"_region": "California",
+				"_street": "456 Fake Street",
+				"_type": "Billing"
+			}
+		}
+		''';
+
+		return "${message}";
+	}
+
+	@prose = "I go to the RabbitMQ section of OSB Admin"
+	macro gotoRabbitMQ {
+		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=1_WAR_osbportlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_1_WAR_osbportlet_mvcPath=%2Fadmin%2Fview.jsp&_1_WAR_osbportlet_tabs1=tools&_1_WAR_osbportlet_tabs3=rabbitmq");
+	}
+
+	@prose = "I publish a RabbitMQ message with routing key ${routingKey} that creates a DXP project with the following values ${table}"
+	macro publishCreateDXPProjectMessage {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Industry") {
+				var industry = "${value}";
+			}
+			else if ("${field}" == "Account Name") {
+				var accountName = "${value}";
+			}
+			else if ("${field}" == "Project Name") {
+				var projectName = "${value}";
+			}
+			else if ("${field}" == "Partner First Line Support") {
+				var partnerFirstLineSupport = "${value}";
+			}
+			else if ("${field}" == "Version Number") {
+				var versionNumber = "${value}";
+			}
+			else {
+				fail("No such project field ${field}");
+			}
+		}
+
+		if (!(isSet(industry))) {
+			var industry = "";
+		}
+		if (!(isSet(accountName))) {
+			var accountName = "";
+		}
+		if (!(isSet(projectName))) {
+			var projectName = "";
+		}
+		if (!(isSet(partnerFirstLineSupport))) {
+			var partnerFirstLineSupport = "false";
+		}
+		if (!(isSet(versionNumber))) {
+			var versionNumber = "";
+		}
+
+		var message = OSBAdminRabbitMQ.createDXPProjectMessage(
+			industry = "${industry}",
+			accountName = "${accountName}",
+			projectName = "${projectName}",
+			partnerFirstLineSupport = "${partnerFirstLineSupport}",
+			versionNumber = "${versionNumber}");
+
+		Type(
+			locator1 = "OSBAdminRabbitMQ#ROUTING_KEY_FIELD",
+			value1 = "${routingKey}");
+
+		Type(
+			locator1 = "OSBAdminRabbitMQ#MESSAGE_FIELD",
+			value1 = "${message}");
+
+		Click(locator1 = "OSBAdminRabbitMQ#SUBMIT_BUTTON");
+
+		Message.success();
+	}
+}
