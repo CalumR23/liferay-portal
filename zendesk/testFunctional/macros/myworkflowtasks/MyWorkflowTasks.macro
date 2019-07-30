@@ -3,10 +3,6 @@ definition {
 
 	@prose = "I assign the Workflow asset titled ${assetTitle} to myself"
 	macro assignWorkflowAssetToMe {
-		MyWorkflowTasks.gotoOtherAssignees();
-
-		MyWorkflowTasks.gotoWorkflowAsset(assetTitle = "${assetTitle}");
-
 		Click(locator1 = "MyWorkflowTasksAsset#DROPDOWN_TOGGLE");
 
 		Click(locator1 = "MyWorkflowTasksAsset#ASSIGN_TO_ME_LINK");
@@ -26,10 +22,6 @@ definition {
 
 	@prose = "I approve the Workflow asset titled ${assetTitle}"
 	macro approveWorkflowAsset {
-		MyWorkflowTasks.gotoOtherAssignees();
-
-		MyWorkflowTasks.gotoWorkflowAsset(assetTitle = "${assetTitle}");
-
 		Click(locator1 = "MyWorkflowTasksAsset#DROPDOWN_TOGGLE");
 
 		Click(locator1 = "MyWorkflowTasksAsset#APPROVE_LINK");
@@ -53,15 +45,64 @@ definition {
 		Click(locator1 = "MyWorkflowTasks#OTHER_ASSIGNEES_TAB");
 	}
 
-	@prose = "I go to the Workflow Asset titled ${assetTitle}"
+	@prose = "I search for and go to the Workflow Asset titled ${assetTitle} using the following parameters ${table}"
 	macro gotoWorkflowAsset {
-		Type(
-			locator1 = "MyWorkflowTasks#SEARCH_FIELD",
-			value1 = "&quot;${assetTitle}&quot;");
+		if (IsElementNotPresent(locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_TOGGLE_EXPANDED")) {
+			Click(locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_TOGGLE");
+		}
 
-		KeyPress(
-			locator1 = "MyWorkflowTasks#SEARCH_FIELD",
-			value1 = "\RETURN");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Match") {
+				Select(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_MATCH_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Code") {
+				Type(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_PROJECT_CODE_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Project Name") {
+				Type(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_PROJECT_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assignee Type") {
+				Select(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_ASSIGNEE_TYPE_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role Name") {
+				Type(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_ROLE_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "User Email Address") {
+				Type(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_USER_EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Completed") {
+				Select(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_COMPLETED_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Opportunity Type") {
+				Select(
+					locator1 = "MyWorkflowTasks#ADVANCED_SEARCH_OPPORTUNITY_TYPE_SELECT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such workflow search field ${field}");
+			}
+		}
+
+		Click(locator1 = "MyWorkflowTasks#SEARCH_BUTTON");
 
 		var key_assetTitle = "${assetTitle}";
 
