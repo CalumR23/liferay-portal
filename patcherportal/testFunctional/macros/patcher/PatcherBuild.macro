@@ -54,7 +54,65 @@ definition {
 		}
 
 		if ("${buildPatcherStatus}" == "Compiling") {
-			fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt, the Patcher build is still in Compiling status.");
+			echo("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the first compile, the Patcher build is still in Compiling status. Since this may be due to a fluke, the test will re-attempt the compile.");
+
+			PatcherBuild.clickActions(
+				accountCode = "${accountCode}",
+				supportTicket = "${supportTicket}");
+
+			AssertClick(
+				locator1 = "Patcher#MENULIST_BUILD",
+				value1 = "Build");
+
+			Message.success();
+
+			PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+			PatcherSearch.searchAdvanced(
+				accountCodeKeyword = "${accountCode}",
+				supportTicketKeyword = "${supportTicket}");
+
+			var key_supportTicket = "${supportTicket}";
+
+			while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+				Refresh();
+
+				PatcherSearch.searchAdvanced(
+					accountCodeKeyword = "${accountCode}",
+					supportTicketKeyword = "${supportTicket}");
+			}
+
+			var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+			var currentIteration = "0";
+
+			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+				PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+				PatcherSearch.searchAdvanced(
+					accountCodeKeyword = "${accountCode}",
+					supportTicketKeyword = "${supportTicket}");
+
+				var key_supportTicket = "${supportTicket}";
+
+				while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+					Refresh();
+
+					PatcherSearch.searchAdvanced(
+						accountCodeKeyword = "${accountCode}",
+						supportTicketKeyword = "${supportTicket}");
+				}
+
+				var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+			}
+
+			if ("${buildPatcherStatus}" == "Compiling") {
+				fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the second compile, the Patcher build is still in Compiling status.");
+			}
 		}
 	}
 
