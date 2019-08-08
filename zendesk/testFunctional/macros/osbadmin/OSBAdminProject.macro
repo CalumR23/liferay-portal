@@ -828,7 +828,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Dossiera Account Key") {
+			if ("${field}" == "Status") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "OSBAdminProjectAdd#STATUS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Dossiera Account Key") {
 				AssertValue(
 					locator1 = "OSBAdminProjectAdd#DOSSIERA_ACCOUNT_KEY_FIELD",
 					value1 = "${value}");
@@ -859,9 +864,14 @@ definition {
 					value1 = "${value}");
 			}
 			else if ("${field}" == "Partner Code") {
-				AssertTextEquals(
-					locator1 = "OSBAdminProjectAdd#PARTNER",
-					value1 = "${value}");
+				if ("${value}" == "") {
+					AssertElementNotPresent(locator1 = "OSBAdminProjectAdd#PARTNER");
+				}
+				else {
+					AssertTextEquals(
+						locator1 = "OSBAdminProjectAdd#PARTNER",
+						value1 = "${value}");
+				}
 			}
 			else if ("${field}" == "Partner First Line Support") {
 				if ("${value}" == "true") {
@@ -938,6 +948,15 @@ definition {
 				fail("No such project field ${field}");
 			}
 		}
+	}
+
+	@prose = "I should not be able to view a project with the name ${projectName}"
+	macro viewNoneViaName {
+		OSBAdminSearch.searchBasicProjectViaName(projectName = "${projectName}");
+
+		var key_name = "${projectName}";
+
+		AssertElementNotPresent(locator1 = "OSBAdmin#SEARCH_RESULT_NAME");
 	}
 
 	@prose = "I should be able to view a project offering for the project ${projectName} with a product name ${productName} and the following values ${table}"
