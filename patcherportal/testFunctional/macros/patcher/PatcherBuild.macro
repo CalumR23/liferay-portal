@@ -29,7 +29,9 @@ definition {
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+		var jenkinsJobStatus = "In Progress";
+
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "In Progress")) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
@@ -51,10 +53,43 @@ definition {
 			}
 
 			var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+			var key_jenkinsValue = "fixpack-builder-hotfix-7x(uat)";
+
+			if (IsElementPresent(locator1 = "Patcher#BUILD_JENKINS_SPECIFIC")) {
+				Click(locator1 = "Patcher#BUILD_JENKINS_SPECIFIC");
+
+				SelectWindow.selectPopUp(locator1 = "null");
+
+				var jenkinsWindowTitle = selenium.getTitle();
+
+				echo("Jenkins Window Title: ${jenkinsWindowTitle}");
+
+				if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
+					var jenkinsJobStatus = "Failed";
+				}
+				else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_SUCCESS")) {
+					var jenkinsJobStatus = "Success";
+				}
+				else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_IN_PROGRESS")) {
+					var jenkinsJobStatus = "In Progress";
+				}
+				else {
+					var jenkinsJobStatus = "Other";
+				}
+
+				Close.closeWindow(locator1 = "${windowTitle}");
+
+				SelectWindow(locator1 = "null");
+
+				echo("Jenkins Job Status: ${jenkinsJobStatus}");
+			}
+
+			echo("Builder Patcher Status: ${buildPatcherStatus}");
 		}
 
-		if ("${buildPatcherStatus}" == "Compiling") {
-			echo("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the first compile, the Patcher build is still in Compiling status. Since this may be due to a fluke, the test will re-attempt the compile.");
+		if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Failed")) {
+			echo("The Patcher build failed to compile after one attempt. Will restart the compile process to assert the failure is not a fluke.");
 
 			PatcherBuild.clickActions(
 				accountCode = "${accountCode}",
@@ -86,6 +121,104 @@ definition {
 
 			var currentIteration = "0";
 
+			var jenkinsJobStatus = "In Progress";
+
+			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "In Progress")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+				PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+				PatcherSearch.searchAdvanced(
+					accountCodeKeyword = "${accountCode}",
+					supportTicketKeyword = "${supportTicket}");
+
+				var key_supportTicket = "${supportTicket}";
+
+				while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+					Refresh();
+
+					PatcherSearch.searchAdvanced(
+						accountCodeKeyword = "${accountCode}",
+						supportTicketKeyword = "${supportTicket}");
+				}
+
+				var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+				var key_jenkinsValue = "fixpack-builder-hotfix-7x(uat)";
+
+				if (IsElementPresent(locator1 = "Patcher#BUILD_JENKINS_SPECIFIC")) {
+					Click(locator1 = "Patcher#BUILD_JENKINS_SPECIFIC");
+
+					SelectWindow.selectPopUp(locator1 = "null");
+
+					var jenkinsWindowTitle = selenium.getTitle();
+
+					echo("Jenkins Window Title: ${jenkinsWindowTitle}");
+
+					if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
+						var jenkinsJobStatus = "Failed";
+					}
+					else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_SUCCESS")) {
+						var jenkinsJobStatus = "Success";
+					}
+					else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_IN_PROGRESS")) {
+						var jenkinsJobStatus = "In Progress";
+					}
+					else {
+						var jenkinsJobStatus = "Other";
+					}
+
+					Close.closeWindow(locator1 = "${windowTitle}");
+
+					SelectWindow(locator1 = "null");
+
+					echo("Jenkins Job Status: ${jenkinsJobStatus}");
+				}
+
+				echo("Builder Patcher Status: ${buildPatcherStatus}");
+			}
+
+			if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Failed")) {
+				fail("The Patcher build failed to compile after two attempts. Please investigate.");
+			}
+			else if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Success")) {
+				echo("The Patcher build has completed and is currently sending the status file");
+
+				while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+					var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+					Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+					PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+					PatcherSearch.searchAdvanced(
+						accountCodeKeyword = "${accountCode}",
+						supportTicketKeyword = "${supportTicket}");
+
+					var key_supportTicket = "${supportTicket}";
+
+					while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+						Refresh();
+
+						PatcherSearch.searchAdvanced(
+							accountCodeKeyword = "${accountCode}",
+							supportTicketKeyword = "${supportTicket}");
+					}
+
+					var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+					echo("Builder Patcher Status: ${buildPatcherStatus}");
+				}
+			}
+			else if ("${buildPatcherStatus}" == "Compiling") {
+				fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the second compile attempt, the Patcher build is still in Compiling status. The Jenkins status is ${jenkinsJobStatus}");
+			}
+		}
+		else if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Success")) {
+			echo("The Patcher build has completed and is currently sending the status file");
+
 			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
 				var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
@@ -108,11 +241,12 @@ definition {
 				}
 
 				var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
-			}
 
-			if ("${buildPatcherStatus}" == "Compiling") {
-				fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the second compile, the Patcher build is still in Compiling status.");
+				echo("Builder Patcher Status: ${buildPatcherStatus}");
 			}
+		}
+		else if ("${buildPatcherStatus}" == "Compiling") {
+			fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the first compile attempt, the Patcher build is still in Compiling status. The Jenkins status is ${jenkinsJobStatus}");
 		}
 	}
 
