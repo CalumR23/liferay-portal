@@ -212,12 +212,70 @@ definition {
 					echo("Builder Patcher Status: ${buildPatcherStatus}");
 				}
 			}
+			else if (("${buildPatcherStatus}" == "Complete") && ("${jenkinsJobStatus}" == "In Progress")) {
+				echo("The Patcher Build is returning a complete status but the Jenkins job may still need to finish");
+
+				while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+					var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+					Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+					PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+					PatcherSearch.searchAdvanced(
+						accountCodeKeyword = "${accountCode}",
+						supportTicketKeyword = "${supportTicket}");
+
+					var key_supportTicket = "${supportTicket}";
+
+					while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+						Refresh();
+
+						PatcherSearch.searchAdvanced(
+							accountCodeKeyword = "${accountCode}",
+							supportTicketKeyword = "${supportTicket}");
+					}
+
+					var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+					echo("Builder Patcher Status: ${buildPatcherStatus}");
+				}
+			}
 			else if ("${buildPatcherStatus}" == "Compiling") {
 				fail("After ${currentIteration} attempts while waiting at ${buildCompileCompletionPollIntervalInMinutes} minutes in between each attempt for the second compile attempt, the Patcher build is still in Compiling status. The Jenkins status is ${jenkinsJobStatus}");
 			}
 		}
 		else if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Success")) {
 			echo("The Patcher build has completed and is currently sending the status file");
+
+			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
+
+				PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+				PatcherSearch.searchAdvanced(
+					accountCodeKeyword = "${accountCode}",
+					supportTicketKeyword = "${supportTicket}");
+
+				var key_supportTicket = "${supportTicket}";
+
+				while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+					Refresh();
+
+					PatcherSearch.searchAdvanced(
+						accountCodeKeyword = "${accountCode}",
+						supportTicketKeyword = "${supportTicket}");
+				}
+
+				var buildPatcherStatus = selenium.getText("Patcher#BUILD_PATCHER_STATUS");
+
+				echo("Builder Patcher Status: ${buildPatcherStatus}");
+			}
+		}
+		else if (("${buildPatcherStatus}" == "Complete") && ("${jenkinsJobStatus}" == "In Progress")) {
+			echo("The Patcher Build is returning a complete status but the Jenkins job may still need to finish");
 
 			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling")) {
 				var currentIteration = MathUtil.sum("${currentIteration}", "1");
