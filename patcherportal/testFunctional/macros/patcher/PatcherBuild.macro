@@ -31,7 +31,7 @@ definition {
 
 		var jenkinsJobStatus = "In Progress";
 
-		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "In Progress")) {
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && (("${jenkinsJobStatus}" == "In Progress") || ("${jenkinsJobStatus}" == "Jenkins page not loaded"))) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
@@ -65,7 +65,10 @@ definition {
 
 				echo("Jenkins Window Title: ${jenkinsWindowTitle}");
 
-				if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
+				if ("${jenkinsWindowTitle}" == "Problem loading page") {
+					var jenkinsJobStatus = "Jenkins page not loaded";
+				}
+				else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
 					var jenkinsJobStatus = "Failed";
 				}
 				else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_SUCCESS")) {
@@ -78,7 +81,7 @@ definition {
 					var jenkinsJobStatus = "Other";
 				}
 
-				Close.closeWindow(locator1 = "${windowTitle}");
+				Close.closeWindow(locator1 = "${jenkinsWindowTitle}");
 
 				SelectWindow(locator1 = "null");
 
@@ -88,7 +91,7 @@ definition {
 			echo("Builder Patcher Status: ${buildPatcherStatus}");
 		}
 
-		if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Failed")) {
+		if (("${buildPatcherStatus}" == "Compiling") && (("${jenkinsJobStatus}" == "Failed") || ("${jenkinsJobStatus}" == "Jenkins page not loaded"))) {
 			echo("The Patcher build failed to compile after one attempt. Will restart the compile process to assert the failure is not a fluke.");
 
 			PatcherBuild.clickActions(
@@ -123,7 +126,7 @@ definition {
 
 			var jenkinsJobStatus = "In Progress";
 
-			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "In Progress")) {
+			while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Compiling") && (("${jenkinsJobStatus}" == "In Progress") || ("${jenkinsJobStatus}" == "Jenkins page not loaded"))) {
 				var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 				Patcher.pauseInMinutes(timeInMinutes = "${buildCompileCompletionPollIntervalInMinutes}");
@@ -157,7 +160,10 @@ definition {
 
 					echo("Jenkins Window Title: ${jenkinsWindowTitle}");
 
-					if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
+					if ("${jenkinsWindowTitle}" == "Problem loading page") {
+						var jenkinsJobStatus = "Jenkins page not loaded";
+					}
+					else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
 						var jenkinsJobStatus = "Failed";
 					}
 					else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_SUCCESS")) {
@@ -170,7 +176,7 @@ definition {
 						var jenkinsJobStatus = "Other";
 					}
 
-					Close.closeWindow(locator1 = "${windowTitle}");
+					Close.closeWindow(locator1 = "${jenkinsWindowTitle}");
 
 					SelectWindow(locator1 = "null");
 
@@ -180,7 +186,7 @@ definition {
 				echo("Builder Patcher Status: ${buildPatcherStatus}");
 			}
 
-			if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Failed")) {
+			if (("${buildPatcherStatus}" == "Compiling") && (("${jenkinsJobStatus}" == "Failed") || ("${jenkinsJobStatus}" == "Jenkins page not loaded"))) {
 				fail("The Patcher build failed to compile after two attempts. Please investigate.");
 			}
 			else if (("${buildPatcherStatus}" == "Compiling") && ("${jenkinsJobStatus}" == "Success")) {
