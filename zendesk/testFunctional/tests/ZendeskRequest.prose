@@ -7,7 +7,7 @@ Feature: Frontend Requests, Request Forms, and Request Comments
 Setup:
 	* I create an organization with the following values
 	| Status           | Approved                   |
-	| Name             | Organization Name 1        |
+	| Name             | Frontend Org Name 1        |
 	| Tags             | liferay_dxp,liferay_portal |
 	| Shared Tickets   | true                       |
 	| Shared Comments  | true                       |
@@ -15,10 +15,10 @@ Setup:
 	| Tier             | Regular                    |
 	| Support Region   | US                         |
 	| Support Language | English                    | 
-	| External ID      | Organization1              |
+	| External ID      | FrontendOrg1               |
 	* I create an organization with the following values
 	| Status           | Approved                   |
-	| Name             | Organization Name 2        |
+	| Name             | Frontend Org Name 2        |
 	| Tags             | liferay_dxp,liferay_portal |
 	| Shared Tickets   | true                       |
 	| Shared Comments  | true                       |
@@ -26,10 +26,10 @@ Setup:
 	| Tier             | Regular                    |
 	| Support Region   | Japan                      |
 	| Support Language | Japanese                   | 
-	| External ID      | Organization2              |
+	| External ID      | FrontendOrg2               |
 	* I create an organization with the following values
 	| Status           | Approved                   |
-	| Name             | Organization Name 3        |
+	| Name             | Frontend Org Name 3        |
 	| Tags             | liferay_dxp,liferay_portal |
 	| Shared Tickets   | true                       |
 	| Shared Comments  | true                       |
@@ -37,36 +37,36 @@ Setup:
 	| Tier             | Regular                    |
 	| Support Region   | Spain                      |
 	| Support Language | Spanish                    | 
-	| External ID      | Organization3              | 
+	| External ID      | FrontendOrg3               | 
 
 Teardown:
 	* I wait for "10" seconds
 	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
 	* I teardown users with the following userExternalIds from zendesk.liferay.com
-	| User1  |
-	| User2  |
-	| Agent1 |
+	| Enduser1  |
+	| Enduser2  |
+	| Endagent1 |
 	* I teardown organizations with the following organizationExternalIds from zendesk.liferay.com
-	| Organization1 |
-	| Organization2 |
-	| Organization3 |
+	| FrontendOrg1 |
+	| FrontendOrg2 |
+	| FrontendOrg3 |
 
 Scenario: Request Creation
 	End users should be able to create and view a request using the Zendesk frontend.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            | 
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            | 
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I create a request with the following values
 	| Product       | Liferay DXP                             | 7.2                                   |
 	| Component     | Activation Key & Project Administration |                                       |
@@ -77,7 +77,7 @@ Scenario: Request Creation
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                   |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -85,7 +85,7 @@ Scenario: Request Creation
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 	And I should be able to view a request comment containing the text "Request Description" with the following details
-	| Author      | Zendesk User1       |
+	| Author      | Zendesk Enduser1    |
 	| Comment     | Request Description |
 	| Attachments | Document_1.txt      |
 
@@ -93,29 +93,29 @@ Scenario: Request Creation as User with Multiple Roles in Multiple Organizations
 	End users should be able to create and view a request using the Zendesk frontend on only the organizations they are not a watcher of.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" to an organization with organizationExternalId "Organization2"
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" to an organization with organizationExternalId "Organization3"
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "Organization1"
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "Organization2"	
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" to an organization with organizationExternalId "FrontendOrg2"
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" to an organization with organizationExternalId "FrontendOrg3"
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "FrontendOrg1"
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "FrontendOrg2"	
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Organization" dropdown
 	Then I should see the following options
-	| Organization Name 3 |
+	| Frontend Org Name 3 |
 	And the following options should not be present
-	| Organization Name 1 |
-	| Organization Name 2 |
+	| Frontend Org Name 1 |
+	| Frontend Org Name 2 |
 	When I go to the zendesk homepage
 	And I create a request with the following values
 	| Product       | Liferay DXP                             | 7.2                                   |
@@ -127,16 +127,16 @@ Scenario: Request Creation as User with Multiple Roles in Multiple Organizations
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                   |
 	| Priority      | Normal                                             |
-	| Organization  | Organization Name 3                                |
+	| Organization  | Frontend Org Name 3                                |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
 	| Component     | Activation Key & Project Administration            |
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 	And I should be able to view a request comment containing the text "Request Description" with the following details
-	| Author      | Zendesk User1       |
+	| Author      | Zendesk Enduser1    |
 	| Comment     | Request Description |
 	| Attachments | Document_1.txt      |
 
@@ -144,25 +144,25 @@ Scenario: Request Comment
 	End users should be able to create and view a comment on a request using the Zendesk frontend.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |  
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |  
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	Then I should see a request with the subject "Request Subject" in the index with the following details
 	| Subject       | Request Subject |
@@ -172,13 +172,13 @@ Scenario: Request Comment
 	| Comment     | Request Comment |
 	| Attachments | Document_1.txt  |
 	Then I should be able to view a request comment containing the text "Request Comment" with the following details
-	| Author      | Zendesk User1   |
-	| Comment     | Request Comment |
-	| Attachments | Document_1.txt  |
+	| Author      | Zendesk Enduser1 |
+	| Comment     | Request Comment  |
+	| Attachments | Document_1.txt   |
 	And I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                   |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -190,25 +190,25 @@ Scenario: Request Comment Positioning
 	Request comments should be ordered from most recent to least.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |  
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |  
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	Then I should see a request with the subject "Request Subject" in the index with the following details
 	| Subject       | Request Subject |
@@ -224,21 +224,21 @@ Scenario: Request Comment Positioning
 	| Comment     | Request Comment 3 |
 	| Attachments | Document_3.txt    |
 	Then I should be able to view a request comment in position number "1" with the following details
-	| Author      | Zendesk User1     |
+	| Author      | Zendesk Enduser1  |
 	| Comment     | Request Comment 3 |
 	| Attachments | Document_3.txt    |
 	And I should be able to view a request comment in position number "2" with the following details
-	| Author      | Zendesk User1     |
+	| Author      | Zendesk Enduser1  |
 	| Comment     | Request Comment 2 |
 	| Attachments | Document_2.txt    |
 	And I should be able to view a request comment in position number "3" with the following details
-	| Author      | Zendesk User1     |
+	| Author      | Zendesk Enduser1  |
 	| Comment     | Request Comment 1 |
 	| Attachments | Document_1.txt    |
 	And I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                   |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -250,43 +250,43 @@ Scenario: Request Assignee
 	End users should be able to view a ticket's assignee on a request using the Zendesk frontend.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk Agent1                    |
-	| Password         | zendeskqauser                     |
-	| Role             | Agent                             |
-	| Email            | zendesk.agent1@liferay.com.broken |
-	| Phone Number     | +1 (555) 555-5555                 |
-	| Language         | English                           |
-	| Time Zone        | Pacific Time (US & Canada)        |
-	| External ID      | Agent1                            |
-	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Endagent1                    |
+	| Password         | zendeskqauser                        |
+	| Role             | Agent                                |
+	| Email            | zendesk.endagent1@liferay.com.broken |
+	| Phone Number     | +1 (555) 555-5555                    |
+	| Language         | English                              |
+	| Time Zone        | Pacific Time (US & Canada)           |
+	| External ID      | Endagent1                            |
+	And I assign the user with the email address "zendesk.endagent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken" 
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.endagent1@liferay.com.broken" 
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I click on the request with the subject "Request Subject" in the index
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
-	| Assigned to   | Zendesk Agent1                                     |
+	| Requester     | Zendesk Enduser1                                   |
+	| Assigned to   | Zendesk Endagent1                                  |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -297,44 +297,44 @@ Scenario: Mark Request as Solved
 	Requesters should be able to mark a request as solved.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    | 
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk Agent1                    |
-	| Password         | zendeskqauser                     |
-	| Role             | Agent                             |
-	| Email            | zendesk.agent1@liferay.com.broken |
-	| Phone Number     | +1 (555) 555-5555                 |
-	| Language         | English                           |
-	| Time Zone        | Pacific Time (US & Canada)        |
-	| External ID      | Agent1                            |
-	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Endagent1                    |
+	| Password         | zendeskqauser                        |
+	| Role             | Agent                                |
+	| Email            | zendesk.endagent1@liferay.com.broken |
+	| Phone Number     | +1 (555) 555-5555                    |
+	| Language         | English                              |
+	| Time Zone        | Pacific Time (US & Canada)           |
+	| External ID      | Endagent1                            |
+	And I assign the user with the email address "zendesk.endagent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken" 
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.endagent1@liferay.com.broken" 
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I click on the request with the subject "Request Subject" in the index
 	And I mark the request as solved
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | SOLVED                                             |
-	| Requester     | Zendesk User1                                      |
-	| Assigned to   | Zendesk Agent1                                     |
+	| Requester     | Zendesk Enduser1                                   |
+	| Assigned to   | Zendesk Endagent1                                  |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -345,36 +345,36 @@ Scenario: Mark Request as Solved with Comment
 	Requesters should be able to mark a request as solved with a comment.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          |
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk Agent1                    |
-	| Password         | zendeskqauser                     |
-	| Role             | Agent                             |
-	| Email            | zendesk.agent1@liferay.com.broken |
-	| Phone Number     | +1 (555) 555-5555                 |
-	| Language         | English                           |
-	| Time Zone        | Pacific Time (US & Canada)        |
-	| External ID      | Agent1                            |
-	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Endagent1                    |
+	| Password         | zendeskqauser                        |
+	| Role             | Agent                                |
+	| Email            | zendesk.endagent1@liferay.com.broken |
+	| Phone Number     | +1 (555) 555-5555                    |
+	| Language         | English                              |
+	| Time Zone        | Pacific Time (US & Canada)           |
+	| External ID      | Endagent1                            |
+	And I assign the user with the email address "zendesk.endagent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken" 
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.endagent1@liferay.com.broken" 
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I click on the request with the subject "Request Subject" in the index
 	And I mark the request as solved with a comment containing the following details
@@ -383,8 +383,8 @@ Scenario: Mark Request as Solved with Comment
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | SOLVED                                             |
-	| Requester     | Zendesk User1                                      |
-	| Assigned to   | Zendesk Agent1                                     |
+	| Requester     | Zendesk Enduser1                                   |
+	| Assigned to   | Zendesk Endagent1                                  |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -392,54 +392,54 @@ Scenario: Mark Request as Solved with Comment
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 	And I should be able to view a request comment containing the text "Request Comment" with the following details
-	| Author      | Zendesk User1   |
-	| Comment     | Request Comment |
-	| Attachments | Document_1.txt  |
+	| Author      | Zendesk Enduser1 |
+	| Comment     | Request Comment  |
+	| Attachments | Document_1.txt   |
 
 Scenario: View Closed Request
 	Closed requests should only contain certain options.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          |
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk Agent1                    |
-	| Password         | zendeskqauser                     |
-	| Role             | Agent                             |
-	| Email            | zendesk.agent1@liferay.com.broken |
-	| Phone Number     | +1 (555) 555-5555                 |
-	| Language         | English                           |
-	| Time Zone        | Pacific Time (US & Canada)        |
-	| External ID      | Agent1                            |
-	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Endagent1                    |
+	| Password         | zendeskqauser                        |
+	| Role             | Agent                                |
+	| Email            | zendesk.endagent1@liferay.com.broken |
+	| Phone Number     | +1 (555) 555-5555                    |
+	| Language         | English                              |
+	| Time Zone        | Pacific Time (US & Canada)           |
+	| External ID      | Endagent1                            |
+	And I assign the user with the email address "zendesk.endagent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.endagent1@liferay.com.broken"
 	And I change the status and sub-status of the ticket with the ID "${staticRequestIdList}" to "solved" and "completed" respectively
 	And I assign a ticket with the ID "${staticRequestIdList}" with the following tags
 	| auto_closed |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I click on the request with the subject "Request Subject" in the index
 	Then I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | SOLVED                                             |
-	| Requester     | Zendesk User1                                      |
-	| Assigned to   | Zendesk Agent1                                     |
+	| Requester     | Zendesk Enduser1                                   |
+	| Assigned to   | Zendesk Endagent1                                  |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | Completed                                          |
@@ -453,46 +453,46 @@ Scenario: Create Follow Up
 	End users should be able to create a follow up on a closed ticket.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk Agent1                    |
-	| Password         | zendeskqauser                     |
-	| Role             | Agent                             |
-	| Email            | zendesk.agent1@liferay.com.broken |
-	| Phone Number     | +1 (555) 555-5555                 |
-	| Language         | English                           |
-	| Time Zone        | Pacific Time (US & Canada)        |
-	| External ID      | Agent1                            |
-	And I assign the user with the email address "zendesk.agent1@liferay.com.broken" to the group "CAS - US"
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Endagent1                    |
+	| Password         | zendeskqauser                        |
+	| Role             | Agent                                |
+	| Email            | zendesk.endagent1@liferay.com.broken |
+	| Phone Number     | +1 (555) 555-5555                    |
+	| Language         | English                              |
+	| Time Zone        | Pacific Time (US & Canada)           |
+	| External ID      | Endagent1                            |
+	And I assign the user with the email address "zendesk.endagent1@liferay.com.broken" to the group "CAS - US"
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.agent1@liferay.com.broken"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "zendesk.endagent1@liferay.com.broken"
 	And I change the status and sub-status of the ticket with the ID "${staticRequestIdList}" to "solved" and "completed" respectively
 	And I assign a ticket with the ID "${staticRequestIdList}" with the following tags
 	| auto_closed |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I click on the request with the subject "Request Subject" in the index
 	And I create a follow-up request
 	Then I should be able to view a request with the following details
 	| Subject       | Re: Request Subject                                |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                   |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | Completed                                          |
@@ -501,7 +501,7 @@ Scenario: Create Follow Up
 	And I should see the request comment field
 	And I should not see the closed comment message
 	And I should be able to view a request comment containing the text "This is a follow-up to your previous request" with the following details
-	| Author          | Zendesk User1                                |
+	| Author          | Zendesk Enduser1                             |
 	| Partial Comment | This is a follow-up to your previous request |
 	| Partial Comment | "Request Subject"                            |
 
@@ -509,38 +509,38 @@ Scenario: Watcher Permissions
 	End users who are watchers in an organization should not be able to create a request for their organization or add comments on any request for their organization.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk User2                    |
-	| Tags             | osb_kb                           |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user2@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User2                            |
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| Name             | Zendesk Enduser2                    |
+	| Tags             | osb_kb                              |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser2@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser2                            |
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                              |
 	| Component                | activation_key_project_administration            |
 	| System Status            | production_functioning_with_limited_capabilities |
 	| Subject                  | Request Subject                                  |
 	| Description              | Request Description                              |
-	| Organization External ID | Organization1                                    |
-	And I assign a user with the email address "zendesk.user2@zendesk.com.broken" as a watcher on an organization with organizationExternalId "Organization1"
-	When I log into zendesk as "zendesk.user2@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                     |
+	And I assign a user with the email address "zendesk.enduser2@zendesk.com.broken" as a watcher on an organization with organizationExternalId "FrontendOrg1"
+	When I log into zendesk as "zendesk.enduser2@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	Then the request form should not be available
 	When I go to My activities
@@ -555,37 +555,37 @@ Scenario: Developer Permissions
 	End users who are developers in an organization should be able to add comments to any request for their organization.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk User2                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user2@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User2                            |
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
-	| Product                  | prd_liferay_dxp_7_2                               |
-	| Component                | activation_key_project_administration             |
-	| System Status            | production_functioning_with_limited_capabilities  |
-	| Subject                  | Request Subject                                   |
-	| Description              | Request Description                               |
-	| Organization External ID | Organization1                                     |
-	When I log into zendesk as "zendesk.user2@zendesk.com.broken" with password "zendeskqauser"
+	| Name             | Zendesk Enduser2                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser2@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser2                            |
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
+	| Product                  | prd_liferay_dxp_7_2                              |
+	| Component                | activation_key_project_administration            |
+	| System Status            | production_functioning_with_limited_capabilities |
+	| Subject                  | Request Subject                                  |
+	| Description              | Request Description                              |
+	| Organization External ID | FrontendOrg1                                     |
+	When I log into zendesk as "zendesk.enduser2@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I go to the Organization requests tab
 	Then I should see a request with the subject "Request Subject" in the index with the following details
@@ -596,13 +596,13 @@ Scenario: Developer Permissions
 	| Comment     | Request Comment |
 	| Attachments | Document_1.txt  |
 	Then I should be able to view a request comment containing the text "Request Comment" with the following details
-	| Author      | Zendesk User2   |
-	| Comment     | Request Comment |
-	| Attachments | Document_1.txt  |
+	| Author      | Zendesk Enduser2 |
+	| Comment     | Request Comment  |
+	| Attachments | Document_1.txt   |
 	And I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                      |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -614,37 +614,37 @@ Scenario: Partner Permissions
 	End users who are partners in an organization should be able to add comments to any request for their organization.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
+	| Name             | Zendesk Enduser1                    |
 	| Tags             | osb_customer,osb_kb              |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
+	| Organization     | Frontend Org Name 1              |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk User2                    |
+	| Name             | Zendesk Enduser2                    |
 	| Tags             | osb_partner,osb_kb               |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user2@zendesk.com.broken |
+	| Email            | zendesk.enduser2@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
+	| Organization     | Frontend Org Name 1              |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User2                            |
-	And I create a request as a user with the email address "zendesk.user1@zendesk.com.broken" with the following values
+	| External ID      | Enduser2                            |
+	And I create a request as a user with the email address "zendesk.enduser1@zendesk.com.broken" with the following values
 	| Product                  | prd_liferay_dxp_7_2                               |
 	| Component                | activation_key_project_administration             |
 	| System Status            | production_functioning_with_limited_capabilities  |
 	| Subject                  | Request Subject                                   |
 	| Description              | Request Description                               |
-	| Organization External ID | Organization1                                     |
-	When I log into zendesk as "zendesk.user2@zendesk.com.broken" with password "zendeskqauser"
+	| Organization External ID | FrontendOrg1                                      |
+	When I log into zendesk as "zendesk.enduser2@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I go to the Organization requests tab
 	Then I should see a request with the subject "Request Subject" in the index with the following details
@@ -655,13 +655,13 @@ Scenario: Partner Permissions
 	| Comment     | Request Comment |
 	| Attachments | Document_1.txt  |
 	Then I should be able to view a request comment containing the text "Request Comment" with the following details
-	| Author      | Zendesk User2   |
+	| Author      | Zendesk Enduser2   |
 	| Comment     | Request Comment |
 	| Attachments | Document_1.txt  |
 	And I should be able to view a request with the following details
 	| Subject       | Request Subject                                    |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                      |
 	| Priority      | Normal                                             |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
@@ -673,37 +673,37 @@ Scenario: Organizational Permissions
 	End users who are developers in an organization but watchers in another should be only be able to submit a request and add comments on a request for the organization that they are a developer on.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
+	| Name             | Zendesk Enduser1                    |
 	| Tags             | osb_customer,osb_kb              |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
+	| Organization     | Frontend Org Name 1              |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
+	| External ID      | Enduser1                            |
 	And I create a user with the following values
-	| Name             | Zendesk User2                    |
+	| Name             | Zendesk Enduser2                    |
 	| Tags             | osb_customer,osb_kb              |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user2@zendesk.com.broken |
+	| Email            | zendesk.enduser2@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 2              |
+	| Organization     | Frontend Org Name 2              |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User2                            |
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" to an organization with organizationExternalId "Organization2"
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "Organization2"	
-	And I assign a user with the email address "zendesk.user2@zendesk.com.broken" to an organization with organizationExternalId "Organization1"
-	And I assign a user with the email address "zendesk.user2@zendesk.com.broken" as a watcher on an organization with organizationExternalId "Organization1"
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| External ID      | Enduser2                            |
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" to an organization with organizationExternalId "FrontendOrg2"
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" as a watcher on an organization with organizationExternalId "FrontendOrg2"	
+	And I assign a user with the email address "zendesk.enduser2@zendesk.com.broken" to an organization with organizationExternalId "FrontendOrg1"
+	And I assign a user with the email address "zendesk.enduser2@zendesk.com.broken" as a watcher on an organization with organizationExternalId "FrontendOrg1"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Organization" dropdown
-	Then I should not see the "Organization Name 2" option
+	Then I should not see the "Frontend Org Name 2" option
 	When I go to the zendesk homepage
 	And I create a request with the following values
 	| Product       | Liferay DXP                             | 7.2                                   |
@@ -715,22 +715,22 @@ Scenario: Organizational Permissions
 	Then I should be able to view a request with the following details
 	| Subject       | Request1 Subject                                   |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User1                                      |
+	| Requester     | Zendesk Enduser1                                      |
 	| Priority      | Normal                                             |
-	| Organization  | Organization Name 1                                |
+	| Organization  | Frontend Org Name 1                                |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
 	| Component     | Activation Key & Project Administration            |
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_1.txt                                     |
 	And I should be able to view a request comment containing the text "Request1 Description" with the following details
-	| Author      | Zendesk User1                           |
+	| Author      | Zendesk Enduser1                           |
 	| Comment     | Request1 Description                    |
 	| Attachments | Document_1.txt                          |
-	When I log out and log into zendesk as "zendesk.user2@zendesk.com.broken" with password "zendeskqauser"
+	When I log out and log into zendesk as "zendesk.enduser2@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Organization" dropdown
-	Then I should not see the "Organization Name 1" option
+	Then I should not see the "Frontend Org Name 1" option
 	When I go to the zendesk homepage
 	And I create a request with the following values
 	| Product       | Liferay DXP                             | 7.2                                   |
@@ -742,31 +742,31 @@ Scenario: Organizational Permissions
 	Then I should be able to view a request with the following details
 	| Subject       | Request2 Subject                                   |
 	| Status        | OPEN                                               |
-	| Requester     | Zendesk User2                                      |
+	| Requester     | Zendesk Enduser2                                      |
 	| Priority      | Normal                                             |
-	| Organization  | Organization Name 2                                |
+	| Organization  | Frontend Org Name 2                                |
 	| Product       | Liferay DXP > 7.2                                  |
 	| Sub-Status    | —                                                  |
 	| Component     | Activation Key & Project Administration            |
 	| System Status | Production > Functioning with limited capabilities |
 	| Attachments   | Document_2.txt                                     |
 	And I should be able to view a request comment containing the text "Request2 Description" with the following details
-	| Author      | Zendesk User2                           |
+	| Author      | Zendesk Enduser2                           |
 	| Comment     | Request2 Description                    |
 	| Attachments | Document_2.txt                          |
-	When I log out and log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log out and log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I go to the Organization requests tab
-	And I select the organization "Organization Name 2" from the search dropdown
+	And I select the organization "Frontend Org Name 2" from the search dropdown
 	Then I should see a request with the subject "Request2 Subject" in the index with the following details
 	| Subject       | Request2 Subject |
 	| Status        | OPEN             |
 	When I click on the request with the subject "Request2 Subject" in the index
 	Then I should not see the request comment field
-	When I log out and log into zendesk as "zendesk.user2@zendesk.com.broken" with password "zendeskqauser"
+	When I log out and log into zendesk as "zendesk.enduser2@zendesk.com.broken" with password "zendeskqauser"
 	And I go to My activities
 	And I go to the Organization requests tab
-	And I select the organization "Organization Name 1" from the search dropdown
+	And I select the organization "Frontend Org Name 1" from the search dropdown
 	Then I should see a request with the subject "Request1 Subject" in the index with the following details
 	| Subject       | Request1 Subject |
 	| Status        | OPEN             |
@@ -777,17 +777,17 @@ Scenario: Non Organization Permissions
 	End users who do not belong to an organization should not be able to create a request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
+	| Name             | Zendesk Enduser1                    |
 	| Tags             | osb_customer,osb_kb              |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| External ID      | Enduser1                            |
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	Then the request form should not be available
 
@@ -795,20 +795,20 @@ Scenario: Ticket Form Validation for Developer Tools
 	End users should be able to see all available ticket fields when filing a Developer Tools request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
+	| Name             | Zendesk Enduser1                    |
 	| Tags             | osb_customer,osb_kb              |
 	| Password         | zendeskqauser                    |
 	| Role             | End-user                         |
 	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
 	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
+	| Organization     | Frontend Org Name 1              |
 	| Language         | English                          |
 	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| developer_tools |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Developer Tools"
@@ -840,20 +840,20 @@ Scenario: Ticket Form Validation for Liferay Analytics Cloud
 	End users should be able to see all available ticket fields when filing a Liferay Analytics Cloud request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| liferay_analytics_cloud |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Liferay Analytics Cloud"
@@ -866,20 +866,20 @@ Scenario: Ticket Form Validation for Liferay Commerce
 	End users should be able to see all available ticket fields when filing a Liferay Commerce request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| liferay_commerce |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Liferay Commerce"
@@ -961,18 +961,18 @@ Scenario: Ticket Form Validation for Liferay DXP
 	End users should be able to see all available ticket fields when filing a Liferay DXP request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Liferay DXP"
@@ -1152,20 +1152,20 @@ Scenario: Ticket Form Validation for Liferay DXP Cloud
 	End users should be able to see all available ticket fields when filing a Liferay DXP cloud request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| liferay_dxp_cloud |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Liferay DXP Cloud"
@@ -1197,18 +1197,18 @@ Scenario: Ticket Form Validation for Liferay Portal
 	End users should be able to see all available ticket fields when filing a Liferay Portal request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Liferay Portal"
@@ -1410,20 +1410,20 @@ Scenario: Ticket Form Validation for Management Tools
 	End users should be able to see all available ticket fields when filing a Management Tools request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| management_tools_lcs |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Management Tools (LCS)"
@@ -1455,20 +1455,20 @@ Scenario: Ticket Form Validation for Mobile Experience
 	End users should be able to see all available ticket fields when filing a Mobile Experience request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| mobile_experience |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Mobile Experience"
@@ -1500,20 +1500,20 @@ Scenario: Ticket Form Validation for Productivity Tools
 	End users should be able to see all available ticket fields when filing a Productivity Tools (Sync) request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| productivity_tools_sync |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Productivity Tools (Sync)"
@@ -1545,31 +1545,31 @@ Scenario: Ticket Form Validation for Multiple Organizations
 	End users should be able to see all available products in the Product dropdown field for a given organization when submitting a request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign a user with the email address "zendesk.user1@zendesk.com.broken" to an organization with organizationExternalId "Organization2"
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign a user with the email address "zendesk.enduser1@zendesk.com.broken" to an organization with organizationExternalId "FrontendOrg2"
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| developer_tools         |
 	| mobile_experience       |
 	| productivity_tools_sync |
 	| liferay_dxp_cloud       |
-	And I assign an organization with organizationExternalId "Organization2" with the following tags
+	And I assign an organization with organizationExternalId "FrontendOrg2" with the following tags
 	| management_tools_lcs    |
 	| liferay_analytics_cloud |
 	| liferay_commerce        |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Organization" dropdown
-	And I click the option "Organization Name 1"
+	And I click the option "Frontend Org Name 1"
 	And I click on the "Product" dropdown
 	Then I should see the following options
 	| Developer Tools           |
@@ -1579,19 +1579,19 @@ Scenario: Ticket Form Validation for Multiple Organizations
 	| Mobile Experience         |
 	| Productivity Tools (Sync) |
 	And the following options should not be visible
-	| Liferay Analytics Cloud   |
-	| Liferay Commerce          |
-	| Management Tools (LCS)    |
+	| Liferay Analytics Cloud |
+	| Liferay Commerce        |
+	| Management Tools (LCS)  |
 	When I click the option "-"
 	And I click on the "Organization" dropdown
-	And I click the option "Organization Name 2"
+	And I click the option "Frontend Org Name 2"
 	And I click on the "Product" dropdown
 	Then I should see the following options
-	| Liferay Analytics Cloud   |
-	| Liferay Commerce          |
-	| Liferay DXP               |
-	| Liferay Portal            |
-	| Management Tools (LCS)    |
+	| Liferay Analytics Cloud |
+	| Liferay Commerce        |
+	| Liferay DXP             |
+	| Liferay Portal          |
+	| Management Tools (LCS)  |
 	And the following options should not be visible
 	| Developer Tools           |
 	| Liferay DXP Cloud         |
@@ -1602,21 +1602,21 @@ Scenario: Ticket Form Validation for Enterprise Search
 	End users should be able to see all available ticket fields when filing an Enterprise Search request.
 
 	Given I create a user with the following values
-	| Name             | Zendesk User1                    |
-	| Tags             | osb_customer,osb_kb              |
-	| Password         | zendeskqauser                    |
-	| Role             | End-user                         |
-	| Access           | Organization                     |
-	| Email            | zendesk.user1@zendesk.com.broken |
-	| Phone Number     | +1 (555) 555-5555                |
-	| Organization     | Organization Name 1              |
-	| Language         | English                          |
-	| Time Zone        | Pacific Time (US & Canada)       | 
-	| External ID      | User1                            |
-	And I assign an organization with organizationExternalId "Organization1" with the following tags
+	| Name             | Zendesk Enduser1                    |
+	| Tags             | osb_customer,osb_kb                 |
+	| Password         | zendeskqauser                       |
+	| Role             | End-user                            |
+	| Access           | Organization                        |
+	| Email            | zendesk.enduser1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                   |
+	| Organization     | Frontend Org Name 1                 |
+	| Language         | English                             |
+	| Time Zone        | Pacific Time (US & Canada)          | 
+	| External ID      | Enduser1                            |
+	And I assign an organization with organizationExternalId "FrontendOrg1" with the following tags
 	| enterprise_search_premium  |
 	| enterprise_search_standard |
-	When I log into zendesk as "zendesk.user1@zendesk.com.broken" with password "zendeskqauser"
+	When I log into zendesk as "zendesk.enduser1@zendesk.com.broken" with password "zendeskqauser"
 	And I go to the Submit a ticket form
 	And I click on the "Product" dropdown
 	And I click the option "Enterprise Search Standard"
