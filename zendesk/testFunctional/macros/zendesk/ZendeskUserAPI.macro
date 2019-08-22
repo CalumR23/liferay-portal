@@ -975,6 +975,17 @@ definition {
 		return "${users}";
 	} 
 
+	macro _viewUserSearchResultsByExternalId {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var users = JSONCurlUtil.get("${curl}", "$.users");
+
+		return "${users}";
+	} 
+
 	@prose = "the user with the email address ${userEmailAddress} should be present on zendesk.liferay.com"
 	macro _viewUserSyncFromOsb {
 		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -1006,6 +1017,42 @@ definition {
 
 		if (!("${userEmailAddressFromAPI}" == "${userEmailAddress}")) {
 			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
+		}
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} should be present via the external id search api on zendesk.liferay.com"
+	macro _viewUserSyncFromOsbViaSearchByExternalIdApi {
+		var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var users = ZendeskUserAPI._viewUserSearchResultsByExternalId(userExternalId = "${userExternalId}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByExternalId(userExternalId = "${userExternalId}");
+		}
+
+		if (!("${users}" == "[]")) {
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var userExternalIdFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].external_id");
+		}
+		else {
+			fail("After ${currentIteration} attempts while waiting at ${pollIntervalInSeconds} in between each attempt, the OSB to Zendesk sync for the user with the external ID ${userExternalId} appears to have been unsuccessful");
+		}
+
+		echo("Expected User External ID: ${userExternalId}");
+		echo("Actual User External ID: ${userExternalIdFromAPI}");
+
+		if (!("${userExternalIdFromAPI}" == "${userExternalId}")) {
+			fail("Actual value ${userExternalIdFromAPI} does not match expected value ${userExternalId}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}
 
