@@ -37,6 +37,7 @@ Scenario: View DXP Trial Project and User
 	When I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
 	And I go to the OSB admin main page
 	Then I should be able to view a project with the name "Trial - ${staticCompanyName}" and following values
+	| Status       | Approved                     |
 	| Name         | Trial - ${staticCompanyName} |
 	| Code         | TRIALCOMPANY                 |
 	| Type         | Trial                        |
@@ -51,6 +52,93 @@ Scenario: View DXP Trial Project and User
 	| SLA              | Limited                        |
 	| Start Date       | Today                          |
 	| Support End Date | 1 month from now               |
+	| Version          | 7                              |
+	| Instance Size    | Sizing 1                       |
+	| Licenses         | 1 / 10000                      |
+	| Tickets          | 0                              |
+	When I go the support email message in MockMock where the sender is "Liferay" the recipient is "DXP Trialuser" with the email address "${staticEmailAddress}" and the message content contains the text "Trial Activation Key"
+	Then I should be able to view the email message containing the following text 
+	| Activate Your Trial Now                                                                                           |
+	| Thanks for your interest in Liferay                                                                               |
+	| We are excited to help you get started                                                                            |
+	| in order to start your Liferay Digital Experience Platform                                                        |
+	| be sure you're running a Liferay instance on your machine                                                         |
+	| If you haven't already                                                                                            |
+	| 30-day-trial                                                                                                      |
+	| download a bundle now                                                                                             |
+	| Once you've initialized your Liferay instance                                                                     |
+	| you'll need your activation key                                                                                   |
+	| The trial activation is limited to 5 concurrent sessions and is intended for use on a local developer workstation |
+	| To install                                                                                                        |
+	| place the attached activation XML file in the Liferay deploy directory and allow the server to auto-deploy it     |
+	| how-to-deploy-a-dxp-activation-key                                                                                |
+	| Watch a video tutorial now                                                                                        |
+	| Enjoy the trial                                                                                                   |
+	| and reach out to                                                                                                  |
+	| if you have any questions                                                                                         |
+	| Sincerely                                                                                                         |
+	| The Liferay Team                                                                                                  |
+
+Scenario: Renew DXP Trial Project
+	Expired trial projects should be renewable by the trial user.
+
+	Given I go to the DXP Trial Sign In page
+	And I generate a web user email address
+	And I generate a web company name
+	And I create a DXP trial account with a randomly generated email address and company name with the following additional values
+	| Email        | ${staticEmailAddress} |
+	| Password     | testtest              |
+	| First Name   | DXP                   |
+	| Last Name    | Trialuser             |
+	| Phone Number | 555-555-5555          |
+	| Company      | ${staticCompanyName}  |
+	| Industry     | Automotive            |
+	| Country      | United States         |
+	| Region       | California            |
+	Then I should be able to the view the DXP Trial Homepage
+	And the user with the email address "${staticEmailAddress}" should be part of the web Trial organization
+	And the user with the email address "${staticEmailAddress}" should be part of the web corporate trial organization for the company "${staticCompanyName}"
+	When I wait for "60" seconds
+	And I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	And I go to the OSB admin main page
+	And I edit a project with the name "Trial - ${staticCompanyName}" to have a support lifetime of "30 Days" starting "60" days ago for the product "Digital Enterprise Development"
+	And I go to the OSB admin main page
+	Then I should be able to view a project with the name "Trial - ${staticCompanyName}" and following values
+	| Status       | Expired                      |
+	| Name         | Trial - ${staticCompanyName} |
+	| Code         | TRIALCOMPANY                 |
+	| Type         | Trial                        |
+	| Industry     | Automotive                   |
+	| Tier         | Regular                      |
+	| Max Contacts | 1                            |
+	| Country      | United States                |
+	And I should be able to view a project offering for the project "Trial - ${staticCompanyName}" with a product name "Digital Enterprise Development" and the following values
+	| Type             | Trial                          |
+	| Product          | Digital Enterprise Development |
+	| SLA              | Limited                        |
+	| Version          | 7                              |
+	| Instance Size    | Sizing 1                       |
+	| Licenses         | 1 / 10000                      |
+	| Tickets          | 0                              |
+	When I update the support password for user with the email address "${staticEmailAddress}" to "testtest"
+	And I log out and log into the support homepage as "${staticEmailAddress}" with password "testtest"
+	And I delete the support email message in MockMock where the sender is "Liferay" the recipient is "DXP Trialuser" with the email address "${staticEmailAddress}" and the message content contains the text "Trial Activation Key"
+	And I renew the DXP Trial
+	And I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	And I go to the OSB admin main page
+	Then I should be able to view a project with the name "Trial - ${staticCompanyName}" and following values
+	| Name         | Trial - ${staticCompanyName} |
+	| Code         | TRIALCOMPANY                 |
+	| Type         | Trial                        |
+	| Industry     | Automotive                   |
+	| Tier         | Regular                      |
+	| Max Contacts | 1                            |
+	| Country      | United States                |
+	And I should be able to view a project offering for the project "Trial - ${staticCompanyName}" with a product name "Digital Enterprise Development" and the following values
+	| Status           | Active                         |
+	| Type             | Trial                          |
+	| Product          | Digital Enterprise Development |
+	| SLA              | Limited                        |
 	| Version          | 7                              |
 	| Instance Size    | Sizing 1                       |
 	| Licenses         | 1 / 10000                      |
