@@ -1,0 +1,79 @@
+@testray.main.component.name = "Support QA"
+@type = "phone.zendesk.integration"
+
+Feature: OSB to Zendesk User Phone Number Integration
+	Testing user phone number sync updates in Zendesk caused by changes in OSB and web.
+
+Setup:
+	* I wait for "10" seconds
+	* I create a user with the following parameters
+	| Screen Name   | phone.customer1                       |
+	| Email Address | phone.customer1@lrcustomer.com.broken |
+	| First Name    | Phone                                 |
+	| Last Name     | Customer1                             |
+	* I update the web password for user with the email address "phone.customer1@lrcustomer.com.broken" to "testtest"
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I go to the OSB admin main page
+	* I create a project with the following values
+	| Name         | Phone Automotive |
+	| Code         | PHONEAUTO        |
+	| Type         | Group            |
+	| Industry     | Automotive       |
+	| Tier         | Premier          |
+	| Max Contacts | 10               |
+	| Address Line | 123 Main Street  |
+	| Country      | United States    |
+	| State        | California       |
+	| City         | Diamond Bar      |
+	| Zip          | 91765            |
+	| Region       | US               |
+	| Language     | English          |
+	* I assign a user the email address "phone.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "PHONEAUTO"
+	* I add an order with the product "Portal Production" and support level "Gold" to the project code "PHONEAUTO"
+	Then the organization "Phone Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "phone.customer1@lrcustomer.com.broken" should be present via the external id search api on zendesk.liferay.com
+	* I wait for "2" minutes
+
+Teardown:
+	* I wait for "10" seconds
+	* I log into the web homepage as "phone.customer1@lrcustomer.com.broken" with password "testtest"
+	* I update my phone number as "phone.customer1" to the following values
+	| Number | |
+	* I log out of the web homepage
+	* I get the ID of the default user belonging to the organization "Phone Automotive" from zendesk.liferay.com
+	* I tear down the users with the following screen names from web.liferay.com
+	| phone.customer1 |
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes
+	| PHONEAUTO |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| phone.customer1@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Phone Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId3}" from zendesk.liferay.com
+
+Scenario: View user phone number update
+	OSB user phone number updates to details on web should sync properly to Zendesk.
+
+	Given I log into the web homepage as "phone.customer1@lrcustomer.com.broken" with password "testtest"
+	And I update the privacy policy form
+	And I update my phone number as "phone.customer1" to the following values
+	| Number  | +15558402834 |
+	And I log out of the web homepage
+	And I wait for "1" minutes
+	Then the user with the email address "phone.customer1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	When I log into the web homepage as "phone.customer1@lrcustomer.com.broken" with password "testtest"
+	And I update my phone number as "phone.customer1" to the following values
+	| Number | 5559873461 |
+	And I log out of the web homepage
+	And I wait for "1" minutes
+	Then the user with the email address "phone.customer1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	When I log into the web homepage as "phone.customer1@lrcustomer.com.broken" with password "testtest"
+	And I update my phone number as "phone.customer1" to the following values
+	| Number | +15554394671 |
+	And I log out of the web homepage
+	And I wait for "1" minutes
+	Then the user with the email address "phone.customer1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
