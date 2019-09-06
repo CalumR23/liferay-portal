@@ -652,6 +652,40 @@ definition {
 		}
 	}
 
+	@prose = "I get the security hotfix counter value for a build for the ticket ${supportTicket} on the account ${accountCode} that is built on the version ${projectVersion} on the root ${rootProjectVersion}"
+	macro getSecurityHotfixCounterValue {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var hotfixValue = selenium.getText("Patcher#BUILD_HOTFIX");
+
+		var hotfixValue = StringUtil.replace("${hotfixValue}", "liferay-security-${projectVersion}-${supportTicket}-", "");
+
+		var hotfixCounterValue = StringUtil.replace("${hotfixValue}", "-${rootProjectVersion}.zip", "");
+
+		echo("Hotfix Counter Value: ${hotfixCounterValue}");
+
+		static var staticHotfixCounterValue = "${hotfixCounterValue}";
+
+		return "${staticHotfixCounterValue}";
+	}
+
+	@prose = "I increase the security hotfix counter value ${hotfixCounterValue} by one"
+	macro increaseSecurityHotfixCounterValueByOne {
+		var updatedHotfixCounterValue = MathUtil.sum("${hotfixCounterValue}", "1");
+
+		echo("Updated Hotfix Counter Value: ${updatedHotfixCounterValue}");
+
+		static var staticUpdatedHotfixCounterValue = "${updatedHotfixCounterValue}";
+
+		return "${staticUpdatedHotfixCounterValue}";
+	}
+
 	@prose = "I release a Patcher build for the ticket ${supportTicket} on the account ${accountCode}"
 	macro releaseBuild {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -691,6 +725,31 @@ definition {
 
 				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 			}
+		}
+	}
+
+	@prose = "the security hotfix counter value for a build for the ticket ${supportTicket} on the account ${accountCode} that is built on the version ${projectVersion} on the root ${rootProjectVersion} should be ${hotfixCounterValue}"
+	macro verifySecurityHotfixCounterValue {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		PatcherSearch.searchAdvanced(
+			accountCodeKeyword = "${accountCode}",
+			supportTicketKeyword = "${supportTicket}");
+
+		var key_supportTicket = "${supportTicket}";
+
+		var hotfixValue = selenium.getText("Patcher#BUILD_HOTFIX");
+
+		var hotfixValue = StringUtil.replace("${hotfixValue}", "liferay-security-${projectVersion}-${supportTicket}-", "");
+
+		var hotfixCounterValueFromBuild = StringUtil.replace("${hotfixValue}", "-${rootProjectVersion}.zip", "");
+
+		echo("Expected Hotfix Counter Value: ${hotfixCounterValue}");
+
+		echo("Actual Hotfix Counter Value: ${hotfixCounterValueFromBuild}");
+
+		if (!("${hotfixCounterValue}" == "${hotfixCounterValueFromBuild}")) {
+			fail("Actual hotfix counter value ${hotfixCounterValueFromBuild} obtained from the web site and the expected hotfix counter value ${hotfixCounterValue} do not match");
 		}
 	}
 
