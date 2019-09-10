@@ -1,0 +1,791 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I create a contact on koroneiki with the following values ${table}"
+	macro _createContact {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		if (!(isSet(emailAddress))) {
+			var emailAddress = "";
+		}
+		if (!(isSet(firstName))) {
+			var firstName = "";
+		}
+		if (!(isSet(languageId))) {
+			var languageId = "";
+		}
+		if (!(isSet(lastName))) {
+			var lastName = "";
+		}
+		if (!(isSet(middleName))) {
+			var middleName = "";
+		}
+		if (!(isSet(oktaId))) {
+			var oktaId = "";
+		}
+		if (!(isSet(uuid))) {
+			var uuid = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete a contact on koroneiki with the email address ${contactEmailAddress}"
+	macro _deleteContactViaEmailAddress {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I delete a contact on koroneiki with the okta ID ${contactOktaId}"
+	macro _deleteContactViaOktaId {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I delete a contact on koroneiki with the email address ${contactEmailAddress} via uuid"
+	macro _deleteContactViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getContactOktaIdViaContactEmailAddress {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactOktaId = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].oktaId");
+
+		var contactOktaId = StringUtil.replace("${contactOktaId}", "[", "");
+
+		var contactOktaId = StringUtil.replace("${contactOktaId}", "]", "");
+
+		var contactOktaId = StringUtil.replace("${contactOktaId}", "&quot;", "");
+
+		echo("Okta ID value for ${contactEmailAddress}: ${contactOktaId}");
+
+		return "${contactOktaId}";
+	}
+
+	macro _getContactUuidViaContactEmailAddress {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactUuid = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].uuid");
+
+		var contactUuid = StringUtil.replace("${contactUuid}", "[", "");
+
+		var contactUuid = StringUtil.replace("${contactUuid}", "]", "");
+
+		var contactUuid = StringUtil.replace("${contactUuid}", "&quot;", "");
+
+		echo("UUID value for ${contactEmailAddress}: ${contactUuid}");
+
+		return "${contactUuid}";
+	}
+
+	@prose = "I tear down the contacts on koroneiki with the following email addresses ${table}"
+	macro _tearDownContacts {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allContacts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allContacts}", "${contactEmailAddress}")) {
+				KoroneikiContactAPI._deleteContactViaEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+				echo("Email address of contact deleted: ${contactEmailAddress}");
+			}
+		}
+	}
+
+	@prose = "I update a koroneiki contact with the email address ${contactEmailAddress} to have the following values ${table}"
+	macro _updateContactViaEmailAddress {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I update a koroneiki contact with the okta ID ${contactOktaId} to have the following values ${table}"
+	macro _updateContactViaOktaId {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I update a koroneiki contact with the email address ${contactEmailAddress} via uuid to have the following values ${table}"
+	macro _updateContactViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should be able to view a koroneiki contact with the email address ${contactEmailAddress} and the following values ${table}"
+	macro _viewContactViaEmailAddress {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddress");
+			}
+			else if ("${field}" == "First Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.firstName");
+			}
+			else if ("${field}" == "Language") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.languageId");
+			}
+			else if ("${field}" == "Last Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.lastName");
+			}
+			else if ("${field}" == "Middle Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
+			}
+			else if ("${field}" == "Okta ID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
+			}
+			else if ("${field}" == "UUID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki contact with the okta ID ${contactOktaId} and the following values ${table}"
+	macro _viewContactViaOktaId {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddress");
+			}
+			else if ("${field}" == "First Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.firstName");
+			}
+			else if ("${field}" == "Language") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.languageId");
+			}
+			else if ("${field}" == "Last Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.lastName");
+			}
+			else if ("${field}" == "Middle Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
+			}
+			else if ("${field}" == "Okta ID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
+			}
+			else if ("${field}" == "UUID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki contact with the email address ${contactEmailAddress} via uuid and the following values ${table}"
+	macro _viewContactViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddress");
+			}
+			else if ("${field}" == "First Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.firstName");
+			}
+			else if ("${field}" == "Language") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.languageId");
+			}
+			else if ("${field}" == "Last Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.lastName");
+			}
+			else if ("${field}" == "Middle Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
+			}
+			else if ("${field}" == "Okta ID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
+			}
+			else if ("${field}" == "UUID") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki contact with the email address ${contactEmailAddress}"
+	macro _viewNoContact {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContacts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContacts}", "${contactEmailAddress}")) {
+			fail("The contact with the email address ${contactEmailAddress} is still present in Koroneiki");
+		}
+	}
+}
