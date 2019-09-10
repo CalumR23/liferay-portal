@@ -305,83 +305,24 @@ definition {
 
 	@prose = "I tear down the accounts on koroneiki with the following names ${table}"
 	macro _tearDownAccounts {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
+		var RawTable rawTable = new RawTable("${table}");
 
-		var totalCount = JSONCurlUtil.get("${curl}", "$.totalCount");
+		for (var row : table "${rawTable}") {
+			var accountName = "${row[0]}";
 
-		if (!("${totalCount}" == "0")) {
-			var RawTable rawTable = new RawTable("${table}");
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
 
-			for (var row : table "${rawTable}") {
-				var accountName = "${row[0]}";
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
 
-				var accountArrayValue = "0";
+			if (contains("${allAccounts}", "${accountName}")) {
+				KoroneikiAccountAPI._deleteAccount(accountName = "${accountName}");
 
-				var curl = '''
-					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-					--header "API_Token: ${apiToken}"
-					-H "accept: application/json"
-					-H "Content-Type: application/json"
-					''';
-
-				var totalCount = JSONCurlUtil.get("${curl}", "$.totalCount");
-
-				var accountDeleted = "false";
-
-				while ((!("${accountArrayValue}" == "${totalCount}")) && ("${accountDeleted}" == "false")) {
-					var curl = '''
-						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-						--header "API_Token: ${apiToken}"
-						-H "accept: application/json"
-						-H "Content-Type: application/json"
-						''';
-
-					var accountNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[${accountArrayValue}].name");
-
-					var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "[", "");
-
-					var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "]", "");
-
-					var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "&quot;", "");
-
-					if ("${accountName}" == "${accountNameFromAPI}") {
-						var curl = '''
-							--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-							--header "API_Token: ${apiToken}"
-							-H "accept: application/json"
-							-H "Content-Type: application/json"
-							''';
-
-						var accountKey = JSONCurlUtil.get("${curl}", "$.items[${accountArrayValue}].key");
-
-						var accountKey = StringUtil.replace("${accountKey}", "[", "");
-
-						var accountKey = StringUtil.replace("${accountKey}", "]", "");
-
-						var accountKey = StringUtil.replace("${accountKey}", "&quot;", "");
-
-						var curl = '''
-							--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
-							--header "API_Token: ${apiToken}"
-							-H "accept: application/json"
-							-H "Content-Type: application/json"
-							''';
-
-						com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-
-						var accountDeleted = "true";
-
-						echo("Name of account deleted: ${accountName}");
-					}
-					else {
-						var accountArrayValue = MathUtil.sum("${accountArrayValue}", "1");
-					}
-				}
+				echo("Name of account deleted: ${accountName}");
 			}
 		}
 	}
