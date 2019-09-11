@@ -4,6 +4,39 @@ definition {
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 
+	@prose = "I assign contacts with the following email addresses to the account ${accountName} ${table}"
+	macro _assignContacts {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		var contactUuids = "";
+
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+			if ("${contactUuids}" == "") {
+				var contactUuids = "${contactUuid}";
+			}
+			else {
+				var contactUuids = "${contactUuids},${contactUuid}";		
+			}
+		}
+
+		echo("Uuid List: ${contactUuids}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuids}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "I create an account on koroneiki with the following values ${table}"
 	macro _createAccount {
 		var RawTable rawTable = new RawTable("${table}");
@@ -301,6 +334,39 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	@prose = "I remove contacts with the following email addresses from the account ${accountName} ${table}"
+	macro _removeContacts {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		var contactUuids = "";
+
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+			if ("${contactUuids}" == "") {
+				var contactUuids = "${contactUuid}";
+			}
+			else {
+				var contactUuids = "${contactUuids},${contactUuid}";		
+			}
+		}
+
+		echo("Uuid List: ${contactUuids}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuids}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I tear down the accounts on koroneiki with the following names ${table}"
