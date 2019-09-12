@@ -1,0 +1,264 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I create a contact role on koroneiki with the following values ${table}"
+	macro _createContactRole {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such contact role field ${field}");
+			}
+		}
+
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+		if (!(isSet(type))) {
+			var type = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete a contact role on koroneiki with the name ${contactRoleName}"
+	macro _deleteContactRole {
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getContactRoleKeyViaContactRoleName {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactRoleKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${contactRoleName}')].key");
+
+		var contactRoleKey = StringUtil.replace("${contactRoleKey}", "[", "");
+
+		var contactRoleKey = StringUtil.replace("${contactRoleKey}", "]", "");
+
+		var contactRoleKey = StringUtil.replace("${contactRoleKey}", "&quot;", "");
+
+		echo("Key value for ${contactRoleName}: ${contactRoleKey}");
+
+		return "${contactRoleKey}";
+	}
+
+	@prose = "I tear down the contact roles on koroneiki with the following names ${table}"
+	macro _tearDownContactRoles {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allContactRoles = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allContactRoles}", "${contactRoleName}")) {
+				KoroneikiContactRoleAPI._deleteContactRole(contactRoleName = "${contactRoleName}");
+
+				echo("Name of contact role deleted: ${contactRoleName}");
+			}
+		}
+	}
+
+	@prose = "I update a koroneiki contact role with the name ${contactRoleName} to have the following values ${table}"
+	macro _updateContactRole {
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such contact role field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(description))) {
+			var contactRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactRoleObject}", "description=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.description");
+
+				var description = "${value}";
+			}
+			else {
+				var description = "";
+			}
+		}
+		if (!(isSet(name))) {
+			var contactRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactRoleObject}", "name=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${value}";
+			}
+			else {
+				var name = "";
+			}
+		}
+		if (!(isSet(type))) {
+			var contactRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactRoleObject}", "type=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.type");
+
+				var type = "${value}";
+			}
+			else {
+				var type = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should be able to view a koroneiki contact role with the name ${contactRoleName} and the following values ${table}"
+	macro _viewContactRole {
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.type");
+			}
+			else {
+				fail("No such contact role field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki contact role with the name ${contactRoleName}"
+	macro _viewNoContactRole {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactRoles}", "${contactRoleName}")) {
+			fail("The contact role with the name ${contactRoleName} is still present in Koroneiki");
+		}
+	}
+}
