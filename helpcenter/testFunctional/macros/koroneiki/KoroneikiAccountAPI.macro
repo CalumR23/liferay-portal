@@ -10,31 +10,20 @@ definition {
 
 		var RawTable rawTable = new RawTable("${table}");
 
-		var contactUuids = "";
-
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
-			if ("${contactUuids}" == "") {
-				var contactUuids = "${contactUuid}";
-			}
-			else {
-				var contactUuids = "${contactUuids},${contactUuid}";		
-			}
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuid}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 		}
-
-		echo("Uuid List: ${contactUuids}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuids}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I create an account on koroneiki with the following values ${table}"
@@ -342,31 +331,20 @@ definition {
 
 		var RawTable rawTable = new RawTable("${table}");
 
-		var contactUuids = "";
-
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
-			if ("${contactUuids}" == "") {
-				var contactUuids = "${contactUuid}";
-			}
-			else {
-				var contactUuids = "${contactUuids},${contactUuid}";		
-			}
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuid}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
-
-		echo("Uuid List: ${contactUuids}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts?contactUuids=${contactUuids}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I tear down the accounts on koroneiki with the following names ${table}"
@@ -731,6 +709,33 @@ definition {
 		}
 	}
 
+	@prose = "the contact with the email address ${contactEmailAddress} should be assigned the account ${accountName}"
+	macro _viewContact {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].emailAddress");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "[", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "&quot;", "");
+
+		echo("Expected contact email address value: ${contactEmailAddress}");
+		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
+
+		if (!("${contactEmailAddressFromAPI}" == "${contactEmailAddress}")) {
+			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
+		}
+	}
+
 	@prose = "I should be able to view a child koroneiki account with the name ${childAccountName} on the parent account with the name ${parentAccountName} that has the following values ${table}"
 	macro _viewChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${parentAccountName}");
@@ -921,6 +926,27 @@ definition {
 
 		if (contains("${allChildAccounts}", "${childAccountName}")) {
 			fail("The account with the name ${childAccountName} is still present in as a child account in ${parentAccountName}");
+		}
+	}
+
+	@prose = "the contact with the email address ${contactEmailAddress} should not be assigned the account ${accountName}"
+	macro _viewNoContact {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountContacts = JSONCurlUtil.get("${curl}", "$");
+
+		echo("Expected contact email address value: ${contactEmailAddress}");
+		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
+
+		if (contains("${allAccountContacts}", "${contactEmailAddress}")) {
+			fail("The account with the name ${accountName} contains the contact ${contactEmailAddress}");
 		}
 	}
 }
