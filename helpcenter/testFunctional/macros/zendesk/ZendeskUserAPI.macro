@@ -715,6 +715,22 @@ definition {
 		}
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should not have the phone number ${userPhoneNumber}"
+	macro _viewNoUserPhoneNumberByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var user = JSONCurlUtil.get("${curl}", "$.user");
+
+		if (contains("${user}", "${userPhoneNumber}")) {
+			fail("The user has the phone number ${userPhoneNumber} which is not the expected result.");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not have the ${tag} tag"
 	macro _viewNoUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
