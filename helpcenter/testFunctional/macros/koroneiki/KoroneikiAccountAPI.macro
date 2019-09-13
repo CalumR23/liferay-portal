@@ -4,6 +4,31 @@ definition {
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 
+	@prose = "I assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles ${table}"
+	macro _assignContactRolesToContact {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/${contactUuid}/roles?contactRoleKeys=${contactRoleKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
 	@prose = "I assign contacts with the following email addresses to the account ${accountName} ${table}"
 	macro _assignContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -324,6 +349,31 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	@prose = "I remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles ${table}"
+	macro _removeContactRolesToContact {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/${contactUuid}/roles?contactRoleKeys=${contactRoleKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
 	}
 
 	@prose = "I remove contacts with the following email addresses from the account ${accountName} ${table}"
@@ -738,6 +788,35 @@ definition {
 		}
 	}
 
+	@prose = "the contact with the email address ${contactEmailAddress} assigned the account ${accountName} should have the contact role ${contactRoleName}"
+	macro _viewContactRole {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/${contactUuid}/roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${contactRoleName}')].name");
+
+		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
+
+		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
+
+		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
+
+		echo("Expected contact role name value: ${contactRoleName}");
+		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
+
+		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
+			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
+		}
+	}
+
 	@prose = "I should be able to view a child koroneiki account with the name ${childAccountName} on the parent account with the name ${parentAccountName} that has the following values ${table}"
 	macro _viewChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${parentAccountName}");
@@ -944,11 +1023,28 @@ definition {
 
 		var allAccountContacts = JSONCurlUtil.get("${curl}", "$");
 
-		echo("Expected contact email address value: ${contactEmailAddress}");
-		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
-
 		if (contains("${allAccountContacts}", "${contactEmailAddress}")) {
 			fail("The account with the name ${accountName} contains the contact ${contactEmailAddress}");
+		}
+	}
+
+	@prose = "the contact with the email address ${contactEmailAddress} assigned the account ${accountName} should not have the contact role ${contactRoleName}"
+	macro _viewNoContactRole {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/${contactUuid}/roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountContactContactRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountContactContactRoles}", "${contactRoleName}")) {
+			fail("The contact with the email address ${contactEmailAddress} on the account with the name ${accountName} contains the contact role ${contactRoleName}");
 		}
 	}
 }
