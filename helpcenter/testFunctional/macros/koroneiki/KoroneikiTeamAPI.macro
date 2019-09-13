@@ -1,0 +1,120 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I delete a koroneiki team with the name ${teamName}"
+	macro _deleteTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getTeamKeyViaTeamName {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${teamName}')].key");
+
+		var teamKey = StringUtil.replace("${teamKey}", "[", "");
+
+		var teamKey = StringUtil.replace("${teamKey}", "]", "");
+
+		var teamKey = StringUtil.replace("${teamKey}", "&quot;", "");
+
+		echo("Team key value for ${teamName}: ${teamKey}");
+
+		return "${teamKey}";
+	}
+
+	@prose = "I tear down the teams on koroneiki with the following names ${table}"
+	macro _tearDownTeams {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var teamName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allTeams = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allTeams}", "${teamName}")) {
+				KoroneikiTeamAPI._deleteTeam(teamName = "${teamName}");
+
+				echo("Name of team deleted: ${teamName}");
+			}
+		}
+	}
+
+	@prose = "I update a team with the name ${teamName} to have the new name ${teamNameEdit}"
+	macro updateTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki team with the name ${teamName}"
+	macro _viewNoTeam {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeams = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeams}", "${teamName}")) {
+			fail("The team with the name ${teamName} is still present in Koroneiki");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki team with the name ${teamName}"
+	macro _viewTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+
+		echo("Expected Name Value: ${teamName}");
+		echo("Actual Name Value: ${teamNameFromAPI}");
+
+		if (!(contains("${teamName}", "${teamNameFromAPI}"))) {
+			fail("Actual team name value ${teamNameFromAPI} does not match expected team name value ${teamName}");
+		}
+	}
+}
