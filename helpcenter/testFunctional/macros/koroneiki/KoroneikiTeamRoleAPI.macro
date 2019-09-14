@@ -1,0 +1,264 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I create a team role on koroneiki with the following values ${table}"
+	macro _createTeamRole {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such team role field ${field}");
+			}
+		}
+
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+		if (!(isSet(type))) {
+			var type = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete a team role on koroneiki with the name ${teamRoleName}"
+	macro _deleteTeamRole {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getTeamRoleKeyViaTeamRoleName {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoleKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${teamRoleName}')].key");
+
+		var teamRoleKey = StringUtil.replace("${teamRoleKey}", "[", "");
+
+		var teamRoleKey = StringUtil.replace("${teamRoleKey}", "]", "");
+
+		var teamRoleKey = StringUtil.replace("${teamRoleKey}", "&quot;", "");
+
+		echo("Key value for ${teamRoleName}: ${teamRoleKey}");
+
+		return "${teamRoleKey}";
+	}
+
+	@prose = "I tear down the team roles on koroneiki with the following names ${table}"
+	macro _tearDownTeamRoles {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var teamRoleName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allTeamRoles = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allTeamRoles}", "${teamRoleName}")) {
+				KoroneikiTeamRoleAPI._deleteTeamRole(teamRoleName = "${teamRoleName}");
+
+				echo("Name of team role deleted: ${teamRoleName}");
+			}
+		}
+	}
+
+	@prose = "I update a koroneiki team role with the name ${teamRoleName} to have the following values ${table}"
+	macro _updateTeamRole {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such team role field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(description))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "description=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.description");
+
+				var description = "${value}";
+			}
+			else {
+				var description = "";
+			}
+		}
+		if (!(isSet(name))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "name=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${value}";
+			}
+			else {
+				var name = "";
+			}
+		}
+		if (!(isSet(type))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "type=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.type");
+
+				var type = "${value}";
+			}
+			else {
+				var type = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should be able to view a koroneiki team role with the name ${teamRoleName} and the following values ${table}"
+	macro _viewTeamRole {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.type");
+			}
+			else {
+				fail("No such team role field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki team role with the name ${teamRoleName}"
+	macro _viewNoTeamRole {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeamRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeamRoles}", "${teamRoleName}")) {
+			fail("The team role with the name ${teamRoleName} is still present in Koroneiki");
+		}
+	}
+}
