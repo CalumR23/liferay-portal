@@ -1,0 +1,136 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I create a product with the name ${productName}"
+	macro _createProduct {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${productName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete a koroneiki product with the name ${productName}"
+	macro _deleteProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getProductKeyViaProductName {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${productName}')].key");
+
+		var productKey = StringUtil.replace("${productKey}", "[", "");
+
+		var productKey = StringUtil.replace("${productKey}", "]", "");
+
+		var productKey = StringUtil.replace("${productKey}", "&quot;", "");
+
+		echo("Product key value for ${productName}: ${productKey}");
+
+		return "${productKey}";
+	}
+
+	@prose = "I tear down the products on koroneiki with the following names ${table}"
+	macro _tearDownProducts {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var productName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allProducts}", "${productName}")) {
+				KoroneikiProductAPI._deleteProduct(productName = "${productName}");
+
+				echo("Name of product deleted: ${productName}");
+			}
+		}
+	}
+
+	@prose = "I update a product with the name ${productName} to have the new name ${productNameEdit}"
+	macro updateProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${productNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki product with the name ${productName}"
+	macro _viewNoProduct {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProducts}", "${productName}")) {
+			fail("The product with the name ${productName} is still present in Koroneiki");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki product with the name ${productName}"
+	macro _viewProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+
+		echo("Expected Name Value: ${productName}");
+		echo("Actual Name Value: ${productNameFromAPI}");
+
+		if (!(contains("${productName}", "${productNameFromAPI}"))) {
+			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+		}
+	}
+}
