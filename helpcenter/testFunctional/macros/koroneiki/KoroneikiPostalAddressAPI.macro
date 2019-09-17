@@ -39,36 +39,21 @@ definition {
 			for (var row : table "${rawTable}") {
 				var streetAddressLine1 = "${row[0]}";
 
-				var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
-					accountName = "${accountName}",
-					streetAddressLine1 = "${streetAddressLine1}");
-
 				var curl = '''
-					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
 					--header "API_Token: ${apiToken}"
 					-H "accept: application/json"
 					-H "Content-Type: application/json"
 					''';
 
-				var allPostalAddresses = JSONCurlUtil.get("${curl}", "$");
+				var allAccountPostalAddresses = JSONCurlUtil.get("${curl}", "$");
 
-				if (contains("${allPostalAddresses}", "${postalAddressId}")) {
-					var curl = '''
-						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
-						--header "API_Token: ${apiToken}"
-						-H "accept: application/json"
-						-H "Content-Type: application/json"
-						''';
-					
-					var allAccountPostalAddresses = JSONCurlUtil.get("${curl}", "$");
+				if (contains("${allAccountPostalAddresses}", "${streetAddressLine1}")) {
+					KoroneikiPostalAddressAPI._deletePostalAddress(
+						accountName = "${accountName}",
+						streetAddressLine1 = "${streetAddressLine1}");
 
-					if (contains("${allAccountPostalAddresses}", "${postalAddressId}")) {
-						KoroneikiPostalAddressAPI._deletePostalAddress(
-							accountName = "${accountName}",
-							streetAddressLine1 = "${streetAddressLine1}");
-
-						echo("Postal Address deleted: ${streetAddressLine1} for ${accountName}");
-					}
+					echo("Postal Address deleted: ${streetAddressLine1} for ${accountName}");
 				}
 			}
 		}
