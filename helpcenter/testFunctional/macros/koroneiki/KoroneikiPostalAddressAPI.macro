@@ -1,0 +1,354 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I delete a postal address on koroneiki for the account ${accountName} with the street address ${streetAddressLine1}"
+	macro _deletePostalAddress {
+		var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
+			accountName = "${accountName}",
+			streetAddressLine1 = "${streetAddressLine1}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I tear down the postal addresses on koroneiki for the account ${accountName} with the following street addresses ${table}"
+	macro _tearDownPostalAddresses {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccounts}", "${accountName}")) {
+			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var streetAddressLine1 = "${row[0]}";
+
+				var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
+					accountName = "${accountName}",
+					streetAddressLine1 = "${streetAddressLine1}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allPostalAddresses = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allPostalAddresses}", "${postalAddressId}")) {
+					var curl = '''
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
+						--header "API_Token: ${apiToken}"
+						-H "accept: application/json"
+						-H "Content-Type: application/json"
+						''';
+					
+					var allAccountPostalAddresses = JSONCurlUtil.get("${curl}", "$");
+
+					if (contains("${allAccountPostalAddresses}", "${postalAddressId}")) {
+						KoroneikiPostalAddressAPI._deletePostalAddress(
+							accountName = "${accountName}",
+							streetAddressLine1 = "${streetAddressLine1}");
+
+						echo("Postal Address deleted: ${streetAddressLine1} for ${accountName}");
+					}
+				}
+			}
+		}
+	}
+
+	@prose = "I update a postal address on koroneiki for the account ${accountName} with the street address ${streetAddressLine1} to have the following values ${table}"
+	macro _updatePostalAddress {
+		var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
+			accountName = "${accountName}",
+			streetAddressLine1 = "${streetAddressLine1}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Country") {
+				var addressCountry = "${value}";
+			}
+			else if ("${field}" == "Locality") {
+				var addressLocality = "${value}";
+			}
+			else if ("${field}" == "Region") {
+				var addressRegion = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var addressType = "${value}";
+			}
+			else if ("${field}" == "Mailing") {
+				var mailing = "${value}";
+			}
+			else if ("${field}" == "Postal Code") {
+				var postalCode = "${value}";
+			}
+			else if ("${field}" == "Primary") {
+				var primary = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 1") {
+				var streetAddressLine1 = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 2") {
+				var streetAddressLine2 = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 3") {
+				var streetAddressLine3 = "${value}";
+			}
+			else {
+				fail("No such postal address field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(addressCountry))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "addressCountry=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.addressCountry");
+
+				var addressCountry = "${value}";
+			}
+			else {
+				var addressCountry = "";
+			}
+		}
+		if (!(isSet(addressLocality))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "addressLocality=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.addressLocality");
+
+				var addressLocality = "${value}";
+			}
+			else {
+				var addressLocality = "";
+			}
+		}
+		if (!(isSet(addressRegion))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "addressRegion=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.addressRegion");
+
+				var addressRegion = "${value}";
+			}
+			else {
+				var addressRegion = "";
+			}
+		}
+		if (!(isSet(addressType))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "addressType=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.addressType");
+
+				var addressType = "${value}";
+			}
+			else {
+				var addressType = "";
+			}
+		}
+		if (!(isSet(mailing))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "mailing=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.mailing");
+
+				var mailing = "${value}";
+			}
+			else {
+				var mailing = "false";
+			}
+		}
+		if (!(isSet(postalCode))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "postalCode=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.postalCode");
+
+				var postalCode = "${value}";
+			}
+			else {
+				var postalCode = "";
+			}
+		}
+		if (!(isSet(primary))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "primary=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.primary");
+
+				var primary = "${value}";
+			}
+			else {
+				var primary = "false";
+			}
+		}
+		if (!(isSet(streetAddressLine1))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "streetAddressLine1=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.streetAddressLine1");
+
+				var streetAddressLine1 = "${value}";
+			}
+			else {
+				var streetAddressLine1 = "false";
+			}
+		}
+			if (!(isSet(streetAddressLine2))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "streetAddressLine2=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.streetAddressLine2");
+
+				var streetAddressLine2 = "${value}";
+			}
+			else {
+				var streetAddressLine2 = "false";
+			}
+		}
+			if (!(isSet(streetAddressLine3))) {
+			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${postalAddressObject}", "streetAddressLine3=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.streetAddressLine3");
+
+				var streetAddressLine3 = "${value}";
+			}
+			else {
+				var streetAddressLine3 = "false";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"addressCountry": "${addressCountry}",
+				"addressLocality": ${addressLocality},
+				"addressRegion": "${addressRegion}",
+				"addressType": ${addressType},
+				"mailing": ${mailing},
+				"postalCode": "${postalCode}",
+				"primary": ${primary},
+				"streetAddressLine1": "${streetAddressLine1}",
+				"streetAddressLine2": "${streetAddressLine2}",
+				"streetAddressLine3": "${streetAddressLine3}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a postal address on koroneiki for the account ${accountName} with the street address ${streetAddressLine1}"
+	macro _viewNoPostalAddress {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+					
+		var allAccountPostalAddresses = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountPostalAddresses}", "${streetAddressLine1}")) {
+			fail("The postal address for ${accountName} with the street address ${streetAddressLine1} is still present on koroneiki");
+		}
+	}
+
+	@prose = "I should be able to view a postal address on koroneiki for the account ${accountName} with the street address ${streetAddressLine1} with the following values ${table}"
+	macro _viewPostalAddress {
+		var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
+			accountName = "${accountName}",
+			streetAddressLine1 = "${streetAddressLine1}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Country") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.addressCountry");
+			}
+			else if ("${field}" == "Locality") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.addressLocality");
+			}
+			else if ("${field}" == "Region") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.addressRegion");
+			}
+			else if ("${field}" == "Type") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.addressType");
+			}
+			else if ("${field}" == "Mailing") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.mailing");
+			}
+			else if ("${field}" == "Postal Code") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.postalCode");
+			}
+			else if ("${field}" == "Primary") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.primary");
+			}
+			else if ("${field}" == "Street Address Line 1") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.streetAddressLine1");
+			}
+			else if ("${field}" == "Street Address Line 2") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.streetAddressLine2");
+			}
+			else if ("${field}" == "Street Address Line 3") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.streetAddressLine3");
+			}
+			else {
+				fail("No such postal address field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+}

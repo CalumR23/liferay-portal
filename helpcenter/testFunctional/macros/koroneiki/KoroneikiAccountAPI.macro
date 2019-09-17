@@ -334,6 +334,105 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a postal address for an account with the name ${accountName} on koroneiki with the following values ${table}"
+	macro _createAccountPostalAddress {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Country") {
+				var addressCountry = "${value}";
+			}
+			else if ("${field}" == "Locality") {
+				var addressLocality = "${value}";
+			}
+			else if ("${field}" == "Region") {
+				var addressRegion = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var addressType = "${value}";
+			}
+			else if ("${field}" == "Mailing") {
+				var mailing = "${value}";
+			}
+			else if ("${field}" == "Postal Code") {
+				var postalCode = "${value}";
+			}
+			else if ("${field}" == "Primary") {
+				var primary = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 1") {
+				var streetAddressLine1 = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 2") {
+				var streetAddressLine2 = "${value}";
+			}
+			else if ("${field}" == "Street Address Line 3") {
+				var streetAddressLine3 = "${value}";
+			}
+			else {
+				fail("No such postal address field ${field}");
+			}
+		}
+
+		if (!(isSet(addressCountry))) {
+			var addressCountry = "";
+		}
+		if (!(isSet(addressLocality))) {
+			var addressLocality = "";
+		}
+		if (!(isSet(addressRegion))) {
+			var addressRegion = "";
+		}
+		if (!(isSet(addressType))) {
+			var addressType = "";
+		}
+		if (!(isSet(mailing))) {
+			var mailing = "false";
+		}
+		if (!(isSet(postalCode))) {
+			var postalCode = "";
+		}
+		if (!(isSet(primary))) {
+			var primary = "false";
+		}
+		if (!(isSet(streetAddressLine1))) {
+			var streetAddressLine1 = "";
+		}
+		if (!(isSet(streetAddressLine2))) {
+			var streetAddressLine2 = "";
+		}
+		if (!(isSet(streetAddressLine3))) {
+			var streetAddressLine3 = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"addressCountry": "${addressCountry}",
+				"addressLocality": ${addressLocality},
+				"addressRegion": "${addressRegion}",
+				"addressType": ${addressType},
+				"mailing": ${mailing},
+				"postalCode": "${postalCode}",
+				"primary": ${primary},
+				"streetAddressLine1": "${streetAddressLine1}",
+				"streetAddressLine2": "${streetAddressLine2}",
+				"streetAddressLine3": "${streetAddressLine3}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values ${table}"
 	macro _createAccountProductConsumption {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -518,6 +617,29 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	macro _getAccountPostalAddressIdViaAccountNameAndStreetAddress {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/postal-addresses
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var postalAddressId = JSONCurlUtil.get("${curl}", "$.items[?(@.streetAddressLine1=='${streetAddressLine1}')].id");
+
+		var postalAddressId = StringUtil.replace("${postalAddressId}", "[", "");
+
+		var postalAddressId = StringUtil.replace("${postalAddressId}", "]", "");
+
+		var postalAddressId = StringUtil.replace("${postalAddressId}", "&quot;", "");
+
+		echo("Account Postal Address id value for ${accountName} on ${streetAddressLine1}: ${postalAddressId}");
+
+		return "${postalAddressId}";
 	}
 
 	macro _getAccountProductConsumptionKeyViaAccountAndProductName {
