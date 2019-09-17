@@ -1,0 +1,140 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I delete a product consumption on koroneiki made by the account ${accountName} for the product ${productName}"
+	macro _deleteProductConsumption {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I tear down the product consumptions on koroneiki made by the account ${accountName} for the following products ${table}"
+	macro _tearDownProductConsumptions {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccounts}", "${accountName}")) {
+			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var productName = "${row[0]}";
+
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allProductConsumptions}", "${accountKey}")) {
+					var curl = '''
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+						--header "API_Token: ${apiToken}"
+						-H "accept: application/json"
+						-H "Content-Type: application/json"
+						''';
+					
+					var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+					if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+						KoroneikiProductConsumptionAPI._deleteProductConsumption(
+							accountName = "${accountName}",
+							productName = "${productName}");
+
+						echo("Product Consumption deleted: ${productName} made by ${accountName}");
+					}
+				}
+			}
+		}
+	}
+
+	@prose = "I should not be able to view a product consumption on koroneiki made by the account ${accountName} for the product ${productName}"
+	macro _viewNoProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+					
+		var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+			fail("The product consumption made by ${accountName} for the product ${productName} is still present on koroneiki");
+		}
+	}
+
+	@prose = "I should be able to view a product consumption on koroneiki made by the account ${accountName} for the product ${productName} with the following values ${table}"
+	macro _viewProductConsumption {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+}

@@ -334,6 +334,65 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values ${table}"
+	macro _createAccountProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+		}
+
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"productKey": "${productKey}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"productKey": "${productKey}",
+					"properties": {
+						${properties}
+					}
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create a product purchase for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values ${table}"
 	macro _createAccountProductPurchase {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -459,6 +518,31 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	macro _getAccountProductConsumptionKeyViaAccountAndProductName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productConsumptionKey = JSONCurlUtil.get("${curl}", "$.items[?(@.productKey=='${productKey}')].key");
+
+		var productConsumptionKey = StringUtil.replace("${productConsumptionKey}", "[", "");
+
+		var productConsumptionKey = StringUtil.replace("${productConsumptionKey}", "]", "");
+
+		var productConsumptionKey = StringUtil.replace("${productConsumptionKey}", "&quot;", "");
+
+		echo("Product Consumption key value for ${productName} product made by ${accountName}: ${productConsumptionKey}");
+
+		return "${productConsumptionKey}";
 	}
 
 	macro _getAccountProductPurchaseKeyViaAccountAndProductName {
@@ -633,7 +717,7 @@ definition {
 
 		if (!(isSet(code))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "code=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.code");
 
@@ -645,7 +729,7 @@ definition {
 		}
 		if (!(isSet(contactEmailAddress))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "contactEmailAddress=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
 
@@ -657,7 +741,7 @@ definition {
 		}
 		if (!(isSet(description))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "description=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.description");
 
@@ -669,7 +753,7 @@ definition {
 		}
 		if (!(isSet(faxNumber))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "faxNumber=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.faxNumber");
 
@@ -681,7 +765,7 @@ definition {
 		}
 		if (!(isSet(industry))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "industry=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.industry");
 
@@ -693,7 +777,7 @@ definition {
 		}
 		if (!(isSet(name))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "name=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.name");
 
@@ -705,7 +789,7 @@ definition {
 		}
 		if (!(isSet(notes))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "notes=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.notes");
 
@@ -717,7 +801,7 @@ definition {
 		}
 		if (!(isSet(phoneNumber))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "phoneNumber=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.phoneNumber");
 
@@ -729,7 +813,7 @@ definition {
 		}
 		if (!(isSet(profileEmailAddress))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "profileEmailAddress=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
 
@@ -741,7 +825,7 @@ definition {
 		}
 		if (!(isSet(soldBy))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "soldBy=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.soldBy");
 
@@ -753,7 +837,7 @@ definition {
 		}
 		if (!(isSet(status))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "status=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.status");
 
@@ -765,7 +849,7 @@ definition {
 		}
 		if (!(isSet(tier))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "tier=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.tier");
 
@@ -777,7 +861,7 @@ definition {
 		}
 		if (!(isSet(website))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
-			
+
 			if (contains("${accountObject}", "website=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.website");
 
