@@ -334,6 +334,98 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a product purchase for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values ${table}"
+	macro _createAccountProductPurchase {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var endDate = "${value1}";
+			}
+			else if ("${field}" == "Perpetual") {
+				var perpetual = "${value1}";
+			}
+			else if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Quantity") {
+				var quantity = "${value1}";
+			}
+			else if ("${field}" == "Start Date") {
+				var startDate = "${value1}";
+			}
+			else {
+				fail("No such product purchase field ${field}");
+			}
+		}
+
+		if (!(isSet(endDate))) {
+			var endDate = "";
+		}
+		if (!(isSet(perpetual))) {
+			var perpetual = "true";
+		}
+		if (!(isSet(quantity))) {
+			var quantity = "1";
+		}
+		if (!(isSet(startDate))) {
+			var startDate = "";
+		}
+
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"endDate": "${endDate}",
+					"perpetual": ${perpetual},
+					"productKey": "${productKey}",
+					"quantity": ${quantity},
+					"startDate": "${startDate}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"endDate": "${endDate}",
+					"perpetual": ${perpetual},
+					"productKey": "${productKey}",
+					"properties": {
+						${properties}
+					},
+					"quantity": ${quantity},
+					"startDate": "${startDate}"
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I delete an account on koroneiki with the name ${accountName}"
 	macro _deleteAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -367,6 +459,31 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	macro _getAccountProductPurchaseKeyViaAccountAndProductName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productPurchaseKey = JSONCurlUtil.get("${curl}", "$.items[?(@.productKey=='${productKey}')].key");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "[", "");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "]", "");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "&quot;", "");
+
+		echo("Product Purchase key value for ${productName} product made by ${accountName}: ${productPurchaseKey}");
+
+		return "${productPurchaseKey}";
 	}
 
 	@prose = "I remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles ${table}"
