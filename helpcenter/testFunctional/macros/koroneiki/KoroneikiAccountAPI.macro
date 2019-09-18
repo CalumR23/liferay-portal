@@ -168,7 +168,6 @@ definition {
 				"description": "${description}",
 				"faxNumber": "${faxNumber}",
 				"industry": "${industry}",
-				"logoId": "0",
 				"name": "${name}",
 				"notes": "${notes}",
 				"phoneNumber": "${phoneNumber}",
@@ -319,7 +318,6 @@ definition {
 				"description": "${description}",
 				"faxNumber": "${faxNumber}",
 				"industry": "${industry}",
-				"logoId": "0",
 				"name": "${name}",
 				"notes": "${notes}",
 				"phoneNumber": "${phoneNumber}",
@@ -618,6 +616,47 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete an account on koroneiki with the ${fieldName} ${fieldValue}"
+	macro _deleteAccountViaAccountFieldNameAndValue {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountFieldNameAndValue(
+			fieldName = "${fieldName}",
+			fieldValue = "${fieldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getAccountKeyViaAccountFieldNameAndValue {
+		var fieldName = StringUtil.replace("${fieldName}", " ", "");
+
+		var fieldName = StringUtil.lowerCaseFirstLetter("${fieldName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountKey = JSONCurlUtil.get("${curl}", "$.items[?(@.${fieldName}=='${fieldValue}')].key");
+
+		var accountKey = StringUtil.replace("${accountKey}", "[", "");
+
+		var accountKey = StringUtil.replace("${accountKey}", "]", "");
+
+		var accountKey = StringUtil.replace("${accountKey}", "&quot;", "");
+
+		echo("Account Key value for account with ${fieldName} value ${fieldValue}: ${accountKey}");
+
+		return "${accountKey}";
+	}
+
 	macro _getAccountKeyViaAccountName {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
@@ -780,6 +819,32 @@ definition {
 				KoroneikiAccountAPI._deleteAccount(accountName = "${accountName}");
 
 				echo("Name of account deleted: ${accountName}");
+			}
+		}
+	}
+
+	@prose = "I tear down the accounts on koroneiki with the following ${fieldName} values ${table}"
+	macro _tearDownAccountsViaAccountFieldNameAndValue {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var fieldValue = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allAccounts}", "${fieldValue}")) {
+				KoroneikiAccountAPI._deleteAccountViaAccountFieldNameAndValue(
+					fieldName = "${fieldName}",
+					fieldValue = "${fieldValue}");
+
+				echo("${fieldName} value of account deleted: ${fieldValue}");
 			}
 		}
 	}
@@ -1026,7 +1091,6 @@ definition {
 				"description": "${description}",
 				"faxNumber": "${faxNumber}",
 				"industry": "${industry}",
-				"logoId": "0",
 				"name": "${name}",
 				"notes": "${notes}",
 				"phoneNumber": "${phoneNumber}",
@@ -1146,6 +1210,89 @@ definition {
 
 		if (!("${teamNameFromAPI}" == "${teamName}")) {
 			fail("Actual team name ${teamNameFromAPI} does not match expected team name value ${teamName}");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki account with the ${fieldName} ${fieldValue} and the following values ${table}"
+	macro _viewAccountViaAccountFieldNameAndValue {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountFieldNameAndValue(
+			fieldName = "${fieldName}",
+			fieldValue = "${fieldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Code") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
+			}
+			else if ("${field}" == "Contact Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
+			}
+			else if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Fax Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.faxNumber");
+			}
+			else if ("${field}" == "Industry") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.industry");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Notes") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.notes");
+			}
+			else if ("${field}" == "Phone Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.phoneNumber");
+			}
+			else if ("${field}" == "Profile Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
+			}
+			else if ("${field}" == "Sold By") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.soldBy");
+			}
+			else if ("${field}" == "Status") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
+			}
+			else if ("${field}" == "Tier") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.tier");
+			}
+			else if ("${field}" == "Website") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.website");
+			}
+			else {
+				fail("No such account field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
 		}
 	}
 
