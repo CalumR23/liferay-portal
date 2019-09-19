@@ -80,6 +80,116 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create an external link for the contact with the okta ID ${contactOktaId} with the following values"
+	macro _createContactExternalLinkViaOktaId {
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I create an external link for the contact with the email address ${contactEmailAddress} with the following values"
+	macro _createContactExternalLinkViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete an external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress}"
+	macro _deleteContactExternalLinkKey {
+		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
+			contactEmailAddress = "${contactEmailAddress}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I delete a contact on koroneiki with the email address ${contactEmailAddress}"
 	macro _deleteContactViaEmailAddress {
 		var curl = '''
@@ -116,6 +226,29 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getContactExternalLinkKey {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].key");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "[", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
+
+		echo("External link key value for ${entityId} on contact with email address ${contactEmailAddress}: ${externalLinkKey}");
+
+		return "${externalLinkKey}";
 	}
 
 	macro _getContactOktaIdViaContactEmailAddress {
@@ -181,6 +314,78 @@ definition {
 
 				echo("Email address of contact deleted: ${contactEmailAddress}");
 			}
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the contact with the okta ID ${contactOktaId} with the following values"
+	macro _viewContactExternalLinkViaOktaId {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		echo("Expected ${field} Value: ${value}");
+		echo("Actual ${field} Value: ${valueFromAPI}");
+
+		if (!(contains("${value}", "${valueFromAPI}"))) {
+			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} with the following values"
+	macro _viewContactExternalLinkViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		echo("Expected ${field} Value: ${value}");
+		echo("Actual ${field} Value: ${valueFromAPI}");
+
+		if (!(contains("${value}", "${valueFromAPI}"))) {
+			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 		}
 	}
 
@@ -786,6 +991,24 @@ definition {
 
 		if (contains("${allContacts}", "${contactEmailAddress}")) {
 			fail("The contact with the email address ${contactEmailAddress} is still present in Koroneiki");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should not be present on the contact with the email address ${contactEmailAddress}"
+	macro _viewNoContactExternalLink {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} is on the contact with the email address ${contactEmailAddress}");
 		}
 	}
 }

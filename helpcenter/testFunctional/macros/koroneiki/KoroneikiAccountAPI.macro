@@ -182,6 +182,54 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create an external link for the account ${accountName} with the following values"
+	macro _createAccountExternalLink {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create a team with the name ${teamName} for the account ${accountName}"
 	macro _createAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -616,6 +664,22 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete an external link with the entity id ${entityId} on the account ${accountName}"
+	macro _deleteAccountExternalLinkKey {
+		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I delete an account on koroneiki with the ${fieldName} ${fieldValue}"
 	macro _deleteAccountViaAccountFieldNameAndValue {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountFieldNameAndValue(
@@ -630,6 +694,29 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getAccountExternalLinkKey {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].key");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "[", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
+
+		echo("External link key value for ${entityId} on account ${accountName}: ${externalLinkKey}");
+
+		return "${externalLinkKey}";
 	}
 
 	macro _getAccountKeyViaAccountFieldNameAndValue {
@@ -1186,6 +1273,43 @@ definition {
 		}
 	}
 
+	@prose = "the external link with the entity id ${entityId} should be present on the account ${accountName} with the following values"
+	macro _viewAccountExternalLink {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		echo("Expected ${field} Value: ${value}");
+		echo("Actual ${field} Value: ${valueFromAPI}");
+
+		if (!(contains("${value}", "${valueFromAPI}"))) {
+			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+		}
+	}
+
 	@prose = "the team with the name ${teamName} should be part of the the account ${accountName}"
 	macro _viewAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -1527,6 +1651,42 @@ definition {
 		}
 	}
 
+	@prose = "the external link with the entity id ${entityId} should not be present on the account ${accountName}"
+	macro _viewNoAccountExternalLink {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} is on the account with the name ${accountName}");
+		}
+	}
+
+	@prose = "the team with the name ${teamName} should not be part of the the account ${accountName}"
+	macro _viewNoAccountTeam {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountTeams = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountTeams}", "${teamName}")) {
+			fail("The team with the name ${teamName} is on the account with the name ${accountName}");
+		}
+	}
+
 	@prose = "I should not be able to view a child koroneiki account with the name ${childAccountName} on the parent account with the name ${parentAccountName}"
 	macro _viewNoChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${parentAccountName}");
@@ -1580,24 +1740,6 @@ definition {
 
 		if (contains("${allAccountContactContactRoles}", "${contactRoleName}")) {
 			fail("The contact with the email address ${contactEmailAddress} on the account with the name ${accountName} contains the contact role ${contactRoleName}");
-		}
-	}
-
-	@prose = "the team with the name ${teamName} should not be part of the the account ${accountName}"
-	macro _viewNoAccountTeam {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allAccountTeams = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allAccountTeams}", "${teamName}")) {
-			fail("The team with the name ${teamName} is on the account with the name ${accountName}");
 		}
 	}
 }
