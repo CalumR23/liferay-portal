@@ -829,6 +829,298 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I should be able to view a product consumption on koroneiki for a contact with the email address ${contactEmailAddress} on the account ${accountName} for the product ${productName} with the following values ${table}"
+	macro _viewContactProductConsumption {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/product-consumptions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productConsumptionKey}')].properties.${value1}");
+	
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product consumption on koroneiki for a contact with the okta ID ${contactOktaId} on the account ${accountName} for the product ${productName} with the following values ${table}"
+	macro _viewContactProductConsumptionViaOktaId {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/product-consumptions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productConsumptionKey}')].properties.${value1}");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product purchase on koroneiki for a contact with the email address ${contactEmailAddress} on the account ${accountName} for the product ${productName} with the following values ${table}"
+	macro _viewContactProductPurchase {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/product-purchases
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].endDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Perpetual") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].perpetual");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].properties.${value1}");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Quantity") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].quantity");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].startDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such product purchase field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product purchase on koroneiki for a contact with the okta ID ${contactOktaId} on the account ${accountName} for the product ${productName} with the following values ${table}"
+	macro _viewContactProductPurchaseViaOktaId {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/product-purchases
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].endDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Perpetual") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].perpetual");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].properties.${value1}");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Quantity") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].quantity");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].startDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such product purchase field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
 	@prose = "I should be able to view a koroneiki contact with the email address ${contactEmailAddress} and the following values ${table}"
 	macro _viewContactViaEmailAddress {
 		var curl = '''
