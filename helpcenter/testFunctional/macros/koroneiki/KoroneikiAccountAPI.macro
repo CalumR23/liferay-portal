@@ -96,6 +96,31 @@ definition {
 		}
 	}
 
+	@prose = "I assign the team with the name ${teamName} on the account ${accountName} to the following roles ${table}"
+	macro _assignTeamRolesToTeam {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var teamRoleName = "${row[0]}";
+
+			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
 	@prose = "I create an account on koroneiki with the following values ${table}"
 	macro _createAccount {
 		var RawTable rawTable = new RawTable("${table}");
@@ -964,6 +989,31 @@ definition {
 
 			var curl = '''
 				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-okta-id?oktaIds=${contactOktaId}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "I remove the team with the name ${teamName} on the account ${accountName} from the following roles ${table}"
+	macro _removeTeamRolesFromTeam {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var teamRoleName = "${row[0]}";
+
+			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1873,6 +1923,55 @@ definition {
 
 		if (contains("${allAccountContactContactRoles}", "${contactRoleName}")) {
 			fail("The contact with the email address ${contactEmailAddress} on the account with the name ${accountName} contains the contact role ${contactRoleName}");
+		}
+	}
+
+	@prose = "the team with the name ${teamName} assigned the account ${accountName} should not have the team role ${teamRoleName}"
+	macro _viewNoTeamRole {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams/${teamKey}/roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountTeamTeamRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountTeamTeamRoles}", "${teamRoleName}")) {
+			fail("The team with the team name ${teamName} on the account with the name ${accountName} contains the team role ${teamRoleName}");
+		}
+	}
+
+	@prose = "the team with the name ${teamName} assigned the account ${accountName} should have the team role ${teamRoleName}"
+	macro _viewTeamRole {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams/${teamKey}/roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${teamRoleName}')].name");
+
+		var teamRoleNameFromAPI = StringUtil.replace("${teamRoleNameFromAPI}", "[", "");
+
+		var teamRoleNameFromAPI = StringUtil.replace("${teamRoleNameFromAPI}", "]", "");
+
+		var teamRoleNameFromAPI = StringUtil.replace("${teamRoleNameFromAPI}", "&quot;", "");
+
+		echo("Expected team role name value: ${teamRoleName}");
+		echo("Actual team role name value: ${teamRoleNameFromAPI}");
+
+		if (!("${teamRoleNameFromAPI}" == "${teamRoleName}")) {
+			fail("Actual team role name value ${teamRoleNameFromAPI} does not match expected team role name value ${teamRoleName}");
 		}
 	}
 }
