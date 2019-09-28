@@ -20,6 +20,54 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create an external link on a product ${productName} with the following values"
+	macro _createProductExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I delete a koroneiki product with the name ${productName}"
 	macro _deleteProduct {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
@@ -32,6 +80,45 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I delete an external link with the entity id ${entityId} on the product ${productName}"
+	macro _deleteProductExternalLink {
+		var externalLinkKey = KoroneikiProductAPI._getProductExternalLinkKey(
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	macro _getProductExternalLinkKey {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].key");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "[", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
+
+		echo("External link key value for ${entityId} for product ${productName}: ${externalLinkKey}");
+
+		return "${externalLinkKey}";
 	}
 
 	macro _getProductKeyViaProductName {
@@ -113,6 +200,24 @@ definition {
 		}
 	}
 
+	@prose = "the external link with the entity id ${entityId} should not be present on the product ${productName}"
+	macro _viewNoProductExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProductExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProductExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} is on the product ${productName}");
+		}
+	}
+
 	@prose = "I should be able to view a koroneiki product with the name ${productName}"
 	macro _viewProduct {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
@@ -131,6 +236,43 @@ definition {
 
 		if (!(contains("${productName}", "${productNameFromAPI}"))) {
 			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the product ${productName} with the following values"
+	macro _viewProductExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		echo("Expected ${field} Value: ${value}");
+		echo("Actual ${field} Value: ${valueFromAPI}");
+
+		if (!(contains("${value}", "${valueFromAPI}"))) {
+			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 		}
 	}
 }
