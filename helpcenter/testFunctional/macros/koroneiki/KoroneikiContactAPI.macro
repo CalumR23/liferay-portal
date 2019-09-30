@@ -321,159 +321,6 @@ definition {
 		}
 	}
 
-	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} via the external link key with the following values ${table}"
-	macro _viewContactExternalLinkViaExternalLinkKey {
-		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
-			contactEmailAddress = "${contactEmailAddress}",
-			entityId = "${entityId}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.domain");
-			}
-			else if ("${field}" == "Entity Id") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.entityId");
-			}
-			else if ("${field}" == "Entity Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.entityName");
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-		}
-
-		echo("Expected ${field} Value: ${value}");
-		echo("Actual ${field} Value: ${valueFromAPI}");
-
-		if (!(contains("${value}", "${valueFromAPI}"))) {
-			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-		}
-	}
-
-	@prose = "the external link with the entity id ${entityId} should be present on the contact with the okta ID ${contactOktaId} with the following values ${table}"
-	macro _viewContactExternalLinkViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Id") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-		}
-
-		echo("Expected ${field} Value: ${value}");
-		echo("Actual ${field} Value: ${valueFromAPI}");
-
-		if (!(contains("${value}", "${valueFromAPI}"))) {
-			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-		}
-	}
-
-	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} with the following values ${table}"
-	macro _viewContactExternalLinkViaUuid {
-		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Id") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-		}
-
-		echo("Expected ${field} Value: ${value}");
-		echo("Actual ${field} Value: ${valueFromAPI}");
-
-		if (!(contains("${value}", "${valueFromAPI}"))) {
-			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-		}
-	}
-
 	@prose = "I update a koroneiki contact with the email address ${contactEmailAddress} to have the following values ${table}"
 	macro _updateContactViaEmailAddress {
 		var RawTable rawTable = new RawTable("${table}");
@@ -912,6 +759,159 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} via the external link key with the following values ${table}"
+	macro _viewContactExternalLinkViaExternalLinkKey {
+		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
+			contactEmailAddress = "${contactEmailAddress}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.domain");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.entityId");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.entityName");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the contact with the okta ID ${contactOktaId} with the following values ${table}"
+	macro _viewContactExternalLinkViaOktaId {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} with the following values ${table}"
+	macro _viewContactExternalLinkViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
 	}
 
 	@prose = "I should be able to view a product consumption on koroneiki for a contact with the email address ${contactEmailAddress} on the account ${accountName} for the product ${productName} with the following values ${table}"
