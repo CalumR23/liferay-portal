@@ -70,6 +70,29 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	macro _getTeamRoleAuditEntryKey {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.field=='${fieldName}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].key");
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "[", "");
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "]", "");
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "&quot;", "");
+
+		echo("Audit entry key value for change to ${fieldName} from ${oldValue} to ${newValue} on team role ${teamRoleName}: ${auditEntryKey}");
+
+		return "${auditEntryKey}";
+	}
+
 	macro _getTeamRoleKeyViaTeamRoleName {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
@@ -236,6 +259,94 @@ definition {
 			else {
 				fail("No such team role field ${field}");
 			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view an audit entry for a change to the team role ${teamRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} with the following values ${table}"
+	macro _viewTeamRoleAuditEntry {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+			var field = StringUtil.replace("${field}", " ", "");
+
+			if ("${field}" == "action") {
+				var value = StringUtil.lowerCase("${value}");
+			}
+
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.field=='${fieldName}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].${field}");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view an audit entry for a change to the team role ${teamRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} via the audit entry key with the following values ${table}"
+	macro _viewTeamRoleAuditEntryViaAuditEntryKey {
+		var auditEntryKey = KoroneikiTeamRoleAPI._getTeamRoleAuditEntryKey(
+			teamRoleName = "${teamRoleName}",
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+			var field = StringUtil.replace("${field}", " ", "");
+
+			if ("${field}" == "action") {
+				var value = StringUtil.lowerCase("${value}");
+			}
+
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.${field}");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 
 			echo("Expected ${field} Value: ${value}");
 			echo("Actual ${field} Value: ${valueFromAPI}");
