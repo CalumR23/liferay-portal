@@ -1,0 +1,186 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create an external link on a team ${teamName} with the following values as a non permissioned user ${table}"
+	macro _createTeamExternalLinkAttempt {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete a koroneiki team with the name ${teamName} as a non permissioned user"
+	macro _deleteTeamAttempt {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete an external link with the entity id ${entityId} on the team ${teamName} as a non permissioned user"
+	macro _deleteTeamExternalLinkAttempt {
+		var externalLinkKey = KoroneikiTeamAPI._getTeamExternalLinkKey(
+			entityId = "${entityId}",
+			teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to update a team with the name ${teamName} to have the new name ${teamNameEdit} as a non permissioned user"
+	macro updateTeamAttempt {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki team with the name ${teamName} as a non permissioned user"
+	macro _viewNoTeam {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeams = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeams}", "${teamName}")) {
+			fail("The team with the name ${teamName} is visible to a non permissioned user");
+		}
+
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var team = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${team}", "${teamName}")) {
+			fail("The team with the name ${teamName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should not be able to view an assigned account with the name ${accountName} for the team ${teamName} as a non permissioned user"
+	macro _viewNoTeamAssignedAccount {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/assigned-accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeamAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeamAccounts}", "${accountName}")) {
+			fail("The assigned account with the name ${accountName} for the team ${teamName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} on the team ${teamName} should not be visible to a non permissioned user"
+	macro _viewNoTeamExternalLink {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeamExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeamExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the team ${teamName} is visible to a non permissioned user");
+		}
+
+		var externalLinkKey = KoroneikiTeamAPI._getTeamExternalLinkKey(
+			entityId = "${entityId}",
+			teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamExternalLink = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${teamExternalLink}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the team ${teamName} is visible to a non permissioned user");
+		}
+	}
+}

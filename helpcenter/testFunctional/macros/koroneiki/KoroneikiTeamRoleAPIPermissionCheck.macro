@@ -1,0 +1,189 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create a team role on koroneiki with the following values as a non permissioned user ${table}"
+	macro _createTeamRoleAttempt {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such team role field ${field}");
+			}
+		}
+
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+		if (!(isSet(type))) {
+			var type = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete a team role on koroneiki with the name ${teamRoleName} as a non permissioned user"
+	macro _deleteTeamRoleAttempt {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to update a koroneiki team role with the name ${teamRoleName} to have the following values as a non permissioned user ${table}"
+	macro _updateTeamRoleAttempt {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "-");
+
+				var type = "${value}";
+			}
+			else {
+				fail("No such team role field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(description))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "description=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.description");
+
+				var description = "${value}";
+			}
+			else {
+				var description = "";
+			}
+		}
+		if (!(isSet(name))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "name=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${value}";
+			}
+			else {
+				var name = "";
+			}
+		}
+		if (!(isSet(type))) {
+			var teamRoleObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${teamRoleObject}", "type=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.type");
+
+				var type = "${value}";
+			}
+			else {
+				var type = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"description": "${description}",
+				"name": "${name}",
+				"type": "${type}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki team role with the name ${teamRoleName} as a non permissioned user"
+	macro _viewNoTeamRole {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allTeamRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allTeamRoles}", "${teamRoleName}")) {
+			fail("The team role with the name ${teamRoleName} is visible for a non permissioned user");
+		}
+
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRole = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${teamRole}", "${teamRoleName}")) {
+			fail("The team role with the name ${teamRoleName} is visible for a non permissioned user");
+		}
+	}
+}
