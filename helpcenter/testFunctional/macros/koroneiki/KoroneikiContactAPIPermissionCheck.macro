@@ -1,0 +1,785 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create a contact on koroneiki with the following values as a non permissioned user ${table}"
+	macro _createContactAttempt {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		if (!(isSet(emailAddress))) {
+			var emailAddress = "";
+		}
+		if (!(isSet(firstName))) {
+			var firstName = "";
+		}
+		if (!(isSet(languageId))) {
+			var languageId = "";
+		}
+		if (!(isSet(lastName))) {
+			var lastName = "";
+		}
+		if (!(isSet(middleName))) {
+			var middleName = "";
+		}
+		if (!(isSet(oktaId))) {
+			var oktaId = "";
+		}
+		if (!(isSet(uuid))) {
+			var uuid = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to create an external link for the contact with the okta ID ${contactOktaId} with the following values as a non permissioned user ${table}"
+	macro _createContactExternalLinkViaOktaIdAttempt {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to create an external link for the contact with the email address ${contactEmailAddress} with the following values as a non permissioned user ${table}"
+	macro _createContactExternalLinkViaUuidAttempt {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete an external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress} as a non permissioned user"
+	macro _deleteContactExternalLinkAttempt {
+		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
+			contactEmailAddress = "${contactEmailAddress}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete a contact on koroneiki with the email address ${contactEmailAddress} as a non permissioned user"
+	macro _deleteContactViaEmailAddressAttempt {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete a contact on koroneiki with the okta ID ${contactOktaId} as a non permissioned user"
+	macro _deleteContactViaOktaIdAttempt {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete a contact on koroneiki with the email address ${contactEmailAddress} via uuid as a non permissioned user"
+	macro _deleteContactViaUuidAttempt {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to update a koroneiki contact with the email address ${contactEmailAddress} to have the following values as a non permissioned user ${table}"
+	macro _updateContactViaEmailAddressAttempt {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I attempt to update a koroneiki contact with the okta ID ${contactOktaId} to have the following values as a non permissioned user ${table}"
+	macro _updateContactViaOktaIdAttempt {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I attempt to update a koroneiki contact with the email address ${contactEmailAddress} via uuid to have the following values as a non permissioned user ${table}"
+	macro _updateContactViaUuidAttempt {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				var emailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var firstName = "${value}";
+			}
+			else if ("${field}" == "Language") {
+				var languageId = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var lastName = "${value}";
+			}
+			else if ("${field}" == "Middle Name") {
+				var middleName = "${value}";
+			}
+			else if ("${field}" == "Okta ID") {
+				var oktaId = "${value}";
+			}
+			else if ("${field}" == "UUID") {
+				var uuid = "${value}";
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(emailAddress))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "emailAddress=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
+
+				var emailAddress = "${value}";
+			}
+			else {
+				var emailAddress = "";
+			}
+		}
+		if (!(isSet(firstName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.firstName");
+
+				var firstName = "${value}";
+			}
+			else {
+				var firstName = "";
+			}
+		}
+		if (!(isSet(languageId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "languageId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.languageId");
+
+				var languageId = "${value}";
+			}
+			else {
+				var languageId = "";
+			}
+		}
+		if (!(isSet(lastName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "lastName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.lastName");
+
+				var lastName = "${value}";
+			}
+			else {
+				var lastName = "";
+			}
+		}
+		if (!(isSet(middleName))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${contactObject}", "middleName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.middleName");
+
+				var middleName = "${value}";
+			}
+			else {
+				var middleName = "";
+			}
+		}
+		if (!(isSet(oktaId))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "oktaId=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
+
+				var oktaId = "${value}";
+			}
+			else {
+				var oktaId = "";
+			}
+		}
+		if (!(isSet(uuid))) {
+			var contactObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${contactObject}", "uuid=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.uuid");
+
+				var uuid = "${value}";
+			}
+			else {
+				var uuid = "";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"emailAddress": "${emailAddress}",
+				"firstName": "${firstName}",
+				"languageId": "${languageId}",
+				"lastName": "${lastName}",
+				"middleName": "${middleName}",
+				"oktaId": "${oktaId}",
+				"uuid": "${uuid}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki contact with the email address ${contactEmailAddress} as a non permissioned user"
+	macro _viewNoContact {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContacts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContacts}", "${contactEmailAddress}")) {
+			fail("The contact with the email address ${contactEmailAddress} is visible to a non permissioned user");
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contact = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${contact}", "${contactEmailAddress}")) {
+			fail("The contact with the email address ${contactEmailAddress} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki contact with the okta ID ${contactOktaId} as a non permissioned user"
+	macro _viewNoContactViaOktaId {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contact = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${contact}", "${contactOktaId}")) {
+			fail("The contact with the okta ID ${contactOktaId} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki contact with the uuid of the contact with the email address ${contactEmailAddress} as a non permissioned user"
+	macro _viewNoContactViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contact = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${contact}", "${contactUuid}")) {
+			fail("The contact with the uuid ${contactUuid} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress} should not be visible to a non permissioned user"
+	macro _viewNoContactExternalLink {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress} is visible to a non permissioned user");
+		}
+
+		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
+			contactEmailAddress = "${contactEmailAddress}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${contactExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress} is visible to a non permissioned user");
+		}
+
+		var contactOktaId = KoroneikiContactAPI._getContactOktaIdViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress} is visible to a non permissioned user");
+		}
+	}
+}
