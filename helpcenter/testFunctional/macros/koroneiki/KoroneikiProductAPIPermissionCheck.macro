@@ -1,0 +1,184 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create a product with the name ${productName} as a non permissioned user"
+	macro _createProductAttempt {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${productName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to create an external link on a product ${productName} with the following values as a non permissioned user ${table}"
+	macro _createProductExternalLinkAttempt {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete a koroneiki product with the name ${productName} as a non permissioned user"
+	macro _deleteProductAttempt {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete an external link with the entity id ${entityId} on the product ${productName} as a non permissioned user"
+	macro _deleteProductExternalLinkAttempt {
+		var externalLinkKey = KoroneikiProductAPI._getProductExternalLinkKey(
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to update a product with the name ${productName} to have the new name ${productNameEdit} as a non permissioned user"
+	macro updateProductAttempt {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${productNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a koroneiki product with the name ${productName} as a non permissioned user"
+	macro _viewNoProduct {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProducts}", "${productName}")) {
+			fail("The product with the name ${productName} is visible to a non permissioned user");
+		}
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var product = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${product}", "${productName}")) {
+			fail("The product with the name ${productName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "the external link with the entity id ${entityId} on the product ${productName} should not be visible to a non permissioned user"
+	macro _viewNoProductExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProductExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProductExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product ${productName} is visible to a non permissioned user");
+		}
+
+		var externalLinkKey = KoroneikiProductAPI._getProductExternalLinkKey(
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productExternalLink = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${productExternalLink}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product ${productName} is visible to a non permissioned user");
+		}
+	}
+}

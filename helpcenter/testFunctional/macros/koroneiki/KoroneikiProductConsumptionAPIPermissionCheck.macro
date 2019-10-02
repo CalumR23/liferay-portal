@@ -1,0 +1,165 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create an external link for a product consumption made by account ${accountName} for the product ${productName} with the following values as a non permissioned user ${table}"
+	macro _createProductConsumptionExternalLinkAttempt {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete a product consumption on koroneiki made by the account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _deleteProductConsumptionAttempt {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete an external link with the entity id ${entityId} on a product consumption made by account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _deleteProductConsumptionExternalLinkAttempt {
+		var externalLinkKey = KoroneikiProductConsumptionAPI._getProductConsumptionExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I should not be able to view a product consumption on koroneiki made by the account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _viewNoProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+					
+		var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+			fail("The product consumption made by ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountProductConsumption = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${accountProductConsumption}", "${productKey}")) {
+			fail("The product consumption made by ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+	}
+
+	@prose = "the external link with the entity id ${entityId} on the product consumption made by account ${accountName} for the product ${productName} should not be visible to non permissioned users"
+	macro _viewNoProductConsumptionExternalLink {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProductConsumptionExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProductConsumptionExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product consumption made by the account ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+		var externalLinkKey = KoroneikiProductConsumptionAPI._getProductConsumptionExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productConsumptionExternalLink = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${productConsumptionExternalLink}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product consumption made by the account ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+	}
+}

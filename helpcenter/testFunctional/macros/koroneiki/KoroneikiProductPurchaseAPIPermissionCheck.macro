@@ -1,0 +1,331 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+
+	@prose = "I attempt to create an external link for a product purchase made by account ${accountName} for the product ${productName} with the following values as a non permissioned user ${table}"
+	macro _createProductPurchaseExternalLinkAttempt {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"domain": "${domain}",
+				"entityId": "${entityId}",
+				"entityName": "${entityName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to delete a product purchase on koroneiki made by the account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _deleteProductPurchaseAttempt {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to delete an external link with the entity id ${entityId} on a product purchase made by account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _deleteProductPurchaseExternalLinkAttempt {
+		var externalLinkKey = KoroneikiProductPurchaseAPI._getProductPurchaseExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to update a product purchase on koroneiki made by the account ${accountName} for the product ${productName} to have the following values as a non permissioned user ${table}"
+	macro _updateProductPurchaseAttempt {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var endDate = "${value1}";
+			}
+			else if ("${field}" == "Perpetual") {
+				var value1 = StringUtil.lowerCase("${value1}");
+
+				var value1 = StringUtil.replace("${value1}", " ", "-");
+
+				var perpetual = "${value1}";
+			}
+			else if ("${field}" == "Product Name") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Quantity") {
+				var quantity = "${value1}";
+			}
+			else if ("${field}" == "Start Date") {
+				var startDate = "${value1}";
+			}
+			else {
+				fail("No such product purchase field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(endDate))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "endDate=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.endDate");
+
+				var endDate = "${value}";
+			}
+			else {
+				var endDate = "";
+			}
+		}
+		if (!(isSet(perpetual))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "perpetual=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.perpetual");
+
+				var perpetual = "${value}";
+			}
+			else {
+				var perpetual = "true";
+			}
+		}
+		if (!(isSet(productKey))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "productKey=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.productKey");
+
+				var productKey = "${value}";
+			}
+			else {
+				var productKey = "";
+			}
+		}
+		if (!(isSet(properties))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "properties=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value}";
+			}
+			else {
+				var properties = "";
+			}
+		}
+		if (!(isSet(quantity))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "quantity=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.quantity");
+
+				var quantity = "${value}";
+			}
+			else {
+				var quantity = "1";
+			}
+		}
+		if (!(isSet(startDate))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "startDate=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.startDate");
+
+				var startDate = "${value}";
+			}
+			else {
+				var startDate = "";
+			}
+		}
+
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"endDate": "${endDate}",
+					"perpetual": ${perpetual},
+					"productKey": "${productKey}",
+					"quantity": ${quantity},
+					"startDate": "${startDate}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"endDate": "${endDate}",
+					"perpetual": ${perpetual},
+					"productKey": "${productKey}",
+					"properties": {
+						${properties}
+					},
+					"quantity": ${quantity},
+					"startDate": "${startDate}"
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a product purchase on koroneiki made by the account ${accountName} for the product ${productName} as a non permissioned user"
+	macro _viewNoProductPurchase {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+					
+		var allAccountProductPurchases = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountProductPurchases}", "${productKey}")) {
+			fail("The product purchase made by ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountProductPurchase = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${accountProductPurchase}", "${productKey}")) {
+			fail("The product purchase made by ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+	}
+
+	@prose = "the external link with the entity id ${entityId} on the product purchase made by account ${accountName} for the product ${productName} should not be visible to non permissioned users"
+	macro _viewNoProductPurchaseExternalLink {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProductPurchaseExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProductPurchaseExternalLinks}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product purchase made by the account ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+
+		var externalLinkKey = KoroneikiProductPurchaseAPI._getProductPurchaseExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}",
+			productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productPurchaseExternalLink = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${productPurchaseExternalLink}", "${entityId}")) {
+			fail("The external link with the entity id ${entityId} on the product purchase made by the account ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+	}
+}
