@@ -338,4 +338,31 @@ definition {
 			}
 		}
 	}
+
+	@prose = "I should be able to view a koroneiki product with the name ${productName} using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId}"
+	macro _viewProductViaExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/by-external-link/${domain}/${entityName}/${entityId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${productName}')].name");
+
+		var productNameFromAPI = StringUtil.replace("${productNameFromAPI}", "[", "");
+
+		var productNameFromAPI = StringUtil.replace("${productNameFromAPI}", "]", "");
+
+		var productNameFromAPI = StringUtil.replace("${productNameFromAPI}", "&quot;", "");
+
+		echo("Expected Name Value: ${productName}");
+		echo("Actual Name Value: ${productNameFromAPI}");
+
+		if (!(contains("${productName}", "${productNameFromAPI}"))) {
+			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+		}
+	}
 }

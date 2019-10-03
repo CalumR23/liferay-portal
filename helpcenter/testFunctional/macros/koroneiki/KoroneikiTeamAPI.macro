@@ -610,4 +610,31 @@ definition {
 			}
 		}
 	}
+
+	@prose = "I should be able to view a koroneiki team with the name ${teamName} using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId}"
+	macro _viewTeamViaExternalLink {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/by-external-link/${domain}/${entityName}/${entityId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${teamName}')].name");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "[", "");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "]", "");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "&quot;", "");
+
+		echo("Expected Name Value: ${teamName}");
+		echo("Actual Name Value: ${teamNameFromAPI}");
+
+		if (!(contains("${teamName}", "${teamNameFromAPI}"))) {
+			fail("Actual team name value ${teamNameFromAPI} does not match expected team name value ${teamName}");
+		}
+	}
 }
