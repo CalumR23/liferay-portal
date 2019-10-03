@@ -1218,6 +1218,22 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view a koroneiki account with the name ${accountName} using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId} as a non permissioned user"
+	macro _viewNoAccountViaExternalLink {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/by-external-link/${domain}/${entityName}/${entityId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var account = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${account}", "${accountName}")) {
+			fail("The account with the name ${accountName} is visible to a non permissioned user");
+		}
+	}
+
 	@prose = "I should not be able to view a child koroneiki account with the name ${childAccountName} on the parent account with the name ${parentAccountName} as a non permissioned user"
 	macro _viewNoChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${parentAccountName}");

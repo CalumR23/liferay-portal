@@ -328,4 +328,24 @@ definition {
 			fail("The external link with the entity id ${entityId} on the product purchase made by the account ${accountName} for the product ${productName} is visible to non permissioned users");
 		}
 	}
+
+	@prose = "I should not be able to view a product purchase on koroneiki made by the account ${accountName} for the product ${productName} using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId} as a non permissioned user"
+	macro _viewNoProductPurchaseViaExternalLink {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/by-external-link/${domain}/${entityName}/${entityId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountProductPurchase = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${accountProductPurchase}", "${accountKey}")) || (contains("${accountProductPurchase}", "${productKey}"))) {
+			fail("The product purchase made by ${accountName} for the product ${productName} is visible to non permissioned users");
+		}
+	}
 }

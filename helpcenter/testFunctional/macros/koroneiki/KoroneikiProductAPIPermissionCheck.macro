@@ -181,4 +181,20 @@ definition {
 			fail("The external link with the entity id ${entityId} on the product ${productName} is visible to a non permissioned user");
 		}
 	}
+
+	@prose = "I should not be able to view a koroneiki product with the name ${productName} using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId} as a non permissioned user"
+	macro _viewNoProductViaExternalLink {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/by-external-link/${domain}/${entityName}/${entityId}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var product = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${product}", "${productName}")) {
+			fail("The product with the name ${productName} is visible to a non permissioned user");
+		}
+	}
 }
