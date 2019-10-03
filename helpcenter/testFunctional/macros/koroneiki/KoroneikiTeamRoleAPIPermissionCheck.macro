@@ -186,4 +186,41 @@ definition {
 			fail("The team role with the name ${teamRoleName} is visible for a non permissioned user");
 		}
 	}
+
+	@prose = "I should not be able to view an audit entry for a change to the team role ${teamRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} as a non permissioned user"
+	macro _viewNoTeamRoleAuditEntry {
+		var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoleAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${teamRoleAuditEntries}", "${fieldName}")) || (contains("${teamRoleAuditEntries}", "${oldValue}")) || (contains("${teamRoleAuditEntries}", "${newValue}"))) {
+			fail("The team role audit entry for a change to the team role ${teamRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var auditEntryKey = KoroneikiTeamRoleAPI._getTeamRoleAuditEntryKey(
+			teamRoleName = "${teamRoleName}",
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoleAuditEntry = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${teamRoleAuditEntry}", "${fieldName}")) || (contains("${teamRoleAuditEntry}", "${oldValue}")) || (contains("${teamRoleAuditEntry}", "${newValue}"))) {
+			fail("The team role audit entry for a change to the team role ${teamRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+	}
 }

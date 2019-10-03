@@ -1165,6 +1165,43 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view an audit entry for a change to the account ${accountName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} as a non permissioned user"
+	macro _viewNoAccountAuditEntry {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${accountAuditEntries}", "${fieldName}")) || (contains("${accountAuditEntries}", "${oldValue}")) || (contains("${accountAuditEntries}", "${newValue}"))) {
+			fail("The account audit entry for a change to the account ${accountName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var auditEntryKey = KoroneikiAccountAPI._getAccountAuditEntryKey(
+			accountName = "${accountName}",
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountAuditEntry = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${accountAuditEntry}", "${fieldName}")) || (contains("${accountAuditEntry}", "${oldValue}")) || (contains("${accountAuditEntry}", "${newValue}"))) {
+			fail("The account audit entry for a change to the account ${accountName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+	}
+
 	@prose = "the external link with the entity id ${entityId} should not be visible on the account ${accountName} for a non permissioned user"
 	macro _viewNoAccountExternalLink {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");

@@ -699,6 +699,58 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view an audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} as a non permissioned user"
+	macro _viewNoContactAuditEntry {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${contactAuditEntries}", "${fieldName}")) || (contains("${contactAuditEntries}", "${oldValue}")) || (contains("${contactAuditEntries}", "${newValue}"))) {
+			fail("The contact audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var contactOktaId = KoroneikiContactAPI._getContactOktaIdViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${contactAuditEntries}", "${fieldName}")) || (contains("${contactAuditEntries}", "${oldValue}")) || (contains("${contactAuditEntries}", "${newValue}"))) {
+			fail("The contact audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var auditEntryKey = KoroneikiContactAPI._getContactAuditEntryKey(
+			contactEmailAddress = "${contactEmailAddress}",
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactAuditEntry = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${contactAuditEntry}", "${fieldName}")) || (contains("${contactAuditEntry}", "${oldValue}")) || (contains("${contactAuditEntry}", "${newValue}"))) {
+			fail("The contact audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+	}
+
 	@prose = "I should not be able to view a product consumption on koroneiki for a contact with the email address ${contactEmailAddress} on the account ${accountName} for the product ${productName} as a non permissioned user"
 	macro _viewNoContactProductConsumption {
 		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(

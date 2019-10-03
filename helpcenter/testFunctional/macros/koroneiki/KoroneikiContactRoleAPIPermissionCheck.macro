@@ -186,4 +186,41 @@ definition {
 			fail("The contact role with the name ${contactRoleName} is visible to a non permissioned user");
 		}
 	}
+
+	@prose = "I should not be able to view an audit entry for a change to the contact role ${contactRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} as a non permissioned user"
+	macro _viewNoContactRoleAuditEntry {
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactRoleAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${contactRoleAuditEntries}", "${fieldName}")) || (contains("${contactRoleAuditEntries}", "${oldValue}")) || (contains("${contactRoleAuditEntries}", "${newValue}"))) {
+			fail("The contact role audit entry for a change to the contact role ${contactRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var auditEntryKey = KoroneikiContactRoleAPI._getContactRoleAuditEntryKey(
+			contactRoleName = "${contactRoleName}",
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactRoleAuditEntry = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${contactRoleAuditEntry}", "${fieldName}")) || (contains("${contactRoleAuditEntry}", "${oldValue}")) || (contains("${contactRoleAuditEntry}", "${newValue}"))) {
+			fail("The contact role audit entry for a change to the contact role ${contactRoleName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+	}
 }

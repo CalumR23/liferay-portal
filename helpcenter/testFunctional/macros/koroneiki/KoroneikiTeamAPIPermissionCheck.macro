@@ -149,6 +149,43 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view an audit entry for a change to the team ${teamName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} as a non permissioned user"
+	macro _viewNoTeamAuditEntry {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/audit-entries
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamAuditEntries = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${teamAuditEntries}", "${fieldName}")) || (contains("${teamAuditEntries}", "${oldValue}")) || (contains("${teamAuditEntries}", "${newValue}"))) {
+			fail("The team audit entry for a change to the team ${teamName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+
+		var auditEntryKey = KoroneikiTeamAPI._getTeamAuditEntryKey(
+			fieldName = "${fieldName}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}",
+			teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamAuditEntry = JSONCurlUtil.get("${curl}", "$");
+
+		if ((contains("${teamAuditEntry}", "${fieldName}")) || (contains("${teamAuditEntry}", "${oldValue}")) || (contains("${teamAuditEntry}", "${newValue}"))) {
+			fail("The team audit entry for a change to the team ${teamName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
+		}
+	}
+
 	@prose = "the external link with the entity id ${entityId} on the team ${teamName} should not be visible to a non permissioned user"
 	macro _viewNoTeamExternalLink {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
