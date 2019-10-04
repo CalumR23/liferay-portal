@@ -151,6 +151,45 @@ definition {
 		return "${teamKey}";
 	}
 
+	@prose = "I tear down the external links for the team ${teamName} on koroneiki with the following entity id values ${table}"
+	macro _tearDownTeamExternalLinks {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allTeams = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allTeams}", "${teamName}")) {
+				var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allTeamExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allTeamExternalLinks}", "${entityId}")) {
+					KoroneikiTeamAPI._deleteTeamExternalLink(
+						teamName = "${teamName}",
+						entityId = "${entityId}");
+
+					echo("Entity ID of external link for ${teamName} deleted: ${entityId}");
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the teams on koroneiki with the following names ${table}"
 	macro _tearDownTeams {
 		var RawTable rawTable = new RawTable("${table}");

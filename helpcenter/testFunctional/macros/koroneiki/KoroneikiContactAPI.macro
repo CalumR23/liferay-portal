@@ -320,6 +320,45 @@ definition {
 		return "${contactUuid}";
 	}
 
+	@prose = "I tear down the external links for the contact with the email address ${contactEmailAddress} on koroneiki with the following entity id values ${table}"
+	macro _tearDownContactExternalLinks {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allContacts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allContacts}", "${contactEmailAddress}")) {
+				var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/external-links
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allContactExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allContactExternalLinks}", "${entityId}")) {
+					KoroneikiContactAPI._deleteContactExternalLink(
+						contactEmailAddress = "${contactEmailAddress}",
+						entityId = "${entityId}");
+
+					echo("Entity ID of external link contact with email address ${contactEmailAddress} deleted: ${entityId}");
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the contacts on koroneiki with the following email addresses ${table}"
 	macro _tearDownContacts {
 		var RawTable rawTable = new RawTable("${table}");

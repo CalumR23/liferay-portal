@@ -1045,6 +1045,45 @@ definition {
 		}
 	}
 
+	@prose = "I tear down the external links for the account ${accountName} on koroneiki with the following entity id values ${table}"
+	macro _tearDownAccountExternalLinks {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allAccounts}", "${accountName}")) {
+				var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allAccountExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allAccountExternalLinks}", "${entityId}")) {
+					KoroneikiAccountAPI._deleteAccountExternalLink(
+						accountName = "${accountName}",
+						entityId = "${entityId}");
+
+					echo("Entity ID of external link for ${accountName} deleted: ${entityId}");
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the accounts on koroneiki with the following names ${table}"
 	macro _tearDownAccounts {
 		var RawTable rawTable = new RawTable("${table}");

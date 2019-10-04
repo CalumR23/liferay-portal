@@ -144,6 +144,45 @@ definition {
 		return "${productKey}";
 	}
 
+	@prose = "I tear down the external links for the product ${productName} on koroneiki with the following entity id values ${table}"
+	macro _tearDownProductExternalLinks {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allProducts}", "${productName}")) {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/external-links
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allProductExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allProductExternalLinks}", "${entityId}")) {
+					KoroneikiProductAPI._deleteProductExternalLink(
+						productName = "${productName}",
+						entityId = "${entityId}");
+
+					echo("Entity ID of external link for ${productName} deleted: ${entityId}");
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the products on koroneiki with the following names ${table}"
 	macro _tearDownProducts {
 		var RawTable rawTable = new RawTable("${table}");

@@ -262,6 +262,61 @@ definition {
 		return "${externalLinkKey}";
 	}
 
+	@prose = "I tear down the external links for the product purchase made by account ${accountName} for the product ${productName} with the following entity id values ${table}"
+	macro _tearDownProductPurchaseExternalLinks {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allAccounts}", "${accountName}")) {
+				var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allAccountProductPurchases = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allAccountProductPurchases}", "${productName}")) {
+					var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+						accountName = "${accountName}",
+						productName = "${productName}");
+
+					var curl = '''
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}/external-links
+						--header "API_Token: ${apiToken}"
+						-H "accept: application/json"
+						-H "Content-Type: application/json"
+						''';
+
+					var allAccountProductPurchaseExternalLinks = JSONCurlUtil.get("${curl}", "$");
+					
+					if (contains("${allAccountProductPurchaseExternalLinks}", "${entityId}")) {
+						KoroneikiProductPurchaseAPI._deleteProductPurchaseExternalLink(
+							accountName = "${accountName}",
+							entityId = "${entityId}",
+							productName = "${productName}");
+
+						echo("Entity ID of external link deleted for product purchase made by ${accountName} for ${productName}: ${entityId}");
+					}
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the product purchases on koroneiki made by the account ${accountName} for the following products ${table}"
 	macro _tearDownProductPurchases {
 		var curl = '''
