@@ -188,6 +188,42 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I tear down the permissions for a koroneiki contact role with the name ${contactRoleName} set for a non permissioned user"
+	macro _tearDownContactRolePermissions {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactRoles = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactRoles}", "${contactRoleName}")) {
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/contact-role-permissions?operation=save
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"assignContact": "false",
+					"delete": "false",
+					"permissions": "false",
+					"roleNames": [
+						"${roleName}"
+					],
+					"update": "false",
+					"view": "false"
+				}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
 	@prose = "I tear down the contact roles on koroneiki with the following names ${table}"
 	macro _tearDownContactRoles {
 		var RawTable rawTable = new RawTable("${table}");
