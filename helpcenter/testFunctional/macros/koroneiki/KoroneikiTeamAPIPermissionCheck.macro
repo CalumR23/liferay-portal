@@ -1,6 +1,7 @@
 definition {
 	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
 	@prose = "I attempt to create an external link on a team ${teamName} with the following values as a non permissioned user ${table}"
 	macro _createTeamExternalLinkAttempt {
@@ -52,6 +53,20 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I delete a koroneiki team with the name ${teamName} as a permissioned user"
+	macro _deleteTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I attempt to delete a koroneiki team with the name ${teamName} as a non permissioned user"
 	macro _deleteTeamAttempt {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -80,6 +95,178 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I set the permissions for a team with the name ${teamName} to have the following values for a non permissioned user as a permissioned user ${table}"
+	macro _setTeamPermissions {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Assign Contact") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignContact = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(assignContact))) {
+			var assignContact = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/team-permissions?operation=save
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"assignContact": "${assignContact}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to set the permissions for a team with the name ${teamName} to have the following values for a non permissioned user as a non permissioned user ${table}"
+	macro _setTeamPermissionsAttempt {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Assign Contact") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignContact = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(assignContact))) {
+			var assignContact = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/team-permissions?operation=save
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"assignContact": "${assignContact}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I update a team with the name ${teamName} to have the new name ${teamNameEdit} as a permissioned user"
+	macro updateTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I attempt to update a team with the name ${teamName} to have the new name ${teamNameEdit} as a non permissioned user"
@@ -234,6 +421,174 @@ definition {
 
 		if (contains("${team}", "${teamName}")) {
 			fail("The team with the name ${teamName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki team with the name ${teamName} as a permissioned user"
+	macro _viewTeam {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+
+		echo("Expected Name Value: ${teamName}");
+		echo("Actual Name Value: ${teamNameFromAPI}");
+
+		if (!(contains("${teamName}", "${teamNameFromAPI}"))) {
+			fail("Actual team name value ${teamNameFromAPI} does not match expected team name value ${teamName}");
+		}
+	}
+
+	@prose = "I should be able to view an assigned account with the name ${accountName} for the team ${teamName} and the following values as a permissioned user ${table}"
+	macro _viewTeamAssignedAccount {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/assigned-accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Code") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].code");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Contact Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].contactEmailAddress");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].description");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Fax Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].faxNumber");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Industry") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].industry");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].name");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Notes") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].notes");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Phone Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].phoneNumber");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Profile Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].profileEmailAddress");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Sold By") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].soldBy");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].status");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Tier") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].tier");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Website") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].website");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such account field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
 		}
 	}
 }

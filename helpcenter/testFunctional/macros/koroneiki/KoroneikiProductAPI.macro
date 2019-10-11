@@ -3,6 +3,7 @@ definition {
 	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
 	@prose = "I create a product with the name ${productName}"
 	macro _createProduct {
@@ -144,6 +145,83 @@ definition {
 		return "${productKey}";
 	}
 
+	@prose = "I set the permissions for a product with the name ${productName} to have the following values for a non permissioned user ${table}"
+	macro _setProductPermissions {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Consume") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var consume = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(consume))) {
+			var consume = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/product-permissions?operation=save
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"consume": "${consume}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I tear down the external links for the product ${productName} on koroneiki with the following entity id values ${table}"
 	macro _tearDownProductExternalLinks {
 		var RawTable rawTable = new RawTable("${table}");
@@ -180,6 +258,42 @@ definition {
 					echo("Entity ID of external link for ${productName} deleted: ${entityId}");
 				}
 			}
+		}
+	}
+
+	@prose = "I tear down the permissions for a koroneiki product with the name ${productName} set for a non permissioned user"
+	macro _tearDownProductPermissions {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProducts}", "${productName}")) {
+			var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/product-permissions?operation=save
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"assignContact": "false",
+					"delete": "false",
+					"permissions": "false",
+					"roleNames": [
+						"${roleName}"
+					],
+					"update": "false",
+					"view": "false"
+				}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 		}
 	}
 

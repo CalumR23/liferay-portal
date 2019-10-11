@@ -1,6 +1,7 @@
 definition {
 	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
 	@prose = "I attempt to create a product with the name ${productName} as a non permissioned user"
 	macro _createProductAttempt {
@@ -68,6 +69,20 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I delete a koroneiki product with the name ${productName} as a permissioned user"
+	macro _deleteProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I attempt to delete a koroneiki product with the name ${productName} as a non permissioned user"
 	macro _deleteProductAttempt {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
@@ -96,6 +111,178 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I set the permissions for a product with the name ${productName} to have the following values for a non permissioned user as a permissioned user ${table}"
+	macro _setProductPermissions {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Consume") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var consume = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(consume))) {
+			var consume = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/product-permissions?operation=save
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"consume": "${consume}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I attempt to set the permissions for a product with the name ${productName} to have the following values for a non permissioned user as a non permissioned user ${table}"
+	macro _setProductPermissionsAttempt {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Consume") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var consume = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(consume))) {
+			var consume = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/product-permissions?operation=save
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"consume": "${consume}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I update a product with the name ${productName} to have the new name ${productNameEdit} as a permissioned user"
+	macro updateProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${productNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I attempt to update a product with the name ${productName} to have the new name ${productNameEdit} as a non permissioned user"
@@ -195,6 +382,27 @@ definition {
 
 		if (contains("${product}", "${productName}")) {
 			fail("The product with the name ${productName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki product with the name ${productName} as a permissioned user"
+	macro _viewProduct {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+
+		echo("Expected Name Value: ${productName}");
+		echo("Actual Name Value: ${productNameFromAPI}");
+
+		if (!(contains("${productName}", "${productNameFromAPI}"))) {
+			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
 		}
 	}
 }
