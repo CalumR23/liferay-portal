@@ -522,6 +522,65 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values as a permissioned user ${table}"
+	macro _createAccountProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;: &quot;${value2}&quot;";
+				}
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+		}
+
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"productKey": "${productKey}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"productKey": "${productKey}",
+					"properties": {
+						${properties}
+					}
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I attempt to create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountProductConsumptionAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
