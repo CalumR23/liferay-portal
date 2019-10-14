@@ -236,14 +236,23 @@ definition {
 	macro _getContactAuditEntryKey {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
+		var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+		var field = StringUtil.replace("${field}", " ", "");
+
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/audit-entries
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/audit-entries?pageSize=100
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
-		var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.field=='${fieldName}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].key");
+		if (!("${oldValue}" == "")) {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].key");
+		}
+		else {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].key");
+		}
 
 		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "[", "");
 
@@ -251,7 +260,7 @@ definition {
 
 		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "&quot;", "");
 
-		echo("Audit entry key value for change to ${fieldName} from ${oldValue} to ${newValue} on contact with the email address ${contactEmailAddress}: ${auditEntryKey}");
+		echo("Audit entry key value: ${auditEntryKey}");
 
 		return "${auditEntryKey}";
 	}
@@ -993,13 +1002,18 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I should be able to view an audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} via the audit entry key with the following values ${table}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue} via the audit entry key"
 	macro _viewContactAuditEntryViaAuditEntryKey {
 		var auditEntryKey = KoroneikiContactAPI._getContactAuditEntryKey(
+			action = "${action}",
 			contactEmailAddress = "${contactEmailAddress}",
-			fieldName = "${fieldName}",
+			field = "${field}",
 			newValue = "${newValue}",
 			oldValue = "${oldValue}");
+
+		var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+		var field = StringUtil.replace("${field}", " ", "");
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
@@ -1008,110 +1022,196 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		var RawTable rawTable = new RawTable("${table}");
+		var actionFromAPI = JSONCurlUtil.get("${curl}", "$.action");
 
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
+		echo("Expected Action Value: ${action}");
+		echo("Actual Action Value: ${actionFromAPI}");
 
-			var field = StringUtil.lowerCaseFirstLetter("${field}");
+		if (!("${action}" == "${actionFromAPI}")) {
+			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
+		}
 
-			var field = StringUtil.replace("${field}", " ", "");
+		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.field");
 
-			if ("${field}" == "action") {
-				var value = StringUtil.lowerCase("${value}");
+		echo("Expected Field Value: ${field}");
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if (!("${field}" == "${fieldFromAPI}")) {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.oldValue");
+
+			echo("Expected Old Value: ${oldValue}");
+			echo("Actual Old Value: ${oldValueFromAPI}");
+
+			if (!("${oldValue}" == "${oldValueFromAPI}")) {
+				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
 			}
+		}
 
-			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.${field}");
+		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
 
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
+		echo("Expected New Value: ${newValue}");
+		echo("Actual New Value: ${newValueFromAPI}");
 
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
+		if (!("${newValue}" == "${newValueFromAPI}")) {
+			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
 	}
 
-	@prose = "I should be able to view an audit entry for a change to the contact with the okta ID ${contactOktaId} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} with the following values ${table}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the okta ID ${contactOktaId} field ${field} from the old value ${oldValue} to the new value ${newValue}"
 	macro _viewContactAuditEntryViaOktaId {
+		var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+		var field = StringUtil.replace("${field}", " ", "");
+
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/audit-entries
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/audit-entries?pageSize=100
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
-		var RawTable rawTable = new RawTable("${table}");
+		var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].action");
 
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "[", "");
 
-			var field = StringUtil.lowerCaseFirstLetter("${field}");
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "]", "");
 
-			var field = StringUtil.replace("${field}", " ", "");
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "&quot;", "");
 
-			if ("${field}" == "action") {
-				var value = StringUtil.lowerCase("${value}");
+		echo("Expected Action Value: ${action}");
+		echo("Actual Action Value: ${actionFromAPI}");
+
+		if (!("${action}" == "${actionFromAPI}")) {
+			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
+		}
+
+		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].field");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "]", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "&quot;", "");
+
+		echo("Expected Field Value: ${field}");
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if (!("${field}" == "${fieldFromAPI}")) {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].oldValue");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "[", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "]", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "&quot;", "");
+
+			echo("Expected Old Value: ${oldValue}");
+			echo("Actual Old Value: ${oldValueFromAPI}");
+
+			if (!("${oldValue}" == "${oldValueFromAPI}")) {
+				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
 			}
+		}
 
-			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.field=='${fieldName}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].${field}");
+		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].newValue");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
 
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
+		echo("Expected New Value: ${newValue}");
+		echo("Actual New Value: ${newValueFromAPI}");
 
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
+		if (!("${newValue}" == "${newValueFromAPI}")) {
+			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
 	}
 
-	@prose = "I should be able to view an audit entry for a change to the contact with the email address ${contactEmailAddress} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} with the following values ${table}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue}"
 	macro _viewContactAuditEntryViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
+		var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+		var field = StringUtil.replace("${field}", " ", "");
+
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/audit-entries
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/audit-entries?pageSize=100
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
-		var RawTable rawTable = new RawTable("${table}");
+		var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].action");
 
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "[", "");
 
-			var field = StringUtil.lowerCaseFirstLetter("${field}");
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "]", "");
 
-			var field = StringUtil.replace("${field}", " ", "");
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "&quot;", "");
 
-			if ("${field}" == "action") {
-				var value = StringUtil.lowerCase("${value}");
+		echo("Expected Action Value: ${action}");
+		echo("Actual Action Value: ${actionFromAPI}");
+
+		if (!("${action}" == "${actionFromAPI}")) {
+			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
+		}
+
+		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].field");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "]", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "&quot;", "");
+
+		echo("Expected Field Value: ${field}");
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if (!("${field}" == "${fieldFromAPI}")) {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].oldValue");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "[", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "]", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "&quot;", "");
+
+			echo("Expected Old Value: ${oldValue}");
+			echo("Actual Old Value: ${oldValueFromAPI}");
+
+			if (!("${oldValue}" == "${oldValueFromAPI}")) {
+				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
 			}
+		}
 
-			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.field=='${fieldName}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].${field}");
+		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].newValue");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
 
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
+		echo("Expected New Value: ${newValue}");
+		echo("Actual New Value: ${newValueFromAPI}");
 
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
+		if (!("${newValue}" == "${newValueFromAPI}")) {
+			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
 	}
 
