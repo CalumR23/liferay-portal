@@ -130,7 +130,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Delete") {
+			if ("${field}" == "Assign Team") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignTeam = "${value}";
+			}
+			else if ("${field}" == "Delete") {
 				var value = StringUtil.lowerCase("${value}");
 
 				var delete = "${value}";
@@ -155,6 +160,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(assignTeam))) {
+			var assignTeam = "false";
+		}
 		if (!(isSet(delete))) {
 			var delete = "false";
 		}
@@ -169,12 +177,13 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/team-role-permissions?operation=save
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/team-role-permissions
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			-d
 			{
+				"assignTeam": "${assignTeam}",
 				"delete": "${delete}",
 				"permissions": "${permissions}",
 				"roleNames": [
@@ -185,7 +194,7 @@ definition {
 			}
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I tear down the permissions for a koroneiki team role with the name ${teamRoleName} set for a non permissioned user"
@@ -203,7 +212,7 @@ definition {
 			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
 
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/team-role-permissions?operation=save
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}/team-role-permissions
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -220,7 +229,7 @@ definition {
 				}
 				''';
 
-			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 		}
 	}
 
