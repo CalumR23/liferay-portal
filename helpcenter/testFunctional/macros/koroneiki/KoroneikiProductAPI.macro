@@ -282,18 +282,18 @@ definition {
 				-H "Content-Type: application/json"
 				-d
 				{
-					"assignContact": "false",
-					"delete": "false",
-					"permissions": "false",
+					"assignContact": "true",
+					"delete": "true",
+					"permissions": "true",
 					"roleNames": [
 						"${roleName}"
 					],
-					"update": "false",
-					"view": "false"
+					"update": "true",
+					"view": "true"
 				}
 				''';
 
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
 	}
 
@@ -337,6 +337,83 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I unset the following permissions for a product with the name ${productName} for a permissioned user ${table}"
+	macro _unsetProductPermissions {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Consume") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var consume = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(consume))) {
+			var consume = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}/product-permissions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"consume": "${consume}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I should not be able to view a koroneiki product with the name ${productName}"
