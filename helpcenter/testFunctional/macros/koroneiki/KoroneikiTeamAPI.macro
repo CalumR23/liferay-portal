@@ -298,18 +298,18 @@ definition {
 				-H "Content-Type: application/json"
 				-d
 				{
-					"assignContact": "false",
-					"delete": "false",
-					"permissions": "false",
+					"assignContact": "true",
+					"delete": "true",
+					"permissions": "true",
 					"roleNames": [
 						"${roleName}"
 					],
-					"update": "false",
-					"view": "false"
+					"update": "true",
+					"view": "true"
 				}
 				''';
 
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
 	}
 
@@ -335,6 +335,83 @@ definition {
 				echo("Name of team deleted: ${teamName}");
 			}
 		}
+	}
+
+	@prose = "I unset the following permissions for a team with the name ${teamName} for a permissioned user ${table}"
+	macro _unsetTeamPermissions {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Assign Contact") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignContact = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(assignContact))) {
+			var assignContact = "false";
+		}
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/team-permissions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"assignContact": "${assignContact}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I update a team with the name ${teamName} to have the new name ${teamNameEdit}"
