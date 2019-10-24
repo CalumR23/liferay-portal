@@ -3,6 +3,44 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "if the trigger ${triggerName} does not have ${updateDate} as its update date then the update date on ${zendeskTestFileName1} and ${zendeskTestFileName2} should be changed if not"
+	macro _changeTriggerUpdateDate {
+		var triggerId = ZendeskTriggerAPI._getTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var updateDateFromAPI = JSONCurlUtil.get("${curl}", "$.trigger.updated_at");
+
+		if (!("${updateDateFromAPI}" == "${updateDate}")) {
+			var testBaseDirName = PropsUtil.get("test.base.dir.name");
+
+			var zendeskTestFileContent1 = FileUtil.read("${testBaseDirName}/tests/${zendeskTestFileName1}");
+
+			var zendeskTestFileContent1 = StringUtil.replace(
+				"${zendeskTestFileContent1}",
+				"the trigger &quot;${triggerName}&quot; should have &quot;${updateDate}&quot; as its update date",
+				"the trigger &quot;${triggerName}&quot; should have &quot;${updateDateFromAPI}&quot; as its update date");
+
+			com.liferay.poshi.runner.util.FileUtil.write(
+				"${testBaseDirName}/tests/${zendeskTestFileName1}",
+				"${zendeskTestFileContent1}");
+
+			var zendeskTestFileContent2 = FileUtil.read("${testBaseDirName}/tests/${zendeskTestFileName2}");
+
+			var zendeskTestFileContent2 = StringUtil.replace(
+				"${zendeskTestFileContent2}",
+				"if the trigger &quot;${triggerName}&quot; does not have &quot;${updateDate}&quot; as its update date then the update date on &quot;${zendeskTestFileName1}&quot; and &quot;${zendeskTestFileName2}&quot; should be changed if not",
+				"if the trigger &quot;${triggerName}&quot; does not have &quot;${updateDateFromAPI}&quot; as its update date then the update date on &quot;${zendeskTestFileName1}&quot; and &quot;${zendeskTestFileName2}&quot; should be changed if not");
+
+			com.liferay.poshi.runner.util.FileUtil.write(
+				"${testBaseDirName}/tests/${zendeskTestFileName2}",
+				"${zendeskTestFileContent2}");
+		}
+	}
+
 	macro _getTriggerIdByName {
 		var triggerNameEditNoSpace = StringUtil.replace("${triggerName}", " ", "+");
 
