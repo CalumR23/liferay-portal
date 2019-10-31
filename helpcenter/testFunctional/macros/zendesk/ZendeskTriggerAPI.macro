@@ -5,7 +5,7 @@ definition {
 
 	@prose = "if the trigger ${triggerName} does not have ${updateDate} as its update date then the update date on ${zendeskTestFileName1} and ${zendeskTestFileName2} should be changed"
 	macro _changeTriggerUpdateDate {
-		var triggerId = ZendeskTriggerAPI._getTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
 
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
@@ -41,6 +41,31 @@ definition {
 		}
 	}
 
+	macro _getActiveTriggerIdByNameWithoutNameVerification {
+		var triggerNameEditNoSpace = StringUtil.replace("${triggerName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/triggers/search.json?query=${triggerNameEditNoSpace}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[?(@.active==true)].id");
+
+		while (contains("${triggerId}", ",")) {
+			var extraTrigger = StringUtil.extractLast("${triggerId}", ",");
+
+			var triggerId = StringUtil.replace("${triggerId}", ",${extraTrigger}", "");
+		}
+
+		var triggerId = StringUtil.replace("${triggerId}", "[", "");
+
+		var triggerId = StringUtil.replace("${triggerId}", "]", "");
+
+		var triggerId = StringUtil.replace("${triggerId}", "&quot;", "");
+
+		return "${triggerId}";
+	}
+
 	macro _getTriggerIdByName {
 		var triggerNameEditNoSpace = StringUtil.replace("${triggerName}", " ", "+");
 
@@ -68,25 +93,6 @@ definition {
 		if (!("${triggerName}" == "${triggerNameFromAPI}")) {
 			fail("Actual trigger name ${triggerNameFromAPI} obtained from search does not match the expected trigger name ${triggerName}");
 		}
-
-		return "${triggerId}";
-	}
-
-	macro _getTriggerIdByNameWithoutNameVerification {
-		var triggerNameEditNoSpace = StringUtil.replace("${triggerName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/triggers/search.json?query=${triggerNameEditNoSpace}
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[0].id");
-
-		var triggerId = StringUtil.replace("${triggerId}", "[", "");
-
-		var triggerId = StringUtil.replace("${triggerId}", "]", "");
-
-		var triggerId = StringUtil.replace("${triggerId}", "&quot;", "");
 
 		return "${triggerId}";
 	}
@@ -963,7 +969,7 @@ definition {
 
 	@prose = "the trigger ${triggerName} should have ${updateDate} as its update date"
 	macro _viewTriggerUpdateDate {
-		var triggerId = ZendeskTriggerAPI._getTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
 
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
