@@ -232,6 +232,51 @@ Scenario: View expired project partner worker updates
 	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
 	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
 
+Scenario: View renewed project partner worker updates
+	If a project's order becomes active from inactive in OSB, existing partner workers on that project should have their tags and also be part of their organization in Zendesk.
+
+	Given I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Portal Production"
+	And I automatically have all expired projects moved to on hold status
+	And I edit a project with the name "Zen OSB Automotive" and code "ZENOSBA" to have a support lifetime of "1 Year" starting "0" days from now for the product "Portal Production"
+	And I edit the product "Portal Production" offering status from "On Hold" to "Active" for the project with the code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be subscribed to the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be subscribed to the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not be subscribed to the organization "Zen OSB Automotive"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner3@lrpartner.com.broken" should not have the "osb_partner" tag
+
 Scenario: View partner manager removal updates
 	If a manager is removed from a partner tied to a project in OSB, the manager's tags should be removed and the manager should also be removed from the organization in Zendesk.
 
