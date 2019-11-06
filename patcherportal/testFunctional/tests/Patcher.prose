@@ -1911,3 +1911,80 @@ Scenario: Create and release a 70 security build
 	| Jenkins         | fixpack-builder-agent(uat)                    |
 	| Hotfix          | liferay-security-de-10-${staticTicketNumber}- |
 	| Hotfix          | -7010                                         |
+
+Scenario: Create a sharepoint connector build
+	@ test.group = "0"
+	As a TSE, I should be able to create a sharepoint connector build
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1 Liferay Connector for SharePoint                 |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private           |
+	| Content         | ${staticFixContent}                                      |
+	| Branch Name     | LPP-35497_marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Github URL      | git@github.com:ricardocousolr/liferay-portal-ee.git      |
+	| Workaround      | true                                                     |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent}                            |
+	| Version         | 1.0                                            |
+	| Product         | DXP 7.1 Liferay Connector for SharePoint       |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Patcher Status  | Adding                                         |
+	| Type            | Workaround                                     |
+	When I check the Patcher fix containing the content "${staticFixContent}" and type "Workaround" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent}                            |
+	| Version         | 1.0                                            |
+	| Product         | DXP 7.1 Liferay Connector for SharePoint       |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Git Hash        | 3c208f49d4                                     |
+	| Patcher Status  | Complete                                       |
+	| Type            | Workaround                                     |
+	| Jenkins         | fixpack-builder-agent(uat)                     |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.1 Liferay Connector for SharePoint       |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Tickets List    | ${staticFixContent}                            |
+	| Account Code    | SERUNIONPORTAL                                 |
+	| Support Ticket  | ${staticTicketNumber}                          |
+	And I set the account code "SERUNIONPORTAL" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" with the following values
+	| Type            | Official                                       |
+	| Support Ticket  | ${staticTicketNumber}                          |
+	| Version         | 1.0                                            |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Content         | 0 Fix Packs + 1 Tickets                        |
+	| Patcher Status  | Merging                                        |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" with the following values
+	| Version         | 1.0                                            |
+	| Name            | ${staticFixContent}                            |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Patcher Status  | Merging Only                                   |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" with the following values
+	| Name            | ${staticFixContent} |
+	| Version         | 1.0                 |
+	| Git Hash        | 3c208f49d4          |
+	| Status          | Complete            |
+	| Type            | Workaround          |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" with the following values
+	| Type            | Official                                       |
+	| Support Ticket  | ${staticTicketNumber}                          |
+	| Version         | 1.0                                            |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Content         | 0 Fix Packs + 1 Tickets                        |
+	| Patcher Status  | Complete                                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat)                 |
+	| Jenkins         | fixpack-builder-agent(uat)                     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "SERUNIONPORTAL" with the following values
+	| Version         | 1.0                                            |
+	| Name            | ${staticFixContent}                            |
+	| Project Version | marketplace-sharepoint-rest-2.0.0-7110-private |
+	| Patcher Status  | Complete Merging Only                          |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat)                 |
+	| Jenkins         | fixpack-builder-agent(uat)                     |
