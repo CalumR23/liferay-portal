@@ -1,0 +1,75 @@
+definition {
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+
+	@prose = "I go to the ticket with the ID ${ticketId}"
+	macro gotoViaId {
+		Open(locator1 = "${zendeskURL}/agent/tickets/${ticketId}");
+	}
+
+	@prose = "I upload a file using the large file uploader with the following parameters via the ticket page ${table}"
+	macro uploadFileViaLargeFileUploader {
+		Click(locator1 = "ZendeskTicketView#LARGE_ATTACHMENT_LINK");
+
+		ZendeskHomepage.pause(timeInSeconds = "10");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Attachment") {
+				MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
+
+				UploadCommonFile(
+					locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
+					value1 = "${value}");
+
+				ZendeskHomepage.pause(timeInSeconds = "10");
+			}
+			else if ("${field}" == "Comment") {
+				Type(
+					locator1 = "LargeFileUploader#COMMENT_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such large file uploader field ${field}");
+			}
+		}
+
+		Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
+	}
+
+	@prose = "I should be able to view a large file comment containing the text ${commentContent} with the following details via the ticket page ${table}"
+	macro viewLargeFileComment {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ZendeskTicketView#TICKET_COMMENT_AUTHOR",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Comment") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ZendeskTicketView#TICKET_LARGE_FILE_COMMENT_CONTENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}");
+			}
+			else if ("${field}" == "Attachment") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ZendeskTicketView#TICKET_LARGE_FILE_COMMENT_ATTACHMENT",
+					value1 = "${value}",
+					key_commentContent = "${commentContent}",
+					key_fileName = "${value}");
+			}
+			else {
+				fail("No such large file ticket comment field ${field}");
+			}
+		}
+	}
+}
