@@ -1,0 +1,58 @@
+definition {
+	var supportURL = PropsUtil.get("support.liferay.url");
+	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
+	var webAdminPassword = PropsUtil.get("web.admin.password");
+	var webWebId = PropsUtil.get("web.liferay.web.id");
+	var webURL = PropsUtil.get("web.liferay.url");
+
+	@prose = "I go to the Liferay University Passport Access page"
+	macro gotoDXPTrialSignInPage {
+		Open(locator1 = "${supportURL}/liferay-university-passport-access");
+	}
+
+	@prose = "I request passport access with the following values ${table}"
+	macro requestPassportAccess {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "End User First Name") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_FIRST_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "End User Last Name") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_LAST_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "End User Email Address") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request passport access field ${field}");
+			}
+		}
+
+		Check(locator1 = "LiferayUniversityPassportAccess#END_USER_AGREE_TO_TERMS_AND_CONDITIONS_CHECKBOX");
+
+		Click(locator1 = "LiferayUniversityPassportAccess#SAVE_BUTTON");
+
+		Message.success();
+	}
+
+	@prose = "I should be able to the view the Liferay University Passport Access text for users with full access to the form"
+	macro viewAsUserWithAccess {
+		AssertTextPresent(value1 = "ALL-ACCESS PASS TO LIFERAY UNIVERSITY");
+		AssertTextPresent(value1 = "Get access to all courses, updates and new offerings for one year. Learn about everything from managing content to app development and customization to UI design with in-depth videos.");
+	}
+
+	@prose = "I should be able to the view the Liferay University Passport Access text for users with limited access to the form"
+	macro viewAsUserWithLimitedAccess {
+		AssertTextPresent(value1 = "To find out how you can obtain a Liferay University Passport access code, please submit a ticket and select Project Administration as your component.");
+	}
+}
