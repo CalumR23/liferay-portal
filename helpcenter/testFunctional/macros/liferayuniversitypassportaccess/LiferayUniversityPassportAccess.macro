@@ -45,6 +45,42 @@ definition {
 		Message.success();
 	}
 
+	@prose = "I request passport access with the following values with invalid email ${table}"
+	macro requestPassportAccessWithInvalidEmail {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "End User First Name") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_FIRST_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "End User Last Name") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_LAST_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "End User Email Address") {
+				Type(
+					locator1 = "LiferayUniversityPassportAccess#END_USER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such request passport access field ${field}");
+			}
+		}
+
+		Check(locator1 = "LiferayUniversityPassportAccess#END_USER_AGREE_TO_TERMS_AND_CONDITIONS_CHECKBOX");
+
+		Click(locator1 = "LiferayUniversityPassportAccess#SAVE_BUTTON");
+
+		Message.error(errorMessage = "Your request failed to complete.");
+		Message.error(errorMessage = "End user email address domain must match your own email address domain.");
+	}
+
 	@prose = "I should be able to the view the Liferay University Passport Access text for users with full access to the form"
 	macro viewAsUserWithAccess {
 		AssertTextPresent(value1 = "ALL-ACCESS PASS TO LIFERAY UNIVERSITY");
@@ -54,5 +90,10 @@ definition {
 	@prose = "I should be able to the view the Liferay University Passport Access text for users with limited access to the form"
 	macro viewAsUserWithLimitedAccess {
 		AssertTextPresent(value1 = "To find out how you can obtain a Liferay University Passport access code, please submit a ticket and select Project Administration as your component.");
+		AssertElementNotPresent(locator1 = "LiferayUniversityPassportAccess#END_USER_FIRST_NAME");
+		AssertElementNotPresent(locator1 = "LiferayUniversityPassportAccess#END_USER_LAST_NAME");
+		AssertElementNotPresent(locator1 = "LiferayUniversityPassportAccess#END_USER_EMAIL_ADDRESS");
+		AssertElementNotPresent(locator1 = "LiferayUniversityPassportAccess#END_USER_AGREE_TO_TERMS_AND_CONDITIONS_CHECKBOX");
+		AssertElementNotPresent(locator1 = "LiferayUniversityPassportAccess#SAVE_BUTTON");
 	}
 }
