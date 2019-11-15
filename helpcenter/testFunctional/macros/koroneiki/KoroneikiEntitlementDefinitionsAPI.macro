@@ -5,27 +5,6 @@ definition {
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
-	macro _getAccountEntitlementDefinitionKey {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var entitlementDefinitionKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].key");
-
-		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "[", "");
-
-		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "]", "");
-
-		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "&quot;", "");
-
-		echo("Key for account entitlement definition ${entitlementDefinitionName}: ${entitlementDefinitionKey}");
-
-		return "${entitlementDefinitionKey}";
-	}
-
 	macro _getAccountEntitlementDefinitionExternalLinkKey {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
@@ -87,70 +66,6 @@ definition {
 		echo("External link key value for ${entityId} on contact entitlement definition ${entitlementDefinitionName}: ${externalLinkKey}");
 
 		return "${externalLinkKey}";
-	}
-
-	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should be present with the following values ${table}"
-	macro _viewAccountEntitlementDefinition {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Definition") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].definition");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Description") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].description");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].name");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Status") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].status");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("No such entitlement definition field ${field}");
-			}
-
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
-
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
-		}
 	}
 
 	@prose = "the external link with the entity id ${entityId} should be present on the account entitlement definition ${entitlementDefinitionName} with the following values ${table}"
@@ -238,48 +153,6 @@ definition {
 			}
 			else {
 				fail("No such external link field ${field}");
-			}
-
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
-
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
-		}
-	}
-
-	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should be present via the entitlment definition key with the following values ${table}"
-	macro _viewAccountEntitlementDefinitionViaEntitlementDefinitionKey {
-		var entitlementDefinitionKey = KoroneikiEntitlementDefinitionsAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Definition") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.definition");
-			}
-			else if ("${field}" == "Description") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
-			}
-			else if ("${field}" == "Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
-			}
-			else if ("${field}" == "Status") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
-			}
-			else {
-				fail("No such entitlement definition field ${field}");
 			}
 
 			echo("Expected ${field} Value: ${value}");

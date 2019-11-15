@@ -247,6 +247,57 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create an account entitlement definition related to the product purchase of the product ${productName} with the following values ${table}"
+	macro _createAccountEntitlementDefinition {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value}";
+			}
+			else {
+				fail("No such entitlment definition field ${field}");
+			}
+		}
+
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+		if (!(isSet(status))) {
+			var status = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"definition": "SELECT DISTINCT(Koroneiki_Account.accountId) FROM Koroneiki_Account INNER JOIN Koroneiki_ProductPurchase ON Koroneiki_ProductPurchase.accountId = Koroneiki_Account.accountId INNER JOIN Koroneiki_ProductEntry ON Koroneiki_ProductEntry.productEntryId = Koroneiki_ProductPurchase.productEntryId WHERE ((Koroneiki_ProductPurchase.startDate IS NULL) OR ((Koroneiki_ProductPurchase.startDate <= '\'[\$NOW$]\'') AND (Koroneiki_ProductPurchase.endDate >= '\'[\$NOW$]\''))) AND (Koroneiki_ProductEntry.productEntryKey in ('\'${productKey}\''))",
+				"description": "${description}",
+				"name": "${name}",
+				"status": "${status}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create an external link for the account ${accountName} with the following values ${table}"
 	macro _createAccountExternalLink {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -718,6 +769,20 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete an account entitlement definition with the name ${entitlementDefinitionName}"
+	macro _deleteAccountEntitlementDefinition {
+		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I delete an external link with the entity id ${entityId} on the account ${accountName}"
 	macro _deleteAccountExternalLink {
 		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKey(
@@ -780,6 +845,27 @@ definition {
 		echo("Audit entry key value: ${auditEntryKey}");
 
 		return "${auditEntryKey}";
+	}
+
+	macro _getAccountEntitlementDefinitionKey {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var entitlementDefinitionKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].key");
+
+		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "[", "");
+
+		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "]", "");
+
+		var entitlementDefinitionKey = StringUtil.replace("${entitlementDefinitionKey}", "&quot;", "");
+
+		echo("Entitlement Definition key value for ${entitlementDefinitionName}: ${entitlementDefinitionKey}");
+
+		return "${entitlementDefinitionKey}";
 	}
 
 	macro _getAccountExternalLinkKey {
@@ -1125,6 +1211,44 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I synchronize the account entitlement definition with the name ${entitlementDefinitionName}"
+	macro _synchronizeAccountEntitlementDefinition {
+		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}/synchronize
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I tear down the account entitlement definitions on koroneiki with the following name values ${table}"
+	macro _tearDownAccountEntitlementDefinitions {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entitlementDefinitionName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccountEntitlementDefinitions = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allAccountEntitlementDefinitions}", "${entitlementDefinitionName}")) {
+				KoroneikiAccountAPI._deleteAccountEntitlementDefinition(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+				echo("Name of entitlement definition deleted: ${entitlementDefinitionName}");
+			}
+		}
 	}
 
 	@prose = "I tear down the external links for the account ${accountName} on koroneiki with the following entity id values ${table}"
@@ -1808,6 +1932,100 @@ definition {
 		}
 	}
 
+	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should be present with the following values ${table}"
+	macro _viewAccountEntitlementDefinition {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].description");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].name");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${entitlementDefinitionName}')].status");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("No such entitlement definition field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should be present via the entitlement definition key with the following values ${table}"
+	macro _viewAccountEntitlementDefinitionViaEntitlementDefinitionKey {
+		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
+			}
+			else {
+				fail("No such entitlement definition field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
 	@prose = "the external link with the entity id ${entityId} should be present on the account ${accountName} with the following values ${table}"
 	macro _viewAccountExternalLink {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -2427,6 +2645,24 @@ definition {
 
 		if (contains("${allAccounts}", "${accountName}")) {
 			fail("The account with the name ${accountName} is still present in Koroneiki");
+		}
+	}
+
+	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should not be present"
+	macro _viewNoAccountEntitlementDefinition {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountEntitlementDefinitions = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountEntitlementDefinitions}", "${entitlementDefinitionName}")) {
+			fail("The entitlement definition with the name ${entitlementDefinitionName} is present");
 		}
 	}
 
