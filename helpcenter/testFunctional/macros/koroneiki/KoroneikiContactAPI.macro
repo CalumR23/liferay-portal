@@ -81,6 +81,61 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a contact entitlement definition related to the product purchase of the product ${productName} and contact role with the name ${contactRoleName} and type ${contactRoleType} with the following values ${table}"
+	macro _createContactEntitlementDefinition {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
+			contactRoleName = "${contactRoleName}",
+			contactRoleType = "${contactRoleType}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value}";
+			}
+			else {
+				fail("No such entitlment definition field ${field}");
+			}
+		}
+
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+		if (!(isSet(status))) {
+			var status = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"definition": "SELECT DISTINCT(Koroneiki_Contact.contactId) FROM Koroneiki_Contact INNER JOIN Koroneiki_ContactAccountRole ON Koroneiki_ContactAccountRole.contactId = Koroneiki_Contact.contactId INNER JOIN Koroneiki_ProductPurchase ON Koroneiki_ProductPurchase.accountId = Koroneiki_ContactAccountRole.accountId WHERE (Koroneiki_ContactAccountRole.contactRoleId = '\'${contactRoleKey}\'') AND ((Koroneiki_ProductPurchase.startDate IS NULL) OR ((Koroneiki_ProductPurchase.startDate < '\'[\$NOW$]\'') AND (Koroneiki_ProductPurchase.endDate >= '\'[\$NOW$]\''))) AND (Koroneiki_ProductPurchase.productEntryId = '\'${productKey}\'')",
+				"description": "${description}",
+				"name": "${name}",
+				"status": "${status}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create an external link for the contact with the okta ID ${contactOktaId} with the following values ${table}"
 	macro _createContactExternalLinkViaOktaId {
 		var RawTable rawTable = new RawTable("${table}");
@@ -177,6 +232,20 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete a contact entitlement definition with the name ${entitlementDefinitionName}"
+	macro _deleteContactEntitlementDefinition {
+		var entitlementDefinitionKey = KoroneikiContactAPI._getContactEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I delete an external link with the entity id ${entityId} on the contact with the email address ${contactEmailAddress}"
@@ -504,6 +573,44 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I synchronize the contact entitlement definition with the name ${entitlementDefinitionName}"
+	macro _synchronizeContactEntitlementDefinition {
+		var entitlementDefinitionKey = KoroneikiContactAPI._getContactEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}/synchronize
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I tear down the contact entitlement definitions on koroneiki with the following name values ${table}"
+	macro _tearDownContactEntitlementDefinitions {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entitlementDefinitionName = "${row[0]}";
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/entitlement-definitions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allContactEntitlementDefinitions = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allContactEntitlementDefinitions}", "${entitlementDefinitionName}")) {
+				KoroneikiContactAPI._deleteContactEntitlementDefinition(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+				echo("Name of entitlement definition deleted: ${entitlementDefinitionName}");
+			}
+		}
 	}
 
 	@prose = "I tear down the external links for the contact with the email address ${contactEmailAddress} on koroneiki with the following entity id values ${table}"
@@ -1551,7 +1658,7 @@ definition {
 		}
 	}
 
-	@prose = "the contact entitlement definition with the name ${entitlementDefinitionName} should be present via the entitlment definition key with the following values ${table}"
+	@prose = "the contact entitlement definition with the name ${entitlementDefinitionName} should be present via the entitlement definition key with the following values ${table}"
 	macro _viewContactEntitlementDefinitionViaEntitlementDefinitionKey {
 		var entitlementDefinitionKey = KoroneikiContactAPI._getContactEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
 
@@ -2217,6 +2324,22 @@ definition {
 
 		if (contains("${allContacts}", "${contactEmailAddress}")) {
 			fail("The contact with the email address ${contactEmailAddress} is still present in Koroneiki");
+		}
+	}
+
+	@prose = "the contact entitlement definition with the name ${entitlementDefinitionName} should not be present"
+	macro _viewNoContactEntitlementDefinition {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/entitlement-definitions
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactEntitlementDefinitions = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactEntitlementDefinitions}", "${entitlementDefinitionName}")) {
+			fail("The entitlement definition with the name ${entitlementDefinitionName} is present");
 		}
 	}
 
