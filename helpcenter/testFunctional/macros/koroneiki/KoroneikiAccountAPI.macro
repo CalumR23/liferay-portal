@@ -2593,6 +2593,33 @@ definition {
 		}
 	}
 
+	@prose = "the contact with the email address ${contactEmailAddress} should be visible via nested field on the account ${accountName}"
+	macro _viewContactViaNestedField {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.contacts[?(@.emailAddress=='${contactEmailAddress}')].emailAddress");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "[", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "&quot;", "");
+
+		echo("Expected contact email address value: ${contactEmailAddress}");
+		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
+
+		if (!("${contactEmailAddressFromAPI}" == "${contactEmailAddress}")) {
+			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
+		}
+	}
+
 	@prose = "I should be able to view a child koroneiki account with the name ${childAccountName} on the parent account with the name ${parentAccountName} that has the following values ${table}"
 	macro _viewChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${parentAccountName}");
@@ -2890,6 +2917,31 @@ definition {
 
 		if (contains("${allAccountContactContactRoles}", "${contactRoleName}")) {
 			fail("The contact with the email address ${contactEmailAddress} on the account with the name ${accountName} contains the contact role ${contactRoleName}");
+		}
+	}
+
+	@prose = "the contact with the email address ${contactEmailAddress} should not be visible via nested field on the account ${accountName}"
+	macro _viewNoContactViaNestedField {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountFields = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountFields}", "contacts")) {
+			var allAccountContacts = JSONCurlUtil.get("${curl}", "$.contacts");
+
+			if (contains("${allAccountContacts}", "${contactEmailAddress}")) {
+				fail("The account with the name ${accountName} contains the contact ${contactEmailAddress}");
+			}
+		}
+		else {
+			echo("No contacts present on ${accountName} and therefore there is no contacts nested field visible");
 		}
 	}
 
