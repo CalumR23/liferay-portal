@@ -160,7 +160,7 @@ definition {
 
 		var startYear = DateUtil.getYear("0");
 
-		var endDay = DateUtil.getDate("335");
+		var originalEndDay = DateUtil.getDate("335");
 
 		if ("${endDay}" == "1") {
 			var endDay = "01";
@@ -193,7 +193,7 @@ definition {
 			var endDay = "${endDay}";
 		}
 
-		var endMonth = DateUtil.getMonth("335");
+		var originalEndMonth = DateUtil.getMonth("335");
 
 		if ("${endMonth}" == "1") {
 			var endMonth = "01";
@@ -226,15 +226,86 @@ definition {
 			var endMonth = "${endMonth}";
 		}
 
-		var endYear = DateUtil.getYear("335");
+		var originalEndYear = DateUtil.getYear("335");
+
+		var endDay = DateUtil.getDate("365");
+
+		if ("${endDay}" == "1") {
+			var endDay = "01";
+		}
+		else if ("${endDay}" == "2") {
+			var endDay = "02";
+		}
+		else if ("${endDay}" == "3") {
+			var endDay = "03";
+		}
+		else if ("${endDay}" == "4") {
+			var endDay = "04";
+		}
+		else if ("${endDay}" == "5") {
+			var endDay = "05";
+		}
+		else if ("${endDay}" == "6") {
+			var endDay = "06";
+		}
+		else if ("${endDay}" == "7") {
+			var endDay = "07";
+		}
+		else if ("${endDay}" == "8") {
+			var endDay = "08";
+		}
+		else if ("${endDay}" == "9") {
+			var endDay = "09";
+		}
+		else {
+			var endDay = "${endDay}";
+		}
+
+		var endMonth = DateUtil.getMonth("365");
+
+		if ("${endMonth}" == "1") {
+			var endMonth = "01";
+		}
+		else if ("${endMonth}" == "2") {
+			var endMonth = "02";
+		}
+		else if ("${endMonth}" == "3") {
+			var endMonth = "03";
+		}
+		else if ("${endMonth}" == "4") {
+			var endMonth = "04";
+		}
+		else if ("${endMonth}" == "5") {
+			var endMonth = "05";
+		}
+		else if ("${endMonth}" == "6") {
+			var endMonth = "06";
+		}
+		else if ("${endMonth}" == "7") {
+			var endMonth = "07";
+		}
+		else if ("${endMonth}" == "8") {
+			var endMonth = "08";
+		}
+		else if ("${endMonth}" == "9") {
+			var endMonth = "09";
+		}
+		else {
+			var endMonth = "${endMonth}";
+		}
+
+		var endYear = DateUtil.getYear("365");
 
 		static var staticStartDate = "${startYear}-${startMonth}-${startDay}T00:00:00Z";
+		static var staticOriginalEndDate = "${originalEndYear}-${originalEndMonth}-${originalEndDay}T00:00:00Z";
 		static var staticEndDate = "${endYear}-${endMonth}-${endDay}T00:00:00Z";
 
 		return "${staticStartDate}";
+		return "${staticOriginalEndDate}";
 		return "${staticEndDate}";
 
 		echo("${staticStartDate}");
+		echo("${staticOriginalEndDate}");
 		echo("${staticEndDate}");
 	}
 
@@ -578,6 +649,9 @@ definition {
 			if ("${field}" == "End Date") {
 				var endDate = "${value1}";
 			}
+			else if ("${field}" == "Original End Date") {
+				var originalEndDate = "${value1}";
+			}
 			else if ("${field}" == "Perpetual") {
 				var value1 = StringUtil.lowerCase("${value1}");
 
@@ -627,6 +701,18 @@ definition {
 			}
 			else {
 				var endDate = "";
+			}
+		}
+		if (!(isSet(originalEndDate))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "originalEndDate=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.originalEndDate");
+
+				var originalEndDate = "${value}";
+			}
+			else {
+				var originalEndDate = "";
 			}
 		}
 		if (!(isSet(perpetual))) {
@@ -711,6 +797,7 @@ definition {
 				-d
 				{
 					"endDate": "${endDate}",
+					"originalEndDate": "${originalEndDate}",
 					"perpetual": ${perpetual},
 					"productKey": "${productKey}",
 					"quantity": ${quantity},
@@ -728,6 +815,7 @@ definition {
 				-d
 				{
 					"endDate": "${endDate}",
+					"originalEndDate": "${originalEndDate}",
 					"perpetual": ${perpetual},
 					"productKey": "${productKey}",
 					"properties": {
@@ -832,6 +920,9 @@ definition {
 
 			if ("${field}" == "End Date") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.endDate");
+			}
+			else if ("${field}" == "Original End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.originalEndDate");
 			}
 			else if ("${field}" == "Perpetual") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.perpetual");
@@ -1015,6 +1106,15 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 			}
+			else if ("${field}" == "Original End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].originalEndDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
 			else if ("${field}" == "Perpetual") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].perpetual");
 
@@ -1105,6 +1205,15 @@ definition {
 
 			if ("${field}" == "End Date") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.productPurchases[?(@.productKey=='${productKey}')].endDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Original End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.productPurchases[?(@.productKey=='${productKey}')].originalEndDate");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
