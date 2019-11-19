@@ -602,6 +602,9 @@ definition {
 			else if ("${field}" == "Start Date") {
 				var startDate = "${value1}";
 			}
+			else if ("${field}" == "Status") {
+				var status = "${value1}";
+			}
 			else {
 				fail("No such product purchase field ${field}");
 			}
@@ -686,6 +689,18 @@ definition {
 				var startDate = "";
 			}
 		}
+		if (!(isSet(status))) {
+			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productPurchaseObject}", "status=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.status");
+
+				var status = "${value}";
+			}
+			else {
+				var status = "";
+			}
+		}
 
 		if ("${properties}" == "") {
 			var curl = '''
@@ -699,7 +714,8 @@ definition {
 					"perpetual": ${perpetual},
 					"productKey": "${productKey}",
 					"quantity": ${quantity},
-					"startDate": "${startDate}"
+					"startDate": "${startDate}",
+					"status": "${status}"
 				}
 				''';
 		}
@@ -718,7 +734,8 @@ definition {
 						${properties}
 					},
 					"quantity": ${quantity},
-					"startDate": "${startDate}"
+					"startDate": "${startDate}",
+					"status": "${status}"
 				}
 				''';
 		}
@@ -827,6 +844,9 @@ definition {
 			}
 			else if ("${field}" == "Start Date") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.startDate");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
 			}
 			else {
 				fail("No such product purchase field ${field}");
@@ -1031,6 +1051,15 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].status");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
 			else {
 				fail("No such product purchase field ${field}");
 			}
@@ -1112,6 +1141,15 @@ definition {
 			}
 			else if ("${field}" == "Start Date") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.productPurchases[?(@.productKey=='${productKey}')].startDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.productPurchases[?(@.productKey=='${productKey}')].status");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
