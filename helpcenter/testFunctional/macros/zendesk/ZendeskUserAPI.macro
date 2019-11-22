@@ -576,6 +576,28 @@ definition {
 		}
 	}
 
+	@prose = "I update the user with the email address ${userEmailAddress} to have the custom role ${customRoleName}"
+	macro _updateUserCustomRoleByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var customRoleId = ZendeskCustomRoleAPI._getCustomRoleIdByName(customRoleName = "${customRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"user":
+				{
+					"custom_role_id": "${customRoleId}"
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "I update the user with the email address ${userEmailAddress} to use the password ${userPassword}"
 	macro _updateUserPasswordByEmailAddress {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
