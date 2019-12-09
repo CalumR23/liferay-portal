@@ -189,6 +189,25 @@ definition {
 		}
 	}
 
+	macro getFirstUATFixId {
+		Patcher.gotoFixes();
+
+		PatcherSearch.searchAdvanced(typeKeyword = "${fixType}");
+
+		var key_fixType = "${fixType}";
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_UAT_FIX_ID")) {
+			var fixId = selenium.getText("Patcher#PATCHER_UAT_FIX_ID");
+
+			return "${fixId}";
+		}
+		else {
+			var fixId = "";
+
+			return "${fixId}";
+		}
+	}
+
 	@prose = "I incorporate the fix pack ${fixPackName} to the fix ${fixContent}"
 	macro incorporateFixPackToFix {
 		Patcher.gotoFixes();
@@ -224,6 +243,27 @@ definition {
 		SelectFrameTop();
 
 		Message.success();
+	}
+
+	@prose = "I tear down all Patcher UAT fixes with the type ${fixType}"
+	macro tearDownAllUATFixesForAccount {
+		var uatFixesForTypeExists = "true";
+
+		while ("${uatFixesForTypeExists}" == "true") {
+			var fixId = PatcherFix.getFirstUATFixId(fixType = "${fixType}");			
+
+			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+			else {
+				var uatFixesForTypeExists = "false";
+			}
+		}
 	}
 
 	@prose = "I tear down the Patcher fix containing the content ${fixContent} and type ${fixType}"

@@ -652,6 +652,36 @@ definition {
 		}
 	}
 
+	macro getFirstUATBuildId {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_UAT_BUILD_ID")) {
+			var buildId = selenium.getText("Patcher#PATCHER_UAT_BUILD_ID");
+
+			return "${buildId}";
+		}
+		else {
+			var buildId = "";
+
+			return "${buildId}";
+		}
+	}
+
+	macro getFirstUATBuildSupportTicket {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_UAT_BUILD_SUPPORT_TICKET")) {
+			var buildSupportTicket = selenium.getText("Patcher#PATCHER_UAT_BUILD_SUPPORT_TICKET");
+
+			return "${buildSupportTicket}";
+		}
+		else {
+			var buildSupportTicket = "";
+
+			return "${buildSupportTicket}";
+		}
+	}
+
 	@prose = "I get the security hotfix counter value for a build for the ticket ${supportTicket} on the account ${accountCode} that is built on the version ${projectVersion} on the root ${rootProjectVersion}"
 	macro getSecurityHotfixCounterValue {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -708,6 +738,27 @@ definition {
 		static var staticAccountCode = "${accountCode}";
 
 		return "${staticAccountCode}";
+	}
+
+	@prose = "I tear down all Patcher UAT builds on the account ${accountCode}"
+	macro tearDownAllUATBuildsForAccount {
+		var uatBuildsForAccountExists = "true";
+
+		while ("${uatBuildsForAccountExists}" == "true") {
+			var buildId = PatcherBuild.getFirstUATBuildId(accountCode = "${accountCode}");
+
+			if ((!(contains("${buildId}", "{buildId}"))) && (!("${buildId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+			else {
+				var uatBuildsForAccountExists = "false";
+			}
+		}
 	}
 
 	@prose = "I tear down the Patcher build for the ticket ${supportTicket} on the account ${accountCode}"

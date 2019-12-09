@@ -15,6 +15,27 @@ definition {
 		return "${ticketId}";
 	}
 
+	@prose = "I teardown all Patcher UAT tickets from the account ${accountCode} from zendesk.liferay.com"
+	macro _tearDownAllUATTicketsForAccount {
+		var uatTicketsForAccountExists = "true";
+
+		while ("${uatTicketsForAccountExists}" == "true") {
+			var buildSupportTicket = PatcherBuild.getFirstUATBuildSupportTicket(accountCode = "${accountCode}");
+
+			if ((!(contains("${buildSupportTicket}", "{buildSupportTicket}"))) && (!("${buildSupportTicket}" == ""))) {
+				var curl = '''
+					--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${buildSupportTicket}
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+			}
+			else {
+				var uatTicketsForAccountExists = "false";
+			}
+		}
+	}
+
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
 		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
