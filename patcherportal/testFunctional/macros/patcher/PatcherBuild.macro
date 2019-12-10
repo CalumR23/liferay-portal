@@ -740,6 +740,42 @@ definition {
 		return "${staticAccountCode}";
 	}
 
+	@prose = "I tear down all Patcher UAT builds and zendesk tickets on the account ${accountCode}"
+	macro tearDownAllUATBuildsAndZendeskTicketsForAccount {
+		var uatBuildsForAccountExists = "true";
+		var uatTicketsForAccountExists = "true";
+
+		while ((!("${uatBuildsForAccountExists}" == "false")) || (!("${uatTicketsForAccountExists}" == "false")))  {
+			var buildSupportTicket = PatcherBuild.getFirstUATBuildSupportTicket(accountCode = "${accountCode}");
+
+			if ((!(contains("${buildSupportTicket}", "{buildSupportTicket}"))) && (!("${buildSupportTicket}" == ""))) {
+				var curl = '''
+					--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${buildSupportTicket}
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+			}
+			else {
+				var uatTicketsForAccountExists = "false";
+			}
+
+			var buildId = PatcherBuild.getFirstUATBuildId(accountCode = "${accountCode}");
+
+			if ((!(contains("${buildId}", "{buildId}"))) && (!("${buildId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+			else {
+				var uatBuildsForAccountExists = "false";
+			}
+		}
+	}
+
 	@prose = "I tear down all Patcher UAT builds on the account ${accountCode}"
 	macro tearDownAllUATBuildsForAccount {
 		var uatBuildsForAccountExists = "true";
