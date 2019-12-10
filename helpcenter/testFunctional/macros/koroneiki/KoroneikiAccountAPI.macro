@@ -420,6 +420,15 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a nested field for the account entitlement coming from the entitlement definition ${entitlementDefinitionName}"
+	macro _createAccountEntitlementNestedField {
+		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		static var staticAccountEntitlementsNestedField = "{&quot;entitlementDefinitionKey&quot;:&quot;${entitlementDefinitionKey}&quot;,&quot;name&quot;:&quot;${entitlementDefinitionName}&quot;}";
+
+		return "${staticAccountEntitlementsNestedField}";
+	}
+
 	@prose = "I create a nested field for the account external link with the following values ${table}"
 	macro _createAccountExternalLinkNestedField {
 		var RawTable rawTable = new RawTable("${table}");
@@ -1454,6 +1463,13 @@ definition {
 		return "${staticAccountExternalLinksNestedField1}";
 	}
 
+	@prose = "I rename the first account entitlement nested field variable"
+	macro _renameFirstAccountEntitlementNestedFieldVariable {
+		static var staticAccountEntitlementsNestedField1 = "${staticAccountEntitlementsNestedField}";
+
+		return "${staticAccountEntitlementsNestedField1}";
+	}
+
 	@prose = "I rename the first postal address nested field variable"
 	macro _renameFirstPostalAddressNestedFieldVariable {
 		static var staticPostalAddressesNestedField1 = "${staticPostalAddressesNestedField}";
@@ -1475,6 +1491,13 @@ definition {
 		return "${staticAccountExternalLinksNestedField2}";
 	}
 
+	@prose = "I rename the second account entitlement nested field variable"
+	macro _renameSecondAccountEntitlementNestedFieldVariable {
+		static var staticAccountEntitlementsNestedField2 = "${staticAccountEntitlementsNestedField}";
+
+		return "${staticAccountEntitlementsNestedField2}";
+	}
+
 	@prose = "I rename the second postal address nested field variable"
 	macro _renameSecondPostalAddressNestedFieldVariable {
 		static var staticPostalAddressesNestedField2 = "${staticPostalAddressesNestedField}";
@@ -1494,6 +1517,13 @@ definition {
 		static var staticAccountExternalLinksNestedField3 = "${staticAccountExternalLinksNestedField}";
 
 		return "${staticAccountExternalLinksNestedField3}";
+	}
+
+	@prose = "I rename the third account entitlement nested field variable"
+	macro _renameThirdAccountEntitlementNestedFieldVariable {
+		static var staticAccountEntitlementsNestedField3 = "${staticAccountEntitlementsNestedField}";
+
+		return "${staticAccountEntitlementsNestedField3}";
 	}
 
 	@prose = "I rename the third postal address nested field variable"
@@ -2529,7 +2559,7 @@ definition {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,externalLinks,postalAddresses,productPurchases
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,entitlements,externalLinks,postalAddresses,productPurchases
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -2586,6 +2616,15 @@ definition {
 			}
 			else if ("${field}" == "Description") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Entitlement Nested Field") {
+				var entitlementsObjects = JSONCurlUtil.get("${curl}", "$.entitlements");
+
+				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "[", "");
+
+				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "]", "");
+
+				var valueFromAPI = "${entitlementsObjects}";
 			}
 			else if ("${field}" == "External Link Nested Field") {
 				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
@@ -3748,6 +3787,33 @@ definition {
 		}
 	}
 
+	@prose = "the entitlement from the entitlement definition ${entitlementDefinitionName} should be visible via nested field on the account ${accountName}"
+	macro _viewEntitlementViaNestedField {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=entitlements
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var entitlementDefinitionNameFromAPI = JSONCurlUtil.get("${curl}", "$.entitlements[?(@.name=='${entitlementDefinitionName}')].name");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "[", "");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "]", "");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "&quot;", "");
+
+		echo("Expected entitlement defintion name value: ${entitlementDefinitionName}");
+		echo("Actual entitlement defintion name value: ${entitlementDefinitionNameFromAPI}");
+
+		if (!("${entitlementDefinitionNameFromAPI}" == "${entitlementDefinitionName}")) {
+			fail("Actual entitlement defintion name value ${entitlementDefinitionNameFromAPI} does not match expected entitlement defintion name value ${entitlementDefinitionName}");
+		}
+	}
+
 	@prose = "I should not be able to view a koroneiki account with the name ${accountName}"
 	macro _viewNoAccount {
 		var curl = '''
@@ -3932,6 +3998,31 @@ definition {
 		}
 		else {
 			echo("No contacts present on ${accountName} and therefore there is no contacts nested field visible");
+		}
+	}
+
+	@prose = "the entitlement from the entitlement definition ${entitlementDefinitionName} should not be visible via nested field on the account ${accountName}"
+	macro _viewNoEntitlementViaNestedField {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=entitlements
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountFields = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountFields}", "entitlements")) {
+			var allAccountEntitlements = JSONCurlUtil.get("${curl}", "$.entitlements");
+
+			if (contains("${allAccountEntitlements}", "${entitlementDefinitionName}")) {
+				fail("The account with the name ${accountName} contains the entitlement from entititlement definition name ${entitlementDefinitionName}");
+			}
+		}
+		else {
+			echo("No entitlements present on ${accountName} and therefore there is no entitlements nested field visible");
 		}
 	}
 

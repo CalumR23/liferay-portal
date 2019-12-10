@@ -136,6 +136,15 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a nested field for the contact entitlement coming from the entitlement definition ${entitlementDefinitionName}"
+	macro _createContactEntitlementNestedField {
+		var entitlementDefinitionKey = KoroneikiContactAPI._getContactEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		static var staticContactEntitlementsNestedField = "{&quot;entitlementDefinitionKey&quot;:&quot;${entitlementDefinitionKey}&quot;,&quot;name&quot;:&quot;${entitlementDefinitionName}&quot;}";
+
+		return "${staticContactEntitlementsNestedField}";
+	}
+
 	@prose = "I create an external link for the contact with the okta ID ${contactOktaId} with the following values ${table}"
 	macro _createContactExternalLinkViaOktaId {
 		var RawTable rawTable = new RawTable("${table}");
@@ -595,6 +604,13 @@ definition {
 		return "${contactUuid}";
 	}
 
+	@prose = "I rename the first contact entitlement nested field variable"
+	macro _renameFirstContactEntitlementNestedFieldVariable {
+		static var staticContactEntitlementsNestedField1 = "${staticContactEntitlementsNestedField}";
+
+		return "${staticContactEntitlementsNestedField1}";
+	}
+
 	@prose = "I rename the first contact nested field variable"
 	macro _renameFirstContactNestedFieldVariable {
 		static var staticContactsNestedField1 = "${staticContactsNestedField}";
@@ -602,11 +618,25 @@ definition {
 		return "${staticContactsNestedField1}";
 	}
 
+	@prose = "I rename the second contact entitlement nested field variable"
+	macro _renameSecondContactEntitlementNestedFieldVariable {
+		static var staticContactEntitlementsNestedField2 = "${staticContactEntitlementsNestedField}";
+
+		return "${staticContactEntitlementsNestedField2}";
+	}
+
 	@prose = "I rename the second contact nested field variable"
 	macro _renameSecondContactNestedFieldVariable {
 		static var staticContactsNestedField2 = "${staticContactsNestedField}";
 
 		return "${staticContactsNestedField2}";
+	}
+
+	@prose = "I rename the third contact entitlement nested field variable"
+	macro _renameThirdContactEntitlementNestedFieldVariable {
+		static var staticContactEntitlementsNestedField3 = "${staticContactEntitlementsNestedField}";
+
+		return "${staticContactEntitlementsNestedField3}";
 	}
 
 	@prose = "I rename the third contact nested field variable"
@@ -1882,6 +1912,31 @@ definition {
 		}
 	}
 
+	@prose = "the entitlement from the entitlement definition ${entitlementDefinitionName} should be visible via nested field on the contact with the email address ${contactEmailAddress}"
+	macro _viewContactEntitlementViaNestedField {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var entitlementDefinitionNameFromAPI = JSONCurlUtil.get("${curl}", "$.entitlements[?(@.name=='${entitlementDefinitionName}')].name");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "[", "");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "]", "");
+
+		var entitlementDefinitionNameFromAPI = StringUtil.replace("${entitlementDefinitionNameFromAPI}", "&quot;", "");
+
+		echo("Expected entitlement defintion name value: ${entitlementDefinitionName}");
+		echo("Actual entitlement defintion name value: ${entitlementDefinitionNameFromAPI}");
+
+		if (!("${entitlementDefinitionNameFromAPI}" == "${entitlementDefinitionName}")) {
+			fail("Actual entitlement defintion name value ${entitlementDefinitionNameFromAPI} does not match expected entitlement defintion name value ${entitlementDefinitionName}");
+		}
+	}
+
 	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} via the external link key with the following values ${table}"
 	macro _viewContactExternalLinkViaExternalLinkKey {
 		var externalLinkKey = KoroneikiContactAPI._getContactExternalLinkKey(
@@ -2398,6 +2453,15 @@ definition {
 			if ("${field}" == "Email Address") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddress");
 			}
+			else if ("${field}" == "Entitlement Nested Field") {
+				var entitlementsObjects = JSONCurlUtil.get("${curl}", "$.entitlements");
+
+				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "[", "");
+
+				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "]", "");
+
+				var valueFromAPI = "${entitlementsObjects}";
+			}
 			else if ("${field}" == "First Name") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.firstName");
 			}
@@ -2558,6 +2622,29 @@ definition {
 
 		if (contains("${allContactEntitlementDefinitions}", "${entitlementDefinitionName}")) {
 			fail("The entitlement definition with the name ${entitlementDefinitionName} is present");
+		}
+	}
+
+	@prose = "the entitlement from the entitlement definition ${entitlementDefinitionName} should not be visible via nested field on the contact with the email address ${contactEmailAddress}"
+	macro _viewNoContactEntitlementViaNestedField {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContactFields = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allContactFields}", "entitlements")) {
+			var allContactEntitlements = JSONCurlUtil.get("${curl}", "$.entitlements");
+
+			if (contains("${allContactEntitlements}", "${entitlementDefinitionName}")) {
+				fail("The contact with the email address ${contactEmailAddress} contains the entitlement from entititlement definition name ${entitlementDefinitionName}");
+			}
+		}
+		else {
+			echo("No entitlements present on ${contactEmailAddress} and therefore there is no entitlements nested field visible");
 		}
 	}
 
