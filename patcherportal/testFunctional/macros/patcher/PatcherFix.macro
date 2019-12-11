@@ -23,11 +23,18 @@ definition {
 				typeKeyword = "${fixType}");
 		}
 
-		var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+		if (IsElementPresent(locator1 = "Patcher#FIX_PATCHER_STATUS")) {
+			var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+		}
+		else {
+			echo("The fix search result did not show up. The search will be attempted again.");
+
+			var fixPatcherStatus = "";
+		}
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && ("${fixPatcherStatus}" == "Adding")) {
+		while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && (("${fixPatcherStatus}" == "Adding") || ("${fixPatcherStatus}" == "")) && (maxIterations = "30")) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			Patcher.pause(timeInSeconds = "${fixCompletionPollIntervalInSeconds}");
@@ -40,7 +47,7 @@ definition {
 
 			var key_fixContent = "${fixContent}";
 
-			while (IsElementNotPresent(locator1 = "Patcher#FIX_ID")) {
+			while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && (IsElementNotPresent(locator1 = "Patcher#FIX_ID"))  && (maxIterations = "30")) {
 				Refresh();
 
 				PatcherSearch.searchAdvanced(
@@ -48,11 +55,27 @@ definition {
 					typeKeyword = "${fixType}");
 			}
 
-			var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+			if (IsElementPresent(locator1 = "Patcher#FIX_PATCHER_STATUS")) {
+				var fixPatcherStatus = selenium.getText("Patcher#FIX_PATCHER_STATUS");
+			}
+			else {
+				echo("The fix search result did not show up. If below the maximum iterations, the search will be attempted again.");
+
+				var fixPatcherStatus = "";
+			}
 		}
 
 		if ("${fixPatcherStatus}" == "Adding") {
 			fail("After ${currentIteration} attempts while waiting at ${fixCompletionPollIntervalInSeconds} seconds in between each attempt, the Patcher fix is still in Adding status.");
+		}
+		else if ("${fixPatcherStatus}" == "Failed") {
+			fail("The fix returned a Failed status. Please investigate.");		
+		}
+		else if ("${fixPatcherStatus}" == "") {
+			fail("The fix search result did not show up in the final search attempt. The fix may either not be present, it may have completed, it may have completed, or there may be an issue with the search. Please investigate.");		
+		}
+		else {
+			echo("Fix status: ${fixPatcherStatus}");
 		}
 	}
 
