@@ -71,6 +71,43 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create a nested field for the product external link with the following values ${table}"
+	macro _createProductExternalLinkNestedField {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var domain = "${value}";
+			}
+			else if ("${field}" == "Entity Id") {
+				var entityId = "${value}";
+			}
+			else if ("${field}" == "Entity Name") {
+				var entityName = "${value}";
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+		}
+
+		if (!(isSet(domain))) {
+			var domain = "";
+		}
+		if (!(isSet(entityId))) {
+			var entityId = "";
+		}
+		if (!(isSet(entityName))) {
+			var entityName = "";
+		}
+
+		static var staticProductExternalLinksNestedField = "{&quot;domain&quot;:&quot;${domain}&quot;,&quot;entityId&quot;:&quot;${entityId}&quot;,&quot;entityName&quot;:&quot;${entityName}&quot;}";
+
+		return "${staticProductExternalLinksNestedField}";
+	}
+
 	@prose = "I create a product nested field for a non existent product with the name ${productName}"
 	macro _createProductNestedFieldForNonexistentProduct {
 		static var staticProductNestedField = "{&quot;name&quot;:&quot;${productName}&quot;}";
@@ -614,6 +651,61 @@ definition {
 
 		if (!(contains("${productName}", "${productNameFromAPI}"))) {
 			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki product with the name ${productName} with the external link nested field value ${productExternalLinkNestedFieldValue}"
+	macro _viewProductWithExternalLink {
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+
+		echo("Expected Name Value: ${productName}");
+		echo("Actual Name Value: ${productNameFromAPI}");
+
+		if (!(contains("${productName}", "${productNameFromAPI}"))) {
+			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+		}
+
+		var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
+
+		var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
+
+		var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+		var externalLinkObjectNumber = "0";
+
+		while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+			var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
+
+			var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+			var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
+
+			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+			var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+		}
+		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+		var productExternalLinkNestedFieldValueFromAPI = "${externalLinksObjectsEdit}";
+
+		echo("Expected External Link Nested Field Value: ${productExternalLinkNestedFieldValue}");
+		echo("Actual External Link Nested Field Value: ${productExternalLinkNestedFieldValueFromAPI}");
+
+		if (!(contains("${productExternalLinkNestedFieldValue}", "${productExternalLinkNestedFieldValueFromAPI}"))) {
+			fail("Actual product external link nested field value ${productExternalLinkNestedFieldValueFromAPI} does not match expected product external link nested field value ${productExternalLinkNestedFieldValue}");
 		}
 	}
 }
