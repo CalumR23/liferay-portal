@@ -6,11 +6,11 @@ Feature: DXP Trial
 
 Teardown:
 	* I wait for "10" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
 	* I get the web corporate trial organziation id value with the name "${staticCompanyName}" belonging to the user with the email address "${staticEmailAddress}"
 	* I tear down the users with the following email addresses from web.liferay.com
 	| ${staticEmailAddress} |
 	* I tear down the web corporate trial organization with the ID value "${staticTrialOrganizationIdValue}"
-	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
 	* I tear down the projects with the following project names
 	| Trial - ${staticCompanyName} |
 	* I delete the support email message in MockMock where the sender is "Liferay" the recipient is "DXP Trialuser" with the email address "${staticEmailAddress}" and the message content contains the text "Trial Activation Key"
@@ -165,3 +165,30 @@ Scenario: Renew DXP Trial Project
 	| if you have any questions                                                                                         |
 	| Sincerely                                                                                                         |
 	| The Liferay Team                                                                                                  |
+
+Scenario: View downloads as DXP Trial User
+	DXP Trial users should be redirected to the trial downloads page on web when attempting to access the downloads page on customer.
+
+	Given I go to the DXP Trial Sign In page
+	And I generate a web user email address
+	And I generate a web company name
+	And I create a DXP trial account with a randomly generated email address and company name with the following additional values
+	| Email        | ${staticEmailAddress} |
+	| Password     | testtest              |
+	| First Name   | DXP                   |
+	| Last Name    | Trialuser             |
+	| Phone Number | 555-555-5555          |
+	| Company      | ${staticCompanyName}  |
+	| Industry     | Automotive            |
+	| Country      | United States         |
+	| Region       | California            |
+	Then I should be able to the view the DXP Trial Homepage
+	And the user with the email address "${staticEmailAddress}" should be part of the web Trial organization
+	And the user with the email address "${staticEmailAddress}" should be part of the web corporate trial organization for the company "${staticCompanyName}"
+	When I wait for "60" seconds
+	And I update the web password for user with the email address "${staticEmailAddress}" to "testtest"
+	And I update the support password for user with the email address "${staticEmailAddress}" to "testtest"
+	And I log out and log into the web homepage as "${staticEmailAddress}" with password "testtest"
+	And I log out and log into the support homepage as "${staticEmailAddress}" with password "testtest"
+	And I go to the Downloads page as a DXP Trial user
+	Then I should be able to the view the DXP Trial Homepage
