@@ -477,6 +477,17 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I create an assigned team nested field for a team with the name ${teamName} assigned to the account ${accountName}"
+	macro _createAssignedTeamNestedField {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		static var staticAssignedTeamNestedField = "{&quot;key&quot;:&quot;${teamKey}&quot;,&quot;name&quot;:&quot;${teamName}&quot;}";
+
+		return "${staticAssignedTeamNestedField}";
+	}
+
 	@prose = "I create a child account for an account with the name ${accountName} on koroneiki with the following values ${table}"
 	macro _createChildAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -2514,7 +2525,7 @@ definition {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,entitlements,externalLinks,postalAddresses,productPurchases
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,entitlements,externalLinks,postalAddresses,productPurchases
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -2526,7 +2537,40 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Code") {
+			if ("${field}" == "Assigned Team Nested Field") {
+				var assignedTeamsObjects = JSONCurlUtil.get("${curl}", "$.assignedTeams");
+
+				var assignedTeamsObjectsEdit = JSONCurlUtil.get("${curl}", "$.assignedTeams");
+
+				var numberOfAssignedTeams = StringUtil.count("${assignedTeamsObjects}", "name");
+
+				var assignedTeamObjectNumber = "0";
+
+				while (!("${assignedTeamObjectNumber}" == "${numberOfAssignedTeams}")) {
+					var assignedTeamObject = JSONCurlUtil.get("${curl}", "$.assignedTeams[${assignedTeamObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl}", "$.assignedTeams[${assignedTeamObjectNumber}].dateCreated");
+
+					var assignedTeamsObjectsEdit = StringUtil.replace("${assignedTeamsObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var dateModified = JSONCurlUtil.get("${curl}", "$.assignedTeams[${assignedTeamObjectNumber}].dateModified");
+
+					var assignedTeamsObjectsEdit = StringUtil.replace("${assignedTeamsObjectsEdit}", "&quot;dateModified&quot;:&quot;${dateModified}&quot;,", "");
+
+					var assignedTeamObjectNumber = MathUtil.sum("${assignedTeamObjectNumber}", "1");
+				}
+
+				var assignedTeamsObjectsEdit = StringUtil.replaceFirst("${assignedTeamsObjectsEdit}", "[", "");
+
+				var assignedTeamsObjectsEdit = StringUtil.reverse("${assignedTeamsObjectsEdit}");
+
+				var assignedTeamsObjectsEdit = StringUtil.replaceFirst("${assignedTeamsObjectsEdit}", "]", "");
+
+				var assignedTeamsObjectsEdit = StringUtil.reverse("${assignedTeamsObjectsEdit}");
+
+				var valueFromAPI = "${assignedTeamsObjectsEdit}";
+			}
+			else if ("${field}" == "Code") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -3191,7 +3235,7 @@ definition {
 		}
 	}
 
-	@prose = "the team with the name ${teamName} should be part of the the account ${accountName}"
+	@prose = "the team with the name ${teamName} should be part of the account ${accountName}"
 	macro _viewAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
@@ -3431,6 +3475,33 @@ definition {
 			if (!(contains("${value}", "${valueFromAPI}"))) {
 				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 			}
+		}
+	}
+
+	@prose = "the team with the name ${teamName} should be assigned to the account ${accountName}"
+	macro _viewAssignedTeam {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/assigned-teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${teamName}')].name");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "[", "");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "]", "");
+
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "&quot;", "");
+
+		echo("Expected team name value: ${teamName}");
+		echo("Actual team name value: ${teamNameFromAPI}");
+
+		if (!("${teamNameFromAPI}" == "${teamName}")) {
+			fail("Actual team name ${teamNameFromAPI} does not match expected team name value ${teamName}");
 		}
 	}
 
@@ -3797,7 +3868,7 @@ definition {
 		}
 	}
 
-	@prose = "the team with the name ${teamName} should not be part of the the account ${accountName}"
+	@prose = "the team with the name ${teamName} should not be part of the account ${accountName}"
 	macro _viewNoAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
