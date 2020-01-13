@@ -182,3 +182,29 @@ Scenario: View ticket after requester removal on organization with one customer
 	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
 	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+
+Scenario: View ticket after requester removal on organization with one developer and one watcher
+	Zendesk users should not be removed from an OSB org if they have open tickets and are the last remaining developer customer on the OSB org.
+
+	Given I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the organization "Zen OSB Automotive" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Zen OSB Automotive                               |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I attempt to remove a user with the email address "osb.customer1@lrcustomer.com.broken" as a customer from the project with the code "ZENOSBA" who still has an open Zendesk ticket
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com

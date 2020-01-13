@@ -1,0 +1,131 @@
+@testray.main.component.name = "Support QA"
+@type = "osb.zendesk.integration"
+
+Feature: OSB to Zendesk Partner and Customer Ticket Integration
+	Testing ticket changes when a project has partners and customers on it.
+
+Setup:
+	* I wait for "10" seconds
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer2                       |
+	| Email Address | osb.customer2@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer2                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.partner1                      |
+	| Email Address | osb.partner1@lrpartner.com.broken |
+	| First Name    | OSB                               |
+	| Last Name     | Partner1                          |
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I go to the OSB admin main page
+	* I assign a user the email address "osb.partner1@lrpartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	* I go to the OSB admin main page
+	* I create a project with the following values
+	| Name                       | Zen OSB Automotive |
+	| Code                       | ZENOSBA            |
+	| Type                       | Group              |
+	| Industry                   | Automotive         |
+	| Partner Code               | Zen OSB Partner    |
+	| Partner First Line Support | true               |
+	| Tier                       | Premier            |
+	| Max Contacts               | 10                 |
+	| Address Line               | 123 Main Street    |
+	| Country                    | United States      |
+	| State                      | California         |
+	| City                       | Diamond Bar        |
+	| Zip                        | 91765              |
+	| Region                     | US                 |
+	| Language                   | English            |
+
+Teardown:
+	* I wait for "10" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I get the ID of the default user belonging to the organization "Zen OSB Automotive" from zendesk.liferay.com
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I tear down the users with the following email addresses from web.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.partner1@lrpartner.com.broken   |
+	* I tear down the partner workers with the following email addresses for the partner with the code "Zen OSB Partner"
+	| osb.partner1@lrpartner.com.broken |
+	* I tear down the projects with the following project codes
+	| ZENOSBA |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.partner1@lrpartner.com.broken   |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen OSB Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+
+Scenario: View ticket after partner and customer requester removal on organization with multiple customers
+	Zendesk tickets should be reassigned if a partner and multiple customer requesters are present on OSB.
+
+	Given I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.partner1@lrpartner.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Zen OSB Automotive                               |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.partner1@lrpartner.com.broken"
+	When I wait for "60" seconds
+	When I remove a user the email address "osb.partner1@lrpartner.com.broken" as a worker from the partner with the code "Zen OSB Partner"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	When I remove a user the email address "osb.customer1@lrcustomer.com.broken" as a customer from the project with the code "ZENOSBA"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer2@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I attempt to remove a user with the email address "osb.customer2@lrcustomer.com.broken" as a customer from the project with the code "ZENOSBA" who still has an open Zendesk ticket
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer2@lrcustomer.com.broken"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
+
+Scenario: View ticket after partner and customer requester removal on organization with one developer and one watcher
+	Zendesk tickets should be reassigned if a partner and one developer and one watcher requesters are present OSB.
+
+	Given I assign a user the email address "osb.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENOSBA"
+	And I assign a user the email address "osb.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENOSBA"
+	And I add an order with the product "Portal Production" and support level "Gold" to the project code "ZENOSBA"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.partner1@lrpartner.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Zen OSB Automotive                               |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.partner1@lrpartner.com.broken"
+	When I wait for "60" seconds
+	When I remove a user the email address "osb.partner1@lrpartner.com.broken" as a worker from the partner with the code "Zen OSB Partner"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I attempt to remove a user with the email address "osb.customer1@lrcustomer.com.broken" as a customer from the project with the code "ZENOSBA" who still has an open Zendesk ticket
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Zen OSB Automotive"
