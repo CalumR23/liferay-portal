@@ -1,0 +1,623 @@
+definition {
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
+	var supportURL = PropsUtil.get("support.liferay.sandbox.url");
+	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
+	var webAdminPassword = PropsUtil.get("web.admin.password");
+	var webURL = PropsUtil.get("web.liferay.sandbox.url");
+
+	@prose = "I have the sandbox web user on with the email address ${userEmailAddress} agree to the web terms of use"
+	macro agreeToTermsOfUse {
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/update-agreed-to-terms-of-use
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			-d agreedToTermsOfUse=true
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox support user with the email address ${userEmailAddress} to the support organization ${organizationName}"
+	macro assignUserToSupportOrganization {
+		var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userIds=${supportUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox web user with the email address ${userEmailAddress} to the web organization ${organizationName}"
+	macro assignUserToWebOrganization {
+		var organizationId = JSONOrganizationSandbox.getWebOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-organization-users
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userIds=${webUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox support user with the email address ${userEmailAddress} to the support role ${roleName}"
+	macro assignUserToSupportRole {
+		var roleId = JSONRoleSandbox.getSupportRoleIdByName(roleName = "${roleName}");
+
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-role-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d roleId=${roleId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox web user with the email address ${userEmailAddress} to the web role ${roleName}"
+	macro assignUserToWebRole {
+		var roleId = JSONRoleSandbox.getWebRoleIdByName(roleName = "${roleName}");
+
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-role-users
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d roleId=${roleId}
+			-d userIds=${webUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox support user with the email address ${userEmailAddress} to the support group ${groupName}"
+	macro assignUserToSupportGroup {
+		var groupId = JSONGroupSandbox.getSupportGroupId(groupName = "${groupName}");
+
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-group-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d groupId=${groupId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox web user with the email address ${userEmailAddress} to the web group ${groupName}"
+	macro assignUserToWebGroup {
+		var groupId = JSONGroupSandbox.getWebGroupId(groupName = "${groupName}");
+
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-group-users
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d groupId=${groupId}
+			-d userIds=${webUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the sandbox support user with the email address ${userEmailAddress} to the support user group ${userGroupName}"
+	macro assignUserToSupportUserGroup {
+		var userGroupId = JSONUserGroupSandbox.getSupportUserGroupId(userGroupName = "${userGroupName}");
+
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user-group-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userGroupId=${userGroupId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro getWebUserUuid {
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserUuId = JSONCurlUtil.post("${curl}", "$.uuid");
+
+		echo("Web User UUID: ${webUserUuId}");
+
+		return "${webUserUuId}";
+	}
+
+	@prose = "I create a sandbox user with the following parameters ${table}"
+	macro create {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/add-user
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		if (contains("${staticWebUserIdList}", "{staticWebUserIdList}")) {
+			static var staticWebUserIdList = "${webUserId}";
+		}
+		else {
+			static var staticWebUserIdList = "${staticWebUserIdList},${webUserId}";
+		}
+
+		echo("Web User ID List: ${staticWebUserIdList}");
+
+		return "${staticWebUserIdList}";
+	}
+
+	@prose = "I create a sandbox support user with the following parameters ${table}"
+	macro createViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		if (contains("${staticSupportUserIdList}", "{staticSupportUserIdList}")) {
+			static var staticSupportUserIdList = "${supportUserId}";
+		}
+		else {
+			static var staticSupportUserIdList = "${staticSupportUserIdList},${supportUserId}";
+		}
+
+		echo("Support User ID List: ${staticSupportUserIdList}");
+
+		return "${staticSupportUserIdList}";
+	}
+
+	@prose = "I tear down the sandbox users with the following email addresses from web.liferay.com ${table}"
+	macro tearDownUsers {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompanySandbox.getWebCompanyId();
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Web User ID: ${webUserId}");
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/delete-user
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d userId=${webUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the sandbox users with the following screen names from web.liferay.com ${table}"
+	macro tearDownUsersByScreenName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userScreenName = "${row[0]}";
+
+			var companyId = JSONCompanySandbox.getWebCompanyId();
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Web User ID: ${webUserId}");
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/delete-user
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d userId=${webUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the sandbox users with the following email addresses from customer.liferay.com ${table}"
+	macro tearDownUsersViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-user-by-screen-name
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Support User ID: ${supportUserId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/delete-user
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d userId=${supportUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I update a sandbox user with the email address ${userEmailAddress} using following parameters ${table}"
+	macro update {
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/update-user
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			-d oldPassword=osbadminqauser
+			-d newPassword1=resuaqnimdabso
+			-d newPassword2=resuaqnimdabso
+			-d passwordReset=false
+			-d reminderQueryQuestion=Test
+			-d reminderQueryAnswer=Test
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=1a23d
+			-d languageId=0
+			-d timeZoneId=0
+			-d greeting=Hello
+			-d comments=Comment
+			-d firstName=${userFirstName}
+			-d middleName=Test
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=30
+			-d birthdayYear=1986
+			-d smsSn=
+			-d aimSn=
+			-d facebookSn=
+			-d icqSn=
+			-d jabberSn=
+			-d msnSn=
+			-d mySpaceSn=
+			-d skypeSn=
+			-d twitterSn=
+			-d ymSn=
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupRoles=
+			-d userGroupIds=
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I update the sandbox support password for user with the email address ${userEmailAddress} to ${userPassword}"
+	macro updateSupportPassword {
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/update-password
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userId=${supportUserId}
+			-d password1=${userPassword}
+			-d password2=${userPassword}
+			-d passwordReset=false
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I update the sandbox web password for user with the email address ${userEmailAddress} to ${userPassword}"
+	macro updateWebPassword {
+		var companyId = JSONCompanySandbox.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/update-password
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			-d password1=${userPassword}
+			-d password2=${userPassword}
+			-d passwordReset=false
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+}
