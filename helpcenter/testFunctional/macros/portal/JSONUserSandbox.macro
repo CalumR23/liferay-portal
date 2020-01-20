@@ -1,4 +1,7 @@
 definition {
+	var koroneikiAdminEmailAddress = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
 	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.sandbox.url");
@@ -220,6 +223,40 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	macro getKoroneikiUserUuid {
+		var companyId = JSONCompanySandbox.getKoroneikiCompanyId();
+
+		var curl = '''
+			${koroneikiURL}/api/jsonws/user/get-user-by-email-address
+			-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var koroneikiUserUuId = JSONCurlUtil.post("${curl}", "$.uuid");
+
+		echo("Koroneiki User UUID: ${koroneikiUserUuId}");
+
+		return "${koroneikiUserUuId}";
+	}
+
+	macro getSupportUserUuid {
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserUuId = JSONCurlUtil.post("${curl}", "$.uuid");
+
+		echo("Support User UUID: ${supportUserUuId}");
+
+		return "${supportUserUuId}";
+	}
+
 	macro getWebUserUuid {
 		var companyId = JSONCompanySandbox.getWebCompanyId();
 
@@ -310,6 +347,81 @@ definition {
 		echo("Web User ID List: ${staticWebUserIdList}");
 
 		return "${staticWebUserIdList}";
+	}
+
+	@prose = "I create a koroneiki user with the following parameters ${table}"
+	macro createViaKoroneiki {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompanySandbox.getKoroneikiCompanyId();
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${koroneikiURL}/api/jsonws/user/add-user
+			-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Koroneiki User ID: ${koroneikiUserId}");
+
+		if (contains("${staticKoroneikiUserIdList}", "{staticKoroneikiUserIdList}")) {
+			static var staticKoroneikiUserIdList = "${koroneikiUserId}";
+		}
+		else {
+			static var staticKoroneikiUserIdList = "${staticKoroneikiUserIdList},${koroneikiUserId}";
+		}
+
+		echo("Koroneiki User ID List: ${staticKoroneikiUserIdList}");
+
+		return "${staticKoroneikiUserIdList}";
 	}
 
 	@prose = "I create a sandbox support user with the following parameters ${table}"
@@ -443,6 +555,38 @@ definition {
 				${webURL}/api/secure/jsonws/user/delete-user
 				-u ${webAdminEmailAddress}:${webAdminPassword}
 				-d userId=${webUserId}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the users with the following email addresses from koroneiki ${table}"
+	macro tearDownUsersViaKoroneiki {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompanySandbox.getKoroneikiCompanyId();
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${koroneikiURL}/api/jsonws/user/get-user-by-screen-name
+				-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Koroneiki User ID: ${koroneikiUserId}");
+
+			var curl = '''
+				${koroneikiURL}/api/jsonws/user/delete-user
+				-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+				-d userId=${koroneikiUserId}
 				''';
 
 			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
