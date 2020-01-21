@@ -1,0 +1,72 @@
+definition {
+	var popupTitle = PropsUtil.get("osb.admin.popup.title");
+	var supportURL = PropsUtil.get("support.liferay.sandbox.url");
+
+	@prose = "I add a product on the sandbox with the following values ${table}"
+	macro addProduct {
+		OSBAdminSandbox.gotoOSBAdminSalesProducts();
+
+		Click(locator1 = "OSBAdminSalesProducts#ADD_PRODUCT_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value}");
+
+				Type(
+					locator1 = "OSBAdminSalesProductsAdd#KORONEIKI_PRODUCT_KEY_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				Select(
+					locator1 = "OSBAdminSalesProductsAdd#TYPE_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Environment") {
+				Select(
+					locator1 = "OSBAdminSalesProductsAdd#ENVIRONMENT_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version List Type") {
+				Type(
+					locator1 = "OSBAdminSalesProductsAdd#VERSION_LIST_TYPE_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I tear down the following products on the sandbox ${table}"
+	macro tearDownProducts {
+		OSBAdminSandbox.gotoOSBAdminSalesProducts();
+
+		Click(locator1 = "OSBAdminSalesProducts#ADD_PRODUCT_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var productName = "${row[0]}";
+
+			var key_productName = "${productName}";
+
+			if (IsElementPresent.isElementPresentAfterWait(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME")) {
+				Click(locator1 = "OSBAdminSalesProducts#PRODUCT_ACTIONS_MENU");
+				ClickNoError(locator1 = "OSBAdminSalesProducts#DELETE_MENU_ITEM");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				Message.success();
+			}
+		}
+	}
+}
