@@ -223,6 +223,32 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I delete the user with the email address ${userEmailAddress} from customer.liferay.com"
+	macro deleteSupportUser {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-screen-name
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d screenName=${userScreenName}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/delete-user
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userId=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	macro getKoroneikiUserUuid {
 		var companyId = JSONCompanySandbox.getKoroneikiCompanyId();
 
@@ -622,6 +648,56 @@ definition {
 				''';
 
 			com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		}
+	}
+
+	@prose = "I tear down the sandbox users with the following email addresses from the support organization ${organizationName} ${table}"
+	macro tearDownUsersViaSupportOrganization {
+		var organizationSearchResults = JSONOrganizationSandbox.searchOrganization(organizationName = "${organizationName}");
+
+		if (contains("${organizationSearchResults}", "${organizationName}")) {
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var userEmailAddress = "${row[0]}";
+
+				var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+				echo("Support Organization ID: ${organizationId}");
+
+				var curl = '''
+					${supportURL}/api/jsonws/user/get-organization-users
+					-u ${supportAdminEmailAddress}:${supportAdminPassword}
+					-d organizationId=${organizationId}
+					''';
+
+				var organizationMembers = JSONCurlUtil.post("${curl}");
+
+				if (contains("${organizationMembers}", "${userEmailAddress}")) {
+					var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+					var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+					var curl = '''
+						${supportURL}/api/jsonws/user/get-user-by-screen-name
+						-u ${supportAdminEmailAddress}:${supportAdminPassword}
+						-d companyId=${companyId}
+						-d screenName=${userScreenName}
+						''';
+
+					var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+					echo("Support User ID: ${supportUserId}");
+
+					var curl = '''
+						${supportURL}/api/jsonws/user/delete-user
+						-u ${supportAdminEmailAddress}:${supportAdminPassword}
+						-d userId=${supportUserId}
+						''';
+
+					com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+				}
+			}
 		}
 	}
 

@@ -8,6 +8,41 @@ definition {
 	var webWebId = PropsUtil.get("web.liferay.sandbox.web.id");
 	var webURL = PropsUtil.get("web.liferay.sandbox.url");
 
+	@prose = "I create a support sandbox organization with the name ${organizationName}"
+	macro createViaSupport {
+		var organizationNameEncoded = URLUtil.encodeUTF8("${organizationName}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/add-organization
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d parentOrganizationId=0
+			-d name=${organizationNameEncoded}
+			-d type=organization
+			-d regionId=0
+			-d countryId=0
+			-d statusId=12017
+			-d comments=
+			-d site=false
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete the sandbox organization ${organizationName} from customer.liferay.com"
+	macro deleteSupportOrganization {
+		var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/delete-organization
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	macro getWebOrganizationId {
 		var companyId = JSONCompanySandbox.getWebCompanyId();
 
@@ -48,5 +83,87 @@ definition {
 		echo("Organization ID: ${organizationId}");
 
 		return "${organizationId}";
+	}
+
+	macro searchOrganization {
+		var companyId = JSONCompanySandbox.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-organizations
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d parentOrganizationId=0
+			-d name=${organizationName}
+			-d start=0
+			-d end=1
+			''';
+
+		var organizationSearchResults = JSONCurlUtil.post("${curl}");
+
+		return "${organizationSearchResults}";
+	}
+
+	@prose = "I tear down the sandbox organizations with the following names from customer.liferay.com ${table}"
+	macro tearDownOrganizationsViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var organizationName = "${row[0]}";
+
+			var organizationSearchResults = JSONOrganizationSandbox.searchOrganization(organizationName = "${organizationName}");
+
+			if (contains("${organizationSearchResults}", "${organizationName}")) {
+				var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+				echo("Support Organization ID: ${organizationId}");
+
+				var curl = '''
+					${supportURL}/api/jsonws/organization/delete-organization
+					-u ${supportAdminEmailAddress}:${supportAdminPassword}
+					-d organizationId=${organizationId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
+	@prose = "the organization ${organizationName} should have the user with the email address ${userEmailAddress} as a member"
+	macro viewSupportOrganizationMemberSync {
+		var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		var organizationMembers = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMembers}", "${userEmailAddress}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+			echo("Support Organization ID: ${organizationId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-organization-users
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d organizationId=${organizationId}
+				''';
+
+			var organizationMembers = JSONCurlUtil.post("${curl}");
+		}
+
+		if (!(contains("${organizationMembers}", "${userEmailAddress}"))) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to have not been added to the support organization ${organizationName}");
+		}		
 	}
 }
