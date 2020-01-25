@@ -130,6 +130,45 @@ definition {
 		}
 	}
 
+	@prose = "the organization ${organizationName} should not have the user with the email address ${userEmailAddress} as a member"
+	macro viewNoSupportOrganizationMemberSync {
+		var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		var organizationMembers = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationMembers}", "${userEmailAddress}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
+
+			echo("Support Organization ID: ${organizationId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-organization-users
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d organizationId=${organizationId}
+				''';
+
+			var organizationMembers = JSONCurlUtil.post("${curl}");
+		}
+
+		if (contains("${organizationMembers}", "${userEmailAddress}")) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to be in the support organization ${organizationName}");
+		}		
+	}
+
 	@prose = "the organization ${organizationName} should have the user with the email address ${userEmailAddress} as a member"
 	macro viewSupportOrganizationMemberSync {
 		var organizationId = JSONOrganizationSandbox.getSupportOrganizationId(organizationName = "${organizationName}");
