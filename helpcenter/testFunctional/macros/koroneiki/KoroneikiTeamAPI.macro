@@ -653,6 +653,26 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I update a team with the name ${teamName} to have the new name ${teamNameEdit} executed by ${agentName}"
+	macro updateTeamWithAgent {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}?agentName=${agentName}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamNameEdit}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "the contact with the email address ${contactEmailAddress} should be assigned the team ${teamName}"
 	macro _viewContact {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -1055,7 +1075,7 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the team ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the team ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName}"
 	macro _viewTeamAuditEntry {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 
@@ -1131,9 +1151,24 @@ definition {
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the team ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} via the audit entry key"
+	@prose = "I should be able to view an audit entry for an action ${action} to the team ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName} via the audit entry key"
 	macro _viewTeamAuditEntryViaAuditEntryKey {
 		var auditEntryKey = KoroneikiTeamAPI._getTeamAuditEntryKey(
 			teamName = "${teamName}",
@@ -1189,6 +1224,15 @@ definition {
 
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
 	}
 

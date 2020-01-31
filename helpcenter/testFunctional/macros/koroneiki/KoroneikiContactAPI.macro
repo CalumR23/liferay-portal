@@ -13,7 +13,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Email Address") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
 				var emailAddress = "${value}";
 			}
 			else if ("${field}" == "First Name") {
@@ -39,6 +44,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(emailAddress))) {
 			var emailAddress = "";
 		}
@@ -61,22 +69,42 @@ definition {
 			var uuid = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"emailAddress": "${emailAddress}",
-				"firstName": "${firstName}",
-				"languageId": "${languageId}",
-				"lastName": "${lastName}",
-				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
-				"uuid": "${uuid}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"emailAddress": "${emailAddress}",
+					"firstName": "${firstName}",
+					"languageId": "${languageId}",
+					"lastName": "${lastName}",
+					"middleName": "${middleName}",
+					"oktaId": "${oktaId}",
+					"uuid": "${uuid}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"emailAddress": "${emailAddress}",
+					"firstName": "${firstName}",
+					"languageId": "${languageId}",
+					"lastName": "${lastName}",
+					"middleName": "${middleName}",
+					"oktaId": "${oktaId}",
+					"uuid": "${uuid}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -1361,7 +1389,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Email Address") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
 				var emailAddress = "${value}";
 			}
 			else if ("${field}" == "First Name") {
@@ -1393,6 +1426,10 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 
 		if (!(isSet(emailAddress))) {
 			var contactObject = JSONCurlUtil.get("${curl}", "$");
@@ -1479,22 +1516,42 @@ definition {
 			}
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"emailAddress": "${emailAddress}",
-				"firstName": "${firstName}",
-				"languageId": "${languageId}",
-				"lastName": "${lastName}",
-				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
-				"uuid": "${uuid}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"emailAddress": "${emailAddress}",
+					"firstName": "${firstName}",
+					"languageId": "${languageId}",
+					"lastName": "${lastName}",
+					"middleName": "${middleName}",
+					"oktaId": "${oktaId}",
+					"uuid": "${uuid}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"emailAddress": "${emailAddress}",
+						"firstName": "${firstName}",
+						"languageId": "${languageId}",
+						"lastName": "${lastName}",
+						"middleName": "${middleName}",
+						"oktaId": "${oktaId}",
+						"uuid": "${uuid}"
+					}
+					''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -1793,7 +1850,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue} via the audit entry key"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName} via the audit entry key"
 	macro _viewContactAuditEntryViaAuditEntryKey {
 		var auditEntryKey = KoroneikiContactAPI._getContactAuditEntryKey(
 			action = "${action}",
@@ -1850,9 +1907,18 @@ definition {
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the okta ID ${contactOktaId} field ${field} from the old value ${oldValue} to the new value ${newValue}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the okta ID ${contactOktaId} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName}"
 	macro _viewContactAuditEntryViaOktaId {
 		var field = StringUtil.lowerCaseFirstLetter("${field}");
 
@@ -1926,9 +1992,24 @@ definition {
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the email address ${contactEmailAddress} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName}"
 	macro _viewContactAuditEntryViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
@@ -2003,6 +2084,21 @@ definition {
 
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
 	}
 

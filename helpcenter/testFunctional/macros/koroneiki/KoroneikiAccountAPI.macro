@@ -174,7 +174,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Code") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Code") {
 				var code = "${value}";
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -230,6 +235,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(code))) {
 			var code = "";
 		}
@@ -282,32 +290,62 @@ definition {
 			var website = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"contacts": [${contactsNestedField}],
-				"description": "${description}",
-				"externalLinks": [${externalLinksNestedField}],
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"name": "${name}",
-				"notes": "${notes}",
-				"phoneNumber": "${phoneNumber}",
-				"postalAddresses": [${postalAddressesNestedField}],
-				"productPurchases": [${productPurchasesNestedField}],
-				"profileEmailAddress": "${profileEmailAddress}",
-				"soldBy": "${soldBy}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"contacts": [${contactsNestedField}],
+					"description": "${description}",
+					"externalLinks": [${externalLinksNestedField}],
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"name": "${name}",
+					"notes": "${notes}",
+					"phoneNumber": "${phoneNumber}",
+					"postalAddresses": [${postalAddressesNestedField}],
+					"productPurchases": [${productPurchasesNestedField}],
+					"profileEmailAddress": "${profileEmailAddress}",
+					"soldBy": "${soldBy}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"contacts": [${contactsNestedField}],
+					"description": "${description}",
+					"externalLinks": [${externalLinksNestedField}],
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"name": "${name}",
+					"notes": "${notes}",
+					"phoneNumber": "${phoneNumber}",
+					"postalAddresses": [${postalAddressesNestedField}],
+					"productPurchases": [${productPurchasesNestedField}],
+					"profileEmailAddress": "${profileEmailAddress}",
+					"soldBy": "${soldBy}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -465,6 +503,26 @@ definition {
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I create a team with the name ${teamName} for the account ${accountName} executed by ${agentName}"
+	macro _createAccountTeamWithAgent {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams?agentName=${agentName}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -1798,7 +1856,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Code") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Code") {
 				var code = "${value}";
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -1848,6 +1911,10 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 
 		if (!(isSet(code))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
@@ -2006,28 +2073,54 @@ definition {
 			}
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"description": "${description}",
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"name": "${name}",
-				"notes": "${notes}",
-				"phoneNumber": "${phoneNumber}",
-				"profileEmailAddress": "${profileEmailAddress}",
-				"soldBy": "${soldBy}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"name": "${name}",
+					"notes": "${notes}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"soldBy": "${soldBy}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"name": "${name}",
+					"notes": "${notes}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"soldBy": "${soldBy}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';			
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -2796,7 +2889,7 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the account ${accountName} field ${field} from the old value ${oldValue} to the new value ${newValue}"
+	@prose = "I should be able to view an audit entry for an action ${action} to the account ${accountName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName}"
 	macro _viewAccountAuditEntry {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
@@ -2872,9 +2965,24 @@ definition {
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
 		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
 	}
 
-	@prose = "I should be able to view an audit entry for an action ${action} to the account ${accountName} field ${field} from the old value ${oldValue} to the new value ${newValue} via the audit entry key"
+	@prose = "I should be able to view an audit entry for an action ${action} to the account ${accountName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName} via the audit entry key"
 	macro _viewAccountAuditEntryViaAuditEntryKey {
 		var auditEntryKey = KoroneikiAccountAPI._getAccountAuditEntryKey(
 			accountName = "${accountName}",
@@ -2930,6 +3038,15 @@ definition {
 
 		if (!("${newValue}" == "${newValueFromAPI}")) {
 			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
 	}
 
