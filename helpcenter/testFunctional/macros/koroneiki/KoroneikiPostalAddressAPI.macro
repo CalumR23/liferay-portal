@@ -107,6 +107,24 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete a postal address on koroneiki for the account ${accountName} with the street address ${streetAddressLine1} executed by ${agentName}"
+	macro _deletePostalAddressExecutedByAgent {
+		var postalAddressId = KoroneikiAccountAPI._getAccountPostalAddressIdViaAccountNameAndStreetAddress(
+			accountName = "${accountName}",
+			streetAddressLine1 = "${streetAddressLine1}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}?agentName=${agentName}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I tear down the postal addresses on koroneiki for the account ${accountName} with the following street addresses ${table}"
 	macro _tearDownPostalAddresses {
 		var curl = '''
@@ -158,7 +176,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Country") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Country") {
 				var addressCountry = "${value}";
 			}
 			else if ("${field}" == "Locality") {
@@ -208,6 +231,9 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(addressCountry))) {
 			var postalAddressObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -328,26 +354,48 @@ definition {
 				var streetAddressLine3 = "false";
 			}
 		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"addressCountry": "${addressCountry}",
-				"addressLocality": "${addressLocality}",
-				"addressRegion": "${addressRegion}",
-				"addressType": "${addressType}",
-				"mailing": ${mailing},
-				"postalCode": "${postalCode}",
-				"primary": ${primary},
-				"streetAddressLine1": "${streetAddressLine1}",
-				"streetAddressLine2": "${streetAddressLine2}",
-				"streetAddressLine3": "${streetAddressLine3}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"addressCountry": "${addressCountry}",
+					"addressLocality": "${addressLocality}",
+					"addressRegion": "${addressRegion}",
+					"addressType": "${addressType}",
+					"mailing": ${mailing},
+					"postalCode": "${postalCode}",
+					"primary": ${primary},
+					"streetAddressLine1": "${streetAddressLine1}",
+					"streetAddressLine2": "${streetAddressLine2}",
+					"streetAddressLine3": "${streetAddressLine3}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/postal-addresses/${postalAddressId}?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"addressCountry": "${addressCountry}",
+					"addressLocality": "${addressLocality}",
+					"addressRegion": "${addressRegion}",
+					"addressType": "${addressType}",
+					"mailing": ${mailing},
+					"postalCode": "${postalCode}",
+					"primary": ${primary},
+					"streetAddressLine1": "${streetAddressLine1}",
+					"streetAddressLine2": "${streetAddressLine2}",
+					"streetAddressLine3": "${streetAddressLine3}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
