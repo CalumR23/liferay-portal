@@ -246,6 +246,37 @@ definition {
 		return "${auditEntryKey}";
 	}
 
+	macro _getTeamAuditEntryKeyRegardingAdditionalEntities {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/audit-entries?pageSize=100
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!("${oldValue}" == "")) {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].key");
+		}
+		else if (!("${newValue}" == "")) {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].key");
+		}
+		else {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].key");
+		}
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "[", "");
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "]", "");
+
+		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "&quot;", "");
+
+		echo("Audit entry key value: ${auditEntryKey}");
+
+		return "${auditEntryKey}";
+	}
+
 	macro _getTeamExternalLinkKey {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 
@@ -1159,6 +1190,220 @@ definition {
 		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
 
 		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
+	}
+
+	@prose = "I should be able to view an audit entry for an action ${action} to the team with the name ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} regarding ${description} executed by ${agentName}"
+	macro _viewTeamAuditEntryRegardingAdditionalEntities {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/audit-entries?pageSize=100
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!("${oldValue}" == "")) {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].action");
+		}
+		else if (!("${newValue}" == "")) {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].action");
+		}
+		else {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].action");			
+		}
+
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "[", "");
+
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "]", "");
+
+		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "&quot;", "");
+
+		echo("Expected Action Value: ${action}");
+		echo("Actual Action Value: ${actionFromAPI}");
+
+		if (!("${action}" == "${actionFromAPI}")) {
+			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].description");
+		}
+		else if (!("${newValue}" == "")) {
+			var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].description");
+		}
+		else {
+			var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].description");			
+		}
+
+		var descriptionFromAPI = StringUtil.replace("${descriptionFromAPI}", "[", "");
+
+		var descriptionFromAPI = StringUtil.replace("${descriptionFromAPI}", "]", "");
+
+		var descriptionFromAPI = StringUtil.replace("${descriptionFromAPI}", "&quot;", "");
+
+		echo("Expected Description Value: ${description}");
+		echo("Actual Description Value: ${descriptionFromAPI}");
+
+		if (!("${description}" == "${descriptionFromAPI}")) {
+			fail("Actual description value ${descriptionFromAPI} does not match expected description value ${description}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].field");
+		}
+		else if (!("${newValue}" == "")) {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].field");
+		}
+		else {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].field");			
+		}
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "]", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "&quot;", "");
+
+		echo("Expected Field Value: ${field}");
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if (!("${field}" == "${fieldFromAPI}")) {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.description=='${description}')].oldValue");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "[", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "]", "");
+
+			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "&quot;", "");
+
+			echo("Expected Old Value: ${oldValue}");
+			echo("Actual Old Value: ${oldValueFromAPI}");
+
+			if (!("${oldValue}" == "${oldValueFromAPI}")) {
+				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
+			}
+		}
+
+		if (!("${newValue}" == "")) {
+			var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}' && @.description=='${description}')].newValue");
+
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
+
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
+
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
+
+			echo("Expected New Value: ${newValue}");
+			echo("Actual New Value: ${newValueFromAPI}");
+
+			if (!("${newValue}" == "${newValueFromAPI}")) {
+				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			}
+		}
+
+		if (!("${oldValue}" == "")) {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].agentName");
+		}
+		else if (!("${newValue}" == "")) {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].agentName");
+		}
+		else {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentName");			
+		}
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
+
+		echo("Expected Agent: ${agentName}");
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if (!("${agentName}" == "${agentNameFromAPI}")) {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
+	}
+
+	@prose = "I should be able to view an audit entry for an action ${action} to the team with the name ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} regarding ${description} executed by ${agentName} via the audit entry key"
+	macro _viewTeamAuditEntryRegardingAdditionalEntitiesViaAuditEntryKey {
+		var auditEntryKey = KoroneikiTeamAPI._getTeamAuditEntryKeyRegardingAdditionalEntities(
+			teamName = "${teamName}",
+			description = "${description}",
+			action = "${action}",
+			field = "${field}",
+			newValue = "${newValue}",
+			oldValue = "${oldValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/audit-entries/${auditEntryKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var actionFromAPI = JSONCurlUtil.get("${curl}", "$.action");
+
+		echo("Expected Action Value: ${action}");
+		echo("Actual Action Value: ${actionFromAPI}");
+
+		if (!("${action}" == "${actionFromAPI}")) {
+			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
+		}
+
+		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+
+		echo("Expected Description Value: ${description}");
+		echo("Actual Description Value: ${descriptionFromAPI}");
+
+		if (!("${description}" == "${descriptionFromAPI}")) {
+			fail("Actual description value ${descriptionFromAPI} does not match expected description value ${description}");
+		}
+
+		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.field");
+
+		echo("Expected Field Value: ${field}");
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if (!("${field}" == "${fieldFromAPI}")) {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		if (!("${oldValue}" == "")) {
+			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.oldValue");
+
+			echo("Expected Old Value: ${oldValue}");
+			echo("Actual Old Value: ${oldValueFromAPI}");
+
+			if (!("${oldValue}" == "${oldValueFromAPI}")) {
+				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
+			}
+		}
+
+		if (!("${newValue}" == "")) {
+			var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
+
+			echo("Expected New Value: ${newValue}");
+			echo("Actual New Value: ${newValueFromAPI}");
+
+			if (!("${newValue}" == "${newValueFromAPI}")) {
+				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			}
+		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");
 
 		echo("Expected Agent: ${agentName}");
 		echo("Actual Agent: ${agentNameFromAPI}");
