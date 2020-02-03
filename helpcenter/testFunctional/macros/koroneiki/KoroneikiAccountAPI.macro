@@ -486,7 +486,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Domain") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Domain") {
 				var domain = "${value}";
 			}
 			else if ("${field}" == "Entity Id") {
@@ -500,6 +505,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(domain))) {
 			var domain = "";
 		}
@@ -510,18 +518,34 @@ definition {
 			var entityName = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"domain": "${domain}",
-				"entityId": "${entityId}",
-				"entityName": "${entityName}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"domain": "${domain}",
+					"entityId": "${entityId}",
+					"entityName": "${entityName}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"domain": "${domain}",
+					"entityId": "${entityId}",
+					"entityName": "${entityName}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -1216,6 +1240,24 @@ definition {
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I delete an external link with the entity id ${entityId} on the account ${accountName} executed by ${agentName}"
+	macro _deleteAccountExternalLinkExecutedByAgent {
+		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKey(
+			accountName = "${accountName}",
+			entityId = "${entityId}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}?agentName=${agentName}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -3511,14 +3553,15 @@ definition {
 				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
 			}
 		}
+		if (!("${newValue}" == "")) {
+			var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
 
-		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
+			echo("Expected New Value: ${newValue}");
+			echo("Actual New Value: ${newValueFromAPI}");
 
-		echo("Expected New Value: ${newValue}");
-		echo("Actual New Value: ${newValueFromAPI}");
-
-		if (!("${newValue}" == "${newValueFromAPI}")) {
-			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			if (!("${newValue}" == "${newValueFromAPI}")) {
+				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			}
 		}
 
 		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");

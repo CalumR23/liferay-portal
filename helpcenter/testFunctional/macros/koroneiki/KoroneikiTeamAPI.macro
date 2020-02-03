@@ -107,7 +107,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Domain") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Domain") {
 				var domain = "${value}";
 			}
 			else if ("${field}" == "Entity Id") {
@@ -121,6 +126,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(domain))) {
 			var domain = "";
 		}
@@ -131,18 +139,34 @@ definition {
 			var entityName = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"domain": "${domain}",
-				"entityId": "${entityId}",
-				"entityName": "${entityName}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"domain": "${domain}",
+					"entityId": "${entityId}",
+					"entityName": "${entityName}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"domain": "${domain}",
+					"entityId": "${entityId}",
+					"entityName": "${entityName}"
+				}
+				''';			
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -214,6 +238,24 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete an external link with the entity id ${entityId} on the team ${teamName} executed by ${agentName}"
+	macro _deleteTeamExternalLinkExecutedByAgent {
+		var externalLinkKey = KoroneikiTeamAPI._getTeamExternalLinkKey(
+			entityId = "${entityId}",
+			teamName = "${teamName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}?agentName=${agentName}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	macro _getTeamAuditEntryKey {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 
@@ -228,11 +270,14 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		if (!("${oldValue}" == "")) {
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
 			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].key");
 		}
-		else {
+		else if (!("${newValue}" == "")) {
 			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].key");
+		}
+		else {
+			var auditEntryKey = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].key");
 		}
 
 		var auditEntryKey = StringUtil.replace("${auditEntryKey}", "[", "");
@@ -1121,7 +1166,15 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].action");
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == "")))  {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].action");
+		}
+		else if (!("${newValue}" == "")) {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].action");
+		}
+		else {
+			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].action");
+		}
 
 		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "[", "");
 
@@ -1136,7 +1189,15 @@ definition {
 			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
 		}
 
-		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].field");
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].field");
+		}
+		else if (!("${newValue}" == "")) {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].field");
+		}
+		else {
+			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].field");
+		}
 
 		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
 
@@ -1152,7 +1213,12 @@ definition {
 		}
 
 		if (!("${oldValue}" == "")) {
-			var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].oldValue");
+			if (!("${newValue}" == "")) {
+				var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].oldValue");
+			}
+			else {
+				var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].oldValue");			
+			}
 
 			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "[", "");
 
@@ -1168,22 +1234,37 @@ definition {
 			}
 		}
 
-		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].newValue");
+		if (!("${newValue}" == "")) {
+			if (!("${oldValue}" == "")) {
+				var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].newValue");
+			}
+			else {
+				var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].newValue");				
+			}
 
-		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
 
-		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
 
-		var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
+			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
 
-		echo("Expected New Value: ${newValue}");
-		echo("Actual New Value: ${newValueFromAPI}");
+			echo("Expected New Value: ${newValue}");
+			echo("Actual New Value: ${newValueFromAPI}");
 
-		if (!("${newValue}" == "${newValueFromAPI}")) {
-			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			if (!("${newValue}" == "${newValueFromAPI}")) {
+				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			}
 		}
 
-		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentName");
+		}
+		else if (!("${newValue}" == "")) {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
+		}
+		else {
+			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].agentName");
+		}
 
 		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
 
@@ -1472,13 +1553,15 @@ definition {
 			}
 		}
 
-		var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
+		if (!("${newValue}" == "")) {
+			var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.newValue");
 
-		echo("Expected New Value: ${newValue}");
-		echo("Actual New Value: ${newValueFromAPI}");
+			echo("Expected New Value: ${newValue}");
+			echo("Actual New Value: ${newValueFromAPI}");
 
-		if (!("${newValue}" == "${newValueFromAPI}")) {
-			fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			if (!("${newValue}" == "${newValueFromAPI}")) {
+				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
+			}
 		}
 
 		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.agentName");
