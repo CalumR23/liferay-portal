@@ -274,6 +274,24 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete a product purchase on koroneiki made by the account ${accountName} for the product ${productName} executed by ${agentName}"
+	macro _deleteProductPurchaseExecutedByAgent {
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}?agentName=${agentName}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I delete an external link with the entity id ${entityId} on a product purchase made by account ${accountName} for the product ${productName}"
 	macro _deleteProductPurchaseExternalLink {
 		var externalLinkKey = KoroneikiProductPurchaseAPI._getProductPurchaseExternalLinkKey(
@@ -868,7 +886,12 @@ definition {
 			var value1 = "${row[1]}";
 			var value2 = "${row[2]}";
 
-			if ("${field}" == "End Date") {
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
+			}
+			else if ("${field}" == "End Date") {
 				var endDate = "${value1}";
 			}
 			else if ("${field}" == "Original End Date") {
@@ -913,6 +936,9 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(endDate))) {
 			var productPurchaseObject = JSONCurlUtil.get("${curl}", "$");
 			
@@ -1011,43 +1037,86 @@ definition {
 		}
 
 		if ("${properties}" == "") {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"endDate": "${endDate}",
-					"originalEndDate": "${originalEndDate}",
-					"perpetual": ${perpetual},
-					"productKey": "${productKey}",
-					"quantity": ${quantity},
-					"startDate": "${startDate}",
-					"status": "${status}"
-				}
-				''';
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
 		}
 		else {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"endDate": "${endDate}",
-					"originalEndDate": "${originalEndDate}",
-					"perpetual": ${perpetual},
-					"productKey": "${productKey}",
-					"properties": {
-						${properties}
-					},
-					"quantity": ${quantity},
-					"startDate": "${startDate}",
-					"status": "${status}"
-				}
-				''';
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						},
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						},
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");

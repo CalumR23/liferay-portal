@@ -435,7 +435,12 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Description") {
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Description") {
 				var description = "${value}";
 			}
 			else if ("${field}" == "Name") {
@@ -449,6 +454,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(description))) {
 			var description = "";
 		}
@@ -459,19 +467,36 @@ definition {
 			var status = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"definition": "SELECT DISTINCT(Koroneiki_Account.accountId) FROM Koroneiki_Account INNER JOIN Koroneiki_ProductPurchase ON Koroneiki_ProductPurchase.accountId = Koroneiki_Account.accountId INNER JOIN Koroneiki_ProductEntry ON Koroneiki_ProductEntry.productEntryId = Koroneiki_ProductPurchase.productEntryId WHERE ((Koroneiki_ProductPurchase.startDate IS NULL) OR ((Koroneiki_ProductPurchase.startDate <= '\'[\$NOW$]\'') AND (Koroneiki_ProductPurchase.endDate >= '\'[\$NOW$]\''))) AND (Koroneiki_ProductEntry.productEntryKey in ('\'${productKey}\''))",
-				"description": "${description}",
-				"name": "${name}",
-				"status": "${status}"
-			}
-			''';
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"definition": "SELECT DISTINCT(Koroneiki_Account.accountId) FROM Koroneiki_Account INNER JOIN Koroneiki_ProductPurchase ON Koroneiki_ProductPurchase.accountId = Koroneiki_Account.accountId INNER JOIN Koroneiki_ProductEntry ON Koroneiki_ProductEntry.productEntryId = Koroneiki_ProductPurchase.productEntryId WHERE ((Koroneiki_ProductPurchase.startDate IS NULL) OR ((Koroneiki_ProductPurchase.startDate <= '\'[\$NOW$]\'') AND (Koroneiki_ProductPurchase.endDate >= '\'[\$NOW$]\''))) AND (Koroneiki_ProductEntry.productEntryKey in ('\'${productKey}\''))",
+					"description": "${description}",
+					"name": "${name}",
+					"status": "${status}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"definition": "SELECT DISTINCT(Koroneiki_Account.accountId) FROM Koroneiki_Account INNER JOIN Koroneiki_ProductPurchase ON Koroneiki_ProductPurchase.accountId = Koroneiki_Account.accountId INNER JOIN Koroneiki_ProductEntry ON Koroneiki_ProductEntry.productEntryId = Koroneiki_ProductPurchase.productEntryId WHERE ((Koroneiki_ProductPurchase.startDate IS NULL) OR ((Koroneiki_ProductPurchase.startDate <= '\'[\$NOW$]\'') AND (Koroneiki_ProductPurchase.endDate >= '\'[\$NOW$]\''))) AND (Koroneiki_ProductEntry.productEntryKey in ('\'${productKey}\''))",
+					"description": "${description}",
+					"name": "${name}",
+					"status": "${status}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -918,7 +943,12 @@ definition {
 			var value1 = "${row[1]}";
 			var value2 = "${row[2]}";
 
-			if ("${field}" == "Product Field and Value") {
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
+			}
+			else if ("${field}" == "Product Field and Value") {
 				if ("${properties}" == "") {
 					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
 				}
@@ -931,32 +961,67 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+
 		if ("${properties}" == "") {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"productKey": "${productKey}"
-				}
-				''';
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"productKey": "${productKey}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"productKey": "${productKey}"
+					}
+					''';
+			}
 		}
 		else {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"productKey": "${productKey}",
-					"properties": {
-						${properties}
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						}
 					}
-				}
-				''';
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -977,7 +1042,12 @@ definition {
 			var value1 = "${row[1]}";
 			var value2 = "${row[2]}";
 
-			if ("${field}" == "End Date") {
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
+			}
+			else if ("${field}" == "End Date") {
 				var endDate = "${value1}";
 			}
 			else if ("${field}" == "External Link Nested Field") {
@@ -1015,6 +1085,9 @@ definition {
 			}
 		}
 
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
 		if (!(isSet(endDate))) {
 			var endDate = "";
 		}
@@ -1038,8 +1111,28 @@ definition {
 		}
 
 		if ("${properties}" == "") {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"externalLinks": [${externalLinksNestedField}],
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases?agentName=${agentName}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1054,29 +1147,54 @@ definition {
 					"startDate": "${startDate}",
 					"status": "${status}"
 				}
-				''';
+				''';			
+			}
 		}
 		else {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"endDate": "${endDate}",
-					"externalLinks": [${externalLinksNestedField}],
-					"originalEndDate": "${originalEndDate}",
-					"perpetual": ${perpetual},
-					"productKey": "${productKey}",
-					"properties": {
-						${properties}
-					},
-					"quantity": ${quantity},
-					"startDate": "${startDate}",
-					"status": "${status}"
-				}
-				''';
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"externalLinks": [${externalLinksNestedField}],
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						},
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"endDate": "${endDate}",
+						"externalLinks": [${externalLinksNestedField}],
+						"originalEndDate": "${originalEndDate}",
+						"perpetual": ${perpetual},
+						"productKey": "${productKey}",
+						"properties": {
+							${properties}
+						},
+						"quantity": ${quantity},
+						"startDate": "${startDate}",
+						"status": "${status}"
+					}
+					''';				
+			}
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -1946,6 +2064,23 @@ definition {
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}/synchronize
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-H "Content-Length: 0"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I synchronize the account entitlement definition with the name ${entitlementDefinitionName} executed by ${agentName}"
+	macro _synchronizeAccountEntitlementDefinitionExecutedByAgent {
+		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/entitlement-definitions/${entitlementDefinitionKey}/synchronize?agentName=${agentName}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
