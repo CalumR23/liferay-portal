@@ -3,18 +3,103 @@ definition {
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
-	@prose = "I attempt to create a product with the name ${productName} as a non permissioned user"
+	@prose = "I attempt to create a product with the following values as a non permissioned user ${table}"
 	macro _createProductAttempt {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"name": "${productName}"
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
 			}
-			''';
+			else if ("${field}" == "Name") {
+				var name = "${value1}";
+			}
+			else if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+		if (!(isSet(name))) {
+			var name = "";
+		}
+
+		if ("${properties}" == "") {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+		}
+		else {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -421,38 +506,264 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I update a product with the name ${productName} to have the new name ${productNameEdit} as a permissioned user"
+	@prose = "I update a product with the name ${productName} to have the following values as a permissioned user ${table}"
 	macro updateProduct {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value1}";
+			}
+			else if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product/${productKey}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
-			-d
-			{
-				"name": "${productNameEdit}"
-			}
 			''';
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+		if (!(isSet(name))) {
+			var productObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productObject}", "name=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${name}";
+			}
+			else {
+				var name = "";
+			}
+		}
+		if (!(isSet(properties))) {
+			var productObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productObject}", "properties=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value}";
+			}
+			else {
+				var properties = "";
+			}
+		}
+
+		if ("${properties}" == "") {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+		}
+		else {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I attempt to update a product with the name ${productName} to have the new name ${productNameEdit} as a non permissioned user"
+	@prose = "I attempt to update a product with the name ${productName} to have the following values as a non permissioned user ${table}"
 	macro updateProductAttempt {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
+		var properties = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Agent Name") {
+				var value1 = StringUtil.replace("${value1}", " ", "%20");
+
+				var agentName = "${value1}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value1}";
+			}
+			else if ("${field}" == "Product Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product/${productKey}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
-			-d
-			{
-				"name": "${productNameEdit}"
-			}
 			''';
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+		if (!(isSet(name))) {
+			var productObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productObject}", "name=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${name}";
+			}
+			else {
+				var name = "";
+			}
+		}
+		if (!(isSet(properties))) {
+			var productObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${productObject}", "properties=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value}";
+			}
+			else {
+				var properties = "";
+			}
+		}
+
+		if ("${properties}" == "") {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}"
+					}
+					''';
+			}
+		}
+		else {
+			if ("${agentName}" == "") {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}?agentName=${agentName}
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"name": "${name}",
+						"properties": {
+							${properties}
+						}
+					}
+					''';
+			}
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
