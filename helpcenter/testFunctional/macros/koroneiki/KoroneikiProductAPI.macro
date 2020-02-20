@@ -724,7 +724,7 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view a koroneiki product with the name ${productName}"
+	@prose = "I should be able to view a koroneiki product with the name ${productName} and the following values ${table}"
 	macro _viewProduct {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
@@ -735,13 +735,67 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+		var RawTable rawTable = new RawTable("${table}");
 
-		echo("Expected Name Value: ${productName}");
-		echo("Actual Name Value: ${productNameFromAPI}");
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
-		if (!(contains("${productName}", "${productNameFromAPI}"))) {
-			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
+			if ("${field}" == "External Link Nested Field") {
+				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI = "${externalLinksObjectsEdit}";
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
 		}
 	}
 
@@ -881,61 +935,6 @@ definition {
 
 		if (!(contains("${productName}", "${productNameFromAPI}"))) {
 			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
-		}
-	}
-
-	@prose = "I should be able to view a koroneiki product with the name ${productName} with the external link nested field value ${productExternalLinkNestedFieldValue}"
-	macro _viewProductWithExternalLink {
-		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products/${productKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var productNameFromAPI = JSONCurlUtil.get("${curl}", "$.name");
-
-		echo("Expected Name Value: ${productName}");
-		echo("Actual Name Value: ${productNameFromAPI}");
-
-		if (!(contains("${productName}", "${productNameFromAPI}"))) {
-			fail("Actual product name value ${productNameFromAPI} does not match expected product name value ${productName}");
-		}
-
-		var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
-		var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
-		var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-
-		var externalLinkObjectNumber = "0";
-
-		while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
-			var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
-
-			var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
-
-			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
-
-			var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
-
-			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
-
-			var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
-		}
-		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
-
-		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
-
-		var productExternalLinkNestedFieldValueFromAPI = "${externalLinksObjectsEdit}";
-
-		echo("Expected External Link Nested Field Value: ${productExternalLinkNestedFieldValue}");
-		echo("Actual External Link Nested Field Value: ${productExternalLinkNestedFieldValueFromAPI}");
-
-		if (!(contains("${productExternalLinkNestedFieldValue}", "${productExternalLinkNestedFieldValueFromAPI}"))) {
-			fail("Actual product external link nested field value ${productExternalLinkNestedFieldValueFromAPI} does not match expected product external link nested field value ${productExternalLinkNestedFieldValue}");
 		}
 	}
 }
