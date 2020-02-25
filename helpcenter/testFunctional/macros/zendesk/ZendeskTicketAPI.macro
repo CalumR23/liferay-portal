@@ -209,12 +209,42 @@ definition {
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
 		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
-		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList}
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
+
+			var curl = '''
+				--tlsv1.2 ${statusUrl}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+
+			if (!("${status}" == "completed")) {
+				if (("${status}" == "queued") || ("${status}" == "working")) {
+					while (("${status}" == "queued") || ("${status}" == "working")) {
+						ZendeskHomepage.pause(timeInSeconds = "2");
+
+						var curl = '''
+							--tlsv1.2 ${statusUrl}
+							-u ${zendeskAdminEmail}/token:${apiToken}
+							''';
+
+						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+					}
+					if (!("${status}" == "completed")) {
+						echo("Warning: The ticket tear down may have failed");
+						echo("Tear Down Job Status: ${status}");
+					}
+				}
+				else {
+					echo("Warning: The ticket tear down may have failed");
+					echo("Tear Down Job Status: ${status}");
+				}
+			}
 		}
 	}
 
