@@ -1,0 +1,80 @@
+@testray.main.component.name = "Support QA"
+@type = "osb.dxp.cloud.subscription"
+
+Feature: OSB DXP Cloud Subscription
+	Testing automatic subscriptions to DXP Cloud for customers on OSB accounts with DXP cloud subscriptions.
+
+Setup:
+	* I wait for "10" seconds
+	* I create a user with the following parameters
+	| Screen Name   | dxpcloud.customer1                       |
+	| Email Address | dxpcloud.customer1@lrcustomer.com.broken |
+	| First Name    | DXPCloud                                 |
+	| Last Name     | Customer1                                |
+	* I create a user with the following parameters
+	| Screen Name   | dxpcloud.customer2                       |
+	| Email Address | dxpcloud.customer2@lrcustomer.com.broken |
+	| First Name    | DXPCloud                                 |
+	| Last Name     | Customer2                                |
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I go to the OSB admin main page
+	* I create a project with the following values
+	| Name         | Zen DXC Automotive |
+	| Code         | ZENDXCA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	* I assign a user the email address "dxpcloud.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENDXCA"
+	* I assign a user the email address "dxpcloud.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENDXCA"
+	* I add an order with the product "Liferay DXP Cloud Subscription Std Production" and support level "Platinum" to the project code "ZENDXCA"
+
+Teardown:
+	* I wait for "10" seconds
+	* I get the ID of the default user belonging to the organization "Zen DXC Automotive" from zendesk.liferay.com
+	* I tear down the users with the following email addresses from web.liferay.com
+	| dxpcloud.customer1@lrcustomer.com.broken |
+	| dxpcloud.customer2@lrcustomer.com.broken |
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes
+	| ZENDXCA |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| dxpcloud.customer1@lrcustomer.com.broken |
+	| dxpcloud.customer2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Zen DXC Automotive |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+
+Scenario: View subscription
+	Users on accounts with DXP cloud subscriptions should be subscribed to DXP cloud
+
+	Given the user with the email address "dxpcloud.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
+	And the user with the email address "dxpcloud.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud
+
+Scenario: View no subscription after offering expiration
+	Users on accounts with expired DXP cloud subscriptions should not be subscribed to DXP cloud
+
+	Given I edit a project with the name "Zen DXC Automotive" and code "ZENDXCA" to have a support lifetime of "1 Minute" starting "60" days ago for the product " Liferay DXP Cloud Subscription Std Production"
+	And I automatically have all expired projects moved to on hold status
+	Then the user with the email address "dxpcloud.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "dxpcloud.customer2@lrcustomer.com.broken" should not be subscribed on DXP cloud
+
+Scenario: View no subscription after customer removal
+	Users that are no longer on a DXP cloud accounts should not be subscribed to DXP cloud
+
+	Given I remove a user the email address "dxpcloud.customer1@lrcustomer.com.broken" as a customer from the project with the code "ZENDXCA"
+	Then the user with the email address "dxpcloud.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "dxpcloud.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud 
+	When I remove a user the email address "dxpcloud.customer2@lrcustomer.com.broken" as a customer from the project with the code "ZENDXCA"
+	Then the user with the email address "dxpcloud.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "dxpcloud.customer2@lrcustomer.com.broken" should not be subscribed on DXP cloud 
