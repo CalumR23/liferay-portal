@@ -76,6 +76,31 @@ definition {
 		}
 	}
 
+	@prose = "I assign contacts with the following email addresses to the team ${teamName} executed by ${agentName} ${table}"
+	macro _assignContactsExecutedByAgent {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&contactUuids=${contactUuid}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
 	@prose = "I assign contacts with the following okta IDs to the team ${teamName} ${table}"
 	macro _assignContactsViaOktaId {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -427,6 +452,31 @@ definition {
 
 			var curl = '''
 				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?contactUuids=${contactUuid}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "I remove contacts with the following email addresses from the team ${teamName} executed by ${agentName} ${table}"
+	macro _removeContactsExecutedByAgent {
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var agentName = StringUtil.replace("${agentName}", " ", "%20");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&contactUuids=${contactUuid}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
