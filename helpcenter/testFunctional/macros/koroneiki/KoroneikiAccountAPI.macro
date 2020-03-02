@@ -2930,7 +2930,7 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,externalLinks,postalAddresses,productPurchases
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -3236,7 +3236,7 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,externalLinks,postalAddresses,productPurchases
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -3356,7 +3356,7 @@ definition {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,entitlements,externalLinks,postalAddresses,productPurchases
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,entitlements,externalLinks,postalAddresses,productPurchases,workerContacts
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -3447,6 +3447,43 @@ definition {
 				var contactsObjectsEdit = StringUtil.reverse("${contactsObjectsEdit}");
 
 				var valueFromAPI = "${contactsObjectsEdit}";
+			}
+			else if ("${field}" == "Customer Contact Nested Field") {
+				var customerContactsObjects = JSONCurlUtil.get("${curl}", "$.customerContacts");
+
+				var customerContactsObjectsEdit = JSONCurlUtil.get("${curl}", "$.customerContacts");
+
+				var numberOfCustomerContacts = StringUtil.count("${customerContactsObjects}", "emailAddress");
+
+				var customerContactObjectNumber = "0";
+
+				while (!("${customerContactObjectNumber}" == "${numberOfCustomerContacts}")) {
+					var customerContactObject = JSONCurlUtil.get("${curl}", "$.customerContacts[${customerContactObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl}", "$.customerContacts[${customerContactObjectNumber}].dateCreated");
+
+					var customerContactsObjectsEdit = StringUtil.replace("${customerContactsObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var dateModified = JSONCurlUtil.get("${curl}", "$.customerContacts[${customerContactObjectNumber}].dateModified");
+
+					var customerContactsObjectsEdit = StringUtil.replace("${customerContactsObjectsEdit}", "&quot;dateModified&quot;:&quot;${dateModified}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl}", "$.customerContacts[${customerContactObjectNumber}].key");
+
+					var customerContactsObjectsEdit = StringUtil.replace("${customerContactsObjectsEdit}", "&quot;key&quot;:&quot;${key}&quot;,", "");
+
+					var customerContactObjectNumber = MathUtil.sum("${customerContactObjectNumber}", "1");
+				}
+
+				var customerContactsObjectsEdit = StringUtil.replaceFirst("${customerContactsObjectsEdit}", "[", "");
+
+				var customerContactsObjectsEdit = StringUtil.reverse("${customerContactsObjectsEdit}");
+
+				var customerContactsObjectsEdit = StringUtil.replaceFirst("${customerContactsObjectsEdit}", "]", "");
+
+				var customerContactsObjectsEdit = StringUtil.reverse("${customerContactsObjectsEdit}");
+
+				var valueFromAPI = "${customerContactsObjectsEdit}";
 			}
 			else if ("${field}" == "Description") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
@@ -3617,6 +3654,43 @@ definition {
 			}
 			else if ("${field}" == "Website") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.website");
+			}
+			else if ("${field}" == "Worker Contact Nested Field") {
+				var workerContactsObjects = JSONCurlUtil.get("${curl}", "$.workerContacts");
+
+				var workerContactsObjectsEdit = JSONCurlUtil.get("${curl}", "$.workerContacts");
+
+				var numberOfWorkerContacts = StringUtil.count("${workerContactsObjects}", "emailAddress");
+
+				var workerContactObjectNumber = "0";
+
+				while (!("${workerContactObjectNumber}" == "${numberOfWorkerContacts}")) {
+					var workerContactObject = JSONCurlUtil.get("${curl}", "$.workerContacts[${workerContactObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl}", "$.workerContacts[${workerContactObjectNumber}].dateCreated");
+
+					var workerContactsObjectsEdit = StringUtil.replace("${workerContactsObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var dateModified = JSONCurlUtil.get("${curl}", "$.workerContacts[${workerContactObjectNumber}].dateModified");
+
+					var workerContactsObjectsEdit = StringUtil.replace("${workerContactsObjectsEdit}", "&quot;dateModified&quot;:&quot;${dateModified}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl}", "$.workerContacts[${workerContactObjectNumber}].key");
+
+					var workerContactsObjectsEdit = StringUtil.replace("${workerContactsObjectsEdit}", "&quot;key&quot;:&quot;${key}&quot;,", "");
+
+					var workerContactObjectNumber = MathUtil.sum("${workerContactObjectNumber}", "1");
+				}
+
+				var workerContactsObjectsEdit = StringUtil.replaceFirst("${workerContactsObjectsEdit}", "[", "");
+
+				var workerContactsObjectsEdit = StringUtil.reverse("${workerContactsObjectsEdit}");
+
+				var workerContactsObjectsEdit = StringUtil.replaceFirst("${workerContactsObjectsEdit}", "]", "");
+
+				var workerContactsObjectsEdit = StringUtil.reverse("${workerContactsObjectsEdit}");
+
+				var valueFromAPI = "${workerContactsObjectsEdit}";
 			}
 			else {
 				fail("No such account field ${field}");
