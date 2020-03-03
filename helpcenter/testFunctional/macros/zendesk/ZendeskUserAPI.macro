@@ -646,6 +646,46 @@ definition {
 		}
 	}
 
+	@prose = "I teardown tickets requested by the user with the following userExternalId ${userExternalId} from zendesk.liferay.com"
+	macro _tearDownUserRequestedTicketsByUserExternalId {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var searchResults = JSONCurlUtil.get("${curl}");
+
+		if (contains("${searchResults}", "${userExternalId}")) {
+			var userID = ZendeskUserAPI._viewUserIdByExternalId(userExternalId = "${userExternalId}");
+
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/users/${userID}/tickets/requested.json
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var allRequestedTickets = JSONCurlUtil.get("${curl}");
+
+			var numberOfRequestedTickets = StringUtil.count("${allRequestedTickets}", "id");
+
+			var ticketObjectNumber = "0";
+
+			while (!("${numberOfRequestedTickets}" == "${ticketObjectNumber}")) {
+				var ticketId = JSONCurlUtil.get("${curl}", "$.tickets[${ticketObjectNumber}].id");
+
+				if ("${ticketObjectNumber}" == "0") {
+					var ticketIdList = "${ticketId}";
+				}
+				else {
+					var ticketIdList = "${ticketIdList},${ticketId}";
+				}
+			}
+
+			if ((!(contains("${ticketIdList}", "{ticketIdList}"))) && (!("${ticketIdList}" == ""))) {
+				ZendeskTicketAPI._tearDownTicketByIds(ticketIdList = "${ticketIdList}");
+			}
+		}
+	}
+	
 	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
 	macro _tearDownUsersByExternalIdList {
 		if ((!(contains("${userExternalIds}", "{userExternalIds}"))) && (!("${userExternalIds}" == ""))) {
@@ -750,6 +790,17 @@ definition {
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
+		}
+	}
+
+	@prose = "I teardown tickets requested by the users with the following userExternalIds from zendesk.liferay.com ${table}"
+	macro _tearDownUsersRequestedTicketsByExternalIdTable {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userExternalId = "${row[0]}";
+
+			ZendeskUserAPI._tearDownUserRequestedTicketsByUserExternalId(userExternalId = "${userExternalId}");
 		}
 	}
 
