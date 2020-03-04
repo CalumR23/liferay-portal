@@ -7,6 +7,7 @@ definition {
 	var patcherAdminEmailAddress = PropsUtil.get("patcher.admin.email.address");
 	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
 	var portalURL = PropsUtil.get("portal.url");
+	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion using the ${jenkinsValue} Jenkins job"
 	macro checkForCompileCompletion {
@@ -709,6 +710,36 @@ definition {
 		}
 	}
 
+	macro getFirstUATConflictBuildId {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_CONFLICT_BUILD_ID")) {
+			var buildId = selenium.getText("Patcher#PATCHER_CONFLICT_BUILD_ID");
+
+			return "${buildId}";
+		}
+		else {
+			var buildId = "";
+
+			return "${buildId}";
+		}
+	}
+
+	macro getFirstUATConflictBuildProjectVersion {
+		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_CONFLICT_BUILD_PROJECT_VERSION")) {
+			var buildProjectVersion = selenium.getText("Patcher#PATCHER_CONFLICT_BUILD_PROJECT_VERSION");
+
+			return "${buildProjectVersion}";
+		}
+		else {
+			var buildProjectVersion = "";
+
+			return "${buildProjectVersion}";
+		}
+	}
+
 	@prose = "I get the security hotfix counter value for a build for the ticket ${supportTicket} on the account ${accountCode} that is built on the version ${projectVersion} on the root ${rootProjectVersion}"
 	macro getSecurityHotfixCounterValue {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -820,6 +851,34 @@ definition {
 			}
 			else {
 				var uatBuildsForAccountExists = "false";
+			}
+		}
+	}
+
+	@prose = "I tear down all Patcher UAT conflict builds on the account ${accountCode} under the version ${projectVersion}"
+	macro tearDownAllUATConflictBuildsForAccount {
+		var uatConflictBuildsForAccountExists = "true";
+
+		while ("${uatConflictBuildsForAccountExists}" == "true") {
+			var buildProjectVersion = PatcherBuild.getFirstUATConflictBuildProjectVersion(accountCode = "${accountCode}");
+
+			if ((!(contains("${buildProjectVersion}", "{buildProjectVersion}"))) && (!("${buildProjectVersion}" == ""))) {
+				if ("${buildProjectVersion}" == "${projectVersion}") {
+					var buildId = PatcherBuild.getFirstUATConflictBuildId(accountCode = "${accountCode}");
+
+					var curl = '''
+						${portalURL}/group/guest/patching/-/osb_patcher/builds/${buildId}/delete.json
+						-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+						''';
+
+					com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+				}
+				else {
+					var uatConflictBuildsForAccountExists = "false";
+				}
+			}
+			else {
+				var uatConflictBuildsForAccountExists = "false";
 			}
 		}
 	}
