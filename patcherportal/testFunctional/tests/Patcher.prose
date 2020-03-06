@@ -601,25 +601,40 @@ Scenario: Create a 71 build with a rebased child build
 	As a TSE, I should be able to create a 7.1 build containing a rebased child build
 
 	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
-	And I generate random fix content
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
 	And I create a Patcher fix with the following values
 	| Product         | DXP 7.1                                          |
 	| Project Version | fix-pack-dxp-4-7110                              |
-	| Content         | ${staticFixContent}                              |
+	| Content         | ${staticFixContent1}                             |
 	| Branch Name     | LPS-89633-dxp-4                                  |
 	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
 	| Workaround      | true                                             |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1                                          |
+	| Project Version | fix-pack-dxp-8-7110                              |
+	| Content         | ${staticFixContent2}                             |
+	| Branch Name     | LPP-36528                                        |
+	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
 	And I wait for "5" seconds
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent} |
-	| Version         | 1.0                 |
-	| Product         | DXP 7.1             |
-	| Project Version | fix-pack-dxp-4-7110 |
-	| Patcher Status  | Adding              |
-	| Type            | Workaround          |
-	When I check the Patcher fix containing the content "${staticFixContent}" and type "Workaround" for add completion
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent}        |
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.1              |
+	| Project Version | fix-pack-dxp-4-7110  |
+	| Patcher Status  | Adding               |
+	| Type            | Workaround           |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Product         | DXP 7.1              |
+	| Project Version | fix-pack-dxp-8-7110  |
+	| Patcher Status  | Adding               |
+	| Type            | Patch                |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Workaround" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}       |
 	| Version         | 1.0                        |
 	| Product         | DXP 7.1                    |
 	| Project Version | fix-pack-dxp-4-7110        |
@@ -627,13 +642,22 @@ Scenario: Create a 71 build with a rebased child build
 	| Patcher Status  | Complete                   |
 	| Type            | Workaround                 |
 	| Jenkins         | fixpack-builder-agent(uat) |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}       |
+	| Version         | 1.0                        |
+	| Product         | DXP 7.1                    |
+	| Project Version | fix-pack-dxp-8-7110        |
+	| Git Hash        | 0daa88f0e1                 |
+	| Patcher Status  | Complete                   |
+	| Type            | Patch                      |
+	| Jenkins         | fixpack-builder-agent(uat) |
 	When I generate a random ticket number
 	And I create a Patcher build for a new account with the following values
-	| Product         | DXP 7.1               |
-	| Project Version | fix-pack-dxp-8-7110   |
-	| Tickets List    | ${staticFixContent}   |
-	| Account Code    | DOEWAIKON             |
-	| Support Ticket  | ${staticTicketNumber} |
+	| Product         | DXP 7.1                                   |
+	| Project Version | fix-pack-dxp-8-7110                       |
+	| Tickets List    | ${staticFixContent1},${staticFixContent2} |
+	| Account Code    | DOEWAIKON                                 |
+	| Support Ticket  | ${staticTicketNumber}                     |
 	And I set the account code "DOEWAIKON" as a static variable
 	And I wait for "5" seconds
 	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
@@ -641,35 +665,41 @@ Scenario: Create a 71 build with a rebased child build
 	| Support Ticket  | ${staticTicketNumber}   |
 	| Version         | 1.0                   	|
 	| Project Version | fix-pack-dxp-8-7110     |
-	| Content         | 0 Fix Packs + 1 Tickets |
+	| Content         | 0 Fix Packs + 2 Tickets |
 	| Patcher Status  | Rebasing                |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
-	| Version         | 1.0                   |
-	| Name            | ${staticFixContent}   |
-	| Project Version | fix-pack-dxp-8-7110   |
-	| Patcher Status  | Rebasing Merging Only |
-	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
-	| Name            | ${staticFixContent} |
-	| Version         | 1.0                 |
-	| Type            | Rebase              |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
+	| Version         | 1.0                                        |
+	| Name            | ${staticFixContent1}, ${staticFixContent2} |
+	| Project Version | fix-pack-dxp-8-7110                        |
+	| Patcher Status  | Rebasing Merging Only                      |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
+	| Name            | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Type            | Rebase               |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent2}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
+	| Name            | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Git Hash        | 0daa88f0e1           |
+	| Status          | Complete             |
+	| Type            | Patch                |
 	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" for rebase completion
 	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" for merge completion
 	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
 	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
-	| Type            | Official                           |
-	| Support Ticket  | ${staticTicketNumber}              |
-	| Version         | 1.0                                |
-	| Project Version | fix-pack-dxp-8-7110                |
-	| Content         | 0 Fix Packs + 1 Tickets            |
-	| Patcher Status  | Complete                           |
-	| Jenkins         | fixpack-builder-hotfix-7x(uat)     |
-	| Jenkins         | fixpack-builder-agent(uat)         |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
-	| Version         | 1.0                        |
-	| Name            | ${staticFixContent}        |
-	| Project Version | fix-pack-dxp-8-7110        |
-	| Patcher Status  | Complete Merging Only      |
-	| Jenkins         | fixpack-builder-agent(uat) |
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | fix-pack-dxp-8-7110            |
+	| Content         | 0 Fix Packs + 2 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
+	| Version         | 1.0                                        |
+	| Name            | ${staticFixContent1}, ${staticFixContent2} |
+	| Project Version | fix-pack-dxp-8-7110                        |
+	| Patcher Status  | Complete Merging Only                      |
+	| Jenkins         | fixpack-builder-agent(uat)                 |
 
 Scenario: Create a 70 build with a rebased child build
 	@ test.group = "0"
