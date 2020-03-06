@@ -228,6 +228,26 @@ definition {
 		}
 	}
 
+	macro getFirstConflictFixId {
+		Patcher.gotoFixes();
+
+		PatcherSearch.searchAdvanced(typeKeyword = "${fixType}");
+
+		var key_fixType = "${fixType}";
+		var key_projectVersion = "${projectVersion}";
+
+		if (IsElementPresent(locator1 = "Patcher#PATCHER_CONFLICT_FIX_ID")) {
+			var fixId = selenium.getText("Patcher#PATCHER_CONFLICT_FIX_ID");
+
+			return "${fixId}";
+		}
+		else {
+			var fixId = "";
+
+			return "${fixId}";
+		}
+	}
+
 	macro getFirstUATFixId {
 		Patcher.gotoFixes();
 
@@ -284,8 +304,33 @@ definition {
 		Message.success();
 	}
 
+	@prose = "I tear down all Patcher conflict fixes with the type ${fixType} under the version ${projectVersion}"
+	macro tearDownAllConflictFixesForType {
+		var conflictFixesForTypeExists1 = "true";
+		var conflictFixesForTypeExists2 = "true";
+
+		while (("${conflictFixesForTypeExists1}" == "true") && ("${conflictFixesForTypeExists2}" == "true") && (maxIterations = "200")) {
+			var fixId = PatcherFix.getFirstConflictFixId(
+				fixType = "${fixType}",
+				projectVersion = "${projectVersion}");			
+
+			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+				var curl = '''
+					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
+					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+			else {
+				var conflictFixesForTypeExists1 = "false";
+				var conflictFixesForTypeExists2 = "false";
+			}
+		}
+	}
+
 	@prose = "I tear down all Patcher UAT fixes with the type ${fixType}"
-	macro tearDownAllUATFixesForAccount {
+	macro tearDownAllUATFixesForType {
 		var uatFixesForTypeExists1 = "true";
 		var uatFixesForTypeExists2 = "true";
 
