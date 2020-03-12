@@ -387,6 +387,33 @@ definition {
 		return "${staticSupportUserIdList}";
 	}
 
+	@prose = "I remove the web user with the email address ${userEmailAddress} from the web organization ${organizationName}"
+	macro removeUserFromWebOrganization {
+		var organizationId = JSONOrganization.getWebOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/get-user-by-email-address
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/user/unset-organization-users
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userIds=${webUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I tear down the users with the following email addresses from web.liferay.com ${table}"
 	macro tearDownUsers {
 		var RawTable rawTable = new RawTable("${table}");

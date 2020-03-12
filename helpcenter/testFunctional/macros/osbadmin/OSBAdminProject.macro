@@ -78,6 +78,49 @@ definition {
 		AssertElementPresent(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_EMAIL");
 	}
 
+	@prose = "I automatically have all customers assigned to their appropriate organizations"
+	macro assignCustomersToAppropriateOrganizations {
+		var script = '''
+			import com.liferay.registry.RegistryUtil
+			import com.liferay.portal.kernel.messaging.Message;
+			try {
+				def registry = RegistryUtil.getRegistry()
+				def bundleContext = registry._bundleContext
+				serviceReferences = bundleContext.getServiceReferences("com.liferay.portal.kernel.scheduler.messaging.SchedulerEventMessageListener", "(javax.portlet.name=1_WAR_osbportlet)");
+				for (serviceReference in serviceReferences) {
+					service = bundleContext.getService(serviceReference);
+					if (service.getSchedulerEntry().toString().contains("SynchronizeUser")) {
+						service.receive(new Message());
+					}
+				}
+			}
+			catch  (Exception e) {
+					out.println("""<div class="portlet-msg-error">${e}</div>""");
+					e.printStackTrace(out);
+			}
+			''';
+
+		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+		OSBAdmin.pause(timeInSeconds = "3");
+
+		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			Click(locator1 = "ProductMenu#TOGGLE");
+		}
+
+		Select(
+			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+			value1 = "Groovy");
+
+		Type(
+			locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+			value1 = "${script}");
+
+		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
+
+		Message.success();
+	}
+
 	macro assignUser {
 		Click(locator1 = "OSBAdminProjectUsers#AVAILABLE_TAB");
 
