@@ -527,7 +527,10 @@ definition {
 			var value1 = "${row[1]}";
 			var value2 = "${row[2]}";
 
-			if ("${field}" == "External Link Nested Field") {
+			if ("${field}" == "End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.endDate");
+			}
+			else if ("${field}" == "External Link Nested Field") {
 				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
 
 				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
@@ -558,6 +561,12 @@ definition {
 			else if ("${field}" == "Product Field and Value") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
 			}
+			else if ("${field}" == "Product Purchase") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.productPurchaseKey");
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.startDate");
+			}
 			else {
 				fail("No such product consumption field ${field}");
 			}
@@ -568,6 +577,20 @@ definition {
 
 				if (!(contains("${value2}", "${valueFromAPI}"))) {
 					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else if ("${field}" == "Product Purchase") {
+				if ("${value1}" == "true") {
+					var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+						accountName = "${accountName}",
+						productName = "${productName}");
+
+					echo("Expected ${field} Value: ${productPurchaseKey}");
+					echo("Actual ${field} Value: ${valueFromAPI}");
+
+					if (!(contains("${productPurchaseKey}", "${valueFromAPI}"))) {
+						fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${productPurchaseKey}");
+					}
 				}
 			}
 			else {
@@ -716,8 +739,35 @@ definition {
 			var value1 = "${row[1]}";
 			var value2 = "${row[2]}";
 
-			if ("${field}" == "Product Field and Value") {
+			if ("${field}" == "End Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].endDate");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}			
+			else if ("${field}" == "Product Field and Value") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].properties.${value1}");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Purchase") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].productPurchaseKey");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].startDate");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
@@ -735,6 +785,20 @@ definition {
 
 				if (!(contains("${value2}", "${valueFromAPI}"))) {
 					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else if ("${field}" == "Product Purchase") {
+				if ("${value1}" == "true") {
+					var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+						accountName = "${accountName}",
+						productName = "${productName}");
+
+					echo("Expected ${field} Value: ${productPurchaseKey}");
+					echo("Actual ${field} Value: ${valueFromAPI}");
+
+					if (!(contains("${productPurchaseKey}", "${valueFromAPI}"))) {
+						fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${productPurchaseKey}");
+					}
 				}
 			}
 			else {
