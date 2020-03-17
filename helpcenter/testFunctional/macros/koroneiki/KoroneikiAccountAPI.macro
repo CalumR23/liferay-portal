@@ -741,6 +741,96 @@ definition {
 		return "${staticAccountExternalLinksNestedField}";
 	}
 
+	@prose = "I create a note for the account ${accountName} with the following values ${table}"
+	macro _createAccountNote {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Content") {
+				var content = "${value}";
+			}
+			else if ("${field}" == "Format") {
+				var format = "${value}";
+			}
+			else if ("${field}" == "Priority") {
+				var priority = "${value}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var type = "${value}";
+			}
+			else {
+				fail("No such note field ${field}");
+			}
+		}
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+		if (!(isSet(content))) {
+			var content = "";
+		}
+		if (!(isSet(format))) {
+			var format = "HTML";
+		}
+		if (!(isSet(priority))) {
+			var priority = "1";
+		}
+		if (!(isSet(status))) {
+			var status = "Approved";
+		}
+		if (!(isSet(type))) {
+			var type = "General";
+		}
+
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"content": "${content}",
+					"format": "${format}",
+					"priority": ${priority},
+					"status": "${status}",
+					"type": "${type}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"content": "${content}",
+					"format": "${format}",
+					"priority": ${priority},
+					"status": "${status}",
+					"type": "${type}"
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I create a team with the name ${teamName} for the account ${accountName}"
 	macro _createAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -1758,6 +1848,29 @@ definition {
 		echo("Account Key value for ${accountName}: ${accountKey}");
 
 		return "${accountKey}";
+	}
+
+	macro _getAccountNoteKeyViaAccountAndStatusAndTypeAndContent {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes/${type}/${status}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var noteKey = JSONCurlUtil.get("${curl}", "$.items[?(@.content=='${content}')].key");
+
+		var noteKey = StringUtil.replace("${noteKey}", "[", "");
+
+		var noteKey = StringUtil.replace("${noteKey}", "]", "");
+
+		var noteKey = StringUtil.replace("${noteKey}", "&quot;", "");
+
+		echo("Note key value for ${accountName} ${status} ${type} note with content ${content}: ${noteKey}");
+
+		return "${noteKey}";
 	}
 
 	macro _getAccountPostalAddressIdViaAccountNameAndStreetAddress {

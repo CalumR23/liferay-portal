@@ -1,0 +1,238 @@
+definition {
+	var apiToken = PropsUtil.get("koroneiki.api.token");
+	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
+	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
+	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
+
+	@prose = "I delete a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content}"
+	macro _deleteNote {
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+			accountName = "${accountName}",
+			content = "${content}",
+			status = "${status}",
+			type = "${type}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I update a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content} to have the following values ${table}"
+	macro _updateNote {
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+			accountName = "${accountName}",
+			content = "${content}",
+			status = "${status}",
+			type = "${type}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Agent Name") {
+				var value = StringUtil.replace("${value}", " ", "%20");
+
+				var agentName = "${value}";
+			}
+			else if ("${field}" == "Content") {
+				var content = "${value}";
+			}
+			else if ("${field}" == "Format") {
+				var format = "${value}";
+			}
+			else if ("${field}" == "Priority") {
+				var priority = "${value}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value}";
+			}
+			else if ("${field}" == "Type") {
+				var type = "${value}";
+			}
+			else {
+				fail("No such note field ${field}");
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(agentName))) {
+			var agentName = "";
+		}
+		if (!(isSet(content))) {
+			var noteObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${noteObject}", "content=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.content");
+
+				var content = "${value}";
+			}
+			else {
+				var content = "";
+			}
+		}
+		if (!(isSet(format))) {
+			var noteObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${noteObject}", "format=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.format");
+
+				var format = "${value}";
+			}
+			else {
+				var format = "";
+			}
+		}
+		if (!(isSet(priority))) {
+			var noteObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${noteObject}", "priority=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.priority");
+
+				var priority = "${value}";
+			}
+			else {
+				var priority = "true";
+			}
+		}
+		if (!(isSet(status))) {
+			var noteObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${noteObject}", "status=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.status");
+
+				var status = "${value}";
+			}
+			else {
+				var status = "";
+			}
+		}
+		if (!(isSet(type))) {
+			var noteObject = JSONCurlUtil.get("${curl}", "$");
+			
+			if (contains("${noteObject}", "properties=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.type");
+
+				var type = "${value}";
+			}
+			else {
+				var type = "";
+			}
+		}
+
+		if ("${agentName}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"content": "${content}",
+					"format": "${format}",
+					"priority": ${priority},
+					"status": "${status}",
+					"type": "${type}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}?agentName=${agentName}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"content": "${content}",
+					"format": "${format}",
+					"priority": ${priority},
+					"status": "${status}",
+					"type": "${type}"
+				}
+				''';
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I should not be able to view a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content}"
+	macro _viewNoNote {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes/${type}/${status}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccountNotes = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccountNotes}", "${content}")) {
+			fail("The note with the content ${content} and status ${status} and type ${type} is still present on the account ${accountName}");
+		}
+	}
+
+	@prose = "I should be able to view a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content} and the following values ${table}"
+	macro _viewNote {
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+			accountName = "${accountName}",
+			content = "${content}",
+			status = "${status}",
+			type = "${type}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Content") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.content");
+			}
+			else if ("${field}" == "Format") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.format");
+			}
+			else if ("${field}" == "Priority") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.priority");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
+			}
+			else if ("${field}" == "Type") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.type");
+			}
+			else {
+				fail("No such note field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+}
