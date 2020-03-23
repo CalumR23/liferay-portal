@@ -455,33 +455,51 @@ definition {
 			for (var row : table "${rawTable}") {
 				var productName = "${row[0]}";
 
-				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+				if (contains("${productName}", " ")) {
+					var keyword = StringUtil.extractFirst("${productName}", " ");
+				}
+				else {
+					var keyword = "${productName}";
+				}
 
 				var curl = '''
-					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/products?search=${keyword}\&pageSize=100
 					--header "API_Token: ${apiToken}"
 					-H "accept: application/json"
 					-H "Content-Type: application/json"
 					''';
 
-				var allProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+				var allProducts = JSONCurlUtil.get("${curl}", "$");
 
-				if (contains("${allProductConsumptions}", "${accountKey}")) {
+				if (contains("${allProducts}", "${productName}")) {
+					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
 					var curl = '''
-						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions
 						--header "API_Token: ${apiToken}"
 						-H "accept: application/json"
 						-H "Content-Type: application/json"
 						''';
 
-					var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+					var allProductConsumptions = JSONCurlUtil.get("${curl}", "$");
 
-					if (contains("${allAccountProductConsumptions}", "${productKey}")) {
-						KoroneikiProductConsumptionAPI._deleteProductConsumption(
-							accountName = "${accountName}",
-							productName = "${productName}");
+					if (contains("${allProductConsumptions}", "${accountKey}")) {
+						var curl = '''
+							--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
+							--header "API_Token: ${apiToken}"
+							-H "accept: application/json"
+							-H "Content-Type: application/json"
+							''';
 
-						echo("Product Consumption deleted: ${productName} made by ${accountName}");
+						var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+						if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+							KoroneikiProductConsumptionAPI._deleteProductConsumption(
+								accountName = "${accountName}",
+								productName = "${productName}");
+
+							echo("Product Consumption deleted: ${productName} made by ${accountName}");
+						}
 					}
 				}
 			}
