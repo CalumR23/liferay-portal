@@ -1,8 +1,8 @@
 @testray.main.component.name = "Support QA"
 @type = "koroneiki.integration"
 
-Feature:  Provisioning
-	Testing to assure the provisioning page works properly.
+Feature:  Koroneiki to Provisioning Account Integration via Details
+	Testing to assure that koroneiki account information transfers properly to the account details page.
 
 Teardown:
 	* I wait for "10" seconds
@@ -11,8 +11,8 @@ Teardown:
 	| Updated Partner   |
 	* I tear down the team roles on koroneiki with the following names
 	| Partner |
-	* I tear down the external links for the product "A Liferay DXP Product" on koroneiki with the following entity id values
-	| A Liferay DXP Product |
+	* I tear down the external links for the product "Liferay DXP Production" on koroneiki with the following entity id values
+	| Liferay DXP Production |
 	* I tear down the external links for the product "Platinum Subscription" on koroneiki with the following entity id values
 	| Platinum Subscription |
 	* I tear down the external links for the product "Gold Subscription" on koroneiki with the following entity id values
@@ -21,15 +21,14 @@ Teardown:
 	| ${staticDossieraAccountKey}   |
 	| ${staticSalesforceProjectKey} |
 	* I tear down the product purchases on koroneiki made by the account "Korpro - ${staticCompanyName}" for the following products
-	| A Liferay DXP Product |
-	| Platinum Subscription |
-	| Gold Subscription     |
+	| Liferay DXP Production |
+	| Platinum Subscription  |
+	| Gold Subscription      |
 	* I tear down the product purchases on koroneiki made by the account "Onepro - ${staticCompanyName}" for the following products
-	| A Liferay DXP Product |
-	| Platinum Subscription |
-	| Gold Subscription     |
+	| Liferay DXP Production |
+	| Platinum Subscription  |
+	| Gold Subscription      |
 	* I tear down the products on koroneiki with the following names
-	| A Liferay DXP Product |
 	| Platinum Subscription |
 	| Gold Subscription     |
 	* I tear down the contact roles on koroneiki with the following names
@@ -44,7 +43,7 @@ Teardown:
 	| ONEPROONEPRO |
 
 Scenario: View regular project
-	Testing the ability to create a regular project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a regular project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -74,7 +73,7 @@ Scenario: View regular project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -92,6 +91,10 @@ Scenario: View regular project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -103,17 +106,20 @@ Scenario: View regular project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
-Scenario: View premier project
-	Testing the ability to create a premier project in Dossiera and viewing the project in the provisioning page 
+Scenario: View regular project with multiple addresses
+	Testing the ability to create a regular project in Dossiera and viewing the project with multiple addresses in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -143,7 +149,7 @@ Scenario: View premier project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -161,6 +167,110 @@ Scenario: View premier project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I create a postal address for an account with the name "Korpro - ${staticCompanyName}" on koroneiki with the following values
+	| Country               | Canada           |
+	| Locality              | Vancouver        |
+	| Region                | British Columbia |
+	| Type                  | Other            |
+	| Mailing               | False            |
+	| Postal Code           | V5Y 0C9          |
+	| Primary               | False            |
+	| Street Address Line 1 | 456 Main Street  |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
+	When I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Main Street" to have the following values
+	| Primary | True |
+	And I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | Canada                        |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
+
+Scenario: View premier project
+	Testing the ability to create a premier project in Dossiera and viewing the project in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Premier |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -172,17 +282,20 @@ Scenario: View premier project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Premier                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Premier                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View OEM project
-	Testing the ability to create an OEM project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create an OEM project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -212,7 +325,7 @@ Scenario: View OEM project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -230,6 +343,10 @@ Scenario: View OEM project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | OEM |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -241,17 +358,20 @@ Scenario: View OEM project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | OEM                           |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | OEM                           |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View strategic project
-	Testing the ability to create an strategic project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create an strategic project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -281,7 +401,7 @@ Scenario: View strategic project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -299,6 +419,10 @@ Scenario: View strategic project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Strategic |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -310,17 +434,20 @@ Scenario: View strategic project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Strategic                     |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Strategic                     |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View closed project
-	Testing the ability to create a closed project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a closed project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -350,7 +477,7 @@ Scenario: View closed project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -368,6 +495,10 @@ Scenario: View closed project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Status | Closed  |
 	| Tier   | Regular |
@@ -380,17 +511,20 @@ Scenario: View closed project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | CLOSED                        |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | CLOSED                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View inactive project
-	Testing the ability to create an inactive project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create an inactive project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -420,7 +554,7 @@ Scenario: View inactive project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -438,6 +572,10 @@ Scenario: View inactive project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Status | Inactive |
 	| Tier   | Regular  |
@@ -450,17 +588,20 @@ Scenario: View inactive project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | INACTIVE                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | INACTIVE                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View expired project
-	Testing the ability to create an expired project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create an expired project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -490,7 +631,7 @@ Scenario: View expired project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -508,6 +649,10 @@ Scenario: View expired project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Status | Expired |
 	| Tier   | Regular |
@@ -520,17 +665,20 @@ Scenario: View expired project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | EXPIRED                       |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | EXPIRED                       |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View project with gold subscription
-	Testing the ability to create a gold subscription project in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a gold subscription project in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -560,7 +708,7 @@ Scenario: View project with gold subscription
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -578,6 +726,10 @@ Scenario: View project with gold subscription
 	| Subscription Level                     | Gold                                       |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -589,28 +741,31 @@ Scenario: View project with gold subscription
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | United States                 |
-	| SLA     | Gold                          |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Gold                          |
+	| Developers     | 1 / 2 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Australia project
-	Testing the ability to create a project with the region Australia in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Australia in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Sydney                                     |
+	| Address Country                        | Australia                                  |
+	| Address Postal Code                    | 2000                                       |
+	| Address Region                         | New South Wales                            |
+	| Address Street                         | 227 Elizabeth Street                       |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -629,7 +784,7 @@ Scenario: View Australia project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -647,6 +802,10 @@ Scenario: View Australia project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "227 Elizabeth Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -658,28 +817,30 @@ Scenario: View Australia project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Australia                     |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Australia                     |
+	| Country        | Australia                     |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Brazil project
-	Testing the ability to create a project with the region Brazil in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Brazil in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Sao Paulo                                  |
+	| Address Country                        | Brazil                                     |
+	| Address Postal Code                    | 04642-000                                  |
+	| Address Street                         | Rua Visconde de Porto Seguro 1238          |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -698,7 +859,7 @@ Scenario: View Brazil project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -716,6 +877,10 @@ Scenario: View Brazil project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "Rua Visconde de Porto Seguro 1238" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -727,28 +892,31 @@ Scenario: View Brazil project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Brazil                        |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Brazil                        |
+	| Country        | Brazil                        |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View China project
-	Testing the ability to create a project with the region China in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region China in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Qingdao Shi                                |
+	| Address Region                         | Shandong                                   |
+	| Address Country                        | China                                      |
+	| Address Postal Code                    | 266033                                     |
+	| Address Street                         | 63 Renmin Lu                               |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -767,7 +935,7 @@ Scenario: View China project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -785,6 +953,10 @@ Scenario: View China project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "63 Renmin Lu" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -796,17 +968,20 @@ Scenario: View China project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | China                         |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | China                         |
+	| Country        | China                         |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Global project
-	Testing the ability to create a project with the region Global in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Global in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -836,7 +1011,7 @@ Scenario: View Global project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -854,6 +1029,10 @@ Scenario: View Global project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -865,28 +1044,30 @@ Scenario: View Global project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Global                        |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Global                        |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Hungary project
-	Testing the ability to create a project with the region Hungary in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Hungary in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Budapest                                   |
+	| Address Country                        | Hungary                                    |
+	| Address Postal Code                    | 1037                                       |
+	| Address Street                         | Virag Ter 3. IV. 61                        |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -905,7 +1086,7 @@ Scenario: View Hungary project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -923,6 +1104,10 @@ Scenario: View Hungary project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "Virag Ter 3. IV. 61" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -934,28 +1119,30 @@ Scenario: View Hungary project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Hungary                       |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Hungary                       |
+	| Country        | Hungary                       |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View India project
-	Testing the ability to create a project with the region India in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region India in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | New Delhi                                  |
+	| Address Country                        | India                                      |
+	| Address Postal Code                    | 110034                                     |
+	| Address Street                         | Flat No. 100 Triveni Apartments Pitam Pura |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -974,7 +1161,7 @@ Scenario: View India project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -992,6 +1179,10 @@ Scenario: View India project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "Flat No. 100 Triveni Apartments Pitam Pura" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -1003,28 +1194,30 @@ Scenario: View India project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | India                         |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | India                         |
+	| Country        | India                         |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Japan project
-	Testing the ability to create a project with the region Japan in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Japan in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Akasaka, Minato-ku                         |
+	| Address Country                        | Japan                                      |
+	| Address Postal Code                    | 107-0052                                   |
+	| Address Street                         | 2 Chome-13-3                               |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -1043,7 +1236,7 @@ Scenario: View Japan project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -1061,6 +1254,10 @@ Scenario: View Japan project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "2 Chome-13-3" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -1072,28 +1269,31 @@ Scenario: View Japan project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Japan                         |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Japan                         |
+	| Country        | Japan                         |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View Spain project
-	Testing the ability to create a project with the region Spain in Dossiera and viewing the project in the provisioning page 
+	Testing the ability to create a project with the region Spain in Dossiera and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
 	And I generate a provisioning project name
 	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
+	| Address City                           | Madrid                                     |
+	| Address Region                         | Madrid                                     |
+	| Address Country                        | Spain                                      |
+	| Address Postal Code                    | 28070                                      |
+	| Address Street                         | Calle Aduana, 29                           |
 	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
 	| Contact First Name                     | PRO                                        |
 	| Contact Last Name                      | Koroneiki1                                 |
@@ -1112,7 +1312,7 @@ Scenario: View Spain project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -1130,6 +1330,10 @@ Scenario: View Spain project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "Calle Aduana, 29" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Tier | Regular |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -1141,17 +1345,20 @@ Scenario: View Spain project
 	| Partner |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
 	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}" and the following values
-	| Name    | Korpro - ${staticCompanyName} |
-	| Code    | KORPROKORPRO                  |
-	| Partner | Koroneiki Partner             |
-	| Region  | Spain                         |
-	| SLA     | Platinum                      |
-	| Tier    | Regular                       |
-	| Status  | APPROVED                      |
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | Spain                         |
+	| Country        | Spain                         |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
 
 Scenario: View updated project
-	Testing the ability to update a regular project in Koroneiki and viewing the project in the provisioning page 
+	Testing the ability to update a regular project in Koroneiki and viewing the project in the provisioning page account details 
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -1181,7 +1388,7 @@ Scenario: View updated project
 	| Owner Last Name                        | Koroneiki1                                 |
 	| Partner First Line Support             | false                                      |
 	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
+	| Product Name                           | Liferay DXP Production                     |
 	| Project Name                           | Korpro - ${staticProjectName}              |
 	| Renewal                                | false                                      |
 	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
@@ -1199,6 +1406,19 @@ Scenario: View updated project
 	| Subscription Level                     | Platinum                                   |
 	| Version Number                         | 7.1                                        |
 	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Country               | Canada           |
+	| Locality              | Vancouver        |
+	| Region                | British Columbia |
+	| Type                  | Other            |
+	| Mailing               | True             |
+	| Postal Code           | V5Y 0C9          |
+	| Primary               | True             |
+	| Street Address Line 1 | 456 Main Street  |
 	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
 	| Code         | ONEPROONEPRO                             |
 	| Description  | Test update account on koroneiki         |
@@ -1206,7 +1426,7 @@ Scenario: View updated project
 	| Name         | Onepro - ${staticCompanyName}            |
 	| Notes        | Some more account notes                  |
 	| Phone Number | 555-555-8765                             |
-	| Region       | Japan                                    |
+	| Region       | Global                                   |
 	| Status       | Inactive                                 |
 	| Tier         | Premier                                  |
 	| Website      | www.koroneikiupdate.com                  |
@@ -1219,76 +1439,15 @@ Scenario: View updated project
 	| Partner |
 	And I update a team with the name "Koroneiki Partner" to have the new name "Updated Partner"
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
-	And I search the accounts page using the keyword "Korpro"
-	Then I should be able to view an account on the provisioning index with the name "Onepro - ${staticCompanyName}" and the following values
-	| Name    | Onepro - ${staticCompanyName} |
-	| Code    | ONEPROONEPRO                  |
-	| Partner | Updated Partner               |
-	| Region  | Japan                         |
-	| SLA     | Platinum                      |
-	| Tier    | Premier                       |
-	| Status  | INACTIVE                      |
-	And I should not be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}"
-
-Scenario: View deleted project
-	Testing the ability to delete a regular project in Koroneiki and viewing the deletion of the project in the provisioning page 
-
-	Given I generate several static variables for Provisioning
-	And I generate a provisioning company name
-	And I generate a provisioning project name
-	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
-	| Account Name                           | Korpro - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
-	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
-	| Contact First Name                     | PRO                                        |
-	| Contact Last Name                      | Koroneiki1                                 |
-	| Contact Role                           | Liferay Account Customer Role              |
-	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
-	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
-	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
-	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
-	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
-	| End Day                                | ${staticEndDay}                            |
-	| End Month                              | ${staticEndMonth}                          |
-	| End Year                               | ${staticEndYear}                           |
-	| Industry                               | Automotive                                 |
-	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
-	| Owner First Name                       | PRO                                        |
-	| Owner Last Name                        | Koroneiki1                                 |
-	| Partner First Line Support             | false                                      |
-	| Product Type                           | New                                        |
-	| Product Name                           | A Liferay DXP Product                      |
-	| Project Name                           | Korpro - ${staticProjectName}              |
-	| Renewal                                | false                                      |
-	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
-	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
-	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
-	| Salesforce Opportunity Sold By         | Liferay US                                 |
-	| Salesforce Opportunity Stage Name      | Closed Won                                 |
-	| Salesforce Opportunity Territory       | United States                              |
-	| Salesforce Opportunity Type            | New Business                               |
-	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
-	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
-	| Start Day                              | ${staticStartDay}                          |
-	| Start Month                            | ${staticStartMonth}                        |
-	| Start Year                             | ${staticStartYear}                         |
-	| Subscription Level                     | Platinum                                   |
-	| Version Number                         | 7.1                                        |
-	And I wait for "10" seconds
-	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
-	| Tier | Regular |
-	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
-	And I create a team role on koroneiki with the following values
-	| Description | This is the partner role |
-	| Name        | Partner                  |
-	| Type        | Account                  |
-	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
-	| Partner |
-	And I delete an account on koroneiki with the name "Korpro - ${staticCompanyName}"
-	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
-	And I search the accounts page using the keyword "Korpro"
-	Then I should not be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}"
+	And I search the accounts page using the keyword "Onepro"
+	And I click on the account with the name "Onepro - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Onepro - ${staticCompanyName} |
+	| Code           | ONEPROONEPRO                  |
+	| Status         | INACTIVE                      |
+	| Support Region | Global                        |
+	| Country        | Canada                        |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Premier                       |
+	| Partner        | Updated Partner               |
