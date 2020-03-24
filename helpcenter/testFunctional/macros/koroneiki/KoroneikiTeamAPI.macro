@@ -46,7 +46,7 @@ definition {
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles?agentName=${agentName}\&contactRoleKeys=${contactRoleKey}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles?agentName=${agentName}\&agentUID=koroneikiagent\&contactRoleKeys=${contactRoleKey}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -117,7 +117,7 @@ definition {
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&contactUuids=${contactUuid}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&agentUID=koroneikiagent\&contactUuids=${contactUuid}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -207,7 +207,7 @@ definition {
 		}
 		else {
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links?agentName=${agentName}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/external-links?agentName=${agentName}\&agentUID=koroneikiagent
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -295,7 +295,7 @@ definition {
 		var agentName = StringUtil.replace("${agentName}", " ", "%20");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}?agentName=${agentName}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}?agentName=${agentName}\&agentUID=koroneikiagent
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -329,7 +329,7 @@ definition {
 		var agentName = StringUtil.replace("${agentName}", " ", "%20");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}?agentName=${agentName}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}?agentName=${agentName}\&agentUID=koroneikiagent
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -496,7 +496,7 @@ definition {
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles?agentName=${agentName}\&contactRoleKeys=${contactRoleKey}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles?agentName=${agentName}\&agentUID=koroneikiagent\&contactRoleKeys=${contactRoleKey}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -567,7 +567,7 @@ definition {
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&contactUuids=${contactUuid}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid?agentName=${agentName}\&agentUID=koroneikiagent\&contactUuids=${contactUuid}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -916,7 +916,7 @@ definition {
 		var agentName = StringUtil.replace("${agentName}", " ", "%20");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}?agentName=${agentName}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}?agentName=${agentName}\&agentUID=koroneikiagent
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -1465,6 +1465,41 @@ definition {
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
+
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')]");
+		}
+		else if (!("${newValue}" == "")) {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.newValue=='${newValue}')]");
+		}
+		else {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.oldValue=='${oldValue}')]");
+		}
+
+		if (contains("${auditEntry}", "agentUID")) {
+			if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentUID");
+			}
+			else if (!("${newValue}" == "")) {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.newValue=='${newValue}')].agentUID");
+			}
+			else {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.oldValue=='${oldValue}')].agentUID");
+			}
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "[", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "]", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "&quot;", "");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
+		}
 	}
 
 	@prose = "I should be able to view an audit entry for the summary ${summary} related to the team with the name ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} regarding ${description} executed by ${agentName}"
@@ -1613,6 +1648,41 @@ definition {
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
+
+		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')]");
+		}
+		else if (!("${newValue}" == "")) {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')]");
+		}
+		else {
+			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')]");
+		}
+
+		if (contains("${auditEntry}", "agentUID")) {
+			if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentUID");
+			}
+			else if (!("${newValue}" == "")) {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.newValue=='${newValue}')].agentUID");
+			}
+			else {
+				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}' && @.description=='${description}' && @.oldValue=='${oldValue}')].agentUID");
+			}
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "[", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "]", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "&quot;", "");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
+		}
 	}
 
 	@prose = "I should be able to view an audit entry for the summary ${summary} related to the team with the name ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} regarding ${description} executed by ${agentName} via the audit entry key"
@@ -1689,6 +1759,19 @@ definition {
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
+
+		var auditEntry = JSONCurlUtil.get("${curl}");
+
+		if (contains("${auditEntry}", "agentUID")) {
+			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.agentUID");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
+		}
 	}
 
 	@prose = "I should be able to view an audit entry for the summary ${summary} related to the team ${teamName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName} via the audit entry key"
@@ -1758,6 +1841,19 @@ definition {
 
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
+
+		var auditEntry = JSONCurlUtil.get("${curl}");
+
+		if (contains("${auditEntry}", "agentUID")) {
+			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.agentUID");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
 		}
 	}
 

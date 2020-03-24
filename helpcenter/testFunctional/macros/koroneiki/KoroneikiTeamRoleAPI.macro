@@ -61,7 +61,7 @@ definition {
 		}
 		else {
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles?agentName=${agentName}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles?agentName=${agentName}\&agentUID=koroneikiagent
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -473,7 +473,7 @@ definition {
 		}
 		else {
 			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}?agentName=${agentName}
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/team-roles/${teamRoleKey}?agentName=${agentName}\&agentUID=koroneikiagent
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -619,6 +619,25 @@ definition {
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
 		}
+
+		var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')]");
+
+		if (contains("${auditEntry}", "agentUID")) {
+			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentUID");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "[", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "]", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "&quot;", "");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
+		}
 	}
 
 	@prose = "I should be able to view an audit entry for an action ${action} to the team role ${teamRoleName} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName} via the audit entry key"
@@ -686,6 +705,19 @@ definition {
 
 		if (!("${agentName}" == "${agentNameFromAPI}")) {
 			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
+
+		var auditEntry = JSONCurlUtil.get("${curl}");
+
+		if (contains("${auditEntry}", "agentUID")) {
+			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.agentUID");
+
+			echo("Expected Agent UID: koroneikiagent");
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
+			}
 		}
 	}
 
