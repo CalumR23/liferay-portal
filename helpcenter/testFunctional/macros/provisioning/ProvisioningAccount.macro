@@ -93,6 +93,48 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the ${noteType} type note with the content ${noteContent} and the following values ${table}"
+	macro _viewAccountNote {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+
+		var key_noteContent = "${noteContent}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#NOTE_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account note field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the account notes empty state"
+	macro _viewAccountNotesEmptyState {
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#NOTE_EMPTY_TEXT",
+			value1 = "No notes were found.");
+	}
+
 	@prose = "I should be able to view the product under the ${tabName} tab with the name ${productName} and the following values on the account details page ${table}"
 	macro _viewAccountProduct {
 		if ("${tabName}" == "Active") {
@@ -147,6 +189,15 @@ definition {
 				fail("No such account product field ${field}");
 			}
 		}
+	}
+
+	@prose = "I should not be able to view the ${noteType} type note with the content ${noteContent}"
+	macro _viewNoAccountNote {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+
+		var key_noteContent = "${noteContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_ROW");
 	}
 
 	@prose = "I should not be able to view the product under the ${tabName} tab with the name ${productName} on the account details page"
