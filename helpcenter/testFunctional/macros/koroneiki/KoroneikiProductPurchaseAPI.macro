@@ -822,31 +822,20 @@ definition {
 					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
 					var curl = '''
-						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
 						--header "API_Token: ${apiToken}"
 						-H "accept: application/json"
 						-H "Content-Type: application/json"
 						''';
 
-					var allProductPurchases = JSONCurlUtil.get("${curl}", "$");
+					var allAccountProductPurchases = JSONCurlUtil.get("${curl}", "$");
 
-					if (contains("${allProductPurchases}", "${accountKey}")) {
-						var curl = '''
-							--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
-							--header "API_Token: ${apiToken}"
-							-H "accept: application/json"
-							-H "Content-Type: application/json"
-							''';
+					if (contains("${allAccountProductPurchases}", "${productKey}")) {
+						KoroneikiProductPurchaseAPI._deleteProductPurchase(
+							accountName = "${accountName}",
+							productName = "${productName}");
 
-						var allAccountProductPurchases = JSONCurlUtil.get("${curl}", "$");
-
-						if (contains("${allAccountProductPurchases}", "${productKey}")) {
-							KoroneikiProductPurchaseAPI._deleteProductPurchase(
-								accountName = "${accountName}",
-								productName = "${productName}");
-
-							echo("Product Purchase deleted: ${productName} made by ${accountName}");
-						}
+						echo("Product Purchase deleted: ${productName} made by ${accountName}");
 					}
 				}
 			}

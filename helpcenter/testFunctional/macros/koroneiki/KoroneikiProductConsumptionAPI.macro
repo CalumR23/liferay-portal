@@ -475,31 +475,20 @@ definition {
 					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
 					var curl = '''
-						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
 						--header "API_Token: ${apiToken}"
 						-H "accept: application/json"
 						-H "Content-Type: application/json"
 						''';
 
-					var allProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+					var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
 
-					if (contains("${allProductConsumptions}", "${accountKey}")) {
-						var curl = '''
-							--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions
-							--header "API_Token: ${apiToken}"
-							-H "accept: application/json"
-							-H "Content-Type: application/json"
-							''';
+					if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+						KoroneikiProductConsumptionAPI._deleteProductConsumption(
+							accountName = "${accountName}",
+							productName = "${productName}");
 
-						var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
-
-						if (contains("${allAccountProductConsumptions}", "${productKey}")) {
-							KoroneikiProductConsumptionAPI._deleteProductConsumption(
-								accountName = "${accountName}",
-								productName = "${productName}");
-
-							echo("Product Consumption deleted: ${productName} made by ${accountName}");
-						}
+						echo("Product Consumption deleted: ${productName} made by ${accountName}");
 					}
 				}
 			}
