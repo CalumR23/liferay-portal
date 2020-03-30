@@ -5,13 +5,11 @@ definition {
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
-	@prose = "I delete a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content}"
+	@prose = "I delete a note on koroneiki for the account ${accountName} with the content ${content}"
 	macro _deleteNote {
-		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountNameAndContent(
 			accountName = "${accountName}",
-			content = "${content}",
-			status = "${status}",
-			type = "${type}");
+			content = "${content}");
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
@@ -23,13 +21,11 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I delete a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content} executed by ${agentName}"
+	@prose = "I delete a note on koroneiki for the account ${accountName} with the content ${content} executed by ${agentName}"
 	macro _deleteNoteExecutedByAgent {
-		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountNameAndContent(
 			accountName = "${accountName}",
-			content = "${content}",
-			status = "${status}",
-			type = "${type}");
+			content = "${content}");
 
 		var agentName = StringUtil.replace("${agentName}", " ", "%20");
 
@@ -43,13 +39,11 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I update a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content} to have the following values ${table}"
+	@prose = "I update a note on koroneiki for the account ${accountName} with the content ${content} to have the following values ${table}"
 	macro _updateNote {
-		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountNameAndContent(
 			accountName = "${accountName}",
-			content = "${content}",
-			status = "${status}",
-			type = "${type}");
+			content = "${content}");
 
 		var RawTable rawTable = new RawTable("${table}");
 
@@ -189,12 +183,12 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I should not be able to view a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content}"
+	@prose = "I should not be able to view a note on koroneiki for the account ${accountName} with the content ${content}"
 	macro _viewNoNote {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes/${type}/${status}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/notes
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -203,17 +197,15 @@ definition {
 		var allAccountNotes = JSONCurlUtil.get("${curl}", "$");
 
 		if (contains("${allAccountNotes}", "${content}")) {
-			fail("The note with the content ${content} and status ${status} and type ${type} is still present on the account ${accountName}");
+			fail("The note with the content ${content} is still present on the account ${accountName}");
 		}
 	}
 
-	@prose = "I should be able to view a note on koroneiki for the account ${accountName} with the status ${status} and type ${type} and content ${content} and the following values ${table}"
+	@prose = "I should be able to view a note on koroneiki for the account ${accountName} with the content ${content} and the following values ${table}"
 	macro _viewNote {
-		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountAndStatusAndTypeAndContent(
+		var noteKey = KoroneikiAccountAPI._getAccountNoteKeyViaAccountNameAndContent(
 			accountName = "${accountName}",
-			content = "${content}",
-			status = "${status}",
-			type = "${type}");
+			content = "${content}");
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/notes/${noteKey}
