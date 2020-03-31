@@ -5582,6 +5582,64 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view a product with the name ${productName} on the account ${accountName}"
+	macro _viewNoProduct {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchase-views
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allProducts}", "${productName}")) {
+			fail("The product with the name ${productName} is still present in on the koroneiki account based on the all products API");
+		}
+	}
+
+	@prose = "I should not be able to view a product consumption made by ${accountName} for the product ${productName} via the account api"
+	macro _viewNoProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var specificProductPurchases = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${specificProductPurchases}", "productConsumptions")) {
+			fail("The product with the name ${productName} has a consumption still present in on the koroneiki account based on the specific products API");
+		}
+	}
+
+	@prose = "I should not be able to view a product purchase made by ${accountName} for the product ${productName} via the account api"
+	macro _viewNoProductPurchase {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var specificProductPurchases = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${specificProductPurchases}", "productPurchases")) {
+			fail("The product with the name ${productName} has a purchase still present in on the koroneiki account based on the specific products API");
+		}
+	}
+
 	@prose = "the team with the name ${teamName} assigned the account ${accountName} should not have the team role ${teamRoleName}"
 	macro _viewNoTeamRole {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -5642,6 +5700,613 @@ definition {
 		}
 		else {
 			echo("No contacts present on ${accountName} and therefore there is no contacts nested field visible");
+		}
+	}
+
+	@prose = "I should be able to view a product with the name ${productName} on the account ${accountName} with the following values ${table}"
+	macro _viewProduct {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl1 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchase-views
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var curl2 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "External Link Nested Field") {
+				var externalLinksObjects = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI1 = "${externalLinksObjectsEdit}";
+
+				var externalLinksObjects = JSONCurlUtil.get("${curl2}", "$.product.externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl2}", "$.product.externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl2}", "$.product.externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl2}", "$.product.externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl2}", "$.product.externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI2 = "${externalLinksObjectsEdit}";
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.name");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.product.name");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].product.properties.${value1}");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.product.properties.${value1}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value from all products API call: ${valueFromAPI1}");
+				echo("Actual property field ${value1} value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value2}", "${valueFromAPI1}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI1} from the all products API does not match expected property field ${value1} value ${value2}");
+				}
+
+				if (!(contains("${value2}", "${valueFromAPI2}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI2} from the specific product API does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value from all products API call: ${valueFromAPI1}");
+				echo("Actual ${field} Value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value1}", "${valueFromAPI1}"))) {
+					fail("Actual ${field} value ${valueFromAPI1} does not match expected ${field} value ${value1}");
+				}
+
+				if (!(contains("${value1}", "${valueFromAPI2}"))) {
+					fail("Actual ${field} value ${valueFromAPI2} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product consumption made by ${accountName} for the product ${productName} with the following values via the account api ${table}"
+	macro _viewProductConsumption {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl1 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchase-views
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var curl2 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].endDate");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].endDate");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "External Link Nested Field") {
+				var externalLinksObjects = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI1 = "${externalLinksObjectsEdit}";
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var externalLinksObjects = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI2 = "${externalLinksObjectsEdit}";
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].properties.${value1}");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].properties.${value1}");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Purchase") {
+				if ("${value1}" == "true") {
+					var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].productPurchaseKey");
+
+					var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+					var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+					var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+					var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].productPurchaseKey");
+
+					var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+					var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+					var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+				}
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productConsumptions[?(@.key=='${productConsumptionKey}')].startDate");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productConsumptions[?(@.key=='${productConsumptionKey}')].startDate");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else {
+				fail("No such product consumption field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value from all products API call: ${valueFromAPI1}");
+				echo("Actual property field ${value1} value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value2}", "${valueFromAPI1}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI1} from the all products API does not match expected property field ${value1} value ${value2}");
+				}
+
+				if (!(contains("${value2}", "${valueFromAPI2}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI2} from the specific product API does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else if ("${field}" == "Product Purchase") {
+				if ("${value1}" == "true") {
+					var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+						accountName = "${accountName}",
+						productName = "${productName}");
+
+					echo("Expected ${field} Value: ${productPurchaseKey}");
+					echo("Actual ${field} Value from all products API call:: ${valueFromAPI1}");
+					echo("Actual ${field} Value from specific products API call:: ${valueFromAPI2}");
+
+					if (!(contains("${productPurchaseKey}", "${valueFromAPI1}"))) {
+						fail("Actual ${field} value ${valueFromAPI1} from the all products API does not match expected ${field} value ${productPurchaseKey}");
+					}
+
+					if (!(contains("${productPurchaseKey}", "${valueFromAPI2}"))) {
+						fail("Actual ${field} value ${valueFromAPI2} from the specific product API does not match expected ${field} value ${productPurchaseKey}");
+					}
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value from all products API call: ${valueFromAPI1}");
+				echo("Actual ${field} Value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value1}", "${valueFromAPI1}"))) {
+					fail("Actual ${field} value ${valueFromAPI1} does not match expected ${field} value ${value1}");
+				}
+
+				if (!(contains("${value1}", "${valueFromAPI2}"))) {
+					fail("Actual ${field} value ${valueFromAPI2} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product purchase made by ${accountName} for the product ${productName} with the following values via the account api ${table}"
+	macro _viewProductPurchase {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		var curl1 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchase-views
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var curl2 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "End Date") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].endDate");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].endDate");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "External Link Nested Field") {
+				var externalLinksObjects = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI1 = "${externalLinksObjectsEdit}";
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var externalLinksObjects = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks");
+
+				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks");
+
+				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
+
+				var externalLinkObjectNumber = "0";
+
+				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+					var externalLinkObject = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}]");
+
+					var dateCreated = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}].dateCreated");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var key = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].externalLinks[${externalLinkObjectNumber}].key");
+
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
+
+					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+				}
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
+
+				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
+
+				var valueFromAPI2 = "${externalLinksObjectsEdit}";
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Original End Date") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].originalEndDate");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].originalEndDate");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Perpetual") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].perpetual");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].perpetual");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Product Field and Value") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].properties.${value1}");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].properties.${value1}");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Quantity") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].quantity");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].quantity");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Start Date") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].startDate");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].startDate");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI1 = JSONCurlUtil.get("${curl1}", "$.items[?(@.product.key=='${productKey}')].productPurchases[?(@.key=='${productPurchaseKey}')].status");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "[", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "]", "");
+
+				var valueFromAPI1 = StringUtil.replace("${valueFromAPI1}", "&quot;", "");
+
+				var valueFromAPI2 = JSONCurlUtil.get("${curl2}", "$.productPurchases[?(@.key=='${productPurchaseKey}')].status");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "[", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "]", "");
+
+				var valueFromAPI2 = StringUtil.replace("${valueFromAPI2}", "&quot;", "");
+			}
+			else {
+				fail("No such product purchase field ${field}");
+			}
+
+			if ("${field}" == "Product Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value from all products API call: ${valueFromAPI1}");
+				echo("Actual property field ${value1} value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value2}", "${valueFromAPI1}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI1} from the all products API does not match expected property field ${value1} value ${value2}");
+				}
+
+				if (!(contains("${value2}", "${valueFromAPI2}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI2} from the specific product API does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value from all products API call: ${valueFromAPI1}");
+				echo("Actual ${field} Value from specific product API call: ${valueFromAPI2}");
+
+				if (!(contains("${value1}", "${valueFromAPI1}"))) {
+					fail("Actual ${field} value ${valueFromAPI1} does not match expected ${field} value ${value1}");
+				}
+
+				if (!(contains("${value1}", "${valueFromAPI2}"))) {
+					fail("Actual ${field} value ${valueFromAPI2} does not match expected ${field} value ${value1}");
+				}
+			}
 		}
 	}
 
