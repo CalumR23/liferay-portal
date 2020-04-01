@@ -1945,6 +1945,31 @@ definition {
 		return "${productPurchaseKey}";
 	}
 
+	macro _getAccountProductPurchaseKeyViaAccountAndProductNameAndFieldValue {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-purchases
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var productPurchaseKey = JSONCurlUtil.get("${curl}", "$.items[?(@.productKey=='${productKey}' && @.${fieldName}=='${fieldValue}')].key");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "[", "");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "]", "");
+
+		var productPurchaseKey = StringUtil.replace("${productPurchaseKey}", "&quot;", "");
+
+		echo("Product Purchase key value for ${productName} product made by ${accountName} with the ${fieldName} ${fieldValue}: ${productPurchaseKey}");
+
+		return "${productPurchaseKey}";
+	}
+
 	@prose = "I remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles ${table}"
 	macro _removeContactRolesFromContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
