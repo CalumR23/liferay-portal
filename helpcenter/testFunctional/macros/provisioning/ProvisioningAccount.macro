@@ -1,6 +1,11 @@
 definition {
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
+	@prose = "I click on the back button in the archived notes section"
+	macro clickBackButtonViaArchivedNotes {
+		Click(locator1 = "ProvisioningAccount#ARCHIVED_NOTES_BACK_BUTTON");
+	}
+
 	@prose = "I click on the ${tabName} side panel tab"
 	macro clickSidePanelTab {
 		var key_tabName = "${tabName}";
@@ -13,6 +18,11 @@ definition {
 		var key_tabName = StringUtil.lowerCase("${tabName}");
 
 		Click(locator1 = "ProvisioningAccount#TAB");
+	}
+
+	@prose = "I click on the view archived notes link"
+	macro clickViewArchivedNotesLink {
+		Click(locator1 = "ProvisioningAccount#VIEW_ARCHIVED_NOTES_LINK");
 	}
 
 	@prose = "I collapse the side panel on the account details page"
@@ -215,13 +225,63 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the archived note with the content ${noteContent} and the following values ${table}"
+	macro _viewAccountNoteViaArchive {
+		var key_noteContent = "${noteContent}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such archived account note field ${field}");
+			}
+		}
+	}
+
 	@prose = "I should not be able to view the ${noteType} type note with the content ${noteContent}"
 	macro _viewNoAccountNote {
 		var key_noteType = StringUtil.lowerCase("${noteType}");
 
 		var key_noteContent = "${noteContent}";
 
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_ROW");
+		if (IsElementPresent(locator1 = "ProvisioningAccount#NOTE_ROW")) {
+			AssertNotVisible(locator1 = "ProvisioningAccount#NOTE_ROW");
+		}
+		else {
+			AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_ROW");
+		}
+	}
+
+	@prose = "I should not be able to view the archived note with the content ${noteContent}"
+	macro _viewNoAccountNoteViaArchive {
+		var key_noteContent = "${noteContent}";
+
+		if (IsElementPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_ROW")) {
+			AssertNotVisible(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_ROW");
+		}
+		else {
+			AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_ROW");
+		}
 	}
 
 	@prose = "I should not be able to view the product under the ${tabName} tab with the name ${productName} on the account details page"
