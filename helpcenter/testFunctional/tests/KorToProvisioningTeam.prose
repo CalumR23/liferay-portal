@@ -1,0 +1,620 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.integration"
+
+Feature:  Koroneiki to Provisioning Team Integration
+	Testing to assure that koroneiki account team information transfers properly to the account index.
+
+Teardown:
+	* I wait for "10" seconds
+	* I tear down the teams on koroneiki with the following names
+	| Koroneiki Partner |
+	| Updated Partner   |
+	* I tear down the team roles on koroneiki with the following names
+	| Partner |
+	* I tear down the external links for the product "A Liferay DXP Product" on koroneiki with the following entity id values
+	| A Liferay DXP Product |
+	* I tear down the external links for the product "Platinum Subscription" on koroneiki with the following entity id values
+	| Platinum Subscription |
+	* I tear down the external links for the account "Korpro - ${staticCompanyName}" on koroneiki with the following entity id values
+	| ${staticDossieraAccountKey}   |
+	| ${staticSalesforceProjectKey} |
+	* I tear down the product consumptions on koroneiki made by the account "Korpro - ${staticCompanyName}" for the following products
+	| A Liferay DXP Product  |
+	| Platinum Subscription  |
+	* I tear down the product purchases on koroneiki made by the account "Korpro - ${staticCompanyName}" for the following products with their respective field values
+	| A Liferay DXP Product | startDate | ${staticStartDate}       |
+	| A Liferay DXP Product | startDate | ${staticFutureStartDate} |
+	| Platinum Subscription | startDate | ${staticStartDate}       |
+	| Platinum Subscription | startDate | ${staticFutureStartDate} |
+	* I tear down the products on koroneiki with the following names
+	| A Liferay DXP Product |
+	| Platinum Subscription |
+	* I tear down the contact roles on koroneiki with the following names
+	| Liferay Account Customer Role |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| pro.koroneiki1@lrcustomer.com.broken |
+	| pro.koroneiki2@lrcustomer.com.broken |
+	| vis.koroneiki3@lrcustomer.com.broken |
+	* I tear down the accounts on koroneiki with the following names
+	| Korpro - ${staticCompanyName} |
+	| Onepro - ${staticCompanyName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| KORPROKORPRO |
+	| ONEPROONEPRO |
+
+Scenario: View teams
+	Testing the ability to create an account in Dossiera and viewing the respective teams in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should be able to view the team with the name "Korpro - ${staticCompanyName}" and the following values
+	| Name   | Korpro - ${staticCompanyName} |
+	| Member | PRO Koroneiki1                |
+	When I click on the "Korpro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should be able to view the team with the name "Koroneiki Partner" and the following values
+	| Name   | Koroneiki Partner |
+	| Member | PRO Koroneiki1    |
+	When I click on the "Koroneiki Partner" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Koroneiki Partner |
+
+Scenario: View teams with multiple members
+	Testing the ability to create an account in Dossiera and viewing teams with multiple members in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I create a contact on koroneiki with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Language      | English                              |
+	| Last Name     | Koroneiki2                           |
+	And I assign customer contacts with the following email addresses to the account "Korpro - ${staticCompanyName}"
+	| pro.koroneiki2@lrcustomer.com.broken |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	| pro.koroneiki2@lrcustomer.com.broken |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should be able to view the team with the name "Korpro - ${staticCompanyName}" and the following values
+	| Name   | Korpro - ${staticCompanyName} |
+	| Member | PRO Koroneiki1                |
+	| Member | PRO Koroneiki2                |
+	When I click on the "Korpro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I search the team details page using the keyword "pro.koroneiki2@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should be able to view the team with the name "Koroneiki Partner" and the following values
+	| Name   | Koroneiki Partner |
+	| Member | PRO Koroneiki1    |
+	| Member | PRO Koroneiki2    |
+	When I click on the "Koroneiki Partner" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I search the team details page using the keyword "pro.koroneiki2@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Koroneiki Partner |
+
+Scenario: View updated account and teams
+	Testing the ability to update an account and teams in Dossiera and viewing the respective teams in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Code         | ONEPROONEPRO                             |
+	| Description  | Test update account on koroneiki         |
+	| Fax Number   | 555-555-4321                             |
+	| Name         | Onepro - ${staticCompanyName}            |
+	| Phone Number | 555-555-8765                             |
+	| Region       | Global                                   |
+	| Status       | Inactive                                 |
+	| Tier         | Premier                                  |
+	| Website      | www.koroneikiupdate.com                  |
+	And I update a team with the name "Koroneiki Partner" to have the new name "Updated Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Onepro"
+	And I click on the account with the name "Onepro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should not be able to view the team with the name "Korpro - ${staticCompanyName}"
+##	When I search the accounts details page using the keyword "Onepro"
+	Then I should be able to view the team with the name "Onepro - ${staticCompanyName}" and the following values
+	| Name   | Onepro - ${staticCompanyName} |
+	| Member | PRO Koroneiki1                |
+	When I click on the "Onepro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Onepro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Onepro"
+	And I click on the account with the name "Onepro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should not be able to view the team with the name "Koroneiki Partner"
+	When I search the accounts details page using the keyword "Updated"
+	Then I should be able to view the team with the name "Updated Partner" and the following values
+	| Name   | Updated Partner |
+	| Member | PRO Koroneiki1  |
+	When I click on the "Updated Partner" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Updated Partner |
+
+Scenario: View deleted team
+	Testing the ability to create an account in Dossiera and adding and deleting a team in koroneiki before viewing the respective teams in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I delete a koroneiki team with the name "Koroneiki Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should be able to view the team with the name "Korpro - ${staticCompanyName}" and the following values
+	| Name   | Korpro - ${staticCompanyName} |
+	| Member | PRO Koroneiki1                |
+	When I click on the "Korpro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should not be able to view the team with the name "Koroneiki Partner"
+
+Scenario: View updated team member
+	Testing the ability to create an account in Dossiera and updating the team member via koroneiki and viewing the respective teams in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I update a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" to have the following values
+	| Email Address | vis.koroneiki3@lrcustomer.com.broken |
+	| First Name    | VIS                                  |
+	| Last Name     | Koroneiki3                           |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should be able to view the team with the name "Korpro - ${staticCompanyName}" and the following values
+	| Name   | Korpro - ${staticCompanyName} |
+	| Member | VIS Koroneiki3                |
+	When I click on the "Korpro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should not be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	When I search the team details page using the keyword "vis.koroneiki3@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "vis.koroneiki3@lrcustomer.com.broken" and the following values
+	| Name          | VIS Koroneiki3                       |
+	| Email Address | vis.koroneiki3@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should be able to view the team with the name "Koroneiki Partner" and the following values
+	| Name   | Koroneiki Partner |
+	| Member | VIS Koroneiki3    |
+	When I click on the "Koroneiki Partner" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should not be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	When I search the team details page using the keyword "vis.koroneiki3@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "vis.koroneiki3@lrcustomer.com.broken" and the following values
+	| Name          | VIS Koroneiki3                       |
+	| Email Address | vis.koroneiki3@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Koroneiki Partner |
+
+Scenario: View removed team member
+	Testing the ability to create an account in Dossiera and removing a team member via koroneiki and viewing the respective teams in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I remove contacts with the following email addresses from the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Korpro"
+	Then I should be able to view the team with the name "Korpro - ${staticCompanyName}" and the following values
+	| Name   | Korpro - ${staticCompanyName} |
+	| Member | PRO Koroneiki1                |
+	When I click on the "Korpro - ${staticCompanyName}" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpro - ${staticCompanyName} |
+	When I go to the provisioning main page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Teams" tab
+	And I search the accounts details page using the keyword "Koroneiki"
+	Then I should be able to view the team with the name "Koroneiki Partner" and the following values
+	| Name   | Koroneiki Partner |
+	When I click on the "Koroneiki Partner" team link
+	And I search the team details page using the keyword "pro.koroneiki1@lrcustomer.com.broken"
+	Then I should not be able to view the team member with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	When I click on the "Details" tab
+	Then I should be able to view the following team values in the team details page
+	| Name | Koroneiki Partner |
