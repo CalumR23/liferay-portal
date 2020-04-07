@@ -1,0 +1,71 @@
+definition {
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+
+	@prose = "I search the team details page using the keyword ${keyword}"
+	macro search {
+		Type(
+			locator1 = "ProvisioningTeam#SEARCH_FIELD",
+			value1 = "${keyword}");
+
+		KeyPress(
+			locator1 = "ProvisioningTeam#SEARCH_FIELD",
+			value1 = "\RETURN");
+	}
+
+	@prose = "I should not be able to view the team member with the email address ${memberEmailAddress}"
+	macro _viewNoTeamMember {
+		var key_memberEmailAddress = "${memberEmailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningTeam#MEMBER_ROW");		
+	}
+
+	@prose = "I should be able to view the following team values in the team details page ${table}"
+	macro _viewTeamDetails {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "ProvisioningTeam#TEAM_DETAILS_NAME",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such team detail field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the team member with the email address ${memberEmailAddress} and the following values ${table}"
+	macro _viewTeamMember {
+		var key_memberEmailAddress = "${memberEmailAddress}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningTeam#MEMBER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningTeam#MEMBER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "ProvisioningTeam#MEMBER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such team member field ${field}");
+			}
+		}
+	}
+}

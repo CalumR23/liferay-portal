@@ -44,6 +44,13 @@ definition {
 		Click(locator1 = "ProvisioningAccount#TAB");
 	}
 
+	@prose = "I click on the ${teamName} team link"
+	macro clickTeamLink {
+		var key_teamName = "${teamName}";
+
+		Click(locator1 = "ProvisioningAccount#TEAM_NAME");
+	}
+
 	@prose = "I click on the view archived notes link"
 	macro clickViewArchivedNotesLink {
 		Click(locator1 = "ProvisioningAccount#VIEW_ARCHIVED_NOTES_LINK");
@@ -61,6 +68,17 @@ definition {
 		if (IsElementPresent(locator1 = "ProvisioningAccount#SIDE_PANEL_EXPAND_BUTTON")) {
 			Click(locator1 = "ProvisioningAccount#SIDE_PANEL_EXPAND_BUTTON");
 		}
+	}
+
+	@prose = "I search the accounts details page using the keyword ${keyword}"
+	macro search {
+		Type(
+			locator1 = "ProvisioningAccount#SEARCH_FIELD",
+			value1 = "${keyword}");
+
+		KeyPress(
+			locator1 = "ProvisioningAccount#SEARCH_FIELD",
+			value1 = "\RETURN");
 	}
 
 	@prose = "I search the ${tabName} subscriptions tab using the keyword ${keyword}"
@@ -292,6 +310,37 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the team with the name ${teamName} and the following values ${table}"
+	macro _viewAccountTeam {
+		var key_teamName = "${teamName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Member") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_MEMBERS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Last Modified") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_LAST_MODIFIED",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such team field ${field}");
+			}
+		}
+	}
+
 	@prose = "I should not be able to view the ${noteType} type note with the content ${noteContent}"
 	macro _viewNoAccountNote {
 		var key_noteType = StringUtil.lowerCase("${noteType}");
@@ -336,5 +385,12 @@ definition {
 		var key_productName = "${productName}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
+	}
+
+	@prose = "I should not be able to view the team with the name ${teamName}"
+	macro _viewNoAccountTeam {
+		var key_teamName = "${teamName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#TEAM_ROW");		
 	}
 }
