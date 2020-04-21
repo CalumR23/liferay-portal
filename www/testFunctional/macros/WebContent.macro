@@ -1,4 +1,75 @@
 definition {
+	@prose = "I create web content with the following web content fields and values ${table}"
+	macro createWebContent {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var fieldName = "${row[0]}";
+			var fieldType = "${row[1]}";
+			var value = "${row[2]}";
+
+			if ("${fieldName}" == "Title") {
+				Type(
+					locator1 = "WebContentCreate#TITLE_FIELD",
+					value1 = "${value}");
+			}
+			else if (contains("${fieldName}", "Quote")) {
+				if ("${fieldType}" == "Input") {
+					WebContent.typeViaExactInputField(			
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					WebContent.typeViaExactTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "File Upload") {
+					WebContent.uploadFileViaExactField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Category Select") {
+					WebContent.selectCategoryViaExactField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, or Category Select");
+				}
+			}
+			else {
+				if ("${fieldType}" == "Input") {
+					WebContent.typeViaApproximateInputField(			
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					WebContent.typeViaApproximateTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "File Upload") {
+					WebContent.uploadFileViaApproximateField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Category Select") {
+					WebContent.selectCategoryViaApproximateField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, or Category Select");
+				}				
+			}
+		}
+
+		Click(locator1 = "WebContentCreate#PUBLISH_BUTTON");
+
+		WaitForSPARefresh();
+	}
+
 	@prose = "I expand the ${sidePanelCategory} header in the side panel"
 	macro expandSidePanelHeader {
 		var sidePanelCategory = StringUtil.replace("${sidePanelCategory}", " ", "");	
@@ -35,61 +106,98 @@ definition {
 		SelectFrameTop();
 	}
 
-	@prose = "I populate the following main web content fields with the following values ${table}"
-	macro populateMainWebContentFields {
-		var RawTable rawTable = new RawTable("${table}");
+	macro selectCategoryViaApproximateField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
 
-		for (var row : table "${rawTable}") {
-			var fieldName = "${row[0]}";
-			var fieldType = "${row[1]}";
-			var value = "${row[2]}";
+		Click(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
 
-			if ("${fieldName}" == "Title") {
-				Type(
-					locator1 = "WebContentCreate#TITLE_FIELD",
-					value1 = "${value}");
-			}
-			else if (contains("${fieldName}", "Quote")) {
-				if ("${fieldType}" == "Input") {
-					WebContent.typeViaExactInputField(			
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else if ("${fieldType}" == "Textarea") {
-					WebContent.typeViaExactTextareaField(
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else if ("${fieldType}" == "File Upload") {
-					WebContent.uploadViaExactField(
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else {
-					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, or File Upload");
-				}
-			}
-			else {
-				if ("${fieldType}" == "Input") {
-					WebContent.typeViaApproximateInputField(			
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else if ("${fieldType}" == "Textarea") {
-					WebContent.typeViaApproximateTextareaField(
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else if ("${fieldType}" == "File Upload") {
-					WebContent.uploadViaApproximateField(
-						field = "${fieldName}",
-						value = "${value}");
-				}
-				else {
-					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, or File Upload");
-				}				
+		SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+				WaitForSPARefresh();
 			}
 		}
+		else {
+			var key_entryTitle = "${value}";
+
+			ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			WaitForSPARefresh();
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+			SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+	}
+
+	macro selectCategoryViaExactField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Click(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+
+		SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+				WaitForSPARefresh();
+			}
+		}
+		else {
+			var key_entryTitle = "${value}";
+
+			ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			WaitForSPARefresh();
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+			SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
 	}
 
 	macro typeViaApproximateInputField {
@@ -176,7 +284,7 @@ definition {
 			value1 = "${value}");
 	}
 
-	macro uploadViaApproximateField {
+	macro uploadFileViaApproximateField {
 		var key_field = "${field}";
 		var key_positionValue = "1";
 
@@ -231,7 +339,7 @@ definition {
 		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
 	}
 
-	macro uploadViaExactField {
+	macro uploadFileViaExactField {
 		var key_field = "${field}";
 		var key_positionValue = "1";
 
