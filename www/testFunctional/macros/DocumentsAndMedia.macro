@@ -1,0 +1,578 @@
+definition {
+	@prose = "I click the document publish button"
+	macro clickPublish {
+		Click(locator1 = "DocumentsAndMediaCreate#PUBLISH_BUTTON");
+
+		WaitForSPARefresh();
+	}
+
+	@prose = "I collapse the ${bottomPanelCategory} header in the document bottom panel"
+	macro collapseBottomPanelHeader {
+		var bottomPanelCategory = StringUtil.replace("${bottomPanelCategory}", " ", "");	
+
+		var key_bottomPanelCategory = StringUtil.lowerCaseFirstLetter("${bottomPanelCategory}");
+
+		if (IsElementPresent(locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_HEADER_EXPANDED")) {
+			Click(locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_HEADER_EXPANDED");
+		}
+	}
+
+	@prose = "I clear the following existing documents and media fields ${table}"
+	macro clearExistingDocumentsAndMediaFields {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var fieldName = "${row[0]}";
+			var fieldType = "${row[1]}";
+
+			if ("${fieldName}" == "File") {
+				UploadCommonFile(
+					locator1 = "DocumentsAndMediaCreate#FILE_FIELD",
+					value1 = "");
+			}
+			else if (contains("${fieldName}", "Quote")) {
+				if ("${fieldType}" == "Input") {
+					DocumentsAndMedia.clearViaExactInputField(			
+						field = "${fieldName}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					DocumentsAndMedia.clearViaExactTextareaField(
+						field = "${fieldName}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input or Textarea");
+				}
+			}
+			else {
+				if ("${fieldType}" == "Input") {
+					DocumentsAndMedia.clearViaApproximateInputField(			
+						field = "${fieldName}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					DocumentsAndMedia.clearViaApproximateTextareaField(
+						field = "${fieldName}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input or Textarea");
+				}
+			}
+		}
+	}
+
+	macro clearViaApproximateInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextEqual.isValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE",
+			value1 = "");
+	}
+
+	macro clearViaApproximateTextareaField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextEqual.isValue(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_APPROXIMATE",
+			value1 = "");
+	}
+
+	macro clearViaExactInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextEqual.isValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT",
+			value1 = "");
+	}
+
+	macro clearViaExactTextareaField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextEqual.isValue(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_EXACT",
+			value1 = "");
+	}
+
+	@prose = "I populate the following documents and media fields and values ${table}"
+	macro createDocument {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var fieldName = "${row[0]}";
+			var fieldType = "${row[1]}";
+			var value = "${row[2]}";
+
+			if ("${fieldName}" == "File") {
+				UploadCommonFile(
+					locator1 = "DocumentsAndMediaCreate#FILE_FIELD",
+					value1 = "${value}");
+			}
+			else if (contains("${fieldName}", "Quote")) {
+				if ("${fieldType}" == "Input") {
+					DocumentsAndMedia.typeViaExactInputField(			
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					DocumentsAndMedia.typeViaExactTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Select") {
+					DocumentsAndMedia.selectViaExactSelectField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "File Upload") {
+					DocumentsAndMedia.uploadFileViaExactField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Category Select") {
+					DocumentsAndMedia.selectCategoryViaExactField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Bottom Panel Input") {
+					DocumentsAndMedia.typeViaExactBottomPanelInputField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, Select, File Upload, Category Select, or Bottom Panel Input");
+				}
+			}
+			else {
+				if ("${fieldType}" == "Input") {
+					DocumentsAndMedia.typeViaApproximateInputField(			
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Textarea") {
+					DocumentsAndMedia.typeViaApproximateTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Select") {
+					DocumentsAndMedia.selectViaApproximateSelectField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "File Upload") {
+					DocumentsAndMedia.uploadFileViaApproximateField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Category Select") {
+					DocumentsAndMedia.selectCategoryViaApproximateField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Bottom Panel Input") {
+					DocumentsAndMedia.typeViaApproximateBottomPanelInputField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else {
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, Select, File Upload, Category Select, or Bottom Panel Input");
+				}
+			}
+		}
+	}
+
+	@prose = "I expand the ${bottomPanelCategory} header in the document bottom panel"
+	macro expandBottomPanelHeader {
+		var bottomPanelCategory = StringUtil.replace("${bottomPanelCategory}", " ", "");	
+
+		var key_bottomPanelCategory = StringUtil.lowerCaseFirstLetter("${bottomPanelCategory}");
+
+		if (IsElementPresent(locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_HEADER_COLLAPSED")) {
+			Click(locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_HEADER_COLLAPSED");
+		}
+	}
+
+	@prose = "I go to the documents and media folder ${folderName}"
+	macro gotoFolder {
+		var key_entryTitle = "${folderName}";
+
+		Click(locator1 = "DocumentsAndMedia#ENTRY_CARDS_THUMBNAIL");
+
+		AssertTextEquals(
+			locator1 = "DocumentsAndMedia#ACTIVE_BREADCRUMB",
+			value1 = "${folderName}");
+	}
+
+	@prose = "I go to a new form for a ${type} document"
+	macro gotoNewDocumentForm {
+		Click(locator1 = "DocumentsAndMedia#ADD_BUTTON");
+		Click(locator1 = "DocumentsAndMedia#MORE_BUTTON");
+
+		SelectFrame(locator1 = "DocumentsAndMedia#MORE_MENU_IFRAME");
+
+		var key_menuItemName = "${type}";
+
+		Click(locator1 = "DocumentsAndMedia#MORE_MENU_ITEM_NAME");
+
+		SelectFrameTop();
+	}
+
+	macro selectCategoryViaApproximateField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Click(locator1 = "DocumentsAndMediaCreate#SELECT_BUTTON_APPROXIMATE");
+
+		SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+				WaitForSPARefresh();
+			}
+		}
+		else {
+			var key_entryTitle = "${value}";
+
+			ScrollWebElementIntoView(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			WaitForSPARefresh();
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+			SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			if (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY_SELECTED")) {
+				Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY_OTHER");
+			}
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_APPROXIMATE")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_APPROXIMATE");
+		}
+	}
+
+	macro selectCategoryViaExactField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Click(locator1 = "DocumentsAndMediaCreate#SELECT_BUTTON_EXACT");
+
+		SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+				WaitForSPARefresh();
+			}
+		}
+		else {
+			var key_entryTitle = "${value}";
+
+			ScrollWebElementIntoView(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			WaitForSPARefresh();
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+			SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			if (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY_SELECTED")) {
+				Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY_OTHER");
+			}
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ENTRY");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "DocumentsAndMediaCreate#SELECT_CATEGORY_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_EXACT")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_EXACT");
+		}
+	}
+
+	macro selectViaApproximateSelectField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Select(
+			locator1 = "DocumentsAndMediaCreate#SELECT_FIELD_APPROXIMATE",
+			value1 = "${value}");
+	}
+
+	macro selectViaExactSelectField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Select(
+			locator1 = "DocumentsAndMediaCreate#SELECT_FIELD_EXACT",
+			value1 = "${value}");
+	}
+
+	macro typeViaApproximateBottomPanelInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_INPUT_FIELD_APPROXIMATE",
+			value1 = "${value}");
+	}
+
+	macro typeViaApproximateInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE",
+			value1 = "${value}");
+	}
+
+	macro typeViaApproximateTextareaField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_APPROXIMATE")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_APPROXIMATE",
+			value1 = "${value}");
+	}
+
+	macro typeViaExactBottomPanelInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#BOTTOM_PANEL_INPUT_FIELD_EXACT",
+			value1 = "${value}");
+	}
+
+	macro typeViaExactInputField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT",
+			value1 = "${value}");
+	}
+
+	macro typeViaExactTextareaField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_EXACT")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type(
+			locator1 = "DocumentsAndMediaCreate#TEXTAREA_FIELD_EXACT",
+			value1 = "${value}");
+	}
+
+	macro uploadFileViaApproximateField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_APPROXIMATE")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Click(locator1 = "DocumentsAndMediaCreate#SELECT_BUTTON_APPROXIMATE");
+
+		SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
+
+				WaitForSPARefresh();
+			}
+		}
+		else {
+			UploadCommonFile(
+				locator1 = "DocumentsAndMediaCreate#SELECT_FILE_FIELD",
+				value1 = "${value}");
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON")) {
+			SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_PREVIEW_FOOTER_RIGHT_BUTTON");
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_PREVIEW_FOOTER_LEFT_BUTTON");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+	}
+
+	macro uploadFileViaExactField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "DocumentsAndMediaCreate#INPUT_FIELD_EXACT")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "DocumentsAndMediaCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Click(locator1 = "DocumentsAndMediaCreate#SELECT_BUTTON_EXACT");
+
+		SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_IFRAME");
+
+		if (contains("${value}", ",")) {
+			for (var individualValue : list "${value}") {
+				var key_entryTitle = "${individualValue}";
+
+				ScrollWebElementIntoView(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
+
+				Click(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
+
+				WaitForSPARefresh();
+			}
+		}
+		else {
+			UploadCommonFile(
+				locator1 = "DocumentsAndMediaCreate#SELECT_FILE_FIELD",
+				value1 = "${value}");
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+
+		while (IsElementPresent(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON")) {
+			SelectFrame(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_IFRAME");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_PREVIEW_FOOTER_RIGHT_BUTTON");
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_PREVIEW_FOOTER_LEFT_BUTTON");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+		}
+
+		AssertElementNotPresent(locator1 = "DocumentsAndMediaCreate#SELECT_FILE_ADD_BUTTON");
+	}
+}
