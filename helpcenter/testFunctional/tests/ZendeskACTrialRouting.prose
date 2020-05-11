@@ -1,0 +1,30 @@
+@testray.main.component.name = "Support QA"
+@type = "zendesk.api"
+
+Feature: AC Trial Routing
+	Testing the routing of AC Trial Tickets
+
+Teardown:
+	* I wait for "10" seconds
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I teardown users with the following userExternalIds from zendesk.liferay.com
+	| User1 |
+
+Scenario: AC Trial Routing
+	End users who create requests for the AC Trial organization should have their requests routed to the AC Trial group.
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                |
+	| Organization     | AC Trial                         |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       |
+	| External ID      | User1                            |
+	When I create several requests as a user with the email address "zendesk.user1@zendesk.com.broken" with the following product and component values
+	| prd_liferay_analytics_cloud | |
+	Then the tickets with ticketIds "${staticRequestIdList}" should be assigned to the group "Analytics Cloud"
