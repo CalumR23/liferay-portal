@@ -1,0 +1,40 @@
+@testray.main.component.name = "Support QA"
+@type = "zendesk.api"
+
+Feature: FLS JIRA Routing
+	Testing the routing of specific tickets from FLS organizations to JIRA. This test will use an existing account a
+
+Teardown:
+	* I wait for "10" seconds
+	* I teardown the tickets with ticketIds "${staticRequestIdList}" from zendesk.liferay.com
+	* I teardown users with the following userExternalIds from zendesk.liferay.com
+	| User1 |
+
+Scenario: FLS JIRA Routing
+	End users who create requests for a partner organization integrated into JIRA should have the requests with the jira_escalated tag included
+
+	Given I create a user with the following values
+	| Name             | Zendesk User1                    |
+	| Tags             | osb_customer,osb_kb              |
+	| Password         | zendeskqauser                    |
+	| Role             | End-user                         |
+	| Access           | Organization                     |
+	| Email            | zendesk.user1@zendesk.com.broken |
+	| Phone Number     | +1 (555) 555-5555                |
+	| Organization     | Cignex - SP                      |
+	| Language         | English                          |
+	| Time Zone        | Pacific Time (US & Canada)       | 
+	| External ID      | User1                            |
+	And I create several requests as a user with the email address "zendesk.user1@zendesk.com.broken" with the following product and component values
+	| prd_developer_tools         |                                        |
+	| prd_enterprise_search       | security                               |
+	| prd_liferay_commerce_2_1    | configuration_and_settings             |
+	| prd_liferay_dxp_7_2         | apio_architect                         |
+	| prd_liferay_portal_6_2      | authentication                         |
+	| prd_management_tools_lcs    |                                        |
+	| prd_mobile_device_detection |                                        |
+	| prd_mobile_experience       |                                        |
+	| prd_productivity_tools_sync |                                        |
+	| prd_social_office           |                                        |
+	And I wait for "5" minutes
+	Then the tickets with the ticketIds "${staticRequestIdList}" should contain the tag "jira_escalated"
