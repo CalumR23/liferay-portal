@@ -907,6 +907,132 @@ Scenario: Create project for Hungary Support Region and view emails
 	| Tickets          | Unlimited                     |
 	And the user with the email address "amos.fong@liferay.com.broken" should be a worker on the project with the name "Provis - ${staticProjectName}"
 
+Scenario: Create project for Hungary Support Region Sold By Italy and view emails
+	Testing the ability to create a project for the Hungary support region sold by Italy using RabbitMQ auto provisioning
+
+	Given I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	And I go to the RabbitMQ section of OSB Admin
+	And I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a DXP project RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Provis - ${staticCompanyName}              |
+	| Address City                           | Rome                                       |
+	| Address Country                        | Italy                                      |
+	| Address Postal Code                    | 00144                                      |
+	| Address Street                         | Viale Europa 22                            |
+	| Contact Email Address                  | amos.fong@liferay.com.broken               |
+	| Contact First Name                     | Amos                                       |
+	| Contact Last Name                      | Fong                                       |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Engineering                                |
+	| Owner Email Address                    | amos.fong@liferay.com.broken               |
+	| Owner First Name                       | Amos                                       |
+	| Owner Last Name                        | Fong                                       |
+	| Partner First Line Support             | false                                      |
+	| Partner Dossiera Key                   | abcdefgh1234567890                         |
+	| Partner Name                           | Zen OSB Partner                            |
+	| Partner Support Level                  | Platinum                                   |
+	| Product Type                           | New                                        |
+	| Project Name                           | Provis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay Italy                              |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | Italy                                      |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Support Level                          | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I go the support email message in MockMock where the sender is "Liferay Support" the recipient is "Edina Papp" with the email address "edina.papp@liferay.com.broken" and the message content contains the text "New Business Closed Won for Hungary Region - PROVISPROVIS - Provis - ${staticProjectName}"
+	Then I should be able to view the email message containing the following text 
+	| Hi Reviewer                                                   |
+	| A New Business task has been created in OSB for you to review |
+	| It is based on the following Salesforce opportunity           |
+	| ${staticSalesforceOpportunityKey}                             |
+	| Sincerely                                                     |
+	| Liferay Support                                               |
+	When I go to My Workflow Tasks
+	And I go to the Other Assignees tab
+	And I search for and go to the Workflow Asset titled "Provis - ${staticProjectName}" using the following parameters
+	| Match            | All                           |
+	| Project Name     | Provis - ${staticProjectName} |
+	| Assignee Type    | Role                          |
+	| Completed        | No                            |
+	| Opportunity Type | New Business                  |
+	Then the workflow asset title should have the value "Provis - ${staticProjectName}"
+	And the workflow asset header should have the value "New Business"
+	And I should be able to view the project summary with the following values
+	| Opportunity Stage          | Closed Won                                                    |
+	| Code                       | PROVISPROVIS                                                  |
+	| Industry                   | Engineering                                                   |
+	| Partner                    | Zen OSB Partner                                               |
+	| Partner First Line Support | False                                                         |
+	| Support Regions            | Hungary                                                       |
+	| Support Languages          | English                                                       |
+	| Start Date                 | ${staticStartMonthName} ${staticStartDay}, ${staticStartYear} |
+	And I should be able to view the offering details with the product "Digital Enterprise Production" with the following values
+	| Product          | Digital Enterprise Production                           |
+	| Licenses         | True                                                    |
+	| License Lifetime | Indefinite                                              |
+	| Support Tickets  | True                                                    |
+	| SLA              | Platinum                                                |
+	| Version          | 7                                                       |
+	| Sizing           | Sizing 1                                                |
+	| Quantity         | 1                                                       |
+	When I assign the Workflow asset titled "Provis - ${staticProjectName}" to myself
+	And I go to My Workflow Tasks
+	And I go to the Other Assignees tab
+	And I search for and go to the Workflow Asset titled "Provis - ${staticProjectName}" using the following parameters
+	| Match            | All                           |
+	| Project Name     | Provis - ${staticProjectName} |
+	| Assignee Type    | User                          |
+	| Completed        | No                            |
+	| Opportunity Type | New Business                  |
+	And I approve the Workflow asset titled "Provis - ${staticProjectName}"
+	And I go to the OSB admin main page
+	Then I should be able to view a project with the name "Provis - ${staticProjectName}" and following values
+	| Status                     | Approved                      |
+	| Dossiera Account Key       | ${staticDossieraAccountKey}   |
+	| Dossiera Account Name      | Provis - ${staticCompanyName} |
+	| Name                       | Provis - ${staticProjectName} |
+	| Code                       | PROVISPROVIS                  |
+	| Type                       | Group                         |
+	| Industry                   | Engineering                   |
+	| Partner Code               | Zen OSB Partner               |
+	| Partner First Line Support | false                         |
+	| Tier                       | Regular                       |
+	| Max Contacts               | 10                            |
+	| Address Line               | Viale Europa 22               |
+	| Country                    | Italy                         |
+	| City                       | Rome                          |
+	| Zip                        | 00144                         |
+	And I should be able to view a project offering for the project "Provis - ${staticProjectName}" with a product name "Digital Enterprise Production" and the following values
+	| Status           | Active                        |
+	| Type             | Regular                       |
+	| Product          | Digital Enterprise Production |
+	| SLA              | Platinum                      |
+	| Start Date       | Today                         |
+	| Version          | 7                             |
+	| Instance Size    | Sizing 1                      |
+	| Licenses         | 0 / 1                         |
+	| Tickets          | Unlimited                     |
+	And the user with the email address "amos.fong@liferay.com.broken" should be a worker on the project with the name "Provis - ${staticProjectName}"
+
 Scenario: Create project for Spain Support Region and view emails
 	Testing the ability to create a project for the Spain support region using RabbitMQ auto provisioning
 
