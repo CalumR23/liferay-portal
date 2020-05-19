@@ -1638,6 +1638,23 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete an external link with the entity id ${entityId} and domain ${domain} on the account ${accountName}"
+	macro _deleteAccountExternalLinkViaIdAndDomain {
+		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKeyViaIdAndDomain(
+			accountName = "${accountName}",
+			domain = "${domain}",
+			entityId = "${entityId}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I delete an account on koroneiki with the ${fieldName} ${fieldValue}"
 	macro _deleteAccountViaAccountFieldNameAndValue {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountFieldNameAndValue(
@@ -1794,6 +1811,29 @@ definition {
 		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
 
 		echo("External link key value for ${entityId} on account ${accountName}: ${externalLinkKey}");
+
+		return "${externalLinkKey}";
+	}
+
+	macro _getAccountExternalLinkKeyViaIdAndDomain {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].key");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "[", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
+
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
+
+		echo("External link key value for ${entityId} and domain ${domain} on account ${accountName}: ${externalLinkKey}");
 
 		return "${externalLinkKey}";
 	}
@@ -2679,6 +2719,54 @@ definition {
 						entityId = "${entityId}");
 
 					echo("Entity ID of external link for ${accountName} deleted: ${entityId}");
+				}
+			}
+		}
+	}
+
+	@prose = "I tear down the external links for the account ${accountName} on koroneiki with the following entity id and domain values ${table}"
+	macro _tearDownAccountExternalLinksViaIdAndDomain {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entityId = "${row[0]}";
+			var domain = "${row[1]}";
+
+			if (contains("${accountName}", " ")) {
+				var keyword = StringUtil.extractFirst("${accountName}", " ");
+			}
+			else {
+				var keyword = "${accountName}";
+			}
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?search=${keyword}\&pageSize=100
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${allAccounts}", "${accountName}")) {
+				var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allAccountExternalLinks = JSONCurlUtil.get("${curl}", "$");
+
+				if ((contains("${allAccountExternalLinks}", "${entityId}")) && (contains("${allAccountExternalLinks}", "${domain}"))) {
+					KoroneikiAccountAPI._deleteAccountExternalLinkViaIdAndDomain(
+						accountName = "${accountName}",
+						domain = "${domain}",
+						entityId = "${entityId}");
+
+					echo("Entity ID and domain of external link for ${accountName} deleted: ${entityId} and ${domain}");
 				}
 			}
 		}
@@ -4751,6 +4839,74 @@ definition {
 		}
 	}
 
+	@prose = "the external link with the entity id ${entityId} and domain ${domain} should be present on the account ${accountName} with the following values ${table}"
+	macro _viewAccountExternalLinkViaIdAndDomain {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Domain") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].domain");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Id") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].entityId");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "Entity Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].entityName");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "URL") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].url");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\/", "/");
+			}
+			else {
+				fail("No such external link field ${field}");
+			}
+
+			echo("Expected ${field} Value: ${value}");
+			echo("Actual ${field} Value: ${valueFromAPI}");
+
+			if (!(contains("${value}", "${valueFromAPI}"))) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
 	@prose = "the team with the name ${teamName} should be part of the account ${accountName}"
 	macro _viewAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -5701,16 +5857,29 @@ definition {
 
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 
-		var curl = '''
+		var curl1 = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchase-views?search=${accountKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var curl2 = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product/${productKey}/product-purchase-view
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
-		var specificProductPurchases = JSONCurlUtil.get("${curl}", "$");
+		var specificProductPurchases1 = JSONCurlUtil.get("${curl1}", "$");
 
-		if (contains("${specificProductPurchases}", "productConsumptions")) {
+		if (contains("${specificProductPurchases1}", "productConsumptions")) {
+			fail("The product with the name ${productName} has a consumption still present in on the koroneiki account based on the products API");
+		}
+
+		var specificProductPurchases1 = JSONCurlUtil.get("${curl2}", "$");
+
+		if (contains("${specificProductPurchases2}", "productConsumptions")) {
 			fail("The product with the name ${productName} has a consumption still present in on the koroneiki account based on the specific products API");
 		}
 	}
