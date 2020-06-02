@@ -3,6 +3,67 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "I create several AC trial requests as a user with the email address ${requesterEmail} with the following product and component values ${table}"
+	macro _createMultipleACTrialRequestsWithProductAndComponentValues {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+			var component = "${row[1]}";
+
+			if (!(isSet(component))) {
+				var component = "";
+			}
+
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/requests.json
+				-u ${requesterEmail}/token:${apiToken}
+				-H "Content-Type: application/json"
+				-d
+				{
+					"request":
+					{
+						"recipient": "provisioning-help@liferaysupport1528999723.zendesk.com",
+						"subject": "Subject",
+						"comment":
+						{
+							"body": "Description"
+						},
+						"custom_fields":
+						[
+							{
+								"id": "360006041192",
+								"value": "${product}"
+							},
+							{
+								"id": "360011314571",
+								"value": "${component}"
+							},
+							{
+								"id": "360009385592",
+								"value": "production_functioning_with_limited_capabilities"
+							}
+						]
+					}
+				}
+				''';
+
+			static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
+
+			echo("Request ID: ${requestId}");
+
+			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+				static var staticRequestIdList = "${requestId}";
+			}
+			else {
+				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+			}
+			echo("Request ID List: ${staticRequestIdList}");
+		}
+
+		return "${staticRequestIdList}";
+	}
+
 	@prose = "I create several requests as a user with the email address ${requesterEmail} with the following product and component values ${table}"
 	macro _createMultipleRequestsWithProductAndComponentValues {
 		var RawTable rawTable = new RawTable("${table}");
