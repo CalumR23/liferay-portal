@@ -156,6 +156,20 @@ definition {
 		Click(locator1 = "ProvisioningAccount#PRODUCT_TAB");
 	}
 
+	@prose = "I click on the related account with the name ${accountName}"
+	macro clickRelatedAccount {
+		var key_accountName = "${accountName}";
+
+		Click(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_NAME");
+	}
+
+	@prose = "I click on the ${tabName} related account tab"
+	macro clickRelatedAccountTab {
+		var key_tabName = "${tabName}";
+
+		Click(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TAB");
+	}
+
 	@prose = "I click on the ${action} button in the dropdown menu for the sales info note with the content ${salesInfoContent}"
 	macro clickSalesInfoActionDropdownButton {
 		var key_salesInfoContent = "${salesInfoContent}";
@@ -187,6 +201,8 @@ definition {
 	@prose = "I click on the ${tabName} tab"
 	macro clickTab {
 		var key_tabName = StringUtil.lowerCase("${tabName}");
+
+		var key_tabName = StringUtil.replace("${key_tabName}", " ", "-");
 
 		Click(locator1 = "ProvisioningAccount#TAB");
 	}
@@ -452,6 +468,17 @@ definition {
 
 		KeyPress(
 			locator1 = "ProvisioningAccount#SEARCH_FIELD",
+			value1 = "\RETURN");
+	}
+
+	@prose = "I search related accounts using the keyword ${keyword}"
+	macro searchRelatedAccounts {
+		Type(
+			locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SEARCH_FIELD",
+			value1 = "${keyword}");
+
+		KeyPress(
+			locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SEARCH_FIELD",
 			value1 = "\RETURN");
 	}
 
@@ -1004,6 +1031,64 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the related account with the name ${accountName} and the following values on the account details page ${table}"
+	macro _viewAccountRelatedAccount {
+		var key_accountName = "${accountName}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Code") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_CODE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support End Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SUPPORT_END_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Partner") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_PARTNER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Region") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_REGION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "SLA") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SLA",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Tier") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TIER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account related account field ${field}");
+			}
+		}
+	}
+
 	@prose = "I should be able to view the sales info note with the content ${salesInfoContent} and the following values ${table}"
 	macro _viewAccountSalesInfo {
 		var key_salesInfoContent = "${salesInfoContent}";
@@ -1182,6 +1267,13 @@ definition {
 		var key_productName = "${productName}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
+	}
+
+	@prose = "I should not be able to view the related account with the name ${accountName} on the account details page"
+	macro _viewNoAccountRelatedAccount {
+		var key_accountName = "${accountName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
 	}
 
 	@prose = "I should not be able to view the sales info note with the content ${salesInfoContent}"
