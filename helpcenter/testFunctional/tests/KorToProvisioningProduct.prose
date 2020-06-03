@@ -1,0 +1,264 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.integration"
+
+Feature:  Koroneiki to Provisioning Product Integration
+	Testing to assure that koroneiki product information transfers properly to the product index page.
+
+Teardown:
+	* I wait for "10" seconds
+	* I tear down the teams on koroneiki with the following names
+	| Koroneiki Partner |
+	* I tear down the team roles on koroneiki with the following names
+	| Partner |
+	* I tear down the external links for the product "A Liferay DXP Product" on koroneiki with the following entity id values
+	| A Liferay DXP Product |
+	* I tear down the external links for the product "A Liferay Portal Product" on koroneiki with the following entity id values
+	| A Liferay Portal Product |
+	* I tear down the external links for the product "Platinum Subscription" on koroneiki with the following entity id values
+	| Platinum Subscription |
+	* I tear down the external links for the product "Gold Subscription" on koroneiki with the following entity id values
+	| Gold Subscription |
+	* I tear down the external links for the account "Korpro - ${staticCompanyName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey}   | salesforce |
+	| ${staticDossieraAccountKey}   | dossiera   |
+	| ${staticSalesforceProjectKey} | salesforce |
+	* I tear down the product purchases on koroneiki made by the account "Korpro - ${staticCompanyName}" for the following products
+	| A Liferay DXP Product    |
+	| A Liferay Portal Product |
+	| Platinum Subscription    |
+	| Gold Subscription        |
+	* I tear down the products on koroneiki with the following names
+	| A Liferay DXP Product    |
+	| A Liferay Portal Product |
+	| Platinum Subscription    |
+	| Gold Subscription        |
+	* I tear down the contact roles on koroneiki with the following names
+	| Liferay Account Customer Role |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| pro.koroneiki1@lrcustomer.com.broken |
+	* I tear down the accounts on koroneiki with the following names
+	| Korpro - ${staticCompanyName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| KORPROKORPRO |
+
+Scenario: View products
+	Testing the ability to create a regular project in Dossiera and viewing products in the provisioning product index 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product index page
+	And I search the products page using the keyword "A"
+	Then I should be able to view a product on the provisioning index with the name "A Liferay DXP Product" and the following values
+	| Name | A Liferay DXP Product |
+	When I search the products page using the keyword "Platinum"
+	Then I should be able to view a product on the provisioning index with the name "Platinum Subscription" and the following values
+	| Name | Platinum Subscription |
+
+Scenario: View updated products
+	Testing the ability to create a regular project in Dossiera and viewing updated products in the provisioning product index 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I update a product with the name "A Liferay DXP Product" to have the following values
+	| Name | A Liferay Portal Product | |
+	And I update a product with the name "Platinum Subscription" to have the following values
+	| Name | Gold Subscription | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product index page
+	And I search the products page using the keyword "A"
+	Then I should be able to view a product on the provisioning index with the name "A Liferay Portal Product" and the following values
+	| Name | A Liferay Portal Product |
+	And I should not be able to view a product on the provisioning index with the name "A Liferay DXP Product"
+	When I search the products page using the keyword "Gold"
+	Then I should be able to view a product on the provisioning index with the name "Gold Subscription" and the following values
+	| Name | Gold Subscription |
+	When I search the products page using the keyword "Platinum"
+	And I should not be able to view a product on the provisioning index with the name "Platinum Subscription"
+
+Scenario: View deleted products
+	Testing the ability to create a regular project in Dossiera and viewing deleted products in the provisioning product index 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I delete a product purchase on koroneiki made by the account "Korpro - ${staticCompanyName}" for the product "A Liferay DXP Product"
+	And I delete a product purchase on koroneiki made by the account "Korpro - ${staticCompanyName}" for the product "Platinum Subscription"
+	And I delete a koroneiki product with the name "A Liferay DXP Product"
+	And I delete a koroneiki product with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product index page
+	And I search the products page using the keyword "A"
+	Then I should not be able to view a product on the provisioning index with the name "A Liferay DXP Product"
+	When I search the products page using the keyword "Platinum"
+	Then I should not be able to view a product on the provisioning index with the name "Platinum Subscription"
