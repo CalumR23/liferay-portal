@@ -116,6 +116,20 @@ definition {
 		Click(locator1 = "ProvisioningAccount#SALES_INFO_DROPDOWN_ACTION_BUTTON");
 	}
 
+	@prose = "I click on the assign contact button"
+	macro clickAssignContactButton {
+		Click(locator1 = "ProvisioningAccount#ASSIGN_CONTACT_BUTTON");
+
+		AssertVisible(locator1 = "ProvisioningAccountAssignContact#EMAIL_ADDRESS_FIELD");
+	}
+
+	@prose = "I click on the assign worker button"
+	macro clickAssignWorkerButton {
+		Click(locator1 = "ProvisioningAccount#ASSIGN_WORKER_BUTTON");
+
+		AssertVisible(locator1 = "ProvisioningAccountAssignWorker#EMAIL_ADDRESS_FIELD");
+	}
+
 	@prose = "I click on the back button in the archived notes section"
 	macro clickBackButtonViaArchivedNotes {
 		Click(locator1 = "ProvisioningAccount#ARCHIVED_NOTES_BACK_BUTTON");
@@ -124,6 +138,17 @@ definition {
 	@prose = "I click on the back button in the archived sales info section"
 	macro clickBackButtonViaArchivedSalesInfo {
 		Click(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_BACK_BUTTON");
+	}
+
+	@prose = "I click on the ${action} button in the dropdown menu for the contact with the email address ${emailAddress}"
+	macro clickContactActionDropdownButton {
+		var key_contactEmailAddress = "${emailAddress}";
+
+		Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#CONTACT_ACTION_BUTTON");
+
+		var key_action = "${action}";
+
+		Click(locator1 = "ProvisioningAccount#CONTACT_DROPDOWN_ACTION_BUTTON");
 	}
 
 	@prose = "I click on the new team button"
@@ -238,6 +263,17 @@ definition {
 	@prose = "I click on the view archived sales info link"
 	macro clickViewArchivedSalesInfoLink {
 		Click(locator1 = "ProvisioningAccount#VIEW_ARCHIVED_SALES_INFO_LINK");
+	}
+
+	@prose = "I click on the ${action} button in the dropdown menu for the worker with the email address ${emailAddress}"
+	macro clickWorkerActionDropdownButton {
+		var key_workerEmailAddress = "${emailAddress}";
+
+		Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#WORKER_ACTION_BUTTON");
+
+		var key_action = "${action}";
+
+		Click(locator1 = "ProvisioningAccount#WORKER_DROPDOWN_ACTION_BUTTON");
 	}
 
 	@prose = "I collapse the side panel on the account details page"
@@ -467,6 +503,84 @@ definition {
 		Click(locator1 = "ProvisioningAccount#FILTER_BY_LINK");
 	}
 
+	@prose = "I populate and save the assign contact form with the following values ${table}"
+	macro populateAssignContactFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignContact#SELECT_LINK");
+
+				Check(locator1 = "ProvisioningAccountAssignContact#ROLE_CHECKBOX");
+
+				Click(locator1 = "ProvisioningAccountAssignContact#SELECT_LINK");
+			}
+			else if ("${field}" == "Unassign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignContact#SELECT_LINK");
+
+				Uncheck(locator1 = "ProvisioningAccountAssignContact#ROLE_CHECKBOX");
+
+				Click(locator1 = "ProvisioningAccountAssignContact#SELECT_LINK");
+			}
+			else {
+				fail("No such contact field ${field}. Please set the field value to Email Address, Assign Role, or Unassign Role.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON");
+	}
+
+	@prose = "I populate and save the assign worker form with the following values ${table}"
+	macro populateAssignWorkerFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				Type(
+					locator1 = "ProvisioningAccountAssignWorker#EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#SELECT_LINK");
+
+				Check(locator1 = "ProvisioningAccountAssignWorker#ROLE_CHECKBOX");
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#SELECT_LINK");
+			}
+			else if ("${field}" == "Unassign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#SELECT_LINK");
+
+				Uncheck(locator1 = "ProvisioningAccountAssignWorker#ROLE_CHECKBOX");
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#SELECT_LINK");
+			}
+			else {
+				fail("No such worker field ${field}. Please set the field value to Email Address, Assign Role, or Unassign Role.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningAccountAssignWorker#SAVE_BUTTON");
+	}
+
 	@prose = "I search the accounts details page using the keyword ${keyword}"
 	macro search {
 		Type(
@@ -518,6 +632,42 @@ definition {
 		KeyPress(
 			locator1 = "ProvisioningAccount#PRODUCT_SEARCH_FIELD",
 			value1 = "\RETURN");
+	}
+
+	@prose = "I should be able to view the contact with the email address ${emailAddress} and the following values ${table}"
+	macro _viewAccountContact {
+		var key_contactEmailAddress = "${emailAddress}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_ROLE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "User Status") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
 	}
 
 	@prose = "I should be able to view the following account values in the account details page ${table}"
@@ -1220,6 +1370,49 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the worker with the email address ${emailAddress} and the following values ${table}"
+	macro _viewAccountWorker {
+		var key_workerEmailAddress = "${emailAddress}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_ROLE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "User Status") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such worker field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the contact with the email address ${emailAddress}"
+	macro _viewNoAccountContact {
+		var key_contactEmailAddress = "${emailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#CONTACT_ROW");
+	}
+
 	@prose = "I should not be able to view the account external link ${externalLink}"
 	macro _viewNoAccountExternalLink {
 		var key_externalLink = "${externalLink}";
@@ -1350,6 +1543,13 @@ definition {
 		var key_teamName = "${teamName}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#TEAM_ROW");		
+	}
+
+	@prose = "I should not be able to view the worker with the email address ${emailAddress}"
+	macro _viewNoAccountWorker {
+		var key_workerEmailAddress = "${emailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#WORKER_ROW");
 	}
 
 	@prose = "I should not be able to view the view archived notes link"
