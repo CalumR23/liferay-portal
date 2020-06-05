@@ -458,6 +458,15 @@ definition {
 		}
 	}
 
+	@prose = "I filter the accounts details page using the filter ${filter}"
+	macro filter {
+		var key_filter = "${filter}";
+
+		Click(locator1 = "ProvisioningAccount#FILTER_AND_ORDER_FIELD");
+
+		Click(locator1 = "ProvisioningAccount#FILTER_BY_LINK");
+	}
+
 	@prose = "I search the accounts details page using the keyword ${keyword}"
 	macro search {
 		Type(
@@ -467,6 +476,26 @@ definition {
 		KeyPress(
 			locator1 = "ProvisioningAccount#SEARCH_FIELD",
 			value1 = "\RETURN");
+	}
+
+	@prose = "I search and filter the accounts details page using the following parameters ${table}"
+	macro searchAndFilter {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Keyword") {
+				ProvisioningAccount.search(keyword = "${value}");
+			}
+			else if ("${field}" == "Filter") {
+				ProvisioningAccount.filter(filter = "${value}");
+			}
+			else {
+				fail("No such search field ${field}. Please set the field value to Keyword or Filter.");
+			}
+		}
 	}
 
 	@prose = "I search related accounts using the keyword ${keyword}"
