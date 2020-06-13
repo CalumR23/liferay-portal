@@ -33,6 +33,13 @@ definition {
 		Confirm(value1 = "Are you sure you want to delete this product?");
 	}
 
+	@prose = "I click on the user with the name ${userName} on the provisioning index"
+	macro clickUser {
+		var key_userName = "${userName}";
+
+		Click(locator1 = "Provisioning#USER_NAME");	
+	}
+
 	@prose = "I go to the account index page"
 	macro gotoAccounts {
 		Open(locator1 = "${provisioningURL}/group/guest/~/control_panel/manage?p_p_id=com_liferay_osb_provisioning_web_portlet_AccountsPortlet&p_p_lifecycle=0&p_p_state=maximized&p_v_l_s_g_id=20124");
@@ -41,6 +48,11 @@ definition {
 	@prose = "I go to the product index page"
 	macro gotoProducts {
 		Open(locator1 = "${provisioningURL}/group/guest/~/control_panel/manage?p_p_id=com_liferay_osb_provisioning_web_portlet_ProductsPortlet&p_p_lifecycle=0&p_p_state=maximized&p_v_l_s_g_id=20124");
+	}
+
+	@prose = "I go to the user index page"
+	macro gotoUsers {
+		Open(locator1 = "${provisioningURL}/group/guest/~/control_panel/manage?p_p_id=com_liferay_osb_provisioning_web_portlet_UsersPortlet&p_p_lifecycle=0&p_p_state=maximized&p_v_l_s_g_id=20124");
 	}
 
 	@prose = "I search the accounts page using the keyword ${keyword}"
@@ -77,6 +89,13 @@ definition {
 		var key_productName = "${productName}";
 
 		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_ROW");		
+	}
+
+	@prose = "I should not be able to view a user on the provisioning index with the name ${userName}"
+	macro _viewNoUserViaIndex {
+		var key_userName = "${userName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#USER_ROW");		
 	}
 
 	@prose = "I should be able to view an account on the provisioning index with the name ${accountName} and the following values ${table}"
@@ -157,6 +176,47 @@ definition {
 			}
 			else {
 				fail("No such product field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a user on the provisioning index with the name ${userName} and the following values ${table}"
+	macro _viewUserViaIndex {
+		var key_userName = "${userName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#USER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Entitlements") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_ENTITLEMENTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Number of Accounts") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_NUMBER_OF_ACCOUNTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such user field ${field}");
 			}
 		}
 	}
