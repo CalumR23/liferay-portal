@@ -90,6 +90,53 @@ definition {
 		Message.success();
 	}
 
+	@prose = "I add a Source Code Access user with the following values ${table}"
+	macro addSourceCodeAccessUser {
+		Click(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_ADD_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				Type(
+					locator1 = "ProjectDetailsSourceCodeAccessForm#NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				Type(
+					locator1 = "ProjectDetailsSourceCodeAccessForm#EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "GitHub Username") {
+				Type(
+					locator1 = "ProjectDetailsSourceCodeAccessForm#GITHUB_USERNAME_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Source Code Access user field ${field}");
+			}
+		}
+
+		Button.save();
+
+		AssertTextEquals(
+			locator1 = "ProjectDetailsSourceCodeAccessForm#SUCCESS_MESSAGE_TITLE",
+			value1 = "Success! Your request submitted successfully.");
+
+		AssertTextEquals(
+			locator1 = "ProjectDetailsSourceCodeAccessForm#SUCCESS_MESSAGE_BODY",
+			value1 = "You will receive an email invitation from GitHub to collaborate on the liferaydxp/repository. Accept the invitation to gain access.");	
+
+		AssertTextEquals(
+			locator1 = "ProjectDetailsSourceCodeAccessForm#SUCCESS_MESSAGE_GITHUB_LINK",
+			value1 = "GitHub");
+
+		Click(locator1 = "ProjectDetailsSourceCodeAccessForm#CLOSE_BUTTON");
+	}
+
 	@prose = "I add support instructions with the content ${supportInstructionsContent}"
 	macro addSupportInstructions {
 		Click(locator1 = "ProjectDetailsProject#ADD_SUPPORT_INSTRUCTIONS_BUTTON");
@@ -118,6 +165,19 @@ definition {
 		}
 
 		Click(locator1 = "ProjectDetailsProject#ENVIRONMENT_DELETE_BUTTON");
+
+		Confirm(value1 = "Are you sure you want to delete this?");
+
+		Message.success();
+	}
+
+	@prose = "I delete the Source Code Access user with the email address ${userEmailAddress}"
+	macro deleteSourceCodeAccessUser {
+		var key_userEmailAddress = "${userEmailAddress}";
+
+		ProjectDetails.expandSourceCodeAccessUserPanel(userEmailAddress = "${userEmailAddress}");
+
+		Click(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_DETAILS_DELETE_BUTTON");
 
 		Confirm(value1 = "Are you sure you want to delete this?");
 
@@ -236,6 +296,17 @@ definition {
 		Button.save();
 
 		Message.success();
+	}
+
+	@prose = "I expand the Source Code Access user panel for the user with the email address ${userEmailAddress}"
+	macro expandSourceCodeAccessUserPanel {
+		var key_userEmailAddress = "${userEmailAddress}";
+
+		if (IsElementNotPresent(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL_EXPANDED")) {
+			Click(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL");
+
+			AssertElementPresent(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL_EXPANDED");
+		}
 	}
 
 	@prose = "I go to the History tab"
@@ -940,6 +1011,20 @@ definition {
 			value1 = "${projectName}");
 	}
 
+	@prose = "the Source Code Access user with the email address ${userEmailAddress} should not be visible"
+	macro viewNoSourceCodeAccessUser {
+		var key_userEmailAddress = "${userEmailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL");
+	}
+
+	@prose = "there should be no Source Code Access users visible"
+	macro viewNoSourceCodeAccessUsers {
+		AssertTextEquals(
+			locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_NO_RESULTS_MESSAGE",
+			value1 = "No Collaborator Details");
+	}
+
 	@prose = "the team member with the name ${teamMemberName} should not be visible"
 	macro viewNoTeamMember {
 		var key_teamMemberName = "${teamMemberName}";
@@ -1113,6 +1198,70 @@ definition {
 		AssertTextEquals(
 			locator1 = "ProjectDetails#PROJECT_STATUS",
 			value1 = "${projectStatus}");
+	}
+
+	@prose = "the Source Code Access user details for a user with the email address ${userEmailAddress} should be visible with the following values ${table}"
+	macro viewSourceCodeAccessUserDetails {
+		var key_userEmailAddress = "${userEmailAddress}";
+
+		ProjectDetails.expandSourceCodeAccessUserPanel(userEmailAddress = "${userEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_DETAILS_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "GitHub Username") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_DETAILS_GITHUB_USERNAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_DETAILS_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Source Code Access user field ${field}");
+			}
+		}
+	}
+
+	@prose = "the Source Code Access user panel for a user with the email address ${userEmailAddress} should be visible with the following values ${table}"
+	macro viewSourceCodeAccessUserPanel {
+		var key_userEmailAddress = "${userEmailAddress}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "GitHub Username") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL_GITHUB_USERNAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals(
+					locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_PANEL_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such Source Code Access user field ${field}");
+			}
+		}
 	}
 
 	@prose = "the support instructions with the content ${supportInstructionsContent} should be visible"
