@@ -1,0 +1,244 @@
+definition {
+	var popupTitle = PropsUtil.get("osb.admin.popup.title");
+	var supportURL = PropsUtil.get("support.liferay.sandbox.2.url");
+
+	@prose = "I add a product on the sandbox 2 with the following values ${table}"
+	macro addProduct {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		Click(locator1 = "OSBAdminSalesProducts#ADD_PRODUCT_BUTTON");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value}");
+
+				Type(
+					locator1 = "OSBAdminSalesProductsAdd#KORONEIKI_PRODUCT_KEY_FIELD",
+					value1 = "${productKey}");
+			}
+			else if ("${field}" == "Koroneiki Product Key") {
+				Type(
+					locator1 = "OSBAdminSalesProductsAdd#KORONEIKI_PRODUCT_KEY_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Environment") {
+				Select(
+					locator1 = "OSBAdminSalesProductsAdd#ENVIRONMENT_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version List Type") {
+				Type(
+					locator1 = "OSBAdminSalesProductsAdd#VERSION_LIST_TYPE_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I delete a product on the sandbox 2 with the name ${productName}"
+	macro deleteProduct {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		Click(locator1 = "OSBAdminSalesProducts#PRODUCT_ACTIONS_MENU");
+		ClickNoError(locator1 = "OSBAdminSalesProducts#DELETE_MENU_ITEM");
+
+		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+		Message.success();
+	}
+
+	@prose = "I attempt to delete a product linked to Koroneiki on the sandbox 2 with the name ${productName}"
+	macro deleteProductLinkedToKoroneikiAttempt {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		Click(locator1 = "OSBAdminSalesProducts#PRODUCT_ACTIONS_MENU");
+		ClickNoError(locator1 = "OSBAdminSalesProducts#DELETE_MENU_ITEM");
+
+		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+		Message.error(errorMessage = "You cannot remove products that are linked to Koroneiki products.");
+	}
+
+	@prose = "I tear down the following products on the sandbox 2 ${table}"
+	macro tearDownProducts {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var productName = "${row[0]}";
+
+			var key_productName = "${productName}";
+
+			if (IsElementPresent(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME")) {
+				Click(locator1 = "OSBAdminSalesProducts#PRODUCT_ACTIONS_MENU");
+				ClickNoError(locator1 = "OSBAdminSalesProducts#DELETE_MENU_ITEM");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				Message.success();
+			}
+		}
+	}
+
+	@prose = "I update a product on the sandbox 2 with the name ${productName} with the following values ${table}"
+	macro updateProduct {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		Click(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value}");
+
+				Type(
+					locator1 = "OSBAdminSalesProductsUpdate#KORONEIKI_PRODUCT_KEY_FIELD",
+					value1 = "${productKey}");
+			}
+			else if ("${field}" == "Koroneiki Product Key") {
+				Type(
+					locator1 = "OSBAdminSalesProductsUpdate#KORONEIKI_PRODUCT_KEY_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Environment") {
+				Select(
+					locator1 = "OSBAdminSalesProductsUpdate#ENVIRONMENT_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version List Type") {
+				Type(
+					locator1 = "OSBAdminSalesProductsUpdate#VERSION_LIST_TYPE_FIELD",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+
+		Button.save();
+
+		Message.success();
+	}
+
+	@prose = "I should not be able to view a product on the sandbox 2 with the name ${productName}"
+	macro viewNoProduct {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		AssertElementNotPresent(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME");
+	}
+
+	@prose = "I should not be able to view a product ${productName} external link on the sandbox 2 with the domain ${domain} and entity name ${entityName} and entity id ${entityId}"
+	macro viewNoProductExternalLink {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		Click(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME");
+
+		var key_productExternalLinkDomain = "${domain}";
+
+		AssertElementNotPresent(locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_DOMAIN");
+
+		var key_productExternalLinkEntityName = "${entityName}";
+
+		AssertElementNotPresent(locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_ENTITY_NAME");
+
+		var key_productExternalLinkEntityId = "${entityId}";
+
+		AssertElementNotPresent(locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_ENTITY_ID");
+	}
+
+	@prose = "I should be able to view a product on the sandbox 2 with the name ${productName} and the following values ${table}"
+	macro viewProduct {
+		OSBAdminSandbox2.gotoOSBAdminSalesProducts();
+
+		var key_productName = "${productName}";
+
+		Click(locator1 = "OSBAdminSalesProducts#PRODUCT_NAME");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "OSBAdminSalesProductsUpdate#NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Koroneiki Product Key") {
+				if ("${value}" == "Verify from name") {
+					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+
+					AssertValue(
+						locator1 = "OSBAdminSalesProductsUpdate#KORONEIKI_PRODUCT_KEY_FIELD",
+						value1 = "${productKey}");
+				}
+				else {
+					AssertValue(
+						locator1 = "OSBAdminSalesProductsUpdate#KORONEIKI_PRODUCT_KEY_FIELD",
+						value1 = "${value}");
+				}
+			}
+			else if ("${field}" == "Environment") {
+				AssertSelectedLabel(
+					locator1 = "OSBAdminSalesProductsUpdate#ENVIRONMENT_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Version List Type") {
+				AssertValue(
+					locator1 = "OSBAdminSalesProductsUpdate#VERSION_LIST_TYPE_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "External Link Domain") {
+				var key_productExternalLinkDomain = "${value}";
+
+				AssertTextEquals(
+					locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_DOMAIN",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "External Link Entity Name") {
+				var key_productExternalLinkEntityName = "${value}";
+
+				AssertTextEquals(
+					locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_ENTITY_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "External Link Entity Id") {
+				var key_productExternalLinkEntityId = "${value}";
+
+				AssertTextEquals(
+					locator1 = "OSBAdminSalesProductsUpdate#EXTERNAL_LINK_ENTITY_ID",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+	}
+}

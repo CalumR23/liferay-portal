@@ -1,0 +1,46 @@
+definition {
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
+	var supportURL = PropsUtil.get("support.liferay.sandbox.2.url");
+	var supportWebId = PropsUtil.get("support.liferay.sandbox.2.web.id");
+	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
+	var webAdminPassword = PropsUtil.get("web.admin.password");
+	var webWebId = PropsUtil.get("web.liferay.sandbox.2.web.id");
+	var webURL = PropsUtil.get("web.liferay.sandbox.2.url");
+
+	macro getSupportGroupId {
+		var companyId = JSONCompanySandbox2.getSupportCompanyId();
+
+		var groupKey = StringUtil.replace("${groupName}", " ", "%20");
+
+		var curl = '''
+			${supportURL}/api/jsonws/group/get-group
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d groupKey=${groupKey}
+			''';
+
+		var groupId = JSONCurlUtil.post("${curl}", "$.groupId");
+
+		echo("Group ID: ${groupId}");
+
+		return "${groupId}";
+	}
+
+	macro getWebGroupId {
+		var companyId = JSONCompanySandbox2.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/group/get-group
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d name=${groupName}
+			''';
+
+		var groupId = JSONCurlUtil.post("${curl}", "$.groupId");
+
+		echo("Group ID: ${groupId}");
+
+		return "${groupId}";
+	}
+}

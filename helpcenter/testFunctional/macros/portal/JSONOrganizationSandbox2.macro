@@ -1,0 +1,210 @@
+definition {
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
+	var supportURL = PropsUtil.get("support.liferay.sandbox.2.url");
+	var supportWebId = PropsUtil.get("support.liferay.sandbox.2.web.id");
+	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
+	var webAdminPassword = PropsUtil.get("web.admin.password");
+	var webWebId = PropsUtil.get("web.liferay.sandbox.web.2.id");
+	var webURL = PropsUtil.get("web.liferay.sandbox.2.url");
+
+	@prose = "I create a support sandbox 2 organization with the name ${organizationName}"
+	macro createViaSupport {
+		var organizationNameEncoded = URLUtil.encodeUTF8("${organizationName}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/add-organization
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d parentOrganizationId=0
+			-d name=${organizationNameEncoded}
+			-d type=organization
+			-d regionId=0
+			-d countryId=0
+			-d statusId=12017
+			-d comments=
+			-d site=false
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I delete the sandbox 2 organization ${organizationName} from customer.liferay.com"
+	macro deleteSupportOrganization {
+		var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/delete-organization
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	macro getWebOrganizationId {
+		var companyId = JSONCompanySandbox2.getWebCompanyId();
+
+		var curl = '''
+			${webURL}/api/secure/jsonws/organization/get-organization-id
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d name=${organizationName}
+			''';
+
+		var organizationId = JSONCurlUtil.post("${curl}");
+
+		var organizationId = StringUtil.replace("${organizationId}", "&quot;", "");
+
+		var organizationId = StringUtil.replace("${organizationId}", "Finished executing commands.", "");
+
+		echo("Organization ID: ${organizationId}");
+
+		return "${organizationId}";
+	}
+
+	macro getSupportOrganizationId {
+		var companyId = JSONCompanySandbox2.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-organization-id
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d name=${organizationName}
+			''';
+
+		var organizationId = JSONCurlUtil.post("${curl}");
+
+		var organizationId = StringUtil.replace("${organizationId}", "&quot;", "");
+
+		var organizationId = StringUtil.replace("${organizationId}", "Finished executing commands.", "");
+
+		echo("Organization ID: ${organizationId}");
+
+		return "${organizationId}";
+	}
+
+	macro searchOrganization {
+		var companyId = JSONCompanySandbox2.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-organizations
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d parentOrganizationId=0
+			-d name=${organizationName}
+			-d start=0
+			-d end=1
+			''';
+
+		var organizationSearchResults = JSONCurlUtil.post("${curl}");
+
+		return "${organizationSearchResults}";
+	}
+
+	@prose = "I tear down the sandbox 2 organizations with the following names from customer.liferay.com ${table}"
+	macro tearDownOrganizationsViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var organizationName = "${row[0]}";
+
+			var organizationSearchResults = JSONOrganizationSandbox2.searchOrganization(organizationName = "${organizationName}");
+
+			if (contains("${organizationSearchResults}", "${organizationName}")) {
+				var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+				echo("Support Organization ID: ${organizationId}");
+
+				var curl = '''
+					${supportURL}/api/jsonws/organization/delete-organization
+					-u ${supportAdminEmailAddress}:${supportAdminPassword}
+					-d organizationId=${organizationId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
+	@prose = "the sandbox 2 organization ${organizationName} should not have the user with the email address ${userEmailAddress} as a member"
+	macro viewNoSupportOrganizationMemberSync {
+		var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		var organizationMembers = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationMembers}", "${userEmailAddress}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+			echo("Support Organization ID: ${organizationId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-organization-users
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d organizationId=${organizationId}
+				''';
+
+			var organizationMembers = JSONCurlUtil.post("${curl}");
+		}
+
+		if (contains("${organizationMembers}", "${userEmailAddress}")) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to be in the support organization ${organizationName}");
+		}		
+	}
+
+	@prose = "the sandbox 2 organization ${organizationName} should have the user with the email address ${userEmailAddress} as a member"
+	macro viewSupportOrganizationMemberSync {
+		var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		echo("Support Organization ID: ${organizationId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d organizationId=${organizationId}
+			''';
+
+		var organizationMembers = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMembers}", "${userEmailAddress}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationId = JSONOrganizationSandbox2.getSupportOrganizationId(organizationName = "${organizationName}");
+
+			echo("Support Organization ID: ${organizationId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-organization-users
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d organizationId=${organizationId}
+				''';
+
+			var organizationMembers = JSONCurlUtil.post("${curl}");
+		}
+
+		if (!(contains("${organizationMembers}", "${userEmailAddress}"))) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to have not been added to the support organization ${organizationName}");
+		}		
+	}
+}
