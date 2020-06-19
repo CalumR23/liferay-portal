@@ -1,0 +1,727 @@
+@testray.main.component.name = "Support QA"
+@type = "project.details.sandbox.2"
+
+Feature: Project Details Source Code Access
+	Testing the Source Code Access feature for the Project Details portlet.
+
+Setup:
+	* I wait for "10" seconds
+	* I create a sandbox 2 support user with the following parameters
+	| Screen Name   | pjd.customer1                       |
+	| Email Address | pjd.customer1@lrcustomer.com.broken |
+	| First Name    | PJD                                 |
+	| Last Name     | Customer1                           |
+	* I create a sandbox 2 support user with the following parameters
+	| Screen Name   | pjd.customer2                       |
+	| Email Address | pjd.customer2@lrcustomer.com.broken |
+	| First Name    | PJD                                 |
+	| Last Name     | Customer2                           |
+	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test" on the sandbox 2
+	* I go to the OSB admin main page on the sandbox 2
+	* I create a project with the following values on the sandbox 2
+	| Name         | Zen PJD Automotive |
+	| Code         | ZENPJDA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	* I assign a user the email address "pjd.customer1@lrcustomer.com.broken" as a customer with the role "Developer" to the project with the code "ZENPJDA" on the sandbox 2
+	* I assign a user the email address "pjd.customer2@lrcustomer.com.broken" as a customer with the role "Watcher" to the project with the code "ZENPJDA" on the sandbox 2
+
+Teardown:
+	* I wait for "10" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test" on the sandbox 2
+	* I tear down the sandbox 2 users with the following email addresses from customer.liferay.com
+	| pjd.customer1@lrcustomer.com.broken |
+	| pjd.customer2@lrcustomer.com.broken |
+	* I tear down the projects with the following project codes on the sandbox 2
+	| ZENPJDA |
+	| ZENDUPA |
+	* I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	* I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	* I tear down all gmail messages with the title "is-support-integration invited you to is-support-integration/liferay-dxp"
+
+Scenario: View source code access user
+	New source code access users on an approved project should be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user added to closed project
+	New source code access users on a closed project should be able to gain access to the proper GitHub repository after project approval.
+
+	Given I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values on a closed project
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	Then I should not be able to see an email message containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user added to expired project
+	New source code access users on an expired project should not be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values on a closed project
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	Then I should not be able to see an email message containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: Delete source code access user
+	Source code access users on an approved project and deleted should not be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: Delete source code access user from closed project
+	Source code access users on a closed project and deleted should not be able to gain access to the proper GitHub repository.
+
+	Given I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values on a closed project
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	And I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	Then I should not be able to see an email message containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user after project expiration
+	New source code access users on an approved project and later expired project should not be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user after project approval
+	New source code access users on a closed project that later gets approved should be able to gain access to the proper GitHub repository.
+
+	Given I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values on a closed project
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user added by team member
+	New source code access users on an approved project added by a team member should be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I update the sandbox 2 support password for user with the email address "pjd.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I update the sandbox 2 support password for user with the email address "pjd.customer2@lrcustomer.com.broken" to "osbadminqauser"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Verified User"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Verified User"
+	And I log out and log into the support homepage as "pjd.customer1@lrcustomer.com.broken" with password "osbadminqauser" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user added by team member after project expiration
+	New source code access users on an approved project added by a team member should not be able to gain access to the proper GitHub repository after their project has expired.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I update the sandbox 2 support password for user with the email address "pjd.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I update the sandbox 2 support password for user with the email address "pjd.customer2@lrcustomer.com.broken" to "osbadminqauser"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Verified User"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Verified User"
+	And I log out and log into the support homepage as "pjd.customer1@lrcustomer.com.broken" with password "osbadminqauser" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test" on the sandbox 2
+	And I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user removed by team member
+	New source code access users on an approved project removed by a team member should not be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I update the sandbox 2 support password for user with the email address "pjd.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I update the sandbox 2 support password for user with the email address "pjd.customer2@lrcustomer.com.broken" to "osbadminqauser"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the sandbox 2 support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support role "Verified User"
+	And I assign the sandbox 2 support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support role "Verified User"
+	And I log out and log into the support homepage as "pjd.customer1@lrcustomer.com.broken" with password "osbadminqauser" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I go to the Project Details page on sandbox 2
+	And I go to the Source Code Access tab
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test" on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user invitation acceptance after access removal
+	Testing for new source code access users who only gain access after access removal via late invitation acceptance on an approved project should be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	And I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+	When I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user invitation acceptance after project expiration
+	Testing for new source code access users who only gain access after project expiration via late invitation acceptance on an approved project should be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	And I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+	When I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user on multiple projects
+	New source code access users on multiple approved projects should be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the OSB admin main page on the sandbox 2
+	And I create a project with the following values on the sandbox 2
+	| Name         | Zen DUP Automotive |
+	| Code         | ZENDUPA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENDUPA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+	When I tear down all gmail messages with the title "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And I go to gmail html mode
+	Then I should not be able to see an email message containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user on multiple projects after removal from one project
+	New source code access users on multiple approved projects should be able to gain access to the proper GitHub repository even if they are removed from one project.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the OSB admin main page on the sandbox 2
+	And I create a project with the following values on the sandbox 2
+	| Name         | Zen DUP Automotive |
+	| Code         | ZENDUPA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENDUPA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user on multiple projects after one project expiration
+	New source code access users on multiple approved projects should be able to gain access to the proper GitHub repository even if they are on one expired project.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the OSB admin main page on the sandbox 2
+	And I create a project with the following values on the sandbox 2
+	| Name         | Zen DUP Automotive |
+	| Code         | ZENDUPA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENDUPA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I tear down all gmail messages with the title "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user after removal from multiple projects
+	New source code access users on multiple approved projects should not be able to gain access to the proper GitHub repository if they are removed from all projects.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the OSB admin main page on the sandbox 2
+	And I create a project with the following values on the sandbox 2
+	| Name         | Zen DUP Automotive |
+	| Code         | ZENDUPA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENDUPA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I delete the Source Code Access user with the email address "info.services.qa@gmail.com"
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
+
+Scenario: View source code access user after multiple project expirations
+	New source code access users on multiple expired projects should not be able to gain access to the proper GitHub repository.
+
+	Given I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENPJDA" on the sandbox 2
+	And I go to the OSB admin main page on the sandbox 2
+	And I create a project with the following values on the sandbox 2
+	| Name         | Zen DUP Automotive |
+	| Code         | ZENDUPA            |
+	| Type         | Group              |
+	| Industry     | Automotive         |
+	| Tier         | Premier            |
+	| Max Contacts | 10                 |
+	| Address Line | 123 Main Street    |
+	| Country      | United States      |
+	| State        | California         |
+	| City         | Diamond Bar        |
+	| Zip          | 91765              |
+	| Region       | US                 |
+	| Language     | English            |
+	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "ZENDUPA" on the sandbox 2
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen PJD Automotive"
+	And I go to the project with the name "Zen PJD Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I log into gmail using the email address "info.services.qa@gmail.com" and the password "rejoicealways123"
+	And I go to gmail html mode
+	And I go to the email message from the user "is-support-integration" containing the text "is-support-integration invited you to is-support-integration/liferay-dxp"
+	And I accept the GitHub repository invitation using the username "infoservicesqa" and the password "rejoicealways123"
+	And I go to the Project Details page on sandbox 2
+	And I search for the project with the name "Zen DUP Automotive"
+	And I go to the project with the name "Zen DUP Automotive"
+	And I go to the Source Code Access tab
+	And I add a Source Code Access user with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	Then the Source Code Access user panel for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	And the Source Code Access user details for a user with the email address "info.services.qa@gmail.com" should be visible with the following values
+	| Name            | Info Services QA           |
+	| Email Address   | info.services.qa@gmail.com |
+	| GitHub Username | infoservicesqa             |
+	When I edit a project with the name "Zen PJD Automotive" and code "ZENPJDA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I edit a project with the name "Zen DUP Automotive" and code "ZENDUPA" to have a support lifetime of "1 Minute" starting "60" days ago for the product "Digital Enterprise Production" on the sandbox 2
+	And I automatically have all expired projects moved to on hold status on the sandbox 2
+	And I automatically have all non Source Code Access users removed from the GitHub repository on the sandbox 2
+	Then I should not be able to view the is-support-integration repository using the username "infoservicesqa" and the password "rejoicealways123"
