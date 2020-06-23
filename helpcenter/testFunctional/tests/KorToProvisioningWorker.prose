@@ -122,12 +122,14 @@ Scenario: View worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -140,6 +142,95 @@ Scenario: View worker
 	| Update Field Name           | Contact Role                                        |
 	| Update Field Original Value | N/A                                                 |
 	| Update Field New Value      | Liferay Account Worker Role                         |
+
+Scenario: View verified worker
+	Testing the ability to create a verified worker in koroneiki and viewing the respective worker in the provisioning account details page
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Language      | English                              |
+	| Last Name     | Koroneiki2                           |
+	And I create a contact role on koroneiki with the following values
+	| Description | This is the Liferay worker role for accounts |
+	| Name        | Liferay Account Worker Role                  |
+	| Type        | Account Worker                               |
+	And I assign the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Liferay Account Worker Role |
+	And I update a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" to have the following values
+	| Email Address Verified | true |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Contacts" tab
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
+	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	When I click on the "Liferay Workers" tab
+	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Liferay Account Worker Role          |
+	| User Status   | VERIFIED                             |
+	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 
 Scenario: View and search multiple workers
 	Testing the ability to create several workers in Dossiera and koroneiki and viewing and searching the respective workers in the provisioning account details page
@@ -229,6 +320,7 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	And I should not be able to view the contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
 	When I search and filter the accounts details page using the following parameters
@@ -237,6 +329,7 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	And I should not be able to view the contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
@@ -244,10 +337,12 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should be able to view the worker with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki3                       |
 	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	When I search and filter the accounts details page using the following parameters
 	| Keyword | pro.koroneiki2@lrcustomer.com.broken |
@@ -256,6 +351,7 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
 	When I clear the account details search
 	And I search and filter the accounts details page using the following parameters
@@ -265,6 +361,7 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki3                       |
 	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I clear the account details search
 	And I search and filter the accounts details page using the following parameters
@@ -275,15 +372,18 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should be able to view the worker with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki3                       |
 	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	When I remove the "Second Account Worker Role" search filter
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki3@lrcustomer.com.broken"
 	When I remove the "Liferay Account Worker Role" search filter
 	And I search and filter the accounts details page using the following parameters
@@ -292,6 +392,7 @@ Scenario: View and search multiple workers
 	| Name          | PRO Koroneiki3                       |
 	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -383,12 +484,14 @@ Scenario: View worker without additional role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Member                               |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -484,6 +587,7 @@ Scenario: View worker with multiple roles
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
@@ -491,6 +595,7 @@ Scenario: View worker with multiple roles
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -590,6 +695,7 @@ Scenario: View updated worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	And I should not be able to view the contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
@@ -597,6 +703,7 @@ Scenario: View updated worker
 	| Name          | PRO Koroneiki3                       |
 	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 
@@ -681,12 +788,14 @@ Scenario: View worker with updated role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 
 Scenario: View removed worker
@@ -768,6 +877,7 @@ Scenario: View removed worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
@@ -867,6 +977,7 @@ Scenario: View deleted worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
@@ -967,6 +1078,7 @@ Scenario: View removed worker role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
@@ -1071,12 +1183,14 @@ Scenario: View removed and reassigned worker role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 
 Scenario: View worker on updated account
@@ -1166,12 +1280,14 @@ Scenario: View worker on updated account
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "Liferay Workers" tab
 	Then I should be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1264,6 +1380,7 @@ Scenario: Assign worker
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Liferay Account Customer Role"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Liferay Account Worker Role"
@@ -1272,6 +1389,7 @@ Scenario: Assign worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1364,6 +1482,7 @@ Scenario: Assign worker via plus menu
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Liferay Account Customer Role"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Liferay Account Worker Role"
@@ -1372,6 +1491,7 @@ Scenario: Assign worker via plus menu
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1470,6 +1590,7 @@ Scenario: Assign worker with multiple roles
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Liferay Account Customer Role"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Liferay Account Worker Role"
@@ -1479,6 +1600,7 @@ Scenario: Assign worker with multiple roles
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1579,6 +1701,7 @@ Scenario: Unassign worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1681,6 +1804,7 @@ Scenario: Assign and unassign worker
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1788,6 +1912,7 @@ Scenario: Unassign worker assigned in provisioning via koroneiki
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -1892,6 +2017,7 @@ Scenario: Update worker role
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Second Account Worker Role"
 	When I click on the "Contacts" tab
@@ -1899,6 +2025,7 @@ Scenario: Update worker role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -2007,6 +2134,7 @@ Scenario: Update additional worker role
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Liferay Account Worker Role"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Second Account Worker Role"
@@ -2015,6 +2143,7 @@ Scenario: Update additional worker role
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -2121,6 +2250,7 @@ Scenario: Update worker role for worker assigned via provisioning
 	| Name          | PRO Koroneiki2                       |
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Second Account Worker Role"
 	When I click on the "Contacts" tab
@@ -2128,6 +2258,7 @@ Scenario: Update worker role for worker assigned via provisioning
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
@@ -2238,6 +2369,7 @@ Scenario: Update additional worker role for worker assigned via provisioning
 	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
 	| Role          | Liferay Account Worker Role          |
 	| Role          | Second Account Worker Role           |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Liferay Account Worker Role"
 	And the account with the name "Korpro - ${staticCompanyName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the worker contact role "Second Account Worker Role"
@@ -2246,6 +2378,7 @@ Scenario: Update additional worker role for worker assigned via provisioning
 	| Name          | PRO Koroneiki1                       |
 	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
 	| Role          | Liferay Account Customer Role        |
+	| User Status   | UNVERIFIED                           |
 	And I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
 	When I click on the "History" tab
 	Then the history entry in position number "3" with the field value "Contact Role" should be visible on the account details page with the following values
