@@ -2617,6 +2617,104 @@ Scenario: Delete address
 	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States |
 	| Update Field New Value      | N/A                                                         |
 
+Scenario: Delete updated address
+	Testing the ability to create a regular project in Dossiera and updating and deleting the project address in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	When I click on the "Details" tab
+	And I edit the following account address fields and types in position "1" to the following values under the account details tab
+	| Street 1       | Input  | 456 Main Street   |
+	| Street 2       | Input  | Attn: Mr. Jones   |
+	| Street 3       | Input  | Suite 100         |
+	| Country        | Select | Canada            |
+	| City           | Input  | Vancouver         |
+	| State/Province | Select | British Columbia  |
+	| Postal Code    | Input  | V5Y 0C9           |
+	And I delete the account address in position "1"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Details" tab
+	Then I should be able to view the following account values under the account details tab
+	| Street 1            | - | 1 |
+	| Country             | - | 1 |
+	| City                | - | 1 |
+	| State/Province      | - | 1 |
+	| Postal Code         | - | 1 |
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street"
+	When I click on the "History" tab
+	Then the history entry in position number "15" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Address                                                          |
+	| Update Field Name           | Address                                                                              |
+	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States                          |
+	| Update Field New Value      | 456 Main Street Attn: Mr. Jones Suite 100 Vancouver, British Columbia V5Y 0C9 Canada |
+	And the history entry in position number "16" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Deleted Address                                                          |
+	| Update Field Name           | Address                                                                              |
+	| Update Field Original Value | 456 Main Street Attn: Mr. Jones Suite 100 Vancouver, British Columbia V5Y 0C9 Canada |
+	| Update Field New Value      | N/A                                                                                  |
+
 Scenario: Delete multiple addresses
 	Testing the ability to create a regular project in Dossiera and deleting a project's multiple addresses in the provisioning page account details 
 
@@ -5526,7 +5624,6 @@ Scenario: Update account address
 	And I wait for "10" seconds
 	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
 	| Primary | True |
-	| Mailing | True |
 	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
 	| Support Developer |
 	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
@@ -5579,10 +5676,7 @@ Scenario: Update account address
 	| Country               | Canada           |
 	| Locality              | Vancouver        |
 	| Region                | British Columbia |
-	| Type                  | Business         |
-	| Mailing               | False            |
 	| Postal Code           | V5Y 0C9          |
-	| Primary               | False            |
 	| Street Address Line 1 | 456 Main Street  |
 	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street"
 	When I click on the "History" tab
@@ -5591,6 +5685,428 @@ Scenario: Update account address
 	| Update Field Name           | Address                                                                              |
 	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States                          |
 	| Update Field New Value      | 456 Main Street Attn: Mr. Jones Suite 100 Vancouver, British Columbia V5Y 0C9 Canada |
+
+Scenario: Update account details and address
+	Testing the ability to update a regular account and account address in Provisioning and viewing the project in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Account Name       | Input         | Onepro - ${staticCompanyName} | |
+	| Status             | Select        | Inactive                      | |
+	| Code               | Input         | ONEPROONEPRO                  | |
+	| Tier               | Select        | Premier                       | |
+	| Dossiera Account   | Input         | zyxwvuts0987654321            | |
+	| Salesforce Project | Input         | 1a2b3c4d5e6f7g8h9i            | |
+	And I edit the following account address fields and types in position "1" to the following values under the account details tab
+	| Street 1       | Input  | 456 Main Street   |
+	| Street 2       | Input  | Attn: Mr. Jones   |
+	| Street 3       | Input  | Suite 100         |
+	| Country        | Select | Canada            |
+	| City           | Input  | Vancouver         |
+	| State/Province | Select | British Columbia  |
+	| Postal Code    | Input  | V5Y 0C9           |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Onepro - ${staticCompanyName} |
+	| Code           | ONEPROONEPRO                  |
+	| Status         | INACTIVE                      |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Premier                       |
+	| Partner        | Koroneiki Partner             |
+	When I click on the "Details" tab
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Onepro - ${staticCompanyName} | |
+	| Status              | INACTIVE                      | |
+	| Code                | ONEPROONEPRO                  | |
+	| Tier                | Premier                       | |
+	| Partner/Reseller/SI | Koroneiki Partner             |	|
+	| Street 1            | 456 Main Street               | |
+	| Street 2            | Attn: Mr. Jones               | |
+	| Street 3            | Suite 100                     | |
+	| Country             | Canada                        | |
+	| City                | Vancouver                     | |
+	| State/Province      | British Columbia              | |
+	| Postal Code         | V5Y 0C9                       | |
+	| Dossiera Account    | zyxwvuts0987654321            | |
+	| Salesforce Project  | 1a2b3c4d5e6f7g8h9i            | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	Then I should not be able to view an account on the provisioning index with the name "Korpro - ${staticCompanyName}"
+	And I should be able to view a koroneiki account with the name "Onepro - ${staticCompanyName}" and the following values
+	| Code                  | ONEPROONEPRO                  |
+	| Name                  | Onepro - ${staticCompanyName} |
+	| Region                | United States                 |
+	| Status                | Inactive                      |
+	| Tier                  | Premier                       |
+	And I should not be able to view a koroneiki account with the name "Korpro - ${staticCompanyName}"
+	When I search the accounts page using the keyword "Onepro"
+	And I click on the account with the name "Onepro - ${staticCompanyName}" on the provisioning index
+	And I click on the "History" tab
+	Then the history entry in position number "15" with the field value "name" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Account   |
+	| Update Field Name           | name                          |
+	| Update Field Original Value | Korpro - ${staticCompanyName} |
+	| Update Field New Value      | Onepro - ${staticCompanyName} |
+	And the history entry in position number "17" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Account |
+	| Update Field Name           | status                      |
+	| Update Field Original Value | Approved                    |
+	| Update Field New Value      | Inactive                    |
+	And the history entry in position number "18" with the field value "code" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Account |
+	| Update Field Name           | code                        |
+	| Update Field Original Value | KORPROKORPRO                |
+	| Update Field New Value      | ONEPROONEPRO                |
+	And the history entry in position number "19" with the field value "tier" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Account |
+	| Update Field Name           | tier                        |
+	| Update Field Original Value | Regular                     |
+	| Update Field New Value      | Premier                     |
+	And the history entry in position number "20" with the field value "entityId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated External Link |
+	| Update Field Name           | entityId                          |
+	| Update Field Original Value | ${staticDossieraAccountKey}       |
+	| Update Field New Value      | zyxwvuts0987654321                |
+	And the history entry in position number "21" with the field value "entityId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated External Link |
+	| Update Field Name           | entityId                          |
+	| Update Field Original Value | ${staticSalesforceProjectKey}     |
+	| Update Field New Value      | 1a2b3c4d5e6f7g8h9i                |
+	And the history entry in position number "22" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Address                                                          |
+	| Update Field Name           | Address                                                                              |
+	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States                          |
+	| Update Field New Value      | 456 Main Street Attn: Mr. Jones Suite 100 Vancouver, British Columbia V5Y 0C9 Canada |
+
+Scenario: Update multiple account addresses
+	Testing the ability to create a regular project in Dossiera and updating multiple addresses on the project in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I create a postal address for an account with the name "Korpro - ${staticCompanyName}" on koroneiki with the following values
+	| Country               | Canada           |
+	| Locality              | Vancouver        |
+	| Region                | British Columbia |
+	| Type                  | Other            |
+	| Mailing               | False            |
+	| Postal Code           | V5Y 0C9          |
+	| Primary               | False            |
+	| Street Address Line 1 | 456 Main Street  |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account address fields and types in position "1" to the following values under the account details tab
+	| Street 1       | Input  | Avenida Agua 120 |
+	| Country        | Select | Mexico           |
+	| City           | Input  | Tijuana          |
+	| State/Province | Select | Baja California  |
+	| Postal Code    | Input  | 20631            |
+	And I edit the following account address fields and types in position "2" to the following values under the account details tab
+	| Street 1       | Input  | 5-2-1 Ginza |
+	| Country        | Select | Japan       |
+	| City           | Input  | Chuo-ku     |
+	| State/Province | Select | 東京都       |
+	| Postal Code    | Input  | 104-0061    |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticCompanyName} |   |
+	| Status              | APPROVED                      |   |
+	| Code                | KORPROKORPRO                  |   |
+	| Tier                | Regular                       |   |
+	| Partner/Reseller/SI | Koroneiki Partner             |	  |
+	| Street 1            | Avenida Agua 120              | 1 |
+	| Country             | Mexico                        | 1 |
+	| City                | Tijuana                       | 1 |
+	| State/Province      | Baja California               | 1 |
+	| Postal Code         | 20631                         | 1 |
+	| Street 1            | 5-2-1 Ginza                   | 2 |
+	| Country             | Japan                         | 2 |
+	| City                | Chuo-ku                       | 2 |
+	| State/Province      | 東京都                         | 2 |
+	| Postal Code         | 104-0061                      | 2 |
+	| Dossiera Account    | ${staticDossieraAccountKey}   |   |
+	| Salesforce Project  | ${staticSalesforceProjectKey} |   |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "Avenida Agua 120" with the following values
+	| Country               | Mexico           |
+	| Locality              | Tijuana          |
+	| Region                | Baja California  |
+	| Postal Code           | 20631            |
+	| Street Address Line 1 | Avenida Agua 120 |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "5-2-1 Ginza" with the following values
+	| Country               | Japan       |
+	| Locality              | Chuo-ku     |
+	| Region                | 東京都       |
+	| Postal Code           | 104-0061    |
+	| Street Address Line 1 | 5-2-1 Ginza |
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street"
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Main Street"
+	When I click on the "History" tab
+	Then the history entry in position number "16" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Address                                 |
+	| Update Field Name           | Address                                                     |
+	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States |
+	| Update Field New Value      | Avenida Agua 120 Tijuana, Baja California 20631 Mexico      |
+	And the history entry in position number "17" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Address                                |
+	| Update Field Name           | Address                                                    |
+	| Update Field Original Value | 456 Main Street Vancouver, British Columbia V5Y 0C9 Canada |
+	| Update Field New Value      | 5-2-1 Ginza Chuo-ku, 東京都 104-0061 Japan                  |
+
+Scenario: Update address and add additional address
+	Testing the ability to update a regular account address before adding an additional address in Provisioning and viewing the project in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korpro - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Support Developer |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticCompanyName}"
+	And I create a team role on koroneiki with the following values
+	| Description | This is the partner role |
+	| Name        | Partner                  |
+	| Type        | Account                  |
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticCompanyName}" to the following roles
+	| Partner |
+	And I update a koroneiki account with the name "Korpro - ${staticCompanyName}" to have the following values
+	| Tier | Regular |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticCompanyName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account address fields and types in position "1" to the following values under the account details tab
+	| Street 1       | Input  | 456 Main Street   |
+	| Street 2       | Input  | Attn: Mr. Jones   |
+	| Street 3       | Input  | Suite 100         |
+	| Country        | Select | Canada            |
+	| City           | Input  | Vancouver         |
+	| State/Province | Select | British Columbia  |
+	| Postal Code    | Input  | V5Y 0C9           |
+	And I click the add account address button in position "1"
+	And I populate and save the add address form with the following values
+	| Street      | Input  | 789 300th Street |
+	| City        | Input  | New York         |
+	| Country     | Select | United States    |
+	| Region      | Select | New York         |
+	| Postal Code | Input  | 10001            |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticCompanyName} |
+	| Code           | KORPROKORPRO                  |
+	| Status         | APPROVED                      |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | Regular                       |
+	| Partner        | Koroneiki Partner             |
+	When I click on the "Details" tab
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticCompanyName} |   |
+	| Status              | APPROVED                      |   |
+	| Code                | KORPROKORPRO                  |   |
+	| Tier                | Regular                       |   |
+	| Partner/Reseller/SI | Koroneiki Partner             |	  |
+	| Street 1            | 456 Main Street               | 1 |
+	| Street 2            | Attn: Mr. Jones               | 1 |
+	| Street 3            | Suite 100                     | 1 |
+	| Country             | Canada                        | 1 |
+	| City                | Vancouver                     | 1 |
+	| State/Province      | British Columbia              | 1 |
+	| Postal Code         | V5Y 0C9                       | 1 |
+	| Street 1            | 789 300th Street              | 2 |
+	| Country             | United States                 | 2 |
+	| City                | New York                      | 2 |
+	| State/Province      | New York                      | 2 |
+	| Postal Code         | 10001                         | 2 |
+	| Dossiera Account    | ${staticDossieraAccountKey}   |   |
+	| Salesforce Project  | ${staticSalesforceProjectKey} |   |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Main Street" with the following values
+	| Country               | Canada           |
+	| Locality              | Vancouver        |
+	| Region                | British Columbia |
+	| Postal Code           | V5Y 0C9          |
+	| Street Address Line 1 | 456 Main Street  |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "789 300th Street" with the following values
+	| Country               | United States    |
+	| Locality              | New York         |
+	| Region                | New York         |
+	| Postal Code           | 10001            |
+	| Street Address Line 1 | 789 300th Street |
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticCompanyName}" with the street address "456 Fake Street"
+	When I click on the "History" tab
+	Then the history entry in position number "15" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Updated Address                                                          |
+	| Update Field Name           | Address                                                                              |
+	| Update Field Original Value | 456 Fake Street Diamond Bar, California 91765 United States                          |
+	| Update Field New Value      | 456 Main Street Attn: Mr. Jones Suite 100 Vancouver, British Columbia V5Y 0C9 Canada |
+	And the history entry in position number "16" with the field value "Address" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Address                               |
+	| Update Field Name           | Address                                                 |
+	| Update Field Original Value | N/A                                                     |
+	| Update Field New Value      | 789 300th Street New York, New York 10001 United States |
 
 Scenario: Update parent and child account
 	Testing the ability to update a regular and child project in Provisioning and viewing the regular and child project in the provisioning page account details 
