@@ -2729,3 +2729,97 @@ Scenario: Create DXP 7.2 Liferay Connector to Elasticsearch 7 build below market
 	| Patcher Status  | Complete                                            |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)                      |
 	| Jenkins         | fixpack-builder-agent(uat)                          |
+
+Scenario: Create a DXP 7.1 Liferay Commerce build below marketplace-commerce-2.1.1-7110
+	@ test.group = "4"
+	As a TSE, I should be able to create a DXP 7.1 Liferay Commerce build below marketplace-commerce-2.1.1-7110
+
+	Given I log into the Patcher homepage as "test@liferay.com" with password "liferay"
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1 Liferay Commerce                                 |
+	| Project Version | marketplace-commerce-2.1.1-7110                          |
+	| Content         | ${staticFixContent1}                                     |
+	| Branch Name     | COMMERCE-4107-hotfix-for-jp-demo                         |
+	| Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.1 Liferay Commerce                                 |
+	| Project Version | marketplace-commerce-2.1.1-7110                          |
+	| Content         | ${staticFixContent2}                                     |
+	| Branch Name     | LPS-94011-commerce211                                    |
+	| Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+	| Content         | ${staticFixContent1}            |
+	| Version         | 1.0                             |
+	| Product         | DXP 7.1 Liferay Commerce        |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Patcher Status  | Adding                          |
+	| Type            | Patch                           |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}            |
+	| Version         | 1.0                             |
+	| Product         | DXP 7.1 Liferay Commerce        |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Patcher Status  | Adding                          |
+	| Type            | Patch                           |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Patch" for add completion
+	When I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+	| Content         | ${staticFixContent1}            |
+	| Version         | 1.0                             |
+	| Product         | DXP 7.1 Liferay Commerce        |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Git Hash        | 0b15e03442                      |
+	| Patcher Status  | Complete                        |
+	| Type            | Patch                           |
+	| Jenkins         | fixpack-builder-agent(uat)      |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}            |
+	| Version         | 1.0                             |
+	| Product         | DXP 7.1 Liferay Commerce        |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Git Hash        | 210ccfe649                      |
+	| Patcher Status  | Complete                        |
+	| Type            | Patch                           |
+	| Jenkins         | fixpack-builder-agent(uat)      |
+	When I generate a random ticket number
+	And I create a Patcher build for a new account with the following values
+	| Product         | DXP 7.1 Liferay Commerce                  |
+	| Project Version | marketplace-commerce-2.1.1-7110           |
+	| Tickets List    | ${staticFixContent1},${staticFixContent2} |
+	| Account Code    | LPSPJP                                    |
+	| Support Ticket  | ${staticTicketNumber}                     |
+	And I set the account code "LPSPJP" as a static variable
+	And I wait for "5" seconds
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+	| Type            | Official                        |
+	| Support Ticket  | ${staticTicketNumber}           |
+	| Version         | 1.0                             |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Content         | 0 Fix Packs + 2 Tickets         |
+	| Patcher Status  | Merging                         |
+	And I should be able to view a Patcher build fix with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+	| Name            | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Git Hash        | 0b15e03442           |
+	| Status          | Complete             |
+	| Type            | Patch                |
+	And I should be able to view a Patcher build fix with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+	| Name            | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Git Hash        | 210ccfe649           |
+	| Status          | Complete             |
+	| Type            | Patch                |
+	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" for merge completion
+	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+	| Type            | Official                        |
+	| Support Ticket  | ${staticTicketNumber}           |
+	| Version         | 1.0                             |
+	| Project Version | marketplace-commerce-2.1.1-7110 |
+	| Content         | 0 Fix Packs + 2 Tickets         |
+	| Patcher Status  | Complete                        |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat)  |
+	| Jenkins         | fixpack-builder-agent(uat)      |
