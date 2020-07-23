@@ -1,0 +1,69 @@
+definition {
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+
+	@prose = "I populate and save the product bundle form with the following values ${table}"
+	macro populateProductBundleFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var value = "${row[2]}";
+
+			var key_field = "${field}";
+
+			if ("${type}" == "Input") {
+				Type(
+					locator1 = "ProvisioningProductBundleForm#INPUT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Add Product") {
+				Click(locator1 = "ProvisioningProductBundleForm#PRODUCT_SELECT_BUTTON");
+
+				SelectFrame(locator1 = "ProvisioningProductBundleSelectProducts#SELECT_PRODUCTS_IFRAME");
+
+				Type(
+					locator1 = "ProvisioningProductBundleSelectProducts#SELECT_PRODUCTS_SEARCH_FIELD",
+					value1 = "${value}");
+
+				Click(locator1 = "ProvisioningProductBundleSelectProducts#SELECT_PRODUCTS_SEARCH_BUTTON");
+
+				var key_productName = "${productName}";
+
+				Check(locator1 = "ProvisioningProductBundleSelectProducts#PRODUCT_CHECKBOX");
+
+				SelectFrameTop();
+
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningProductBundleSelectProducts#ADD_BUTTON");
+
+				while (IsElementPresent(locator1 = "ProvisioningProductBundleSelectProducts#ADD_BUTTON")) {
+					SelectFrame(locator1 = "ProvisioningProductBundleSelectProducts#SELECT_PRODUCTS_IFRAME");
+
+					Uncheck(locator1 = "ProvisioningProductBundleSelectProducts#PRODUCT_CHECKBOX");
+
+					Check(locator1 = "ProvisioningProductBundleSelectProducts#PRODUCT_CHECKBOX");
+
+					SelectFrameTop();
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningProductBundleSelectProducts#ADD_BUTTON");
+				}
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningProductBundleForm#PRODUCT_NAME",
+					value1 = "${productName}");
+			}
+			else if ("${field}" == "Remove Product") {
+				var key_productName = "${productName}";
+
+				ClickNoError(locator1 = "ProvisioningProductBundleForm#PRODUCT_DELETE_BUTTON");
+
+				AssertElementNotPresent(locator1 = "ProvisioningProductBundleSelectProducts#PRODUCT_NAME");
+			}
+			else {
+				fail("No such product field type ${type} or field ${field}. Please use Input as type, Add Product as field with no type, or Remove Product as field with no type.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningProductBundleForm#SAVE_BUTTON");
+	}
+}

@@ -33,6 +33,22 @@ definition {
 		Click(locator1 = "Provisioning#PRODUCT_NAME");	
 	}
 
+	@prose = "I click on the product bundle with the name ${productBundleName} on the provisioning index"
+	macro clickProductBundle {
+		var key_productBundleName = "${productBundleName}";
+
+		Click(locator1 = "Provisioning#PRODUCT_BUNDLE_NAME");	
+	}
+
+	@prose = "I click on the delete button for the product bundle ${productBundleName}"
+	macro clickProductBundleDeleteButton {
+		var key_productBundleName = "${productBundleName}";
+
+		ClickNoError(locator1 = "Provisioning#PRODUCT_BUNDLE_DELETE");
+
+		Confirm(value1 = "Are you sure you want to delete this product bundle?");
+	}
+
 	@prose = "I click on the delete button for the product ${productName}"
 	macro clickProductDeleteButton {
 		var key_productName = "${productName}";
@@ -127,6 +143,13 @@ definition {
 		AssertElementNotPresent(locator1 = "Provisioning#ACCOUNT_ROW");		
 	}
 
+	@prose = "I should not be able to view a product bundle on the provisioning index with the name ${productBundleName}"
+	macro _viewNoProductBundleViaIndex {
+		var key_productBundleName = "${productBundleName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_BUNDLE_ROW");
+	}
+
 	@prose = "I should not be able to view a product on the provisioning index with the name ${productName}"
 	macro _viewNoProductViaIndex {
 		var key_productName = "${productName}";
@@ -195,6 +218,38 @@ definition {
 				fail("No such account field ${field}");
 			}
 		}
+	}
+
+	@prose = "I should be able to view a product bundle on the provisioning index with the name ${productBundleName} and the following values ${table}"
+	macro _viewProductBundleViaIndex {
+		var key_productBundleName = "${productBundleName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_BUNDLE_NAME",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product bundle field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the product bundle error message on the product index resulting from an attempted deletion of the product"
+	macro viewProductIndexProductBundleErrorMessage {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Please remove the product from all product bundles before deleting.");
 	}
 
 	@prose = "I should be able to view the product consumption error message on the product index resulting from an attempted deletion of the product with the id value ${productId}"
