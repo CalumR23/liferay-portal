@@ -206,6 +206,73 @@ definition {
 		return "${requesterId}";
 	}
 
+	@prose = "I teardown the tickets with the following keywords from zendesk.liferay.com ${table}"
+	macro _tearDownTicketsByKeywords {
+		var ticketIdList = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var keywords = "${row[0]}";
+
+			var ticketId = "";
+
+			var results = ZendeskTicketAPI._viewTicketSearchResultsByKeywords(keywords = "${keywords}");
+
+			if (contains("${results}", "${keywords}")) {
+				var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+			}
+
+			if (!("${ticketId}" == "")) {
+				if ("${ticketIdList}" == "") {
+					var ticketIdList = "${ticketId}";
+				}
+				else {
+					var ticketIdList = "${ticketIdList},${ticketId}";
+				}
+			}
+		}
+
+		if (!("${ticketIdList}" == "")) {
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
+
+			var curl = '''
+				--tlsv1.2 ${statusUrl}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+
+			if (!("${status}" == "completed")) {
+				if (("${status}" == "queued") || ("${status}" == "working")) {
+					while (("${status}" == "queued") || ("${status}" == "working")) {
+						ZendeskHomepage.pause(timeInSeconds = "2");
+
+						var curl = '''
+							--tlsv1.2 ${statusUrl}
+							-u ${zendeskAdminEmail}/token:${apiToken}
+							''';
+
+						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+					}
+					if (!("${status}" == "completed")) {
+						echo("Warning: The ticket tear down may have failed");
+						echo("Tear Down Job Status: ${status}");
+					}
+				}
+				else {
+					echo("Warning: The ticket tear down may have failed");
+					echo("Tear Down Job Status: ${status}");
+				}
+			}
+		}
+	}
+
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
 		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
@@ -1524,6 +1591,19 @@ definition {
 		}
 	}
 
+	macro _viewTicketIdByKeywords {
+		var keywords = StringUtil.replace("${keywords}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json?query=${keywords}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
+
+		return "${ticketId}";
+	}
+
 	macro _viewTicketIdByTicketSubject {
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/search.json
@@ -1581,6 +1661,22 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with keywords ${keywords} should have the requester with the email address ${requesterEmailAddress}"
+	macro _viewTicketRequester {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
+
+		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
+
+		echo("Expected Requester ID: ${requesterId}");
+		echo("Actual Requester ID: ${requesterIdFromAPI}");
+
+		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
+		}
+	}
+
 	@prose = "the ticket with ticketId ${ticketId} should have the requester with the email address ${requesterEmailAddress}"
 	macro _viewTicketRequesterSync {
 		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
@@ -1603,6 +1699,19 @@ definition {
 		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
 			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
 		}
+	}
+
+	macro _viewTicketSearchResultsByKeywords {
+		var keywords = StringUtil.replace("${keywords}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json?query=${keywords}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var results = JSONCurlUtil.get("${curl}", "$.results");
+
+		return "${results}";
 	}
 
 	@prose = "the ticket with ticketId ${ticketId} should have the status ${status}"
@@ -1701,6 +1810,32 @@ definition {
 
 		if (!("${supportRegionAbbreviation}" == "${supportRegionAbbreviationFromAPI}")) {
 			fail("The schedule trigger may be incorrect as it is setting ${supportRegionAbbreviationFromAPI} schedule to the ${supportRegionAbbreviation} trigger.");
+		}
+	}
+
+	@prose = "the ticket with keywords ${keywords} should be synced to zendesk"
+	macro _viewTicketSyncByKeywords {
+		var keywordsNoSpaces = StringUtil.replace("${keywords}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json?query=${keywordsNoSpaces}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var results = JSONCurlUtil.get("${curl}", "$.results");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${results}", "${keywords}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var results = JSONCurlUtil.get("${curl}", "$.results");
+		}
+
+		if (!(contains("${results}", "${keywords}"))) {
+			fail("After ${currentIteration} checks, the ticket with the keywords ${keywords} has not been synced to zendesk");
 		}
 	}
 }
