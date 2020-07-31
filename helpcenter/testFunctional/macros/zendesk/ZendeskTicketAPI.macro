@@ -1521,6 +1521,25 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with keywords ${keywords} should have the text ${descriptionText} in its description"
+	macro _viewTicketDescription {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+
+		echo("Expected Description Text: ${descriptionText}");
+		echo("Actual Description: ${descriptionFromAPI}");
+
+		if (!(contains("${descriptionFromAPI}", "${descriptionText}"))) {
+			fail("Actual description ${descriptionFromAPI} does not contain the text ${descriptionText}");
+		}
+	}
+
 	@prose = "the ticket with ticket subject ${ticketSubject} should have the environment ${environment}"
 	macro _viewTicketEnvironment {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
@@ -1840,6 +1859,25 @@ definition {
 
 		if (!("${statusFromAPI}" == "${status}")) {
 			fail("After ${currentIteration} checks, actual value ${statusFromAPI} status for ticket ID ${ticketId} does not match expected status value ${status}");
+		}
+	}
+
+	@prose = "the ticket with keywords ${keywords} should have the subject ${subject}"
+	macro _viewTicketSubject {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.subject");
+
+		echo("Expected Subject: ${subject}");
+		echo("Actual Subject: ${subjectFromAPI}");
+
+		if (!("${subjectFromAPI}" == "${subject}")) {
+			fail("Actual value ${subjectFromAPI} does not match expected value ${subject}");
 		}
 	}
 
