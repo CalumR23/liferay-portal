@@ -13,6 +13,8 @@ Teardown:
 	* I tear down the external links for the account "Korzen - ${staticCompanyName}" on koroneiki with the following entity id and domain values
 	| ${staticDossieraAccountKey}   | salesforce |
 	| ${staticDossieraAccountKey}   | dossiera   |
+	| zyxwvuts0987654321            | salesforce |
+	| zyxwvuts0987654321            | dossiera   |
 	| ${staticSalesforceProjectKey} | salesforce |
 	* I tear down the product purchases on koroneiki made by the account "Korzen - ${staticCompanyName}" for the following products
 	| Digital Enterprise Production |
@@ -30,12 +32,13 @@ Teardown:
 	* I tear down the accounts on koroneiki with the following names
 	| Korzen - ${staticCompanyName} |
 	* I tear down the accounts on koroneiki with the following "Code" values
-	| KORZENKORZEN |
+	| KORZENKORZEN  |
+	| KORZENKORZEN1 |
 	* I teardown the tickets with the following keywords from zendesk.liferay.com
 	| Korzen - ${staticCompanyName} |
 
-Scenario: View regular project ticket
-	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket
+Scenario: View new business ticket
+	Testing the ability to create a new business in Dossiera and viewing the project in the form of a zendesk ticket
 
 	Given I generate several static variables for Provisioning
 	And I generate a provisioning company name
@@ -95,7 +98,96 @@ Scenario: View regular project ticket
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
 
-Scenario: View maximum contact warning
+Scenario: View existing business ticket
+	Testing the ability to create an existing business in Dossiera and viewing the project in the form of a zendesk ticket
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORZENKORZEN                         |
+	| Contact Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Name                  | Korzen - ${staticCompanyName}        |
+	| Profile Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Approved                             |
+	| Tier                  | Regular                              |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korzen - ${staticCompanyName}" and the product "Digital Enterprise Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | true                     | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | Existing Business                          |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	Then the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Name: Korzen - ${staticCompanyName}" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Code: KORZENKORZEN" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Opportunity Type: Existing Business" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the requester with the email address "provisioningrequest@liferay.com"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the organization "Provisioning"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the product "prd_provisioning_request"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the support region "United States"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
+
+Scenario: View maximum contact ticket warning
 	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with a maximum contact warning
 
 	Given I generate several static variables for Provisioning
@@ -158,7 +250,7 @@ Scenario: View maximum contact warning
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
 
-Scenario: View global region warning from empty sold by field
+Scenario: View global region ticket warning from empty sold by field
 	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with a global region warning
 
 	Given I generate several static variables for Provisioning
@@ -221,7 +313,7 @@ Scenario: View global region warning from empty sold by field
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
 
-Scenario: View global region warning from invalid sold by field
+Scenario: View global region ticket warning from invalid sold by field
 	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with a global region warning
 
 	Given I generate several static variables for Provisioning
@@ -281,5 +373,249 @@ Scenario: View global region warning from invalid sold by field
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the organization "Provisioning"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the product "prd_provisioning_request"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the support region "Global"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
+
+Scenario: View existing business ticket warning
+	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with an existing business warning
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | Existing Business                          |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	Then the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "[Warning] New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Name: Korzen - ${staticCompanyName}" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Code: KORZENKORZEN" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Opportunity Type: Existing Business" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Warning" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "The opportunity type is Existing Business and the project does not exist" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the requester with the email address "provisioningrequest@liferay.com"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the organization "Provisioning"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the product "prd_provisioning_request"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the support region "United States"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
+
+Scenario: View new business ticket warning
+	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with a new business warning
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORZENKORZEN                         |
+	| Contact Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Name                  | Korzen - ${staticCompanyName}        |
+	| Profile Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Approved                             |
+	| Tier                  | Regular                              |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korzen - ${staticCompanyName}" and the product "Digital Enterprise Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | true                     | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	Then the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "[Warning] New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Name: Korzen - ${staticCompanyName}" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Code: KORZENKORZEN" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Opportunity Type: New Business" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Warning" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "The opportunity type is New Business and the project already exists" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the requester with the email address "provisioningrequest@liferay.com"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the organization "Provisioning"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the product "prd_provisioning_request"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the support region "United States"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
+
+Scenario: View unique project ticket warning
+	Testing the ability to create a regular project in Dossiera and viewing the project in the form of a zendesk ticket with a unique project warning
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORZENKORZEN                         |
+	| Contact Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Name                  | Korzen - ${staticCompanyName}        |
+	| Profile Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Approved                             |
+	| Tier                  | Regular                              |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce         |
+	| Entity Id   | zyxwvuts0987654321 |
+	| Entity Name | account            |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | dossiera           |
+	| Entity Id   | zyxwvuts0987654321 |
+	| Entity Name | account            |
+	And I create an external link for the account "Korzen - ${staticCompanyName}" with the following values
+	| Domain      | salesforce         |
+	| Entity Id   | bcdefgh12345678901 |
+	| Entity Name | project            |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korzen - ${staticCompanyName}" and the product "Digital Enterprise Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | true                     | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	Then the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "[Warning] New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Name: Korzen - ${staticCompanyName}" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Account Code: KORZENKORZEN" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Opportunity Type: New Business" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "Warning" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the requester with the email address "provisioningrequest@liferay.com"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the organization "Provisioning"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the product "prd_provisioning_request"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the support region "United States"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the opportunity owner "pro.koroneiki1@lrcustomer.com.broken"
 	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the primary address country "United States"
