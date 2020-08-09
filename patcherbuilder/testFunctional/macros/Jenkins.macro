@@ -240,7 +240,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I start the fixpack-builder-hotfix-7x job with the following parameters ${table}"
+	@prose = "I start the fixpack-builder-hotfix-7x job for the ${branch} branch with the following parameters ${table}"
 	macro startFixPackBuilderHotfix7xJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
@@ -341,8 +341,14 @@ definition {
 			var patcherSecurityPatch = "false";
 		}
 
+		if ("${branch}" == "2.x") {
+			var jobName = "fixpack-builder-hotfix-7x\(2x-test\)";
+		} else {
+			var jobName = "fixpack-builder-hotfix-7x\(uat-test\)";
+		}
+
 		var curl = '''
-			${portalUrl}/view/All/job/fixpack-builder-hotfix-7x\(uat-test\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			${portalUrl}/view/All/job/${jobName}/buildWithParameters?token=${jenkinsAuthenticationToken}
 			-d fix.pack.customer.ticket=${fixPackCustomerTicket}
 			-d fix.pack.built.for=${fixPackBuiltFor}
 			-d fix.pack.fixed.issues=${fixPackFixedIssues}
@@ -362,7 +368,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I start the test-fixpack-builder-hotfix-copy job with the following parameters ${table}"
+	@prose = "I start the test-fixpack-builder-hotfix-copy job for the ${branch} branch with the following parameters ${table}"
 	macro startTestFixPackBuilderHotfixCopyJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
@@ -391,8 +397,14 @@ definition {
 			var originFilePath = "";
 		}
 
+		if ("${branch}" == "2.x") {
+			var jobName = "test-fixpack-builder-hotfix-copy\(2x-test\)";
+		} else {
+			var jobName = "test-fixpack-builder-hotfix-copy\(uat-test\)";
+		}
+
 		var curl = '''
-			${portalUrl}/view/All/job/test-fixpack-builder-hotfix-copy\(uat-test\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			${portalUrl}/view/All/job/${jobName}/buildWithParameters?token=${jenkinsAuthenticationToken}
 			-d originFilePath=${originFilePath}
 			-d destinationFilePath=${destinationFilePath}
 			''';
@@ -400,7 +412,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I start the test-fixpack-builder-install job with the following parameters ${table}"
+	@prose = "I start the test-fixpack-builder-install job for the ${branch} branch with the following parameters ${table}"
 	macro startTestFixPackBuilderInstallJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
@@ -441,8 +453,23 @@ definition {
 			var patchingTool = "";
 		}
 
+		if (contains("${patchingTool}", "LATEST")) {
+			var curlLatestPatchingTool = '''
+				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-2.0.txt
+				 -u {$mirrorUser}:{$mirrorPassword}
+			''';
+			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
+			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
+			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${latestVersion}");
+		}
+		if ("${branch}" == "2.x") {
+			var jobName = "test-fixpack-builder-install\(2x-test\)";
+		} else {
+			var jobName = "test-fixpack-builder-install\(uat-test\)";
+		}
+
 		var curl = '''
-			${portalUrl}/view/All/job/test-fixpack-builder-install\(uat-test\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			${portalUrl}/view/All/job/${jobName}/buildWithParameters?token=${jenkinsAuthenticationToken}
 			-d bundle=${bundle}
 			-d fixPack=${fixPack}
 			-d hotfix=${hotfix}
@@ -490,7 +517,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I start the test-fixpack-builder-patch-difference job with the following parameters ${table}"
+	@prose = "I start the test-fixpack-builder-patch-difference job for the ${branch} branch with the following parameters ${table}"
 	macro startTestFixPackBuilderPatchDifferenceJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
@@ -519,8 +546,14 @@ definition {
 			var betaPath = "";
 		}
 
+		if ("${branch}" == "2.x") {
+			var jobName = "test-fixpack-builder-patch-difference\(2x-test\)";
+		} else {
+			var jobName = "test-fixpack-builder-patch-difference\(uat-test\)";
+		}
+
 		var curl = '''
-			${portalUrl}/view/All/job/test-fixpack-builder-patch-difference\(uat-test\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			${portalUrl}/view/All/job/${jobName}/buildWithParameters?token=${jenkinsAuthenticationToken}
 			-d alphaPath=${alphaPath}
 			-d betaPath=${betaPath}
 			''';
