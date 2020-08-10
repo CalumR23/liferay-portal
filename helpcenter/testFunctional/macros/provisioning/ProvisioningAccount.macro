@@ -471,7 +471,7 @@ definition {
 			AssertVisible(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_LABEL");
 
 			if (!("${type}" == "File Upload")) {
-				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
 			}
 
 			if ("${type}" == "Input") {
@@ -506,11 +506,44 @@ definition {
 					}
 				}
 			}
-			else {
-				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, or Toggle Switch.");
+			else if ("${type}" == "Select Entity") {
+				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT_BUTTON");
+
+				SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+ 				var keyword = StringUtil.extractFirst("${value}", " ");
+
+				Type(
+					locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_FIELD",
+					value1 = "${keyword}");
+
+				Click(locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_BUTTON");
+
+				var key_entityName = "${value}";
+
+				Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+				SelectFrameTop();
+
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#ADD_BUTTON");
+
+				while (IsElementPresent(locator1 = "ProvisioningAccountSelect#ADD_BUTTON")) {
+					SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					SelectFrameTop();
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#ADD_BUTTON");
+				}
+			}
+ 			else {
+				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, Toggle Switch, File Upload, or Select Entity.");
 			}
 
-			if (!("${type}" == "File Upload")) {
+			if ((!("${type}" == "File Upload")) && (!("${type}" == "Select Entity"))) {
 				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SAVE_BUTTON");
 			}
 		}
