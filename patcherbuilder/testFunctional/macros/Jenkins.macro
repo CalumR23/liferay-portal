@@ -132,6 +132,65 @@ definition {
 		Pause(locator1 = "${timeInMilliseconds}");
 	}
 
+	@prose = "I start the fixpack-builder-fixpack-7x job with the following parameters ${table}"
+	macro startFixpackBuilderFixpack7xJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "fix.pack.fixed.issues") {
+				var fixPackFixedIssues = "${value}";
+			}
+			else if ("${field}" == "fix.pack.id") {
+				var fixPackId = "${value}";
+			}
+			else if ("${field}" == "git.revision") {
+				var gitRevision = "${value}";
+			}
+			else if ("${field}" == "runBuilderUpToPublishAppsOnly") {
+				var runBuilderUpToPublishAppsOnly = "${value}";
+			}
+			else if ("${field}" == "checkStaleArtifactsSkip") {
+				var checkStaleArtifactsSkip = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for fixpack-builder-fixpack-7x");
+			}
+		}
+
+		if (!(isSet(fixPackFixedIssues))) {
+			var fixPackFixedIssues = "";
+		}
+		if (!(isSet(fixPackId))) {
+			var fixPackId = "";
+		}
+		if (!(isSet(gitRevision))) {
+			var gitRevision = "";
+		}
+		if (!(isSet(runBuilderUpToPublishAppsOnly))) {
+			var runBuilderUpToPublishAppsOnly = "false";
+		}
+		if (!(isSet(checkStaleArtifactsSkip))) {
+			var checkStaleArtifactsSkip = "false";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/fixpack-builder-fixpack-7x/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d fix.pack.fixed.issues=${fixPackFixedIssues}
+			-d fix.pack.id=${fixPackId}
+			-d git.revision=${gitRevision}
+			-d runBuilderUpToPublishAppsOnly=${runBuilderUpToPublishAppsOnly}
+			-d checkStaleArtifactsSkip=${checkStaleArtifactsSkip}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I start the fixpack-builder-agent job with the following parameters ${table}"
 	macro startFixPackBuilderAgentJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
