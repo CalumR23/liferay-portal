@@ -1,6 +1,43 @@
 definition {
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
+	@prose = "I populate and save the user form with the following values ${table}"
+	macro populateUserFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var value = "${row[2]}";
+
+			var key_field = "${field}";
+
+			if ("${type}" == "Input") {
+				Type(
+					locator1 = "ProvisioningUser#INPUT_FIELD",
+					value1 = "${value}");				
+			}
+			else if ("${type}" == "Select") {
+				Select(
+					locator1 = "ProvisioningUser#SELECT_FIELD",
+					value1 = "${value}");	
+			}
+			else if ("${type}" == "Checkbox") {
+				if ("${value}" == "true") {
+					Check(locator1 = "ProvisioningUser#CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "ProvisioningUser#CHECKBOX");
+				}
+			}
+			else {
+				fail("No such writeable user field type ${type}. Please use Input, Select, or Checkbox.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningAccountAddAddress#SAVE_BUTTON");
+	}
+
 	@prose = "I should be able to view the contact account with the name ${accountName} and the following values ${table}"
 	macro _viewContactAccount {
 		var key_accountName = "${accountName}";
@@ -132,6 +169,69 @@ definition {
 			}
 			else {
 				fail("No such user detail field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the user form with the following values ${table}"
+	macro _viewUserForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var value = "${row[2]}";
+
+			if (contains("${field}", " from email address")) {
+				var key_field = StringUtil.replace("${field}", " from email address", "");
+			}
+			else {
+				var key_field = "${field}";
+			}
+
+			if ("${type}" == "Read Only Input") {
+				if ("${field}" == "Key from email address") {
+					var contactKey = KoroneikiContactAPI._getContactKeyViaContactEmailAddress(contactEmailAddress = "${value}");
+
+					AssertValue(
+						locator1 = "ProvisioningUser#READ_ONLY_INPUT_FIELD",
+						value1 = "${contactKey}");
+				}
+				else {
+					AssertValue(
+						locator1 = "ProvisioningUser#READ_ONLY_INPUT_FIELD",
+						value1 = "${value}");
+				}			
+			}
+			else if ("${type}" == "Input") {
+				if ("${field}" == "UUID from email address") {
+					var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${value}");
+
+					AssertValue(
+						locator1 = "ProvisioningUser#INPUT_FIELD",
+						value1 = "${contactUuid}");
+				}
+				else {
+					AssertValue(
+						locator1 = "ProvisioningUser#INPUT_FIELD",
+						value1 = "${value}");
+				}			
+			}
+			else if ("${type}" == "Select") {
+				AssertSelectedLabel(
+					locator1 = "ProvisioningUser#SELECT_FIELD",
+					value1 = "${value}");	
+			}
+			else if ("${type}" == "Checkbox") {
+				if ("${value}" == "true") {
+					AssertChecked(locator1 = "ProvisioningUser#CHECKBOX");
+				}
+				else {
+					AssertNotChecked(locator1 = "ProvisioningUser#CHECKBOX");
+				}
+			}
+			else {
+				fail("No such readable user field type ${type}. Please use Read Only Input, Input, Select, or Checkbox.");
 			}
 		}
 	}
