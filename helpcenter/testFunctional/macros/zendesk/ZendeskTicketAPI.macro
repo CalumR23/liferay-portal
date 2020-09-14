@@ -762,6 +762,32 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with keywords ${keywords} should not be synced to zendesk"
+	macro _viewNoTicketSyncByKeywords {
+		var keywordsNoSpaces = StringUtil.replace("${keywords}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json?query=${keywordsNoSpaces}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var results = JSONCurlUtil.get("${curl}", "$.results");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${results}", "${keywords}")))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var results = JSONCurlUtil.get("${curl}", "$.results");
+		}
+
+		if (contains("${results}", "${keywords}")) {
+			fail("The unexpected ticket with the keywords ${keywords} appears to have been synced to zendesk");
+		}
+	}
+
 	@prose = "an email regarding the reopening of ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to the ticket assignee ${table}"
 	macro _viewReopenedTicketEmailToAssignee {
 		var RawTable rawTable = new RawTable("${table}");
@@ -1537,6 +1563,25 @@ definition {
 
 		if (!(contains("${descriptionFromAPI}", "${descriptionText}"))) {
 			fail("Actual description ${descriptionFromAPI} does not contain the text ${descriptionText}");
+		}
+	}
+
+	@prose = "the ticket with keywords ${keywords} should not have the text ${descriptionText} in its description"
+	macro _viewTicketDescriptionNonText {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+
+		echo("Expected Description Text: ${descriptionText}");
+		echo("Actual Description: ${descriptionFromAPI}");
+
+		if (contains("${descriptionFromAPI}", "${descriptionText}")) {
+			fail("Actual description ${descriptionFromAPI} contains the unexpected the text ${descriptionText}");
 		}
 	}
 
