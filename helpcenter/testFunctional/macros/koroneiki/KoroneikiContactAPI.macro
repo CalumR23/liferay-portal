@@ -36,9 +36,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -68,9 +65,6 @@ definition {
 		if (!(isSet(middleName))) {
 			var middleName = "";
 		}
-		if (!(isSet(oktaId))) {
-			var oktaId = "";
-		}
 		if (!(isSet(uuid))) {
 			var uuid = "";
 		}
@@ -89,7 +83,6 @@ definition {
 					"languageId": "${languageId}",
 					"lastName": "${lastName}",
 					"middleName": "${middleName}",
-					"oktaId": "${oktaId}",
 					"uuid": "${uuid}"
 				}
 				''';
@@ -108,7 +101,6 @@ definition {
 					"languageId": "${languageId}",
 					"lastName": "${lastName}",
 					"middleName": "${middleName}",
-					"oktaId": "${oktaId}",
 					"uuid": "${uuid}"
 				}
 				''';
@@ -145,9 +137,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -174,9 +163,6 @@ definition {
 		if (!(isSet(middleName))) {
 			var middleName = "";
 		}
-		if (!(isSet(oktaId))) {
-			var oktaId = "";
-		}
 		if (!(isSet(uuid))) {
 			var uuid = "";
 		}
@@ -194,7 +180,6 @@ definition {
 				"languageId": "${languageId}",
 				"lastName": "${lastName}",
 				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
 				"uuid": "${uuid}"
 			}
 			''';
@@ -230,9 +215,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -259,9 +241,6 @@ definition {
 		if (!(isSet(middleName))) {
 			var middleName = "";
 		}
-		if (!(isSet(oktaId))) {
-			var oktaId = "";
-		}
 		if (!(isSet(uuid))) {
 			var uuid = "";
 		}
@@ -279,7 +258,6 @@ definition {
 				"languageId": "${languageId}",
 				"lastName": "${lastName}",
 				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
 				"uuid": "${uuid}"
 			}
 			''';
@@ -315,9 +293,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -344,9 +319,6 @@ definition {
 		if (!(isSet(middleName))) {
 			var middleName = "";
 		}
-		if (!(isSet(oktaId))) {
-			var oktaId = "";
-		}
 		if (!(isSet(uuid))) {
 			var uuid = "";
 		}
@@ -364,7 +336,6 @@ definition {
 				"languageId": "${languageId}",
 				"lastName": "${lastName}",
 				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
 				"uuid": "${uuid}"
 			}
 			''';
@@ -498,54 +469,6 @@ definition {
 		return "${staticContactExternalLinksNestedField}";
 	}
 
-	@prose = "I create an external link for the contact with the okta ID ${contactOktaId} with the following values ${table}"
-	macro _createContactExternalLinkViaOktaId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var domain = "${value}";
-			}
-			else if ("${field}" == "Entity Id") {
-				var entityId = "${value}";
-			}
-			else if ("${field}" == "Entity Name") {
-				var entityName = "${value}";
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-		}
-
-		if (!(isSet(domain))) {
-			var domain = "";
-		}
-		if (!(isSet(entityId))) {
-			var entityId = "";
-		}
-		if (!(isSet(entityName))) {
-			var entityName = "";
-		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"domain": "${domain}",
-				"entityId": "${entityId}",
-				"entityName": "${entityName}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I create an external link for the contact with the email address ${contactEmailAddress} with the following values ${table}"
 	macro _createContactExternalLinkViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -648,16 +571,9 @@ definition {
 			var middleName = "";
 		}
 
-		if (contains("${contact}", "oktaId")) {
-			var oktaId = JSONCurlUtil.get("${curl}", "$.oktaId");
-		}
-		else {
-			var oktaId = "";
-		}
-
 		var uuid = JSONCurlUtil.get("${curl}", "$.uuid");
 
-		static var staticContactsNestedField = "{&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;oktaId&quot;:&quot;${oktaId}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
+		static var staticContactsNestedField = "{&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
 
 		return "${staticContactsNestedField}";
 	}
@@ -690,16 +606,9 @@ definition {
 			var middleName = "";
 		}
 
-		if (contains("${contact}", "oktaId")) {
-			var oktaId = JSONCurlUtil.get("${curl}", "$.oktaId");
-		}
-		else {
-			var oktaId = "";
-		}
-
 		var uuid = JSONCurlUtil.get("${curl}", "$.uuid");
 
-		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Customer&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;oktaId&quot;:&quot;${oktaId}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
+		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Customer&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
 
 		return "${staticContactsNestedField}";
 	}
@@ -842,16 +751,9 @@ definition {
 			var middleName = "";
 		}
 
-		if (contains("${contact}", "oktaId")) {
-			var oktaId = JSONCurlUtil.get("${curl}", "$.oktaId");
-		}
-		else {
-			var oktaId = "";
-		}
-
 		var uuid = JSONCurlUtil.get("${curl}", "$.uuid");
 
-		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[${contactRolesNestedField},{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Customer&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;oktaId&quot;:&quot;${oktaId}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
+		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[${contactRolesNestedField},{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Customer&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
 
 		return "${staticContactsNestedField}";
 	}
@@ -884,16 +786,9 @@ definition {
 			var middleName = "";
 		}
 
-		if (contains("${contact}", "oktaId")) {
-			var oktaId = JSONCurlUtil.get("${curl}", "$.oktaId");
-		}
-		else {
-			var oktaId = "";
-		}
-
 		var uuid = JSONCurlUtil.get("${curl}", "$.uuid");
 
-		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Worker&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;oktaId&quot;:&quot;${oktaId}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
+		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Worker&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
 
 		return "${staticContactsNestedField}";
 	}
@@ -1036,16 +931,9 @@ definition {
 			var middleName = "";
 		}
 
-		if (contains("${contact}", "oktaId")) {
-			var oktaId = JSONCurlUtil.get("${curl}", "$.oktaId");
-		}
-		else {
-			var oktaId = "";
-		}
-
 		var uuid = JSONCurlUtil.get("${curl}", "$.uuid");
 
-		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[${contactRolesNestedField},{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Worker&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;oktaId&quot;:&quot;${oktaId}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
+		static var staticContactsNestedField = "{&quot;contactRoles&quot;:[${contactRolesNestedField},{&quot;description&quot;: &quot;&quot;,&quot;name&quot;: &quot;Member&quot;,&quot;type&quot;: &quot;Account Worker&quot;}],&quot;emailAddress&quot;:&quot;${emailAddress}&quot;,&quot;emailAddressVerified&quot;:${emailAddressVerified},&quot;firstName&quot;:&quot;${firstName}&quot;,&quot;languageId&quot;:&quot;${languageId}&quot;,&quot;lastName&quot;:&quot;${lastName}&quot;,&quot;middleName&quot;:&quot;${middleName}&quot;,&quot;uuid&quot;:&quot;${uuid}&quot;}";
 
 		return "${staticContactsNestedField}";
 	}
@@ -1118,18 +1006,6 @@ definition {
 	macro _deleteContactViaEmailAddress {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-email-address/${contactEmailAddress}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-	}
-
-	@prose = "I delete a contact on koroneiki with the okta ID ${contactOktaId}"
-	macro _deleteContactViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -1304,27 +1180,6 @@ definition {
 		return "${contactKey}";
 	}
 
-	macro _getContactOktaIdViaContactEmailAddress {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?search=${contactEmailAddress}\&pageSize=100
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactOktaId = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].oktaId");
-
-		var contactOktaId = StringUtil.replace("${contactOktaId}", "[", "");
-
-		var contactOktaId = StringUtil.replace("${contactOktaId}", "]", "");
-
-		var contactOktaId = StringUtil.replace("${contactOktaId}", "&quot;", "");
-
-		echo("Okta ID value for ${contactEmailAddress}: ${contactOktaId}");
-
-		return "${contactOktaId}";
-	}
-
 	macro _getContactUuidViaContactEmailAddress {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?search=${contactEmailAddress}\&pageSize=100
@@ -1393,72 +1248,6 @@ definition {
 		static var staticContactsNestedField4 = "${staticContactsNestedField}";
 
 		return "${staticContactsNestedField4}";
-	}
-
-	@prose = "I set the permissions for a contact with the okta ID ${contactOktaId} to have the following values for a non permissioned user ${table}"
-	macro _setContactPermissionsViaOktaId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Delete") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var delete = "${value}";
-			}
-			else if ("${field}" == "Permissions") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var permissions = "${value}";
-			}
-			else if ("${field}" == "Update") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var update = "${value}";
-			}
-			else if ("${field}" == "View") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var view = "${value}";
-			}
-			else {
-				fail("No such permission field ${field}");
-			}
-		}
-
-		if (!(isSet(delete))) {
-			var delete = "false";
-		}
-		if (!(isSet(permissions))) {
-			var permissions = "false";
-		}
-		if (!(isSet(update))) {
-			var update = "false";
-		}
-		if (!(isSet(view))) {
-			var view = "false";
-		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-permissions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"delete": "${delete}",
-				"permissions": "${permissions}",
-				"roleNames": [
-					"${roleName}"
-				],
-				"update": "${update}",
-				"view": "${view}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I set the permissions for a contact with the email address ${contactEmailAddress} to have the following values for a non permissioned user ${table}"
@@ -1683,72 +1472,6 @@ definition {
 		}
 	}
 
-	@prose = "I unset the following permissions for a contact with the okta ID ${contactOktaId} for a permissioned user ${table}"
-	macro _unsetContactPermissionsViaOktaId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Delete") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var delete = "${value}";
-			}
-			else if ("${field}" == "Permissions") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var permissions = "${value}";
-			}
-			else if ("${field}" == "Update") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var update = "${value}";
-			}
-			else if ("${field}" == "View") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var view = "${value}";
-			}
-			else {
-				fail("No such permission field ${field}");
-			}
-		}
-
-		if (!(isSet(delete))) {
-			var delete = "false";
-		}
-		if (!(isSet(permissions))) {
-			var permissions = "false";
-		}
-		if (!(isSet(update))) {
-			var update = "false";
-		}
-		if (!(isSet(view))) {
-			var view = "false";
-		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-permissions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"delete": "${delete}",
-				"permissions": "${permissions}",
-				"roleNames": [
-					"${roleName}"
-				],
-				"update": "${update}",
-				"view": "${view}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-	}
-
 	@prose = "I unset the following permissions for a contact with the email address ${contactEmailAddress} for a permissioned user ${table}"
 	macro _unsetContactPermissionsViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -1848,9 +1571,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -1942,18 +1662,6 @@ definition {
 				var middleName = "";
 			}
 		}
-		if (!(isSet(oktaId))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "oktaId=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
-
-				var oktaId = "${value}";
-			}
-			else {
-				var oktaId = "";
-			}
-		}
 		if (!(isSet(uuid))) {
 			var contactObject = JSONCurlUtil.get("${curl}", "$");
 			
@@ -1981,7 +1689,6 @@ definition {
 					"languageId": "${languageId}",
 					"lastName": "${lastName}",
 					"middleName": "${middleName}",
-					"oktaId": "${oktaId}",
 					"uuid": "${uuid}"
 				}
 				''';
@@ -2000,173 +1707,10 @@ definition {
 						"languageId": "${languageId}",
 						"lastName": "${lastName}",
 						"middleName": "${middleName}",
-						"oktaId": "${oktaId}",
 						"uuid": "${uuid}"
 					}
 					''';
 		}
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "I update a koroneiki contact with the okta ID ${contactOktaId} to have the following values ${table}"
-	macro _updateContactViaOktaId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Email Address") {
-				var emailAddress = "${value}";
-			}
-			else if ("${field}" == "Email Address Verified") {
-				var emailAddressVerified = "${value}";
-			}
-			else if ("${field}" == "First Name") {
-				var firstName = "${value}";
-			}
-			else if ("${field}" == "Language") {
-				var languageId = "${value}";
-			}
-			else if ("${field}" == "Last Name") {
-				var lastName = "${value}";
-			}
-			else if ("${field}" == "Middle Name") {
-				var middleName = "${value}";
-			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
-			else if ("${field}" == "UUID") {
-				var uuid = "${value}";
-			}
-			else {
-				fail("No such contact field ${field}");
-			}
-		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		if (!(isSet(emailAddress))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "emailAddress=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.emailAddress");
-
-				var emailAddress = "${value}";
-			}
-			else {
-				var emailAddress = "";
-			}
-		}
-		if (!(isSet(emailAddressVerified))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "emailAddressVerified=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.emailAddressVerified");
-
-				var emailAddressVerified = "${value}";
-			}
-			else {
-				var emailAddressVerified = "false";
-			}
-		}
-		if (!(isSet(firstName))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "firstName=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.firstName");
-
-				var firstName = "${value}";
-			}
-			else {
-				var firstName = "";
-			}
-		}
-		if (!(isSet(languageId))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "languageId=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.languageId");
-
-				var languageId = "${value}";
-			}
-			else {
-				var languageId = "";
-			}
-		}
-		if (!(isSet(lastName))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "lastName=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.lastName");
-
-				var lastName = "${value}";
-			}
-			else {
-				var lastName = "";
-			}
-		}
-		if (!(isSet(middleName))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${contactObject}", "middleName=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.middleName");
-
-				var middleName = "${value}";
-			}
-			else {
-				var middleName = "";
-			}
-		}
-		if (!(isSet(oktaId))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "oktaId=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
-
-				var oktaId = "${value}";
-			}
-			else {
-				var oktaId = "";
-			}
-		}
-		if (!(isSet(uuid))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "uuid=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.uuid");
-
-				var uuid = "${value}";
-			}
-			else {
-				var uuid = "";
-			}
-		}
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"emailAddress": "${emailAddress}",
-				"emailAddressVerified": ${emailAddressVerified},
-				"firstName": "${firstName}",
-				"languageId": "${languageId}",
-				"lastName": "${lastName}",
-				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
-				"uuid": "${uuid}"
-			}
-			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -2199,9 +1743,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var middleName = "${value}";
 			}
-			else if ("${field}" == "Okta ID") {
-				var oktaId = "${value}";
-			}
 			else if ("${field}" == "UUID") {
 				var uuid = "${value}";
 			}
@@ -2289,18 +1830,6 @@ definition {
 				var middleName = "";
 			}
 		}
-		if (!(isSet(oktaId))) {
-			var contactObject = JSONCurlUtil.get("${curl}", "$");
-			
-			if (contains("${contactObject}", "oktaId=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.oktaId");
-
-				var oktaId = "${value}";
-			}
-			else {
-				var oktaId = "";
-			}
-		}
 		if (!(isSet(uuid))) {
 			var contactObject = JSONCurlUtil.get("${curl}", "$");
 			
@@ -2327,37 +1856,11 @@ definition {
 				"languageId": "${languageId}",
 				"lastName": "${lastName}",
 				"middleName": "${middleName}",
-				"oktaId": "${oktaId}",
 				"uuid": "${uuid}"
 			}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} with the contact role ${contactRoleName}"
-	macro _viewAccountContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].contactRoles[?(@.name=='${contactRoleName}')].name");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
-
-		echo("Expected contact role name value: ${contactRoleName}");
-		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
-
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
-			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
-		}
 	}
 
 	@prose = "the account with the name ${accountName} should be assigned the contact with the email address ${contactEmailAddress} with the contact role ${contactRoleName}"
@@ -2372,31 +1875,6 @@ definition {
 			''';
 
 		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].contactRoles[?(@.name=='${contactRoleName}')].name");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
-
-		echo("Expected contact role name value: ${contactRoleName}");
-		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
-
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
-			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
-		}
-	}
-
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} with the customer contact role ${contactRoleName}"
-	macro _viewAccountCustomerContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].customerContactRoles[?(@.name=='${contactRoleName}')].name");
 
 		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
 
@@ -2439,31 +1917,6 @@ definition {
 		}
 	}
 
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId}"
-	macro _viewAccountViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var accountNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].name");
-
-		var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "[", "");
-
-		var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "]", "");
-
-		var accountNameFromAPI = StringUtil.replace("${accountNameFromAPI}", "&quot;", "");
-
-		echo("Expected account name value: ${accountName}");
-		echo("Actual account name value: ${accountNameFromAPI}");
-
-		if (!("${accountNameFromAPI}" == "${accountName}")) {
-			fail("Actual account name value ${accountNameFromAPI} does not match expected account name value ${accountName}");
-		}
-	}
-
 	@prose = "the account with the name ${accountName} should be assigned the contact with the email address ${contactEmailAddress}"
 	macro _viewAccountViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -2488,31 +1941,6 @@ definition {
 
 		if (!("${accountNameFromAPI}" == "${accountName}")) {
 			fail("Actual account name value ${accountNameFromAPI} does not match expected account name value ${accountName}");
-		}
-	}
-
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} with the worker contact role ${contactRoleName}"
-	macro _viewAccountWorkerContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].workerContactRoles[?(@.name=='${contactRoleName}')].name");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
-
-		echo("Expected contact role name value: ${contactRoleName}");
-		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
-
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
-			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
 		}
 	}
 
@@ -2888,168 +2316,6 @@ definition {
 
 		if (contains("${auditEntry}", "agentUID")) {
 			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.agentUID");
-
-			echo("Expected Agent UID: koroneikiagent");
-			echo("Actual Agent UID: ${agentUIDFromAPI}");
-
-			if (!("koroneikiagent" == "${agentUIDFromAPI}")) {
-				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID koroneikiagent");
-			}
-		}
-	}
-
-	@prose = "I should be able to view an audit entry for an action ${action} to the contact with the okta ID ${contactOktaId} field ${field} from the old value ${oldValue} to the new value ${newValue} executed by ${agentName}"
-	macro _viewContactAuditEntryViaOktaId {
-		var field = StringUtil.lowerCaseFirstLetter("${field}");
-
-		var field = StringUtil.replace("${field}", " ", "");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/audit-entries?pageSize=100
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		if ((!("${oldValue}" == "")) && (!("${newValue}" == "")))  {
-			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].action");
-		}
-		else if (!("${newValue}" == "")) {
-			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].action");
-		}
-		else {
-			var actionFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].action");
-		}
-
-		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "[", "");
-
-		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "]", "");
-
-		var actionFromAPI = StringUtil.replace("${actionFromAPI}", "&quot;", "");
-
-		echo("Expected Action Value: ${action}");
-		echo("Actual Action Value: ${actionFromAPI}");
-
-		if (!("${action}" == "${actionFromAPI}")) {
-			fail("Actual action value ${actionFromAPI} does not match expected action value ${action}");
-		}
-
-		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
-			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].field");
-		}
-		else if (!("${newValue}" == "")) {
-			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].field");
-		}
-		else {
-			var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].field");
-		}
-
-		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
-
-		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "]", "");
-
-		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "&quot;", "");
-
-		echo("Expected Field Value: ${field}");
-		echo("Actual Field Value: ${fieldFromAPI}");
-
-		if (!("${field}" == "${fieldFromAPI}")) {
-			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
-		}
-
-		if (!("${oldValue}" == "")) {
-			if (!("${newValue}" == "")) {
-				var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].oldValue");
-			}
-			else {
-				var oldValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].oldValue");			
-			}
-
-			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "[", "");
-
-			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "]", "");
-
-			var oldValueFromAPI = StringUtil.replace("${oldValueFromAPI}", "&quot;", "");
-
-			echo("Expected Old Value: ${oldValue}");
-			echo("Actual Old Value: ${oldValueFromAPI}");
-
-			if (!("${oldValue}" == "${oldValueFromAPI}")) {
-				fail("Actual old value ${oldValueFromAPI} does not match expected old value ${oldValue}");
-			}
-		}
-
-		if (!("${newValue}" == "")) {
-			if (!("${oldValue}" == "")) {
-				var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].newValue");
-			}
-			else {
-				var newValueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].newValue");				
-			}
-
-			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "[", "");
-
-			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "]", "");
-
-			var newValueFromAPI = StringUtil.replace("${newValueFromAPI}", "&quot;", "");
-
-			echo("Expected New Value: ${newValue}");
-			echo("Actual New Value: ${newValueFromAPI}");
-
-			if (!("${newValue}" == "${newValueFromAPI}")) {
-				fail("Actual new value ${newValueFromAPI} does not match expected new value ${newValue}");
-			}
-		}
-
-		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
-			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentName");
-		}
-		else if (!("${newValue}" == "")) {
-			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentName");
-		}
-		else {
-			var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].agentName");
-		}
-
-		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
-
-		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
-
-		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "&quot;", "");
-
-		echo("Expected Agent: ${agentName}");
-		echo("Actual Agent: ${agentNameFromAPI}");
-
-		if (!("${agentName}" == "${agentNameFromAPI}")) {
-			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
-		}
-
-		if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
-			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')]");
-		}
-		else if (!("${newValue}" == "")) {
-			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')]");
-		}
-		else {
-			var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')]");
-		}
-
-		if (contains("${auditEntry}", "agentUID")) {
-			if ((!("${oldValue}" == "")) && (!("${newValue}" == ""))) {
-				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}' && @.newValue=='${newValue}')].agentUID");
-			}
-			else if (!("${newValue}" == "")) {
-				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.newValue=='${newValue}')].agentUID");
-			}
-			else {
-				var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.action=='${action}' && @.field=='${field}' && @.oldValue=='${oldValue}')].agentUID");
-			}
-
-			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "[", "");
-
-			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "]", "");
-
-			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "&quot;", "");
 
 			echo("Expected Agent UID: koroneikiagent");
 			echo("Actual Agent UID: ${agentUIDFromAPI}");
@@ -3495,72 +2761,6 @@ definition {
 		}
 	}
 
-	@prose = "the external link with the entity id ${entityId} should be present on the contact with the okta ID ${contactOktaId} with the following values ${table}"
-	macro _viewContactExternalLinkViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].domain");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Id") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "URL") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].url");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\/", "/");
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
-
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
-		}
-	}
-
 	@prose = "the external link with the entity id ${entityId} should be present on the contact with the email address ${contactEmailAddress} with the following values ${table}"
 	macro _viewContactExternalLinkViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -3683,58 +2883,6 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view a product consumption on koroneiki for a contact with the okta ID ${contactOktaId} on the account ${accountName} for the product ${productName} with the following values ${table}"
-	macro _viewContactProductConsumptionViaOktaId {
-		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
-			accountName = "${accountName}",
-			productName = "${productName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/product-consumptions
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value1 = "${row[1]}";
-			var value2 = "${row[2]}";
-
-			if ("${field}" == "Product Field and Value") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productConsumptionKey}')].properties.${value1}");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("No such product consumption field ${field}");
-			}
-
-			if ("${field}" == "Product Field and Value") {
-				echo("Expected property field ${value1} value: ${value2}");
-				echo("Actual property field ${value1} value: ${valueFromAPI}");
-
-				if (!(contains("${value2}", "${valueFromAPI}"))) {
-					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
-				}
-			}
-			else {
-				echo("Expected ${field} Value: ${value1}");
-				echo("Actual ${field} Value: ${valueFromAPI}");
-
-				if (!(contains("${value1}", "${valueFromAPI}"))) {
-					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
-				}
-			}
-		}
-	}
-
 	@prose = "I should be able to view a product purchase on koroneiki for a contact with the email address ${contactEmailAddress} on the account ${accountName} for the product ${productName} with the following values ${table}"
 	macro _viewContactProductPurchase {
 		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
@@ -3745,112 +2893,6 @@ definition {
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/product-purchases
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value1 = "${row[1]}";
-			var value2 = "${row[2]}";
-
-			if ("${field}" == "End Date") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].endDate");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Original End Date") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].originalEndDate");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Perpetual") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].perpetual");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Product Field and Value") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].properties.${value1}");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Quantity") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].quantity");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Start Date") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].startDate");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Status") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.key=='${productPurchaseKey}')].status");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("No such product purchase field ${field}");
-			}
-
-			if ("${field}" == "Product Field and Value") {
-				echo("Expected property field ${value1} value: ${value2}");
-				echo("Actual property field ${value1} value: ${valueFromAPI}");
-
-				if (!(contains("${value2}", "${valueFromAPI}"))) {
-					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
-				}
-			}
-			else {
-				echo("Expected ${field} Value: ${value1}");
-				echo("Actual ${field} Value: ${valueFromAPI}");
-
-				if (!(contains("${value1}", "${valueFromAPI}"))) {
-					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
-				}
-			}
-		}
-	}
-
-	@prose = "I should be able to view a product purchase on koroneiki for a contact with the okta ID ${contactOktaId} on the account ${accountName} for the product ${productName} with the following values ${table}"
-	macro _viewContactProductPurchaseViaOktaId {
-		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
-			accountName = "${accountName}",
-			productName = "${productName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/product-purchases
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -4019,98 +3061,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
 			}
-			else if ("${field}" == "Okta ID") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
-			}
-			else if ("${field}" == "UUID") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
-			}
-			else {
-				fail("No such contact field ${field}");
-			}
-
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
-
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view a koroneiki contact with the okta ID ${contactOktaId} and the following values ${table}"
-	macro _viewContactViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Email Address") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddress");
-			}
-			else if ("${field}" == "Email Address Verified") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.emailAddressVerified");
-			}
-			else if ("${field}" == "Entitlement Nested Field") {
-				var entitlementsObjects = JSONCurlUtil.get("${curl}", "$.entitlements");
-
-				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "[", "");
-
-				var entitlementsObjects = StringUtil.replace("${entitlementsObjects}", "]", "");
-
-				var valueFromAPI = "${entitlementsObjects}";
-			}
-			else if ("${field}" == "External Link Nested Field") {
-				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
-				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
-				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-
-				var externalLinkObjectNumber = "0";
-
-				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
-					var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
-
-					var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
-
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
-
-					var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
-
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
-
-					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
-				}
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
-
-				var valueFromAPI = "${externalLinksObjectsEdit}";
-			}
-			else if ("${field}" == "First Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.firstName");
-			}
-			else if ("${field}" == "Language") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.languageId");
-			}
-			else if ("${field}" == "Last Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.lastName");
-			}
-			else if ("${field}" == "Middle Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
-			}
-			else if ("${field}" == "Okta ID") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
-			}
 			else if ("${field}" == "UUID") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
 			}
@@ -4199,9 +3149,6 @@ definition {
 			else if ("${field}" == "Middle Name") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.middleName");
 			}
-			else if ("${field}" == "Okta ID") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.oktaId");
-			}
 			else if ("${field}" == "UUID") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.uuid");
 			}
@@ -4215,22 +3162,6 @@ definition {
 			if (!(contains("${value}", "${valueFromAPI}"))) {
 				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 			}
-		}
-	}
-
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} without the contact role ${contactRoleName}"
-	macro _viewNoAccountContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allContactRoles = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].contactRoles");
-
-		if (contains("${allContactRoles}", "${contactRoleName}")) {
-			fail("The contact with the okta ID ${contactOktaId} still has the contact role ${contactRoleName}");
 		}
 	}
 
@@ -4252,22 +3183,6 @@ definition {
 		}
 	}
 
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} without the customer contact role ${contactRoleName}"
-	macro _viewNoAccountCustomerContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allContactRoles = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].customerContactRoles");
-
-		if (contains("${allContactRoles}", "${contactRoleName}")) {
-			fail("The contact with the okta ID ${contactOktaId} still has the contact role ${contactRoleName}");
-		}
-	}
-
 	@prose = "the account with the name ${accountName} should be assigned the contact with the email address ${contactEmailAddress} without the customer contact role ${contactRoleName}"
 	macro _viewNoAccountCustomerContactRoleViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -4286,22 +3201,6 @@ definition {
 		}
 	}
 
-	@prose = "the account with the name ${accountName} should not be assigned the contact with the okta ID ${contactOktaId}"
-	macro _viewNoAccountViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allContactAccounts = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allContactAccounts}", "${accountName}")) {
-			fail("The contact with the okta ID ${contactOktaId} contains the account ${accountName}");
-		}
-	}
-
 	@prose = "the account with the name ${accountName} should not be assigned the contact with the email address ${contactEmailAddress}"
 	macro _viewNoAccountViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -4317,22 +3216,6 @@ definition {
 
 		if (contains("${allContactAccounts}", "${accountName}")) {
 			fail("The contact with the email address ${contactEmailAddress} contains the account ${accountName}");
-		}
-	}
-
-	@prose = "the account with the name ${accountName} should be assigned the contact with the okta ID ${contactOktaId} without the worker contact role ${contactRoleName}"
-	macro _viewNoAccountWorkerContactRoleViaOktaId {
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-okta-id/${contactOktaId}/contact-account-views
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allContactRoles = JSONCurlUtil.get("${curl}", "$.items[?(@.account[?(@.name=='${accountName}')])].workerContactRoles");
-
-		if (contains("${allContactRoles}", "${contactRoleName}")) {
-			fail("The contact with the okta ID ${contactOktaId} still has the contact role ${contactRoleName}");
 		}
 	}
 

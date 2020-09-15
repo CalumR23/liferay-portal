@@ -53,29 +53,6 @@ definition {
 		}
 	}
 
-	@prose = "I assign the contact with the okta ID ${contactOktaId} on the team ${teamName} to the following roles ${table}"
-	macro _assignContactRolesToContactViaOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id/${contactOktaId}/roles?contactRoleKeys=${contactRoleKey}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-		}
-	}
-
 	@prose = "I assign the contact with the email address ${contactEmailAddress} on the team ${teamName} to the following roles via uuid ${table}"
 	macro _assignContactRolesToContactViaUuid {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -135,27 +112,6 @@ definition {
 
 			var curl = '''
 				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-email-address?agentName=${agentName}\&agentUID=koroneikiagent\&emailAddresses=${contactEmailAddress}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-		}
-	}
-
-	@prose = "I assign contacts with the following okta IDs to the team ${teamName} ${table}"
-	macro _assignContactsViaOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactOktaId = "${row[0]}";
-
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id?oktaIds=${contactOktaId}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -543,29 +499,6 @@ definition {
 		}
 	}
 
-	@prose = "I remove the contact with the okta ID ${contactOktaId} on the team ${teamName} from the following roles ${table}"
-	macro _removeContactRolesFromContactViaOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id/${contactOktaId}/roles?contactRoleKeys=${contactRoleKey}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-		}
-	}
-
 	@prose = "I remove the contact with the email address ${contactEmailAddress} on the team ${teamName} from the following roles via uuid ${table}"
 	macro _removeContactRolesFromContactViaUuid {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -625,27 +558,6 @@ definition {
 
 			var curl = '''
 				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-email-address?agentName=${agentName}\&agentUID=koroneikiagent\&emailAddresses=${contactEmailAddress}
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-		}
-	}
-
-	@prose = "I remove contacts with the following okta IDs from the team ${teamName} ${table}"
-	macro _removeContactsViaOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactOktaId = "${row[0]}";
-
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id?oktaIds=${contactOktaId}
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1063,33 +975,6 @@ definition {
 		}
 	}
 
-	@prose = "the contact with the okta ID ${contactOktaId} assigned the team ${teamName} should have the contact role ${contactRoleName}"
-	macro _viewContactRoleViaContactOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id/${contactOktaId}/roles
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactRoleNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${contactRoleName}')].name");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "[", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
-
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
-
-		echo("Expected contact role name value: ${contactRoleName}");
-		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
-
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
-			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
-		}
-	}
-
 	@prose = "the contact with the email address ${contactEmailAddress} assigned the team ${teamName} should have the contact role ${contactRoleName} visible via uuid"
 	macro _viewContactRoleViaContactUuid {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
@@ -1170,24 +1055,6 @@ definition {
 
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-email-address/${contactEmailAddress}/roles
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allTeamContactContactRoles = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allTeamContactContactRoles}", "${contactRoleName}")) {
-			fail("The contact with the email address ${contactEmailAddress} on the team with the name ${teamName} contains the contact role ${contactRoleName}");
-		}
-	}
-
-	@prose = "the contact with the okta ID ${contactOktaId} assigned the team ${teamName} should not have the contact role ${contactRoleName}"
-	macro _viewNoContactRoleViaContactOktaId {
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-okta-id/${contactOktaId}/roles
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
