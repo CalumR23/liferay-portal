@@ -1,0 +1,79 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.integration"
+
+Feature:  Koroneiki to Provisioning XSS
+	Testing to assure that the provisioning site has no XSS vulnerabilities.
+
+Teardown:
+	* I wait for "10" seconds
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| svg.koroneiki1@lrcustomer.com.broken |
+	* I log out and log into the koroneiki homepage as "koroneiki.admin@liferay.com.broken" with password "test"
+	* I go to the koroneiki account index page
+	* I tear down the following accounts via the koroneiki frontend
+	| ><svg /onload=alert(/child/)>  |
+	| ><svg /onload=alert(/parent/)> |
+
+Scenario: View XSS
+	Testing XSS vulnerabilities on the provisioning page
+
+	Given I log into the koroneiki homepage as "koroneiki.admin@liferay.com.broken" with password "test"
+	And I go to the koroneiki contact index page
+	And I click on the new entity button
+	And I populate and save the entity form with the following values
+	| First Name    | Input | '"><svg /onload=alert(/contact/)>    |
+	| Middle Name   | Input | '"><svg /onload=alert(/contact/)>    |
+	| Last Name     | Input | '"><svg /onload=alert(/contact/)>    |
+	| Email Address | Input | svg.koroneiki1@lrcustomer.com.broken |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I click on the new account button
+	And I populate and save the account form with the following values
+	| Name           | Input  | '"><svg /onload=alert(/parent/)> |
+	| Code           | Input  | '"><svg /onload=alert(/parent/)> |
+	| Tier           | Select | Regular                          |
+	| Support Region | Select | United States                    |
+	| Status         | Select | Approved                         |
+	And I click on the new account button
+	And I populate and save the account form with the following values
+	| Name           | Input  | '"><svg /onload=alert(/child/)> |
+	| Code           | Input  | '"><svg /onload=alert(/child/)> |
+	| Tier           | Select | Regular                         |
+	| Support Region | Select | United States                   |
+	| Status         | Select | Approved                        |
+	When I search the accounts page using the keyword "><svg /onload=alert(/child/)>"
+	And I click on the account with the name "><svg /onload=alert(/child/)>" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | svg.koroneiki1@lrcustomer.com.broken |
+	| Assign Role   | Member                               |
+	And I click on the "Liferay Workers" tab
+	And I click on the assign worker button
+	And I populate and save the assign worker form with the following values
+	| Email Address | svg.koroneiki1@lrcustomer.com.broken |
+	| Assign Role   | Member                               |
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Parent | Select Entity | ><svg /onload=alert(/parent/)> | |
+	And I go to the account index page
+	And I search the accounts page using the keyword "><svg /onload=alert(/child/)>"
+	Then I should not see an alert
+	When I click on the account with the name "><svg /onload=alert(/child/)>" on the provisioning index
+	Then I should not see an alert
+	When I click on the "Details" tab
+	Then I should not see an alert
+	When I click on the "Contacts" tab
+	Then I should not see an alert
+	When I click on the "Liferay Workers" tab
+	Then I should not see an alert
+	When I click on the "Teams" tab
+	Then I should not see an alert
+	When I click on the "Related Accounts" tab
+	Then I should not see an alert
+	When I click on the "Approved" related account tab
+	Then I should not see an alert
+	When I click on the "History" tab
+	Then I should not see an alert
+	When I click on the "Teams" tab
+	And I click on the "><svg /onload=alert(/child/)>" team link
+	Then I should not see an alert
