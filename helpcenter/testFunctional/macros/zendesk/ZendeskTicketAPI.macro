@@ -1252,6 +1252,26 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with the ticketId ${ticketId} should have the comment containing the text ${commentContent}"
+	macro _viewTicketComment {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}/comments.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
+
+		var commentArrayValue = MathUtil.difference("${commentCount}", "1");
+
+		var commentFromAPI = JSONCurlUtil.get("${curl}", "$.comments[${commentArrayValue}].body");
+
+		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "&quot;", "");
+
+		if (!(contains("${commentFromAPI}", "${commentContent}"))) {
+			fail("Actual comment ${commentFromAPI} as the most recent comment body does not contain the expected comment body content ${commentContent}.");
+		}
+	}
+
 	@prose = "an email regarding the comment with the body ${commentBody} added to a ticket with the ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to the ticket assignee ${table}"
 	macro _viewTicketCommentEmailToAssignee {
 		var RawTable rawTable = new RawTable("${table}");
