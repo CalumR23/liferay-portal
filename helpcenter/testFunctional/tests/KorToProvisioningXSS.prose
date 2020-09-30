@@ -8,14 +8,27 @@ Teardown:
 	* I wait for "10" seconds
  	* I tear down the contacts on koroneiki with the following email addresses
 	| svg.koroneiki1@lrcustomer.com.broken |
+	* I log out and log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	* I go to the product bundles index page
+	* I tear down the following product bundles
+	| ><svg /onload=alert(/bundle/)> |
 	* I log out and log into the koroneiki homepage as "koroneiki.admin@liferay.com.broken" with password "test"
+	* I go to the koroneiki product purchase index page
+	* I tear down the following product purchases via the koroneiki frontend
+	| ><svg /onload=alert(/product/)> |
+	* I go to the koroneiki product index page
+	* I tear down the following products via the koroneiki frontend
+	| ><svg /onload=alert(/product/)> |
+	* I go to the koroneiki team index page
+	* I tear down the following teams via the koroneiki frontend
+	| ><svg /onload=alert(/team/)> |
 	* I go to the koroneiki account index page
 	* I tear down the following accounts via the koroneiki frontend
 	| ><svg /onload=alert(/child/)>  |
 	| ><svg /onload=alert(/parent/)> |
 
-Scenario: View account and user XSS
-	Testing XSS vulnerabilities on the account and user provisioning pages
+Scenario: View account and user and team XSS
+	Testing XSS vulnerabilities on the account and user and team provisioning pages
 
 	Given I log into the koroneiki homepage as "koroneiki.admin@liferay.com.broken" with password "test"
 	And I go to the koroneiki contact index page
@@ -40,7 +53,7 @@ Scenario: View account and user XSS
 	| Tier           | Select | Regular                         |
 	| Support Region | Select | United States                   |
 	| Status         | Select | Approved                        |
-	When I search the accounts page using the keyword "><svg /onload=alert(/child/)>"
+	And I search the accounts page using the keyword "><svg /onload=alert(/child/)>"
 	And I click on the account with the name "><svg /onload=alert(/child/)>" on the provisioning index
 	And I click on the "Contacts" tab
 	And I click on the assign contact button
@@ -55,7 +68,13 @@ Scenario: View account and user XSS
 	And I click on the "Details" tab
 	And I edit the following account fields and types to the following values under the account details tab
 	| Parent | Select Entity | ><svg /onload=alert(/parent/)> | |
-	And I go to the account index page
+	And I click on the "Teams" tab
+	And I click on the new team button
+	And I populate and save the team form with the name "'><svg /onload=alert(/team/)>"
+	And I click on the assign members button
+	And I assign the team member with the email address "svg.koroneiki1@lrcustomer.com.broken"
+	Then I should not see an alert
+	When I go to the account index page
 	And I search the accounts page using the keyword "><svg /onload=alert(/child/)>"
 	Then I should not see an alert
 	When I click on the account with the name "><svg /onload=alert(/child/)>" on the provisioning index
@@ -86,4 +105,57 @@ Scenario: View account and user XSS
 	When I click on the "General" tab
 	Then I should not see an alert
 	When I click on the "Entitlements" tab 
+	Then I should not see an alert
+
+Scenario: View account and product XSS
+	Testing XSS vulnerabilities on the account and product provisioning pages
+
+	Given I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I click on the new account button
+	And I populate and save the account form with the following values
+	| Name           | Input  | '"><svg /onload=alert(/parent/)> |
+	| Code           | Input  | '"><svg /onload=alert(/parent/)> |
+	| Tier           | Select | Regular                          |
+	| Support Region | Select | United States                    |
+	| Status         | Select | Approved                         |
+	Then I should not see an alert
+	When I go to the product index page
+	And I click on the new product button
+	And I populate and save the product form with the following values
+	| Name | Input  | '"><svg /onload=alert(/product/)> |
+	| Type | Select | Primary                           |
+	Then I should not see an alert
+	When I go to the product bundles index page
+	And I click on the new product bundle button
+	And I populate and save the product bundle form with the following values
+	| Name        | Input | '"><svg /onload=alert(/bundle/)> |
+	| Add Product |       | ><svg /onload=alert(/product/)>  |
+	Then I should not see an alert
+	When I go to the account index page
+	And I search the accounts page using the keyword "><svg /onload=alert(/parent/)>"
+	And I click on the account with the name "><svg /onload=alert(/parent/)>" on the provisioning index
+	And I click on the add subscription button
+	And I generate static mmddyyyy start and end dates
+	And I populate and save the subscription form with the following values
+	| Product                    | ><svg /onload=alert(/product/)>  |
+	| Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Start Date                 | ${staticMmDdYyyyStartDate}       |
+	| End Date                   | ${staticMmDdYyyyOriginalEndDate} |
+	And I go to the account index page
+	And I search the accounts page using the keyword "><svg /onload=alert(/parent/)>"
+	And I click on the account with the name "><svg /onload=alert(/parent/)>" on the provisioning index
+	And I click on the "History" tab
+	Then I should not see an alert
+	And I click on the "Subscriptions" tab
+	Then I should not see an alert
+	When I click on the "Inactive" product tab
+	Then I should not see an alert
+	When I click on the "All" product tab
+	Then I should not see an alert
+	When I click on the "><svg /onload=alert(/product/)>" subscription link
+	Then I should not see an alert
+	When I go to the product index page
+	And I search the products page using the keyword "svg"
+	Then I should not see an alert
+	When I go to the product bundles index page
 	Then I should not see an alert
