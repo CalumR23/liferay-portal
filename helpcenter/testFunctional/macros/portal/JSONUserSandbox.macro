@@ -223,6 +223,33 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I deactivate the user with the email address ${userEmailAddress} from web.liferay.com"
+	macro deactivateWebUser {
+		var companyId = JSONCompany.getWebCompanyId();
+
+		var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+		var curl = '''
+			${webURL}/secure/api/jsonws/user/get-user-by-screen-name
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d companyId=${companyId}
+			-d screenName=${userScreenName}
+			''';
+
+		var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Web User ID: ${webUserId}");
+
+		var curl = '''
+			${webURL}/secure/api/jsonws/user/update-status
+			-u ${webAdminEmailAddress}:${webAdminPassword}
+			-d userId=${webUserId}
+			-d status=5
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I delete the user with the email address ${userEmailAddress} from customer.liferay.com"
 	macro deleteSupportUser {
 		var companyId = JSONCompany.getSupportCompanyId();
