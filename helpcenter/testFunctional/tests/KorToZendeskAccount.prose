@@ -4,6 +4,18 @@
 Feature:  Koroneiki to Zendesk Account Integration
 	Testing to assure that koroneiki account information transfers properly to zendesk in the form of a ticket.
 
+Setup:
+	* I create a sandbox user with the following parameters
+	| Screen Name   | pro.koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	* I create a sandbox user with the following parameters
+	| Screen Name   | pro.koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+
 Teardown:
 	* I wait for "10" seconds
 	* I tear down the external links for the product "Service Partnership" on koroneiki with the following entity id values
@@ -41,8 +53,6 @@ Teardown:
 	| Basic Reseller Partnership       |
 	| Distribution Partnership         |
 	| Training Partnership             |
-	| Platinum Subscription            |
-	| Gold Subscription                |
 	* I tear down the contact roles on koroneiki with the following names
 	| Liferay Account Customer Role |
  	* I tear down the contacts on koroneiki with the following email addresses
@@ -56,6 +66,15 @@ Teardown:
 	* I teardown the tickets with the following keywords from zendesk.liferay.com
 	| Korzen - ${staticCompanyName} |
 	| Korzen - ${staticProjectName} |
+	* I tear down the sandbox users with the following email addresses from web.liferay.com
+	| pro.koroneiki1@lrcustomer.com.broken |
+	| pro.koroneiki2@lrcustomer.com.broken |
+	* I tear down the sandbox users with the following email addresses from customer.liferay.com
+	| pro.koroneiki1@lrcustomer.com.broken |
+	| pro.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| pro.koroneiki1@lrcustomer.com.broken |
+	| pro.koroneiki2@lrcustomer.com.broken |
 
 Scenario: View new business ticket
 	Testing the ability to create a new business in Dossiera and viewing the project in the form of a zendesk ticket
@@ -1056,3 +1075,115 @@ Scenario: View no Value Added Reseller Partnership ticket
 	| Start Year                             | ${staticStartYear}                         |
 	And I wait for "1" minutes
 	Then the ticket with keywords "Korzen - ${staticCompanyName}" should not be synced to zendesk
+
+Scenario: View deactivated user ticket
+	Testing the ability to create a new business in Dossiera with a deactivated user and viewing the project in the form of a zendesk ticket
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I deactivate the sandbox user with the email address "pro.koroneiki1@lrcustomer.com.broken" from web.liferay.com
+	And I wait for "1" minutes
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "[Warning] New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "The following missing contact(s) cannot be assigned to the account:" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "pro.koroneiki1@lrcustomer.com.broken" in its description
+
+Scenario: View deleted user ticket
+	Testing the ability to create a new business in Dossiera with a deleted user and viewing the project in the form of a zendesk ticket
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I delete the sandbox user with the email address "pro.koroneiki1@lrcustomer.com.broken" from web.liferay.com
+	And I wait for "1" minutes
+	And I publish a project with no partner RabbitMQ message on sandbox with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Korzen - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay DXP Production                     |
+	| Project Name                           | Korzen - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "1" minutes
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should be synced to zendesk
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the subject "[Warning] New Subscription for Korzen - ${staticCompanyName}"
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "The following missing contact(s) cannot be assigned to the account:" in its description
+	And the ticket with keywords "Korzen - ${staticCompanyName}" should have the text "pro.koroneiki1@lrcustomer.com.broken" in its description
