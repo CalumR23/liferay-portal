@@ -3310,3 +3310,66 @@ Scenario: Create a 73 build with child build
     | Patcher Status  | Complete Merging Only                      |
     | Jenkins         | fixpack-builder-agent(uat)                 |
     | Jenkins         | fixpack-builder-hotfix-7x(uat)             |
+
+Scenario: Create a 73 commerce build
+    @ test.group = "0"
+    As a TSE, I should be able to create a 7.3 commerce build
+
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content
+    And I create a Patcher fix with the following values
+    | Product         | DXP 7.3                                                  |
+    | Project Version | fix-pack-base-7310                                       |
+    | Content         | ${staticFixContent}                                      |
+    | Branch Name     | LRP-934-commerce-7310                                    |
+    | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+    | Content         | ${staticFixContent}     |
+    | Version         | 1.0                     |
+    | Product         | DXP 7.3                 |
+    | Project Version | fix-pack-base-7310      |
+    | Patcher Status  | Adding                  |
+    | Type            | Patch                   |
+    When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+    | Content         | ${staticFixContent}         |
+    | Version         | 1.0                         |
+    | Product         | DXP 7.3                     |
+    | Project Version | fix-pack-base-7310          |
+    | Git Hash        | 0c40ce0ae9                  |
+    | Patcher Status  | Complete                    |
+    | Type            | Patch                       |
+    | Jenkins         | fixpack-builder-agent(uat)  |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+    | Product         | DXP 7.3                 |
+    | Project Version | fix-pack-base-7310      |
+    | Tickets List    | ${staticFixContent}     |
+    | Account Code    | LPSPJP                  |
+    | Support Ticket  | ${staticTicketNumber}   |
+    And I set the account code "LPSPJP" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+    | Type            | Official                |
+    | Support Ticket  | ${staticTicketNumber}   |
+    | Version         | 1.0                     |
+    | Project Version | fix-pack-base-7310      |
+    | Content         | 0 Fix Packs + 1 Tickets |
+    | Patcher Status  | Compiling               |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+    | Name            | ${staticFixContent} |
+    | Version         | 1.0                 |
+    | Git Hash        | 0c40ce0ae9          |
+    | Status          | Complete            |
+    | Type            | Patch               |
+    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LPSPJP" with the following values
+    | Type            | Official                       |
+    | Support Ticket  | ${staticTicketNumber}          |
+    | Version         | 1.0                            |
+    | Project Version | fix-pack-base-7310             |
+    | Content         | 0 Fix Packs + 1 Tickets        |
+    | Patcher Status  | Complete                       |
+    | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+    | Jenkins         | fixpack-builder-agent(uat)     |
