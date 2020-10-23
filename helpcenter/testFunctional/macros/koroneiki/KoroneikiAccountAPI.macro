@@ -301,6 +301,9 @@ definition {
 
 				var agentName = "${value}";
 			}
+			else if ("${field}" == "Assigned Team Nested Field") {
+				var assignedTeamsNestedField = "${value}";
+			}
 			else if ("${field}" == "Code") {
 				var code = "${value}";
 			}
@@ -359,6 +362,9 @@ definition {
 
 		if (!(isSet(agentName))) {
 			var agentName = "";
+		}
+		if (!(isSet(assignedTeamsNestedField))) {
+			var assignedTeamsNestedField = "";
 		}
 		if (!(isSet(code))) {
 			var code = "";
@@ -420,6 +426,7 @@ definition {
 				-H "Content-Type: application/json"
 				-d
 				{
+					"assignedTeams": [${assignedTeamsNestedField}],
 					"code": "${code}",
 					"contactEmailAddress": "${contactEmailAddress}",
 					"contacts": [${contactsNestedField}],
@@ -448,6 +455,7 @@ definition {
 				-H "Content-Type: application/json"
 				-d
 				{
+					"assignedTeams": [${assignedTeamsNestedField}],
 					"code": "${code}",
 					"contactEmailAddress": "${contactEmailAddress}",
 					"contacts": [${contactsNestedField}],
@@ -3074,7 +3082,10 @@ definition {
 			var field = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${field}" == "Code") {
+			if ("${field}" == "Assigned Team Nested Field") {
+				var assignedTeamsNestedField = "${value}";
+			}
+			else if ("${field}" == "Code") {
 				var code = "${value}";
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -3131,12 +3142,28 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
+		if (!(isSet(assignedTeamsNestedField))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "assignedTeams=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.assignedTeams");
+
+				var value = StringUtil.replace("${value}", "[", "");
+
+				var value = StringUtil.replace("${value}", "]", "");
+
+				var assignedTeamsNestedField = "${value}";
+			}
+			else {
+				var assignedTeamsNestedField = "";
+			}
+		}
 		if (!(isSet(code))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -3437,12 +3464,13 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			-d
 			{
+				"assignedTeams": [${assignedTeamsNestedField}],
 				"code": "${code}",
 				"contactEmailAddress": "${contactEmailAddress}",
 				"contacts": [${contactsNestedField}],
