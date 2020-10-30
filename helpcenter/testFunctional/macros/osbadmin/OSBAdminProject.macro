@@ -292,14 +292,14 @@ definition {
 
 	@prose = "I delete the project with the code ${projectCode} via groovy"
 	macro deleteProjectViaGroovy {
-		var accountId = OSBAdminProject.getAccountId(projectCode = "${projectCode}");
+		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
 
 		var script = '''
 			import com.liferay.portal.kernel.dao.db.DB;
 			import com.liferay.portal.kernel.dao.db.DBManagerUtil;
 			import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 			DB db = DBManagerUtil.getDB();
-			db.runSQL("delete from OSB_AccountEntry where accountEntryid = ${accountId}");
+			db.runSQL("delete from OSB_AccountEntry where accountEntryid = ${accountEntryId}");
 			CacheRegistryUtil.clear();
 			''';
 
@@ -471,18 +471,6 @@ definition {
 		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
 
 		Message.success();
-	}
-
-	macro getAccountId {
-		OSBAdminSearch.searchBasicProject(projectCode = "${projectCode}");
-
-		var key_code = "${projectCode}";
-
-		var accountLinkHref = selenium.getAttribute("//td[contains(@class,'code')]/a[.='${key_code}']/parent::td/parent::tr//td[contains(@class,'code')]/a@href");
-
-		var accountId = StringUtil.extractLast("${accountLinkHref}", "=");
-
-		return "${accountId}";
 	}
 
 	macro gotoAccount {
