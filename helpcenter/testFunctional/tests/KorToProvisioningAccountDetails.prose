@@ -5236,7 +5236,7 @@ Scenario: Update parent and child account
 	| Account Name       | Input         | Vchild - ${staticProjectName} | |
 	| Code               | Input         | VCHILDVCHILD                  | |
 	| Tier               | Select        | T1                            | |
-	| Dossiera Project   | Input         | 0987654321zyxwvuts            | |
+	| Dossiera Project   | Input         | 7654321                       | |
 	| Salesforce Project | Input         | e6f7g8h9i1a2b3c4d5            | |
 	Then I should be able to view the following account values in the account details page
 	| Name           | Vchild - ${staticProjectName} |
@@ -5254,7 +5254,7 @@ Scenario: Update parent and child account
 	| Tier                | T1                            | |
 	| Parent              | Onepro - ${staticProjectName} | |
 	| Partner/Reseller/SI | Koroneiki Partner             |	|
-	| Dossiera Project    | 0987654321zyxwvuts            | |
+	| Dossiera Project    | 7654321                       | |
 	| Salesforce Project  | e6f7g8h9i1a2b3c4d5            | |
 	When I click on the "Related Accounts" tab
 	And I search related accounts using the keyword "Korpro"
@@ -7319,3 +7319,82 @@ Scenario: View project max developer count after developer role removal
 	| Developers     | 0 / 3 Filled                  |
 	| Tier           | T4                            |
 	| Partner        | Koroneiki Partner             |
+
+Scenario: Update accounts with invalid Dossiera key values
+	Testing the inability to update a T4 account with a duplicate and second Dossiera keys in the provisioning page
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I update a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" to have the following values
+	| Primary | True |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I update a koroneiki account with the name "Korpro - ${staticProjectName}" to have the following values
+	| Tier | T4 |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Dossiera Account | Input | ${staticDossieraAccountKey} | |
+	Then I should be able to view an error message stating that the account must have a unique Dossiera key
+	When I edit the following account fields and types to the following values under the account details tab
+	| Dossiera Account | Input | 0987654321zyxwvuts | |
+	Then I should be able to view an error message stating that the account can only have one Dossiera key
+	When I go to the account index page
+	And I search the accounts page using the keyword "Prokor"
+	And I click on the account with the name "Prokor - ${staticCompanyName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Dossiera Project | Input | ${staticDossieraProjectKey} | |
+	Then I should be able to view an error message stating that the account must have a unique Dossiera key
+	When I edit the following account fields and types to the following values under the account details tab
+	| Dossiera Project | Input | 7654321 | |
+	Then I should be able to view an error message stating that the account can only have one Dossiera key
