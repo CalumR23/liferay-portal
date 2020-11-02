@@ -290,40 +290,6 @@ definition {
 		// Message.error(errorMessage = "AccountCustomerRemovalException");
 	}
 
-	@prose = "I delete the project with the code ${projectCode} via groovy"
-	macro deleteProjectViaGroovy {
-		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
-
-		var script = '''
-			import com.liferay.portal.kernel.dao.db.DB;
-			import com.liferay.portal.kernel.dao.db.DBManagerUtil;
-			import com.liferay.portal.kernel.cache.CacheRegistryUtil;
-			DB db = DBManagerUtil.getDB();
-			db.runSQL("delete from OSB_AccountEntry where accountEntryid = ${accountEntryId}");
-			CacheRegistryUtil.clear();
-			''';
-
-		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
-
-		OSBAdmin.pause(timeInSeconds = "3");
-
-		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
-			Click(locator1 = "ProductMenu#TOGGLE");
-		}
-
-		Select(
-			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
-			value1 = "Groovy");
-
-		Type(
-			locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
-			value1 = "${script}");
-
-		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
-
-		Message.success();
-	}
-
 	macro deleteUsers {
 		Click(locator1 = "OSBAdminProjectUsers#CURRENT_TAB");
 
@@ -652,6 +618,50 @@ definition {
 				ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
 
 				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				Message.success();
+			}
+		}
+	}
+
+	@prose = "I tear down the projects with the following project codes via groovy ${table}"
+	macro tearDownProjectsViaGroovy {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var projectCode = "${row[0]}";
+
+			var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${projectCode}");
+
+			if ((contains("${accountEntryObject}", "${projectCode}")) && (!(contains("${accountEntryObject}", "NoSuchAccountEntryException")))) {
+				var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
+
+				var script = '''
+					import com.liferay.portal.kernel.dao.db.DB;
+					import com.liferay.portal.kernel.dao.db.DBManagerUtil;
+					import com.liferay.portal.kernel.cache.CacheRegistryUtil;
+					DB db = DBManagerUtil.getDB();
+					db.runSQL("delete from OSB_AccountEntry where accountEntryid = ${accountEntryId}");
+					CacheRegistryUtil.clear();
+					''';
+
+				Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+				OSBAdmin.pause(timeInSeconds = "3");
+
+				if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+					Click(locator1 = "ProductMenu#TOGGLE");
+				}
+
+				Select(
+					locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+					value1 = "Groovy");
+
+				Type(
+					locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+					value1 = "${script}");
+
+				Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
 
 				Message.success();
 			}
