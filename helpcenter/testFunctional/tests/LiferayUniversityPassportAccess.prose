@@ -21,7 +21,7 @@ Setup:
 	| Email Address | passport.partner1@pspartner.com.broken |
 	| First Name    | Passport                               |
 	| Last Name     | Partner1                               |
-	* I create a support user with the following parameters
+	* I create a user with the following parameters
 	| Screen Name   | passport.employee1                    |
 	| Email Address | passport.employee1@liferay.com.broken |
 	| First Name    | Passport                              |
@@ -36,18 +36,54 @@ Setup:
 	| Email Address | passport.user2@pspartner.com.broken |
 	| First Name    | Passport                            |
 	| Last Name     | User2                               |
-	* I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
-	* I go to the OSB admin main page
-	* I assign a user the email address "passport.partner1@pspartner.com.broken" as a worker with the role "Manager" to the partner with the code "Zen OSB Partner"
+	* I create a contact on koroneiki with the following values
+	| Email Address | passport.customer1@pscustomer.com.broken |
+	| First Name    | Passport                                 |
+	| Language      | English                                  |
+	| Last Name     | Customer1                                |
+	* I create a contact on koroneiki with the following values
+	| Email Address | passport.customer2@pscustomer.com.broken |
+	| First Name    | Passport                                 |
+	| Language      | English                                  |
+	| Last Name     | Customer2                                |
+	* I create a contact on koroneiki with the following values
+	| Email Address | passport.partner1@pspartner.com.broken |
+	| First Name    | Passport                               |
+	| Language      | English                                |
+	| Last Name     | Partner1                               |
+	* I create a contact on koroneiki with the following values
+	| Email Address | passport.employee1@liferay.com.broken |
+	| First Name    | Passport                              |
+	| Language      | English                               |
+	| Last Name     | Employee1                             |
+	* I generate a provisioning project name
+	* I generate a provisioning company name
+	* I create an account on koroneiki with the following values
+	| Name   | Passpartner - ${staticCompanyName} |
+	| Code   | PASSPARTNER                        |
+	| Status | Active                             |
+	* I generate static start and end dates
+	* I create a product purchase for an account with the name "Passpartner - ${staticCompanyName}" and the product "Service Partnership" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I assign the contact with the email address "passport.partner1@pspartner.com.broken" on the account "Passpartner - ${staticCompanyName}" to the following roles
+	| Partner Manager |
 
 Teardown:
 	* I wait for "10" seconds
-	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
-	* I get the ID of the default user belonging to the organization "Passport Automotive" from zendesk.liferay.com
+	* I get the ID of the default user belonging to the organization "Passport - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Passpartner - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
 	* I tear down the users with the following email addresses from web.liferay.com
 	| passport.customer1@pscustomer.com.broken |
 	| passport.customer2@pscustomer.com.broken |
 	| passport.partner1@pspartner.com.broken   |
+	| passport.employee1@liferay.com.broken    |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| passport.customer1@pscustomer.com.broken |
 	| passport.customer2@pscustomer.com.broken |
@@ -55,11 +91,38 @@ Teardown:
 	| passport.employee1@liferay.com.broken    |
 	| passport.user1@pscustomer.com.broken     |
 	| passport.user2@pspartner.com.broken      |
-	* I tear down the partner workers with the following email addresses for the partner with the code "Zen OSB Partner"
-	| passport.partner1@pspartner.com.broken |
-	* I tear down the projects with the following project codes
-	| PASSAUTO |
+	* I tear down the users with the following email addresses from koroneiki
+	| passport.customer1@pscustomer.com.broken |
+	| passport.customer2@pscustomer.com.broken |
+	| passport.partner1@pspartner.com.broken   |
+	| passport.employee1@liferay.com.broken    |
+	* I tear down the product purchases on koroneiki made by the account "Passport - ${staticProjectName}" for the following products
+	| DXP Production                 |
+	| Portal Production              |
+	| Platinum Subscription          |
+	| Gold Subscription              |
+	| Enterprise Search - Production |
+	* I tear down the product purchases on koroneiki made by the account "Passpartner - ${staticCompanyName}" for the following products
+	| Service Partnership |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| passport.customer1@pscustomer.com.broken |
+	| passport.customer2@pscustomer.com.broken |
+	| passport.partner1@pspartner.com.broken   |
+	| passport.employee1@liferay.com.broken    |
+	* I tear down the accounts on koroneiki with the following names
+	| Passpartner - ${staticCompanyName} |
+	| Passport - ${staticProjectName}    |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| PASSPARTNER |
+	| PASSPORT    |
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes via groovy
+	| PASSPARTNER |
+	| PASSPORT    |
 	* I wait for "5" seconds
+	* I teardown the tickets with the following keywords from zendesk.liferay.com
+	| Passpartner - ${staticCompanyName} |
+	| Passport - ${staticProjectName}   |
 	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
 	| passport.customer1@pscustomer.com.broken |
 	| passport.customer2@pscustomer.com.broken |
@@ -67,33 +130,46 @@ Teardown:
 	| passport.employee1@liferay.com.broken    |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com
-	| Passport Automotive |
+	| Passpartner - ${staticCompanyName} |
+	| Passport - ${staticProjectName}    |
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
 
 Scenario: Request passport access as dxp customers
 	New passports should be able to be requested by dxp customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -130,26 +206,37 @@ Scenario: Request passport access as dxp customers
 Scenario: Request passport access as portal customers
 	New passports should be able to be requested by portal customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Portal Production" and support level "Gold" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -186,24 +273,37 @@ Scenario: Request passport access as portal customers
 Scenario: Request passport access as dxp partners
 	New passports should be able to be requested by dxp partners.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.partner1@pspartner.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.partner1@pspartner.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.partner1@pspartner.com.broken" to the support group "Guest"
@@ -223,24 +323,37 @@ Scenario: Request passport access as dxp partners
 Scenario: Request passport access as portal partners
 	New passports should be able to be requested by portal partners.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I add an order with the product "Portal Production" and support level "Gold" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.partner1@pspartner.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.partner1@pspartner.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.partner1@pspartner.com.broken" to the support group "Guest"
@@ -260,7 +373,9 @@ Scenario: Request passport access as portal partners
 Scenario: Request passport access as Liferay employee
 	New passports should be able to be requested by Liferay employees.
 
-	Given I go to the OSB admin main page
+	Given I assign customer contacts with the following email addresses to the account "Liferay, Inc."
+	| passport.employee1@liferay.com.broken |
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
 	And I update the support password for user with the email address "passport.employee1@liferay.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.employee1@liferay.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.employee1@liferay.com.broken" to the support group "Guest"
@@ -280,25 +395,37 @@ Scenario: Request passport access as Liferay employee
 Scenario: Request multiple passport access tokens
 	Mulitple passports should be able to be requested by a single user.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Guest"
@@ -326,25 +453,37 @@ Scenario: Request multiple passport access tokens
 Scenario: Request passport access tokens with invalid email
 	New passports should not be able to be requested with an invalid email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Guest"
@@ -365,26 +504,37 @@ Scenario: Request passport access tokens with invalid email
 Scenario: Request passport access as non portal or non dxp customers
 	New passports should not be able to be requested by non portal or non dxp customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Enterprise Search - Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Enterprise Search - Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -421,25 +571,37 @@ Scenario: Request passport access as non portal or non dxp customers
 Scenario: Request passport access as Japan customers
 	New passports should not be able to be requested by Japan customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 2 Chome-13-3        |
-	| Country                    | Japan               |
-	| City                       | Akasaka, Minato-ku  |
-	| Zip                        | 107-0052            |
-	| Region                     | Japan               |
-	| Language                   | Japanese            |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | Japan                            |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -476,26 +638,37 @@ Scenario: Request passport access as Japan customers
 Scenario: Request passport access as China customers
 	New passports should not be able to be requested by China customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 63 Renmin Lu        |
-	| Country                    | China               |
-	| State                      | Shandong            |
-	| City                       | Qingdao Shi         |
-	| Zip                        | 266033              |
-	| Region                     | China               |
-	| Language                   | Chinese             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | China                            |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -532,25 +705,37 @@ Scenario: Request passport access as China customers
 Scenario: Request passport access as India customers
 	New passports should not be able to be requested by India customers.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive                        |
-	| Code                       | PASSAUTO                                   |
-	| Type                       | Group                                      |
-	| Industry                   | Automotive                                 |
-	| Partner Code               | Zen OSB Partner                            |
-	| Partner First Line Support | true                                       |
-	| Tier                       | T1                                         |
-	| Max Contacts               | 10                                         |
-	| Address Line               | Flat No. 100 Triveni Apartments Pitam Pura |
-	| Country                    | India                                      |
-	| City                       | New Delhi                                  |
-	| Zip                        | 110034                                     |
-	| Region                     | India                                      |
-	| Language                   | English                                    |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | India                            |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.customer1@pscustomer.com.broken" to "osbadminqauser"
 	And I update the support password for user with the email address "passport.customer2@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.customer1@pscustomer.com.broken" to the support group "Help Center"
@@ -587,25 +772,37 @@ Scenario: Request passport access as India customers
 Scenario: Request passport access as user with dxp customer email
 	New passports should be able to be requested by user with a dxp customer email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user1@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Guest"
@@ -622,25 +819,37 @@ Scenario: Request passport access as user with dxp customer email
 Scenario: Request passport access as user with dxp partner email
 	New passports should be able to be requested by user with a dxp partner email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Digital Enterprise Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user2@pspartner.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Guest"
@@ -657,25 +866,37 @@ Scenario: Request passport access as user with dxp partner email
 Scenario: Request passport access as user with portal customer email
 	New passports should be able to be requested by user with a portal customer email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Portal Production" and support level "Gold" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user1@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Guest"
@@ -692,25 +913,37 @@ Scenario: Request passport access as user with portal customer email
 Scenario: Request passport access as user with portal partner email
 	New passports should be able to be requested by user with a portal partner email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I add an order with the product "Portal Production" and support level "Gold" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user2@pspartner.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Guest"
@@ -727,26 +960,37 @@ Scenario: Request passport access as user with portal partner email
 Scenario: Request passport access as user with non portal or non dxp customer email
 	New passports should not be able to be requested by a user with non portal or non dxp customer email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Enterprise Search - Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Enterprise Search - Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user1@pscustomer.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user1@pscustomer.com.broken" to the support group "Guest"
@@ -763,26 +1007,37 @@ Scenario: Request passport access as user with non portal or non dxp customer em
 Scenario: Request passport access as user with non portal or non dxp partner email
 	New passports should not be able to be requested by a user with non portal or non dxp partner email.
 
-	Given I go to the OSB admin main page
-	And I create a project with the following values
-	| Name                       | Passport Automotive |
-	| Code                       | PASSAUTO            |
-	| Type                       | Group               |
-	| Industry                   | Automotive          |
-	| Partner Code               | Zen OSB Partner     |
-	| Partner First Line Support | true                |
-	| Tier                       | T1                  |
-	| Max Contacts               | 10                  |
-	| Address Line               | 123 Main Street     |
-	| Country                    | United States       |
-	| State                      | California          |
-	| City                       | Diamond Bar         |
-	| Zip                        | 91765               |
-	| Region                     | US                  |
-	| Language                   | English             |
-	And I assign a user the email address "passport.customer1@pscustomer.com.broken" as a customer with the role "Developer" to the project with the code "PASSAUTO"
-	And I assign a user the email address "passport.customer2@pscustomer.com.broken" as a customer with the role "Watcher" to the project with the code "PASSAUTO"
-	And I add an order with the product "Enterprise Search - Production" and support level "Platinum" to the project code "PASSAUTO"
+	Given I create an assigned team nested field for a team with the name "Passpartner - ${staticCompanyName}" assigned to the account "Passport - ${staticProjectName}"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | PASSPORT                         |
+	| Name                       | Passport - ${staticProjectName}  |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Passpartner - ${staticCompanyName}" on the account "Passport - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "passport.customer1@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "passport.customer2@pscustomer.com.broken" on the account "Passport - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Enterprise Search - Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create a product purchase for an account with the name "Passport - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
 	And I update the support password for user with the email address "passport.user2@pspartner.com.broken" to "osbadminqauser"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Help Center"
 	And I assign the support user with the email address "passport.user2@pspartner.com.broken" to the support group "Guest"
