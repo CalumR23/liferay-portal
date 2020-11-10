@@ -401,30 +401,45 @@ Scenario: Create a public MP build
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)                                   |
 	| Jenkins         | fixpack-builder-agent(uat)                                       |
 
-Scenario: Create a private MP build
+Scenario: Create a public MP build with public and private child builds
 	@ test.group = "3"
-	As a TSE, I should be able to create a private MP build
+	As a TSE, I should be able to Create a public MP build with public and private child builds
 
 	Given I log into the Patcher homepage as the admin user
-	And I generate random fix content
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
 	And I create a Patcher fix with the following values
 	| Product         | DXP 7.0 Liferay SAML 2.0 Provider                |
 	| Project Version | marketplace-saml-3.1.1-7010-private              |
-	| Content         | ${staticFixContent}                              |
+	| Content         | ${staticFixContent1}                             |
 	| Branch Name     | LPS-88302-snapshot3                              |
 	| Github URL      | git@github.com:kenduenwald/liferay-portal-ee.git |
 	| Workaround      | true                                             |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0 Liferay SAML 2.0 Provider                        |
+	| Project Version | marketplace-saml-3.1.1-7010                              |
+	| Content         | ${staticFixContent2}                                     |
+	| Branch Name     | LPS-107323-de86                                          |
+	| Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
 	And I wait for "5" seconds
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent}                 |
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}                |
 	| Version         | 1.0                                 |
 	| Product         | DXP 7.0 Liferay SAML 2.0 Provider   |
 	| Project Version | marketplace-saml-3.1.1-7010-private |
 	| Patcher Status  | Adding                              |
 	| Type            | Workaround                          |
-	When I check the Patcher fix containing the content "${staticFixContent}" and type "Workaround" for add completion
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent}                 |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}                |
+	| Version         | 1.0                                 |
+	| Product         | DXP 7.0 Liferay SAML 2.0 Provider   |
+	| Project Version | marketplace-saml-3.1.1-7010         |
+	| Patcher Status  | Adding                              |
+	| Type            | Patch                               |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Workaround" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}                |
 	| Version         | 1.0                                 |
 	| Product         | DXP 7.0 Liferay SAML 2.0 Provider   |
 	| Project Version | marketplace-saml-3.1.1-7010-private |
@@ -432,51 +447,78 @@ Scenario: Create a private MP build
 	| Patcher Status  | Complete                            |
 	| Type            | Workaround                          |
 	| Jenkins         | fixpack-builder-agent(uat)          |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}                |
+	| Version         | 1.0                                 |
+	| Product         | DXP 7.0 Liferay SAML 2.0 Provider   |
+	| Project Version | marketplace-saml-3.1.1-7010         |
+	| Git Hash        | 240c93340f                          |
+	| Patcher Status  | Complete                            |
+	| Type            | Patch                               |
+	| Jenkins         | fixpack-builder-agent(uat)          |
 	When I generate a random ticket number
 	And I create a Patcher build for a new account with the following values
-	| Product         | DXP 7.0 Liferay SAML 2.0 Provider   |
-	| Project Version | marketplace-saml-3.1.1-7010-private |
-	| Tickets List    | ${staticFixContent}                 |
-	| Account Code    | BROADCINTRAN                        |
-	| Support Ticket  | ${staticTicketNumber}               |
+	| Product         | DXP 7.0 Liferay SAML 2.0 Provider         |
+	| Project Version | marketplace-saml-3.1.1-7010               |
+	| Tickets List    | ${staticFixContent1},${staticFixContent2} |
+	| Account Code    | BROADCINTRAN                              |
+	| Support Ticket  | ${staticTicketNumber}                     |
 	And I set the account code "BROADCINTRAN" as a static variable
 	And I wait for "5" seconds
 	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
 	| Type            | Official                            |
 	| Support Ticket  | ${staticTicketNumber}               |
 	| Version         | 1.0                                 |
-	| Project Version | marketplace-saml-3.1.1-7010-private |
-	| Content         | 0 Fix Packs + 1 Tickets             |
+	| Project Version | marketplace-saml-3.1.1-7010         |
+	| Content         | 0 Fix Packs + 2 Tickets             |
 	| Patcher Status  | Merging                             |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
 	| Version         | 1.0                                 |
-	| Name            | ${staticFixContent}                 |
+	| Name            | ${staticFixContent1}                |
 	| Project Version | marketplace-saml-3.1.1-7010-private |
 	| Patcher Status  | Merging Only                        |
-	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
-	| Name            | ${staticFixContent} |
-	| Version         | 1.0                 |
-	| Git Hash        | 8f13e49f9f          |
-	| Status          | Complete            |
-	| Type            | Workaround          |
+	And I should be able to view a Patcher child build with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
+	| Version         | 1.0                         |
+	| Name            | ${staticFixContent2}        |
+	| Project Version | marketplace-saml-3.1.1-7010 |
+	| Patcher Status  | Merging Only                |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
+	| Name            | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Git Hash        | 8f13e49f9f           |
+	| Status          | Complete             |
+	| Type            | Workaround           |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent2}" for the child build with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
+	| Name            | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Git Hash        | 240c93340f           |
+	| Status          | Complete             |
+	| Type            | Patch                |
 	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" for merge completion
 	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
 	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
-	| Type            | Official                            |
-	| Support Ticket  | ${staticTicketNumber}               |
+	| Type            | Official                       |
+	| Support Ticket  | ${staticTicketNumber}          |
+	| Version         | 1.0                            |
+	| Project Version | marketplace-saml-3.1.1-7010    |
+	| Content         | 0 Fix Packs + 2 Tickets        |
+	| Patcher Status  | Complete                       |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
 	| Version         | 1.0                                 |
-	| Project Version | marketplace-saml-3.1.1-7010-private |
-	| Content         | 0 Fix Packs + 1 Tickets             |
-	| Patcher Status  | Complete                            |
-	| Jenkins         | fixpack-builder-hotfix-7x(uat)      |
-	| Jenkins         | fixpack-builder-agent(uat)          |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
-	| Version         | 1.0                                 |
-	| Name            | ${staticFixContent}                 |
+	| Name            | ${staticFixContent1}                |
 	| Project Version | marketplace-saml-3.1.1-7010-private |
 	| Patcher Status  | Complete Merging Only               |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)      |
 	| Jenkins         | fixpack-builder-agent(uat)          |
+	And I should be able to view a Patcher child build with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "BROADCINTRAN" with the following values
+	| Version         | 1.0                            |
+	| Name            | ${staticFixContent2}           |
+	| Project Version | marketplace-saml-3.1.1-7010    |
+	| Patcher Status  | Complete Merging Only          |
+	| Jenkins         | fixpack-builder-hotfix-7x(uat) |
+	| Jenkins         | fixpack-builder-agent(uat)     |
 
 Scenario: Create a 71 build with public and private child builds
 	@ test.group = "4"
@@ -958,11 +1000,11 @@ Scenario: Create an elasticsearch MP build with patch fix
 	Given I log into the Patcher homepage as the admin user
 	And I generate random fix content
 	And I create a Patcher fix with the following values
-	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6	                |
+	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6                    |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010             |
 	| Content         | ${staticFixContent}                                             |
-	| Branch Name     | LPS-86861-marketplace-portal-search-elasticsearch6-1.0.1-7010-2 |
-	| Github URL      | git@github.com:chriskian/liferay-portal-ee.git                  |
+	| Branch Name     | LPP-39246-marketplace-portal-search-elasticsearch6-1.0.1-7010-2 |
+	| Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git        |
 	And I wait for "5" seconds
 	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
 	| Content         | ${staticFixContent}                                 |
@@ -977,7 +1019,7 @@ Scenario: Create an elasticsearch MP build with patch fix
 	| Version         | 1.0                                                 |
 	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
-	| Git Hash        | 11312f576c                                          |
+	| Git Hash        | 3bf35cfb52                                          |
 	| Patcher Status  | Complete                                            |
 	| Type            | Patch                                               |
 	| Jenkins         | fixpack-builder-agent(uat)                          |
@@ -1005,7 +1047,7 @@ Scenario: Create an elasticsearch MP build with patch fix
 	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "FEDBANK" with the following values
 	| Name            | ${staticFixContent} |
 	| Version         | 1.0                 |
-	| Git Hash        | 11312f576c          |
+	| Git Hash        | 3bf35cfb52          |
 	| Status          | Complete            |
 	| Type            | Patch               |
 	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "FEDBANK" for merge completion
@@ -1032,25 +1074,40 @@ Scenario: Create an elasticsearch MP build with workaround fix
 	As a TSE, I should be able to create an elastic search MP build with a workaround fix
 
 	Given I log into the Patcher homepage as the admin user
-	And I generate random fix content
+	And I generate random fix content for the first fix
+	And I generate random fix content for the second fix
 	And I create a Patcher fix with the following values
-	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6	    |
+	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
-	| Content         | ${staticFixContent}                                 |
+	| Content         | ${staticFixContent1}                                |
 	| Branch Name     | elastic101Marketplace                               |
 	| Github URL      | git@github.com:janditibi/liferay-portal-ee.git      |
 	| Workaround      | true                                                |
+	And I create a Patcher fix with the following values
+	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6                    |
+	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010             |
+	| Content         | ${staticFixContent2}                                            |
+	| Branch Name     | LPP-39246-marketplace-portal-search-elasticsearch6-1.0.1-7010-2 |
+	| Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git        |
 	And I wait for "5" seconds
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent}                                 |
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}                                |
 	| Version         | 1.0                                                 |
 	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
 	| Patcher Status  | Adding                                              |
 	| Type            | Workaround                                          |
-	When I check the Patcher fix containing the content "${staticFixContent}" and type "Workaround" for add completion
-	Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Workaround" with the following values
-	| Content         | ${staticFixContent}                                 |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}                                |
+	| Version         | 1.0                                                 |
+	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
+	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
+	| Patcher Status  | Adding                                              |
+	| Type            | Patch                                               |
+	When I check the Patcher fix containing the content "${staticFixContent1}" and type "Workaround" for add completion
+	And I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+	Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+	| Content         | ${staticFixContent1}                                |
 	| Version         | 1.0                                                 |
 	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
@@ -1058,11 +1115,20 @@ Scenario: Create an elasticsearch MP build with workaround fix
 	| Patcher Status  | Complete                                            |
 	| Type            | Workaround                                          |
 	| Jenkins         | fixpack-builder-agent(uat)                          |
+	And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+	| Content         | ${staticFixContent2}                                |
+	| Version         | 1.0                                                 |
+	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
+	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
+	| Git Hash        | 3bf35cfb52                                          |
+	| Patcher Status  | Complete                                            |
+	| Type            | Patch                                               |
+	| Jenkins         | fixpack-builder-agent(uat)                          |
 	When I generate a random ticket number
 	And I create a Patcher build for a new account with the following values
 	| Product         | DXP 7.0 Liferay Connector to Elasticsearch 6        |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010	|
-	| Tickets List    | ${staticFixContent}                                 |
+	| Tickets List    | ${staticFixContent1},${staticFixContent2}           |
 	| Account Code    | OPAPSAOPAPGR                                        |
 	| Support Ticket  | ${staticTicketNumber}                               |
 	And I set the account code "OPAPSAOPAPGR" as a static variable
@@ -1072,19 +1138,25 @@ Scenario: Create an elasticsearch MP build with workaround fix
 	| Support Ticket  | ${staticTicketNumber}                               |
 	| Version         | 1.0                                                 |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
-	| Content         | 0 Fix Packs + 1 Tickets                             |
+	| Content         | 0 Fix Packs + 2 Tickets                             |
 	| Patcher Status  | Merging                                             |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
 	| Version         | 1.0                                                 |
-	| Name            | ${staticFixContent}                                 |
+	| Name            | ${staticFixContent1}, ${staticFixContent2}          |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
 	| Patcher Status  | Merging Only                                        |
-	And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
-	| Name            | ${staticFixContent} |
-	| Version         | 1.0                 |
-	| Git Hash        | d758ca3550          |
-	| Status          | Complete            |
-	| Type            | Workaround          |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
+	| Name            | ${staticFixContent1} |
+	| Version         | 1.0                  |
+	| Git Hash        | d758ca3550           |
+	| Status          | Complete             |
+	| Type            | Workaround           |
+	And I should be able to view a Patcher child build fix with the name "${staticFixContent2}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
+	| Name            | ${staticFixContent2} |
+	| Version         | 1.0                  |
+	| Git Hash        | 3bf35cfb52           |
+	| Status          | Complete             |
+	| Type            | Patch                |
 	When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" for merge completion
 	And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
 	Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
@@ -1092,13 +1164,13 @@ Scenario: Create an elasticsearch MP build with workaround fix
 	| Support Ticket  | ${staticTicketNumber}                               |
 	| Version         | 1.0                                                 |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
-	| Content         | 0 Fix Packs + 1 Tickets                             |
+	| Content         | 0 Fix Packs + 2 Tickets                             |
 	| Patcher Status  | Complete                                            |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)                      |
 	| Jenkins         | fixpack-builder-agent(uat)                          |
-	And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
+	And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "OPAPSAOPAPGR" with the following values
 	| Version         | 1.0                                                 |
-	| Name            | ${staticFixContent}                                 |
+	| Name            | ${staticFixContent1}, ${staticFixContent2}          |
 	| Project Version | marketplace-portal-search-elasticsearch6-1.0.1-7010 |
 	| Patcher Status  | Complete Merging Only                               |
 	| Jenkins         | fixpack-builder-hotfix-7x(uat)                      |
