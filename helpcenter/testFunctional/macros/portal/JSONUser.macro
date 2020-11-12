@@ -712,6 +712,49 @@ definition {
 		}
 	}
 
+	@prose = "I tear down the users with the following screen names from koroneiki ${table}"
+	macro tearDownUsersByScreenNameViaKoroneiki {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userScreenName = "${row[0]}";
+
+			var companyId = JSONCompany.getKoroneikiCompanyId();
+
+			var curl = '''
+				${koroneikiURL}/api/jsonws/user/get-user-by-screen-name
+				-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var userObject = JSONCurlUtil.post("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+				echo("Koroneiki User ID: ${koroneikiUserId}");
+
+				var curl = '''
+					${koroneikiURL}/api/jsonws/user/update-status
+					-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+					-d userId=${supportUserId}
+	  				-d status=5
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+				var curl = '''
+					${koroneikiURL}/api/jsonws/user/delete-user
+					-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+					-d userId=${supportUserId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
 	@prose = "I tear down the users with the following screen names from customer.liferay.com ${table}"
 	macro tearDownUsersByScreenNameViaSupport {
 		var RawTable rawTable = new RawTable("${table}");
