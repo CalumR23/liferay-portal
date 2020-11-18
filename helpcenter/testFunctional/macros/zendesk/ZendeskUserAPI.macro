@@ -578,6 +578,13 @@ definition {
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
+
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userId}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
 	}
 
@@ -664,6 +671,19 @@ definition {
 	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
 	macro _tearDownUsersByExternalIdList {
 		if ((!(contains("${userExternalIds}", "{userExternalIds}"))) && (!("${userExternalIds}" == ""))) {
+			var userIDs = "";
+
+			for (var userExternalId : list "${userExternalIds}") {
+				var userID = ZendeskUserAPI._viewUserIdByExternalId(userExternalId = "${userExternalId}");
+
+				if ("${userIDs}" == "") {
+					var userIDs = "${userID}";
+				}
+				else {
+					var userIDs = "${userIDs},${userID}";
+				}
+			}
+
 			var curl = '''
 				--tlsv1.2 ${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds}
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -699,6 +719,15 @@ definition {
 					echo("Warning: The user tear down may have failed");
 					echo("Tear Down Job Status: ${status}");
 				}
+			}
+
+			for (var userID : list "${userIDs}") {
+				var curl = '''
+					--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userID}
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 			}
 		}
 	}
@@ -764,6 +793,15 @@ definition {
 					echo("Warning: The user tear down may have failed");
 					echo("Tear Down Job Status: ${status}");
 				}
+			}
+
+			for (var userId : list "${userIds}") {
+				var curl = '''
+					--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userId}
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 			}
 		}
 	}
