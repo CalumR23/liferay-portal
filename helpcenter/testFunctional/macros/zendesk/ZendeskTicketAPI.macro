@@ -1822,6 +1822,33 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with keywords ${keywords} should have the provisioning component ${provisioningComponent}"
+	macro _viewTicketProvisioningComponent {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Provisioning Component");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var provisioningComponentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "[", "");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "]", "");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "&quot;", "");
+
+		echo("Expected Provisioning Component Name: ${provisioningComponent}");
+		echo("Actual Provisioning Component Name: ${provisioningComponentFromAPI}");
+
+		if (!("${provisioningComponentFromAPI}" == "${provisioningComponent}")) {
+			fail("Actual value ${provisioningComponentFromAPI} does not match expected value ${provisioningComponent}");
+		}
+	}
+
 	@prose = "the ticket with ticket subject ${ticketSubject} should have the priority level ${priority}"
 	macro _viewTicketPriority {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
