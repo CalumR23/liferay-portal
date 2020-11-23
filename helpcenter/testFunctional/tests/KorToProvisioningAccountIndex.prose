@@ -2152,3 +2152,110 @@ Scenario: View advanced search result for limited account
 	| State   | ACTIVE                        |
 	And I should be able to view the search info message with the following types and values
 	| Label | Subscription Level: Limited Subscription |
+
+Scenario: View advanced search result via enter key
+	Testing the ability to create a T4 project in Dossiera and viewing the project advanced search result via enter key in the provisioning page via Search Accounts field
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I generate past static yyyymmdd start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner            |
+	| First Line Support |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I expand the advanced search form
+	And I populate the advanced search form with the following values and search via the enter key
+	| Match               |               | Radio Button  | All                                  |
+	| Account Name        |               | Input         | Korpro - ${staticProjectName}        |
+	| Code                |               | Input         | PROKORKORPRO                         |
+	| Parent Account      |               | Select Entity | Prokor - ${staticCompanyName}        |
+	| Project Worker      |               | Input         | pro.koroneiki2@lrcustomer.com.broken |
+	| Country             |               | Select        | United States                        |
+	| Account             |               | Panel         | Collapse                             |
+	| Categorization      |               | Panel         | Expand                               |
+	| Partner             | No            | Checkbox      | true                                 |
+	| Receives FLS        | Yes           | Checkbox      | true                                 |
+	| Internal            | No            | Checkbox      | true                                 |
+	| Tier                | T4            | Checkbox      | true                                 |
+	| Subscription Status | Active        | Checkbox      | true                                 |
+	| Subscription Level  | Platinum      | Checkbox      | true                                 |
+	| Support Region      | United States | Checkbox      | true                                 |
+	| Categorization      |               | Panel         | Collapse                             |
+	| Dates               |               | Panel         | Expand                               |
+	| Created After       |               | Input         | ${staticYyyyMmDdPastEndDate}         |
+	| Created Before      |               | Input         | ${staticYyyyMmDdFutureStartDate}     |
+	| Modified After      |               | Input         | ${staticYyyyMmDdPastEndDate}         |
+	| Modified Before     |               | Input         | ${staticYyyyMmDdFutureStartDate}     |
+	| Date                |               | Panel         | Collapse                             |
+	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}" and the following values
+	| Name    | Korpro - ${staticProjectName} |
+	| Code    | PROKORKORPRO                  |
+	| Partner | Koroneiki Partner             |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+	And I should be able to view the search info message with the following types and values
+	| Label | Country: United States                               |
+	| Label | Internal: No                                         |
+	| Label | Code: PROKORKORPRO                                   |
+	| Label | Modified After: ${staticYyyyMmDdPastEndDate}         |
+	| Label | Subscription Status: Active                          |
+	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate}    |
+	| Label | Receives FLS: Yes                                    |
+	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}     |
+	| Label | Partner: No                                          |
+	| Label | Tier: T4                                             |
+	| Label | Support Region: United States                        |
+	| Label | Parent Account: Prokor - ${staticCompanyName}        |
+	| Label | Account Name: Korpro - ${staticProjectName}          |
+	| Label | Created After: ${staticYyyyMmDdPastEndDate}          |
+	| Label | Subscription Level: Platinum Subscription            |
+	| Label | Project Worker: pro.koroneiki2@lrcustomer.com.broken |
