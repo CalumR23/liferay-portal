@@ -1759,9 +1759,9 @@ Scenario: View advanced search result
 	| Country         | | Select       | United States                  |
 	| Date            | | Panel        | Expand                         |
 	| Created After   | | Input        | ${staticYyyyMmDdPastStartDate} |
-	| Created Before  | | Input        | ${staticYyyyMdDdPastEndDate}   |
+	| Created Before  | | Input        | ${staticYyyyMmDdPastEndDate}   |
 	| Modified After  | | Input        | ${staticYyyyMmDdPastStartDate} |
-	| Modified Before | | Input        | ${staticYyyyMdDdPastEndDate}   |
+	| Modified Before | | Input        | ${staticYyyyMmDdPastEndDate}   |
 	| Date            | | Panel        | Collapse                       |
 	Then I should not be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}"
 
@@ -2259,3 +2259,105 @@ Scenario: View advanced search result via enter key
 	| Label | Created After: ${staticYyyyMmDdPastEndDate}          |
 	| Label | Subscription Level: Platinum Subscription            |
 	| Label | Project Worker: pro.koroneiki2@lrcustomer.com.broken |
+
+Scenario: View advanced search result after filter removal
+	Testing the ability to create a T4 project in Dossiera and viewing the project advanced search result in the provisioning page via Search Accounts field after removing filters
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I generate past static yyyymmdd start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Contact Role                           | Liferay Account Customer Role              |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I wait for "10" seconds
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner            |
+	| First Line Support |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I expand the advanced search form
+	And I populate the advanced search form with the following values and search
+	| Match               |        | Radio Button | All                            |
+	| Account Name        |        | Input        | Korpro - ${staticProjectName}  |
+	| Code                |        | Input        | PROKORKORPRO                   |
+	| Country             |        | Select       | Japan                          |
+	| Account             |        | Panel        | Collapse                       |
+	| Categorization      |        | Panel        | Expand                         |
+	| Partner             | Yes    | Checkbox     | true                           |
+	| Provides FLS        | Yes    | Checkbox     | true                           |
+	| Receives FLS        | No     | Checkbox     | true                           |
+	| Internal            | Yes    | Checkbox     | true                           |
+	| Tier                | T1     | Checkbox     | true                           |
+	| Subscription Status | Active | Checkbox     | true                           |
+	| Subscription Level  | Gold   | Checkbox     | true                           |
+	| Support Region      | Japan  | Checkbox     | true                           |
+	| Categorization      |        | Panel        | Collapse                       |
+	| Dates               |        | Panel        | Expand                         |
+	| Created After       |        | Input        | ${staticYyyyMmDdPastStartDate} |
+	| Created Before      |        | Input        | ${staticYyyyMmDdPastEndDate}   |
+	| Modified After      |        | Input        | ${staticYyyyMmDdPastStartDate} |
+	| Modified Before     |        | Input        | ${staticYyyyMmDdPastEndDate}   |
+	| Date                |        | Panel        | Collapse                       |
+	And I remove the advanced search labels with the following content values
+	| Country: Japan                                 |
+	| Support Region: Japan                          |
+	| Modified After: ${staticYyyyMmDdPastStartDate} |
+	| Modified Before: ${staticYyyyMmDdPastEndDate}  |
+	| Created Before: ${staticYyyyMmDdPastEndDate}   |
+	| Partner: Yes                                   |
+	| Provides FLS: Yes                              |
+	| Receives FLS: No                               |
+	| Internal: Yes                                  |
+	| Tier: T1                                       |
+	| Created After: ${staticYyyyMmDdPastStartDate}  |
+	| Subscription Level: Gold Subscription          |
+	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}" and the following values
+	| Name    | Korpro - ${staticProjectName} |
+	| Code    | PROKORKORPRO                  |
+	| Partner | Koroneiki Partner             |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
