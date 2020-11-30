@@ -588,3 +588,60 @@ Scenario: View new partner workers without initial project
 	And the user with the email address "osb.partner2@lrpartner.com.broken" should have the "osb_kb" tag
 	And the user with the email address "osb.partner1@lrpartner.com.broken" should not have the "osb_partner" tag
 	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
+
+Scenario: View partner member removal updates
+	If a member is removed from a partner tied to a project in OSB, the member's tags should be removed and the member should also be removed from the organization in Zendesk.
+
+	Given I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | OSBZENOSBZEN                     |
+	| Language                   | English                          |
+	| Name                       | Osbzen - ${staticProjectName}    |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Osbpar - ${staticProjectName}" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Osbpar - ${staticProjectName}" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I create a postal address for an account with the name "Osbzen - ${staticProjectName}" on koroneiki with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Type                  | Business        |
+	| Mailing               | True            |
+	| Postal Code           | 91765           |
+	| Primary               | True            |
+	| Street Address Line 1 | 123 Main Street |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	Then the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	When I remove customer contacts with the following email addresses from the account "Osbpar - ${staticProjectName}"
+	| osb.partner2@lrpartner.com.broken |
+	Then the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" on zendesk.liferay.com should have the name "OSB Partner1 [P]"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" on zendesk.liferay.com should have the name "OSB Partner2"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should have the "osb_partner" tag
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should not have the "osb_partner" tag
