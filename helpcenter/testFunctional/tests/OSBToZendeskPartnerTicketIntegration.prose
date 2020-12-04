@@ -152,3 +152,73 @@ Scenario: View ticket after partner requester removal on organization with partn
 	And I remove customer contacts with the following email addresses from the account "Osbpar - ${staticProjectName}"
 	| osb.partner2@lrpartner.com.broken |
 	Then the ticket with ticketId "${staticRequestIdList}" should have the default user from the organization with the name "Osbzen - ${staticProjectName}" as the requester
+
+Scenario: View ticket after partner requester removal on provisioning with partner workers
+	Zendesk tickets should be reassigned if a partner requester is removed from provisioning.
+
+	Given I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	| Code                       | OSBZENOSBZEN                     |
+	| Language                   | English                          |
+	| Name                       | Osbzen - ${staticProjectName}    |
+	| Region                     | United States                    |
+	| Status                     | Active                           |
+	| Tier                       | T1                               |
+	And I assign the team with the name "Osbpar - ${staticProjectName}" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Osbpar - ${staticProjectName}" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I create a postal address for an account with the name "Osbzen - ${staticProjectName}" on koroneiki with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Type                  | Business        |
+	| Mailing               | True            |
+	| Postal Code           | 91765           |
+	| Primary               | True            |
+	| Street Address Line 1 | 123 Main Street |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	Then the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.partner1@lrpartner.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.partner2@lrpartner.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.partner1@lrpartner.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Osbzen - ${staticProjectName}                    |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.partner1@lrpartner.com.broken"
+	When I wait for "60" seconds
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Osbpar"
+	And I click on the account with the name "Osbpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the "Unassign" button in the dropdown menu for the contact with the email address "osb.partner1@lrpartner.com.broken"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.partner2@lrpartner.com.broken"
+	When I wait for "60" seconds
+	And I click on the "Unassign" button in the dropdown menu for the contact with the email address "osb.partner2@lrpartner.com.broken"
+	Then I should be able to view the error message for open zendesk tickets
+	And the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.partner2@lrpartner.com.broken"
