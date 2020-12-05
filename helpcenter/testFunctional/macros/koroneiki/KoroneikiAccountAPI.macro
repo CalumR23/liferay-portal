@@ -2579,6 +2579,56 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I tear down the contacts from the account ${accountName} on koroneiki with the following email addresses ${table}"
+	macro _tearDownAccountContacts {
+		if (contains("${accountName}", " ")) {
+			var keyword = StringUtil.extractFirst("${accountName}", " ");
+		}
+		else {
+			var keyword = "${accountName}";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?search=${keyword}\&pageSize=100
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccounts}", "${accountName}")) {
+			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var contactEmailAddress = "${row[0]}";
+
+				var curl = '''
+					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allAccountContacts = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allAccountContacts}", "${contactEmailAddress}")) {
+					var curl = '''
+						--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address?contactEmailAddresses=${contactEmailAddress}
+						--header "API_Token: ${apiToken}"
+						-H "accept: application/json"
+						-H "Content-Type: application/json"
+						-H "Content-Length: 0"
+						''';
+
+					com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the account entitlement definitions on koroneiki with the following name values ${table}"
 	macro _tearDownAccountEntitlementDefinitions {
 		var RawTable rawTable = new RawTable("${table}");
