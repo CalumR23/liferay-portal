@@ -3,6 +3,126 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	@prose = "I create a DXP Cloud request as a user with the email address ${requesterEmail} with the following values ${table}"
+	macro _createDXPCloudRequest {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Subject") {
+				var subject = "${value}";
+			}
+			else if ("${field}" == "Description") {
+				var description = "${value}";
+			}
+			else if ("${field}" == "Liferay Version") {
+				var liferayVersion = "${value}";
+			}
+			else if ("${field}" == "Organization External ID") {
+				var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${value}");
+			}
+			else if ("${field}" == "Organization Name") {
+				var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${value}");
+
+				var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+			}
+			else if ("${field}" == "Tags") {
+				var tags = "${value}";
+			}
+			else if ("${field}" == "Product") {
+				var product = "${value}";
+			}
+			else if ("${field}" == "Component") {
+				var component = "${value}";
+			}
+			else if ("${field}" == "System Status") {
+				var systemStatus = "${value}";
+			}
+			else {
+				fail("No such request field ${field}");
+			}
+		}
+
+		if (!(isSet(subject))) {
+			var subject = "";
+		}
+		if (!(isSet(description))) {
+			var description = "";
+		}
+		if (!(isSet(liferayVersion))) {
+			var liferayVersion = "";
+		}
+		if (!(isSet(organizationId))) {
+			var organizationId = "";
+		}
+		if (!(isSet(tags))) {
+			var tags = "";
+		}
+		if (!(isSet(product))) {
+			var product = "";
+		}
+		if (!(isSet(component))) {
+			var component = "";
+		}
+		if (!(isSet(systemStatus))) {
+			var systemStatus = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/requests.json
+			-u ${requesterEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"request":
+				{
+					"subject": "${subject}",
+					"organization_id": "${organizationId}",
+					"tags": "${tags}",
+					"comment":
+					{
+						"body": "${description}"
+					},
+					"custom_fields":
+					[
+						{
+							"id": "360006041192",
+							"value": "${product}"
+						},
+						{
+							"id": "360011314571",
+							"value": "${component}"
+						},
+						{
+							"id": "360009385592",
+							"value": "${systemStatus}"
+						},
+						{
+							"id": "360033422312",
+							"value": "${liferayVersion}"
+						}
+					]
+				}
+			}
+			''';
+
+		static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
+
+		echo("Request ID: ${requestId}");
+
+		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			static var staticRequestIdList = "${requestId}";
+		}
+		else {
+			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+		}
+		echo("Request ID List: ${staticRequestIdList}");
+
+		return "${staticRequestIdList}";
+	}
+
 	@prose = "I create several AC trial requests as a user with the email address ${requesterEmail} with the following product, component, and region values ${table}"
 	macro _createMultipleACTrialRequestsWithProductAndComponentValues {
 		var RawTable rawTable = new RawTable("${table}");
