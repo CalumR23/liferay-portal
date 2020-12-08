@@ -610,13 +610,22 @@ definition {
 			var userIDs = "";
 
 			for (var userExternalId : list "${userExternalIds}") {
-				var userID = ZendeskUserAPI._viewUserIdByExternalId(userExternalId = "${userExternalId}");
+				var curl = '''
+					--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+					-u ${zendeskAdminEmail}/token:${apiToken}
+					''';
 
-				if ("${userIDs}" == "") {
-					var userIDs = "${userID}";
-				}
-				else {
-					var userIDs = "${userIDs},${userID}";
+				var searchResults = JSONCurlUtil.get("${curl}");
+
+				if (contains("${searchResults}", "${userExternalId}")) {
+					var userID = ZendeskUserAPI._viewUserIdByExternalId(userExternalId = "${userExternalId}");
+
+					if ("${userIDs}" == "") {
+						var userIDs = "${userID}";
+					}
+					else {
+						var userIDs = "${userIDs},${userID}";
+					}
 				}
 			}
 
