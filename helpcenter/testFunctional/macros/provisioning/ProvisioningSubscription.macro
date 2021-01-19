@@ -16,6 +16,11 @@ definition {
 		Click(locator1 = "ProvisioningSubscription#SUBSCRIPTION_PROVISIONED");
 	}
 
+	@prose = "I click on the select button on the subscription form"
+	macro clickSubscriptionFormSelectButton {
+		Click(locator1 = "ProvisioningSubscriptionForm#SELECT_BUTTON");
+	}
+
 	@prose = "I click on the ${action} button in the dropdown menu for the subscription term with the start date to end date ${startDateEndDate}"
 	macro clickSubscriptionTermActionDropdownButton {
 		var key_startDateEndDate = "${startDateEndDate}";
@@ -39,41 +44,13 @@ definition {
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var product = "${row[0]}";
+			var field = "${row[1]}";
+			var value = "${row[2]}";
 
-			if ("${field}" == "Product") {
-				Click(locator1 = "ProvisioningSubscriptionForm#SELECT_BUTTON");
+			var key_entityName = "${product}";
 
-				SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
-
-				Type(
-					locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_FIELD",
-					value1 = "&quot;${value}&quot;");
-
-				Click(locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_BUTTON");
-
-				var key_entityName = "${value}";
-
-				Click(locator1 = "ProvisioningSubscriptionSelect#ENTITY_ROW");
-
-				SelectFrameTop();
-
-				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
-
-				while (IsElementPresent(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON")) {
-					SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
-
-					Click(locator1 = "ProvisioningSubscriptionSelect#ENTITY_ROW");
-
-					Click(locator1 = "ProvisioningSubscriptionSelect#ENTITY_ROW");
-
-					SelectFrameTop();
-
-					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
-				}
-			}
-			else if ("${field}" == "Salesforce Opportunity Key") {
+			if ("${field}" == "Salesforce Opportunity Key") {
 				Type(
 					locator1 = "ProvisioningSubscriptionForm#SALESFORCE_OPPORTUNITY_KEY_FIELD",
 					value1 = "${value}");
@@ -84,11 +61,39 @@ definition {
 					value1 = "${value}");
 			}
 			else if ("${field}" == "Perpetual") {
-				if ("${value}" == "true") {				
-					Check(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+				if ("${value}" == "true") {
+					if (IsNotChecked(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX")) {
+						Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD_DISABLED");
+					}
 				}
 				else {
-					Uncheck(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+					if (IsChecked(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX")) {
+						Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD_DISABLED");
+					}
 				}
 			}
 			else if ("${field}" == "Start Date") {
@@ -122,12 +127,61 @@ definition {
 					locator1 = "ProvisioningSubscriptionForm#INSTANCE_SIZE_SELECT",
 					value1 = "${value}");
 			}
+			else if ("${field}" == "Grace Period End Date") {
+				Click.pauseMakeVisibleClickAt(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "${value}");
+
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "${value}");
+
+				KeyPress(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "\RETURN");
+			}
+			else if ("${field}" == "Status") {
+				Select(
+					locator1 = "ProvisioningSubscriptionForm#STATUS_SELECT",
+					value1 = "${value}");
+			}
 			else {
 				fail("No such editable subscription field ${field}.");
 			}
 		}
 
 		Click(locator1 = "ProvisioningSubscriptionForm#SAVE_BUTTON");
+	}
+
+	@prose = "I select the product with the name ${productName}"
+	macro selectProduct {
+		SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+		Type(
+			locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_FIELD",
+			value1 = "&quot;${productName}&quot;");
+
+		Click(locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_BUTTON");
+
+		var key_entityName = "${productName}";
+
+		Check(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+
+		while (IsElementPresent(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON")) {
+			SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+			Uncheck(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+
+			Check(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+		}
 	}
 
 	@prose = "I should be able to view the error message with the text ${errorMessage}"
