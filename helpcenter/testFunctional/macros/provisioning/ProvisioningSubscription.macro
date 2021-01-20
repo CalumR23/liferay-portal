@@ -153,6 +153,64 @@ definition {
 		Click(locator1 = "ProvisioningSubscriptionForm#SAVE_BUTTON");
 	}
 
+	@prose = "I populate the subscription term form using the following product and term values and proceed ${table}"
+	macro populateSubscriptionTermFormAndProceed {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+			var term = "${row[1]}";
+
+			var key_entityName = "${product}";
+
+			Select(
+				locator1 = "ProvisioningSubscriptionForm#SUBSCRIPTION_TERM_SELECT",
+				value1 = "${term}");
+		}
+
+		Click(locator1 = "ProvisioningSubscriptionForm#NEXT_BUTTON");
+	}
+
+	@prose = "I remove the subscription row with the product ${productName}"
+	macro removeSubscriptionRow {
+		var key_entityName = "${productName}";
+
+		Click(locator1 = "ProvisioningSubscriptionForm#DELETE_BUTTON");
+	}
+
+	@prose = "I select all products using the search term ${keyword} on the subscription select window"
+	macro selectAllProductsViaSubscriptionSelectWindow {
+		SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+		if (!("${keyword}" == "")) {
+			Type(
+				locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_FIELD",
+				value1 = "&quot;${keyword}&quot;");
+
+			Click(locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_BUTTON");
+		}
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		Check(locator1 = "ProvisioningSubscriptionSelect#SELECT_ALL_CHECKBOX");
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+
+		while (IsElementPresent(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON")) {
+			SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+			Uncheck(locator1 = "ProvisioningSubscriptionSelect#SELECT_ALL_CHECKBOX");
+
+			Check(locator1 = "ProvisioningSubscriptionSelect#SELECT_ALL_CHECKBOX");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+		}
+	}
+
 	@prose = "I select the product with the name ${productName} on the subscription select window"
 	macro selectProductViaSubscriptionSelectWindow {
 		SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
@@ -182,6 +240,52 @@ definition {
 
 			Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
 		}
+	}
+
+	@prose = "I select the following products using the search term ${keyword} on the subscription select window ${table}"
+	macro selectProductsViaSubscriptionSelectWindow {
+		SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+		if (!("${keyword}" == "")) {
+			Type(
+				locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_FIELD",
+				value1 = "&quot;${keyword}&quot;");
+
+			Click(locator1 = "ProvisioningSubscriptionSelect#SELECT_SEARCH_BUTTON");
+		}
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+
+			var key_entityName = "${product}";
+
+			Check(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+		}
+
+		SelectFrameTop();
+
+		Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+
+		while (IsElementPresent(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON")) {
+			SelectFrame(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME");
+
+			Uncheck(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+
+			Check(locator1 = "ProvisioningSubscriptionSelect#ENTITY_CHECKBOX");
+
+			SelectFrameTop();
+
+			Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionSelect#DONE_BUTTON");
+		}
+	}
+
+	@prose = "I subscription row with the product ${productName} should have the delete button disabled"
+	macro viewDisabledSubscriptionDeleteButton {
+		var key_entityName = "${productName}";
+
+		AssertVisible(locator1 = "ProvisioningSubscriptionForm#DELETE_BUTTON_DISABLED");
 	}
 
 	@prose = "I should be able to view the error message with the text ${errorMessage}"
