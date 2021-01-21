@@ -1,11 +1,6 @@
 definition {
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
-	@prose = "I click on the cancel button"
-	macro clickCancelButton {
-		Click(locator1 = "ProvisioningSubscriptionForm#CANCEL_BUTTON");
-	}
-
 	@prose = "I click on generate license button"
 	macro clickGenerateLicenseButton {
 		Click(locator1 = "ProvisioningSubscription#GENERATE_LICENSE_BUTTON");
@@ -14,6 +9,16 @@ definition {
 	@prose = "I click on subscription provisioned link"
 	macro clickSubscriptionProvisionedLink {
 		Click(locator1 = "ProvisioningSubscription#SUBSCRIPTION_PROVISIONED");
+	}
+
+	@prose = "I click on the cancel button on the subscription form"
+	macro clickSubscriptionFormCancelButton {
+		Click(locator1 = "ProvisioningSubscriptionForm#CANCEL_BUTTON");
+	}
+
+	@prose = "I click on the next button on the subscription form"
+	macro clickSubscriptionFormNextButton {
+		Click(locator1 = "ProvisioningSubscriptionForm#NEXT_BUTTON");
 	}
 
 	@prose = "I click on the save button on the subscription form"
@@ -42,6 +47,123 @@ definition {
 		var key_startDateEndDate = "${startDateEndDate}";
 
 		Click(locator1 = "ProvisioningSubscription#SUBSCRIPTION_PROVISIONED");
+	}
+
+	@prose = "I populate the subscription form with the following values ${table}"
+	macro populateSubscriptionForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+			var field = "${row[1]}";
+			var value = "${row[2]}";
+
+			var key_entityName = "${product}";
+
+			if ("${field}" == "Subscription Term") {
+				Select(
+					locator1 = "ProvisioningSubscriptionForm#SUBSCRIPTION_TERM_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Salesforce Opportunity Key") {
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#SALESFORCE_OPPORTUNITY_KEY_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Purchased") {
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#PURCHASED_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Perpetual") {
+				if ("${value}" == "true") {
+					if (IsNotChecked(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX")) {
+						Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD")) {
+						AssertVisible(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD_DISABLED");
+					}
+				}
+				else {
+					if (IsChecked(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX")) {
+						Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningSubscriptionForm#PERPETUAL_CHECBOX");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD_DISABLED");
+					}
+
+					if (IsElementPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD")) {
+						AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD_DISABLED");
+					}
+				}
+			}
+			else if ("${field}" == "Start Date") {
+				Click.pauseMakeVisibleClickAt(
+					locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD",
+					value1 = "${value}");
+
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD",
+					value1 = "${value}");
+
+				KeyPress(
+					locator1 = "ProvisioningSubscriptionForm#START_DATE_FIELD",
+					value1 = "\RETURN");
+			}
+			else if ("${field}" == "End Date") {
+				Click.pauseMakeVisibleClickAt(
+					locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD",
+					value1 = "${value}");
+
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD",
+					value1 = "${value}");
+
+				KeyPress(
+					locator1 = "ProvisioningSubscriptionForm#END_DATE_FIELD",
+					value1 = "\RETURN");
+			}
+			else if ("${field}" == "Instance Size") {
+				Select(
+					locator1 = "ProvisioningSubscriptionForm#INSTANCE_SIZE_SELECT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Grace Period End Date") {
+				Click.pauseMakeVisibleClickAt(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "${value}");
+
+				Type(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "${value}");
+
+				KeyPress(
+					locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+					value1 = "\RETURN");
+			}
+			else if ("${field}" == "Status") {
+				Select(
+					locator1 = "ProvisioningSubscriptionForm#STATUS_SELECT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such editable subscription field ${field}.");
+			}
+		}
 	}
 
 	@prose = "I populate and save the subscription form with the following values ${table}"
@@ -293,12 +415,8 @@ definition {
 		AssertVisible(locator1 = "ProvisioningSubscriptionForm#DELETE_BUTTON_DISABLED");
 	}
 
-	@prose = "I should be able to view the error message with the text ${errorMessage}"
+	@prose = "I should be able to view the subscription form error message with the text ${errorMessage}"
 	macro viewErrorMessage {
-		AssertTextEquals.assertPartialText(
-			locator1 = "ProvisioningSubscriptionForm#ERROR_MESSAGE",
-			value1 = "Error:");
-
 		AssertTextEquals.assertPartialText(
 			locator1 = "ProvisioningSubscriptionForm#ERROR_MESSAGE",
 			value1 = "${errorMessage}");
