@@ -1060,3 +1060,607 @@ Scenario: View advanced search results after partner update via provisioning
 	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate}  |
 	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}   |
 	| Label | Created After: ${staticYyyyMmDdPastEndDate}        |
+
+Scenario: Update account containing partner
+	Testing the ability to update a T4 project in Dossiera with a project partner 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | KORPARKORPAR                                   |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Korpar - ${staticProjectName}                  |
+	| Profile Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Korpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Korpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticProjectName} |
+	| Code           | PROKORKORPRO                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Korpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | Korpar - ${staticProjectName} |	|
+	| First Line Support  | Korpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should have the team role "Partner"
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should have the team role "First Line Support"
+	When I update a koroneiki account with the name "Korpro - ${staticProjectName}" to have the following values
+	| Code         | ONEPROONEPRO                             |
+	| Description  | Test update account on koroneiki         |
+	| Fax Number   | 555-555-4321                             |
+	| Name         | Onepro - ${staticProjectName}            |
+	| Phone Number | 555-555-8765                             |
+	| Region       | Global                                   |
+	| Status       | Active                                   |
+	| Tier         | T1                                       |
+	| Website      | www.koroneikiupdate.com                  |
+	And I go to the account index page
+	And I search the accounts page using the keyword "Onepro"
+	And I click on the account with the name "Onepro - ${staticProjectName}" on the provisioning index
+	And I click on the partner link in the account header
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpar - ${staticProjectName} |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpar"
+	And I click on the account with the name "Korpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Korpar - ${staticProjectName}" and the following values
+	| Name                         | Korpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 1                             |
+	| First Line Support Accounts  | 1                             |
+	When I click on the "Korpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Onepro - ${staticProjectName}" and the following values
+	| Account Name  | Onepro - ${staticProjectName} |
+	| Code          | ONEPROONEPRO                  |
+	| Region        | Global                        |
+	| SLA           | Platinum                      |
+	| Tier          | T1                            |
+	| Account State | ACTIVE                        |
+	And I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}" 
+	When I click on the "First Line Support Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Onepro - ${staticProjectName}" and the following values
+	| Account Name  | Onepro - ${staticProjectName} |
+	| Code          | ONEPROONEPRO                  |
+	| Region        | Global                        |
+	| SLA           | Platinum                      |
+	| Tier          | T1                            |
+	| Account State | ACTIVE                        |
+	And I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}" 
+	When I go to the account index page
+	And I search the accounts page using the keyword "Onepro"
+	Then I should be able to view an account on the provisioning index with the name "Onepro - ${staticProjectName}" and the following values
+	| Name    | Onepro - ${staticProjectName} |
+	| Code    | ONEPROONEPRO                  |
+	| Partner | Korpar - ${staticProjectName} |
+	| Region  | Global                        |
+	| SLA     | Platinum                      |
+	| Tier    | T1                            |
+	| State   | ACTIVE                        |
+
+Scenario: Remove partner
+	Testing the ability to create a T4 project in Dossiera and add and remove a project partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | KORPARKORPAR                                   |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Korpar - ${staticProjectName}                  |
+	| Profile Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Korpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Korpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticProjectName} |
+	| Code           | PROKORKORPRO                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Korpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | Korpar - ${staticProjectName} |	|
+	| First Line Support  | Korpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Delete Entity | | |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | -                             |	|
+	| First Line Support  | Korpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should not have the team role "Partner"
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should have the team role "First Line Support"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the partner link in the account header
+	Then I should be able to view the following team values in the team details page
+	| Name | Korpar - ${staticProjectName} |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpar"
+	And I click on the account with the name "Korpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Korpar - ${staticProjectName}" and the following values
+	| Name                         | Korpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 0                             |
+	| First Line Support Accounts  | 1                             |
+	When I click on the "Korpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}"
+	When I click on the "First Line Support Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Korpro - ${staticProjectName}" and the following values
+	| Account Name  | Korpro - ${staticProjectName} |
+	| Code          | PROKORKORPRO                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}" and the following values
+	| Name    | Korpro - ${staticProjectName} |
+	| Code    | PROKORKORPRO                  |
+	| Partner | -                             |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+
+Scenario: Remove fls partner
+	Testing the ability to create a T4 project in Dossiera and add and remove a project fls partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | KORPARKORPAR                                   |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Korpar - ${staticProjectName}                  |
+	| Profile Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Korpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Korpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticProjectName} |
+	| Code           | PROKORKORPRO                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Korpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | Korpar - ${staticProjectName} |	|
+	| First Line Support  | Korpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I edit the following account fields and types to the following values under the account details tab
+	| First Line Support | Delete Entity | | |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | Korpar - ${staticProjectName} |	|
+	| First Line Support  | -                             |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should have the team role "Partner"
+	And the team with the name "Korpar - ${staticProjectName}" assigned the account "Korpro - ${staticProjectName}" should not have the team role "First Line Support"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| FLS Partner | - |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpar"
+	And I click on the account with the name "Korpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Korpar - ${staticProjectName}" and the following values
+	| Name                         | Korpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 1                             |
+	| First Line Support Accounts  | 0                             |
+	When I click on the "Korpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Korpro - ${staticProjectName}" and the following values
+	| Account Name  | Korpro - ${staticProjectName} |
+	| Code          | PROKORKORPRO                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I click on the "First Line Support Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}" and the following values
+	| Name    | Korpro - ${staticProjectName} |
+	| Code    | PROKORKORPRO                  |
+	| Partner | Korpar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+
+Scenario: Remove partner and fls partner
+	Testing the ability to create a T4 project in Dossiera and add and remove a project partner and fls partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | KORPARKORPAR                                   |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Korpar - ${staticProjectName}                  |
+	| Profile Email Address | pro.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Korpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Korpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korpro - ${staticProjectName} |
+	| Code           | PROKORKORPRO                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Korpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | Korpar - ${staticProjectName} |	|
+	| First Line Support  | Korpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Delete Entity | | |
+	| First Line Support  | Delete Entity | | |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Korpro - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | PROKORKORPRO                  | |
+	| Tier                | T4                            | |
+	| Partner/Reseller/SI | -                             |	|
+	| First Line Support  | -                             |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| FLS Partner | - |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpar"
+	And I click on the account with the name "Korpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Korpar - ${staticProjectName}" and the following values
+	| Name                         | Korpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 0                             |
+	| First Line Support Accounts  | 0                             |
+	When I click on the "Korpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}"
+	When I click on the "First Line Support Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Korpro - ${staticProjectName}"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korpro"
+	Then I should be able to view an account on the provisioning index with the name "Korpro - ${staticProjectName}" and the following values
+	| Name    | Korpro - ${staticProjectName} |
+	| Code    | PROKORKORPRO                  |
+	| Partner | -                             |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
