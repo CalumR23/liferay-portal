@@ -254,6 +254,66 @@ Scenario: View non production project
 	| Subscription End Date | ${staticFullEndDate}          |
 	| Support End Date      | ${staticFullEndDate}          |
 
+Scenario: View cancelled project
+	Testing the ability to not be able to integrate a cancelled project from provisioning to LCS
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLCSKORLCS                         |
+	| Contact Email Address | lcs.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlcs - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lcs.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlcs - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I create a product purchase for an account with the name "Korlcs - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Cancelled                |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlcs - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlcs - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I create a product purchase for an account with the name "Korlcs - ${staticProjectName}" and the product "Management Tools (LCS)" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 0 |
+	| Product Field and Value | version                  | 0 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I assign the contact with the email address "lcs.koroneiki1@lrcustomer.com.broken" on the account "Korlcs - ${staticProjectName}" to the following roles
+	| LCS User |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korlcs"
+	And I click on the account with the name "Korlcs - ${staticProjectName}" on the provisioning index
+	And I click on the Sync To LCS button on the account page
+	And I wait for "6" minutes
+	And I generate the account ID value for "Korlcs - ${staticProjectName}"
+	And I log into the lcs homepage as "patricia.draut@liferay.com.broken" with password "test"
+	And I go to the lcs support page
+	And I search the lcs support index using the corp project id "${staticAccountId}"
+	Then I should not be able to view a project on the lcs support index with the name "Korlcs - ${staticProjectName}"
+
 Scenario: View project with multiple servers
 	Testing the ability to integrate a project with multiple servers from provisioning to LCS
 
