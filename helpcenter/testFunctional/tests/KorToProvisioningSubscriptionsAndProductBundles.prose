@@ -271,6 +271,185 @@ Scenario: Add product bundle subscription
 	| Update Field Original Value | N/A                                                                   |
 	| Update Field New Value      | 0                                                                     |
 
+Scenario: Add product bundle subscription via bulk input
+	Testing the ability to add subcriptions via a product bundle and bulk input in provisioning and viewing the subscriptions in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Subkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sub.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SUB                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sub.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SUB                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korsub - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I create a product with the following values
+	| Name | A Bundled Subscri Product | |
+	And I create a product with the following values
+	| Name | A Bundled Subscri Second Product | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product bundles index page
+	And I click on the new product bundle button
+	And I populate and save the product bundle form with the following values
+	| Name        | Input | Bundled Subscri Products         |
+	| Add Product |       | A Bundled Subscri Product        |
+	| Add Product |       | A Bundled Subscri Second Product |
+	Then I should be able to view a product bundle on the provisioning index with the name "Bundled Subscri Products" and the following values
+	| Name | Bundled Subscri Products |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Bundled Subscri Products" on the subscription select window
+	And I populate and save the subscription form with the following values
+	| Bulk Input | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Bulk Input | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Bulk Input | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 0              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "A Bundled Subscri Product" and the following values on the account details page
+	| Name                | A Bundled Subscri Product |
+	| Current Provisioned | 0                         |
+	| Current Purchased   | 1                         |
+	| State               | ACTIVE                    |
+	And I should be able to view the product with the name "A Bundled Subscri Second Product" and the following values on the account details page
+	| Name                | A Bundled Subscri Second Product |
+	| Current Provisioned | 0                                |
+	| Current Purchased   | 1                                |
+	| State               | ACTIVE                           |
+	And I should be able to view a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Product" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Second Product" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Product" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Second Product" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	When I click on the "Inactive" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "A Bundled Subscri Product" on the account details page
+	And I should not be able to view the product with the name "A Bundled Subscri Second Product" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production |
+	| Provisioned        | 0              |
+	| Approved Purchased | 1              |
+	| State              | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "A Bundled Subscri Product" and the following values on the account details page
+	| Name               | A Bundled Subscri Product |
+	| Provisioned        | 0                         |
+	| Approved Purchased | 1                         |
+	| State              | ACTIVE                    |
+	And I should be able to view the product with the name "A Bundled Subscri Second Product" and the following values on the account details page
+	| Name               | A Bundled Subscri Second Product |
+	| Provisioned        | 0                                |
+	| Approved Purchased | 1                                |
+	| State              | ACTIVE                           |
+	When I click on the "A Bundled Subscri Product" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | A Bundled Subscri Product |
+	| State  | ACTIVE                    |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "A Bundled Subscri Second Product" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | A Bundled Subscri Second Product |
+	| State  | ACTIVE                           |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Korsub - ${staticProjectName}"
+	Then the history entry in position number "14" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | quantity                                                       |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | 1                                                              |
+	And the history entry in position number "14" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | accountId                                                      |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | ${staticAccountId}                                             |
+	And the history entry in position number "14" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | status                                                         |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | 0                                                              |
+	And the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | quantity                                                              |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | 1                                                                     |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | accountId                                                             |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | ${staticAccountId}                                                    |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | status                                                                |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | 0                                                                     |
+
 Scenario: Add product and product bundle subscription
 	Testing the ability to add a product subcription and subscriptions via product bundle in provisioning and viewing the subscriptions in the provisioning account details page 
 
@@ -351,6 +530,230 @@ Scenario: Add product and product bundle subscription
 	| A Non Bundled Product            | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
 	| A Non Bundled Product            | Start Date                 | ${staticYyyyMmDdStartDate}       |
 	| A Non Bundled Product            | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 0              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "A Bundled Subscri Product" and the following values on the account details page
+	| Name                | A Bundled Subscri Product |
+	| Current Provisioned | 0                         |
+	| Current Purchased   | 1                         |
+	| State               | ACTIVE                    |
+	And I should be able to view the product with the name "A Bundled Subscri Second Product" and the following values on the account details page
+	| Name                | A Bundled Subscri Second Product |
+	| Current Provisioned | 0                                |
+	| Current Purchased   | 1                                |
+	| State               | ACTIVE                           |
+	And I should be able to view the product with the name "A Non Bundled Product" and the following values on the account details page
+	| Name                | A Non Bundled Product |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Product" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Second Product" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "A Non Bundled Product" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Product" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Korsub - ${staticProjectName}" for the product "A Bundled Subscri Second Product" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Korsub - ${staticProjectName}" for the product "A Non Bundled Product" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	When I click on the "Inactive" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "A Bundled Subscri Product" on the account details page
+	And I should not be able to view the product with the name "A Bundled Subscri Second Product" on the account details page
+	And I should not be able to view the product with the name "A Non Bundled Product" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production |
+	| Provisioned        | 0              |
+	| Approved Purchased | 1              |
+	| State              | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "A Bundled Subscri Product" and the following values on the account details page
+	| Name               | A Bundled Subscri Product |
+	| Provisioned        | 0                         |
+	| Approved Purchased | 1                         |
+	| State              | ACTIVE                    |
+	And I should be able to view the product with the name "A Bundled Subscri Second Product" and the following values on the account details page
+	| Name               | A Bundled Subscri Second Product |
+	| Provisioned        | 0                                |
+	| Approved Purchased | 1                                |
+	| State              | ACTIVE                           |
+	And I should be able to view the product with the name "A Non Bundled Product" and the following values on the account details page
+	| Name               | A Non Bundled Product |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	When I click on the "A Bundled Subscri Product" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | A Bundled Subscri Product |
+	| State  | ACTIVE                    |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "A Bundled Subscri Second Product" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | A Bundled Subscri Second Product |
+	| State  | ACTIVE                           |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "A Non Bundled Product" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | A Non Bundled Product |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Korsub - ${staticProjectName}"
+	Then the history entry in position number "14" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | quantity                                                       |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | 1                                                              |
+	And the history entry in position number "14" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | accountId                                                      |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | ${staticAccountId}                                             |
+	And the history entry in position number "14" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Product |
+	| Update Field Name           | status                                                         |
+	| Update Field Original Value | N/A                                                            |
+	| Update Field New Value      | 0                                                              |
+	And the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | quantity                                                              |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | 1                                                                     |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | accountId                                                             |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | ${staticAccountId}                                                    |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Bundled Subscri Second Product |
+	| Update Field Name           | status                                                                |
+	| Update Field Original Value | N/A                                                                   |
+	| Update Field New Value      | 0                                                                     |
+	And the history entry in position number "16" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Non Bundled Product |
+	| Update Field Name           | quantity                                                   |
+	| Update Field Original Value | N/A                                                        |
+	| Update Field New Value      | 1                                                          |
+	And the history entry in position number "16" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Non Bundled Product |
+	| Update Field Name           | accountId                                                  |
+	| Update Field Original Value | N/A                                                        |
+	| Update Field New Value      | ${staticAccountId}                                         |
+	And the history entry in position number "16" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Test Test > Added Product Purchase > A Non Bundled Product |
+	| Update Field Name           | status                                                     |
+	| Update Field Original Value | N/A                                                        |
+	| Update Field New Value      | 0                                                          |
+
+Scenario: Add product and product bundle subscription via bulk input
+	Testing the ability to add a product subcription and subscriptions via product bundle and bulk input in provisioning and viewing the subscriptions in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Subkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sub.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SUB                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sub.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SUB                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korsub - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I create a product with the following values
+	| Name | A Bundled Subscri Product | |
+	And I create a product with the following values
+	| Name | A Bundled Subscri Second Product | |
+	And I create a product with the following values
+	| Name | A Non Bundled Product | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product bundles index page
+	And I click on the new product bundle button
+	And I populate and save the product bundle form with the following values
+	| Name        | Input | Bundled Subscri Products         |
+	| Add Product |       | A Bundled Subscri Product        |
+	| Add Product |       | A Bundled Subscri Second Product |
+	Then I should be able to view a product bundle on the provisioning index with the name "Bundled Subscri Products" and the following values
+	| Name | Bundled Subscri Products |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Bundled Subscri Products" on the subscription select window
+	And I click on the select button on the subscription form
+	And I select the product with the name "A Non Bundled Product" on the subscription select window
+	And I populate and save the subscription form with the following values
+	| Bulk Input | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Bulk Input | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Bulk Input | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
 	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
 	| Name                | DXP Production |
 	| Current Provisioned | 0              |
