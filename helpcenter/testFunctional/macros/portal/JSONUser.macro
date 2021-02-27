@@ -2,6 +2,8 @@ definition {
 	var koroneikiAdminEmailAddress = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
 	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
@@ -1112,5 +1114,33 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "the support user with the email address ${userEmailAddress} should be synced to the support site"
+	macro viewSupportUserSync {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var userObject = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${userObject}", "NoSuchUserException"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var userObject = JSONCurlUtil.post("${curl}");
+		}
+
+		if (contains("${userObject}", "NoSuchUserException")) {
+			fail("After ${currentIteration} checks, the support user appears to have not been added to the support site");
+		}
 	}
 }
