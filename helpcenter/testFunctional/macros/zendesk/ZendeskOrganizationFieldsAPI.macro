@@ -3,6 +3,40 @@ definition {
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	macro _getSubOrganizationIdByName {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/organization_fields.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var subOrganizationId = JSONCurlUtil.get("${curl}", "$.organization_fields[?(@.title=='Sub Organization')].custom_field_options[?(@.name=='${subOrganizationName}')].id");
+
+		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "[", "");
+
+		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "]", "");
+
+		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "&quot;", "");
+
+		return "${subOrganizationId}";
+	}
+
+	macro _getSubOrganizationNameById {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/organization_fields.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var subOrganizationName = JSONCurlUtil.get("${curl}", "$.organization_fields[?(@.title=='Sub Organization')].custom_field_options[?(@.id==${subOrganizationId})].name");
+
+		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "[", "");
+
+		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "]", "");
+
+		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "&quot;", "");
+
+		return "${subOrganizationName}";
+	}
+
 	macro _getSupportRegionIdByName {
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/organization_fields.json
