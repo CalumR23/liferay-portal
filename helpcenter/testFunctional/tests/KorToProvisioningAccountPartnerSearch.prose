@@ -1,0 +1,419 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.provisioning.account.search"
+
+Feature:  Koroneiki to Provisioning Account Partner Search Integration
+	Testing to assure that koroneiki account partner search works properly.
+
+Setup:
+	* I create a user with the following parameters
+	| Screen Name   | sea.koroneiki1                       |
+	| Email Address | sea.koroneiki1@lrcustomer.com.broken |
+	| First Name    | SEA                                  |
+	| Last Name     | Koroneiki1                           |
+	* I create a user with the following parameters
+	| Screen Name   | sea.koroneiki2                       |
+	| Email Address | sea.koroneiki2@lrcustomer.com.broken |
+	| First Name    | SEA                                  |
+	| Last Name     | Koroneiki2                           |
+
+Teardown:
+	* I wait for "5" seconds
+	* I get the ID of the default user belonging to the organization "Korsea - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Seakor - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I get the ID of the default user belonging to the organization "Seapar - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the third default user ID variable
+	* I tear down the external links for the account "Korsea - ${staticProjectName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey}   | salesforce |
+	| ${staticDossieraProjectKey}   | dossiera   |
+	| ${staticSalesforceProjectKey} | salesforce |
+	* I tear down the external links for the account "Seakor - ${staticCompanyName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey} | salesforce |
+	| ${staticDossieraAccountKey} | dossiera   |
+	* I tear down the product purchases on koroneiki made by the account "Korsea - ${staticProjectName}" for the following products
+	| DXP Production         |
+	| Platinum Subscription  |
+	| Gold Subscription      |
+	* I tear down the product purchases on koroneiki made by the account "Seapar - ${staticProjectName}" for the following products
+	| Service Partnership              |
+	| Basic Reseller Partnership       |
+	| Value-Added Reseller Partnership |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| sea.koroneiki1@lrcustomer.com.broken |
+	| sea.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| sea.koroneiki1@lrcustomer.com.broken |
+	| sea.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| sea.koroneiki1@lrcustomer.com.broken |
+	| sea.koroneiki2@lrcustomer.com.broken |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| sea.koroneiki1@lrcustomer.com.broken |
+	| sea.koroneiki2@lrcustomer.com.broken |
+	* I tear down the accounts on koroneiki with the following names
+	| Seapar - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| SEAPARSEAPAR |
+	* I tear down the accounts on koroneiki with the following names
+	| Korsea - ${staticProjectName} |
+	| Seakor - ${staticCompanyName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| SEAKORKORSEA |
+	| SEAKOR       |
+	* I teardown the tickets with the following keywords from zendesk.liferay.com
+	| New Subscription(s) for Korsea - ${staticProjectName} |
+	| New Subscription(s) for Seakor - ${staticCompanyName} |
+	* I wait for "5" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes via groovy
+	| SEAPARSEAPAR |
+	| SEAKORKORSEA |
+	| SEAKOR       |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| sea.koroneiki1@lrcustomer.com.broken |
+	| sea.koroneiki2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Seapar - ${staticProjectName} |
+	| Korsea - ${staticProjectName} |
+	| Seakor - ${staticCompanyName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId3}" from zendesk.liferay.com
+
+Scenario: View advanced search results
+	@ help.center.smoke = "true"
+	Testing the ability to create a T4 project in Dossiera and add the project partner in koroneiki and view the project partner view advanced search results
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I generate past static yyyymmdd start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Seakor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sea.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SEA                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sea.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SEA                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korsea - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "sea.koroneiki1@lrcustomer.com.broken" on the account "Korsea - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | SEAPARSEAPAR                                   |
+	| Contact Email Address | sea.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Seapar - ${staticProjectName}                  |
+	| Profile Email Address | sea.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Seapar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I create an assigned team nested field for a team with the name "Seapar - ${staticProjectName}" assigned to the account "Korsea - ${staticProjectName}"
+	And I update a koroneiki account with the name "Korsea - ${staticProjectName}" including nested fields to have the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} |
+	* I assign the team with the name "Seapar - ${staticProjectName}" on the account "Korsea - ${staticProjectName}" to the following roles
+	| Partner |
+	* I assign the team with the name "Seapar - ${staticProjectName}" on the account "Korsea - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I expand the account advanced search form
+	And I populate the advanced search form with the following values and search
+	| Match               |               | Radio Button | All                              |
+	| Account Name        |               | Input        | Seapar - ${staticProjectName}    |
+	| Code                |               | Input        | SEAPARSEAPAR                     |
+	| Account             |               | Panel        | Collapse                         |
+	| Categorization      |               | Panel        | Expand                           |
+	| Partner             | Yes           | Checkbox     | true                             |
+	| Provides FLS        | Yes           | Checkbox     | true                             |
+	| Receives FLS        | No            | Checkbox     | true                             |
+	| Internal            | No            | Checkbox     | true                             |
+	| Tier                | T4            | Checkbox     | true                             |
+	| Support Region      | United States | Checkbox     | true                             |
+	| Categorization      |               | Panel        | Collapse                         |
+	| Dates               |               | Panel        | Expand                           |
+	| Created After       |               | Input        | ${staticYyyyMmDdPastEndDate}     |
+	| Created Before      |               | Input        | ${staticYyyyMmDdFutureStartDate} |
+	| Modified After      |               | Input        | ${staticYyyyMmDdPastEndDate}     |
+	| Modified Before     |               | Input        | ${staticYyyyMmDdFutureStartDate} |
+	| Date                |               | Panel        | Collapse                         |
+	Then I should be able to view an account on the provisioning index with the name "Seapar - ${staticProjectName}" and the following values
+	| Name    | Seapar - ${staticProjectName} |
+	| Code    | SEAPARSEAPAR                  |
+	| Region  | United States                 |
+	| Tier    | T4                            |
+	And I should be able to view the search info message with the following types and values
+	| Label | Code: SEAPARSEAPAR                                |
+	| Label | Account Name: Seapar - ${staticProjectName}       |
+	| Label | Partner: Yes                                      |
+	| Label | Provides FLS: Yes                                 |
+	| Label | Receives FLS: No                                  |
+	| Label | Internal: No                                      |
+	| Label | Tier: T4                                          |
+	| Label | Support Region: United States                     |
+	| Label | Modified After: ${staticYyyyMmDdPastEndDate}      |
+	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate} |
+	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}  |
+	| Label | Created After: ${staticYyyyMmDdPastEndDate}       |
+	When I go to the account index page
+	And I expand the account advanced search form
+	And I populate the advanced search form with the following values and search
+	| Match               |               | Radio Button   | All                              |
+	| Account Name        |               | Input          | Korsea - ${staticProjectName}    |
+	| Code                |               | Input          | SEAKORKORSEA                     |
+	| Partner/Reseller/SI |               | Select Entity  | Seapar - ${staticProjectName}    |
+	| First Line Support  |               | Select Entity  | Seapar - ${staticProjectName}    |
+	| Country             |               | Select         | United States                    |
+	| Account             |               | Panel          | Collapse                         |
+	| Categorization      |               | Panel          | Expand                           |
+	| Partner             | No            | Checkbox       | true                             |
+	| Provides FLS        | No            | Checkbox       | true                             |
+	| Receives FLS        | Yes           | Checkbox       | true                             |
+	| Internal            | No            | Checkbox       | true                             |
+	| Tier                | T4            | Checkbox       | true                             |
+	| Subscription Status | Active        | Checkbox       | true                             |
+	| Subscription Level  | Platinum      | Checkbox       | true                             |
+	| Support Region      | United States | Checkbox       | true                             |
+	| Categorization      |               | Panel          | Collapse                         |
+	| Dates               |               | Panel          | Expand                           |
+	| Created After       |               | Input          | ${staticYyyyMmDdPastEndDate}     |
+	| Created Before      |               | Input          | ${staticYyyyMmDdFutureStartDate} |
+	| Modified After      |               | Input          | ${staticYyyyMmDdPastEndDate}     |
+	| Modified Before     |               | Input          | ${staticYyyyMmDdFutureStartDate} |
+	| Date                |               | Panel          | Collapse                         |
+	Then I should be able to view an account on the provisioning index with the name "Korsea - ${staticProjectName}" and the following values
+	| Name    | Korsea - ${staticProjectName} |
+	| Code    | SEAKORKORSEA                  |
+	| Partner | Seapar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+	And I should be able to view the search info message with the following types and values
+	| Label | Country: United States                             |
+	| Label | Code: SEAKORKORSEA                                 |
+	| Label | Account Name: Korsea - ${staticProjectName}        |
+	| Label | Partner/Reseller/SI: Seapar - ${staticProjectName} |
+	| Label | First Line Support: Seapar - ${staticProjectName}  |
+	| Label | Partner: No                                        |
+	| Label | Provides FLS: No                                   |
+	| Label | Receives FLS: Yes                                  |
+	| Label | Internal: No                                       |
+	| Label | Tier: T4                                           |
+	| Label | Subscription Status: Active                        |
+	| Label | Subscription Level: Platinum Subscription          |
+	| Label | Support Region: United States                      |
+	| Label | Modified After: ${staticYyyyMmDdPastEndDate}       |
+	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate}  |
+	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}   |
+	| Label | Created After: ${staticYyyyMmDdPastEndDate}        |
+
+Scenario: View advanced search results after partner update via provisioning
+	Testing the ability to create a T4 project in Dossiera and add the project partner in the provisioning page account details and view the project partner view advanced search results
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I generate past static yyyymmdd start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Seakor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sea.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SEA                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sea.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SEA                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korsea - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "sea.koroneiki1@lrcustomer.com.broken" on the account "Korsea - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | SEAPARSEAPAR                                   |
+	| Contact Email Address | sea.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Seapar - ${staticProjectName}                  |
+	| Profile Email Address | sea.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Seapar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korsea"
+	And I click on the account with the name "Korsea - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Seapar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Seapar - ${staticProjectName} | |
+	And I go to the account index page
+	And I expand the account advanced search form
+	And I populate the advanced search form with the following values and search
+	| Match               |               | Radio Button | All                              |
+	| Account Name        |               | Input        | Seapar - ${staticProjectName}    |
+	| Code                |               | Input        | SEAPARSEAPAR                     |
+	| Account             |               | Panel        | Collapse                         |
+	| Categorization      |               | Panel        | Expand                           |
+	| Partner             | Yes           | Checkbox     | true                             |
+	| Provides FLS        | Yes           | Checkbox     | true                             |
+	| Receives FLS        | No            | Checkbox     | true                             |
+	| Internal            | No            | Checkbox     | true                             |
+	| Tier                | T4            | Checkbox     | true                             |
+	| Support Region      | United States | Checkbox     | true                             |
+	| Categorization      |               | Panel        | Collapse                         |
+	| Dates               |               | Panel        | Expand                           |
+	| Created After       |               | Input        | ${staticYyyyMmDdPastEndDate}     |
+	| Created Before      |               | Input        | ${staticYyyyMmDdFutureStartDate} |
+	| Modified After      |               | Input        | ${staticYyyyMmDdPastEndDate}     |
+	| Modified Before     |               | Input        | ${staticYyyyMmDdFutureStartDate} |
+	| Date                |               | Panel        | Collapse                         |
+	Then I should be able to view an account on the provisioning index with the name "Seapar - ${staticProjectName}" and the following values
+	| Name    | Seapar - ${staticProjectName} |
+	| Code    | SEAPARSEAPAR                  |
+	| Region  | United States                 |
+	| Tier    | T4                            |
+	And I should be able to view the search info message with the following types and values
+	| Label | Code: SEAPARSEAPAR                                |
+	| Label | Account Name: Seapar - ${staticProjectName}       |
+	| Label | Partner: Yes                                      |
+	| Label | Provides FLS: Yes                                 |
+	| Label | Receives FLS: No                                  |
+	| Label | Internal: No                                      |
+	| Label | Tier: T4                                          |
+	| Label | Support Region: United States                     |
+	| Label | Modified After: ${staticYyyyMmDdPastEndDate}      |
+	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate} |
+	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}  |
+	| Label | Created After: ${staticYyyyMmDdPastEndDate}       |
+	When I go to the account index page
+	And I expand the account advanced search form
+	And I populate the advanced search form with the following values and search
+	| Match               |               | Radio Button   | All                              |
+	| Account Name        |               | Input          | Korsea - ${staticProjectName}    |
+	| Code                |               | Input          | SEAKORKORSEA                     |
+	| Partner/Reseller/SI |               | Select Entity  | Seapar - ${staticProjectName}    |
+	| First Line Support  |               | Select Entity  | Seapar - ${staticProjectName}    |
+	| Country             |               | Select         | United States                    |
+	| Account             |               | Panel          | Collapse                         |
+	| Categorization      |               | Panel          | Expand                           |
+	| Partner             | No            | Checkbox       | true                             |
+	| Provides FLS        | No            | Checkbox       | true                             |
+	| Receives FLS        | Yes           | Checkbox       | true                             |
+	| Internal            | No            | Checkbox       | true                             |
+	| Tier                | T4            | Checkbox       | true                             |
+	| Subscription Status | Active        | Checkbox       | true                             |
+	| Subscription Level  | Platinum      | Checkbox       | true                             |
+	| Support Region      | United States | Checkbox       | true                             |
+	| Categorization      |               | Panel          | Collapse                         |
+	| Dates               |               | Panel          | Expand                           |
+	| Created After       |               | Input          | ${staticYyyyMmDdPastEndDate}     |
+	| Created Before      |               | Input          | ${staticYyyyMmDdFutureStartDate} |
+	| Modified After      |               | Input          | ${staticYyyyMmDdPastEndDate}     |
+	| Modified Before     |               | Input          | ${staticYyyyMmDdFutureStartDate} |
+	| Date                |               | Panel          | Collapse                         |
+	Then I should be able to view an account on the provisioning index with the name "Korsea - ${staticProjectName}" and the following values
+	| Name    | Korsea - ${staticProjectName} |
+	| Code    | SEAKORKORSEA                  |
+	| Partner | Seapar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+	And I should be able to view the search info message with the following types and values
+	| Label | Country: United States                             |
+	| Label | Code: SEAKORKORSEA                                 |
+	| Label | Account Name: Korsea - ${staticProjectName}        |
+	| Label | Partner/Reseller/SI: Seapar - ${staticProjectName} |
+	| Label | First Line Support: Seapar - ${staticProjectName}  |
+	| Label | Partner: No                                        |
+	| Label | Provides FLS: No                                   |
+	| Label | Receives FLS: Yes                                  |
+	| Label | Internal: No                                       |
+	| Label | Tier: T4                                           |
+	| Label | Subscription Status: Active                        |
+	| Label | Subscription Level: Platinum Subscription          |
+	| Label | Support Region: United States                      |
+	| Label | Modified After: ${staticYyyyMmDdPastEndDate}       |
+	| Label | Modified Before: ${staticYyyyMmDdFutureStartDate}  |
+	| Label | Created Before: ${staticYyyyMmDdFutureStartDate}   |
+	| Label | Created After: ${staticYyyyMmDdPastEndDate}        |
