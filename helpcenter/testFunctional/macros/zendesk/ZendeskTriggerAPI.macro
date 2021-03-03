@@ -74,9 +74,29 @@ definition {
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[0].id");
+		if ("${triggerName}" == "Assign to Platinum Critical - US") {
+			var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[?(@.title=='${triggerName}')].id");
 
-		var triggerNameFromAPI = JSONCurlUtil.get("${curl}", "$.triggers[0].title");
+			var triggerId = StringUtil.replace("${triggerId}", "[", "");
+
+			var triggerId = StringUtil.replace("${triggerId}", "]", "");
+
+			var triggerNameFromAPI = JSONCurlUtil.get("${curl}", "$.triggers[?(@.id==${triggerId})].title");
+		}
+		else if ("${triggerName}" == "Assign Spain Platinum Critical to Platinum Critical - US") {
+			var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[?(@.title=='${triggerName} ')].id");
+
+			var triggerId = StringUtil.replace("${triggerId}", "[", "");
+
+			var triggerId = StringUtil.replace("${triggerId}", "]", "");
+
+			var triggerNameFromAPI = JSONCurlUtil.get("${curl}", "$.triggers[?(@.id==${triggerId})].title");
+		}
+		else {
+			var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[0].id");
+
+			var triggerNameFromAPI = JSONCurlUtil.get("${curl}", "$.triggers[0].title");
+		}
 
 		var triggerId = StringUtil.replace("${triggerId}", "[", "");
 
@@ -89,6 +109,10 @@ definition {
 		var triggerNameFromAPI = StringUtil.replace("${triggerNameFromAPI}", "]", "");
 
 		var triggerNameFromAPI = StringUtil.replace("${triggerNameFromAPI}", "&quot;", "");
+
+		if ("${triggerName}" == "Assign Spain Platinum Critical to Platinum Critical - US") {
+			var triggerNameFromAPI = StringUtil.trimTrailing("${triggerNameFromAPI}");
+		}
 
 		if (!("${triggerName}" == "${triggerNameFromAPI}")) {
 			fail("Actual trigger name ${triggerNameFromAPI} obtained from search does not match the expected trigger name ${triggerName}");
