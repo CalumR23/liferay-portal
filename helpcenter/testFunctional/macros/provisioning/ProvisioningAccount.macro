@@ -810,6 +810,47 @@ definition {
 		Click(locator1 = "ProvisioningAccountAddAddress#SAVE_BUTTON");
 	}
 
+	@prose = "I populate the assign contact form with the following values ${table}"
+	macro populateAssignContactForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assign Role") {
+				var key_role = "${value}";
+
+				if (IsElementNotPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+
+				Click(locator1 = "ProvisioningAccountAssignContact#ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+			}
+			else if ("${field}" == "Unassign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignContact#REMOVE_ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+			}
+			else {
+				fail("No such contact field ${field}. Please set the field value to Email Address, Assign Role, or Unassign Role.");
+			}
+		}
+	}
+
 	@prose = "I populate and save the assign contact form with the following values ${table}"
 	macro populateAssignContactFormAndSave {
 		var RawTable rawTable = new RawTable("${table}");
@@ -851,6 +892,47 @@ definition {
 		}
 
 		Click(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON");
+	}
+
+	@prose = "I populate the assign worker form with the following values ${table}"
+	macro populateAssignWorkerForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Email Address") {
+				Type(
+					locator1 = "ProvisioningAccountAssignWorker#EMAIL_ADDRESS_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Assign Role") {
+				var key_role = "${value}";
+
+				if (IsElementNotPresent(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_LINK");
+				}
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_LINK");
+				}
+			}
+			else if ("${field}" == "Unassign Role") {
+				var key_role = "${value}";
+
+				Click(locator1 = "ProvisioningAccountAssignWorker#REMOVE_ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignWorker#ROLE_SELECT_LINK");
+				}
+			}
+			else {
+				fail("No such worker field ${field}. Please set the field value to Email Address, Assign Role, or Unassign Role.");
+			}
+		}
 	}
 
 	@prose = "I populate and save the assign worker form with the following values ${table}"
@@ -1844,6 +1926,11 @@ definition {
 			value1 = "${accountName}");
 	}
 
+	@prose = "the save button on the assign contact form should be disabled"
+	macro viewDisabledContactFormSaveButton {
+		AssertElementPresent(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON_DISABLED");
+	}
+
 	@prose = "I should be able to view the error message for an invalid contact"
 	macro viewErrorMessageForInvalidContact {
 		AssertTextEquals.assertPartialText(
@@ -1853,6 +1940,17 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Provisioning#ERROR_MESSAGE",
 			value1 = "Contact does not exist.");
+	}
+
+	@prose = "I should be able to view the error message for overlapping roles"
+	macro viewErrorMessageForOverlappingRoles {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Overlapping Roles");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Please only select one support role or one partner role.");
 	}
 
 	@prose = "I should be able to view the error message for open zendesk tickets"
