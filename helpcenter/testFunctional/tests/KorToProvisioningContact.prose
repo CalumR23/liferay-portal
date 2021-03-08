@@ -2352,3 +2352,664 @@ Scenario: View contact web sync from unverified to verified
 	| First Name             | PRO                                  |
 	| Last Name              | Koroneiki2                           |
 	| Email Address Verified | true                                 |
+
+Scenario: Assign contact with overlapping support roles
+	Testing the ability to create a contacts in Dossiera and koroneiki and attempting to assign the contact to an account with multiple overlapping support roles via provisioning
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Support Watcher                      |
+	| Assign Role   | Support Developer                    |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Support Watcher |
+	Then I should not be able to view an error message
+	And the save button on the assign contact form should not be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Support Developer |
+	Then I should not be able to view an error message
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Support Developer |
+	Then I should not be able to view an error message
+	And the save button on the assign contact form should not be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Support Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Update additional overlapping support developer role
+	Testing the ability to create a contacts in Dossiera and koroneiki and assigning the contact to an account via provisioning and adding an additional overlapping support developer role
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Support Developer                    |
+	And I click on the "Edit" button in the dropdown menu for the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I populate the assign contact form with the following values
+	| Assign Role | Support Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Support Developer                    |
+	| User Status   | VERIFIED                             |
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the customer contact role "Support Developer"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	When I click on the "Liferay Workers" tab
+	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Update additional overlapping support watcher role
+	Testing the ability to create a contacts in Dossiera and koroneiki and assigning the contact to an account via provisioning and adding an additional overlapping support developer role
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Support Watcher                    |
+	And I click on the "Edit" button in the dropdown menu for the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I populate the assign contact form with the following values
+	| Assign Role | Support Developer |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Support Developer"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	When I click on the "Liferay Workers" tab
+	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Assign contact with overlapping partner roles
+	Testing the ability to create a contacts in Dossiera and koroneiki and attempting to assign the contact to an account with multiple overlapping partner roles via provisioning
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Partner Watcher                      |
+	Then I should not be able to view an error message
+	And the save button on the assign contact form should not be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Member |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Manager |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Partner Member |
+	Then I should not be able to view an error message
+	And the save button on the assign contact form should not be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should not be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Update additional overlapping partner member and manager roles
+	Testing the ability to create a contacts in Dossiera and koroneiki and assigning the contact to an account via provisioning and adding an additional overlapping partner member and manager roles
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Partner Watcher                      |
+	And I click on the "Edit" button in the dropdown menu for the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I populate the assign contact form with the following values
+	| Assign Role | Partner Member |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Manager |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Partner Member |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Partner Watcher                      |
+	| User Status   | VERIFIED                             |
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Member"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Manager"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the customer contact role "Partner Watcher"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	When I click on the "Liferay Workers" tab
+	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Update additional overlapping partner watcher and manager roles
+	Testing the ability to create a contacts in Dossiera and koroneiki and assigning the contact to an account via provisioning and adding an additional overlapping partner watcher and manager roles
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Partner Member                       |
+	And I click on the "Edit" button in the dropdown menu for the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I populate the assign contact form with the following values
+	| Assign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Manager |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Partner Member                       |
+	| User Status   | VERIFIED                             |
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Manager"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the customer contact role "Partner Member"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	When I click on the "Liferay Workers" tab
+	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
+
+Scenario: Update additional overlapping partner watcher and member roles
+	Testing the ability to create a contacts in Dossiera and koroneiki and assigning the contact to an account via provisioning and adding an additional overlapping partner watcher and member roles
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "Koroneiki Partner" for the account "Korpro - ${staticProjectName}"
+	And I assign the team with the name "Koroneiki Partner" on the account "Korpro - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "Koroneiki Partner"
+	| pro.koroneiki1@lrcustomer.com.broken |
+	And I create a contact on koroneiki with the following values
+	| Email Address          | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name             | PRO                                  |
+	| Language               | English                              |
+	| Last Name              | Koroneiki2                           |
+	| Email Address Verified | true                                 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Korpro"
+	And I click on the account with the name "Korpro - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Assign Role   | Partner Manager                      |
+	And I click on the "Edit" button in the dropdown menu for the contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I populate the assign contact form with the following values
+	| Assign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Assign Role | Partner Member |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I populate the assign contact form with the following values
+	| Unassign Role | Partner Watcher |
+	Then I should be able to view the error message for overlapping roles
+	And the save button on the assign contact form should be disabled
+	When I click on the cancel button in the contact form
+	Then I should be able to view the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki1                       |
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support Watcher                      |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | PRO Koroneiki2                       |
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Role          | Partner Manager                      |
+	| User Status   | VERIFIED                             |
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" with the customer contact role "Support Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Watcher"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" without the customer contact role "Partner Member"
+	And the account with the name "Korpro - ${staticProjectName}" should be assigned the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" with the customer contact role "Partner Manager"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" should be assigned the team "Korpro - ${staticProjectName}"
+	When I click on the "Liferay Workers" tab
+	Then I should not be able to view the worker with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view the worker with the email address "pro.koroneiki2@lrcustomer.com.broken"
