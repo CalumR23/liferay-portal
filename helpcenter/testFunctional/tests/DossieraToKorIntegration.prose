@@ -54,9 +54,13 @@ Teardown:
 	| A Liferay Portal Product |
 	| Portal Production        |
 	| Gold Subscription        |
+	| Random Subscription      |
+	| Nonexistent Subscription |
 	* I tear down the products on koroneiki with the following names
 	| A Liferay DXP Product    |
 	| A Liferay Portal Product |
+	| Random Subscription      |
+	| Nonexistent Subscription |
 	* I tear down the users with the following email addresses from web.liferay.com
 	| pro.koroneiki1@lrcustomer.com.broken |
 	| pro.koroneiki2@lrcustomer.com.broken |
@@ -476,6 +480,258 @@ Scenario: Send message with existing product and contact entities
 	| Quantity | 1        | |
 	| Status   | Approved | |
 
+Scenario: Send message with non existing product
+	Testing the ability to create a project in Dossiera and verifying that the non existing product entities on Koroneiki do not get used
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should not be able to view a koroneiki product with the name "A Liferay DXP Product"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send message with non existing subscription
+	Testing the ability to create a project in Dossiera and verifying that the non existing subscription entities on Koroneiki do not get used
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Random                                     |
+	| Version Number                         | 7.1                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should not be able to view a koroneiki product with the name "Random Subscription"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send message with non existing product and subscription
+	Testing the ability to create a project in Dossiera and verifying that the non existing product and subscription entities on Koroneiki do not get used
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay DXP Product                      |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Random                                     |
+	| Version Number                         | 7.1                                        |
+	Then I should not be able to view a koroneiki account with the name "Korpro - ${staticProjectName}"
+	And I should not be able to view a koroneiki account with the name "Prokor - ${staticCompanyName}"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki product with the name "A Liferay DXP Product"
+	And I should not be able to view a koroneiki product with the name "Random Subscription"
+
 Scenario: Send message with existing product and contact entities without external links
 	Testing the ability to create a project in Dossiera and verifying that the existing contact and product entities without external links on Koroneiki get used and that the external links get created
 
@@ -726,6 +982,442 @@ Scenario: Send message with multiple entities
 	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
 	| Quantity | 1        | |
 	| Status   | Approved | |
+
+Scenario: Send message with existing and non existing products
+	Testing the ability to create a project in Dossiera using multiple entities and making sure that the appropriate entities are created in Koroneiki
+
+	Given I generate several static variables for Provisioning including multiple contacts and projects
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project RabbitMQ message with routing key "dossiera.provisioning.create" and multiple contacts and products and no partner with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address 1                | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name 1                   | PRO                                        |
+	| Contact Last Name 1                    | Koroneiki1                                 |
+	| Contact Email Address 2                | pro.koroneiki2@lrcustomer.com.broken       |
+	| Contact First Name 2                   | PRO                                        |
+	| Contact Last Name 2                    | Koroneiki2                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key 1                 | ${staticDossieraContactKey1}               |
+	| Dossiera Contact Key 2                 | ${staticDossieraContactKey2}               |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki3@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki3                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name 1                         | DXP Production                             |
+	| Product Name 2                         | A Liferay Portal Product                   |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level 1                   | Platinum                                   |
+	| Subscription Level 2                   | Gold                                       |
+	| Version Number                         | 7.1                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki3                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki3@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send message with existing and non existing products and subscriptions
+	Testing the ability to create a project in Dossiera using multiple entities and making sure that the appropriate entities are created in Koroneiki
+
+	Given I generate several static variables for Provisioning including multiple contacts and projects
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project RabbitMQ message with routing key "dossiera.provisioning.create" and multiple contacts and products and no partner with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address 1                | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name 1                   | PRO                                        |
+	| Contact Last Name 1                    | Koroneiki1                                 |
+	| Contact Email Address 2                | pro.koroneiki2@lrcustomer.com.broken       |
+	| Contact First Name 2                   | PRO                                        |
+	| Contact Last Name 2                    | Koroneiki2                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key 1                 | ${staticDossieraContactKey1}               |
+	| Dossiera Contact Key 2                 | ${staticDossieraContactKey2}               |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki3@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki3                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name 1                         | DXP Production                             |
+	| Product Name 2                         | A Liferay Portal Product                   |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level 1                   | Random                                     |
+	| Subscription Level 2                   | Gold                                       |
+	| Version Number                         | 7.1                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki3                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And I should not be able to view a koroneiki product with the name "Random Subscription"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki3@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send message with non existing products
+	Testing the ability to create a project in Dossiera using multiple entities and making sure that the appropriate entities are created in Koroneiki
+
+	Given I generate several static variables for Provisioning including multiple contacts and projects
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project RabbitMQ message with routing key "dossiera.provisioning.create" and multiple contacts and products and no partner with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address 1                | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name 1                   | PRO                                        |
+	| Contact Last Name 1                    | Koroneiki1                                 |
+	| Contact Email Address 2                | pro.koroneiki2@lrcustomer.com.broken       |
+	| Contact First Name 2                   | PRO                                        |
+	| Contact Last Name 2                    | Koroneiki2                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key 1                 | ${staticDossieraContactKey1}               |
+	| Dossiera Contact Key 2                 | ${staticDossieraContactKey2}               |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki3@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki3                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name 1                         | A Liferay DXP Product                      |
+	| Product Name 2                         | A Liferay Portal Product                   |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level 1                   | Platinum                                   |
+	| Subscription Level 2                   | Gold                                       |
+	| Version Number                         | 7.1                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki3                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should not be able to view a koroneiki product with the name "A Liferay DXP Product"
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki3@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send message with non existing products and subscriptions
+	Testing the ability to create a project in Dossiera using multiple entities and making sure that the appropriate entities are created in Koroneiki
+
+	Given I generate several static variables for Provisioning including multiple contacts and projects
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project RabbitMQ message with routing key "dossiera.provisioning.create" and multiple contacts and products and no partner with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address 1                | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name 1                   | PRO                                        |
+	| Contact Last Name 1                    | Koroneiki1                                 |
+	| Contact Email Address 2                | pro.koroneiki2@lrcustomer.com.broken       |
+	| Contact First Name 2                   | PRO                                        |
+	| Contact Last Name 2                    | Koroneiki2                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key 1                 | ${staticDossieraContactKey1}               |
+	| Dossiera Contact Key 2                 | ${staticDossieraContactKey2}               |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki3@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki3                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name 1                         | A Liferay DXP Product                      |
+	| Product Name 2                         | A Liferay Portal Product                   |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level 1                   | Random                                     |
+	| Subscription Level 2                   | Nonexistent                                |
+	| Version Number                         | 7.1                                        |
+	Then I should not be able to view a koroneiki account with the name "Korpro - ${staticProjectName}"
+	And I should not be able to view a koroneiki account with the name "Prokor - ${staticCompanyName}"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki4@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki product with the name "A Liferay DXP Product"
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And I should not be able to view a koroneiki product with the name "Random Subscription"
+	And I should not be able to view a koroneiki product with the name "Nonexistent Subscription"
 
 Scenario: Send subsequent message
 	Testing the ability to create a project in Dossiera and sending a subsequent message while making sure that only appropriate changes are made by the subsequent message
@@ -1304,5 +1996,323 @@ Scenario: Send subsequent message with existing entities without external links
 	| Quantity | 1        | |
 	| Status   | Approved | |
 	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send subsequent message with non existing product
+	Testing the ability to create a project in Dossiera and sending a subsequent message while making sure that only appropriate changes are made by the subsequent message
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | 000000e5f6e7fa1b2c3d4                      |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Proone - ${staticCompanyName}              |
+	| Address City                           | Los Angeles                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 90011                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 123 Main Street                            |
+	| Contact Email Address                  | pro.koroneiki3@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki3                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Engineering                                |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay Portal Product                   |
+	| Project Name                           | Onepro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Gold                                       |
+	| Version Number                         | 6.2                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should not be able to view a koroneiki account with the name "Onepro - ${staticProjectName}"
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "123 Main Street"
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki3@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki3                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki4@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki4@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki4                           |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And the contact with the email address "pro.koroneiki3@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki4@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+
+Scenario: Send subsequent message with non existing product and subscription
+	Testing the ability to create a project in Dossiera and sending a subsequent message while making sure that only appropriate changes are made by the subsequent message
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Prokor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | DXP Production                             |
+	| Project Name                           | Korpro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | 000000e5f6e7fa1b2c3d4                      |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Proone - ${staticCompanyName}              |
+	| Address City                           | Los Angeles                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 90011                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 123 Main Street                            |
+	| Contact Email Address                  | pro.koroneiki3@lrcustomer.com.broken       |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Koroneiki3                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Engineering                                |
+	| Owner Email Address                    | pro.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | A Liferay Portal Product                   |
+	| Project Name                           | Onepro - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Random                                     |
+	| Version Number                         | 6.2                                        |
+	Then I should be able to view a koroneiki account with the name "Korpro - ${staticProjectName}" and the following values
+	| Code                  | PROKORKORPRO                         |
+	| Parent Account Name   | Prokor - ${staticCompanyName}        |
+	| Contact Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| Name                  | Korpro - ${staticProjectName}        |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	And I should not be able to view a koroneiki account with the name "Onepro - ${staticProjectName}"
+	And I should be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "456 Fake Street" with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Postal Code           | 91765           |
+	| Street Address Line 1 | 456 Fake Street |
+	And I should not be able to view a postal address on koroneiki for the account "Korpro - ${staticProjectName}" with the street address "123 Main Street"
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraProjectKey}" and domain "dossiera" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraProjectKey} |
+	| Entity Name | project                     |
+	And the external link with the entity id "${staticSalesforceProjectKey}" should be present on the account "Korpro - ${staticProjectName}" with the following values
+	| Domain      | salesforce                    |
+	| Entity Id   | ${staticSalesforceProjectKey} |
+	| Entity Name | project                       |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "salesforce" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | salesforce                  |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And the external link with the entity id "${staticDossieraAccountKey}" and domain "dossiera" should be present on the account "Prokor - ${staticCompanyName}" with the following values
+	| Domain      | dossiera                    |
+	| Entity Id   | ${staticDossieraAccountKey} |
+	| Entity Name | account                     |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki1@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki1                           |
+	And I should be able to view a koroneiki contact with the email address "pro.koroneiki2@lrcustomer.com.broken" and the following values
+	| Email Address | pro.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRO                                  |
+	| Last Name     | Koroneiki2                           |
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki3@lrcustomer.com.broken"
+	And I should not be able to view a koroneiki contact with the email address "pro.koroneiki4@lrcustomer.com.broken"
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And the external link with the entity id "${staticSalesforceOpportunityKey}" should be present on the product purchase made by account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
+	| Domain      | salesforce                        |
+	| Entity Id   | ${staticSalesforceOpportunityKey} |
+	| Entity Name | opportunity                       |
+	And I should not be able to view a koroneiki product with the name "A Liferay Portal Product"
+	And I should not be able to view a koroneiki product with the name "Random Subscription"
+	And the contact with the email address "pro.koroneiki1@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Support Watcher"
+	And the contact with the email address "pro.koroneiki2@lrcustomer.com.broken" assigned the account "Korpro - ${staticProjectName}" should have the contact role "Liferay Sales"
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "DXP Production" with the following values
+	| Quantity | 1        | |
+	| Status   | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Korpro - ${staticProjectName}" for the product "Platinum Subscription" with the following values
 	| Quantity | 1        | |
 	| Status   | Approved | |
