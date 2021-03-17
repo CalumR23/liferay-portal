@@ -23,27 +23,29 @@ definition {
 			portlet = "Objects");
 	}
 
-	tearDown {
-		User.logoutAndLoginPG(
-			userLoginEmailAddress = "test@liferay.com",
-			userLoginFullName = "Test Test");
+	//tearDown {
+	//	User.logoutAndLoginPG(
+	//		userLoginEmailAddress = "test@liferay.com",
+	//		userLoginFullName = "Test Test");
 
-		AppBuilderAdmin.teardownAppBuilder();
+	//	AppBuilderAdmin.teardownAppBuilder();
 
-		Page.tearDownCP();
+	//	Page.tearDownCP();
 
-		JSONGroup.deleteGroupByName(groupName = "App Builder Workflow Site Name");
+	//	JSONGroup.deleteGroupByName(groupName = "App Builder Workflow Site Name");
 
-		User.tearDownCP();
+	//	User.tearDownCP();
 
-		Workflow.tearDownWorkflowDefinitions();
+	//	Workflow.tearDownWorkflowDefinitions();
 
-		var testPortalInstance = PropsUtil.get("test.portal.instance");
+	//	var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		if ("${testPortalInstance}" == "true") {
-			PortalInstances.tearDownCP();
-		}
-	}
+	//	if ("${testPortalInstance}" == "true") {
+	//		PortalInstances.tearDownCP();
+
+	//}
+
+	//}
 
 	@description = "Assign an entry (task) through the App's table view"
 	@priority = "5"
@@ -2429,6 +2431,81 @@ definition {
 			fieldValue = "Content");
 	}
 
+	@description = "LRQA-64943 Automate LPS-117042: As an App Adm, I want to be warned when re-deploying a Workflow App with a Start-Form View without all required fields for a Custom Object"
+	@priority = "4"
+	test WarningDuringRedeployment {
+		AppBuilderAdmin.addCustomObject(
+			customObjectName = "my custom object",
+			isCreatingFormView = "true",
+			isCreatingViaPlusIcon = "true");
+
+		FormViewBuilder.setName(formViewName = "My Form View With Required");
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Numeric");
+		FormViewBuilder.setFieldRequired();
+		FormViewBuilder.clickRequiredEllipses();
+		FormViewBuilder.selectRequiredRadioOption(optionLabel = "For All Forms Using This Field");
+		FormViewBuilder.closeSidebar();
+		FormViewBuilder.addFieldByDoubleClick(fieldType = "Upload");
+		FormViewBuilder.setFieldRequired();
+		FormViewBuilder.clickRequiredEllipses();
+		FormViewBuilder.selectRequiredRadioOption(optionLabel = "For All Forms Using This Field");
+		FormViewBuilder.closeSidebar();
+		FormViewBuilder.save();
+
+		AppBuilderAdmin.createFormViewAndTableView(
+			fieldType = "Text",
+			formViewName = "My Form View Without Required",
+			tableViewName = "My Table View");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "App Builder",
+			panel = "Applications",
+			portlet = "Apps");
+
+		AppBuilderAppAdmin.goToWorkflowPoweredTab();
+		AppBuilderAppAdmin.clickOnCreateNewAppButton();
+		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "My Workflow App");
+		AppBuilderWorkflow.selectStep(step = "Start");
+		AppBuilderWorkflow.selectDataAndViewsCard();
+		AppBuilderWorkflow.clickOnSelectObject();
+		AppBuilderWorkflow.selectObject(objectName = "my custom object");
+		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "1");
+		AssertElementPresent(locator1 = "AppBuilder#WARNING_SIGN");
+		AppBuilderWorkflow.selectFormView(formViewName = "My Form View Without Required");
+		AppBuilderWorkflow.clickOnSelectTableView();
+		AppBuilderWorkflow.selectTableView(tableViewName = "My Table View");
+		Button.click(button = "Deploy");
+		App.toggleDeploy(deployOption = "Standalone");
+		Button.click(button = "Done");
+		AppBuilderAdmin.undeployApp(itemName = "My Workflow App");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "App Builder",
+			panel = "Applications",
+			portlet = "Objects");
+
+		AppBuilderAdmin.openItem(itemName = "my custom object");
+		AppBuilderAdmin.openItem(itemName = "My Form View Without Required");
+
+		FormViewBuilder.deleteFromObjectViaX(fieldName = "Upload");
+		Button.click(button = "Save");
+
+		ApplicationsMenu.gotoPortlet(
+			category = "App Builder",
+			panel = "Applications",
+			portlet = "Apps");
+
+		AppBuilderAppAdmin.goToWorkflowPoweredTab();
+		AppBuilderAdmin.openItem(itemName = "My Workflow App");
+		AssertElementPresent(locator1 = "AppBuilder#MODIFY_SIGN");
+		AssertElementPresent(locator1 = "AppBuilder#MODIFY_DROPDOWN_SIGN");
+		Button.click(button = "Deploy");
+
+		AssertTextEquals(
+			locator1 = "AppBuilder#MODAL_MODIFY",
+			value1 = "The Form View for this App was modified and does not contain all required fields (*) for the my custom object object. This can result in incomplete data records.");
+	}
+
 	@description = "LRQA-64406 Automate LPS-116593: As an App Adm, I want to be warned when a Form View cannot be used to create new records for Custom Objects in the Start-Step of the Workflow"
 	@priority = "4"
 	test WarningDuringStartStep {
@@ -2468,61 +2545,6 @@ definition {
 		AppBuilderWorkflow.assertFormViewSelected(
 			formViewName = "My Form View Without Required",
 			positionNumber = "1");
-	}
-
-	@description = "LRQA-60455 - Automate LPS-112666: As an App Admin, I want to be alerted when one same Object field is present in more than one Form for the same step"
-	@priority = "5"
-	test WorkflowAppStepsSharingSameObjectsField {
-		property portal.acceptance = "true";
-
-		AppBuilderAdmin.addCustomObject(
-			customObjectName = "my custom object",
-			isCreatingFormView = "true",
-			isCreatingViaPlusIcon = "true");
-
-		AppBuilderAdmin.createFormViewAndTableView(
-			fieldType = "Text",
-			formViewName = "My Form View 1",
-			tableViewName = "My Table View");
-
-		FormViewBuilder.addFormViewSameFields(
-			fieldLabel = "Text",
-			formViewName = "My Form View 2");
-
-		ApplicationsMenu.gotoPortlet(
-			category = "App Builder",
-			panel = "Applications",
-			portlet = "Apps");
-
-		AppBuilderAppAdmin.goToWorkflowPoweredTab();
-
-		AppBuilderAppAdmin.clickOnPlusButton();
-
-		AppBuilderWorkflow.addWorkflowAppName(workflowAppName = "My Workflow App");
-
-		AppBuilderWorkflow.selectStartStepDataAndViews(
-			formViewName = "My Form View 1",
-			objectName = "my custom object",
-			tableViewName = "My Table View");
-
-		AppBuilderWorkflow.addNewStep();
-
-		AppBuilderWorkflow.selectStepAssignee(
-			assignee = "Administrator",
-			step = "1");
-
-		AppBuilderWorkflow.selectDataAndViewsCard();
-
-		AppBuilderWorkflow.assertButtonEnabled(buttonName = "Deploy");
-		AppBuilderWorkflow.assertButtonEnabled(buttonName = "Save");
-
-		AppBuilderWorkflow.addNewFormView();
-		AppBuilderWorkflow.clickOnSelectFormView(positionNumber = "2");
-		AppBuilderWorkflow.selectFormView(formViewName = "My Form View 2");
-
-		AppBuilderWorkflow.assertButtonDisabled(buttonName = "Deploy");
-		AppBuilderWorkflow.assertButtonDisabled(buttonName = "Save");
-		AppBuilderWorkflow.assert1SharedFieldErrorMessage(fieldLabel = "Text");
 	}
 
 }
