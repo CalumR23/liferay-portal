@@ -1613,6 +1613,31 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with keywords ${keywords} should have the email cc ${userEmailAddress}"
+	macro _viewTicketEmailCc {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var emailCcIdsFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.email_cc_ids");
+
+		var emailCcIdsFromAPI = StringUtil.replace("${emailCcIdsFromAPI}", "[", "");
+
+		var emailCcIdsFromAPI = StringUtil.replace("${emailCcIdsFromAPI}", "]", "");
+
+		echo("Expected Email CC ID: ${userId}");
+		echo("Actual Email CC IDs: ${emailCcIdsFromAPI}");
+
+		if (!(contains("${emailCcIdsFromAPI}", "${userId}"))) {
+			fail("User with the email address ${userEmailAddress} appears to not be ccd on the ticket");
+		}
+	}
+
 	@prose = "the ticket with ticket subject ${ticketSubject} should have the environment ${environment}"
 	macro _viewTicketEnvironment {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
