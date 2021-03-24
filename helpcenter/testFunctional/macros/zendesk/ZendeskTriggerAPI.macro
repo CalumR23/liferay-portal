@@ -5,7 +5,12 @@ definition {
 
 	@prose = "if the trigger ${triggerName} does not have ${updateDate} as its update date then the update date on ${zendeskTestFileName1} and ${zendeskTestFileName2} should be changed"
 	macro _changeTriggerUpdateDate {
-		var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		if ("${triggerName}" == "Route to Provisioning - US") {
+			var triggerId = ZendeskTriggerAPI._getTriggerIdByName(triggerName = "${triggerName}");
+		}
+		else {
+			var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		}
 
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
@@ -85,6 +90,15 @@ definition {
 		}
 		else if ("${triggerName}" == "Assign Spain Platinum Critical to Platinum Critical - US") {
 			var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[?(@.title=='${triggerName} ')].id");
+
+			var triggerId = StringUtil.replace("${triggerId}", "[", "");
+
+			var triggerId = StringUtil.replace("${triggerId}", "]", "");
+
+			var triggerNameFromAPI = JSONCurlUtil.get("${curl}", "$.triggers[?(@.id==${triggerId})].title");
+		}
+		else if ("${triggerName}" == "Route to Provisioning - US") {
+			var triggerId = JSONCurlUtil.get("${curl}", "$.triggers[?(@.title=='${triggerName}')].id");
 
 			var triggerId = StringUtil.replace("${triggerId}", "[", "");
 
@@ -1008,7 +1022,12 @@ definition {
 
 	@prose = "the trigger ${triggerName} should have ${updateDate} as its update date"
 	macro _viewTriggerUpdateDate {
-		var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		if ("${triggerName}" == "Route to Provisioning - US") {
+			var triggerId = ZendeskTriggerAPI._getTriggerIdByName(triggerName = "${triggerName}");
+		}
+		else {
+			var triggerId = ZendeskTriggerAPI._getActiveTriggerIdByNameWithoutNameVerification(triggerName = "${triggerName}");
+		}
 
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/triggers/${triggerId}.json
