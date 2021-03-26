@@ -4071,24 +4071,39 @@ Feature: Patcher UAT
     @ test.group = "6"
     As a TSE, I should be able to create a 7.0 fix pack de 31 build
     Given I log into the Patcher homepage as the admin user
-    And I generate random fix content
+    And I generate random fix content for the first fix
+    And I generate random fix content for the second fix
     And I create a Patcher fix with the following values
       | Product         | DXP 7.0                                                  |
       | Project Version | fix-pack-de-31-7010                                      |
-      | Content         | ${staticFixContent}                                      |
+      | Content         | ${staticFixContent1}                                     |
       | Branch Name     | LPS-87074-70fp31                                         |
       | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.0                                                  |
+      | Project Version | fix-pack-de-31-7010                                      |
+      | Content         | ${staticFixContent2}                                     |
+      | Branch Name     | LPS-107154-LPS-107323                                    |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
     And I wait for "5" seconds
-    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
-      | Content         | ${staticFixContent} |
-      | Version         | 1.0                 |
-      | Product         | DXP 7.0             |
-      | Project Version | fix-pack-de-31-7010 |
-      | Patcher Status  | Adding              |
-      | Type            | Patch               |
-    When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
-    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
-      | Content         | ${staticFixContent}        |
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.0              |
+      | Project Version | fix-pack-de-31-7010  |
+      | Patcher Status  | Adding               |
+      | Type            | Patch                |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+      | Content         | ${staticFixContent2} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.0              |
+      | Project Version | fix-pack-de-31-7010  |
+      | Patcher Status  | Adding               |
+      | Type            | Patch                |
+    When I check the Patcher fix containing the content "${staticFixContent1}" and type "Patch" for add completion
+    And I check the Patcher fix containing the content "${staticFixContent2}" and type "Patch" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1}       |
       | Version         | 1.0                        |
       | Product         | DXP 7.0                    |
       | Project Version | fix-pack-de-31-7010        |
@@ -4096,13 +4111,22 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                   |
       | Type            | Patch                      |
       | Jenkins         | fixpack-builder-agent(uat) |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Patch" with the following values
+      | Content         | ${staticFixContent2}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.0                    |
+      | Project Version | fix-pack-de-31-7010        |
+      | Git Hash        | ded0b9a6fa                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Patch                      |
+      | Jenkins         | fixpack-builder-agent(uat) |
     When I generate a random ticket number
     And I create a Patcher build for a new account with the following values
-      | Product         | DXP 7.0               |
-      | Project Version | fix-pack-de-31-7010   |
-      | Tickets List    | ${staticFixContent}   |
-      | Account Code    | HITACHIGP             |
-      | Support Ticket  | ${staticTicketNumber} |
+      | Product         | DXP 7.0                                   |
+      | Project Version | fix-pack-de-31-7010                       |
+      | Tickets List    | ${staticFixContent1},${staticFixContent2} |
+      | Account Code    | HITACHIGP                                 |
+      | Support Ticket  | ${staticTicketNumber}                     |
     And I set the account code "HITACHIGP" as a static variable
     And I wait for "5" seconds
     Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
@@ -4110,19 +4134,25 @@ Feature: Patcher UAT
       | Support Ticket  | ${staticTicketNumber}   |
       | Version         | 1.0                     |
       | Project Version | fix-pack-de-31-7010     |
-      | Content         | 0 Fix Packs + 1 Tickets |
+      | Content         | 0 Fix Packs + 2 Tickets |
       | Patcher Status  | Merging                 |
-    And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
-      | Version         | 1.0                 |
-      | Name            | ${staticFixContent} |
-      | Project Version | fix-pack-de-31-7010 |
-      | Patcher Status  | Merging Only        |
-    And I should be able to view a Patcher child build fix with the name "${staticFixContent}" for the child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
-      | Name     | ${staticFixContent} |
-      | Version  | 1.0                 |
-      | Git Hash | 6bb7f4287f          |
-      | Status   | Complete            |
-      | Type     | Patch               |
+    And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Version         | 1.0                                        |
+      | Name            | ${staticFixContent1}, ${staticFixContent2} |
+      | Project Version | fix-pack-de-31-7010                        |
+      | Patcher Status  | Merging Only                               |
+    And I should be able to view a Patcher child build fix with the name "${staticFixContent1}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Name     | ${staticFixContent1} |
+      | Version  | 1.0                  |
+      | Git Hash | 6bb7f4287f           |
+      | Status   | Complete             |
+      | Type     | Patch                |
+    And I should be able to view a Patcher child build fix with the name "${staticFixContent2}" for the child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Name     | ${staticFixContent2} |
+      | Version  | 1.0                  |
+      | Git Hash | ded0b9a6fa           |
+      | Status   | Complete             |
+      | Type     | Patch                |
     When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for merge completion
     And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
     Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
@@ -4130,17 +4160,17 @@ Feature: Patcher UAT
       | Support Ticket  | ${staticTicketNumber}          |
       | Version         | 1.0                            |
       | Project Version | fix-pack-de-31-7010            |
-      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Content         | 0 Fix Packs + 2 Tickets        |
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
-    And I should be able to view a Patcher child build with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
-      | Version         | 1.0                            |
-      | Name            | ${staticFixContent}            |
-      | Project Version | fix-pack-de-31-7010            |
-      | Patcher Status  | Complete Merging Only          |
-      | Jenkins         | fixpack-builder-agent(uat)     |
-      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+    And I should be able to view a Patcher child build with the name "${staticFixContent1}, ${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Version         | 1.0                                        |
+      | Name            | ${staticFixContent1}, ${staticFixContent2} |
+      | Project Version | fix-pack-de-31-7010                        |
+      | Patcher Status  | Complete Merging Only                      |
+      | Jenkins         | fixpack-builder-agent(uat)                 |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat)             |
 
   Scenario: Create a 73 fix pack dxp 1 build
     @ test.group = "0"
