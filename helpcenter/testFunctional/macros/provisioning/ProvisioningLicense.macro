@@ -1,0 +1,60 @@
+definition {
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+
+	@prose = "I populate the generate license form with the following values ${table}"
+	macro populateGenerateLicenseForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var option = "${row[1]}";
+			var type = "${row[2]}";
+			var value = "${row[3]}";
+
+			var key_field = "${field}";
+			var key_option = "${option}";
+
+			if ("${type}" == "Select") {
+				Select(
+					locator1 = "ProvisioningLicenseGenerateLicenseForm#SELECT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${type}" == "Select Entity") {
+				Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#SELECT_ENTITY_BUTTON");
+
+				SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+ 				var keyword = StringUtil.extractFirst("${value}", " ");
+
+				Type(
+					locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_FIELD",
+					value1 = "${keyword}");
+
+				Click(locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_BUTTON");
+
+				var key_entityName = "${value}";
+
+				Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+				SelectFrameTop();
+
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#DONE_BUTTON");
+
+				while (IsElementPresent(locator1 = "ProvisioningAccountSelect#DONE_BUTTON")) {
+					SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					SelectFrameTop();
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#DONE_BUTTON");
+				}
+			}
+			else {
+				fail("No such generate license field type ${type}. Please use Select or Select Entity");
+			}
+		}
+	}
+}
