@@ -471,6 +471,8 @@ definition {
 		Patcher.pause(timeInSeconds = "1");
 
 		var RawTable rawTable = new RawTable("${table}");
+		var initialTicketsList = "";
+		var ticketSuggestions = "";
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
@@ -494,8 +496,12 @@ definition {
 				Type(
 					locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
 					value1 = "${value}");
+					var initialTicketsList = "${value}";
 
 				Patcher.pause(timeInSeconds = "1");
+			}
+			else if ("${field}" == "Troubleshooting Ticket Suggestions") {
+				var ticketSuggestions = "${value}";
 			}
 			else if ("${field}" == "Account Code") {
 				Type(
@@ -546,12 +552,80 @@ definition {
 				fail("No such Patcher build field ${field}");
 			}
 		}
+		if (!("${ticketSuggestions}" == "")) {
+		    AssertValue(
+		    locator1 = "PatcherBuildAdd#TROUBLESHOOTING_TICKET_SUGGESTIONS",
+		    value1 = "${ticketSuggestions}");
+		    Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
 
+		    Patcher.pause(timeInSeconds = "1");
+		    AssertValue(locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD", value1 = "${initialTicketsList},${ticketSuggestions}");
+		}
 		AssertClick(
 			locator1 = "PatcherBuildAdd#ADD_BUTTON",
 			value1 = "Add");
 
 		Message.success();
+	}
+
+	@prose = "I check build for new account with Troubleshooting tickets with the following values ${table}"
+	macro checkBuildForNewAccountWithTroubleshootingTickets {
+		Patcher.gotoAccounts();
+
+		AssertClick(
+			locator1 = "Patcher#CREATE_BUTTON",
+			value1 = "Create Build for New Account");
+
+		Patcher.pause(timeInSeconds = "1");
+
+		var RawTable rawTable = new RawTable("${table}");
+		var initialTicketsList = "";
+		var ticketSuggestions = "";
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Product") {
+				Select(
+					locator1 = "PatcherBuildAdd#PRODUCT_VERSION_SELECT",
+					value1 = "${value}");
+
+				Patcher.pause(timeInSeconds = "1");
+			}
+			else if ("${field}" == "Project Version") {
+				Select(
+					locator1 = "PatcherBuildAdd#PROJECT_VERSION_SELECT",
+					value1 = "${value}");
+
+				Patcher.pause(timeInSeconds = "1");
+			}
+			else if ("${field}" == "Tickets List") {
+				Type(
+					locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
+					value1 = "${value}");
+				var initialTicketsList = "${value}";
+				Patcher.pause(timeInSeconds = "1");
+			}
+			else if ("${field}" == "Troubleshooting Ticket Suggestions") {
+				var ticketSuggestions = "${value}";
+			}
+		}
+		AssertValue(
+			locator1 = "PatcherBuildAdd#TROUBLESHOOTING_TICKET_SUGGESTIONS",
+			value1 = "${ticketSuggestions}");
+		Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
+		Patcher.pause(timeInSeconds = "1");
+		if (!("${initialTicketsList}" == "")) {
+			AssertValue(
+			locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
+			value1 = "${initialTicketsList},${ticketSuggestions}");
+		}
+		else {
+			AssertValue(
+			locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
+			value1 = "${ticketSuggestions}");
+		}
 	}
 
 	macro editFix {
@@ -803,7 +877,7 @@ definition {
 		var uatBuildsForAccountExists = "true";
 		var uatTicketsForAccountExists = "true";
 
-		while ((!("${uatBuildsForAccountExists}" == "false")) || (!("${uatTicketsForAccountExists}" == "false")))  {
+		while ((!("${uatBuildsForAccountExists}" == "false")) || (!("${uatTicketsForAccountExists}" == "false"))) {
 			var buildSupportTicket = PatcherBuild.getFirstUATBuildSupportTicket(accountCode = "${accountCode}");
 
 			if ((!(contains("${buildSupportTicket}", "{buildSupportTicket}"))) && (!("${buildSupportTicket}" == ""))) {
