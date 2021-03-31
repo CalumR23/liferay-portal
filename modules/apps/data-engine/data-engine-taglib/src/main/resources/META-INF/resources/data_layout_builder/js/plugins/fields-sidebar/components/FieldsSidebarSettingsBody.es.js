@@ -34,6 +34,7 @@ function getSettingsContext(
 	return focusedField.settingsContext;
 }
 
+<<<<<<< HEAD
 /**
  * This component will override the Column from Form Renderer and will
  * check if field to be rendered has a custom field.
@@ -90,6 +91,19 @@ export default function ({
 	focusedField,
 	hasFocusedCustomObjectField,
 }) {
+=======
+	const [dataLayoutBuilder] = useContext(DataLayoutBuilderContext);
+	const [
+		{
+			config,
+			dataLayout: {dataRules},
+			editingLanguageId,
+			focusedCustomObjectField,
+			focusedField,
+		},
+		dispatch,
+	] = useContext(AppContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [activePage, setActivePage] = useState(0);
 	const [dataLayoutBuilder] = useContext(DataLayoutBuilderContext) ?? [];
 	const spritemap = useContext(ClayIconSpriteContext);
@@ -155,7 +169,18 @@ export default function ({
 							break;
 					}
 				}}
+<<<<<<< HEAD
 				spritemap={spritemap}
+=======
+				value={{
+					...filteredSettingsContext,
+					activePage,
+					builderRules: dataRules,
+					editable: true,
+					editingLanguageId,
+					spritemap,
+				}}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			>
 				<Pages editable={false} overrides={{Column}} />
 			</FormFieldSettings>

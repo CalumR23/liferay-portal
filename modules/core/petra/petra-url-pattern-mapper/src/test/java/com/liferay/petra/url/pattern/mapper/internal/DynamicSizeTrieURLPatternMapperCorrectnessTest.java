@@ -15,9 +15,13 @@
 package com.liferay.petra.url.pattern.mapper.internal;
 
 import com.liferay.petra.url.pattern.mapper.URLPatternMapper;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +30,10 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
+<<<<<<< HEAD
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -36,6 +43,7 @@ public class DynamicSizeTrieURLPatternMapperCorrectnessTest
 	extends BaseURLPatternMapperCorrectnessTestCase {
 
 	@ClassRule
+<<<<<<< HEAD
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
@@ -53,6 +61,21 @@ public class DynamicSizeTrieURLPatternMapperCorrectnessTest
 
 			},
 			LiferayUnitTestRule.INSTANCE);
+=======
+	public static final CodeCoverageAssertor codeCoverageAssertor =
+		new CodeCoverageAssertor() {
+
+			@Override
+			public void appendAssertClasses(List<Class<?>> assertClasses) {
+				assertClasses.add(DynamicSizeTrieURLPatternMapper.class);
+
+				Collections.addAll(
+					assertClasses,
+					DynamicSizeTrieURLPatternMapper.class.getDeclaredClasses());
+			}
+
+		};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Test
 	public void testConstructor() {

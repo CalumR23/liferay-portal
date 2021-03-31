@@ -1105,11 +1105,21 @@ public class UserLocalServiceUtil {
 	 * @return the default user for the company, or <code>null</code> if a user
 	 with the company key could not be found
 	 */
+<<<<<<< HEAD
 	public static User fetchDefaultUser(long companyId) {
 		return getService().fetchDefaultUser(companyId);
 	}
 
 	public static User fetchUser(long userId) {
+=======
+	public static com.liferay.portal.kernel.model.User fetchDefaultUser(
+		long companyId) {
+
+		return getService().fetchDefaultUser(companyId);
+	}
+
+	public static com.liferay.portal.kernel.model.User fetchUser(long userId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getService().fetchUser(userId);
 	}
 

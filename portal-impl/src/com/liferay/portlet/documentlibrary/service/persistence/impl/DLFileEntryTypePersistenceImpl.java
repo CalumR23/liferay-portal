@@ -2951,7 +2951,11 @@ public class DLFileEntryTypePersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			result = FinderCacheUtil.getResult(
+<<<<<<< HEAD
 				_finderPathFetchByG_DDI, finderArgs);
+=======
+				_finderPathFetchByG_DDI, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (result instanceof DLFileEntryType) {
@@ -3059,7 +3063,12 @@ public class DLFileEntryTypePersistenceImpl
 
 			finderArgs = new Object[] {groupId, dataDefinitionId};
 
+<<<<<<< HEAD
 			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+=======
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (count == null) {
@@ -3508,6 +3517,19 @@ public class DLFileEntryTypePersistenceImpl
 		args = new Object[] {
 			dlFileEntryTypeModelImpl.getGroupId(),
 			dlFileEntryTypeModelImpl.getDataDefinitionId()
+<<<<<<< HEAD
+=======
+		};
+
+		FinderCacheUtil.putResult(
+			_finderPathCountByG_DDI, args, Long.valueOf(1), false);
+		FinderCacheUtil.putResult(
+			_finderPathFetchByG_DDI, args, dlFileEntryTypeModelImpl, false);
+
+		args = new Object[] {
+			dlFileEntryTypeModelImpl.getGroupId(),
+			dlFileEntryTypeModelImpl.getFileEntryTypeKey()
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		};
 
 		FinderCacheUtil.putResult(
@@ -4622,17 +4644,29 @@ public class DLFileEntryTypePersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"groupId"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathFetchByG_DDI = new FinderPath(
+=======
+		_finderPathFetchByG_DDI = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_DDI",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "dataDefinitionId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByG_DDI = new FinderPath(
+=======
+		_finderPathCountByG_DDI = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByG_DDI",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"groupId", "dataDefinitionId"}, false);
 
+<<<<<<< HEAD
 		_finderPathFetchByG_F = new FinderPath(
+=======
+		_finderPathFetchByG_F = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_ENTITY, "fetchByG_F",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"groupId", "fileEntryTypeKey"}, true);
@@ -4712,6 +4746,11 @@ public class DLFileEntryTypePersistenceImpl
 		return FinderCacheUtil.getFinderCache();
 	}
 
+<<<<<<< HEAD
+=======
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

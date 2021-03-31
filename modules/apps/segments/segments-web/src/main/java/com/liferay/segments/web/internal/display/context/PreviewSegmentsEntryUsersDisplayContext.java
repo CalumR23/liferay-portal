@@ -154,11 +154,18 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 	}
 
 	protected PortletURL getPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
 			"/segments/preview_segments_entry_users"
 		).build();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/segments/preview_segments_entry_users");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		SegmentsEntry segmentsEntry = getSegmentsEntry();
 

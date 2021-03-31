@@ -73,7 +73,12 @@ public class ShippingMethodResourceImpl extends BaseShippingMethodResourceImpl {
 					_commerceShippingMethodLocalService.
 						getCommerceShippingMethods(
 							commerceChannel.getGroupId(),
+<<<<<<< HEAD
 							shippingCommerceAddress.getCountryId(), true),
+=======
+							shippingCommerceAddress.getCommerceCountryId(),
+							true),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					shippingMethod -> _toShippingMethod(
 						shippingMethod, commerceChannel, commerceOrder)));
 		}

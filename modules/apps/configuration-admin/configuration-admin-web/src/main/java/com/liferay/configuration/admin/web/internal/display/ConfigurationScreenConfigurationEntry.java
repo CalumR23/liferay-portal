@@ -68,6 +68,7 @@ public class ConfigurationScreenConfigurationEntry
 	public String getEditURL(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			renderResponse
 		).setMVCRenderCommandName(
@@ -75,6 +76,17 @@ public class ConfigurationScreenConfigurationEntry
 		).setParameter(
 			"configurationScreenKey", _configurationScreen.getKey()
 		).buildString();
+=======
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/configuration_admin/view_configuration_screen");
+		portletURL.setParameter(
+			"configurationScreenKey", _configurationScreen.getKey());
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

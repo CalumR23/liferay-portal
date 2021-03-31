@@ -200,6 +200,7 @@ public class CommerceAccountUserClayDataSetDataSetDisplayView
 			long userId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL viewURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceAccount.class.getName(),
@@ -207,6 +208,15 @@ public class CommerceAccountUserClayDataSetDataSetDisplayView
 		).setMVCRenderCommandName(
 			"/commerce_account/view_commerce_account_user"
 		).build();
+=======
+		PortletURL viewURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceAccount.class.getName(),
+			PortletProvider.Action.VIEW);
+
+		viewURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account/view_commerce_account_user");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceAccountId = ParamUtil.getLong(
 			httpServletRequest, "commerceAccountId");

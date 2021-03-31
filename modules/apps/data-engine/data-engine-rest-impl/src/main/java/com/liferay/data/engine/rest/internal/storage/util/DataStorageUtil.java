@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,7 +135,13 @@ public class DataStorageUtil {
 		Map<String, List<DDMFormFieldValue>> ddmFormFieldValuesMap =
 			ddmFormValues.getDDMFormFieldValuesMap(false);
 
+<<<<<<< HEAD
 		List<DDMFormFieldValue> ddmFormFieldValues = new ArrayList<>();
+=======
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			if (!ddmFormFieldValues.containsKey(ddmFormField.getName()) &&
+				!_isFieldSet(ddmFormField)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		for (DDMFormField ddmFormField : ddmFormFields.values()) {
 			ddmFormFieldValues.addAll(
@@ -277,6 +284,17 @@ public class DataStorageUtil {
 		}
 
 		return ddmFormFieldValues;
+	}
+
+	private static boolean _isFieldSet(DDMFormField ddmFormField) {
+		if (GetterUtil.getBoolean(
+				ddmFormField.getProperty("upgradedStructure")) ||
+			Validator.isNotNull(ddmFormField.getProperty("ddmStructureId"))) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static Map<String, Object> _toLocalizedMap(

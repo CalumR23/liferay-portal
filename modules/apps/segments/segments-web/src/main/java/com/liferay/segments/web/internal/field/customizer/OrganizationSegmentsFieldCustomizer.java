@@ -87,6 +87,18 @@ public class OrganizationSegmentsFieldCustomizer
 	@Override
 	public Field.SelectEntity getSelectEntity(PortletRequest portletRequest) {
 		try {
+<<<<<<< HEAD
+=======
+			PortletURL portletURL = _portal.getControlPanelPortletURL(
+				portletRequest, SegmentsPortletKeys.SEGMENTS,
+				PortletRequest.RENDER_PHASE);
+
+			portletURL.setParameter(
+				"mvcRenderCommandName", "/segments/select_organizations");
+			portletURL.setParameter("eventName", "selectEntity");
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			return new Field.SelectEntity(
 				"selectEntity",
 				getSelectEntityTitle(

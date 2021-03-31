@@ -103,6 +103,7 @@ public class CommercePricingClassCPDefinitionRelDataSetActionProvider
 			long cpDefinitionId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -114,6 +115,19 @@ public class CommercePricingClassCPDefinitionRelDataSetActionProvider
 		).setParameter(
 			"screenNavigationCategoryKey", "details"
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpDefinitionId));
+		portletURL.setParameter("screenNavigationCategoryKey", "details");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getPricingClassCPDefinitionRelDeleteURL(

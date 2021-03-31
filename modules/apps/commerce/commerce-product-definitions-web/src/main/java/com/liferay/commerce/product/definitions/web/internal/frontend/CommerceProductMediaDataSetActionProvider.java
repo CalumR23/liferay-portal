@@ -108,6 +108,7 @@ public class CommerceProductMediaDataSetActionProvider
 			long cpAttachmentFileEntryId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				_portal.getOriginalServletRequest(httpServletRequest),
@@ -117,6 +118,16 @@ public class CommerceProductMediaDataSetActionProvider
 		).setParameter(
 			Constants.CMD, Constants.DELETE
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			_portal.getOriginalServletRequest(httpServletRequest),
+			CPPortletKeys.CP_DEFINITIONS, PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/cp_definitions/edit_cp_attachment_file_entry");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = ParamUtil.getString(
 			httpServletRequest, "currentUrl",
@@ -135,6 +146,7 @@ public class CommerceProductMediaDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -144,6 +156,19 @@ public class CommerceProductMediaDataSetActionProvider
 		).setParameter(
 			"cpDefinitionId", cpAttachmentFileEntry.getClassPK()
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/cp_definitions/edit_cp_attachment_file_entry");
+		portletURL.setParameter(
+			"cpDefinitionId",
+			String.valueOf(cpAttachmentFileEntry.getClassPK()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"cpAttachmentFileEntryId",
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId()
 		).setParameter(

@@ -278,6 +278,7 @@ public class ResourceActionsUtil {
 		return getResourceActions().isRootModelResource(modelResource);
 	}
 
+<<<<<<< HEAD
 	public static void populateModelResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -291,6 +292,8 @@ public class ResourceActionsUtil {
 		getResourceActions().populateModelResources(document);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static void populatePortletResource(
 			Portlet portlet, ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -299,6 +302,7 @@ public class ResourceActionsUtil {
 			portlet, classLoader, sources);
 	}
 
+<<<<<<< HEAD
 	public static void populatePortletResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -310,16 +314,21 @@ public class ResourceActionsUtil {
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static void read(ClassLoader classLoader, String source)
 		throws Exception {
 
 		getResourceActions().read(classLoader, source);
 	}
 
+<<<<<<< HEAD
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static void read(ClassLoader classLoader, String... sources)
 		throws Exception {
 
@@ -349,10 +358,13 @@ public class ResourceActionsUtil {
 		getResourceActions().read(servletContextName, classLoader, sources);
 	}
 
+<<<<<<< HEAD
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static void readAndCheck(ClassLoader classLoader, String... sources)
 		throws Exception {
 

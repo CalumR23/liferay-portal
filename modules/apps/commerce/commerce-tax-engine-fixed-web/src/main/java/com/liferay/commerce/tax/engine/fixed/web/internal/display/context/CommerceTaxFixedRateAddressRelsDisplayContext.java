@@ -24,7 +24,11 @@ import com.liferay.commerce.tax.engine.fixed.configuration.CommerceTaxByAddressT
 import com.liferay.commerce.tax.engine.fixed.model.CommerceTaxFixedRateAddressRel;
 import com.liferay.commerce.tax.engine.fixed.service.CommerceTaxFixedRateAddressRelService;
 import com.liferay.commerce.tax.engine.fixed.web.internal.frontend.constants.CommerceTaxRateSettingDataSetConstants;
+<<<<<<< HEAD
 import com.liferay.commerce.tax.engine.fixed.web.internal.frontend.taglib.servlet.taglib.CommerceTaxMethodAddressRateRelsScreenNavigationCategory;
+=======
+import com.liferay.commerce.tax.engine.fixed.web.internal.servlet.taglib.ui.CommerceTaxMethodAddressRateRelsScreenNavigationCategory;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.tax.model.CommerceTaxMethod;
 import com.liferay.commerce.tax.service.CommerceTaxMethodService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
@@ -92,8 +96,16 @@ public class CommerceTaxFixedRateAddressRelsDisplayContext
 		).buildString();
 	}
 
+<<<<<<< HEAD
 	public CommerceTaxFixedRateAddressRel getCommerceTaxFixedRateAddressRel()
 		throws PortalException {
+=======
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_tax_methods/edit_commerce_tax_fixed_rate_address_rel");
+		portletURL.setParameter(
+			"commerceTaxMethodId", String.valueOf(getCommerceTaxMethodId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceTaxFixedRateAddressRelId = ParamUtil.getLong(
 			commerceTaxFixedRateRequestHelper.getRequest(),

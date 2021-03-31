@@ -43,6 +43,7 @@ LayoutsTreeDisplayContext layoutsTreeDisplayContext = new LayoutsTreeDisplayCont
 		<clay:content-row
 			containerElement="span"
 		>
+<<<<<<< HEAD
 			<a class="{cssClass}" data-regular-url="{regularURL}" data-url="{url}" data-uuid="{uuid}" href="{url}" id="{id}" title="{title}">
 				<span class="c-inner" tabindex="-1">
 					<span class="mr-1 list-icon {type}-layout">
@@ -51,6 +52,28 @@ LayoutsTreeDisplayContext layoutsTreeDisplayContext = new LayoutsTreeDisplayCont
 					<span class="mr-1 page-icon {type}-layout">
 						<aui:icon image="page" markupView="lexicon" />
 					</span>
+=======
+			<clay:content-col
+				containerElement="span"
+				cssClass="mr-2 list-icon {type}-layout"
+			>
+				<aui:icon image="list" markupView="lexicon" />
+			</clay:content-col>
+
+			<clay:content-col
+				containerElement="span"
+				cssClass="mr-2 page-icon {type}-layout"
+			>
+				<aui:icon image="page" markupView="lexicon" />
+			</clay:content-col>
+
+			<clay:content-col
+				containerElement="span"
+				cssClass="table-cell-content"
+				expand="<%= true %>"
+			>
+				<a class="{cssClass}" data-regular-url="{regularURL}" data-url="{url}" data-uuid="{uuid}" href="{url}" id="{id}" title="{title}">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					{label}
 				</span>
 			</a>

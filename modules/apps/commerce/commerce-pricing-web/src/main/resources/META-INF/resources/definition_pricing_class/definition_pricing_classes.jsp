@@ -49,9 +49,15 @@ CProduct cProduct = cpDefinition.getCProduct();
 						headers: headers,
 						method: 'POST',
 					}
+<<<<<<< HEAD
 				).then((response) => {
 					if (!response.ok) {
 						return response.json().then((data) => {
+=======
+				).then(function (response) {
+					if (!response.ok) {
+						return response.json().then(function (data) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							return Promise.reject(data.errorDescription);
 						});
 					}
@@ -82,12 +88,20 @@ CProduct cProduct = cpDefinition.getCProduct();
 						method: 'POST',
 					}
 				)
+<<<<<<< HEAD
 					.then((response) => {
+=======
+					.then(function (response) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						if (response.ok) {
 							return response.json();
 						}
 
+<<<<<<< HEAD
 						return response.json().then((data) => {
+=======
+						return response.json().then(function (data) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							return Promise.reject(data.message);
 						});
 					})

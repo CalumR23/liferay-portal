@@ -2165,12 +2165,21 @@ public class SitesImpl implements Sites {
 				if (layout == null) {
 					return true;
 				}
+<<<<<<< HEAD
 
 				Date modifiedDate = layout.getModifiedDate();
 
 				long lastMergeTime = GetterUtil.getLong(
 					unicodeProperties.getProperty(LAST_MERGE_TIME));
 
+=======
+
+				Date modifiedDate = layout.getModifiedDate();
+
+				long lastMergeTime = GetterUtil.getLong(
+					unicodeProperties.getProperty(LAST_MERGE_TIME));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				if (modifiedDate.getTime() > lastMergeTime) {
 					return true;
 				}

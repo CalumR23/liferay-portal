@@ -30,6 +30,13 @@ import com.liferay.commerce.payment.request.CommercePaymentRequest;
 import com.liferay.commerce.payment.result.CommercePaymentResult;
 import com.liferay.commerce.payment.result.CommerceSubscriptionStatusResult;
 import com.liferay.commerce.product.constants.CPConstants;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CPInstance;
+import com.liferay.commerce.product.model.CPSubscriptionInfo;
+import com.liferay.commerce.product.service.CommerceChannelLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.service.CommerceAddressLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
 import com.liferay.petra.string.CharPool;
@@ -430,10 +437,16 @@ public class PayPalCommercePaymentMethod implements CommercePaymentMethod {
 			_commerceOrderLocalService.getCommerceOrder(
 				commercePaymentRequest.getCommerceOrderId());
 
+<<<<<<< HEAD
 		try {
 			Agreement agreement = Agreement.get(
 				_getAPIContext(commerceOrder.getGroupId()),
 				commercePaymentRequest.getTransactionId());
+=======
+		Agreement agreement = Agreement.get(
+			_getAPIContext(commerceOrder.getGroupId()),
+			commercePaymentRequest.getTransactionId());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			String agreementState = agreement.getState();
 
@@ -1219,19 +1232,34 @@ public class PayPalCommercePaymentMethod implements CommercePaymentMethod {
 		if (commerceAddress != null) {
 			shippingAddress.setCity(commerceAddress.getCity());
 
+<<<<<<< HEAD
 			Country country = commerceAddress.getCountry();
 
 			shippingAddress.setCountryCode(country.getA2());
+=======
+			CommerceCountry commerceCountry =
+				commerceAddress.getCommerceCountry();
+
+			shippingAddress.setCountryCode(
+				commerceCountry.getTwoLettersISOCode());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			shippingAddress.setLine1(commerceAddress.getStreet1());
 			shippingAddress.setLine2(commerceAddress.getStreet2());
 			shippingAddress.setPostalCode(commerceAddress.getZip());
 			shippingAddress.setRecipientName(commerceAddress.getName());
 
+<<<<<<< HEAD
 			Region region = commerceAddress.getRegion();
 
 			if (region != null) {
 				shippingAddress.setState(region.getRegionCode());
+=======
+			CommerceRegion commerceRegion = commerceAddress.getCommerceRegion();
+
+			if (commerceRegion != null) {
+				shippingAddress.setState(commerceRegion.getCode());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 
@@ -1295,6 +1323,12 @@ public class PayPalCommercePaymentMethod implements CommercePaymentMethod {
 
 	@Reference
 	private CommerceAddressLocalService _commerceAddressLocalService;
+<<<<<<< HEAD
+=======
+
+	@Reference
+	private CommerceChannelLocalService _commerceChannelLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private CommerceOrderLocalService _commerceOrderLocalService;

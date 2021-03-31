@@ -15,11 +15,16 @@
 package com.liferay.dynamic.data.mapping.form.field.type.internal.numeric;
 
 import com.liferay.portal.kernel.util.LocaleUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+
+import org.junit.Assert;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -27,11 +32,14 @@ import org.junit.Test;
  */
 public class NumericDDMFormFieldValueLocalizerTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Test
 	public void testLocalize() {
 		String localizedValue = _numericDDMFormFieldValueLocalizer.localize(

@@ -29,6 +29,7 @@ const Liferay = {
 		getLanguageId: () => 'it_IT',
 		getPathThemeImages: () => '/assets',
 		getPortalURL: () => window.location.origin,
+<<<<<<< HEAD
 		getScopeGroupId: () => '123',
 	},
 	Util: {
@@ -38,6 +39,8 @@ const Liferay = {
 				key
 			);
 		},
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	},
 	component: () => {},
 	detach: (name, fn) => {

@@ -85,6 +85,7 @@ public class CommerceAddressDisplayContext {
 	}
 
 	public String getAddCommerceAddressURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -98,6 +99,20 @@ public class CommerceAddressDisplayContext {
 				return themeDisplay.getURLCurrent();
 			}
 		).buildString();
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_address_content/edit_commerce_address");
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceAccount getCommerceAccount() throws PortalException {
@@ -148,6 +163,7 @@ public class CommerceAddressDisplayContext {
 	}
 
 	public String getDeleteCommerceAddressURL(long commerceAddressId) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse
 		).setActionName(
@@ -165,6 +181,23 @@ public class CommerceAddressDisplayContext {
 		).setParameter(
 			"commerceAddressId", commerceAddressId
 		).buildString();
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		PortletURL portletURL = _liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_address_content/edit_commerce_address");
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+		portletURL.setParameter(
+			"commerceAddressId", String.valueOf(commerceAddressId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getDisplayStyle() {
@@ -193,6 +226,7 @@ public class CommerceAddressDisplayContext {
 	}
 
 	public String getEditCommerceAddressURL(long commerceAddressId) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -202,6 +236,20 @@ public class CommerceAddressDisplayContext {
 		).setParameter(
 			"commerceAddressId", commerceAddressId
 		).buildString();
+=======
+		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_address_content/edit_commerce_address");
+		portletURL.setParameter(
+			"redirect",
+			String.valueOf(_liferayPortletResponse.createRenderURL()));
+		portletURL.setParameter(
+			"commerceAddressId", String.valueOf(commerceAddressId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public PortletURL getPortletURL() throws PortalException {

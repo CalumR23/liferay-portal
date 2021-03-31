@@ -15,7 +15,10 @@ import React from 'react';
 
 import Chart from '../../../src/main/resources/META-INF/resources/js/components/Chart';
 import {ChartStateContextProvider} from '../../../src/main/resources/META-INF/resources/js/context/ChartStateContext';
+<<<<<<< HEAD
 import {StoreContextProvider} from '../../../src/main/resources/META-INF/resources/js/context/StoreContext';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 const mockReadsDataProvider = jest.fn(() =>
 	Promise.resolve({
@@ -156,6 +159,7 @@ describe('Chart', () => {
 		};
 
 		const {getByText} = render(
+<<<<<<< HEAD
 			<StoreContextProvider value={{languageTag: mockLanguageTag}}>
 				<ChartStateContextProvider
 					publishDate={testProps.pagePublishDate}
@@ -169,6 +173,20 @@ describe('Chart', () => {
 					/>
 				</ChartStateContextProvider>
 			</StoreContextProvider>
+=======
+			<ChartStateContextProvider
+				publishDate={testProps.pagePublishDate}
+				timeRange={testProps.timeRange}
+				timeSpanKey={testProps.timeSpanKey}
+			>
+				<Chart
+					dataProviders={[mockViewsDataProvider]}
+					languageTag={'en-US'}
+					publishDate={mockPublishDate}
+					timeSpanOptions={mockTimeSpanOptions}
+				/>
+			</ChartStateContextProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		);
 
 		await wait(() =>
@@ -188,6 +206,7 @@ describe('Chart', () => {
 		};
 
 		const {getByText} = render(
+<<<<<<< HEAD
 			<StoreContextProvider value={{languageTag: mockLanguageTag}}>
 				<ChartStateContextProvider
 					publishDate={testProps.pagePublishDate}
@@ -204,6 +223,30 @@ describe('Chart', () => {
 					/>
 				</ChartStateContextProvider>
 			</StoreContextProvider>
+=======
+			<ChartStateContextProvider
+				publishDate={testProps.pagePublishDate}
+				timeRange={testProps.timeRange}
+				timeSpanKey={testProps.timeSpanKey}
+			>
+				<Chart
+					dataProviders={[
+						mockViewsDataProvider,
+						mockReadsDataProvider,
+					]}
+					languageTag={'en-US'}
+					publishDate={mockPublishDate}
+					timeSpanOptions={mockTimeSpanOptions}
+				/>
+			</ChartStateContextProvider>
+		);
+
+		await wait(() =>
+			expect(mockViewsDataProvider).toHaveBeenCalledTimes(1)
+		);
+		await wait(() =>
+			expect(mockReadsDataProvider).toHaveBeenCalledTimes(1)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		);
 
 		await wait(() => {

@@ -12,10 +12,18 @@
  * details.
  */
 
+<<<<<<< HEAD
 module.exports = {
 	build: {
 		dependencies: [
 			'data-engine-taglib',
+=======
+const standard = require('@liferay/npm-scripts/src/presets/standard');
+
+module.exports = Object.assign(standard, {
+	build: Object.assign(standard.build, {
+		dependencies: standard.build.dependencies.concat([
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			'dynamic-data-mapping-form-builder',
 			'dynamic-data-mapping-form-renderer',
 		],

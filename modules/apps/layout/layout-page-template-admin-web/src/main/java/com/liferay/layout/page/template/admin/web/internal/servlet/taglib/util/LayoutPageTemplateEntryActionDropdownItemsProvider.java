@@ -238,6 +238,19 @@ public class LayoutPageTemplateEntryActionDropdownItemsProvider {
 			return null;
 		}
 
+<<<<<<< HEAD
+=======
+		PortletURL discardDraftURL = PortletURLFactoryUtil.create(
+			_httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.ACTION_PHASE);
+
+		discardDraftURL.setParameter(
+			ActionRequest.ACTION_NAME, "/layout_admin/discard_draft_layout");
+		discardDraftURL.setParameter("redirect", _themeDisplay.getURLCurrent());
+		discardDraftURL.setParameter(
+			"selPlid", String.valueOf(_draftLayout.getPlid()));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return dropdownItem -> {
 			dropdownItem.putData("action", "discardDraft");
 			dropdownItem.putData(

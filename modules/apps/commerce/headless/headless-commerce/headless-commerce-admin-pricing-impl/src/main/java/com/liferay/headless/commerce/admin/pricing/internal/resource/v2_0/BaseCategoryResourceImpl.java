@@ -79,7 +79,10 @@ public abstract class BaseCategoryResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-categories/{discountCategoryId}/category'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "discountCategoryId")}
 	)
@@ -100,7 +103,10 @@ public abstract class BaseCategoryResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifier-categories/{priceModifierCategoryId}/category'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "priceModifierCategoryId")
@@ -111,8 +117,12 @@ public abstract class BaseCategoryResourceImpl
 	@Tags(value = {@Tag(name = "Category")})
 	public Category getPriceModifierCategoryCategory(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("priceModifierCategoryId")
 				Long priceModifierCategoryId)
+=======
+			@PathParam("priceModifierCategoryId") Long priceModifierCategoryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new Category();

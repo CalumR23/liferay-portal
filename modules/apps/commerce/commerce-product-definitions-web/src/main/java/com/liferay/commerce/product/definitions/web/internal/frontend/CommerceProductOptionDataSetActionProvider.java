@@ -105,6 +105,7 @@ public class CommerceProductOptionDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -114,6 +115,19 @@ public class CommerceProductOptionDataSetActionProvider
 		).setParameter(
 			"cpDefinitionId", cpDefinitionOptionRel.getCPDefinitionId()
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/cp_definitions/edit_cp_definition_option_rel");
+		portletURL.setParameter(
+			"cpDefinitionId",
+			String.valueOf(cpDefinitionOptionRel.getCPDefinitionId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"cpDefinitionOptionRelId",
 			cpDefinitionOptionRel.getCPDefinitionOptionRelId()
 		).build();

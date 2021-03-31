@@ -198,6 +198,61 @@ portletURL.setParameter("kaleoProcessId", String.valueOf(kaleoProcess.getKaleoPr
 	);
 </aui:script>
 
+<<<<<<< HEAD
+=======
+<aui:script sandbox="<%= true %>">
+	var deleteRecords = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace /><%= kaleoFormsViewRecordsDisplayContext.getSearchContainerId() %>'
+			);
+
+			if (searchContainer) {
+				Liferay.Util.postForm(
+					document.<portlet:namespace />searchContainerForm,
+					{
+						data: {
+							ddlRecordIds: Liferay.Util.listCheckedExcept(
+								searchContainer,
+								'<portlet:namespace />allRowIds'
+							),
+						},
+
+						<portlet:actionURL name="/kaleo_forms/delete_record" var="deleteDDLRecordURL">
+							<portlet:param name="mvcPath" value="/admin/view_kaleo_process.jsp" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+							<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcess.getKaleoProcessId()) %>" />
+						</portlet:actionURL>
+
+						url: '<%= deleteDDLRecordURL %>',
+					}
+				);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteRecords: deleteRecords,
+	};
+
+	Liferay.componentReady('kaleoFormsRecordsManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <%
 portletDisplay.setShowBackIcon(true);
 portletDisplay.setURLBack(redirect);

@@ -26,6 +26,7 @@ import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDMFieldsCounter;
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
+import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -234,7 +235,14 @@ public class FieldsToDDMFormValuesConverterImpl
 				decimalFormat.setMinimumFractionDigits(1);
 			}
 
+<<<<<<< HEAD
 			return decimalFormat.format(number.doubleValue());
+=======
+			String valueString = numberFormat.format(number.doubleValue());
+
+			return StringUtil.removeChars(
+				valueString, CharPool.NO_BREAK_SPACE, CharPool.SPACE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		return String.valueOf(fieldValue);

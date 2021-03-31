@@ -199,8 +199,15 @@ request.removeAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 							<liferay-ui:message key="<%= GroupConstants.getTypeLabel(group.getType()) %>" />
 						</li>
 
+<<<<<<< HEAD
 						<c:if test="<%= Validator.isNotNull(group.getDescription()) %>">
 							<li class="sidebar-dt"><liferay-ui:message key="description" /></li>
+=======
+						<p>
+							<%= HtmlUtil.escape(group.getDescription(locale)) %>
+						</p>
+					</c:if>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							<li class="sidebar-dd">
 								<%= HtmlUtil.escape(group.getDescription(locale)) %>

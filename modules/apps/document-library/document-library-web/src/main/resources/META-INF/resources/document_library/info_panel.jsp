@@ -21,9 +21,28 @@ DLInfoPanelDisplayContext dlInfoPanelDisplayContext = new DLInfoPanelDisplayCont
 
 request.setAttribute("view.jsp-repositoryId", String.valueOf(dlInfoPanelDisplayContext.getRepositoryId()));
 
+<<<<<<< HEAD
 List<FileEntry> fileEntries = dlInfoPanelDisplayContext.getFileEntries();
 List<FileShortcut> fileShortcuts = dlInfoPanelDisplayContext.getFileShortcuts();
 List<Folder> folders = dlInfoPanelDisplayContext.getFolders();
+=======
+List<Folder> folders = (List<Folder>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FOLDERS);
+List<FileEntry> fileEntries = (List<FileEntry>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_ENTRIES);
+List<FileShortcut> fileShortcuts = (List<FileShortcut>)request.getAttribute(WebKeys.DOCUMENT_LIBRARY_FILE_SHORTCUTS);
+
+if (ListUtil.isEmpty(folders) && ListUtil.isEmpty(fileEntries) && ListUtil.isEmpty(fileShortcuts)) {
+	long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"), ParamUtil.getLong(request, "folderId"));
+
+	folders = new ArrayList<>();
+
+	if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+		folders.add(DLAppLocalServiceUtil.getFolder(folderId));
+	}
+	else {
+		folders.add(null);
+	}
+}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <c:choose>

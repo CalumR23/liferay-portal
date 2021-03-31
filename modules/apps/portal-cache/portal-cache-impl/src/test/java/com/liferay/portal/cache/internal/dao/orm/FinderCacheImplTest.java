@@ -147,18 +147,32 @@ public class FinderCacheImplTest {
 
 		// Empty list
 
+<<<<<<< HEAD
 		finderCache.putResult(finderPath, _KEY1, Collections.emptyList());
 
 		Assert.assertSame(
 			Collections.emptyList(), finderCache.getResult(finderPath, _KEY1));
+=======
+		finderCache.putResult(finderPath, _KEY1, Collections.emptyList(), true);
+
+		Assert.assertSame(
+			Collections.emptyList(),
+			finderCache.getResult(finderPath, _KEY1, null));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		// Not empty list
 
 		List<Long> list = Collections.singletonList(1L);
 
+<<<<<<< HEAD
 		finderCache.putResult(finderPath, _KEY1, list);
 
 		Assert.assertSame(list, finderCache.getResult(finderPath, _KEY1));
+=======
+		finderCache.putResult(finderPath, _KEY1, list, true);
+
+		Assert.assertSame(list, finderCache.getResult(finderPath, _KEY1, null));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test

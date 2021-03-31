@@ -25,6 +25,27 @@ const useFilterNameWithLabel = ({
 	return title;
 };
 
+<<<<<<< HEAD
+=======
+const useFilterNameWithLabel = ({
+	labelPropertyName = 'name',
+	multiple,
+	selectedItems = [],
+	title,
+	withSelectionTitle,
+}) => {
+	return useMemo(() => {
+		if (!multiple && withSelectionTitle && selectedItems.length) {
+			const [{resultName, [labelPropertyName]: label}] = selectedItems;
+
+			return resultName || label;
+		}
+
+		return title;
+	}, [labelPropertyName, multiple, selectedItems, title, withSelectionTitle]);
+};
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const useFilterName = (
 	multiple,
 	selectedItems = [],

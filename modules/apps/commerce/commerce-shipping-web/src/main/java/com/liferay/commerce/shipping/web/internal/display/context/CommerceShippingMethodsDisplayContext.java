@@ -48,7 +48,10 @@ public class CommerceShippingMethodsDisplayContext {
 		_commerceShippingFixedOptionService =
 			commerceShippingFixedOptionService;
 		_commerceShippingMethodService = commerceShippingMethodService;
+<<<<<<< HEAD
 		_countryService = countryService;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_commerceShippingMethodRequestHelper =
 			new CommerceShippingMethodRequestHelper(httpServletRequest);

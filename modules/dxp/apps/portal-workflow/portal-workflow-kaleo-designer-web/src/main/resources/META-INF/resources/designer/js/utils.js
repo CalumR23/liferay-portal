@@ -61,6 +61,10 @@ AUI.add(
 			freemarker: Liferay.Language.get('freemarker'),
 			groovy: Liferay.Language.get('groovy'),
 			hour: Liferay.Language.get('hour'),
+<<<<<<< HEAD
+=======
+			im: Liferay.Language.get('instant-messenger'),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			initial: Liferay.Language.get('initial'),
 			inspectTaskMessage: Liferay.Language.get(
 				'inspect-the-task-nodes-to-assign-a-form-template'
@@ -82,6 +86,10 @@ AUI.add(
 			onExit: Liferay.Language.get('on-exit'),
 			organization: Liferay.Language.get('organization'),
 			priority: Liferay.Language.get('priority'),
+<<<<<<< HEAD
+=======
+			privateMessage: Liferay.Language.get('private-message'),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			python: Liferay.Language.get('python'),
 			reassignment: Liferay.Language.get('reassignment'),
 			recipientType: Liferay.Language.get('recipient-type'),

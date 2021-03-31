@@ -109,6 +109,18 @@ CommerceInventoryWarehousesDisplayContext commerceInventoryWarehousesDisplayCont
 				keyProperty="commerceInventoryWarehouseId"
 				modelVar="commerceInventoryWarehouse"
 			>
+<<<<<<< HEAD
+=======
+
+				<%
+				PortletURL rowURL = renderResponse.createRenderURL();
+
+				rowURL.setParameter("mvcRenderCommandName", "/commerce_inventory_warehouse/edit_commerce_inventory_warehouse");
+				rowURL.setParameter("redirect", currentURL);
+				rowURL.setParameter("commerceInventoryWarehouseId", String.valueOf(commerceInventoryWarehouse.getCommerceInventoryWarehouseId()));
+				%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<liferay-ui:search-container-column-text
 					cssClass="important table-cell-expand"
 					href='<%=

@@ -35,6 +35,7 @@ import com.liferay.journal.internal.upgrade.v0_0_5.UpgradeJournalArticles;
 import com.liferay.journal.internal.upgrade.v0_0_5.UpgradeJournalDisplayPreferences;
 import com.liferay.journal.internal.upgrade.v0_0_5.UpgradeLastPublishDate;
 import com.liferay.journal.internal.upgrade.v0_0_5.UpgradePortletSettings;
+<<<<<<< HEAD
 import com.liferay.journal.internal.upgrade.v0_0_6.ImageTypeContentAttributesUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v0_0_7.JournalArticleDatesUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v0_0_7.JournalArticleTreePathUpgradeProcess;
@@ -51,6 +52,24 @@ import com.liferay.journal.internal.upgrade.v1_1_2.CheckIntervalConfigurationUpg
 import com.liferay.journal.internal.upgrade.v1_1_3.ResourcePermissionsUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v1_1_5.ContentImagesUpgradeProcess;
 import com.liferay.journal.internal.upgrade.v1_1_6.AssetDisplayPageEntryUpgradeProcess;
+=======
+import com.liferay.journal.internal.upgrade.v0_0_6.UpgradeImageTypeContentAttributes;
+import com.liferay.journal.internal.upgrade.v0_0_7.UpgradeJournalArticleDates;
+import com.liferay.journal.internal.upgrade.v0_0_7.UpgradeJournalArticleTreePath;
+import com.liferay.journal.internal.upgrade.v0_0_8.UpgradeArticleAssets;
+import com.liferay.journal.internal.upgrade.v0_0_8.UpgradeArticleExpirationDate;
+import com.liferay.journal.internal.upgrade.v0_0_8.UpgradeArticleSystemEvents;
+import com.liferay.journal.internal.upgrade.v1_0_0.UpgradeJournalArticleImage;
+import com.liferay.journal.internal.upgrade.v1_0_1.UpgradeJournalContentSearch;
+import com.liferay.journal.internal.upgrade.v1_1_0.UpgradeDocumentLibraryTypeContent;
+import com.liferay.journal.internal.upgrade.v1_1_0.UpgradeImageTypeContent;
+import com.liferay.journal.internal.upgrade.v1_1_0.UpgradeJournalArticleLocalizedValues;
+import com.liferay.journal.internal.upgrade.v1_1_1.UpgradeFileUploadsConfiguration;
+import com.liferay.journal.internal.upgrade.v1_1_2.UpgradeCheckIntervalConfiguration;
+import com.liferay.journal.internal.upgrade.v1_1_3.UpgradeResourcePermissions;
+import com.liferay.journal.internal.upgrade.v1_1_5.UpgradeContentImages;
+import com.liferay.journal.internal.upgrade.v1_1_6.UpgradeAssetDisplayPageEntry;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalArticleTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFeedTable;
 import com.liferay.journal.internal.upgrade.v2_0_0.util.JournalFolderTable;
@@ -197,7 +216,11 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.3", "1.1.4",
 			new com.liferay.journal.internal.upgrade.v1_1_4.
+<<<<<<< HEAD
 				JournalArticleUpgradeProcess());
+=======
+				UpgradeJournalArticle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"1.1.4", "1.1.5",
@@ -218,7 +241,11 @@ public class JournalServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.7", "1.1.8",
 			new com.liferay.journal.internal.upgrade.v1_1_8.
+<<<<<<< HEAD
 				JournalArticleUpgradeProcess());
+=======
+				UpgradeJournalArticle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"1.1.8", "2.0.0",

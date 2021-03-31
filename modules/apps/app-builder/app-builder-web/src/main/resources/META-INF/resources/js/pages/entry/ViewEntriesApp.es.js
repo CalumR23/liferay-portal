@@ -51,7 +51,11 @@ export default function ({appTab, ...props}) {
 
 	return (
 		<div className="app-builder-root">
+<<<<<<< HEAD
 			<AppContextProvider {...newProps}>
+=======
+			<AppContextProvider {...props}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<PermissionsContextProvider dataDefinitionId={dataDefinitionId}>
 					<PortalEntry
 						dataDefinitionId={dataDefinitionId}
@@ -59,6 +63,7 @@ export default function ({appTab, ...props}) {
 						showAppName={showAppName}
 						userLanguageId={userLanguageId}
 					/>
+<<<<<<< HEAD
 					<PermissionTunnel permissionType="view">
 						<Router>
 							<Switch>
@@ -74,6 +79,17 @@ export default function ({appTab, ...props}) {
 							</Switch>
 						</Router>
 					</PermissionTunnel>
+=======
+					<Router>
+						<Switch>
+							<Route component={ListPage} exact path="/" />
+							<Route
+								component={ViewPage}
+								path="/entries/:entryIndex(\d+)"
+							/>
+						</Switch>
+					</Router>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				</PermissionsContextProvider>
 			</AppContextProvider>
 		</div>

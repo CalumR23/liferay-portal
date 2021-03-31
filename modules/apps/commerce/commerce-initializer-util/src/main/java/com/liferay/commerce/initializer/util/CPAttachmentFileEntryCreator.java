@@ -168,7 +168,10 @@ public class CPAttachmentFileEntryCreator {
 		long classPK = GetterUtil.getLong(classedModel.getPrimaryKeyObj());
 
 		return _cpAttachmentFileEntryLocalService.addCPAttachmentFileEntry(
+<<<<<<< HEAD
 			_friendlyURLNormalizer.normalize(fileName),
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			serviceContext.getUserId(), fileEntry.getGroupId(),
 			_portal.getClassNameId(classedModel.getModelClass()), classPK,
 			fileEntry.getFileEntryId(), displayDateMonth, displayDateDay,

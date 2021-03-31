@@ -90,9 +90,26 @@ public class CPCompareContentHelperImpl implements CPCompareContentHelper {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public String getCompareContentPortletNamespace() {
 		return _portal.getPortletNamespace(
 			CPPortletKeys.CP_COMPARE_CONTENT_WEB);
+=======
+	public String getClearCompareProductsURL(
+		RenderRequest renderRequest, RenderResponse renderResponse) {
+
+		PortletURL portletURL = renderResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/cp_compare_content_mini_web/clear_compare_products");
+
+		String redirect = _portal.getCurrentURL(renderRequest);
+
+		portletURL.setParameter("redirect", redirect);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getCompareProductsURL(ThemeDisplay themeDisplay)
@@ -234,6 +251,7 @@ public class CPCompareContentHelperImpl implements CPCompareContentHelper {
 		long cpDefinitionId, RenderRequest renderRequest,
 		RenderResponse renderResponse) {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			renderResponse
 		).setActionName(
@@ -243,6 +261,22 @@ public class CPCompareContentHelperImpl implements CPCompareContentHelper {
 		).setParameter(
 			"cpDefinitionId", cpDefinitionId
 		).buildString();
+=======
+		PortletURL portletURL = renderResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/cp_compare_content_mini_web/delete_compare_product");
+
+		String redirect = _portal.getCurrentURL(renderRequest);
+
+		portletURL.setParameter("redirect", redirect);
+
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpDefinitionId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

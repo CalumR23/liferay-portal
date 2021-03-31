@@ -96,7 +96,13 @@ public class DBPartitionUtilTest extends BaseDBPartitionTestCase {
 	public void tearDown() throws Exception {
 		db.runSQL("drop schema if exists " + _getSchemaName(_COMPANY_ID));
 
+<<<<<<< HEAD
 		_connection.setCatalog(_defaultSchemaName);
+=======
+		try (Statement statement = _connection.createStatement()) {
+			statement.execute("use " + _defaultSchemaName);
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test

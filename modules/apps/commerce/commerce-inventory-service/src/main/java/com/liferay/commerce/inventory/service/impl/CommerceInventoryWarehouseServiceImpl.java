@@ -67,6 +67,7 @@ public class CommerceInventoryWarehouseServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
@@ -74,6 +75,10 @@ public class CommerceInventoryWarehouseServiceImpl
 		portletResourcePermission.check(
 			getPermissionChecker(), null,
 			CommerceInventoryActionKeys.ADD_WAREHOUSE);
+=======
+		PortalPermissionUtil.check(
+			getPermissionChecker(), CommerceInventoryActionKeys.ADD_WAREHOUSE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return commerceInventoryWarehouseLocalService.
 			addCommerceInventoryWarehouse(

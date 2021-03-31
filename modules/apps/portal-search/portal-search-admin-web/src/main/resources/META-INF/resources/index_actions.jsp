@@ -49,11 +49,17 @@ page import="java.util.Map" %>
 <portlet:defineObjects />
 
 <%
+<<<<<<< HEAD
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
 ).setMVCRenderCommandName(
 	"/portal_search_admin/view"
 ).build();
+=======
+PortletURL portletURL = renderResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", "/portal_search_admin/view");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <portlet:renderURL var="redirectURL">

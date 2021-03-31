@@ -52,12 +52,20 @@ public class DocumentRequestExecutorFixture {
 		createBulkDocumentRequestExecutor(
 			ElasticsearchClientResolver elasticsearchClientResolver,
 			ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 				elasticsearchBulkableDocumentRequestTranslator) {
+=======
+				bulkableDocumentRequestTranslator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return new BulkDocumentRequestExecutorImpl() {
 			{
 				setElasticsearchBulkableDocumentRequestTranslator(
+<<<<<<< HEAD
 					elasticsearchBulkableDocumentRequestTranslator);
+=======
+					bulkableDocumentRequestTranslator);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				setElasticsearchClientResolver(elasticsearchClientResolver);
 			}
 		};
@@ -96,7 +104,11 @@ public class DocumentRequestExecutorFixture {
 		createDeleteDocumentRequestExecutor(
 			ElasticsearchClientResolver elasticsearchClientResolver,
 			ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 				elasticsearchBulkableDocumentRequestTranslator) {
+=======
+				bulkableDocumentRequestTranslator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return new DeleteDocumentRequestExecutorImpl() {
 			{
@@ -112,7 +124,11 @@ public class DocumentRequestExecutorFixture {
 		ElasticsearchDocumentFactory elasticsearchDocumentFactory) {
 
 		ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 			elasticsearchBulkableDocumentRequestTranslator =
+=======
+			bulkableDocumentRequestTranslator =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				createBulkableDocumentRequestTranslator(
 					elasticsearchDocumentFactory);
 
@@ -152,7 +168,11 @@ public class DocumentRequestExecutorFixture {
 		createGetDocumentRequestExecutor(
 			ElasticsearchClientResolver elasticsearchClientResolver,
 			ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 				elasticsearchBulkableDocumentRequestTranslator) {
+=======
+				bulkableDocumentRequestTranslator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return new GetDocumentRequestExecutorImpl() {
 			{
@@ -169,7 +189,11 @@ public class DocumentRequestExecutorFixture {
 		createIndexDocumentRequestExecutor(
 			ElasticsearchClientResolver elasticsearchClientResolver,
 			ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 				elasticsearchBulkableDocumentRequestTranslator) {
+=======
+				bulkableDocumentRequestTranslator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return new IndexDocumentRequestExecutorImpl() {
 			{
@@ -215,7 +239,11 @@ public class DocumentRequestExecutorFixture {
 		createUpdateDocumentRequestExecutor(
 			ElasticsearchClientResolver elasticsearchClientResolver,
 			ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 				elasticsearchBulkableDocumentRequestTranslator) {
+=======
+				bulkableDocumentRequestTranslator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return new UpdateDocumentRequestExecutorImpl() {
 			{

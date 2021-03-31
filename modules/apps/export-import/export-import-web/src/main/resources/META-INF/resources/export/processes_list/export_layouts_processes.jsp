@@ -25,6 +25,7 @@ String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
 String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
+<<<<<<< HEAD
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	liferayPortletResponse
 ).setMVCRenderCommandName(
@@ -44,6 +45,18 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 ).setParameter(
 	"searchContainerId", searchContainerId
 ).build();
+=======
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", "exportLayoutsView");
+portletURL.setParameter("groupId", String.valueOf(groupId));
+portletURL.setParameter("privateLayout", String.valueOf(privateLayout));
+portletURL.setParameter("displayStyle", displayStyle);
+portletURL.setParameter("navigation", navigation);
+portletURL.setParameter("orderByCol", orderByCol);
+portletURL.setParameter("orderByType", orderByType);
+portletURL.setParameter("searchContainerId", searchContainerId);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTasksURL">

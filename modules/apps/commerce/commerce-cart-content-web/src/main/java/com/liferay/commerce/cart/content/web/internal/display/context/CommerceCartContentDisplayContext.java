@@ -197,8 +197,20 @@ public class CommerceCartContentDisplayContext {
 				getCommercePriceDisplayType(),
 				CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 
+<<<<<<< HEAD
 			return commerceOrderItem.getDiscountWithTaxAmountMoney();
 		}
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_cart_content/edit_commerce_order_item");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter(
+			"redirect", commerceCartContentRequestHelper.getCurrentURL());
+		portletURL.setParameter(
+			"commerceOrderItemId",
+			String.valueOf(commerceOrderItem.getCommerceOrderItemId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return commerceOrderItem.getDiscountAmountMoney();
 	}

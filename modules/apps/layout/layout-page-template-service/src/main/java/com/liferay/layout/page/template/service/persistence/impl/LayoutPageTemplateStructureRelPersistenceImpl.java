@@ -3986,11 +3986,33 @@ public class LayoutPageTemplateStructureRelPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid", "layoutPageTemplateStructureRelId", "data"});
 
+<<<<<<< HEAD
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+=======
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

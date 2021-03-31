@@ -118,6 +118,13 @@ public class DepotAdminManagementToolbarDisplayContext
 				dropdownItem -> {
 					dropdownItem.putData("action", "addDepotEntry");
 
+<<<<<<< HEAD
+=======
+					ThemeDisplay themeDisplay =
+						(ThemeDisplay)httpServletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					PortletURL addDepotEntryURL =
 						DepotEntryURLUtil.getAddDepotEntryActionURL(
 							_themeDisplay.getURLCurrent(),
@@ -161,6 +168,13 @@ public class DepotAdminManagementToolbarDisplayContext
 
 	@Override
 	public Boolean isShowCreationMenu() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return DepotPermission.contains(
 			_themeDisplay.getPermissionChecker(),
 			_themeDisplay.getScopeGroupId(), DepotActionKeys.ADD_DEPOT_ENTRY);
@@ -206,6 +220,13 @@ public class DepotAdminManagementToolbarDisplayContext
 	private boolean _hasDeleteDepotEntryPermission(DepotEntry depotEntry)
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (!DepotEntryPermission.contains(
 				_themeDisplay.getPermissionChecker(),
 				depotEntry.getDepotEntryId(), ActionKeys.DELETE)) {

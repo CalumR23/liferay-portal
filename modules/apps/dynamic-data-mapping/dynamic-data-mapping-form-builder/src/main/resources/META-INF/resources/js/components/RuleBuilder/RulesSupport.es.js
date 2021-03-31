@@ -14,7 +14,10 @@
 
 import {PagesVisitor} from 'dynamic-data-mapping-form-renderer';
 
+<<<<<<< HEAD
 import {Tokenizer} from '../../expressions/Tokenizer.es';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {DEFAULT_FIELD_NAMES_REGEX_FOR_EXPRESSION} from '../../util/regex.es';
 import {getFieldProperty} from '../LayoutProvider/util/fields.es';
 
@@ -68,6 +71,7 @@ const fieldWithOptions = (fieldType) => {
 	);
 };
 
+<<<<<<< HEAD
 const getFieldOptions = (fieldName, pages) => {
 	let options = [];
 	const visitor = new PagesVisitor(pages);
@@ -81,13 +85,19 @@ const getFieldOptions = (fieldName, pages) => {
 	return options;
 };
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const getFieldType = (fieldName, pages) => {
 	return getFieldProperty(pages, fieldName, 'type');
 };
 
 const optionBelongsToRule = (condition, options) => {
 	return options.some(
+<<<<<<< HEAD
 		(option) => option.value === condition.operands[1]?.value
+=======
+		(option) => option.value === condition.operands[1].value
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	);
 };
 
@@ -168,6 +178,22 @@ const syncActions = (pages, actions) => {
 	return actions;
 };
 
+<<<<<<< HEAD
+=======
+const getFieldOptions = (fieldName, pages) => {
+	let options = [];
+	const visitor = new PagesVisitor(pages);
+
+	const field = visitor.findField((field) => {
+		return field.fieldName === fieldName;
+	});
+
+	options = field ? field.options : [];
+
+	return options;
+};
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const formatRules = (pages, rules) => {
 	const visitor = new PagesVisitor(pages);
 
@@ -302,8 +328,12 @@ const fieldNameBelongsToAction = (actions, fieldName, fields) => {
 				if (fieldName === '') {
 					return (
 						expression.indexOf(emptyField) !== -1 ||
+<<<<<<< HEAD
 						target === fieldName ||
 						expressionHasNonNumericFields(action, fields)
+=======
+						target === fieldName
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					);
 				}
 				else {
@@ -330,7 +360,11 @@ const fieldNameBelongsToCondition = (conditions, fieldName) => {
 		.some((fieldFound) => fieldFound === true);
 };
 
+<<<<<<< HEAD
 const findRuleByFieldName = (fieldName, pages, rules) => {
+=======
+const findRuleByFieldName = (fieldName, rules) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	return rules.some(
 		(rule) =>
 			fieldNameBelongsToAction(rule.actions, fieldName, pages) ||
@@ -338,6 +372,7 @@ const findRuleByFieldName = (fieldName, pages, rules) => {
 	);
 };
 
+<<<<<<< HEAD
 const isOperandValid = (operand) =>
 	operand && Boolean(operand.type) && Boolean(operand.value);
 
@@ -406,6 +441,10 @@ const replaceFieldNameByFieldLabel = (expression, fields) => {
 	});
 
 	return newExpression;
+=======
+const findInvalidRule = (rule) => {
+	return findRuleByFieldName('', [rule]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };
 
 export default {

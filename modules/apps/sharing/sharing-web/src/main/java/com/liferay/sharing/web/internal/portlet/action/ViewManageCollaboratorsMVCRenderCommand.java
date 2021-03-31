@@ -14,7 +14,10 @@
 
 package com.liferay.sharing.web.internal.portlet.action;
 
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -45,7 +48,13 @@ import java.text.Format;
 import java.util.Date;
 import java.util.List;
 
+<<<<<<< HEAD
 import javax.portlet.PortletException;
+=======
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletException;
+import javax.portlet.PortletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -97,11 +106,20 @@ public class ViewManageCollaboratorsMVCRenderCommand
 	}
 
 	private String _getActionURL(RenderResponse renderResponse) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			renderResponse
 		).setActionName(
 			"/sharing/edit_collaborators"
 		).buildString();
+=======
+		PortletURL editCollaboratorsURL = renderResponse.createActionURL();
+
+		editCollaboratorsURL.setParameter(
+			ActionRequest.ACTION_NAME, "/sharing/edit_collaborators");
+
+		return editCollaboratorsURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private JSONArray _getCollaboratorsJSONArray(

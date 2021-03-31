@@ -190,8 +190,14 @@ public class JspPrecompileTest {
 			outputStream.write(classWriter.toByteArray());
 		}
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_JSP_COMPILER, LoggerTestUtil.DEBUG)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_JSP_COMPILER, Level.DEBUG)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			_invokeJSP(_PRECOMPILE_JSP_FILE_NAME, "Precompiled");
 
@@ -206,8 +212,14 @@ public class JspPrecompileTest {
 
 	@Test
 	public void testRuntimeCompiledJsp() throws Exception {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_JSP_COMPILER, LoggerTestUtil.DEBUG)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_JSP_COMPILER, Level.DEBUG)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			_invokeJSP(_RUNTIME_COMPILE_JSP_FILE_NAME, "Runtime Compiled");
 

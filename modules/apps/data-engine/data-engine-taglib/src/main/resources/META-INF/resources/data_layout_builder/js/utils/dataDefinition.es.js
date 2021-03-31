@@ -16,7 +16,11 @@ import {addItem, updateItem} from './client.es';
 import {getLocalizedValue} from './lang.es';
 import {normalizeDataDefinition, normalizeDataLayout} from './normalizers.es';
 
+<<<<<<< HEAD
 export function forEachDataDefinitionField(
+=======
+export const forEachDataDefinitionField = (
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	dataDefinition = {dataDefinitionFields: []},
 	fn
 ) {
@@ -65,7 +69,31 @@ export function containsFieldSet(dataDefinition, dataDefinitionId) {
 	return hasFieldSet;
 }
 
+<<<<<<< HEAD
 export function getDataDefinitionField(
+=======
+export const containsFieldSet = (dataDefinition, dataDefinitionId) => {
+	let hasFieldSet = false;
+
+	forEachDataDefinitionField(dataDefinition, (dataDefinitionField) => {
+		const {customProperties, fieldType} = dataDefinitionField;
+
+		if (
+			fieldType === 'fieldset' &&
+			customProperties &&
+			customProperties.ddmStructureId == dataDefinitionId
+		) {
+			hasFieldSet = true;
+		}
+
+		return hasFieldSet;
+	});
+
+	return hasFieldSet;
+};
+
+export const getDataDefinitionField = (
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	dataDefinition = {dataDefinitionFields: []},
 	fieldName
 ) {

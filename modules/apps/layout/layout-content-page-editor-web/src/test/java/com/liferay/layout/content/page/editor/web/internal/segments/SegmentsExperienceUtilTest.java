@@ -17,18 +17,25 @@ package com.liferay.layout.content.page.editor.web.internal.segments;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.language.LanguageImpl;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.kernel.test.util.RandomTestUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.segments.model.SegmentsExperience;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -38,20 +45,26 @@ import org.mockito.Mockito;
  */
 public class SegmentsExperienceUtilTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() {
 		JSONFactoryUtil jsonFactoryUtil = new JSONFactoryUtil();
 
 		jsonFactoryUtil.setJSONFactory(new JSONFactoryImpl());
+<<<<<<< HEAD
 
 		LanguageUtil languageUtil = new LanguageUtil();
 
 		languageUtil.setLanguage(new LanguageImpl());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test
@@ -89,19 +102,25 @@ public class SegmentsExperienceUtilTest {
 			RandomTestUtil.randomLong()
 		);
 
+<<<<<<< HEAD
 		Mockito.when(
 			segmentsExperience.getTypeSettingsUnicodeProperties()
 		).thenReturn(
 			new UnicodeProperties(true)
 		);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Assert.assertEquals(
 			JSONUtil.put(
 				"active", segmentsExperience.isActive()
 			).put(
+<<<<<<< HEAD
 				"languageIds",
 				LocaleUtil.toLanguageIds(LanguageUtil.getAvailableLocales())
 			).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				"name", segmentsExperience.getNameCurrentValue()
 			).put(
 				"priority", segmentsExperience.getPriority()

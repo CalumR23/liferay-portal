@@ -62,6 +62,7 @@ public class SelectLayoutMasterLayoutVerticalCard implements VerticalCard {
 		Map<String, String> data = new HashMap<>();
 
 		try {
+<<<<<<< HEAD
 			data.put(
 				"data-add-layout-url",
 				PortletURLBuilder.createRenderURL(
@@ -90,6 +91,50 @@ public class SelectLayoutMasterLayoutVerticalCard implements VerticalCard {
 				).setWindowState(
 					LiferayWindowState.POP_UP
 				).buildString());
+=======
+			PortletURL addLayoutURL = _renderResponse.createRenderURL();
+
+			addLayoutURL.setParameter(
+				"mvcRenderCommandName", "/layout_admin/add_layout");
+
+			String redirect = ParamUtil.getString(
+				_httpServletRequest, "redirect");
+
+			addLayoutURL.setParameter("redirect", redirect);
+
+			long groupId = ParamUtil.getLong(_httpServletRequest, "groupId");
+
+			addLayoutURL.setParameter("groupId", String.valueOf(groupId));
+
+			long selPlid = ParamUtil.getLong(_httpServletRequest, "selPlid");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+
+			boolean privateLayout = ParamUtil.getBoolean(
+				_httpServletRequest, "privateLayout");
+
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
+
+			addLayoutURL.setParameter("type", LayoutConstants.TYPE_COLLECTION);
+
+			String collectionPK = ParamUtil.getString(
+				_httpServletRequest, "collectionPK");
+
+			addLayoutURL.setParameter("collectionPK", collectionPK);
+
+			String collectionType = ParamUtil.getString(
+				_httpServletRequest, "collectionType");
+
+			addLayoutURL.setParameter("collectionType", collectionType);
+
+			addLayoutURL.setParameter(
+				"masterLayoutPlid",
+				String.valueOf(_layoutPageTemplateEntry.getPlid()));
+			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
+
+			data.put("add-layout-url", addLayoutURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

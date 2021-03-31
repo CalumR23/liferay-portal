@@ -23,16 +23,23 @@ page import="com.liferay.document.library.exception.DLStorageQuotaExceededExcept
 page import="com.liferay.document.library.kernel.model.DLVersionNumberIncrease" %><%@
 page import="com.liferay.document.library.web.internal.bulk.selection.BulkSelectionRunnerUtil" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLAccessFromDesktopDisplayContext" %><%@
+<<<<<<< HEAD
 page import="com.liferay.document.library.web.internal.display.context.DLAdminDisplayContextProvider" %><%@
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.document.library.web.internal.display.context.DLEditFileEntryTypeDataEngineDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLEditFileShortcutDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLEditFolderDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLFileEntryAdditionalMetadataSetsDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLFileEntryTypeDetailsDisplayContext" %><%@
+<<<<<<< HEAD
 page import="com.liferay.document.library.web.internal.display.context.DLInfoPanelDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewEntriesDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.display.context.DLViewFileEntryDisplayContext" %><%@
+=======
+page import="com.liferay.document.library.web.internal.display.context.DLViewDisplayContext" %><%@
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.document.library.web.internal.display.context.FolderActionDisplayContext" %><%@
 page import="com.liferay.document.library.web.internal.search.DDMStructureRowChecker" %><%@
 page import="com.liferay.document.library.web.internal.util.DDMStructureUtil" %><%@
@@ -47,13 +54,21 @@ page import="com.liferay.portal.kernel.module.configuration.ConfigurationProvide
 page import="com.liferay.portal.kernel.repository.model.RepositoryEntry" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.view.count.ViewCountManagerUtil" %><%@
+<<<<<<< HEAD
 page import="com.liferay.taglib.util.PortalIncludeUtil" %>
+=======
+page import="com.liferay.portal.util.RepositoryUtil" %>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 <%@ page import="java.util.Collections" %>
 
 <%
 DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
+<<<<<<< HEAD
 DLRequestHelper dlRequestHelper = new DLRequestHelper(request);
+=======
+DLRequestHelper dlRequestHelper = (DLRequestHelper)request.getAttribute(DLRequestHelper.class.getName());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <%@ include file="/document_library/init-ext.jsp" %>

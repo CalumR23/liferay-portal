@@ -79,7 +79,10 @@ public abstract class BaseAccountGroupResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-account-groups/{discountAccountGroupId}/account-group'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "discountAccountGroupId")
@@ -90,8 +93,12 @@ public abstract class BaseAccountGroupResourceImpl
 	@Tags(value = {@Tag(name = "AccountGroup")})
 	public AccountGroup getDiscountAccountGroupAccountGroup(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("discountAccountGroupId")
 				Long discountAccountGroupId)
+=======
+			@PathParam("discountAccountGroupId") Long discountAccountGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new AccountGroup();
@@ -103,7 +110,10 @@ public abstract class BaseAccountGroupResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-list-account-groups/{priceListAccountGroupId}/account-group'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "priceListAccountGroupId")
@@ -114,8 +124,12 @@ public abstract class BaseAccountGroupResourceImpl
 	@Tags(value = {@Tag(name = "AccountGroup")})
 	public AccountGroup getPriceListAccountGroupAccountGroup(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("priceListAccountGroupId")
 				Long priceListAccountGroupId)
+=======
+			@PathParam("priceListAccountGroupId") Long priceListAccountGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new AccountGroup();

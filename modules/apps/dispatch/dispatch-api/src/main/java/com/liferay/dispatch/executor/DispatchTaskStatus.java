@@ -21,7 +21,10 @@ public enum DispatchTaskStatus {
 
 	CANCELED("text-info", "cancelled", 3), FAILED("text-danger", "failed", 4),
 	IN_PROGRESS("text-warning", "in-progress", 1),
+<<<<<<< HEAD
 	NEVER_RAN("text-info", "never-ran", 5),
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	SUCCESSFUL("text-success", "successful", 2);
 
 	public static DispatchTaskStatus valueOf(int status) {

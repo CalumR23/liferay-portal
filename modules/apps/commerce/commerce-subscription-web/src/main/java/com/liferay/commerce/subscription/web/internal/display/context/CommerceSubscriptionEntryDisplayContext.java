@@ -214,6 +214,7 @@ public class CommerceSubscriptionEntryDisplayContext {
 
 		ThemeDisplay themeDisplay = _cpRequestHelper.getThemeDisplay();
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				_httpServletRequest, themeDisplay.getScopeGroup(),
@@ -237,6 +238,19 @@ public class CommerceSubscriptionEntryDisplayContext {
 				return orderId;
 			}
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			_httpServletRequest, themeDisplay.getScopeGroup(),
+			CommerceOrder.class.getName(), PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+		portletURL.setParameter("commerceOrderId", orderId);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels() {
@@ -376,6 +390,7 @@ public class CommerceSubscriptionEntryDisplayContext {
 	}
 
 	public PortletURL getTransitionOrderPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_cpRequestHelper.getLiferayPortletResponse()
 		).setActionName(
@@ -385,6 +400,18 @@ public class CommerceSubscriptionEntryDisplayContext {
 		).setParameter(
 			Constants.CMD, ActionKeys.UPDATE
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter(Constants.CMD, ActionKeys.UPDATE);
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commerceSubscriptionEntryId",
 			_commerceSubscriptionEntry.getCommerceSubscriptionEntryId()
 		).build();

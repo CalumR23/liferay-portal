@@ -79,7 +79,10 @@ public abstract class BaseSkuResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-entries/{priceEntryId}/sku'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
 	)
@@ -87,8 +90,13 @@ public abstract class BaseSkuResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Sku")})
 	public Sku getPriceEntryIdSku(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId)
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new Sku();

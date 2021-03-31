@@ -39,8 +39,13 @@ portletDisplay.setShowBackIcon(true);
 							<span><%= HtmlUtil.escape(ctCollection.getName()) %></span>
 
 							<clay:label
+<<<<<<< HEAD
 								displayType="<%= publicationsDisplayContext.getStatusStyle(ctCollection.getStatus()) %>"
 								label="<%= publicationsDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+=======
+								displayType="<%= WorkflowConstants.getStatusStyle(ctCollection.getStatus()) %>"
+								label="<%= viewChangesDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							/>
 						</div>
 
@@ -103,6 +108,7 @@ portletDisplay.setShowBackIcon(true);
 						/>
 					</li>
 				</c:when>
+<<<<<<< HEAD
 				<c:when test="<%= ctCollection.getStatus() == WorkflowConstants.STATUS_EXPIRED %>">
 					<li class="tbar-item tbar-item-expand text-left">
 						<div class="publication-name">
@@ -153,14 +159,21 @@ portletDisplay.setShowBackIcon(true);
 						/>
 					</li>
 				</c:when>
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<c:when test="<%= ctCollection.getStatus() == WorkflowConstants.STATUS_SCHEDULED %>">
 					<li class="tbar-item tbar-item-expand text-left">
 						<div class="publication-name">
 							<span><%= HtmlUtil.escape(ctCollection.getName()) %></span>
 
 							<clay:label
+<<<<<<< HEAD
 								displayType="<%= publicationsDisplayContext.getStatusStyle(ctCollection.getStatus()) %>"
 								label="<%= publicationsDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+=======
+								displayType="<%= WorkflowConstants.getStatusStyle(ctCollection.getStatus()) %>"
+								label="<%= viewChangesDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							/>
 						</div>
 
@@ -209,8 +222,13 @@ portletDisplay.setShowBackIcon(true);
 							<span><%= HtmlUtil.escape(ctCollection.getName()) %></span>
 
 							<clay:label
+<<<<<<< HEAD
 								displayType="<%= publicationsDisplayContext.getStatusStyle(ctCollection.getStatus()) %>"
 								label="<%= publicationsDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+=======
+								displayType="<%= WorkflowConstants.getStatusStyle(ctCollection.getStatus()) %>"
+								label="<%= viewChangesDisplayContext.getStatusLabel(ctCollection.getStatus()) %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							/>
 						</div>
 
@@ -225,6 +243,7 @@ portletDisplay.setShowBackIcon(true);
 						<div class="publication-description"><%= HtmlUtil.escape(description.concat(LanguageUtil.format(resourceBundle, "published-by-x-on-x", new Object[] {ctCollection.getUserName(), format.format(ctCollection.getStatusDate())}, false))) %></div>
 					</li>
 					<li class="tbar-item">
+<<<<<<< HEAD
 						<c:choose>
 							<c:when test="<%= viewChangesDisplayContext.isExpired(ctCollection) %>">
 								<a class="btn btn-secondary btn-sm disabled lfr-portal-tooltip" title="<liferay-ui:message key="this-publication-was-created-on-a-previous-liferay-version.-you-cannot-revert-it" />" type="button">
@@ -244,6 +263,18 @@ portletDisplay.setShowBackIcon(true);
 								</a>
 							</c:otherwise>
 						</c:choose>
+=======
+						<liferay-portlet:renderURL var="revertURL">
+							<portlet:param name="mvcRenderCommandName" value="/change_tracking/undo_ct_collection" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+							<portlet:param name="ctCollectionId" value="<%= String.valueOf(ctCollection.getCtCollectionId()) %>" />
+							<portlet:param name="revert" value="true" />
+						</liferay-portlet:renderURL>
+
+						<a class="btn btn-secondary btn-sm" href="<%= revertURL %>" type="button">
+							<liferay-ui:message key="revert" />
+						</a>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					</li>
 				</c:otherwise>
 			</c:choose>

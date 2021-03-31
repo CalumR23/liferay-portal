@@ -20,8 +20,11 @@ import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.search.test.util.mappings.BaseMaxExpansionsTestCase;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -33,6 +36,33 @@ public class MaxExpansionsTest extends BaseMaxExpansionsTestCase {
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
+
+	@Override
+	@Test
+	public void testPrefixWithNumberSpaceNumberSuffix() throws Exception {
+		addDocuments("AlphaPrefix# #");
+
+		assertSearch("AlphaPrefi", MAX_EXPANSIONS);
+		assertSearchCount("AlphaPrefi", MAX_EXPANSIONS);
+	}
+
+	@Override
+	@Test
+	public void testPrefixWithNumberSuffix() throws Exception {
+		addDocuments("BetaPrefix#");
+
+		assertSearch("BetaPrefi", MAX_EXPANSIONS);
+		assertSearchCount("BetaPrefi", MAX_EXPANSIONS);
+	}
+
+	@Override
+	@Test
+	public void testPrefixWithUnderscoreNumberSuffix() throws Exception {
+		addDocuments("GammaPrefix_#");
+
+		assertSearch("GammaPrefi", MAX_EXPANSIONS);
+		assertSearchCount("GammaPrefi", MAX_EXPANSIONS);
+	}
 
 	@Override
 	@Test

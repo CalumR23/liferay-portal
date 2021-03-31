@@ -146,6 +146,7 @@ public class CommercePricingClassDataSetActionProvider
 	private PortletURL _getPricingClassEditURL(
 		long pricingClassId, HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest,
@@ -156,6 +157,19 @@ public class CommercePricingClassDataSetActionProvider
 		).setParameter(
 			"commercePricingClassId", pricingClassId
 		).setParameter(
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest,
+			CommercePricingPortletKeys.COMMERCE_PRICING_CLASSES,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_pricing_classes/edit_commerce_pricing_class");
+		portletURL.setParameter(
+			"commercePricingClassId", String.valueOf(pricingClassId));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommercePricingClassScreenNavigationConstants.CATEGORY_KEY_DETAILS
 		).build();

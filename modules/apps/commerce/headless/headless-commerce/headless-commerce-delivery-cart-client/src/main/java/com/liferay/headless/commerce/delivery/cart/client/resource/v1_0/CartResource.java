@@ -632,6 +632,7 @@ public interface CartResource {
 
 			String content = httpResponse.getContent();
 
+<<<<<<< HEAD
 			if ((httpResponse.getStatusCode() / 100) != 2) {
 				_logger.log(
 					Level.WARNING,
@@ -654,6 +655,13 @@ public interface CartResource {
 					"HTTP response status code: " +
 						httpResponse.getStatusCode());
 			}
+=======
+			_logger.fine("HTTP response content: " + content);
+
+			_logger.fine("HTTP response message: " + httpResponse.getMessage());
+			_logger.fine(
+				"HTTP response status code: " + httpResponse.getStatusCode());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			try {
 				return CartSerDes.toDTO(content);

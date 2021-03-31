@@ -25,7 +25,10 @@ import com.liferay.commerce.product.model.CommerceCatalog;
 import com.liferay.commerce.product.portlet.action.ActionHelper;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
 import com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScreenNavigationConstants;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -119,6 +122,7 @@ public class CPDefinitionOptionValueRelDisplayContext
 	}
 
 	public String getRemoveSkuUrl(String redirect) throws PortalException {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			liferayPortletResponse
 		).setActionName(
@@ -130,6 +134,20 @@ public class CPDefinitionOptionValueRelDisplayContext
 		).setParameter(
 			"cpDefinitionOptionValueRelId", getCPDefinitionOptionValueRelId()
 		).buildString();
+=======
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(Constants.CMD, "deleteSku");
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/cp_definitions/edit_cp_definition_option_value_rel");
+		portletURL.setParameter(
+			"cpDefinitionOptionValueRelId",
+			String.valueOf(getCPDefinitionOptionValueRelId()));
+		portletURL.setParameter("redirect", redirect);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

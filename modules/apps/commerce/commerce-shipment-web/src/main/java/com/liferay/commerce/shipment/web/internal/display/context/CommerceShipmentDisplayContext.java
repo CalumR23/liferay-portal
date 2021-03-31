@@ -234,6 +234,7 @@ public class CommerceShipmentDisplayContext
 					CommerceShipmentConstants.getShipmentTransitionLabel(
 						shipmentStatus);
 
+<<<<<<< HEAD
 				PortletURL portletURL = PortletURLBuilder.create(
 					PortalUtil.getControlPanelPortletURL(
 						httpServletRequest,
@@ -250,6 +251,23 @@ public class CommerceShipmentDisplayContext
 				).setParameter(
 					"transitionName", shipmentStatus
 				).build();
+=======
+				PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+					httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
+					PortletRequest.ACTION_PHASE);
+
+				portletURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/commerce_shipment/edit_commerce_shipment");
+				portletURL.setParameter(Constants.CMD, "transition");
+				portletURL.setParameter(
+					"redirect", PortalUtil.getCurrentURL(httpServletRequest));
+				portletURL.setParameter(
+					"commerceShipmentId",
+					String.valueOf(getCommerceShipmentId()));
+				portletURL.setParameter(
+					"transitionName", String.valueOf(shipmentStatus));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				String buttonClass = "btn-primary";
 
@@ -318,6 +336,7 @@ public class CommerceShipmentDisplayContext
 			(commerceShipment.getStatus() ==
 				CommerceShipmentConstants.SHIPMENT_STATUS_PROCESSING)) {
 
+<<<<<<< HEAD
 			PortletURL portletURL = PortletURLBuilder.create(
 				getPortletURL()
 			).setMVCRenderCommandName(
@@ -329,6 +348,19 @@ public class CommerceShipmentDisplayContext
 			).setWindowState(
 				LiferayWindowState.POP_UP
 			).build();
+=======
+			PortletURL portletURL = getPortletURL();
+
+			portletURL.setParameter(
+				"redirect", PortalUtil.getCurrentURL(httpServletRequest));
+			portletURL.setParameter(
+				"commerceShipmentId",
+				String.valueOf(commerceShipment.getCommerceShipmentId()));
+			portletURL.setParameter(
+				"mvcRenderCommandName",
+				"/commerce_shipment/add_commerce_shipment_items");
+			portletURL.setWindowState(LiferayWindowState.POP_UP);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			creationMenu.addDropdownItem(
 				dropdownItem -> {

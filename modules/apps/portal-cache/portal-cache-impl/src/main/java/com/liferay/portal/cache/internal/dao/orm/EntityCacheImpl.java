@@ -77,7 +77,11 @@ public class EntityCacheImpl
 
 	@Override
 	public void clearCache(Class<?> clazz) {
+<<<<<<< HEAD
 		_notifyFinderCache(clazz.getName(), null, false);
+=======
+		_finderCacheImpl.clearCache(clazz);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		clearLocalCache();
 

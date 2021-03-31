@@ -105,11 +105,21 @@ public class StagingProcessesWebPublishTemplatesToolbarDisplayContext
 
 	@Override
 	public String getSearchActionURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			getRenderURL()
 		).setMVCRenderCommandName(
 			"/staging_processes/view_publish_configurations"
 		).buildString();
+=======
+		PortletURL searchActionURL = getRenderURL();
+
+		searchActionURL.setParameter(
+			"mvcRenderCommandName",
+			"/staging_processes/view_publish_configurations");
+
+		return searchActionURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public SearchContainer<ExportImportConfiguration> getSearchContainer() {

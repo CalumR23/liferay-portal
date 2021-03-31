@@ -205,6 +205,7 @@ export default function Sidebar() {
 	};
 
 	return createPortal(
+<<<<<<< HEAD
 		<div
 			className="page-editor__sidebar page-editor__theme-adapter-forms"
 			ref={dropClearRef}
@@ -230,6 +231,53 @@ export default function Sidebar() {
 						} = panel;
 
 						if (isLink) {
+=======
+		<ClayTooltipProvider>
+			<div
+				className="page-editor__sidebar page-editor__theme-adapter-forms"
+				ref={dropClearRef}
+			>
+				<div
+					className={classNames('page-editor__sidebar__buttons', {
+						light: true,
+					})}
+					onClick={deselectItem}
+				>
+					{panels.reduce((elements, group, groupIndex) => {
+						const buttons = group.map((panelId) => {
+							const panel = sidebarPanels[panelId];
+
+							const active =
+								sidebarOpen && sidebarPanelId === panelId;
+							const {
+								icon,
+								isLink,
+								label,
+								pluginEntryPoint,
+								url,
+							} = panel;
+
+							if (isLink) {
+								return (
+									<a
+										className={classNames({active})}
+										data-tooltip-align="left"
+										href={url}
+										key={panel.sidebarPanelId}
+										title={label}
+									>
+										<ClayIcon symbol={icon} />
+									</a>
+								);
+							}
+
+							const prefetch = () =>
+								load(
+									panel.sidebarPanelId,
+									pluginEntryPoint
+								).then(...swallow);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							return (
 								<a
 									className={classNames({active})}

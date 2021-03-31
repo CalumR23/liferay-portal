@@ -73,7 +73,16 @@ public class DefaultLayoutDefinitionImporter {
 			String layoutDefinitionJSON = StringUtil.replace(
 				_DEFAULT_LAYOUT_DEFINITION, "${", "}",
 				HashMapBuilder.put(
+<<<<<<< HEAD
 					"RELEASE_INFO", releaseInfo + "."
+=======
+					"RELEASE_INFO",
+					StringBundler.concat(
+						"Welcome to ",
+						StringUtil.replace(
+							releaseInfo, CharPool.OPEN_PARENTHESIS, "<br>("),
+						".")
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				).put(
 					"TREE_IMAGE_ID",
 					String.valueOf(

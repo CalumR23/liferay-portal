@@ -141,6 +141,33 @@ AUI.add(
 					);
 
 					originalForm.append(formNode);
+<<<<<<< HEAD
+=======
+
+					submitForm(formNode, actionUrl, false);
+				},
+
+				_moveToFolder(obj) {
+					var instance = this;
+
+					var dropTarget = obj.targetItem;
+
+					var selectedItems = obj.selectedItems;
+
+					var folderId = dropTarget.attr('data-folder-id');
+
+					if (folderId) {
+						if (
+							!instance._searchContainer.select ||
+							selectedItems.indexOf(
+								dropTarget.one('input[type=checkbox]')
+							)
+						) {
+							instance._moveCurrentSelection(folderId);
+						}
+					}
+				},
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 					submitForm(formNode, actionUrl, false);
 				},

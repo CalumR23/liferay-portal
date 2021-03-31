@@ -29,7 +29,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.portlet.SearchDisplayStyleUtil;
+=======
+import com.liferay.portal.kernel.util.ParamUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
@@ -119,6 +123,7 @@ public class DepotAdminDisplayContext {
 
 	public String getViewDepotURL(DepotEntry depotEntry)
 		throws PortalException {
+<<<<<<< HEAD
 
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
@@ -129,6 +134,19 @@ public class DepotAdminDisplayContext {
 		).setParameter(
 			"depotEntryId", depotEntry.getDepotEntryId()
 		).buildString();
+=======
+
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			_liferayPortletRequest, depotEntry.getGroup(),
+			DepotPortletKeys.DEPOT_ADMIN, 0, 0, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/depot/view_depot_dashboard");
+		portletURL.setParameter(
+			"depotEntryId", String.valueOf(depotEntry.getDepotEntryId()));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public boolean isDisplayStyleDescriptive() {
@@ -175,6 +193,19 @@ public class DepotAdminDisplayContext {
 
 	private Group _getGroup(Group group) {
 		Group stagingGroup = group.getStagingGroup();
+<<<<<<< HEAD
+=======
+
+		if (stagingGroup != null) {
+			return stagingGroup;
+		}
+
+		return group;
+	}
+
+	private PortletURL _getPortletURL() {
+		PortletURL portletURL = _liferayPortletResponse.createRenderURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (stagingGroup != null) {
 			return stagingGroup;

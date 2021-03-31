@@ -489,6 +489,32 @@ public class ActionUtil {
 		return true;
 	}
 
+<<<<<<< HEAD
+=======
+	protected static String getElementInstanceId(
+			String content, String fieldName, int index)
+		throws Exception {
+
+		Document document = SAXReaderUtil.read(content);
+
+		String xPathExpression =
+			"//dynamic-element[@name = " +
+				HtmlUtil.escapeXPathAttribute(fieldName) + "]";
+
+		XPath xPath = SAXReaderUtil.createXPath(xPathExpression);
+
+		List<Node> nodes = xPath.selectNodes(document);
+
+		if (index > nodes.size()) {
+			return StringPool.BLANK;
+		}
+
+		Element dynamicElementElement = (Element)nodes.get(index);
+
+		return dynamicElementElement.attributeValue("instance-id");
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	protected static String getLanguageId(
 			RenderRequest renderRequest, long groupId, String articleId,
 			double sourceVersion, double targetVersion)
@@ -561,6 +587,9 @@ public class ActionUtil {
 		return false;
 	}
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(ActionUtil.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 }

@@ -94,6 +94,7 @@ describe('Navigation', () => {
 					validAnalyticsConnection: false,
 				}}
 			>
+<<<<<<< HEAD
 				<StoreContextProvider
 					value={{
 						endpoints: mockEndpoints,
@@ -120,6 +121,26 @@ describe('Navigation', () => {
 						/>
 					</ChartStateContextProvider>
 				</StoreContextProvider>
+=======
+				<ChartStateContextProvider
+					publishDate={testProps.pagePublishDate}
+					timeRange={testProps.timeRange}
+					timeSpanKey={testProps.timeSpanKey}
+				>
+					<Navigation
+						author={testProps.author}
+						canonicalURL={testProps.canonicalURL}
+						endpoints={mockEndpoints}
+						languageTag={testProps.languageTag}
+						onSelectedLanguageClick={noop}
+						page={testProps.page}
+						pagePublishDate={testProps.pagePublishDate}
+						pageTitle={testProps.pageTitle}
+						timeSpanOptions={mockTimeSpanOptions}
+						viewURLs={mockViewURLs}
+					/>
+				</ChartStateContextProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			</ConnectionContext.Provider>
 		);
 
@@ -142,6 +163,7 @@ describe('Navigation', () => {
 		};
 
 		const {getByText} = render(
+<<<<<<< HEAD
 			<StoreContextProvider
 				value={{
 					endpoints: mockEndpoints,
@@ -151,6 +173,9 @@ describe('Navigation', () => {
 					warning: true,
 				}}
 			>
+=======
+			<StoreContextProvider value={{warning: true}}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<ChartStateContextProvider
 					publishDate={testProps.publishDate}
 					timeRange={testProps.timeRange}
@@ -160,6 +185,10 @@ describe('Navigation', () => {
 						author={testProps.author}
 						canonicalURL={testProps.canonicalURL}
 						endpoints={mockEndpoints}
+<<<<<<< HEAD
+=======
+						languageTag={testProps.languageTag}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						onSelectedLanguageClick={noop}
 						page={testProps.page}
 						pagePublishDate={testProps.pagePublishDate}
@@ -192,6 +221,7 @@ describe('Navigation', () => {
 		};
 
 		const {getByText} = render(
+<<<<<<< HEAD
 			<StoreContextProvider
 				value={{
 					endpoints: mockEndpoints,
@@ -201,6 +231,9 @@ describe('Navigation', () => {
 					publishedToday: true,
 				}}
 			>
+=======
+			<StoreContextProvider value={{publishedToday: true}}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<ChartStateContextProvider
 					publishDate={testProps.pagePublishDate}
 					timeRange={testProps.timeRange}
@@ -210,6 +243,10 @@ describe('Navigation', () => {
 						author={testProps.author}
 						canonicalURL={testProps.canonicalURL}
 						endpoints={mockEndpoints}
+<<<<<<< HEAD
+=======
+						languageTag={testProps.languageTag}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						onSelectedLanguageClick={noop}
 						page={testProps.page}
 						pagePublishDate={testProps.pagePublishDate}

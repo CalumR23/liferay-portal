@@ -66,7 +66,11 @@ public class EditCommerceShipmentCourierDetailMVCRenderCommand
 		renderRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT, commerceShipmentDisplayContext);
 
+<<<<<<< HEAD
 		return "/shipment/edit_commerce_shipment_courier_detail.jsp";
+=======
+		return "/shipment/edit_commerce_shipment_courier_details.jsp";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference

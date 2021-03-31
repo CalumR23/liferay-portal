@@ -66,7 +66,11 @@ String displayStyle = oAuth2ApplicationsManagementToolbarDisplayContext.getDispl
 				modelVar="oAuth2Application"
 			>
 				<portlet:renderURL var="editURL">
+<<<<<<< HEAD
 					<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/update_oauth2_application" />
+=======
+					<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/update_o_auth2_application" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2Application.getOAuth2ApplicationId()) %>" />
 					<portlet:param name="redirect" value="<%= currentURL %>" />
 				</portlet:renderURL>
@@ -154,4 +158,31 @@ String displayStyle = oAuth2ApplicationsManagementToolbarDisplayContext.getDispl
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
+<<<<<<< HEAD
 </clay:container-fluid>
+=======
+</clay:container-fluid>
+
+<script>
+	function <portlet:namespace />deleteOAuth2Applications() {
+		if (
+			confirm(
+				'<%= HtmlUtil.escapeJS(LanguageUtil.get(request, "are-you-sure-you-want-to-delete-the-selected-entries-this-action-revokes-all-authorizations-and-associated-tokens")) %>'
+			)
+		) {
+			var form = document.<portlet:namespace />fm;
+
+			Liferay.Util.postForm(form, {
+				data: {
+					oAuth2ApplicationIds: Liferay.Util.listCheckedExcept(
+						form,
+						'<portlet:namespace />allRowIds'
+					),
+				},
+				url:
+					'<portlet:actionURL name="/oauth2_provider/delete_o_auth2_applications" />',
+			});
+		}
+	}
+</script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

@@ -26,8 +26,11 @@ boolean showPreview = GetterUtil.getBoolean(request.getAttribute("liferay-layout
 RenderFragmentLayoutDisplayContext renderFragmentLayoutDisplayContext = new RenderFragmentLayoutDisplayContext(request, response);
 %>
 
+<<<<<<< HEAD
 <liferay-util:dynamic-include key="com.liferay.layout,taglib#/render_fragment_layout/page.jsp#pre" />
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <%
 try {
 	request.setAttribute(WebKeys.SHOW_PORTLET_TOPPER, Boolean.TRUE);
@@ -52,6 +55,10 @@ try {
 finally {
 	request.removeAttribute(WebKeys.SHOW_PORTLET_TOPPER);
 }
+<<<<<<< HEAD
 %>
 
 <liferay-util:dynamic-include key="com.liferay.layout,taglib#/render_fragment_layout/page.jsp#post" />
+=======
+%>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

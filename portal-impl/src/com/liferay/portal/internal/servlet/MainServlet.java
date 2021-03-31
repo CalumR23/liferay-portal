@@ -47,7 +47,6 @@ import com.liferay.portal.kernel.portlet.PortletConfigFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletInstanceFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
 import com.liferay.portal.kernel.service.CompanyLocalServiceUtil;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
@@ -459,6 +458,7 @@ public class MainServlet extends HttpServlet {
 			}
 		}
 
+<<<<<<< HEAD
 		if (StartupHelperUtil.isDBNew() &&
 			PropsValues.SETUP_WIZARD_ADD_SAMPLE_DATA) {
 
@@ -471,6 +471,8 @@ public class MainServlet extends HttpServlet {
 			}
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
 	}
 

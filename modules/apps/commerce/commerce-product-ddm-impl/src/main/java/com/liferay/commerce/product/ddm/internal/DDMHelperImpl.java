@@ -544,6 +544,7 @@ public class DDMHelperImpl implements DDMHelper {
 		return _ddmFormRenderer.render(ddmForm, ddmFormRenderingContext);
 	}
 
+<<<<<<< HEAD
 	private String _render(
 			long cpDefinitionId, Locale locale, DDMForm ddmForm, String json,
 			RenderRequest renderRequest, RenderResponse renderResponse)
@@ -554,6 +555,8 @@ public class DDMHelperImpl implements DDMHelper {
 			renderResponse);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private void _setPredefinedValue(
 		DDMFormField ddmFormField,
 		CPDefinitionOptionRel cpDefinitionOptionRel) {

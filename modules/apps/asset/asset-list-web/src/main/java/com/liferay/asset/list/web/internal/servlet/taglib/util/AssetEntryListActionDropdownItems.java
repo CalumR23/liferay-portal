@@ -97,6 +97,20 @@ public class AssetEntryListActionDropdownItems {
 	private UnsafeConsumer<DropdownItem, Exception>
 		_getDeleteAssetListEntryActionUnsafeConsumer() {
 
+<<<<<<< HEAD
+=======
+		PortletURL deleteAssetListEntryURL =
+			_liferayPortletResponse.createActionURL();
+
+		deleteAssetListEntryURL.setParameter(
+			ActionRequest.ACTION_NAME, "/asset_list/delete_asset_list_entries");
+		deleteAssetListEntryURL.setParameter(
+			"redirect", _themeDisplay.getURLCurrent());
+		deleteAssetListEntryURL.setParameter(
+			"assetListEntryId",
+			String.valueOf(_assetListEntry.getAssetListEntryId()));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return dropdownItem -> {
 			dropdownItem.putData("action", "deleteAssetListEntry");
 			dropdownItem.putData(

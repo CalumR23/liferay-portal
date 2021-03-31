@@ -355,9 +355,14 @@ public class CommercePriceListHierarchyDiscoveryTest {
 
 		CommerceCatalog catalog =
 			_commerceCatalogLocalService.addCommerceCatalog(
+<<<<<<< HEAD
 				null, RandomTestUtil.randomString(),
 				_commerceCurrency.getCode(), LocaleUtil.US.getDisplayLanguage(),
 				_serviceContext);
+=======
+				RandomTestUtil.randomString(), _commerceCurrency.getCode(),
+				LocaleUtil.US.getDisplayLanguage(), null, _serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		CommercePriceListTestUtil.addAccountAndChannelPriceList(
 			catalog.getGroupId(), _commerceAccount1.getCommerceAccountId(),
@@ -392,9 +397,14 @@ public class CommercePriceListHierarchyDiscoveryTest {
 
 		CommerceCatalog catalog =
 			_commerceCatalogLocalService.addCommerceCatalog(
+<<<<<<< HEAD
 				null, RandomTestUtil.randomString(),
 				_commerceCurrency.getCode(), LocaleUtil.US.getDisplayLanguage(),
 				_serviceContext);
+=======
+				RandomTestUtil.randomString(), _commerceCurrency.getCode(),
+				LocaleUtil.US.getDisplayLanguage(), null, _serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long[] commerceAccountGroupIds =
 			_commerceAccountHelper.getCommerceAccountGroupIds(

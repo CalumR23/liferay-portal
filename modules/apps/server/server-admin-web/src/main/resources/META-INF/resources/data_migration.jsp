@@ -71,6 +71,13 @@ Collection<ConvertProcess> convertProcesses = ConvertProcessUtil.getEnabledConve
 
 									<%
 									for (String parameterName : parameterNames) {
+<<<<<<< HEAD
+=======
+										if (parameterName.contains(StringPool.EQUAL) && parameterName.contains(StringPool.SEMICOLON)) {
+											String[] parameterPair = StringUtil.split(parameterName, CharPool.EQUAL);
+
+											String[] parameterSelectEntries = StringUtil.split(parameterPair[1], CharPool.SEMICOLON);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									%>
 
 										<c:choose>

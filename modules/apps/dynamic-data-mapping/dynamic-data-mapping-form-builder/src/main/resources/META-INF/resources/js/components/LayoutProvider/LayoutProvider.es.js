@@ -19,7 +19,11 @@ import {
 	generateName,
 	getRepeatedIndex,
 } from 'dynamic-data-mapping-form-renderer';
+<<<<<<< HEAD
 import {openModal} from 'frontend-js-web';
+=======
+import {openModal, openToast} from 'frontend-js-web';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import Component from 'metal-jsx';
 import {Config} from 'metal-state';
 
@@ -397,10 +401,14 @@ class LayoutProvider extends Component {
 	_handleFieldDeleted(event) {
 		const {rules} = this.state;
 
+<<<<<<< HEAD
 		if (
 			rules &&
 			RulesSupport.findRuleByFieldName(event.fieldName, null, rules)
 		) {
+=======
+		if (rules && RulesSupport.findRuleByFieldName(event.fieldName, rules)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			openModal({
 				bodyHTML: Liferay.Language.get(
 					'a-rule-is-applied-to-this-field'

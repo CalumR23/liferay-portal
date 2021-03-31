@@ -158,4 +158,82 @@ RankingPortletDisplayContext rankingPortletDisplayContext = (RankingPortletDispl
 			markupView="lexicon"
 		/>
 	</liferay-ui:search-container>
+<<<<<<< HEAD
 </aui:form>
+=======
+</aui:form>
+
+<aui:script sandbox="<%= true %>">
+	var submitForm = function (url) {
+		var searchContainer = document.getElementById(
+			'<portlet:namespace />resultsRankingEntries'
+		);
+
+		if (searchContainer) {
+			Liferay.Util.postForm(
+				document.<portlet:namespace />resultsRankingEntriesFm,
+				{
+					data: {
+						actionFormInstanceIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							'<portlet:namespace />allRowIds'
+						),
+					},
+					url: url,
+				}
+			);
+		}
+	};
+
+	var activateResultsRankingsEntries = function () {
+		<portlet:actionURL name="/result_rankings/edit_ranking" var="activateResultsRankingEntryURL">
+			<portlet:param name="<%= Constants.CMD %>" value="<%= ResultRankingsConstants.ACTIVATE %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:actionURL>
+
+		submitForm('<%= activateResultsRankingEntryURL %>');
+	};
+
+	var deactivateResultsRankingsEntries = function () {
+		<portlet:actionURL name="/result_rankings/edit_ranking" var="deactivateResultsRankingEntryURL">
+			<portlet:param name="<%= Constants.CMD %>" value="<%= ResultRankingsConstants.DEACTIVATE %>" />
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:actionURL>
+
+		submitForm('<%= deactivateResultsRankingEntryURL %>');
+	};
+
+	var deleteResultsRankingsEntries = function () {
+		if (
+			confirm(
+				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
+			)
+		) {
+			<portlet:actionURL name="/result_rankings/edit_ranking" var="deleteResultsRankingEntryURL">
+				<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
+				<portlet:param name="redirect" value="<%= currentURL %>" />
+			</portlet:actionURL>
+
+			submitForm('<%= deleteResultsRankingEntryURL %>');
+		}
+	};
+
+	var ACTIONS = {
+		activateResultsRankingsEntries: activateResultsRankingsEntries,
+		deactivateResultsRankingsEntries: deactivateResultsRankingsEntries,
+		deleteResultsRankingsEntries: deleteResultsRankingsEntries,
+	};
+
+	Liferay.componentReady('resultsRankingEntriesManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

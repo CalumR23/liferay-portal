@@ -160,6 +160,54 @@ public class CommercePriceEntryServiceSoap {
 		}
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 #addCommercePriceEntry(String, long, String, long,
+	 BigDecimal, boolean, BigDecimal, BigDecimal, BigDecimal,
+	 int, int, int, int, int, int, int, int, int, int, boolean,
+	 ServiceContext)}
+	 */
+	@Deprecated
+	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
+			addCommercePriceEntry(
+				String externalReferenceCode, long cProductId,
+				String cpInstanceUuid, long commercePriceListId,
+				java.math.BigDecimal price, boolean discountDiscovery,
+				java.math.BigDecimal discountLevel1,
+				java.math.BigDecimal discountLevel2,
+				java.math.BigDecimal discountLevel3,
+				java.math.BigDecimal discountLevel4, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws RemoteException {
+
+		try {
+			com.liferay.commerce.price.list.model.CommercePriceEntry
+				returnValue =
+					CommercePriceEntryServiceUtil.addCommercePriceEntry(
+						externalReferenceCode, cProductId, cpInstanceUuid,
+						commercePriceListId, price, discountDiscovery,
+						discountLevel1, discountLevel2, discountLevel3,
+						discountLevel4, displayDateMonth, displayDateDay,
+						displayDateYear, displayDateHour, displayDateMinute,
+						expirationDateMonth, expirationDateDay,
+						expirationDateYear, expirationDateHour,
+						expirationDateMinute, neverExpire, serviceContext);
+
+			return com.liferay.commerce.price.list.model.CommercePriceEntrySoap.
+				toSoapModel(returnValue);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			throw new RemoteException(exception.getMessage());
+		}
+	}
+
 	public static com.liferay.commerce.price.list.model.CommercePriceEntrySoap
 			addCommercePriceEntry(
 				String externalReferenceCode, long cProductId,

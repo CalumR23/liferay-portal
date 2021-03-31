@@ -23,7 +23,10 @@ import com.liferay.portal.kernel.scheduler.SchedulerException;
 import com.liferay.portal.kernel.scheduler.StorageType;
 import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.Date;
 
@@ -69,6 +72,7 @@ public class DispatchTriggerHelper {
 		long dispatchTriggerId, StorageType storageType) {
 
 		try {
+<<<<<<< HEAD
 			String jobName = _getJobName(dispatchTriggerId);
 			String groupName = _getGroupName(dispatchTriggerId);
 
@@ -82,6 +86,11 @@ public class DispatchTriggerHelper {
 				scheduledJob = _schedulerEngineHelper.getScheduledJob(
 					jobName, groupName, storageType);
 			}
+=======
+			_schedulerEngineHelper.delete(
+				_getJobName(dispatchTriggerId),
+				_getGroupName(dispatchTriggerId), storageType);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (SchedulerException schedulerException) {
 			_log.error(

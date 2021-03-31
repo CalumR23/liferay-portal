@@ -17,6 +17,7 @@ import useDataDefinition from 'app-builder-web/js/hooks/useDataDefinition.es';
 import {ViewDataLayoutPageValues} from 'app-builder-web/js/pages/entry/ViewEntry.es';
 import ViewEntryUpperToolbar from 'app-builder-web/js/pages/entry/ViewEntryUpperToolbar.es';
 import {getLocalizedUserPreferenceValue} from 'app-builder-web/js/utils/lang.es';
+<<<<<<< HEAD
 import Loading from 'data-engine-js-components-web/js/components/loading/Loading.es';
 import useQuery from 'data-engine-js-components-web/js/hooks/useQuery.es';
 import {
@@ -25,6 +26,11 @@ import {
 } from 'data-engine-js-components-web/js/utils/client.es';
 import {errorToast} from 'data-engine-js-components-web/js/utils/toast.es';
 import {isEqualObjects} from 'data-engine-js-components-web/js/utils/utils.es';
+=======
+import {errorToast} from 'app-builder-web/js/utils/toast.es';
+import {isEqualObjects} from 'app-builder-web/js/utils/utils.es';
+import {usePrevious, useTimeout} from 'frontend-js-react-web';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import React, {useContext, useEffect, useState} from 'react';
 
 import WorkflowInfoBar from '../../components/workflow-info-bar/WorkflowInfoBar.es';
@@ -99,10 +105,25 @@ export default function ViewEntry({
 	const previousQuery = usePrevious(query);
 	const previousIndex = usePrevious(entryIndex);
 
+<<<<<<< HEAD
 	const dataEngineAddItem = (state, dataRecordIds, newAssignee) => {
 		addItem(
 			`/o/app-builder-workflow/v1.0/apps/${appId}/app-workflows/data-record-links`,
 			{dataRecordIds}
+=======
+	const doFetch = ({newAssignee} = {}) => {
+		setState({
+			dataRecord: {},
+			isFetching: true,
+			page: 1,
+			totalCount: 0,
+			workflowInfo: null,
+		});
+
+		getItem(
+			`/o/data-engine/v2.0/data-definitions/${dataDefinitionId}/data-records`,
+			{...query, dataListViewId, page: entryIndex, pageSize: 1}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		)
 			.then(({items}) => {
 				if (items.length) {
@@ -121,6 +142,7 @@ export default function ViewEntry({
 							{classPKs: dataRecordIds}
 						).then(({items}) => {
 							if (items.length) {
+<<<<<<< HEAD
 								const {id, ...instance} = items.pop();
 
 								const [assignee] = instance.assignees || [];
@@ -152,6 +174,78 @@ export default function ViewEntry({
 								setDataLayoutIds(
 									getDataLayoutIds(state.workflowInfo)
 								);
+=======
+								const {
+									appWorkflow: {
+										appVersion,
+										appWorkflowDefinitionId,
+										appWorkflowTasks: tasks,
+									},
+								} = items.pop();
+								let retryCount = 0;
+
+								const getWorkflowInfo = () => {
+									getItem(
+										`/o/portal-workflow-metrics/v1.0/processes/${appWorkflowDefinitionId}/instances`,
+										{classPKs: dataRecordIds}
+									).then(({items}) => {
+										if (items.length) {
+											const {
+												id,
+												...instance
+											} = items.pop();
+
+											const [assignee] =
+												instance.assignees || [];
+
+											if (
+												newAssignee &&
+												newAssignee?.id !==
+													assignee?.id &&
+												retryCount <= 5
+											) {
+												retryCount++;
+
+												return delay(
+													getWorkflowInfo,
+													1000
+												);
+											}
+
+											const assignedToUser =
+												Number(
+													themeDisplay.getUserId()
+												) === assignee?.id;
+
+											state.workflowInfo = {
+												...instance,
+												appVersion,
+												assignees: [
+													newAssignee || assignee,
+												],
+												canReassign:
+													assignedToUser ||
+													assignee?.reviewer,
+												instanceId: id,
+												tasks,
+											};
+
+											setDataLayoutIds(
+												getDataLayoutIds(
+													state.workflowInfo
+												)
+											);
+										}
+
+										setState((prevState) => ({
+											...prevState,
+											...state,
+										}));
+									});
+								};
+
+								getWorkflowInfo();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							}
 
 							setState((prevState) => ({
@@ -179,6 +273,7 @@ export default function ViewEntry({
 			});
 	};
 
+<<<<<<< HEAD
 	const doFetch = async ({newAssignee} = {}) => {
 		setState({
 			dataRecord: {},
@@ -240,6 +335,8 @@ export default function ViewEntry({
 		}
 	};
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	useEffect(() => {
 		if (entryId) {
 			doFetch();
@@ -353,7 +450,11 @@ export default function ViewEntry({
 				<ReassignEntryModal
 					entry={workflowInfo}
 					onCloseModal={() => setModalVisible(false)}
+<<<<<<< HEAD
 					refetch={() => doFetch()}
+=======
+					refetch={doFetch}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				/>
 			)}
 		</div>

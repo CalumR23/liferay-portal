@@ -140,9 +140,29 @@ WikiPagesManagementToolbarDisplayContext wikiPagesManagementToolbarDisplayContex
 				showParentGroups="<%= false %>"
 			/>
 
+<<<<<<< HEAD
 			<%
 			WikiVisualizationHelper wikiVisualizationHelper = new WikiVisualizationHelper(wikiRequestHelper, wikiPortletInstanceSettingsHelper, wikiGroupServiceConfiguration);
 			%>
+=======
+				<liferay-ui:search-container-row
+					className="com.liferay.wiki.model.WikiPage"
+					keyProperty="pageId"
+					modelVar="curPage"
+				>
+
+					<%
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(wikiPagesManagementToolbarDisplayContext.getAvailableActions(curPage))
+						).build());
+
+					PortletURL rowURL = renderResponse.createRenderURL();
+
+					if (!navigation.equals("draft-pages") || Validator.isNotNull(keywords)) {
+						rowURL.setParameter("mvcRenderCommandName", "/wiki/view");
+						rowURL.setParameter("redirect", currentURL);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<c:if test="<%= wikiVisualizationHelper.isUndoTrashControlVisible() %>">
 

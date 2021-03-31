@@ -12,12 +12,20 @@
 import ClayButton from '@clayui/button';
 import {useStateSafe} from '@liferay/frontend-js-react-web';
 import className from 'classnames';
+<<<<<<< HEAD
+=======
+import {useStateSafe} from 'frontend-js-react-web';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import PropTypes from 'prop-types';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {Cell, Pie, PieChart, Tooltip} from 'recharts';
 
 import ConnectionContext from '../context/ConnectionContext';
+<<<<<<< HEAD
 import {StoreDispatchContext, StoreStateContext} from '../context/StoreContext';
+=======
+import {StoreContext, useWarning} from '../context/StoreContext';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {numberFormat} from '../utils/numberFormat';
 import EmptyPieChart from './EmptyPieChart';
 import Hint from './Hint';
@@ -52,13 +60,17 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 
 	const dispatch = useContext(StoreDispatchContext);
 
+<<<<<<< HEAD
 	const {languageTag, publishedToday} = useContext(StoreStateContext);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [trafficSources, setTrafficSources] = useStateSafe([]);
 
 	useEffect(() => {
 		if (validAnalyticsConnection) {
 			dataProvider()
+<<<<<<< HEAD
 				.then((trafficSources) => setTrafficSources(trafficSources))
 				.catch(() => {
 					setTrafficSources([]);
@@ -66,6 +78,15 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 				});
 		}
 	}, [dispatch, dataProvider, setTrafficSources, validAnalyticsConnection]);
+=======
+				.then((response) => setTrafficSources(response.trafficSources))
+				.catch(() => {
+					setTrafficSources([]);
+					addWarning();
+				});
+		}
+	}, [addWarning, dataProvider, setTrafficSources, validAnalyticsConnection]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const fullPieChart = useMemo(
 		() =>
@@ -116,7 +137,11 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 				<div className="pie-chart-wrapper--legend">
 					<table>
 						<tbody>
+<<<<<<< HEAD
 							{trafficSources?.map((entry) => {
+=======
+							{trafficSources.map((entry) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								const hasDetails =
 									entry?.countryKeywords ||
 									(entry?.referringPages &&
@@ -152,10 +177,14 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 												)
 											}
 										>
+<<<<<<< HEAD
 											{validAnalyticsConnection &&
 											!publishedToday &&
 											entry.value > 0 &&
 											hasDetails ? (
+=======
+											{entry.value > 0 && hasDetails ? (
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 												<ClayButton
 													className="px-0 py-1 text-primary"
 													displayType="link"
@@ -180,9 +209,14 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 											/>
 										</td>
 										<td className="font-weight-semi-bold">
+<<<<<<< HEAD
 											{validAnalyticsConnection &&
 											!publishedToday &&
 											entry.value !== undefined
+=======
+											{entry.value !== undefined &&
+											!publishedToday
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 												? numberFormat(
 														languageTag,
 														entry.value
@@ -218,7 +252,11 @@ export default function TrafficSources({dataProvider, onTrafficSourceClick}) {
 								dataKey="value"
 								innerRadius={PIE_CHART_SIZES.innerRadius}
 								isAnimationActive={false}
+<<<<<<< HEAD
 								nameKey="name"
+=======
+								nameKey={'name'}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								outerRadius={PIE_CHART_SIZES.radius}
 								paddingAngle={PIE_CHART_SIZES.paddingAngle}
 							>

@@ -84,6 +84,7 @@ SegmentsEntry segmentsEntry = (SegmentsEntry)row.getObject();
 		%>
 
 		<liferay-ui:icon
+			cssClass='<%= segmentsDisplayContext.isRoleSegmentationEnabled() ? "" : "action disabled" %>'
 			data='<%=
 				HashMapBuilder.<String, Object>put(
 					"itemSelectorURL", itemSelectorURL.toString()

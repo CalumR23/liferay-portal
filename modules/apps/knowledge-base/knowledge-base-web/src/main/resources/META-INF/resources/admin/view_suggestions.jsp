@@ -88,4 +88,40 @@ request.setAttribute("view_suggestions.jsp-searchContainer", kbCommentsSearchCon
 	<liferay-ui:success key="suggestionSaved" message="suggestion-saved-successfully" />
 
 	<liferay-util:include page="/admin/common/view_suggestions_by_status.jsp" servletContext="<%= application %>" />
+<<<<<<< HEAD
 </clay:container-fluid>
+=======
+</clay:container-fluid>
+
+<script>
+	var deleteKBComments = function () {
+		if (
+			confirm(
+				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
+			)
+		) {
+			var form = document.getElementById('<portlet:namespace />fm');
+
+			if (form) {
+				submitForm(form);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteKBComments: deleteKBComments,
+	};
+
+	Liferay.componentReady('kbSuggestionListManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

@@ -240,6 +240,7 @@ public class SegmentsDisplayContext {
 				segmentsEntry.getSegmentsEntryKey();
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -251,6 +252,20 @@ public class SegmentsDisplayContext {
 		).setParameter(
 			"showInEditMode", Boolean.FALSE.toString()
 		).buildString();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/segments/edit_segments_entry");
+		portletURL.setParameter(
+			"redirect", PortalUtil.getCurrentURL(_renderRequest));
+		portletURL.setParameter(
+			"segmentsEntryId",
+			String.valueOf(segmentsEntry.getSegmentsEntryId()));
+		portletURL.setParameter("showInEditMode", Boolean.FALSE.toString());
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getSegmentsEntryURLTarget(SegmentsEntry segmentsEntry) {

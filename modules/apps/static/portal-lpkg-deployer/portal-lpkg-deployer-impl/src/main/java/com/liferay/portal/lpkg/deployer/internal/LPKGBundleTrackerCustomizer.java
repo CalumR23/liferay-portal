@@ -537,6 +537,7 @@ public class LPKGBundleTrackerCustomizer
 
 	private String _extractFileName(String string) {
 		Matcher matcher = _pattern.matcher(string);
+<<<<<<< HEAD
 
 		if (matcher.matches()) {
 			String name = matcher.group(1);
@@ -544,6 +545,15 @@ public class LPKGBundleTrackerCustomizer
 			return name.concat(matcher.group(3));
 		}
 
+=======
+
+		if (matcher.matches()) {
+			String name = matcher.group(1);
+
+			return name.concat(matcher.group(3));
+		}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (_log.isWarnEnabled()) {
 			_log.warn("Unable to extract symbolic name from " + string);
 		}

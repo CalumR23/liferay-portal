@@ -200,7 +200,11 @@ const AutocompleteMultiSelect = ({
 
 const Item = ({name, onRemove}) => {
 	return (
+<<<<<<< HEAD
 		<span className="label label-dismissible label-secondary">
+=======
+		<span className="label label-dismissible label-secondary" key={key}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<span className="label-item label-item-expand">{name}</span>
 
 			<span className="label-item label-item-after">

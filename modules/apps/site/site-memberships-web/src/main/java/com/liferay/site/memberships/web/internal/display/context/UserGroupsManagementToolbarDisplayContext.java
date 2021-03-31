@@ -210,6 +210,7 @@ public class UserGroupsManagementToolbarDisplayContext
 							themeDisplay.getLocale()));
 
 					dropdownItem.putData(
+<<<<<<< HEAD
 						"selectUserGroupsURL",
 						PortletURLBuilder.createRenderURL(
 							liferayPortletResponse
@@ -218,6 +219,9 @@ public class UserGroupsManagementToolbarDisplayContext
 						).setWindowState(
 							LiferayWindowState.POP_UP
 						).buildString());
+=======
+						"selectUserGroupsURL", selectUserGroupsURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					dropdownItem.setLabel(
 						LanguageUtil.get(httpServletRequest, "add"));
 				}
@@ -323,10 +327,21 @@ public class UserGroupsManagementToolbarDisplayContext
 				dropdownItem.setActive(
 					Objects.equals(getNavigation(), "roles"));
 
+<<<<<<< HEAD
+=======
+				PortletURL viewRoleURL =
+					liferayPortletResponse.createRenderURL();
+
+				viewRoleURL.setParameter("mvcPath", "/view.jsp");
+				viewRoleURL.setParameter("tabs1", "user-groups");
+				viewRoleURL.setParameter("navigation", "roles");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				ThemeDisplay themeDisplay =
 					(ThemeDisplay)httpServletRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 				dropdownItem.putData(
 					"viewRoleURL",
 					PortletURLBuilder.createRenderURL(
@@ -342,6 +357,16 @@ public class UserGroupsManagementToolbarDisplayContext
 					).setParameter(
 						"groupId", _userGroupsDisplayContext.getGroupId()
 					).buildString());
+=======
+				viewRoleURL.setParameter(
+					"redirect", themeDisplay.getURLCurrent());
+
+				viewRoleURL.setParameter(
+					"groupId",
+					String.valueOf(_userGroupsDisplayContext.getGroupId()));
+
+				dropdownItem.putData("viewRoleURL", viewRoleURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "roles"));

@@ -72,10 +72,21 @@ int defaultSpeed = 3000;
 
 				<%
 				FileEntry fileEntry = fileEntries.get(0);
+<<<<<<< HEAD
 				%>
 
 				<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="slide-show" />" name="<portlet:namespace />slideShow" src="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>" />
 			</c:if>
+=======
+			%>
+
+				<img alt="<liferay-ui:message escapeAttribute="<%= true %>" key="slide-show" />" name="<portlet:namespace />slideShow" src="<%= DLURLHelperUtil.getPreviewURL(fileEntry, fileEntry.getFileVersion(), themeDisplay, StringPool.BLANK) %>" />
+
+			<%
+			}
+			%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</td>
 	</tr>
 </table>

@@ -54,6 +54,7 @@ for (String childrenItemId : childrenItemIds) {
 							request.setAttribute(LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_PROVIDER, renderLayoutStructureDisplayContext.getCollectionLayoutDisplayPageProvider(collectionStyledLayoutStructureItem));
 
 							List<Object> collection = renderLayoutStructureDisplayContext.getCollection(collectionStyledLayoutStructureItem);
+<<<<<<< HEAD
 
 							int maxNumberOfItems = Math.min(collection.size(), collectionStyledLayoutStructureItem.getNumberOfItems());
 
@@ -72,6 +73,26 @@ for (String childrenItemId : childrenItemIds) {
 										break;
 									}
 
+=======
+
+							int maxNumberOfItems = Math.min(collection.size(), collectionStyledLayoutStructureItem.getNumberOfItems());
+
+							int numberOfRows = (int)Math.ceil((double)maxNumberOfItems / collectionStyledLayoutStructureItem.getNumberOfColumns());
+
+							for (int i = 0; i < numberOfRows; i++) {
+						%>
+
+							<clay:row>
+
+								<%
+								for (int j = 0; j < collectionStyledLayoutStructureItem.getNumberOfColumns(); j++) {
+									int index = (i * collectionStyledLayoutStructureItem.getNumberOfColumns()) + j;
+
+									if (index >= maxNumberOfItems) {
+										break;
+									}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									request.setAttribute(InfoDisplayWebKeys.INFO_LIST_DISPLAY_OBJECT, collection.get(index));
 									request.setAttribute("render_layout_structure.jsp-childrenItemIds", layoutStructureItem.getChildrenItemIds());
 								%>

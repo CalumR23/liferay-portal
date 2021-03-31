@@ -168,6 +168,7 @@ public class ContentDashboardDataProvider {
 		TermsAggregation termsAggregation = _getTermsAggregation(
 			assetVocabulary, assetCategoryTitlesMap.keySet(), "categories");
 
+<<<<<<< HEAD
 		termsAggregation.addChildAggregation(
 			_getTermsAggregation(
 				childAssetVocabulary, childAssetCategoryTitlesMap.keySet(), 0,
@@ -181,6 +182,18 @@ public class ContentDashboardDataProvider {
 			).addAggregation(
 				filterAggregation
 			).addAggregation(
+=======
+		TermsAggregation childTermsAggregation = _getTermsAggregation(
+			childAssetVocabulary, childAssetCategoryTitlesMap.keySet(),
+			"childCategories");
+
+		termsAggregation.addChildAggregation(childTermsAggregation);
+
+		SearchResponse searchResponse = _searcher.search(
+			_searchRequestBuilder.addAggregation(
+				childTermsAggregation
+			).addAggregation(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				termsAggregation
 			).size(
 				0
@@ -192,6 +205,7 @@ public class ContentDashboardDataProvider {
 
 		Collection<Bucket> buckets = termsAggregationResult.getBuckets();
 
+<<<<<<< HEAD
 		TermsAggregationResult childTermsAggregationResult =
 			(TermsAggregationResult)searchResponse.getAggregationResult(
 				"childCategories");
@@ -239,11 +253,28 @@ public class ContentDashboardDataProvider {
 				_getNoneAssetCategoryMetric(
 					assetVocabulary, childAssetVocabulary,
 					childAssetCategoryTitlesMap, filterAggregationResult));
+=======
+		if (buckets.isEmpty()) {
+			termsAggregationResult =
+				(TermsAggregationResult)searchResponse.getAggregationResult(
+					"childCategories");
+
+			return _toAssetVocabularyMetric(
+				childAssetCategoryTitlesMap, childAssetVocabulary,
+				termsAggregationResult.getBuckets());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		return new AssetVocabularyMetric(
 			String.valueOf(assetVocabulary.getVocabularyId()),
+<<<<<<< HEAD
 			assetVocabulary.getTitle(_locale), assetCategoryMetrics);
+=======
+			assetVocabulary.getTitle(_locale),
+			_toAssetCategoryMetrics(
+				assetCategoryTitlesMap, buckets, childAssetCategoryTitlesMap,
+				childAssetVocabulary, "childCategories"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private Collection<Bucket> _getBuckets(
@@ -333,13 +364,18 @@ public class ContentDashboardDataProvider {
 
 	private TermsAggregation _getTermsAggregation(
 		AssetVocabulary assetVocabulary, Set<String> assetCategoryIds,
+<<<<<<< HEAD
 		int minDocCount, String termsAggregationName) {
+=======
+		String termsAggregationName) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		TermsAggregation termsAggregation = _getTermsAggregation(
 			assetVocabulary, assetCategoryIds, termsAggregationName);
 
 		termsAggregation.setMinDocCount(minDocCount);
 
+<<<<<<< HEAD
 		return termsAggregation;
 	}
 
@@ -351,6 +387,15 @@ public class ContentDashboardDataProvider {
 			termsAggregationName, _getAssetVocabularyField(assetVocabulary));
 
 		termsAggregation.addOrders(Order.key(true));
+=======
+			termsAggregation = _aggregations.terms(
+				termsAggregationName, Field.ASSET_INTERNAL_CATEGORY_IDS);
+		}
+		else {
+			termsAggregation = _aggregations.terms(
+				termsAggregationName, Field.ASSET_CATEGORY_IDS);
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		termsAggregation.setIncludeExcludeClause(
 			new IncludeExcludeClauseImpl(
@@ -363,9 +408,13 @@ public class ContentDashboardDataProvider {
 		Map<String, String> assetCategoryTitlesMap, Collection<Bucket> buckets,
 		Set<String> childAssetCategoryMetricKeys,
 		Map<String, String> childAssetCategoryTitlesMap,
+<<<<<<< HEAD
 		AssetVocabulary childAssetVocabulary,
 		Map<String, Long> childNoneAssetCategoryMetricCounts,
 		String termsAggregationName) {
+=======
+		AssetVocabulary childAssetVocabulary, String termsAggregationName) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Stream<Bucket> stream = buckets.stream();
 

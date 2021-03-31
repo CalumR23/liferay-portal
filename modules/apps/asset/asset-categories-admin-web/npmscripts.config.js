@@ -12,6 +12,11 @@
  * details.
  */
 
+<<<<<<< HEAD
+=======
+const preset = require('@liferay/npm-scripts/src/presets/standard');
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 module.exports = {
 	build: {
 		bundler: {
@@ -34,4 +39,8 @@ module.exports = {
 		],
 		remotes: ['asset-taglib'],
 	},
+<<<<<<< HEAD
+=======
+	preset: '@liferay/npm-scripts/src/presets/standard',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };

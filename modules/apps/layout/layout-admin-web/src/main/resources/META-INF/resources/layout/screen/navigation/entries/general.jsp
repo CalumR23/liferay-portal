@@ -81,7 +81,11 @@ renderResponse.setTitle(selLayout.getName(locale));
 					);
 
 					if (enableLayoutButton) {
+<<<<<<< HEAD
 						enableLayoutButton.addEventListener('click', (event) => {
+=======
+						enableLayoutButton.addEventListener('click', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							<portlet:actionURL name="/layout_admin/enable_layout" var="enableLayoutURL">
 								<portlet:param name="redirect" value="<%= currentURL %>" />
 								<portlet:param name="incompleteLayoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
@@ -96,7 +100,11 @@ renderResponse.setTitle(selLayout.getName(locale));
 					);
 
 					if (deleteLayoutButton) {
+<<<<<<< HEAD
 						deleteLayoutButton.addEventListener('click', (event) => {
+=======
+						deleteLayoutButton.addEventListener('click', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							<portlet:actionURL name="/layout_admin/delete_layout" var="deleteLayoutURL">
 								<portlet:param name="redirect" value="<%= currentURL %>" />
 								<portlet:param name="selPlid" value="<%= String.valueOf(layoutsAdminDisplayContext.getSelPlid()) %>" />

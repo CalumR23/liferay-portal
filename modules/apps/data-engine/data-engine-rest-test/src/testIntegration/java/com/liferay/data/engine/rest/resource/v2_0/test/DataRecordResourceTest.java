@@ -112,11 +112,17 @@ public class DataRecordResourceTest extends BaseDataRecordResourceTestCase {
 					{
 						dataRecordCollectionId = _dataRecordCollectionId;
 						dataRecordValues = HashMapBuilder.<String, Object>put(
+<<<<<<< HEAD
 							DataRecordValueKeyUtil.createDataRecordValueKey(
 								"Numeric", RandomTestUtil.randomString(),
 								StringPool.BLANK, 0),
 							HashMapBuilder.put(
 								"en_US", "10"
+=======
+							"Numeric",
+							HashMapBuilder.put(
+								"en_US", new String[] {"10"}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							).build()
 						).build();
 					}
@@ -129,11 +135,17 @@ public class DataRecordResourceTest extends BaseDataRecordResourceTestCase {
 					{
 						dataRecordCollectionId = _dataRecordCollectionId;
 						dataRecordValues = HashMapBuilder.<String, Object>put(
+<<<<<<< HEAD
 							DataRecordValueKeyUtil.createDataRecordValueKey(
 								"Numeric", RandomTestUtil.randomString(),
 								StringPool.BLANK, 0),
 							HashMapBuilder.put(
 								"en_US", "20"
+=======
+							"Numeric",
+							HashMapBuilder.put(
+								"en_US", new String[] {"20"}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							).build()
 						).build();
 					}
@@ -243,12 +255,18 @@ public class DataRecordResourceTest extends BaseDataRecordResourceTestCase {
 					{
 						dataRecordCollectionId = _dataRecordCollectionId;
 						dataRecordValues = HashMapBuilder.<String, Object>put(
+<<<<<<< HEAD
 							DataRecordValueKeyUtil.createDataRecordValueKey(
 								"SingleSelection",
 								RandomTestUtil.randomString(), StringPool.BLANK,
 								0),
 							HashMapBuilder.put(
 								"en_US", "Boat"
+=======
+							"SingleSelection",
+							HashMapBuilder.put(
+								"en_US", new String[] {"Boat"}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							).build()
 						).build();
 					}

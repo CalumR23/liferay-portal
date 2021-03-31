@@ -23,11 +23,17 @@ CPOptionCategoryDisplayContext cpOptionCategoryDisplayContext = (CPOptionCategor
 
 String displayStyle = cpOptionCategoryDisplayContext.getDisplayStyle();
 
+<<<<<<< HEAD
 PortletURL portletURL = PortletURLBuilder.create(
 	cpOptionCategoryDisplayContext.getPortletURL()
 ).setParameter(
 	"searchContainerId", "cpOptionCategories"
 ).build();
+=======
+PortletURL portletURL = cpOptionCategoryDisplayContext.getPortletURL();
+
+portletURL.setParameter("searchContainerId", "cpOptionCategories");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 request.setAttribute("view.jsp-portletURL", portletURL);
 
@@ -54,7 +60,11 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 			selectedDisplayStyle="<%= displayStyle %>"
 		/>
 
+<<<<<<< HEAD
 		<c:if test="<%= cpOptionCategoryDisplayContext.hasPermission(CPActionKeys.ADD_COMMERCE_PRODUCT_OPTION_CATEGORY) %>">
+=======
+		<c:if test="<%= PortalPermissionUtil.contains(permissionChecker, CPActionKeys.ADD_COMMERCE_PRODUCT_OPTION_CATEGORY) %>">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<liferay-portlet:renderURL var="addProductOptionCategoryURL">
 				<portlet:param name="mvcRenderCommandName" value="/cp_specification_options/edit_cp_option_category" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -102,7 +112,11 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 </liferay-frontend:management-bar>
 
 <div id="<portlet:namespace />productOptionCategoriesContainer">
+<<<<<<< HEAD
 	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+=======
+	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<c:if test="<%= cpOptionCategoryDisplayContext.isShowInfoPanel() %>">
 			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/cp_specification_options/cp_option_category_info_panel" var="sidebarPanelURL" />
 
@@ -115,6 +129,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 		</c:if>
 
 		<div class="sidenav-content">
+<<<<<<< HEAD
 			<clay:container-fluid>
 				<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
 					<aui:input name="<%= Constants.CMD %>" type="hidden" />
@@ -177,6 +192,65 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 					</div>
 				</aui:form>
 			</clay:container-fluid>
+=======
+			<aui:form action="<%= portletURL.toString() %>" method="post" name="fm">
+				<aui:input name="<%= Constants.CMD %>" type="hidden" />
+				<aui:input name="redirect" type="hidden" value="<%= portletURL.toString() %>" />
+				<aui:input name="deleteCPOptionCategoryIds" type="hidden" />
+
+				<div class="product-option-categories-container" id="<portlet:namespace />entriesContainer">
+					<liferay-ui:search-container
+						id="cpOptionCategories"
+						iteratorURL="<%= portletURL %>"
+						searchContainer="<%= cpOptionCategoryDisplayContext.getSearchContainer() %>"
+					>
+						<liferay-ui:search-container-row
+							className="com.liferay.commerce.product.model.CPOptionCategory"
+							cssClass="entry-display-style"
+							keyProperty="CPOptionCategoryId"
+							modelVar="cpOptionCategory"
+						>
+
+							<%
+							PortletURL rowURL = renderResponse.createRenderURL();
+
+							rowURL.setParameter("mvcRenderCommandName", "/cp_specification_options/edit_cp_option_category");
+							rowURL.setParameter("redirect", currentURL);
+							rowURL.setParameter("cpOptionCategoryId", String.valueOf(cpOptionCategory.getCPOptionCategoryId()));
+							%>
+
+							<liferay-ui:search-container-column-text
+								cssClass="important table-cell-content"
+								href="<%= rowURL %>"
+								name="group"
+								value="<%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %>"
+							/>
+
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-content"
+								property="priority"
+							/>
+
+							<liferay-ui:search-container-column-date
+								cssClass="table-cell-content"
+								name="modified-date"
+								property="modifiedDate"
+							/>
+
+							<liferay-ui:search-container-column-jsp
+								cssClass="entry-action-column"
+								path="/option_category_action.jsp"
+							/>
+						</liferay-ui:search-container-row>
+
+						<liferay-ui:search-iterator
+							displayStyle="<%= displayStyle %>"
+							markupView="lexicon"
+						/>
+					</liferay-ui:search-container>
+				</div>
+			</aui:form>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</div>
 	</div>
 </div>

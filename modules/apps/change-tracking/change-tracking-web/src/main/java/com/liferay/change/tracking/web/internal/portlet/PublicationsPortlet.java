@@ -61,7 +61,11 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.display-name=Overview",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.template-path=/META-INF/resources/",
+<<<<<<< HEAD
 		"javax.portlet.init-param.view-template=/publications/view_publications.jsp",
+=======
+		"javax.portlet.init-param.view-template=/publications/view.jsp",
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		"javax.portlet.name=" + CTPortletKeys.PUBLICATIONS,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator"
@@ -85,9 +89,14 @@ public class PublicationsPortlet extends MVCPortlet {
 		PublicationsDisplayContext publicationsDisplayContext =
 			new PublicationsDisplayContext(
 				_ctCollectionService, _ctDisplayRendererRegistry,
+<<<<<<< HEAD
 				_ctEntryLocalService, _ctPreferencesLocalService,
 				_portal.getHttpServletRequest(renderRequest), _language,
 				renderRequest, renderResponse);
+=======
+				_ctEntryLocalService, _ctPreferencesLocalService, _language,
+				_portal, renderRequest, renderResponse);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		renderRequest.setAttribute(
 			CTWebKeys.PUBLICATIONS_DISPLAY_CONTEXT, publicationsDisplayContext);

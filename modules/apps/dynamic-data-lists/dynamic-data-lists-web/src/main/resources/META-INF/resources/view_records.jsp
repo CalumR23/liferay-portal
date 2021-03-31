@@ -177,4 +177,57 @@ if (!ddlDisplayContext.isAdminPortlet()) {
 	</aui:form>
 </clay:container-fluid>
 
+<<<<<<< HEAD
 <%@ include file="/export_record_set.jspf" %>
+=======
+<%@ include file="/export_record_set.jspf" %>
+
+<aui:script use="liferay-portlet-dynamic-data-lists">
+	var deleteRecords = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var form = document.<portlet:namespace />fm;
+
+			var searchContainer = form.querySelector(
+				'#<portlet:namespace />ddlRecord'
+			);
+
+			if (searchContainer) {
+				<portlet:actionURL name="/dynamic_data_lists/delete_record" var="deleteRecordURL">
+					<portlet:param name="mvcPath" value="/view_records.jsp" />
+					<portlet:param name="redirect" value="<%= currentURL %>" />
+				</portlet:actionURL>
+
+				Liferay.Util.postForm(form, {
+					data: {
+						recordIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							'<portlet:namespace />allRowIds'
+						),
+					},
+					url: '<%= deleteRecordURL %>',
+				});
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteRecords: deleteRecords,
+	};
+
+	Liferay.componentReady(
+		'<%= randomNamespace + "ddlViewRecordsManagementToolbar" %>'
+	).then(function (managementToolbar) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

@@ -106,6 +106,7 @@ public class CommerceProductDefinitionLinkDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				_portal.getOriginalServletRequest(httpServletRequest),
@@ -121,6 +122,21 @@ public class CommerceProductDefinitionLinkDataSetActionProvider
 		).setParameter(
 			"cpDefinitionLinkId", cpDefinitionLink.getCPDefinitionLinkId()
 		).build();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/cp_definitions/edit_cp_definition_link");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"cpDefinitionId",
+			String.valueOf(cpDefinitionLink.getCPDefinitionId()));
+		portletURL.setParameter(
+			"cpDefinitionLinkId",
+			String.valueOf(cpDefinitionLink.getCPDefinitionLinkId()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private PortletURL _getProductLinkEditURL(
@@ -128,6 +144,7 @@ public class CommerceProductDefinitionLinkDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -139,6 +156,20 @@ public class CommerceProductDefinitionLinkDataSetActionProvider
 		).setParameter(
 			"cpDefinitionLinkId", cpDefinitionLink.getCPDefinitionLinkId()
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition_link");
+		portletURL.setParameter(
+			"cpDefinitionId",
+			String.valueOf(cpDefinitionLink.getCPDefinitionId()));
+		portletURL.setParameter(
+			"cpDefinitionLinkId",
+			String.valueOf(cpDefinitionLink.getCPDefinitionLinkId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

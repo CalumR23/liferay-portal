@@ -573,6 +573,7 @@ describe('Options', () => {
 				name="options"
 				onChange={jest.fn()}
 				spritemap={spritemap}
+<<<<<<< HEAD
 				value={{
 					...optionsValue,
 					pt_BR: [
@@ -590,6 +591,9 @@ describe('Options', () => {
 						},
 					],
 				}}
+=======
+				value={optionsValue}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			/>
 		);
 
@@ -635,6 +639,7 @@ describe('Options', () => {
 		unmockLiferayLanguage();
 	});
 
+<<<<<<< HEAD
 	describe('Normalize option reference during the onBlur event', () => {
 		it('changes to the option value when the reference is duplicated', () => {
 			mockLiferayLanguage();
@@ -725,5 +730,46 @@ describe('Options', () => {
 
 			unmockLiferayLanguage();
 		});
+=======
+	it('adds the default option value to the reference property when it is empty and leaves the field', () => {
+		mockLiferayLanguage();
+
+		const {container} = render(
+			<OptionsWithProvider
+				name="options"
+				onChange={jest.fn()}
+				spritemap={spritemap}
+				value={{
+					[themeDisplay.getLanguageId()]: [
+						{
+							label: 'Bar',
+							reference: 'Bar',
+							value: 'Bar',
+						},
+					],
+				}}
+			/>
+		);
+
+		const referenceInput = container.querySelector(
+			'.key-value-reference-input'
+		);
+
+		expect(referenceInput.value).toBe('Bar');
+
+		fireEvent.input(referenceInput, {target: {value: ''}});
+
+		fireEvent.blur(referenceInput);
+
+		act(() => {
+			jest.runAllTimers();
+		});
+
+		expect(referenceInput.value).toEqual(
+			expect.stringMatching(DEFAULT_OPTION_NAME_REGEX)
+		);
+
+		unmockLiferayLanguage();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	});
 });

@@ -26,7 +26,11 @@ CommercePriceListDisplayContext commercePriceListDisplayContext = (CommercePrice
 	title='<%= LanguageUtil.get(request, "add-price-modifier") %>'
 >
 	<div class="col-12 lfr-form-content">
+<<<<<<< HEAD
 		<aui:form action="<%= editCommercePriceModifierActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+		<aui:form action="<%= editCommercePriceModifierActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="commercePriceListId" type="hidden" value="<%= commercePriceListDisplayContext.getCommercePriceListId() %>" />

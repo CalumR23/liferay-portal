@@ -30,10 +30,19 @@ function createEditor(element, changeCallback, destroyCallback) {
 		const url = image && image.url ? image.url : '';
 
 		changeCallback(
+<<<<<<< HEAD
 			{
 				fileEntryId: image ? image.fileEntryId : undefined,
 				url,
 			},
+=======
+			config.adaptiveMediaEnabled
+				? {
+						fileEntryId: image ? image.fileEntryId : undefined,
+						url,
+				  }
+				: url,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			{imageTitle: image && image.title ? image.title : ''}
 		);
 	}, destroyCallback);

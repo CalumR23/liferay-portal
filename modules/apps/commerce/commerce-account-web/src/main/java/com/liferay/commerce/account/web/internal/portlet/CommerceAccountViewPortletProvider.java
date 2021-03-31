@@ -65,6 +65,7 @@ public class CommerceAccountViewPortletProvider
 		long plid = _portal.getPlidFromPortletId(
 			group.getGroupId(), getPortletName());
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				httpServletRequest, getPortletName(), plid,
@@ -72,6 +73,16 @@ public class CommerceAccountViewPortletProvider
 		).setMVCRenderCommandName(
 			"/commerce_account/view_commerce_account"
 		).build();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			httpServletRequest, getPortletName(), plid,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_account/view_commerce_account");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference

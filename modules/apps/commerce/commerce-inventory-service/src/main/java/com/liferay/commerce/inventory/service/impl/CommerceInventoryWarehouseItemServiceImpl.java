@@ -62,10 +62,13 @@ public class CommerceInventoryWarehouseItemServiceImpl
 			String externalReferenceCode, String sku, int quantity)
 		throws PortalException {
 
+<<<<<<< HEAD
 		_commerceInventoryWarehouseModelResourcePermission.check(
 			getPermissionChecker(), commerceInventoryWarehouseId,
 			ActionKeys.UPDATE);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return addCommerceInventoryWarehouseItem(
 			externalReferenceCode, userId, commerceInventoryWarehouseId, sku,
 			quantity);
@@ -77,9 +80,15 @@ public class CommerceInventoryWarehouseItemServiceImpl
 			long commerceInventoryWarehouseId, String sku, int quantity)
 		throws PortalException {
 
+<<<<<<< HEAD
 		_commerceInventoryWarehouseModelResourcePermission.check(
 			getPermissionChecker(), commerceInventoryWarehouseId,
 			ActionKeys.UPDATE);
+=======
+		PortalPermissionUtil.check(
+			getPermissionChecker(),
+			CommerceInventoryActionKeys.MANAGE_INVENTORY);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return commerceInventoryWarehouseItemLocalService.
 			addCommerceInventoryWarehouseItem(
@@ -195,6 +204,7 @@ public class CommerceInventoryWarehouseItemServiceImpl
 				long companyId, String externalReferenceCode)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
@@ -203,6 +213,8 @@ public class CommerceInventoryWarehouseItemServiceImpl
 			getPermissionChecker(), null,
 			CommerceInventoryActionKeys.MANAGE_INVENTORY);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getCommerceInventoryWarehouseItemByReferenceCode(
 			externalReferenceCode, companyId);
 	}
@@ -213,12 +225,17 @@ public class CommerceInventoryWarehouseItemServiceImpl
 				String externalReferenceCode, long companyId)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
 
 		portletResourcePermission.check(
 			getPermissionChecker(), null,
+=======
+		PortalPermissionUtil.check(
+			getPermissionChecker(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			CommerceInventoryActionKeys.MANAGE_INVENTORY);
 
 		return commerceInventoryWarehouseItemLocalService.
@@ -489,10 +506,15 @@ public class CommerceInventoryWarehouseItemServiceImpl
 			String externalReferenceCode, String sku, int quantity)
 		throws PortalException {
 
+<<<<<<< HEAD
 		_commerceInventoryWarehouseModelResourcePermission.check(
 			getPermissionChecker(), commerceInventoryWarehouseId,
 			ActionKeys.UPDATE);
 
+		return upsertCommerceInventoryWarehouseItem(
+			externalReferenceCode, companyId, userId,
+			commerceInventoryWarehouseId, sku, quantity);
+=======
 		return upsertCommerceInventoryWarehouseItem(
 			externalReferenceCode, companyId, userId,
 			commerceInventoryWarehouseId, sku, quantity);
@@ -504,13 +526,30 @@ public class CommerceInventoryWarehouseItemServiceImpl
 			int quantity)
 		throws PortalException {
 
+		PortalPermissionUtil.check(
+			getPermissionChecker(),
+			CommerceInventoryActionKeys.MANAGE_INVENTORY);
+
+		return commerceInventoryWarehouseItemLocalService.
+			upsertCommerceInventoryWarehouseItem(
+				userId, commerceInventoryWarehouseId, sku, quantity);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+	}
+
+	@Override
+	public CommerceInventoryWarehouseItem upsertCommerceInventoryWarehouseItem(
+			String externalReferenceCode, long companyId, long userId,
+			long commerceInventoryWarehouseId, String sku, int quantity)
+		throws PortalException {
+
 		_commerceInventoryWarehouseModelResourcePermission.check(
 			getPermissionChecker(), commerceInventoryWarehouseId,
 			ActionKeys.UPDATE);
 
 		return commerceInventoryWarehouseItemLocalService.
 			upsertCommerceInventoryWarehouseItem(
-				userId, commerceInventoryWarehouseId, sku, quantity);
+				externalReferenceCode, companyId, userId,
+				commerceInventoryWarehouseId, sku, quantity);
 	}
 
 	@Override

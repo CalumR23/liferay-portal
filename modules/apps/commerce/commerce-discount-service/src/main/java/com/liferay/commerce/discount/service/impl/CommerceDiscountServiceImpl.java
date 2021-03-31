@@ -162,11 +162,16 @@ public class CommerceDiscountServiceImpl
 			boolean neverExpire, ServiceContext serviceContext)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceDiscountResourcePermission.getPortletResourcePermission();
 
 		portletResourcePermission.check(
 			getPermissionChecker(), null,
+=======
+		PortalPermissionUtil.check(
+			getPermissionChecker(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			CommerceDiscountActionKeys.ADD_COMMERCE_DISCOUNT);
 
 		return commerceDiscountLocalService.addCommerceDiscount(

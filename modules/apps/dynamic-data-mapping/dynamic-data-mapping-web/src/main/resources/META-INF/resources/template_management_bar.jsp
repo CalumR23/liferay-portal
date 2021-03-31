@@ -43,4 +43,54 @@ boolean includeCheckBox = ParamUtil.getBoolean(request, "includeCheckBox", true)
 	selectable="<%= includeCheckBox && !user.isDefaultUser() %>"
 	sortingOrder="<%= ddmDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDisplayContext.getSortingURL() %>"
+<<<<<<< HEAD
 />
+=======
+/>
+
+<aui:script sandbox="<%= true %>">
+	var deleteTemplates = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace />entriesContainer'
+			);
+
+			<portlet:actionURL name="/dynamic_data_mapping/delete_template" var="deleteTemplatesURL">
+				<portlet:param name="mvcPath" value="/view_template.jsp" />
+			</portlet:actionURL>
+
+			if (searchContainer) {
+				Liferay.Util.postForm(document.<portlet:namespace />fm, {
+					data: {
+						deleteTemplateIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							'<portlet:namespace />allRowIds'
+						),
+					},
+					url: '<%= deleteTemplatesURL %>',
+				});
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteTemplates: deleteTemplates,
+	};
+
+	Liferay.componentReady('ddmTemplateManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

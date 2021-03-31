@@ -238,6 +238,7 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, themeDisplay.getScopeGroup(),
@@ -249,6 +250,20 @@ public class EditCPDefinitionMVCActionCommand extends BaseMVCActionCommand {
 		).setParameter(
 			"screenNavigationCategoryKey", screenNavigationCategoryKey
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, themeDisplay.getScopeGroup(),
+			CPDefinition.class.getName(), PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpDefinition.getCPDefinitionId()));
+		portletURL.setParameter(
+			"screenNavigationCategoryKey", screenNavigationCategoryKey);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	protected void reindexCPDefinition(long cpDefinitionId)

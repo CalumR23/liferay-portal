@@ -70,6 +70,7 @@ public interface ImageDDMFormFieldTypeSettings
 	@Override
 	public String dataType();
 
+<<<<<<< HEAD
 	@DDMFormField(
 		label = "%searchable", optionLabels = {"%disable", "%keyword", "%text"},
 		optionValues = {"none", "keyword", "text"}, predefinedValue = "text",
@@ -78,6 +79,8 @@ public interface ImageDDMFormFieldTypeSettings
 	@Override
 	public String indexType();
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@DDMFormField(
 		dataType = "string", label = "%predefined-value", type = "image"
 	)

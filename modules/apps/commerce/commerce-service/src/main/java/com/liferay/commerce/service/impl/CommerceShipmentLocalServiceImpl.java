@@ -428,7 +428,11 @@ public class CommerceShipmentLocalServiceImpl
 
 		CommerceAddress commerceAddress = updateCommerceShipmentAddress(
 			commerceShipment, name, description, street1, street2, street3,
+<<<<<<< HEAD
 			city, zip, regionId, countryId, phoneNumber, serviceContext);
+=======
+			city, zip, commerceRegionId, commerceCountryId, phoneNumber);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		commerceShipment.setCommerceAddressId(
 			commerceAddress.getCommerceAddressId());

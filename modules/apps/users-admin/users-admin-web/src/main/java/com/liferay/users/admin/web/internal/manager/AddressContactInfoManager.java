@@ -60,6 +60,7 @@ public class AddressContactInfoManager extends BaseContactInfoManager<Address> {
 
 		Address address = _addressLocalService.createAddress(addressId);
 
+<<<<<<< HEAD
 		address.setCountryId(countryId);
 		address.setRegionId(
 			ParamUtil.getLong(actionRequest, "addressRegionId"));
@@ -69,10 +70,23 @@ public class AddressContactInfoManager extends BaseContactInfoManager<Address> {
 			ParamUtil.getBoolean(actionRequest, "addressMailing"));
 		address.setPrimary(
 			ParamUtil.getBoolean(actionRequest, "addressPrimary"));
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		address.setStreet1(street1);
 		address.setStreet2(street2);
 		address.setStreet3(street3);
 		address.setZip(zip);
+<<<<<<< HEAD
+=======
+		address.setRegionId(
+			ParamUtil.getLong(actionRequest, "addressRegionId"));
+		address.setCountryId(countryId);
+		address.setTypeId(ParamUtil.getLong(actionRequest, "addressTypeId"));
+		address.setMailing(
+			ParamUtil.getBoolean(actionRequest, "addressMailing"));
+		address.setPrimary(
+			ParamUtil.getBoolean(actionRequest, "addressPrimary"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return address;
 	}

@@ -597,6 +597,24 @@ SearchContainer<?> searchContainer = new SearchContainer(renderRequest, itemSele
 	var itemSelector = new ItemSelectorRepositoryEntryBrowser.default({
 		closeCaption: '<%= UnicodeLanguageUtil.get(request, tabName) %>',
 
+<<<<<<< HEAD
+=======
+		<c:if test="<%= uploadURL != null %>">
+
+			<%
+			String imageEditorPortletId = PortletProviderUtil.getPortletId(Image.class.getName(), PortletProvider.Action.EDIT);
+			%>
+
+			<c:if test="<%= Validator.isNotNull(imageEditorPortletId) %>">
+				<liferay-portlet:renderURL portletName="<%= imageEditorPortletId %>" var="viewImageEditorURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+					<liferay-portlet:param name="mvcRenderCommandName" value="/frontend_image_editor/view" />
+				</liferay-portlet:renderURL>
+
+				editItemURL: '<%= viewImageEditorURL.toString() %>',
+			</c:if>
+		</c:if>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		maxFileSize: '<%= maxFileSize %>',
 
 		rootNode: '#<%= randomNamespace %>ItemSelectorContainer',

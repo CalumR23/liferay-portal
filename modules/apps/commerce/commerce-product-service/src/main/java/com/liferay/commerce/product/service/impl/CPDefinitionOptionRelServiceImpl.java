@@ -251,6 +251,7 @@ public class CPDefinitionOptionRelServiceImpl
 				String keywords, int start, int end, Sort sort)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return cpDefinitionOptionRelService.searchCPDefinitionOptionRels(
 			companyId, groupId, cpDefinitionId, keywords, start, end,
 			new Sort[] {sort});
@@ -263,6 +264,8 @@ public class CPDefinitionOptionRelServiceImpl
 				String keywords, int start, int end, Sort[] sorts)
 		throws PortalException {
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_checkCommerceCatalog(cpDefinitionId, ActionKeys.VIEW);
 
 		return cpDefinitionOptionRelLocalService.searchCPDefinitionOptionRels(

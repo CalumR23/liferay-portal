@@ -103,7 +103,11 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 </liferay-frontend:management-bar>
 
 <div id="<portlet:namespace />cpDefinitionGroupedEntriesContainer">
+<<<<<<< HEAD
 	<div class="closed sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+=======
+	<div class="closed container-fluid-1280 sidenav-container sidenav-right" id="<portlet:namespace />infoPanelId">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<c:if test="<%= cpDefinitionGroupedEntriesDisplayContext.isShowInfoPanel() %>">
 			<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/cp_definitions/cp_definition_grouped_entry_info_panel" var="sidebarPanelURL" />
 
@@ -116,7 +120,11 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 		</c:if>
 
 		<div class="sidenav-content">
+<<<<<<< HEAD
 			<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+			<aui:form action="<%= portletURL.toString() %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				<aui:input name="<%= Constants.CMD %>" type="hidden" />
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 				<aui:input name="deleteCPDefinitionGroupedEntryIds" type="hidden" />
@@ -129,11 +137,16 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 					>
 						<liferay-ui:search-container-row
 							className="com.liferay.commerce.product.type.grouped.model.CPDefinitionGroupedEntry"
+<<<<<<< HEAD
+=======
+							cssClass="entry-display-style"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							keyProperty="CPDefinitionGroupedEntryId"
 							modelVar="cpDefinitionGroupedEntry"
 						>
 
 							<%
+<<<<<<< HEAD
 							PortletURL rowURL = PortletURLBuilder.createRenderURL(
 								renderResponse
 							).setMVCRenderCommandName(
@@ -143,6 +156,13 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 							).setParameter(
 								"cpDefinitionGroupedEntryId", String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId())
 							).build();
+=======
+							PortletURL rowURL = renderResponse.createRenderURL();
+
+							rowURL.setParameter("mvcRenderCommandName", "/cp_definitions/edit_cp_definition_grouped_entry");
+							rowURL.setParameter("cpDefinitionId", String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionId()));
+							rowURL.setParameter("cpDefinitionGroupedEntryId", String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							CProduct cProduct = cpDefinitionGroupedEntry.getEntryCProduct();
 
@@ -150,19 +170,31 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 							%>
 
 							<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 								cssClass="important table-cell-expand"
+=======
+								cssClass="important table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								href="<%= rowURL %>"
 								name="name"
 								value="<%= HtmlUtil.escape(cProductCPDefinition.getName(themeDisplay.getLanguageId())) %>"
 							/>
 
 							<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 								cssClass="table-cell-expand"
+=======
+								cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								property="quantity"
 							/>
 
 							<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 								cssClass="table-cell-expand"
+=======
+								cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								property="priority"
 							/>
 
@@ -213,7 +245,11 @@ renderResponse.setTitle(cpDefinition.getName(themeDisplay.getLanguageId()));
 <aui:script use="liferay-item-selector-dialog">
 	window.document
 		.querySelector('#<portlet:namespace />addDefinitionGroupedEntry')
+<<<<<<< HEAD
 		.addEventListener('click', (event) => {
+=======
+		.addEventListener('click', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			event.preventDefault();
 
 			var itemSelectorDialog = new A.LiferayItemSelectorDialog({

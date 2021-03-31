@@ -1513,6 +1513,11 @@ public class CPDefinitionLocalizationPersistenceImpl
 		return finderCache;
 	}
 
+<<<<<<< HEAD
+=======
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

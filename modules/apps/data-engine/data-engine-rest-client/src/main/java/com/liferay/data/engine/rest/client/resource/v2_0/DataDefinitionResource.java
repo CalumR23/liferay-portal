@@ -726,6 +726,7 @@ public interface DataDefinitionResource {
 						"/o/data-engine/v2.0/data-definitions/{dataDefinitionId}");
 
 			httpInvoker.path("dataDefinitionId", dataDefinitionId);
+<<<<<<< HEAD
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -811,6 +812,8 @@ public interface DataDefinitionResource {
 						"/o/data-engine/v2.0/data-definitions/{dataDefinitionId}");
 
 			httpInvoker.path("dataDefinitionId", dataDefinitionId);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

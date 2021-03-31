@@ -38,8 +38,11 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -166,10 +169,13 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 			jsonObject.put("deleted", Boolean.TRUE);
 		}
 		catch (Exception exception) {
+<<<<<<< HEAD
 			if (_log.isDebugEnabled()) {
 				_log.debug(exception, exception);
 			}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			jsonObject.put("deleted", Boolean.FALSE);
 
 			String errorMessage = themeDisplay.translate(
@@ -420,9 +426,12 @@ public class EditPageAttachmentMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditPageAttachmentMVCActionCommand.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private volatile DLConfiguration _dlConfiguration;
 
 	@Reference

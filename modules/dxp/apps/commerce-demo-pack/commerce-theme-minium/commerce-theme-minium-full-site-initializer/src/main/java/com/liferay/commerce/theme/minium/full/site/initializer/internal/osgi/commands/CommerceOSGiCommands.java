@@ -15,7 +15,10 @@
 package com.liferay.commerce.theme.minium.full.site.initializer.internal.osgi.commands;
 
 import com.liferay.commerce.theme.minium.SiteInitializerDependencyResolver;
+<<<<<<< HEAD
 import com.liferay.commerce.theme.minium.full.site.initializer.internal.importer.CommerceMLForecastImporter;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.theme.minium.full.site.initializer.internal.importer.CommerceMLRecommendationImporter;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
@@ -44,7 +47,10 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	enabled = false, immediate = true,
 	property = {
+<<<<<<< HEAD
 		"osgi.command.function=importForecasts",
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		"osgi.command.function=importRecommendations",
 		"osgi.command.scope=commerce"
 	},
@@ -52,6 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CommerceOSGiCommands {
 
+<<<<<<< HEAD
 	public void importForecasts(long siteId) throws Exception {
 		User user = _getImportUserByGroupId(siteId);
 
@@ -62,10 +69,13 @@ public class CommerceOSGiCommands {
 			jsonArray, siteId, user.getUserId());
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void importRecommendations(
 			long siteId, String externalReferenceCodePrefix)
 		throws Exception {
 
+<<<<<<< HEAD
 		User user = _getImportUserByGroupId(siteId);
 
 		JSONArray jsonArray = _jsonFactory.createJSONArray(
@@ -78,6 +88,9 @@ public class CommerceOSGiCommands {
 
 	private User _getImportUserByGroupId(long groupId) throws Exception {
 		Group group = _groupLocalService.getGroup(groupId);
+=======
+		Group group = _groupLocalService.getGroup(siteId);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Company company = _companyLocalService.getCompanyById(
 			group.getCompanyId());
@@ -96,11 +109,21 @@ public class CommerceOSGiCommands {
 
 		PermissionThreadLocal.setPermissionChecker(permissionChecker);
 
+<<<<<<< HEAD
 		return user;
 	}
 
 	@Reference
 	private CommerceMLForecastImporter _commerceMLForecastImporter;
+=======
+		JSONArray jsonArray = _jsonFactory.createJSONArray(
+			_fullSiteInitializerDependencyResolver.getJSON(
+				"recommendations.json"));
+
+		_commerceMLRecommendationImporter.importCommerceMLRecommendations(
+			jsonArray, externalReferenceCodePrefix, siteId, user.getUserId());
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private CommerceMLRecommendationImporter _commerceMLRecommendationImporter;

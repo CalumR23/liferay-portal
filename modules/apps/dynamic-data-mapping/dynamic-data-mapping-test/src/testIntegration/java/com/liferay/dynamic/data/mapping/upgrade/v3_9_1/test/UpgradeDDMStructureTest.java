@@ -89,7 +89,11 @@ public class UpgradeDDMStructureTest {
 			DDMFormInstanceTestUtil.addDDMFormInstance(
 				ddmForm, _group, _userId);
 
+<<<<<<< HEAD
 		_ddmStructureUpgradeProcess.upgrade();
+=======
+		_upgradeDDMStructure.upgrade();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		ddmForm = _getUpgradedDDMForm(ddmFormInstance);
 
@@ -117,7 +121,11 @@ public class UpgradeDDMStructureTest {
 			DDMFormInstanceTestUtil.addDDMFormInstance(
 				ddmForm, _group, _userId);
 
+<<<<<<< HEAD
 		_ddmStructureUpgradeProcess.upgrade();
+=======
+		_upgradeDDMStructure.upgrade();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		ddmForm = _getUpgradedDDMForm(ddmFormInstance);
 
@@ -169,7 +177,11 @@ public class UpgradeDDMStructureTest {
 			DDMFormInstanceTestUtil.addDDMFormInstance(
 				ddmForm, _group, _userId);
 
+<<<<<<< HEAD
 		_ddmStructureUpgradeProcess.upgrade();
+=======
+		_upgradeDDMStructure.upgrade();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		ddmForm = _getUpgradedDDMForm(ddmFormInstance);
 
@@ -222,7 +234,11 @@ public class UpgradeDDMStructureTest {
 			DDMFormInstanceTestUtil.addDDMFormInstance(
 				ddmForm, _group, _userId);
 
+<<<<<<< HEAD
 		_ddmStructureUpgradeProcess.upgrade();
+=======
+		_upgradeDDMStructure.upgrade();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		ddmForm = _getUpgradedDDMForm(ddmFormInstance);
 
@@ -254,7 +270,11 @@ public class UpgradeDDMStructureTest {
 			DDMFormInstanceTestUtil.addDDMFormInstance(
 				ddmForm, _group, _userId);
 
+<<<<<<< HEAD
 		_ddmStructureUpgradeProcess.upgrade();
+=======
+		_upgradeDDMStructure.upgrade();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		ddmForm = _getUpgradedDDMForm(ddmFormInstance);
 
@@ -287,8 +307,12 @@ public class UpgradeDDMStructureTest {
 						String className = clazz.getName();
 
 						if (className.contains(_CLASS_NAME)) {
+<<<<<<< HEAD
 							_ddmStructureUpgradeProcess =
 								(UpgradeProcess)upgradeStep;
+=======
+							_upgradeDDMStructure = (UpgradeProcess)upgradeStep;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						}
 					}
 				}
@@ -320,18 +344,29 @@ public class UpgradeDDMStructureTest {
 
 	private static final String _CLASS_NAME =
 		"com.liferay.dynamic.data.mapping.internal.upgrade.v3_9_1." +
+<<<<<<< HEAD
 			"DDMStructureUpgradeProcess";
+=======
+			"UpgradeDDMStructure";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Inject(
 		filter = "(&(objectClass=com.liferay.dynamic.data.mapping.internal.upgrade.DDMServiceUpgrade))"
 	)
 	private static UpgradeStepRegistrator _upgradeStepRegistrator;
 
+<<<<<<< HEAD
 	private UpgradeProcess _ddmStructureUpgradeProcess;
 
 	@DeleteAfterTestRun
 	private Group _group;
 
+=======
+	@DeleteAfterTestRun
+	private Group _group;
+
+	private UpgradeProcess _upgradeDDMStructure;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private long _userId;
 
 }

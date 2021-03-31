@@ -1177,6 +1177,7 @@ public class LanguageImpl implements Language, Serializable {
 	 *             #getResourceBundleLoader}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	@Override
 	public com.liferay.portal.kernel.util.ResourceBundleLoader
 		getPortalResourceBundleLoader() {
@@ -1187,6 +1188,18 @@ public class LanguageImpl implements Language, Serializable {
 	}
 
 	@Override
+=======
+	@Override
+	public com.liferay.portal.kernel.util.ResourceBundleLoader
+		getPortalResourceBundleLoader() {
+
+		ResourceBundleLoader resourceBundleLoader = getResourceBundleLoader();
+
+		return locale -> resourceBundleLoader.loadResourceBundle(locale);
+	}
+
+	@Override
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public ResourceBundleLoader getResourceBundleLoader() {
 		return LanguageResources.PORTAL_RESOURCE_BUNDLE_LOADER;
 	}

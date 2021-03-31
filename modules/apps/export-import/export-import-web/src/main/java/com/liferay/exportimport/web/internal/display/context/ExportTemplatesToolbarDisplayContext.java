@@ -77,11 +77,18 @@ public class ExportTemplatesToolbarDisplayContext
 
 				dropdownItem.setHref(
 					getRenderURL(), "mvcRenderCommandName",
+<<<<<<< HEAD
 					"/export_import/edit_export_configuration", Constants.CMD,
 					Constants.ADD, "groupId",
 					groupDisplayContextHelper.getGroupId(), "liveGroupId",
 					groupDisplayContextHelper.getLiveGroupId(), "privateLayout",
 					Boolean.FALSE.toString());
+=======
+					"editExportConfiguration", Constants.CMD, Constants.ADD,
+					"groupId", groupDisplayContextHelper.getGroupId(),
+					"liveGroupId", groupDisplayContextHelper.getLiveGroupId(),
+					"privateLayout", Boolean.FALSE.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "new"));

@@ -298,8 +298,13 @@ public class StyleBookEntryLocalServiceUtil {
 		return getService().fetchStyleBookEntry(groupId, styleBookEntryKey);
 	}
 
+<<<<<<< HEAD
 	public static StyleBookEntry fetchStyleBookEntryByUuidAndGroupId(
 		String uuid, long groupId) {
+=======
+	public static com.liferay.style.book.model.StyleBookEntry
+		fetchStyleBookEntryByUuidAndGroupId(String uuid, long groupId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().fetchStyleBookEntryByUuidAndGroupId(uuid, groupId);
 	}
@@ -390,8 +395,13 @@ public class StyleBookEntryLocalServiceUtil {
 			groupId, name, start, end, orderByComparator);
 	}
 
+<<<<<<< HEAD
 	public static List<StyleBookEntry> getStyleBookEntriesByUuidAndCompanyId(
 		String uuid, long companyId) {
+=======
+	public static java.util.List<com.liferay.style.book.model.StyleBookEntry>
+		getStyleBookEntriesByUuidAndCompanyId(String uuid, long companyId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getStyleBookEntriesByUuidAndCompanyId(
 			uuid, companyId);
@@ -499,20 +509,36 @@ public class StyleBookEntryLocalServiceUtil {
 			styleBookEntryId, previewFileEntryId);
 	}
 
+<<<<<<< HEAD
 	public static StyleBookEntry updateStyleBookEntry(
 			long userId, long styleBookEntryId, boolean defaultStylebookEntry,
 			String frontendTokensValues, String name, String styleBookEntryKey,
 			long previewFileEntryId)
 		throws PortalException {
+=======
+	public static com.liferay.style.book.model.StyleBookEntry
+			updateStyleBookEntry(
+				long userId, long styleBookEntryId,
+				boolean defaultStylebookEntry, String frontendTokensValues,
+				String name, String styleBookEntryKey, long previewFileEntryId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().updateStyleBookEntry(
 			userId, styleBookEntryId, defaultStylebookEntry,
 			frontendTokensValues, name, styleBookEntryKey, previewFileEntryId);
 	}
 
+<<<<<<< HEAD
 	public static StyleBookEntry updateStyleBookEntry(
 			long styleBookEntryId, String frontendTokensValues, String name)
 		throws PortalException {
+=======
+	public static com.liferay.style.book.model.StyleBookEntry
+			updateStyleBookEntry(
+				long styleBookEntryId, String frontendTokensValues, String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().updateStyleBookEntry(
 			styleBookEntryId, frontendTokensValues, name);

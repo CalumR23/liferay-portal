@@ -30,7 +30,10 @@ page import="com.liferay.commerce.currency.exception.CommerceCurrencyNameExcepti
 page import="com.liferay.commerce.currency.model.CommerceCurrency" %><%@
 page import="com.liferay.commerce.currency.web.internal.display.context.CommerceCurrenciesDisplayContext" %><%@
 page import="com.liferay.commerce.currency.web.internal.servlet.taglib.ui.constants.CommerceCurrencyScreenNavigationConstants" %><%@
+<<<<<<< HEAD
 page import="com.liferay.petra.portlet.url.builder.PortletURLBuilder" %><%@
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.petra.string.StringPool" %><%@
 page import="com.liferay.portal.kernel.bean.BeanParamUtil" %><%@
 page import="com.liferay.portal.kernel.dao.search.ResultRow" %><%@

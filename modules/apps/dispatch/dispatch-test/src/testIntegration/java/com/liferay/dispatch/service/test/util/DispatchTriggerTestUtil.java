@@ -15,7 +15,10 @@
 package com.liferay.dispatch.service.test.util;
 
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
+<<<<<<< HEAD
 import com.liferay.dispatch.executor.DispatchTaskStatus;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -126,11 +129,14 @@ public class DispatchTriggerTestUtil {
 			}
 
 			@Override
+<<<<<<< HEAD
 			public DispatchTaskStatus getDispatchTaskStatus() {
 				return DispatchTaskStatus.NEVER_RAN;
 			}
 
 			@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			public long getDispatchTriggerId() {
 				throw new UnsupportedOperationException();
 			}

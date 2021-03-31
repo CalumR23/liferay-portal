@@ -15,6 +15,7 @@
 import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -120,6 +121,7 @@ export default ({currentSection, items, question, showSectionLabel}) => {
 
 					{!!question.locked && (
 						<span className="c-ml-2">
+<<<<<<< HEAD
 							<ClayIcon
 								data-tooltip-align="top"
 								symbol="lock"
@@ -127,6 +129,17 @@ export default ({currentSection, items, question, showSectionLabel}) => {
 									'this-question-is-closed-new-answers-and-comments-are-disabled'
 								)}
 							/>
+=======
+							<ClayTooltipProvider>
+								<ClayIcon
+									data-tooltip-align="top"
+									symbol="lock"
+									title={Liferay.Language.get(
+										'this-question-is-closed-new-answers-and-comments-are-disabled'
+									)}
+								/>
+							</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						</span>
 					)}
 				</h2>

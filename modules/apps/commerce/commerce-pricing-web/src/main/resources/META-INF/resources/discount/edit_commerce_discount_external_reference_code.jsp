@@ -25,7 +25,11 @@ CommerceDiscount commerceDiscount = commerceDiscountDisplayContext.getCommerceDi
 <portlet:actionURL name="/commerce_discount/edit_commerce_discount_external_reference_code" var="editCommerceDiscountExternalReferenceCodeURL" />
 
 <commerce-ui:modal-content>
+<<<<<<< HEAD
 	<aui:form action="<%= editCommerceDiscountExternalReferenceCodeURL %>" cssClass="container-fluid container-fluid-max-xl p-0" method="post" name="fm">
+=======
+	<aui:form action="<%= editCommerceDiscountExternalReferenceCodeURL %>" cssClass="container-fluid-1280 p-0" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="commerceDiscountId" type="hidden" value="<%= commerceDiscount.getCommerceDiscountId() %>" />
 

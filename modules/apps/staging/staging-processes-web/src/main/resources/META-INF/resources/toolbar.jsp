@@ -19,9 +19,28 @@
 <%
 String tabs1 = ParamUtil.getString(request, "tabs1");
 
+<<<<<<< HEAD
 String searchContainerId = ParamUtil.getString(request, "searchContainerId");
 
 boolean hasPublishStagingPermission = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PUBLISH_STAGING);
+=======
+String navigation = ParamUtil.getString(request, "navigation", "all");
+String orderByCol = ParamUtil.getString(request, "orderByCol");
+String orderByType = ParamUtil.getString(request, "orderByType");
+String searchContainerId = ParamUtil.getString(request, "searchContainerId");
+
+boolean hasPublishStagingPermission = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.PUBLISH_STAGING);
+
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
+portletURL.setParameter("tabs1", tabs1);
+portletURL.setParameter("displayStyle", stagingProcessesWebToolbarDisplayContext.getDisplayStyle());
+portletURL.setParameter("navigation", navigation);
+portletURL.setParameter("orderByCol", orderByCol);
+portletURL.setParameter("orderByType", orderByType);
+portletURL.setParameter("searchContainerId", String.valueOf(searchContainerId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <clay:management-toolbar

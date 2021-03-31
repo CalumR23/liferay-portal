@@ -11,9 +11,15 @@
 
 import ClayList from '@clayui/list';
 import className from 'classnames';
+<<<<<<< HEAD
 import {ALIGN_POSITIONS} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useMemo, useState} from 'react';
+=======
+import {Align} from 'metal-position';
+import PropTypes from 'prop-types';
+import React, {useMemo, useState} from 'react';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import {
 	useChangeTimeSpanKey,
@@ -23,7 +29,10 @@ import {
 	useNextTimeSpan,
 	usePreviousTimeSpan,
 } from '../../context/ChartStateContext';
+<<<<<<< HEAD
 import {StoreStateContext} from '../../context/StoreContext';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {generateDateFormatters as dateFormat} from '../../utils/dateFormat';
 import {numberFormat} from '../../utils/numberFormat';
 import TimeSpanSelector from '../TimeSpanSelector';
@@ -43,13 +52,20 @@ const SOCIAL_MEDIA_COLORS = {
 
 export default function SocialDetail({
 	currentPage,
+<<<<<<< HEAD
+=======
+	languageTag,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	showTimeSpanSelector = false,
 	timeSpanOptions,
 	trafficShareDataProvider,
 	trafficVolumeDataProvider,
 }) {
+<<<<<<< HEAD
 	const {languageTag} = useContext(StoreStateContext);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const {referringSocialMedia} = currentPage.data;
 
 	const dateFormatters = useMemo(() => dateFormat(languageTag), [
@@ -129,7 +145,12 @@ export default function SocialDetail({
 				className="c-mb-2"
 				dataProvider={trafficVolumeDataProvider}
 				label={Liferay.Util.sub(Liferay.Language.get('traffic-volume'))}
+<<<<<<< HEAD
 				popoverAlign={ALIGN_POSITIONS.Bottom}
+=======
+				languageTag={languageTag}
+				popoverAlign={Align.Bottom}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				popoverHeader={Liferay.Language.get('traffic-volume')}
 				popoverMessage={Liferay.Language.get(
 					'traffic-volume-is-the-number-of-page-views-coming-from-one-channel'
@@ -219,6 +240,10 @@ export default function SocialDetail({
 
 SocialDetail.propTypes = {
 	currentPage: PropTypes.object.isRequired,
+<<<<<<< HEAD
+=======
+	languageTag: PropTypes.string.isRequired,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	showTimeSpanSelector: PropTypes.bool,
 	timeSpanOptions: PropTypes.arrayOf(
 		PropTypes.shape({

@@ -73,10 +73,16 @@ public class IndexDocumentRequestExecutorImpl
 	@Reference(target = "(search.engine.impl=Elasticsearch)", unbind = "-")
 	protected void setBulkableDocumentRequestTranslator(
 		ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 			elasticsearchBulkableDocumentRequestTranslator) {
 
 		_elasticsearchBulkableDocumentRequestTranslator =
 			elasticsearchBulkableDocumentRequestTranslator;
+=======
+			eulkableDocumentRequestTranslator) {
+
+		_bulkableDocumentRequestTranslator = eulkableDocumentRequestTranslator;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference(unbind = "-")
@@ -87,7 +93,11 @@ public class IndexDocumentRequestExecutorImpl
 	}
 
 	private ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 		_elasticsearchBulkableDocumentRequestTranslator;
+=======
+		_bulkableDocumentRequestTranslator;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ElasticsearchClientResolver _elasticsearchClientResolver;
 
 }

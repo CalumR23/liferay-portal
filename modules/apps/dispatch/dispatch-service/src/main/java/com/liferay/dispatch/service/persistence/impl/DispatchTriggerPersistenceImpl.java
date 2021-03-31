@@ -43,7 +43,11 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.ArrayUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.HashMapDictionary;
+=======
+import com.liferay.portal.kernel.util.MapUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -1821,7 +1825,11 @@ public class DispatchTriggerPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, userId};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2033,7 +2041,11 @@ public class DispatchTriggerPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DispatchTrigger>)finderCache.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DispatchTrigger dispatchTrigger : list) {
@@ -2842,7 +2854,11 @@ public class DispatchTriggerPersistenceImpl
 			companyId, dispatchTaskExecutorType
 		};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3049,7 +3065,12 @@ public class DispatchTriggerPersistenceImpl
 		Object result = null;
 
 		if (useFinderCache) {
+<<<<<<< HEAD
 			result = finderCache.getResult(_finderPathFetchByC_N, finderArgs);
+=======
+			result = finderCache.getResult(
+				_finderPathFetchByC_N, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (result instanceof DispatchTrigger) {
@@ -3160,7 +3181,11 @@ public class DispatchTriggerPersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId, name};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3329,7 +3354,11 @@ public class DispatchTriggerPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DispatchTrigger>)finderCache.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DispatchTrigger dispatchTrigger : list) {
@@ -4319,6 +4348,7 @@ public class DispatchTriggerPersistenceImpl
 		}
 
 		List<DispatchTrigger> list = null;
+<<<<<<< HEAD
 
 		if (useFinderCache) {
 			list = (List<DispatchTrigger>)finderCache.getResult(
@@ -4357,6 +4387,46 @@ public class DispatchTriggerPersistenceImpl
 
 				sb.append(")");
 			}
+=======
+
+		if (useFinderCache) {
+			list = (List<DispatchTrigger>)finderCache.getResult(
+				_finderPathWithPaginationFindByA_DTCM, finderArgs, this);
+
+			if ((list != null) && !list.isEmpty()) {
+				for (DispatchTrigger dispatchTrigger : list) {
+					if ((active != dispatchTrigger.isActive()) ||
+						!ArrayUtil.contains(
+							dispatchTaskClusterModes,
+							dispatchTrigger.getDispatchTaskClusterMode())) {
+
+						list = null;
+
+						break;
+					}
+				}
+			}
+		}
+
+		if (list == null) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_SQL_SELECT_DISPATCHTRIGGER_WHERE);
+
+			sb.append(_FINDER_COLUMN_A_DTCM_ACTIVE_2);
+
+			if (dispatchTaskClusterModes.length > 0) {
+				sb.append("(");
+
+				sb.append(_FINDER_COLUMN_A_DTCM_DISPATCHTASKCLUSTERMODE_7);
+
+				sb.append(StringUtil.merge(dispatchTaskClusterModes));
+
+				sb.append(")");
+
+				sb.append(")");
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			sb.setStringAt(
 				removeConjunction(sb.stringAt(sb.index() - 1)), sb.index() - 1);
@@ -4444,6 +4514,7 @@ public class DispatchTriggerPersistenceImpl
 			sb.append(_FINDER_COLUMN_A_DTCM_ACTIVE_2);
 
 			sb.append(_FINDER_COLUMN_A_DTCM_DISPATCHTASKCLUSTERMODE_2);
+<<<<<<< HEAD
 
 			String sql = sb.toString();
 
@@ -4462,6 +4533,26 @@ public class DispatchTriggerPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+=======
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				queryPos.add(active);
+
+				queryPos.add(dispatchTaskClusterMode);
+
+				count = (Long)query.uniqueResult();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderCache.putResult(finderPath, finderArgs, count);
 			}
 			catch (Exception exception) {
@@ -4497,6 +4588,7 @@ public class DispatchTriggerPersistenceImpl
 		};
 
 		Long count = (Long)finderCache.getResult(
+<<<<<<< HEAD
 			_finderPathWithPaginationCountByA_DTCM, finderArgs);
 
 		if (count == null) {
@@ -4506,6 +4598,17 @@ public class DispatchTriggerPersistenceImpl
 
 			sb.append(_FINDER_COLUMN_A_DTCM_ACTIVE_2);
 
+=======
+			_finderPathWithPaginationCountByA_DTCM, finderArgs, this);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler();
+
+			sb.append(_SQL_COUNT_DISPATCHTRIGGER_WHERE);
+
+			sb.append(_FINDER_COLUMN_A_DTCM_ACTIVE_2);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (dispatchTaskClusterModes.length > 0) {
 				sb.append("(");
 
@@ -4590,11 +4693,19 @@ public class DispatchTriggerPersistenceImpl
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
 			queryPos.add(active);
+<<<<<<< HEAD
 
 			queryPos.add(dispatchTaskClusterMode);
 
 			Long count = (Long)sqlQuery.uniqueResult();
 
+=======
+
+			queryPos.add(dispatchTaskClusterMode);
+
+			Long count = (Long)sqlQuery.uniqueResult();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			return count.intValue();
 		}
 		catch (Exception exception) {
@@ -4638,9 +4749,15 @@ public class DispatchTriggerPersistenceImpl
 			sb.append("(");
 
 			sb.append(_FINDER_COLUMN_A_DTCM_DISPATCHTASKCLUSTERMODE_7);
+<<<<<<< HEAD
 
 			sb.append(StringUtil.merge(dispatchTaskClusterModes));
 
+=======
+
+			sb.append(StringUtil.merge(dispatchTaskClusterModes));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			sb.append(")");
 
 			sb.append(")");
@@ -5286,7 +5403,11 @@ public class DispatchTriggerPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByC_U = new FinderPath(
+=======
+		_finderPathWithPaginationFindByC_U = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_U",
 			new String[] {
 				Long.class.getName(), Long.class.getName(),
@@ -5295,17 +5416,29 @@ public class DispatchTriggerPersistenceImpl
 			},
 			new String[] {"companyId", "userId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByC_U = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByC_U = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByC_U = new FinderPath(
+=======
+		_finderPathCountByC_U = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_U",
 			new String[] {Long.class.getName(), Long.class.getName()},
 			new String[] {"companyId", "userId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByC_DTET = new FinderPath(
+=======
+		_finderPathWithPaginationFindByC_DTET = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByC_DTET",
 			new String[] {
 				Long.class.getName(), String.class.getName(),
@@ -5314,17 +5447,29 @@ public class DispatchTriggerPersistenceImpl
 			},
 			new String[] {"companyId", "dispatchTaskExecutorType"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByC_DTET = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByC_DTET = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByC_DTET",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "dispatchTaskExecutorType"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByC_DTET = new FinderPath(
+=======
+		_finderPathCountByC_DTET = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByC_DTET",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "dispatchTaskExecutorType"}, false);
 
+<<<<<<< HEAD
 		_finderPathFetchByC_N = new FinderPath(
+=======
+		_finderPathFetchByC_N = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_ENTITY, "fetchByC_N",
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "name"}, true);
@@ -5334,7 +5479,11 @@ public class DispatchTriggerPersistenceImpl
 			new String[] {Long.class.getName(), String.class.getName()},
 			new String[] {"companyId", "name"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByA_DTCM = new FinderPath(
+=======
+		_finderPathWithPaginationFindByA_DTCM = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByA_DTCM",
 			new String[] {
 				Boolean.class.getName(), Integer.class.getName(),
@@ -5343,17 +5492,29 @@ public class DispatchTriggerPersistenceImpl
 			},
 			new String[] {"active_", "dispatchTaskClusterMode"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByA_DTCM = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByA_DTCM = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByA_DTCM",
 			new String[] {Boolean.class.getName(), Integer.class.getName()},
 			new String[] {"active_", "dispatchTaskClusterMode"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByA_DTCM = new FinderPath(
+=======
+		_finderPathCountByA_DTCM = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByA_DTCM",
 			new String[] {Boolean.class.getName(), Integer.class.getName()},
 			new String[] {"active_", "dispatchTaskClusterMode"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationCountByA_DTCM = new FinderPath(
+=======
+		_finderPathWithPaginationCountByA_DTCM = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "countByA_DTCM",
 			new String[] {Boolean.class.getName(), Integer.class.getName()},
 			new String[] {"active_", "dispatchTaskClusterMode"}, false);
@@ -5449,11 +5610,33 @@ public class DispatchTriggerPersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"active", "system"});
 
+<<<<<<< HEAD
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+=======
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

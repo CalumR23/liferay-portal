@@ -26,8 +26,12 @@ import com.liferay.frontend.taglib.clay.data.set.provider.ClayDataSetDataProvide
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+=======
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.Portal;
 
 import java.util.ArrayList;
@@ -56,12 +60,17 @@ public class CommerceInventoryItemDataSetDataProvider
 			Pagination pagination, Sort sort)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
 
 		portletResourcePermission.contains(
 			PermissionThreadLocal.getPermissionChecker(), null,
+=======
+		PortalPermissionUtil.check(
+			PermissionThreadLocal.getPermissionChecker(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			CommerceInventoryActionKeys.MANAGE_INVENTORY);
 
 		List<InventoryItem> inventoryItems = new ArrayList<>();
@@ -88,12 +97,17 @@ public class CommerceInventoryItemDataSetDataProvider
 			HttpServletRequest httpServletRequest, Filter filter)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
 
 		portletResourcePermission.contains(
 			PermissionThreadLocal.getPermissionChecker(), null,
+=======
+		PortalPermissionUtil.check(
+			PermissionThreadLocal.getPermissionChecker(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			CommerceInventoryActionKeys.MANAGE_INVENTORY);
 
 		return _commerceInventoryWarehouseItemLocalService.

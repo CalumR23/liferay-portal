@@ -42,7 +42,10 @@ import com.liferay.portal.kernel.test.portlet.MockLiferayPortletURL;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Html;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.Portal;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.util.HtmlImpl;
@@ -104,13 +107,17 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		setUpJSONFactory();
 		setUpJSONFactoryUtil();
 		setUpParamUtil();
+<<<<<<< HEAD
 		setUpPortal();
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		setUpPortletFileRepository();
 		setUpRequestBackedPortletURLFactoryUtil();
 		setUpUserLocalService();
 	}
 
 	@Test
+<<<<<<< HEAD
 	public void testDDMFormPortletItemSelector() {
 		mockDDMFormPortletItemSelector();
 
@@ -168,12 +175,38 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				new DDMFormField("field", "document_library"),
 				createDDMFormFieldRenderingContext());
+=======
+	public void testGetParametersShouldContainAllowGuestUsers() {
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		DDMFormField ddmFormField = new DDMFormField(
+			"field", "document_library");
+
+		ddmFormField.setProperty("allowGuestUsers", true);
+
+		Map<String, Object> parameters = spy.getParameters(
+			ddmFormField, createDDMFormFieldRenderingContext());
+
+		Assert.assertEquals(true, parameters.get("allowGuestUsers"));
+	}
+
+	@Test
+	public void testGetParametersShouldContainFileEntryURL() {
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertTrue(parameters.containsKey("fileEntryURL"));
 	}
 
 	@Test
 	public void testGetParametersShouldContainFormsFolderId() {
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				mockThemeDisplay());
@@ -182,12 +215,21 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				new DDMFormField("field", "document_library"),
 				createDDMFormFieldRenderingContext());
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertEquals(_FORMS_FOLDER_ID, parameters.get("folderId"));
 	}
 
 	@Test
 	public void testGetParametersShouldContainGuestUploadURL() {
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				mockThemeDisplay());
@@ -196,6 +238,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				new DDMFormField("field", "document_library"),
 				createDDMFormFieldRenderingContext());
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String guestUploadURL = String.valueOf(
 			parameters.get("guestUploadURL"));
@@ -227,6 +277,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			Boolean.TRUE
 		);
 
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				themeDisplay);
@@ -237,22 +288,50 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 				createDDMFormFieldRenderingContext());
 
 		Assert.assertTrue(parameters.containsKey("itemSelectorURL"));
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			themeDisplay);
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+
+		Assert.assertTrue(parameters.containsKey("itemSelectorURL"));
+
+		String itemSelectorURL = String.valueOf(
+			parameters.get("itemSelectorURL"));
+
+		Assert.assertThat(
+			itemSelectorURL,
+			CoreMatchers.containsString(
+				"param_folderId=" + _PRIVATE_FOLDER_ID));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test
 	public void testGetParametersShouldContainMaximumRepetitions() {
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				mockThemeDisplay());
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		DDMFormField ddmFormField = new DDMFormField(
 			"field", "document_library");
 
 		ddmFormField.setProperty("maximumRepetitions", 8);
 
+<<<<<<< HEAD
 		Map<String, Object> parameters =
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				ddmFormField, createDDMFormFieldRenderingContext());
+=======
+		Map<String, Object> parameters = spy.getParameters(
+			ddmFormField, createDDMFormFieldRenderingContext());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertEquals(8, parameters.get("maximumRepetitions"));
 	}
@@ -267,6 +346,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			Boolean.TRUE
 		);
 
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				themeDisplay);
@@ -296,6 +376,33 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				ddmFormField, createDDMFormFieldRenderingContext());
 
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			themeDisplay);
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+
+		Assert.assertEquals(_PRIVATE_FOLDER_ID, parameters.get("folderId"));
+	}
+
+	@Test
+	public void testGetParametersShouldUseExistingGuestUploadURL() {
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		DDMFormField ddmFormField = new DDMFormField(
+			"field", "document_library");
+
+		String expectedGuestUploadURL = RandomTestUtil.randomString();
+
+		ddmFormField.setProperty("guestUploadURL", expectedGuestUploadURL);
+
+		Map<String, Object> parameters = spy.getParameters(
+			ddmFormField, createDDMFormFieldRenderingContext());
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Assert.assertEquals(
 			expectedGuestUploadURL,
 			String.valueOf(parameters.get("guestUploadURL")));
@@ -303,6 +410,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 
 	@Test
 	public void testGetParametersShouldUseFileEntryTitle() {
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				mockThemeDisplay());
@@ -311,6 +419,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			documentLibraryDDMFormFieldTemplateContextContributor.getParameters(
 				new DDMFormField("field", "document_library"),
 				createDDMFormFieldRenderingContext());
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			mockThemeDisplay());
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertEquals("New Title", parameters.get("fileEntryTitle"));
 	}
@@ -318,6 +434,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	@Test
 	public void testGetParametersWithNullGroupShouldContainItemSelectorURL() {
 		mockGroupLocalServiceFetchGroup(null);
+<<<<<<< HEAD
 
 		ThemeDisplay themeDisplay = mockThemeDisplay();
 
@@ -327,12 +444,24 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			_scopeGroup
 		);
 
+=======
+
+		ThemeDisplay themeDisplay = mockThemeDisplay();
+
+		when(
+			themeDisplay.getScopeGroup()
+		).thenReturn(
+			_scopeGroup
+		);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		when(
 			themeDisplay.isSignedIn()
 		).thenReturn(
 			Boolean.TRUE
 		);
 
+<<<<<<< HEAD
 		DocumentLibraryDDMFormFieldTemplateContextContributor
 			documentLibraryDDMFormFieldTemplateContextContributor = createSpy(
 				themeDisplay);
@@ -343,6 +472,22 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 				createDDMFormFieldRenderingContext());
 
 		Assert.assertTrue(parameters.containsKey("itemSelectorURL"));
+=======
+		DocumentLibraryDDMFormFieldTemplateContextContributor spy = createSpy(
+			themeDisplay);
+
+		Map<String, Object> parameters = spy.getParameters(
+			new DDMFormField("field", "document_library"),
+			createDDMFormFieldRenderingContext());
+
+		String itemSelectorURL = String.valueOf(
+			parameters.get("itemSelectorURL"));
+
+		Assert.assertThat(
+			itemSelectorURL,
+			CoreMatchers.containsString(
+				"param_folderId=" + _PRIVATE_FOLDER_ID));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	protected DDMFormFieldRenderingContext
@@ -384,10 +529,17 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 			Matchers.any(Locale.class)
 		);
 
+<<<<<<< HEAD
 		powerMockitoStubber = PowerMockito.doReturn(themeDisplay);
 
 		powerMockitoStubber.when(
 			documentLibraryDDMFormFieldTemplateContextContributor
+=======
+		stubber = PowerMockito.doReturn(themeDisplay);
+
+		stubber.when(
+			spy
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		).getThemeDisplay(
 			Matchers.any(HttpServletRequest.class)
 		);
@@ -406,6 +558,104 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		).thenReturn(
 			new MockLiferayPortletURL()
 		);
+	}
+
+	protected Folder mockFolder(long folderId) {
+		Folder folder = mock(Folder.class);
+
+		PowerMockito.when(
+			folder.getFolderId()
+		).thenReturn(
+			folderId
+		);
+
+		return folder;
+	}
+
+	protected void mockGroupLocalServiceFetchGroup(Group group) {
+		PowerMockito.when(
+			_groupLocalService.fetchGroup(_GROUP_ID)
+		).thenReturn(
+			group
+		);
+	}
+
+	protected Repository mockRepository() {
+		Repository repository = mock(Repository.class);
+
+		PowerMockito.when(
+			repository.getRepositoryId()
+		).thenReturn(
+			_REPOSITORY_ID
+		);
+
+		return repository;
+	}
+
+	protected RequestBackedPortletURLFactory
+		mockRequestBackedPortletURLFactory() {
+
+		RequestBackedPortletURLFactory requestBackedPortletURLFactory = mock(
+			RequestBackedPortletURLFactory.class);
+
+		when(
+			requestBackedPortletURLFactory.createActionURL(
+				DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM)
+		).thenReturn(
+			new MockLiferayPortletURL()
+		);
+
+		return requestBackedPortletURLFactory;
+	}
+
+	protected ThemeDisplay mockThemeDisplay() {
+		ThemeDisplay themeDisplay = mock(ThemeDisplay.class);
+
+		when(
+			themeDisplay.getCompanyId()
+		).thenReturn(
+			_COMPANY_ID
+		);
+
+		when(
+			themeDisplay.getPathContext()
+		).thenReturn(
+			"/my/path/context/"
+		);
+
+		when(
+			themeDisplay.getPathThemeImages()
+		).thenReturn(
+			"/my/theme/images/"
+		);
+
+		User user = mockUser();
+
+		when(
+			themeDisplay.getUser()
+		).thenReturn(
+			user
+		);
+
+		return themeDisplay;
+	}
+
+	protected User mockUser() {
+		User user = mock(User.class);
+
+		when(
+			user.getScreenName()
+		).thenReturn(
+			"Test"
+		);
+
+		when(
+			user.getUserId()
+		).thenReturn(
+			0L
+		);
+
+		return user;
 	}
 
 	protected Folder mockFolder(long folderId) {
@@ -591,7 +841,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 					}),
 				Mockito.eq(_GROUP_ID),
 				Mockito.eq(_PORTLET_NAMESPACE + "selectDocumentLibrary"),
+<<<<<<< HEAD
 				Mockito.any(DDMUserPersonalFolderItemSelectorCriterion.class),
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				Mockito.any(FileItemSelectorCriterion.class))
 		).thenReturn(
 			new MockLiferayPortletURL()
@@ -617,6 +870,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		PropsUtil.setProps(Mockito.mock(Props.class));
 	}
 
+<<<<<<< HEAD
 	protected void setUpPortal() throws Exception {
 		MemberMatcher.field(
 			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
@@ -633,6 +887,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 		);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	protected void setUpPortletFileRepository() throws Exception {
 		MemberMatcher.field(
 			DocumentLibraryDDMFormFieldTemplateContextContributor.class,
@@ -706,9 +962,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	private static final String _PORTLET_NAMESPACE =
 		RandomTestUtil.randomString();
 
+<<<<<<< HEAD
 	private static final String _PORTLET_NAMESPACE_DDM_FORM =
 		"_com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet_";
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final long _PRIVATE_FOLDER_ID = RandomTestUtil.randomLong();
 
 	private static final long _REPOSITORY_ID = RandomTestUtil.randomLong();
@@ -737,9 +996,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributorTest
 	private final JSONFactory _jsonFactory = new JSONFactoryImpl();
 
 	@Mock
+<<<<<<< HEAD
 	private Portal _portal;
 
 	@Mock
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private PortletFileRepository _portletFileRepository;
 
 	private final RequestBackedPortletURLFactory

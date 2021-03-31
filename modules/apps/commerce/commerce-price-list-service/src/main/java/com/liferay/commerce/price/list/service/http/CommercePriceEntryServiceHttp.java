@@ -263,6 +263,66 @@ public class CommercePriceEntryServiceHttp {
 		}
 	}
 
+	public static com.liferay.commerce.price.list.model.CommercePriceEntry
+			addCommercePriceEntry(
+				HttpPrincipal httpPrincipal, String externalReferenceCode,
+				long cProductId, String cpInstanceUuid,
+				long commercePriceListId, java.math.BigDecimal price,
+				boolean discountDiscovery, java.math.BigDecimal discountLevel1,
+				java.math.BigDecimal discountLevel2,
+				java.math.BigDecimal discountLevel3,
+				java.math.BigDecimal discountLevel4, int displayDateMonth,
+				int displayDateDay, int displayDateYear, int displayDateHour,
+				int displayDateMinute, int expirationDateMonth,
+				int expirationDateDay, int expirationDateYear,
+				int expirationDateHour, int expirationDateMinute,
+				boolean neverExpire,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				CommercePriceEntryServiceUtil.class, "addCommercePriceEntry",
+				_addCommercePriceEntryParameterTypes3);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, externalReferenceCode, cProductId, cpInstanceUuid,
+				commercePriceListId, price, discountDiscovery, discountLevel1,
+				discountLevel2, discountLevel3, discountLevel4,
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, expirationDateMonth,
+				expirationDateDay, expirationDateYear, expirationDateHour,
+				expirationDateMinute, neverExpire, serviceContext);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception exception) {
+				if (exception instanceof
+						com.liferay.portal.kernel.exception.PortalException) {
+
+					throw (com.liferay.portal.kernel.exception.PortalException)
+						exception;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					exception);
+			}
+
+			return (com.liferay.commerce.price.list.model.CommercePriceEntry)
+				returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException
+					systemException) {
+
+			_log.error(systemException, systemException);
+
+			throw systemException;
+		}
+	}
+
 	public static void deleteCommercePriceEntry(
 			HttpPrincipal httpPrincipal, long commercePriceEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -1512,6 +1572,19 @@ public class CommercePriceEntryServiceHttp {
 			int.class, int.class, int.class, boolean.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
+<<<<<<< HEAD
+=======
+	private static final Class<?>[] _addCommercePriceEntryParameterTypes3 =
+		new Class[] {
+			String.class, long.class, String.class, long.class,
+			java.math.BigDecimal.class, boolean.class,
+			java.math.BigDecimal.class, java.math.BigDecimal.class,
+			java.math.BigDecimal.class, java.math.BigDecimal.class, int.class,
+			int.class, int.class, int.class, int.class, int.class, int.class,
+			int.class, int.class, int.class, boolean.class,
+			com.liferay.portal.kernel.service.ServiceContext.class
+		};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final Class<?>[] _deleteCommercePriceEntryParameterTypes4 =
 		new Class[] {long.class};
 	private static final Class<?>[]

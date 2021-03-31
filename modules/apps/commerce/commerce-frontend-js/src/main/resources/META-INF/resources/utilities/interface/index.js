@@ -14,7 +14,10 @@
 
 import AJAX from '../AJAX/index';
 import * as Events from '../eventsDefinitions';
+<<<<<<< HEAD
 import DDMFormHandler from '../forms/DDMFormHandler';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import * as FormUtils from '../forms/index';
 import * as BaseUtils from '../index';
 
@@ -22,8 +25,12 @@ export default {
 	AJAX,
 	BaseUtils,
 	Events,
+<<<<<<< HEAD
 	FormUtils: {
 		...FormUtils,
 		DDMFormHandler,
 	},
+=======
+	FormUtils,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };

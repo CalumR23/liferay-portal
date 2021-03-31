@@ -246,6 +246,7 @@ public class StyleBookEntryVersionWrapper
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Returns the mvcc version of this style book entry version.
 	 *
 	 * @return the mvcc version of this style book entry version
@@ -256,6 +257,8 @@ public class StyleBookEntryVersionWrapper
 	}
 
 	/**
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 * Returns the name of this style book entry version.
 	 *
 	 * @return the name of this style book entry version
@@ -446,6 +449,7 @@ public class StyleBookEntryVersionWrapper
 	}
 
 	/**
+<<<<<<< HEAD
 	 * Sets the mvcc version of this style book entry version.
 	 *
 	 * @param mvccVersion the mvcc version of this style book entry version
@@ -456,6 +460,8 @@ public class StyleBookEntryVersionWrapper
 	}
 
 	/**
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 * Sets the name of this style book entry version.
 	 *
 	 * @param name the name of this style book entry version

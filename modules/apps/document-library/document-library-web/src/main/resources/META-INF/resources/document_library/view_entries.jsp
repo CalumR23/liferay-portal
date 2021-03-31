@@ -17,6 +17,7 @@
 <%@ include file="/document_library/init.jsp" %>
 
 <%
+<<<<<<< HEAD
 DLViewEntriesDisplayContext dlViewEntriesDisplayContext = new DLViewEntriesDisplayContext(liferayPortletRequest, liferayPortletResponse);
 
 boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
@@ -24,10 +25,65 @@ boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getIni
 if (portletTitleBasedNavigation && !dlViewEntriesDisplayContext.isRootFolder() && Validator.isNotNull(dlViewEntriesDisplayContext.getRedirect())) {
 	portletDisplay.setShowBackIcon(true);
 	portletDisplay.setURLBack(dlViewEntriesDisplayContext.getRedirect());
+=======
+String navigation = ParamUtil.getString(request, "navigation", "home");
+
+String currentFolder = ParamUtil.getString(request, "curFolder");
+String deltaFolder = ParamUtil.getString(request, "deltaFolder");
+
+long folderId = GetterUtil.getLong((String)request.getAttribute("view.jsp-folderId"));
+
+long repositoryId = GetterUtil.getLong((String)request.getAttribute("view.jsp-repositoryId"));
+
+DLAdminDisplayContext dlAdminDisplayContext = (DLAdminDisplayContext)request.getAttribute(DLAdminDisplayContext.class.getName());
+DLPortletInstanceSettingsHelper dlPortletInstanceSettingsHelper = new DLPortletInstanceSettingsHelper(dlRequestHelper);
+
+String displayStyle = dlAdminDisplayContext.getDisplayStyle();
+
+FolderActionDisplayContext folderActionDisplayContext = new FolderActionDisplayContext(dlTrashHelper, request, liferayPortletResponse);
+
+PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) ? "/document_library/view" : "/document_library/view_folder");
+portletURL.setParameter("navigation", navigation);
+portletURL.setParameter("curFolder", currentFolder);
+portletURL.setParameter("deltaFolder", deltaFolder);
+portletURL.setParameter("folderId", String.valueOf(folderId));
+
+EntriesChecker entriesChecker = new EntriesChecker(liferayPortletRequest, liferayPortletResponse);
+
+entriesChecker.setCssClass("entry-selector");
+
+entriesChecker.setRememberCheckBoxStateURLRegex(dlAdminDisplayContext.getRememberCheckBoxStateURLRegex());
+
+EntriesMover entriesMover = new EntriesMover(dlTrashHelper.isTrashEnabled(scopeGroupId, repositoryId));
+
+String[] entryColumns = dlPortletInstanceSettingsHelper.getEntryColumns();
+
+boolean portletTitleBasedNavigation = GetterUtil.getBoolean(portletConfig.getInitParameter("portlet-title-based-navigation"));
+
+if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) && (folderId != dlAdminDisplayContext.getRootFolderId())) {
+	String redirect = ParamUtil.getString(request, "redirect");
+
+	if (Validator.isNotNull(redirect)) {
+		portletDisplay.setShowBackIcon(true);
+		portletDisplay.setURLBack(redirect);
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 }
 %>
 
 <div class="document-container" id="<portlet:namespace />entriesContainer">
+<<<<<<< HEAD
+=======
+
+	<%
+	DLAdminManagementToolbarDisplayContext dlAdminManagementToolbarDisplayContext = (DLAdminManagementToolbarDisplayContext)request.getAttribute(DLAdminManagementToolbarDisplayContext.class.getName());
+
+	SearchContainer<Object> dlSearchContainer = dlAdminDisplayContext.getSearchContainer();
+	%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<liferay-ui:search-container
 		id="entries"
 		searchContainer="<%= dlViewEntriesDisplayContext.getSearchContainer() %>"
@@ -42,11 +98,33 @@ if (portletTitleBasedNavigation && !dlViewEntriesDisplayContext.isRootFolder() &
 				<c:when test="<%= fileEntry != null %>">
 
 					<%
+<<<<<<< HEAD
 					row.setData(
 						HashMapBuilder.<String, Object>put(
 							"actions", StringUtil.merge(dlViewEntriesDisplayContext.getAvailableActions(fileEntry))
 						).put(
 							"draggable", dlViewEntriesDisplayContext.isDraggable(fileEntry)
+=======
+					boolean draggable = false;
+
+					if (!BrowserSnifferUtil.isMobile(request) && (DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) || DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.UPDATE))) {
+						draggable = true;
+
+						if (dlSearchContainer.getRowMover() == null) {
+							dlSearchContainer.setRowMover(entriesMover);
+						}
+					}
+
+					if (dlSearchContainer.getRowChecker() == null) {
+						dlSearchContainer.setRowChecker(entriesChecker);
+					}
+
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(dlAdminManagementToolbarDisplayContext.getAvailableActions(fileEntry))
+						).put(
+							"draggable", draggable
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						).put(
 							"title", fileEntry.getTitle()
 						).build());
@@ -279,11 +357,33 @@ if (portletTitleBasedNavigation && !dlViewEntriesDisplayContext.isRootFolder() &
 				<c:otherwise>
 
 					<%
+<<<<<<< HEAD
 					row.setData(
 						HashMapBuilder.<String, Object>put(
 							"actions", StringUtil.merge(dlViewEntriesDisplayContext.getAvailableActions(curFolder))
 						).put(
 							"draggable", dlViewEntriesDisplayContext.isDraggable(curFolder)
+=======
+					if (dlSearchContainer.getRowChecker() == null) {
+						dlSearchContainer.setRowChecker(entriesChecker);
+					}
+
+					boolean draggable = false;
+
+					if (!BrowserSnifferUtil.isMobile(request) && (DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.DELETE) || DLFolderPermission.contains(permissionChecker, curFolder, ActionKeys.UPDATE))) {
+						draggable = true;
+
+						if (dlSearchContainer.getRowMover() == null) {
+							dlSearchContainer.setRowMover(entriesMover);
+						}
+					}
+
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(dlAdminManagementToolbarDisplayContext.getAvailableActions(curFolder))
+						).put(
+							"draggable", draggable
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						).put(
 							"folder", true
 						).put(

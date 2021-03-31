@@ -36,7 +36,11 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentDashboardPortletKeys.CONTENT_DASHBOARD_ADMIN,
+<<<<<<< HEAD
 		"mvc.command.name=/content_dashboard/edit_content_dashboard_configuration"
+=======
+		"mvc.command.name=/edit_content_dashboard_configuration"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	},
 	service = MVCRenderCommand.class
 )

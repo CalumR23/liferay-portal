@@ -72,6 +72,12 @@ public class DLViewFileEntryTypesDisplayContext {
 						"mvcRenderCommandName",
 						"/document_library/edit_file_entry_type", "redirect",
 						PortalUtil.getCurrentURL(_httpServletRequest));
+<<<<<<< HEAD
+=======
+
+					dropdownItem.setHref(creationURL.toString());
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					dropdownItem.setLabel(
 						LanguageUtil.get(_httpServletRequest, "new"));
 				}

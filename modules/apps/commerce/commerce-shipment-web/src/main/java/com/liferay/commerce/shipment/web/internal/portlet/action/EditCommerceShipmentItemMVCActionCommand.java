@@ -124,6 +124,7 @@ public class EditCommerceShipmentItemMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, themeDisplay.getScopeGroup(),
@@ -131,6 +132,15 @@ public class EditCommerceShipmentItemMVCActionCommand
 		).setMVCRenderCommandName(
 			"/commerce_shipment/edit_commerce_shipment_item"
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, themeDisplay.getScopeGroup(),
+			CommerceShipment.class.getName(), PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/edit_commerce_shipment_item");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceShipmentId = ParamUtil.getLong(
 			actionRequest, "commerceShipmentId");

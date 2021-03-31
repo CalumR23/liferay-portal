@@ -22,7 +22,10 @@ import java.io.File;
 
 import java.util.Iterator;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Properties;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 /**
  * @author Igor Beslic
@@ -37,10 +40,13 @@ public class TalendArchive {
 		return _contextName;
 	}
 
+<<<<<<< HEAD
 	public Properties getContextProperties() {
 		return _contextProperties;
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public String getJobDirectory() {
 		return _jobDirectory;
 	}
@@ -83,6 +89,7 @@ public class TalendArchive {
 			return this;
 		}
 
+<<<<<<< HEAD
 		public Builder contextProperties(Properties contextProperties) {
 			_contextProperties = new Properties();
 
@@ -96,6 +103,8 @@ public class TalendArchive {
 			return this;
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		public Builder jobDirectory(String jobDirectory) {
 			_jobDirectory = jobDirectory;
 
@@ -163,7 +172,10 @@ public class TalendArchive {
 
 		private List<String> _classPathEntries;
 		private String _contextName;
+<<<<<<< HEAD
 		private Properties _contextProperties;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		private String _jobDirectory;
 		private String _jobJarPath;
 		private String _jobMainClassFQN;
@@ -174,7 +186,10 @@ public class TalendArchive {
 	private TalendArchive(Builder builder) {
 		_classPath = builder._buildClassPath();
 		_contextName = builder._contextName;
+<<<<<<< HEAD
 		_contextProperties = builder._contextProperties;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_jobDirectory = builder._jobDirectory;
 		_jobJarPath = builder._jobJarPath;
 		_jobMainClassFQN = builder._jobMainClassFQN;
@@ -183,7 +198,10 @@ public class TalendArchive {
 
 	private final String _classPath;
 	private final String _contextName;
+<<<<<<< HEAD
 	private final Properties _contextProperties;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final String _jobDirectory;
 	private final String _jobJarPath;
 	private final String _jobMainClassFQN;

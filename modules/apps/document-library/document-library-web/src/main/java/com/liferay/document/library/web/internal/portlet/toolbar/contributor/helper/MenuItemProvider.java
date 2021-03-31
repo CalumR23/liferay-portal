@@ -110,6 +110,7 @@ public class MenuItemProvider {
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
+<<<<<<< HEAD
 		urlMenuItem.setURL(
 			PortletURLBuilder.create(
 				_getPortletURL(themeDisplay, portletRequest)
@@ -128,6 +129,19 @@ public class MenuItemProvider {
 			).setParameter(
 				"fileEntryTypeId", _getDefaultFileEntryTypeId(folderId)
 			).buildString());
+=======
+		portletURL.setParameter("portletResource", portletDisplay.getId());
+
+		portletURL.setParameter(
+			"repositoryId",
+			String.valueOf(_getRepositoryId(folder, themeDisplay)));
+		portletURL.setParameter("folderId", String.valueOf(folderId));
+		portletURL.setParameter(
+			"fileEntryTypeId",
+			String.valueOf(_getDefaultFileEntryTypeId(folderId)));
+
+		urlMenuItem.setURL(portletURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return urlMenuItem;
 	}

@@ -152,6 +152,7 @@ const Body = ({
 					/>
 				)}
 
+<<<<<<< HEAD
 				<a
 					className="btn btn-secondary btn-sm font-weight-medium mb-1 mt-3"
 					data-tooltip-align="bottom"
@@ -166,6 +167,24 @@ const Body = ({
 						<ClayIcon symbol="shortcut" />
 					</span>
 				</a>
+=======
+				<ClayTooltipProvider>
+					<a
+						className="btn btn-secondary btn-sm font-weight-medium mb-1 mt-3"
+						data-tooltip-align="bottom"
+						data-tooltip-delay="0"
+						href={`/group/control_panel/manage/-/workflow_instance/view/${id}`}
+						target="_blank"
+						title={Liferay.Language.get('open-page-in-a-new-tab')}
+					>
+						{Liferay.Language.get('go-to-submission-page')}
+
+						<span className="inline-item inline-item-after">
+							<ClayIcon symbol="shortcut" />
+						</span>
+					</a>
+				</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			</ContentView>
 		</ClayModal.Body>
 	);

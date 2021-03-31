@@ -1023,6 +1023,7 @@ public interface BlogPostingResource {
 						"/o/headless-delivery/v1.0/blog-postings/{blogPostingId}/my-rating");
 
 			httpInvoker.path("blogPostingId", blogPostingId);
+<<<<<<< HEAD
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -1108,6 +1109,8 @@ public interface BlogPostingResource {
 
 			httpInvoker.path("blogPostingId", blogPostingId);
 			httpInvoker.path("displayPageKey", displayPageKey);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

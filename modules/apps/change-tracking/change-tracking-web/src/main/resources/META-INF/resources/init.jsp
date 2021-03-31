@@ -36,10 +36,18 @@ page import="com.liferay.change.tracking.model.CTProcess" %><%@
 page import="com.liferay.change.tracking.web.internal.constants.CTPortletKeys" %><%@
 page import="com.liferay.change.tracking.web.internal.constants.CTWebKeys" %><%@
 page import="com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry" %><%@
+<<<<<<< HEAD
+=======
+page import="com.liferay.change.tracking.web.internal.display.CTEntryDiffDisplay" %><%@
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.change.tracking.web.internal.display.context.PublicationsConfigurationDisplayContext" %><%@
 page import="com.liferay.change.tracking.web.internal.display.context.PublicationsDisplayContext" %><%@
 page import="com.liferay.change.tracking.web.internal.display.context.PublicationsManagementToolbarDisplayContext" %><%@
 page import="com.liferay.change.tracking.web.internal.display.context.ReschedulePublicationDisplayContext" %><%@
+<<<<<<< HEAD
+=======
+page import="com.liferay.change.tracking.web.internal.display.context.SelectPublicationManagementToolbarDisplayContext" %><%@
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.change.tracking.web.internal.display.context.ViewChangesDisplayContext" %><%@
 page import="com.liferay.change.tracking.web.internal.display.context.ViewConflictsDisplayContext" %><%@
 page import="com.liferay.change.tracking.web.internal.display.context.ViewDiscardDisplayContext" %><%@
@@ -56,7 +64,10 @@ page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.model.ModelHintsUtil" %><%@
 page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
 page import="com.liferay.portal.kernel.service.permission.PortletPermissionUtil" %><%@
+<<<<<<< HEAD
 page import="com.liferay.portal.kernel.servlet.MultiSessionErrors" %><%@
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.portal.kernel.util.FastDateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@

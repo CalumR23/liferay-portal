@@ -29,18 +29,33 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.LocaleUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.util.ProxyUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+<<<<<<< HEAD
 import com.liferay.portlet.test.MockLiferayPortletContext;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
 
 import java.util.Dictionary;
+<<<<<<< HEAD
 
 import javax.portlet.Portlet;
+=======
+import java.util.Objects;
+
+import javax.portlet.Portlet;
+import javax.portlet.PortletContext;
+import javax.portlet.PortletRequestDispatcher;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.After;
 import org.junit.Assert;
@@ -138,7 +153,31 @@ public class SegmentsDisplayContextTest {
 		mockLiferayPortletRenderRequest.setAttribute(
 			MVCRenderConstants.
 				PORTLET_CONTEXT_OVERRIDE_REQUEST_ATTIBUTE_NAME_PREFIX + path,
+<<<<<<< HEAD
 			new MockLiferayPortletContext(path));
+=======
+			ProxyUtil.newProxyInstance(
+				PortletContext.class.getClassLoader(),
+				new Class<?>[] {PortletContext.class},
+				(PortletContextProxy, portletContextMethod,
+				 portletContextArgs) -> {
+
+					if (Objects.equals(
+							portletContextMethod.getName(),
+							"getRequestDispatcher") &&
+						Objects.equals(portletContextArgs[0], path)) {
+
+						return ProxyUtil.newProxyInstance(
+							PortletRequestDispatcher.class.getClassLoader(),
+							new Class<?>[] {PortletRequestDispatcher.class},
+							(portletRequestDispatcherProxy,
+							 portletRequestDispatcherMethod,
+							 portletRequestDispatcherArgs) -> null);
+					}
+
+					throw new UnsupportedOperationException();
+				}));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		mockLiferayPortletRenderRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());

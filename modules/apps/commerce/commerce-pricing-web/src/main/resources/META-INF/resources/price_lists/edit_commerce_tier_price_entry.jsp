@@ -45,7 +45,11 @@ if ((commerceTierPriceEntry != null) && (commerceTierPriceEntry.getExpirationDat
 <commerce-ui:side-panel-content
 	title='<%= LanguageUtil.get(request, "edit-price-tier") %>'
 >
+<<<<<<< HEAD
 	<aui:form action="<%= editCommerceTierPriceEntryActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+	<aui:form action="<%= editCommerceTierPriceEntryActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="commercePriceEntryId" type="hidden" value="<%= commercePriceEntryId %>" />
@@ -54,6 +58,7 @@ if ((commerceTierPriceEntry != null) && (commerceTierPriceEntry.getExpirationDat
 
 		<liferay-ui:error exception="<%= DuplicateCommerceTierPriceEntryException.class %>" message="there-is-already-a-tier-price-entry-with-the-same-minimum-quantity" />
 
+<<<<<<< HEAD
 		<commerce-ui:panel
 			title='<%= LanguageUtil.get(request, "details") %>'
 		>
@@ -72,6 +77,32 @@ if ((commerceTierPriceEntry != null) && (commerceTierPriceEntry.getExpirationDat
 				/>
 			</commerce-ui:panel>
 		</c:if>
+=======
+		<div class="row">
+			<div class="col-12">
+				<commerce-ui:panel
+					title='<%= LanguageUtil.get(request, "details") %>'
+				>
+					<%@ include file="/price_lists/tier_price_entry/details.jspf" %>
+				</commerce-ui:panel>
+			</div>
+
+			<c:if test="<%= commerceTierPriceEntryDisplayContext.hasCustomAttributes() %>">
+				<div class="col-12">
+					<commerce-ui:panel
+						title='<%= LanguageUtil.get(request, "custom-attributes") %>'
+					>
+						<liferay-expando:custom-attribute-list
+							className="<%= CommerceTierPriceEntry.class.getName() %>"
+							classPK="<%= (commerceTierPriceEntry != null) ? commerceTierPriceEntry.getCommerceTierPriceEntryId() : 0 %>"
+							editable="<%= true %>"
+							label="<%= true %>"
+						/>
+					</commerce-ui:panel>
+				</div>
+			</c:if>
+		</div>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		<aui:button-row cssClass="tier-price-entry-button-row">
 			<aui:button cssClass="btn-lg" type="submit" />

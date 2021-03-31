@@ -74,11 +74,48 @@ export default function MultiPanelSidebar({
 					.catch((error) => console.error(error))
 		);
 
+<<<<<<< HEAD
 		setPanelComponents([]);
 
 		Promise.all(panelPromises).then((result) => {
 			if (isMounted()) {
 				setPanelComponents(result);
+=======
+	const togglePlugin = () => {
+		if (hasError) {
+			setHasError(false);
+		}
+
+		if (registerPanel) {
+			registerPanel.then((plugin) => {
+				if (
+					plugin &&
+					typeof plugin.activate === 'function' &&
+					isMounted()
+				) {
+					plugin.activate();
+				}
+				else if (!plugin) {
+					setHasError(true);
+				}
+			});
+		}
+	};
+
+	useEffect(
+		() => {
+			if (panel) {
+				togglePlugin(panel);
+			}
+			else if (sidebarPanelId) {
+				dispatch({
+					payload: {
+						sidebarOpen: false,
+						sidebarPanelId: null,
+					},
+					type: 'SWITCH_SIDEBAR_PANEL',
+				});
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,12 +208,22 @@ export default function MultiPanelSidebar({
 		>
 			<nav
 				className={classNames(
+<<<<<<< HEAD
 					'multi-panel-sidebar-buttons',
 					'tbar',
 					'tbar-stacked',
 					variant === 'dark'
 						? `tbar-${variant}-d1`
 						: `tbar-${variant}`
+=======
+					'multi-panel-sidebar',
+					`multi-panel-sidebar-${variant}`,
+					{
+						'publications-enabled': document.querySelector(
+							'.change-tracking-indicator'
+						),
+					}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				)}
 			>
 				<ul className="tbar-nav">

@@ -237,6 +237,7 @@ public class CommerceShippingFixedOptionSettingClayTable
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest,
@@ -251,6 +252,18 @@ public class CommerceShippingFixedOptionSettingClayTable
 		).setParameter(
 			"commerceShippingFixedOptionRelId", shippingFixedOptionSettingId
 		).buildString();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceShippingFixedOptionRelId",
+			String.valueOf(shippingFixedOptionSettingId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getShippingFixedOptionSettingEditURL(
@@ -258,6 +271,7 @@ public class CommerceShippingFixedOptionSettingClayTable
 			long shippingFixedOptionSettingId)
 		throws Exception {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceShippingMethod.class.getName(),
@@ -265,6 +279,15 @@ public class CommerceShippingFixedOptionSettingClayTable
 		).setMVCRenderCommandName(
 			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel"
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceShippingMethod.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceShippingMethodId = ParamUtil.getLong(
 			httpServletRequest, "commerceShippingMethodId");

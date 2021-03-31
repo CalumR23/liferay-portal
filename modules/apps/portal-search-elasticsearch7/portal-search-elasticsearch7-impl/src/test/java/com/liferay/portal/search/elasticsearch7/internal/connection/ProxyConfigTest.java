@@ -15,12 +15,18 @@
 package com.liferay.portal.search.elasticsearch7.internal.connection;
 
 import com.liferay.portal.kernel.util.Http;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+
+import org.junit.Assert;
+import org.junit.Before;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Mock;
@@ -32,11 +38,14 @@ import org.mockito.MockitoAnnotations;
  */
 public class ProxyConfigTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);

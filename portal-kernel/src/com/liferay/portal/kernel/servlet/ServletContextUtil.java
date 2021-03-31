@@ -319,7 +319,10 @@ public class ServletContextUtil {
 	private static final String _LIFERAY_WAB_BUNDLE_RESOURCES_LAST_MODIFIED =
 		"LIFERAY_WAB_BUNDLE_RESOURCES_LAST_MODIFIED";
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		ServletContextUtil.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 }

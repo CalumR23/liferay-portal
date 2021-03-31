@@ -27,7 +27,10 @@ import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.Locale;
 import java.util.Objects;
@@ -36,8 +39,11 @@ import java.util.Optional;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -45,11 +51,14 @@ import org.junit.Test;
  */
 public class AddressUtilTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() {
 		LanguageUtil languageUtil = new LanguageUtil();

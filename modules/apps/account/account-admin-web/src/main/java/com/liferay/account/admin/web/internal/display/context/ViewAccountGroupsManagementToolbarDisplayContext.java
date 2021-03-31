@@ -61,6 +61,16 @@ public class ViewAccountGroupsManagementToolbarDisplayContext
 
 				dropdownItem.putData("action", "deleteAccountGroups");
 
+<<<<<<< HEAD
+=======
+				PortletURL deleteAccountGroupsURL =
+					liferayPortletResponse.createActionURL();
+
+				deleteAccountGroupsURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/account_admin/delete_account_groups");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				dropdownItem.putData(
 					"deleteAccountGroupsURL",
 					PortletURLBuilder.createActionURL(

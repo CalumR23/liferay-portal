@@ -321,6 +321,23 @@ public class EditCommerceOrderMVCActionCommand extends BaseMVCActionCommand {
 			ActionResponse actionResponse)
 		throws Exception {
 
+<<<<<<< HEAD
+=======
+		PortletURL shipmentPortletURL = _portal.getControlPanelPortletURL(
+			actionRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
+			PortletRequest.RENDER_PHASE);
+
+		String redirect = ParamUtil.getString(actionRequest, "redirect");
+
+		shipmentPortletURL.setParameter("redirect", redirect);
+
+		shipmentPortletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/edit_commerce_shipment");
+		shipmentPortletURL.setParameter(
+			"commerceShipmentId", String.valueOf(commerceShipmentId));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		sendRedirect(
 			actionRequest, actionResponse,
 			PortletURLBuilder.create(

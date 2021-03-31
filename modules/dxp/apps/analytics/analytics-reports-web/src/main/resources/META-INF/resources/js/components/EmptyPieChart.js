@@ -26,7 +26,11 @@ export default function EmptyPieChart({height, innerRadius, radius, width}) {
 					dataKey="value"
 					innerRadius={innerRadius}
 					isAnimationActive={false}
+<<<<<<< HEAD
 					nameKey="name"
+=======
+					nameKey={'name'}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					outerRadius={radius}
 					paddingAngle={1}
 				>

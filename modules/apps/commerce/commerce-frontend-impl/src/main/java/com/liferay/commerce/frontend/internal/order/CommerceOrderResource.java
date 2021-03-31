@@ -150,6 +150,7 @@ public class CommerceOrderResource {
 			long commerceOrderId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL editURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceOrder.class.getName(),
@@ -161,6 +162,18 @@ public class CommerceOrderResource {
 		).setParameter(
 			"commerceOrderId", commerceOrderId
 		).build();
+=======
+		PortletURL editURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceOrder.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		editURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_open_order_content/edit_commerce_order");
+		editURL.setParameter(Constants.CMD, "setCurrent");
+		editURL.setParameter(
+			"commerceOrderId", String.valueOf(commerceOrderId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = _portal.getCurrentURL(httpServletRequest);
 

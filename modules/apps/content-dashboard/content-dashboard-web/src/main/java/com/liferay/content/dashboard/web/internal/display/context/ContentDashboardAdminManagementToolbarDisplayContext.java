@@ -639,6 +639,11 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				dropdownItem.putData(
 					"dialogTitle",
 					LanguageUtil.get(httpServletRequest, "select-author"));
+<<<<<<< HEAD
+=======
+
+				PortletURL portletURL = getPortletURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				PortletURL portletURL = PortletURLBuilder.create(
 					getPortletURL()
@@ -706,6 +711,11 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 					"dialogTitle",
 					LanguageUtil.get(
 						httpServletRequest, "select-site-or-asset-library"));
+<<<<<<< HEAD
+=======
+
+				PortletURL portletURL = getPortletURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				PortletURL portletURL = PortletURLBuilder.create(
 					getPortletURL()
@@ -744,6 +754,11 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				dropdownItem.putData(
 					"dialogTitle",
 					LanguageUtil.get(httpServletRequest, "select-subtype"));
+<<<<<<< HEAD
+=======
+
+				PortletURL portletURL = getPortletURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				PortletURL portletURL = PortletURLBuilder.create(
 					getPortletURL()
@@ -772,6 +787,11 @@ public class ContentDashboardAdminManagementToolbarDisplayContext
 				dropdownItem.putData(
 					"dialogTitle",
 					LanguageUtil.get(httpServletRequest, "select-tags"));
+<<<<<<< HEAD
+=======
+
+				PortletURL portletURL = getPortletURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				PortletURL portletURL = PortletURLBuilder.create(
 					getPortletURL()

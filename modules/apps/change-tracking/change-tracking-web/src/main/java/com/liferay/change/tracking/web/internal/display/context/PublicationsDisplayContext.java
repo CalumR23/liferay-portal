@@ -26,8 +26,11 @@ import com.liferay.change.tracking.web.internal.security.permission.resource.CTC
 import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.string.StringPool;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -40,6 +43,11 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
@@ -50,6 +58,10 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.portlet.ActionRequest;
+<<<<<<< HEAD
+=======
+import javax.portlet.PortletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
@@ -58,24 +70,43 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Samuel Trong Tran
  */
+<<<<<<< HEAD
 public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
+=======
+public class PublicationsDisplayContext {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	public PublicationsDisplayContext(
 		CTCollectionService ctCollectionService,
 		CTDisplayRendererRegistry ctDisplayRendererRegistry,
 		CTEntryLocalService ctEntryLocalService,
+<<<<<<< HEAD
 		CTPreferencesLocalService ctPreferencesLocalService,
 		HttpServletRequest httpServletRequest, Language language,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		super(httpServletRequest);
+=======
+		CTPreferencesLocalService ctPreferencesLocalService, Language language,
+		Portal portal, RenderRequest renderRequest,
+		RenderResponse renderResponse) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_ctCollectionService = ctCollectionService;
 		_ctDisplayRendererRegistry = ctDisplayRendererRegistry;
 		_ctEntryLocalService = ctEntryLocalService;
+<<<<<<< HEAD
 		_httpServletRequest = httpServletRequest;
 		_language = language;
 
+=======
+		_language = language;
+
+		_portal = portal;
+
+		_httpServletRequest = _portal.getHttpServletRequest(renderRequest);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_renderRequest = renderRequest;
 
 		_themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
@@ -103,6 +134,13 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return _ctDisplayRendererRegistry;
 	}
 
+<<<<<<< HEAD
+=======
+	public String getDisplayStyle() {
+		return ParamUtil.getString(_renderRequest, "displayStyle", "list");
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public Map<String, Object> getDropdownReactData(
 			CTCollection ctCollection, PermissionChecker permissionChecker)
 		throws Exception {
@@ -113,6 +151,7 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 	}
 
 	public String getReviewChangesURL(long ctCollectionId) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -120,6 +159,16 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		).setParameter(
 			"ctCollectionId", ctCollectionId
 		).buildString();
+=======
+		PortletURL reviewURL = _renderResponse.createRenderURL();
+
+		reviewURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/view_changes");
+		reviewURL.setParameter(
+			"ctCollectionId", String.valueOf(ctCollectionId));
+
+		return reviewURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public SearchContainer<CTCollection> getSearchContainer() {
@@ -134,18 +183,27 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			_language.get(_httpServletRequest, "no-publications-were-found"));
 
 		searchContainer.setId("ongoing");
+<<<<<<< HEAD
 		searchContainer.setOrderByCol(getOrderByCol());
 		searchContainer.setOrderByType(getOrderByType());
+=======
+		searchContainer.setOrderByCol(_getOrderByCol());
+		searchContainer.setOrderByType(_getOrderByType());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
 
 		String keywords = displayTerms.getKeywords();
 
 		int count = _ctCollectionService.getCTCollectionsCount(
+<<<<<<< HEAD
 			_themeDisplay.getCompanyId(),
 			new int[] {
 				WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_EXPIRED
 			},
+=======
+			_themeDisplay.getCompanyId(), WorkflowConstants.STATUS_DRAFT,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			keywords);
 
 		searchContainer.setTotal(count);
@@ -162,10 +220,14 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 				Objects.equals(searchContainer.getOrderByType(), "asc"));
 
 		List<CTCollection> results = _ctCollectionService.getCTCollections(
+<<<<<<< HEAD
 			_themeDisplay.getCompanyId(),
 			new int[] {
 				WorkflowConstants.STATUS_DRAFT, WorkflowConstants.STATUS_EXPIRED
 			},
+=======
+			_themeDisplay.getCompanyId(), WorkflowConstants.STATUS_DRAFT,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			keywords, searchContainer.getStart(), searchContainer.getEnd(),
 			orderByComparator);
 
@@ -176,6 +238,7 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return _searchContainer;
 	}
 
+<<<<<<< HEAD
 	public String getStatusLabel(int status) {
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 			return "published";
@@ -204,6 +267,8 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return WorkflowConstants.getStatusStyle(status);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public List<NavigationItem> getViewNavigationItems() {
 		return NavigationItemListBuilder.add(
 			navigationItem -> {
@@ -218,7 +283,12 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 				navigationItem.setActive(false);
 				navigationItem.setHref(
 					_renderResponse.createRenderURL(), "mvcRenderCommandName",
+<<<<<<< HEAD
 					"/change_tracking/view_scheduled");
+=======
+					"/change_tracking/view_scheduled", "displayStyle",
+					getDisplayStyle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				navigationItem.setLabel(
 					_language.get(_httpServletRequest, "scheduled"));
 			}
@@ -227,7 +297,12 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 				navigationItem.setActive(false);
 				navigationItem.setHref(
 					_renderResponse.createRenderURL(), "mvcRenderCommandName",
+<<<<<<< HEAD
 					"/change_tracking/view_history");
+=======
+					"/change_tracking/view_history", "displayStyle",
+					getDisplayStyle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				navigationItem.setLabel(
 					_language.get(_httpServletRequest, "history"));
 			}
@@ -245,6 +320,7 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return false;
 	}
 
+<<<<<<< HEAD
 	@Override
 	protected String getDefaultOrderByCol() {
 		return "modified-date";
@@ -255,6 +331,8 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return "ongoing";
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private JSONArray _getDropdownItemsJSONArray(
 			CTCollection ctCollection, PermissionChecker permissionChecker)
 		throws Exception {
@@ -267,10 +345,13 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			if (ctCollection.getCtCollectionId() != _ctCollectionId) {
 				jsonArray.put(
 					JSONUtil.put(
+<<<<<<< HEAD
 						"disabled",
 						ctCollection.getStatus() ==
 							WorkflowConstants.STATUS_EXPIRED
 					).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						"href",
 						PublicationsPortletURLUtil.getHref(
 							_renderResponse.createActionURL(),
@@ -361,10 +442,13 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 			if (PropsValues.SCHEDULER_ENABLED) {
 				jsonArray.put(
 					JSONUtil.put(
+<<<<<<< HEAD
 						"disabled",
 						ctCollection.getStatus() ==
 							WorkflowConstants.STATUS_EXPIRED
 					).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						"href",
 						PublicationsPortletURLUtil.getHref(
 							_renderResponse.createRenderURL(),
@@ -382,9 +466,12 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 
 			jsonArray.put(
 				JSONUtil.put(
+<<<<<<< HEAD
 					"disabled",
 					ctCollection.getStatus() == WorkflowConstants.STATUS_EXPIRED
 				).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					"href",
 					PublicationsPortletURLUtil.getHref(
 						_renderResponse.createRenderURL(),
@@ -402,12 +489,31 @@ public class PublicationsDisplayContext extends BasePublicationsDisplayContext {
 		return jsonArray;
 	}
 
+<<<<<<< HEAD
+=======
+	private String _getOrderByCol() {
+		return ParamUtil.getString(
+			_renderRequest, SearchContainer.DEFAULT_ORDER_BY_COL_PARAM,
+			"modified-date");
+	}
+
+	private String _getOrderByType() {
+		return ParamUtil.getString(
+			_renderRequest, SearchContainer.DEFAULT_ORDER_BY_TYPE_PARAM,
+			"desc");
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final long _ctCollectionId;
 	private final CTCollectionService _ctCollectionService;
 	private final CTDisplayRendererRegistry _ctDisplayRendererRegistry;
 	private final CTEntryLocalService _ctEntryLocalService;
 	private final HttpServletRequest _httpServletRequest;
 	private final Language _language;
+<<<<<<< HEAD
+=======
+	private final Portal _portal;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
 	private SearchContainer<CTCollection> _searchContainer;

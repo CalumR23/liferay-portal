@@ -122,7 +122,12 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 	protected Region updateCommerceRegion(ActionRequest actionRequest)
 		throws Exception {
 
+<<<<<<< HEAD
 		long regionId = ParamUtil.getLong(actionRequest, "regionId");
+=======
+		long commerceRegionId = ParamUtil.getLong(
+			actionRequest, "commerceRegionId");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		boolean active = ParamUtil.getBoolean(actionRequest, "active");
 		String code = ParamUtil.getString(actionRequest, "code");
@@ -134,10 +139,20 @@ public class EditCommerceRegionMVCActionCommand extends BaseMVCActionCommand {
 		if (regionId <= 0) {
 			long countryId = ParamUtil.getLong(actionRequest, "countryId");
 
+<<<<<<< HEAD
 			region = _regionService.addRegion(
 				countryId, active, name, priority, code,
 				ServiceContextFactory.getInstance(
 					Region.class.getName(), actionRequest));
+=======
+		if (commerceRegionId <= 0) {
+			long commerceCountryId = ParamUtil.getLong(
+				actionRequest, "commerceCountryId");
+
+			commerceRegion = _commerceRegionService.addCommerceRegion(
+				commerceCountryId, name, code, priority, active,
+				serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		else {
 			region = _regionService.updateRegion(

@@ -110,6 +110,19 @@ public class CommerceTierPriceEntryDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_price_list/edit_commerce_tier_price_entry");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceTierPriceEntryId",
+			String.valueOf(
+				commerceTierPriceEntry.getCommerceTierPriceEntryId()));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		CommercePriceEntry commercePriceEntry =
 			commerceTierPriceEntry.getCommercePriceEntry();
 
@@ -148,6 +161,23 @@ public class CommerceTierPriceEntryDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommercePriceList.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_price_list/edit_commerce_tier_price_entry");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceTierPriceEntryId",
+			String.valueOf(
+				commerceTierPriceEntry.getCommerceTierPriceEntryId()));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		CommercePriceEntry commercePriceEntry =
 			commerceTierPriceEntry.getCommercePriceEntry();
 

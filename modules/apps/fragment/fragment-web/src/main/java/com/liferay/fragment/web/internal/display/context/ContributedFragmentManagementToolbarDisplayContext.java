@@ -92,6 +92,7 @@ public class ContributedFragmentManagementToolbarDisplayContext
 					(ThemeDisplay)httpServletRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 				return PortletURLBuilder.createActionURL(
 					liferayPortletResponse
 				).setActionName(
@@ -99,6 +100,18 @@ public class ContributedFragmentManagementToolbarDisplayContext
 				).setRedirect(
 					themeDisplay.getURLCurrent()
 				).buildString();
+=======
+				PortletURL copyContributedFragmentEntryURL =
+					liferayPortletResponse.createActionURL();
+
+				copyContributedFragmentEntryURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/fragment/copy_contributed_fragment_entry");
+				copyContributedFragmentEntryURL.setParameter(
+					"redirect", themeDisplay.getURLCurrent());
+
+				return copyContributedFragmentEntryURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		).put(
 			"selectFragmentCollectionURL",

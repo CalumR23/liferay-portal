@@ -81,12 +81,20 @@ public class WorkflowDefinitionsDataProviderTest extends PowerMockito {
 		WorkflowDefinition workflowDefinition1 = mock(WorkflowDefinition.class);
 
 		_setUpWorkflowDefinition(
+<<<<<<< HEAD
 			workflowDefinition1, "definition1", "Definition 1");
+=======
+			workflowDefinition1, "definition1", 1, "Definition 1");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		WorkflowDefinition workflowDefinition2 = mock(WorkflowDefinition.class);
 
 		_setUpWorkflowDefinition(
+<<<<<<< HEAD
 			workflowDefinition2, "definition2", "Definition 2");
+=======
+			workflowDefinition2, "definition2", 2, "Definition 2");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		when(
 			_workflowDefinitionManager.getActiveWorkflowDefinitions(
@@ -109,8 +117,13 @@ public class WorkflowDefinitionsDataProviderTest extends PowerMockito {
 		List<KeyValuePair> keyValuePairs = new ArrayList<KeyValuePair>() {
 			{
 				add(new KeyValuePair("no-workflow", "No Workflow"));
+<<<<<<< HEAD
 				add(new KeyValuePair("definition1", "Definition 1"));
 				add(new KeyValuePair("definition2", "Definition 2"));
+=======
+				add(new KeyValuePair("definition1@1", "Definition 1"));
+				add(new KeyValuePair("definition2@2", "Definition 2"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		};
 
@@ -193,7 +206,12 @@ public class WorkflowDefinitionsDataProviderTest extends PowerMockito {
 	}
 
 	private void _setUpWorkflowDefinition(
+<<<<<<< HEAD
 		WorkflowDefinition workflowDefinition1, String name, String title) {
+=======
+		WorkflowDefinition workflowDefinition1, String name, int version,
+		String title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		when(
 			workflowDefinition1.getName()
@@ -202,6 +220,15 @@ public class WorkflowDefinitionsDataProviderTest extends PowerMockito {
 		);
 
 		when(
+<<<<<<< HEAD
+=======
+			workflowDefinition1.getVersion()
+		).thenReturn(
+			version
+		);
+
+		when(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			workflowDefinition1.getTitle("en_US")
 		).thenReturn(
 			title

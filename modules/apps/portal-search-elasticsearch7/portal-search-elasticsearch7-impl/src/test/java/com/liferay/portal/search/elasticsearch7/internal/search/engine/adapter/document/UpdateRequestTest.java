@@ -16,7 +16,10 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.
 
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.IOException;
 
@@ -39,7 +42,10 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+<<<<<<< HEAD
 import org.junit.ClassRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -47,10 +53,13 @@ import org.junit.Test;
  */
 public class UpdateRequestTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		_elasticsearchFixture = new ElasticsearchFixture();

@@ -46,7 +46,10 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.User;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.model.UserTable;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
@@ -334,8 +337,37 @@ public class ViewChangesDisplayContext {
 			}
 		).put(
 			"namespace", _renderResponse.getNamespace()
+<<<<<<< HEAD
 		).put(
 			"pathParam", ParamUtil.getString(_renderRequest, "path")
+=======
+		).put(
+			"pathParam", ParamUtil.getString(_renderRequest, "path")
+		).put(
+			"renderCTEntryURL",
+			() -> {
+				ResourceURL renderCTEntryURL =
+					_renderResponse.createResourceURL();
+
+				renderCTEntryURL.setResourceID(
+					"/change_tracking/render_ct_entry");
+
+				renderCTEntryURL.setParameter(
+					"ctCollectionId",
+					String.valueOf(_ctCollection.getCtCollectionId()));
+
+				return renderCTEntryURL.toString();
+			}
+		).put(
+			"renderDiffURL",
+			() -> {
+				ResourceURL renderDiffURL = _renderResponse.createResourceURL();
+
+				renderDiffURL.setResourceID("/change_tracking/render_diff");
+
+				return renderDiffURL.toString();
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		).put(
 			"rootDisplayClasses",
 			() -> {
@@ -557,10 +589,13 @@ public class ViewChangesDisplayContext {
 			if (_ctCollection.getCtCollectionId() != _activeCTCollectionId) {
 				jsonArray.put(
 					JSONUtil.put(
+<<<<<<< HEAD
 						"disabled",
 						_ctCollection.getStatus() ==
 							WorkflowConstants.STATUS_EXPIRED
 					).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						"href",
 						PublicationsPortletURLUtil.getHref(
 							_renderResponse.createActionURL(),

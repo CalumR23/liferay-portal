@@ -23,7 +23,10 @@ import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.frontend.taglib.clay.data.set.ClayDataSetActionProvider;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuilder;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -98,6 +101,7 @@ public class CommerceProductPricingClassDataSetActionProvider
 			long pricingClassId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -107,6 +111,17 @@ public class CommerceProductPricingClassDataSetActionProvider
 		).setParameter(
 			"commercePricingClassId", pricingClassId
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/cp_definitions/edit_cp_definition_pricing_class");
+		portletURL.setParameter(
+			"commercePricingClassId", String.valueOf(pricingClassId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

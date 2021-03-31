@@ -30,13 +30,20 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LoggerTestUtil;
+=======
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.test.rule.SynchronousMailTestRule;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.log4j.Level;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -165,8 +172,14 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			roleResource.postOrganizationRoleUserAccountAssociationHttpResponse(
 				0L, _user.getUserId(), organization.getOrganizationId()));
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_EXCEPTION_MAPPER, LoggerTestUtil.ERROR)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_EXCEPTION_MAPPER, Level.ERROR)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			assertHttpResponseStatusCode(
 				500,
@@ -198,8 +211,14 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			roleResource.postRoleUserAccountAssociationHttpResponse(
 				0L, _user.getUserId()));
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_EXCEPTION_MAPPER, LoggerTestUtil.ERROR)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_EXCEPTION_MAPPER, Level.ERROR)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			assertHttpResponseStatusCode(
 				500,
@@ -229,8 +248,14 @@ public class RoleResourceTest extends BaseRoleResourceTestCase {
 			roleResource.postSiteRoleUserAccountAssociationHttpResponse(
 				0L, _user.getUserId(), testGroup.getGroupId()));
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_EXCEPTION_MAPPER, LoggerTestUtil.ERROR)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_EXCEPTION_MAPPER, Level.ERROR)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			assertHttpResponseStatusCode(
 				500,

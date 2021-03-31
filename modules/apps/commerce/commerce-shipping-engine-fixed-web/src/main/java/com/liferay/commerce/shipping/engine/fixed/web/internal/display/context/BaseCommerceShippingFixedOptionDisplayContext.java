@@ -55,6 +55,7 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 	public String getCommerceCurrencyCode() throws PortalException {
 		CommerceShippingMethod commerceShippingMethod =
 			getCommerceShippingMethod();
+<<<<<<< HEAD
 
 		if (commerceShippingMethod == null) {
 			return StringPool.BLANK;
@@ -68,6 +69,21 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 			return StringPool.BLANK;
 		}
 
+=======
+
+		if (commerceShippingMethod == null) {
+			return StringPool.BLANK;
+		}
+
+		CommerceChannel commerceChannel =
+			commerceChannelLocalService.getCommerceChannelByGroupId(
+				commerceShippingMethod.getGroupId());
+
+		if (commerceChannel == null) {
+			return StringPool.BLANK;
+		}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return commerceChannel.getCommerceCurrencyCode();
 	}
 
@@ -102,11 +118,20 @@ public class BaseCommerceShippingFixedOptionDisplayContext {
 	}
 
 	public PortletURL getPortletURL() throws PortalException {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			renderResponse
 		).setMVCRenderCommandName(
 			"/commerce_shipping_methods/edit_commerce_shipping_method"
 		).setParameter(
+=======
+		PortletURL portletURL = renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipping_methods/edit_commerce_shipping_method");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			getSelectedScreenNavigationCategoryKey()
 		).build();

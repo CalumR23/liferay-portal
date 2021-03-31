@@ -304,8 +304,12 @@ public class DDMFormValidatorImpl implements DDMFormValidator {
 			validateDDMFormFieldIndexType(ddmFormField);
 
 			validateDDMFormFieldOptions(
+<<<<<<< HEAD
 				allowInvalidAvailableLocalesForProperty, ddmFormField,
 				ddmFormAvailableLocales, ddmFormDefaultLocale);
+=======
+				ddmFormField, ddmFormAvailableLocales, ddmFormDefaultLocale);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			validateOptionalDDMFormFieldLocalizedProperty(
 				ddmFormField, "label", allowInvalidAvailableLocalesForProperty,

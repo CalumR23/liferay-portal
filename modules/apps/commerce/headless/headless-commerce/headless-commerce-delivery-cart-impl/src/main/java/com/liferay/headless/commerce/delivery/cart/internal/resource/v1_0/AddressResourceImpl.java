@@ -26,6 +26,11 @@ import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldId;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
+<<<<<<< HEAD
+=======
+
+import javax.validation.constraints.NotNull;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

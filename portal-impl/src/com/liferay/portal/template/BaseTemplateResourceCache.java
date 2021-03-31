@@ -144,11 +144,23 @@ public abstract class BaseTemplateResourceCache
 		_multiVMPool.removePortalCache(
 			_multiVMPortalCache.getPortalCacheName());
 
+<<<<<<< HEAD
 		_singleVMPool.removePortalCache(
 			_singleVMPortalCache.getPortalCacheName());
 
 		_singleVMPool.removePortalCache(
 			_secondLevelPortalCache.getPortalCacheName());
+=======
+		_multiVMPool.removePortalCache(_portalCacheName);
+
+		_multiVMPortalCache = null;
+
+		_singleVMPool.removePortalCache(_portalCacheName);
+
+		_singleVMPortalCache = null;
+
+		_templateResourcePortalCacheListener = null;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	/**
@@ -215,10 +227,19 @@ public abstract class BaseTemplateResourceCache
 
 	private volatile long _modificationCheckInterval;
 	private MultiVMPool _multiVMPool;
+<<<<<<< HEAD
 	private PortalCache<String, TemplateResource> _multiVMPortalCache;
 	private PortalCache<TemplateResource, ?> _secondLevelPortalCache;
 	private SingleVMPool _singleVMPool;
 	private PortalCache<String, TemplateResource> _singleVMPortalCache;
+=======
+	private volatile PortalCache<String, TemplateResource> _multiVMPortalCache;
+	private String _portalCacheName;
+	private SingleVMPool _singleVMPool;
+	private volatile PortalCache<String, TemplateResource> _singleVMPortalCache;
+	private volatile TemplateResourcePortalCacheListener
+		_templateResourcePortalCacheListener;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	private class TemplateResourcePortalCacheListener
 		implements PortalCacheListener<String, TemplateResource> {

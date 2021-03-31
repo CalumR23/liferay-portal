@@ -816,10 +816,20 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 				"Tag name cannot be an empty string");
 		}
 
+<<<<<<< HEAD
 		if (!_isValidWord(name)) {
 			throw new AssetTagException(
 				"Tag name has one or more invalid characters: " +
 					StringUtil.merge(_INVALID_CHARACTERS, StringPool.SPACE),
+=======
+		if (!AssetUtil.isValidWord(name)) {
+			String invalidCharacters = StringUtil.merge(
+				AssetUtil.INVALID_CHARACTERS, StringPool.SPACE);
+
+			throw new AssetTagException(
+				"Tag name has one or more invalid characters: " +
+					invalidCharacters,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				AssetTagException.INVALID_CHARACTER);
 		}
 

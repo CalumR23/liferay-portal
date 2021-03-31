@@ -32,8 +32,11 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.portal.kernel.service.persistence.change.tracking.helper.CTPersistenceHelper;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -54,10 +57,14 @@ import java.io.Serializable;
 
 import java.lang.reflect.InvocationHandler;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
+=======
+import java.util.Date;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -183,30 +190,47 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
+<<<<<<< HEAD
 			if (useFinderCache && productionMode) {
+=======
+			if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderPath = _finderPathWithoutPaginationFindByUuid;
 				finderArgs = new Object[] {uuid};
 			}
 		}
+<<<<<<< HEAD
 		else if (useFinderCache && productionMode) {
+=======
+		else if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderPath = _finderPathWithPaginationFindByUuid;
 			finderArgs = new Object[] {uuid, start, end, orderByComparator};
 		}
 
 		List<StyleBookEntry> list = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			list = (List<StyleBookEntry>)finderCache.getResult(
 				finderPath, finderArgs);
+=======
+		if (useFinderCache) {
+			list = (List<StyleBookEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (StyleBookEntry styleBookEntry : list) {
@@ -271,7 +295,11 @@ public class StyleBookEntryPersistenceImpl
 
 				cacheResult(list);
 
+<<<<<<< HEAD
 				if (useFinderCache && productionMode) {
+=======
+				if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -585,6 +613,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUuid(String uuid) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -600,6 +629,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUuid;
+
+		Object[] finderArgs = new Object[] {uuid};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -634,9 +670,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -737,21 +777,32 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
+<<<<<<< HEAD
 			if (useFinderCache && productionMode) {
+=======
+			if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderPath = _finderPathWithoutPaginationFindByUuid_Head;
 				finderArgs = new Object[] {uuid, head};
 			}
 		}
+<<<<<<< HEAD
 		else if (useFinderCache && productionMode) {
+=======
+		else if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderPath = _finderPathWithPaginationFindByUuid_Head;
 			finderArgs = new Object[] {
 				uuid, head, start, end, orderByComparator
@@ -760,9 +811,15 @@ public class StyleBookEntryPersistenceImpl
 
 		List<StyleBookEntry> list = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			list = (List<StyleBookEntry>)finderCache.getResult(
 				finderPath, finderArgs);
+=======
+		if (useFinderCache) {
+			list = (List<StyleBookEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (StyleBookEntry styleBookEntry : list) {
@@ -833,7 +890,11 @@ public class StyleBookEntryPersistenceImpl
 
 				cacheResult(list);
 
+<<<<<<< HEAD
 				if (useFinderCache && productionMode) {
+=======
+				if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -1171,6 +1232,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUuid_Head(String uuid, boolean head) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -1186,6 +1248,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUuid_Head;
+
+		Object[] finderArgs = new Object[] {uuid, head};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1224,9 +1293,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -1330,21 +1403,32 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
+<<<<<<< HEAD
 			if (useFinderCache && productionMode) {
+=======
+			if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderPath = _finderPathWithoutPaginationFindByUUID_G;
 				finderArgs = new Object[] {uuid, groupId};
 			}
 		}
+<<<<<<< HEAD
 		else if (useFinderCache && productionMode) {
+=======
+		else if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderPath = _finderPathWithPaginationFindByUUID_G;
 			finderArgs = new Object[] {
 				uuid, groupId, start, end, orderByComparator
@@ -1353,9 +1437,15 @@ public class StyleBookEntryPersistenceImpl
 
 		List<StyleBookEntry> list = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			list = (List<StyleBookEntry>)finderCache.getResult(
 				finderPath, finderArgs);
+=======
+		if (useFinderCache) {
+			list = (List<StyleBookEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (StyleBookEntry styleBookEntry : list) {
@@ -1426,7 +1516,11 @@ public class StyleBookEntryPersistenceImpl
 
 				cacheResult(list);
 
+<<<<<<< HEAD
 				if (useFinderCache && productionMode) {
+=======
+				if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -1767,6 +1861,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUUID_G(String uuid, long groupId) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -1782,6 +1877,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUUID_G;
+
+		Object[] finderArgs = new Object[] {uuid, groupId};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -1820,9 +1922,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -1919,20 +2025,32 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
 		Object[] finderArgs = null;
 
 		if (useFinderCache && productionMode) {
+=======
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderArgs = new Object[] {uuid, groupId, head};
 		}
 
 		Object result = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			result = finderCache.getResult(
 				_finderPathFetchByUUID_G_Head, finderArgs);
+=======
+		if (useFinderCache) {
+			result = finderCache.getResult(
+				_finderPathFetchByUUID_G_Head, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (result instanceof StyleBookEntry) {
@@ -1988,7 +2106,11 @@ public class StyleBookEntryPersistenceImpl
 				List<StyleBookEntry> list = query.list();
 
 				if (list.isEmpty()) {
+<<<<<<< HEAD
 					if (useFinderCache && productionMode) {
+=======
+					if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						finderCache.putResult(
 							_finderPathFetchByUUID_G_Head, finderArgs, list);
 					}
@@ -2047,6 +2169,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUUID_G_Head(String uuid, long groupId, boolean head) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -2062,6 +2185,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUUID_G_Head;
+
+		Object[] finderArgs = new Object[] {uuid, groupId, head};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -2104,9 +2234,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -2214,21 +2348,32 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
+<<<<<<< HEAD
 			if (useFinderCache && productionMode) {
+=======
+			if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderPath = _finderPathWithoutPaginationFindByUuid_C;
 				finderArgs = new Object[] {uuid, companyId};
 			}
 		}
+<<<<<<< HEAD
 		else if (useFinderCache && productionMode) {
+=======
+		else if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderPath = _finderPathWithPaginationFindByUuid_C;
 			finderArgs = new Object[] {
 				uuid, companyId, start, end, orderByComparator
@@ -2237,9 +2382,15 @@ public class StyleBookEntryPersistenceImpl
 
 		List<StyleBookEntry> list = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			list = (List<StyleBookEntry>)finderCache.getResult(
 				finderPath, finderArgs);
+=======
+		if (useFinderCache) {
+			list = (List<StyleBookEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (StyleBookEntry styleBookEntry : list) {
@@ -2310,7 +2461,11 @@ public class StyleBookEntryPersistenceImpl
 
 				cacheResult(list);
 
+<<<<<<< HEAD
 				if (useFinderCache && productionMode) {
+=======
+				if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -2651,6 +2806,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUuid_C(String uuid, long companyId) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -2666,6 +2822,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUuid_C;
+
+		Object[] finderArgs = new Object[] {uuid, companyId};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -2704,9 +2867,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -2817,21 +2984,32 @@ public class StyleBookEntryPersistenceImpl
 
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		FinderPath finderPath = null;
 		Object[] finderArgs = null;
 
 		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
 			(orderByComparator == null)) {
 
+<<<<<<< HEAD
 			if (useFinderCache && productionMode) {
+=======
+			if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				finderPath = _finderPathWithoutPaginationFindByUuid_C_Head;
 				finderArgs = new Object[] {uuid, companyId, head};
 			}
 		}
+<<<<<<< HEAD
 		else if (useFinderCache && productionMode) {
+=======
+		else if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			finderPath = _finderPathWithPaginationFindByUuid_C_Head;
 			finderArgs = new Object[] {
 				uuid, companyId, head, start, end, orderByComparator
@@ -2840,9 +3018,15 @@ public class StyleBookEntryPersistenceImpl
 
 		List<StyleBookEntry> list = null;
 
+<<<<<<< HEAD
 		if (useFinderCache && productionMode) {
 			list = (List<StyleBookEntry>)finderCache.getResult(
 				finderPath, finderArgs);
+=======
+		if (useFinderCache) {
+			list = (List<StyleBookEntry>)finderCache.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (StyleBookEntry styleBookEntry : list) {
@@ -2918,7 +3102,11 @@ public class StyleBookEntryPersistenceImpl
 
 				cacheResult(list);
 
+<<<<<<< HEAD
 				if (useFinderCache && productionMode) {
+=======
+				if (useFinderCache) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					finderCache.putResult(finderPath, finderArgs, list);
 				}
 			}
@@ -3276,6 +3464,7 @@ public class StyleBookEntryPersistenceImpl
 	public int countByUuid_C_Head(String uuid, long companyId, boolean head) {
 		uuid = Objects.toString(uuid, "");
 
+<<<<<<< HEAD
 		boolean productionMode = ctPersistenceHelper.isProductionMode(
 			StyleBookEntry.class);
 
@@ -3291,6 +3480,13 @@ public class StyleBookEntryPersistenceImpl
 
 			count = (Long)finderCache.getResult(finderPath, finderArgs);
 		}
+=======
+		FinderPath finderPath = _finderPathCountByUuid_C_Head;
+
+		Object[] finderArgs = new Object[] {uuid, companyId, head};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(4);
@@ -3333,9 +3529,13 @@ public class StyleBookEntryPersistenceImpl
 
 				count = (Long)query.uniqueResult();
 
+<<<<<<< HEAD
 				if (productionMode) {
 					finderCache.putResult(finderPath, finderArgs, count);
 				}
+=======
+				finderCache.putResult(finderPath, finderArgs, count);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			catch (Exception exception) {
 				throw processException(exception);
@@ -8030,9 +8230,16 @@ public class StyleBookEntryPersistenceImpl
 		};
 
 		finderCache.putResult(
+<<<<<<< HEAD
 			_finderPathCountByUUID_G_Head, args, Long.valueOf(1));
 		finderCache.putResult(
 			_finderPathFetchByUUID_G_Head, args, styleBookEntryModelImpl);
+=======
+			_finderPathCountByUUID_G_Head, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G_Head, args, styleBookEntryModelImpl,
+			false);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		args = new Object[] {
 			styleBookEntryModelImpl.getGroupId(),
@@ -8735,7 +8942,11 @@ public class StyleBookEntryPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -8743,17 +8954,29 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid = new FinderPath(
+=======
+		_finderPathCountByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid_Head = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_Head",
 			new String[] {
 				String.class.getName(), Boolean.class.getName(),
@@ -8762,17 +8985,29 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "head"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid_Head = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_Head",
 			new String[] {String.class.getName(), Boolean.class.getName()},
 			new String[] {"uuid_", "head"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid_Head = new FinderPath(
+=======
+		_finderPathCountByUuid_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_Head",
 			new String[] {String.class.getName(), Boolean.class.getName()},
 			new String[] {"uuid_", "head"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUUID_G = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUUID_G = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUUID_G",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8781,17 +9016,29 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "groupId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUUID_G = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUUID_G = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUUID_G = new FinderPath(
+=======
+		_finderPathCountByUUID_G = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
+<<<<<<< HEAD
 		_finderPathFetchByUUID_G_Head = new FinderPath(
+=======
+		_finderPathFetchByUUID_G_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G_Head",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8799,7 +9046,11 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "groupId", "head"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUUID_G_Head = new FinderPath(
+=======
+		_finderPathCountByUUID_G_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G_Head",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8807,7 +9058,11 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "groupId", "head"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8816,17 +9071,29 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid_C = new FinderPath(
+=======
+		_finderPathCountByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid_C_Head = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid_C_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C_Head",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8835,7 +9102,11 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId", "head"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid_C_Head = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid_C_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C_Head",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8843,7 +9114,11 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId", "head"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid_C_Head = new FinderPath(
+=======
+		_finderPathCountByUuid_C_Head = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C_Head",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -8851,7 +9126,11 @@ public class StyleBookEntryPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId", "head"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByGroupId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -9077,12 +9356,34 @@ public class StyleBookEntryPersistenceImpl
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
+<<<<<<< HEAD
+=======
+
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+<<<<<<< HEAD
+=======
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

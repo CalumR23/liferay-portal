@@ -146,9 +146,19 @@ export default function ({context}) {
 							<Navigation
 								author={state.data.author}
 								canonicalURL={state.data.canonicalURL}
+<<<<<<< HEAD
 								onSelectedLanguageClick={
 									handleSelectedLanguageClick
 								}
+=======
+								endpoints={state.data.endpoints}
+								languageTag={state.data.languageTag}
+								namespace={state.data.namespace}
+								onSelectedLanguageClick={
+									handleSelectedLanguageClick
+								}
+								page={state.data.page}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								pagePublishDate={state.data.publishDate}
 								pageTitle={state.data.title}
 								timeSpanOptions={state.data.timeSpans}

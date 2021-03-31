@@ -148,6 +148,7 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 			</div>
 		</clay:container-fluid>
 
+<<<<<<< HEAD
 		<div id="<portlet:namespace />-container">
 			<react:component
 				module="admin/js/App.es"
@@ -211,6 +212,34 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 					).build()
 				%>'
 			/>
+=======
+		<div class="ddm-form-basic-info">
+			<clay:container-fluid>
+				<h1>
+					<liferay-editor:editor
+						autoCreate="<%= false %>"
+						contents="<%= HtmlUtil.toInputSafe(ddmFormAdminDisplayContext.getFormName()) %>"
+						cssClass="ddm-form-name"
+						editorName="alloyeditor"
+						name="nameEditor"
+						placeholder="untitled-form"
+						showSource="<%= false %>"
+					/>
+				</h1>
+
+				<h5>
+					<liferay-editor:editor
+						autoCreate="<%= false %>"
+						contents="<%= HtmlUtil.toInputSafe(ddmFormAdminDisplayContext.getFormDescription()) %>"
+						cssClass="ddm-form-description h5"
+						editorName="alloyeditor"
+						name="descriptionEditor"
+						placeholder="add-a-short-description-for-this-form"
+						showSource="<%= false %>"
+					/>
+				</h5>
+			</clay:container-fluid>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</div>
 	</aui:form>
 
@@ -225,6 +254,15 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 	</clay:container-fluid>
 </div>
 
+<<<<<<< HEAD
+=======
+<portlet:actionURL name="/dynamic_data_mapping_form/publish_form_instance" var="publishFormInstanceURL">
+	<portlet:param name="mvcRenderCommandName" value="/admin/edit_form_instance" />
+</portlet:actionURL>
+
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/dynamic_data_mapping_form/save_form_instance" var="autoSaveFormInstanceURL" />
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <liferay-portlet:runtime
 	portletName="<%= DDMPortletKeys.DYNAMIC_DATA_MAPPING_FORM_REPORT %>"
 	queryString='<%= "formInstanceId=" + formInstanceId %>'
@@ -264,6 +302,15 @@ renderResponse.setTitle((formInstance == null) ? LanguageUtil.get(request, "new-
 	};
 
 	Liferay.on('destroyPortlet', clearPortletHandlers);
+<<<<<<< HEAD
+=======
+
+	Liferay.Forms.App.start();
+
+	if (Liferay.Browser.isIe()) {
+		document.querySelector('.portlet-forms').classList.add('portlet-forms-ie');
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 </aui:script>
 
 <aui:script use="aui-base">

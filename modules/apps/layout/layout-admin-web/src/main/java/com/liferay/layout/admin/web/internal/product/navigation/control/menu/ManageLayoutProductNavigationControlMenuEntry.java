@@ -102,6 +102,7 @@ public class ManageLayoutProductNavigationControlMenuEntry
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", themeDisplay.getLocale(), getClass());
 
+<<<<<<< HEAD
 		PortletURL editPageURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
@@ -109,6 +110,14 @@ public class ManageLayoutProductNavigationControlMenuEntry
 		).setMVCRenderCommandName(
 			"/layout_admin/edit_layout"
 		).build();
+=======
+		PortletURL editPageURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		editPageURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String currentURL = _portal.getCurrentURL(httpServletRequest);
 

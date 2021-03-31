@@ -22,7 +22,10 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +35,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import org.junit.Assert;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -43,11 +49,14 @@ import org.mockito.Mockito;
  */
 public class JSONLocalizerTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Test
 	public void testGetTranslatedToExistingLocale() {
 		ResourceBundleLoader resourceBundleLoader = Mockito.mock(

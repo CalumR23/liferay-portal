@@ -66,7 +66,11 @@
 
 <div id="<%= componentId %>container">
 	<react:component
+<<<<<<< HEAD
 		module="<%= module %>"
+=======
+		module="data_layout_builder/js/App.es"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"availableLanguageIds", availableLanguageIds
@@ -75,8 +79,11 @@
 			).put(
 				"contentType", contentType
 			).put(
+<<<<<<< HEAD
 				"contentTypeConfig", contentTypeConfigJSONObject
 			).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				"context", dataLayoutJSONObject
 			).put(
 				"dataDefinitionId", dataDefinitionId
@@ -87,8 +94,11 @@
 			).put(
 				"dataLayoutId", dataLayoutId
 			).put(
+<<<<<<< HEAD
 				"defaultLanguageId", defaultLanguageId
 			).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				"fieldSetContentType", fieldSetContentType
 			).put(
 				"fieldTypes", fieldTypesJSONArray
@@ -104,6 +114,9 @@
 				"spritemap", themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 			).build()
 		%>'
+<<<<<<< HEAD
 		servletContext="<%= moduleServletContext %>"
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/>
 </div>

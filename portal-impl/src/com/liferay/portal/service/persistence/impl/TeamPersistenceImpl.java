@@ -1596,7 +1596,11 @@ public class TeamPersistenceImpl
 
 		if (useFinderCache && productionMode) {
 			list = (List<Team>)FinderCacheUtil.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (Team team : list) {
@@ -1960,7 +1964,12 @@ public class TeamPersistenceImpl
 
 			finderArgs = new Object[] {companyId};
 
+<<<<<<< HEAD
 			count = (Long)FinderCacheUtil.getResult(finderPath, finderArgs);
+=======
+			count = (Long)FinderCacheUtil.getResult(
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (count == null) {
@@ -4598,7 +4607,11 @@ public class TeamPersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4606,17 +4619,29 @@ public class TeamPersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
+<<<<<<< HEAD
 		_finderPathCountByCompanyId = new FinderPath(
+=======
+		_finderPathCountByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByGroupId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByGroupId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByGroupId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4719,6 +4744,11 @@ public class TeamPersistenceImpl
 		return FinderCacheUtil.getFinderCache();
 	}
 
+<<<<<<< HEAD
+=======
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

@@ -222,7 +222,11 @@ public abstract class BaseLanguageResourceTestCase {
 		Long irrelevantAssetLibraryId =
 			testGetAssetLibraryLanguagesPage_getIrrelevantAssetLibraryId();
 
+<<<<<<< HEAD
 		if (irrelevantAssetLibraryId != null) {
+=======
+		if ((irrelevantAssetLibraryId != null)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Language irrelevantLanguage =
 				testGetAssetLibraryLanguagesPage_addLanguage(
 					irrelevantAssetLibraryId, randomIrrelevantLanguage());
@@ -285,7 +289,11 @@ public abstract class BaseLanguageResourceTestCase {
 		Long siteId = testGetSiteLanguagesPage_getSiteId();
 		Long irrelevantSiteId = testGetSiteLanguagesPage_getIrrelevantSiteId();
 
+<<<<<<< HEAD
 		if (irrelevantSiteId != null) {
+=======
+		if ((irrelevantSiteId != null)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Language irrelevantLanguage = testGetSiteLanguagesPage_addLanguage(
 				irrelevantSiteId, randomIrrelevantLanguage());
 
@@ -853,12 +861,21 @@ public abstract class BaseLanguageResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
+<<<<<<< HEAD
 					sb.append(": ");
 					sb.append(entry.getValue());
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(":");
+					sb.append(entry.getValue());
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append(")");
 			}
@@ -868,10 +885,17 @@ public abstract class BaseLanguageResourceTestCase {
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
+<<<<<<< HEAD
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append("}");
 			}

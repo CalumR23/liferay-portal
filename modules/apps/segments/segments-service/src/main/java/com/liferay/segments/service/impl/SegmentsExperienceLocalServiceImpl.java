@@ -65,7 +65,18 @@ public class SegmentsExperienceLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+		int lowestPriority = _getLowestPriority(
+			serviceContext.getScopeGroupId(), classNameId,
+			_getPublishedLayoutClassPK(classPK));
+
+		if ((lowestPriority - 1) ==
+				SegmentsExperienceConstants.PRIORITY_DEFAULT) {
+
+			lowestPriority = lowestPriority - 1;
+		}
+
 		return addSegmentsExperience(
+<<<<<<< HEAD
 			segmentsEntryId, classNameId, classPK, nameMap, active,
 			new UnicodeProperties(true), serviceContext);
 	}
@@ -91,6 +102,10 @@ public class SegmentsExperienceLocalServiceImpl
 		return addSegmentsExperience(
 			segmentsEntryId, classNameId, classPK, nameMap, lowestPriority - 1,
 			active, typeSettingsUnicodeProperties, serviceContext);
+=======
+			segmentsEntryId, classNameId, classPK, nameMap, lowestPriority - 1,
+			active, serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -166,6 +181,7 @@ public class SegmentsExperienceLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return appendSegmentsExperience(
 			segmentsEntryId, classNameId, classPK, nameMap, active,
 			new UnicodeProperties(true), serviceContext);
@@ -179,6 +195,8 @@ public class SegmentsExperienceLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException {
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		int highestPriority = _getHighestPriority(
 			serviceContext.getScopeGroupId(), classNameId,
 			_getPublishedLayoutClassPK(classPK));
@@ -191,7 +209,11 @@ public class SegmentsExperienceLocalServiceImpl
 
 		return addSegmentsExperience(
 			segmentsEntryId, classNameId, classPK, nameMap, highestPriority + 1,
+<<<<<<< HEAD
 			active, typeSettingsUnicodeProperties, serviceContext);
+=======
+			active, serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -255,6 +277,7 @@ public class SegmentsExperienceLocalServiceImpl
 				segmentsExperience.getGroupId(),
 				segmentsExperience.getClassNameId(),
 				segmentsExperience.getClassPK());
+<<<<<<< HEAD
 
 			int highestPriority = _getHighestPriority(
 				segmentsExperience.getGroupId(),
@@ -278,6 +301,31 @@ public class SegmentsExperienceLocalServiceImpl
 					segmentsExperience.getPriority()));
 
 			_updateSegmentExperiencesPriority(
+=======
+
+			int highestPriority = _getHighestPriority(
+				segmentsExperience.getGroupId(),
+				segmentsExperience.getClassNameId(),
+				segmentsExperience.getClassPK());
+
+			segmentsExperiences = _updateSegmentExperiencesPriority(
+				segmentsExperiences, lowestPriority - 1, -1);
+
+			segmentsExperiencePersistence.flush();
+
+			_updateSegmentExperiencesPriority(
+				segmentsExperiences, highestPriority - 1, -1);
+		}
+		else {
+			List<SegmentsExperience> segmentsExperiences = new ArrayList<>(
+				segmentsExperiencePersistence.findByG_C_C_LtP(
+					segmentsExperience.getGroupId(),
+					segmentsExperience.getClassNameId(),
+					segmentsExperience.getClassPK(),
+					segmentsExperience.getPriority()));
+
+			_updateSegmentExperiencesPriority(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				segmentsExperiences, segmentsExperience.getPriority(), +1);
 		}
 

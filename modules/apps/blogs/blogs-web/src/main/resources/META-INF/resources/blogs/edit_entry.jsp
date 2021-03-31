@@ -290,7 +290,11 @@ renderResponse.setTitle((entry != null) ? BlogsEntryUtil.getDisplayTitle(resourc
 					<aui:input label="display-date" name="displayDate" />
 
 					<c:if test="<%= (entry != null) && blogsGroupServiceSettings.isEmailEntryUpdatedEnabled() %>">
+<<<<<<< HEAD
 						<aui:input helpMessage="comments-regarding-the-blog-entry-update" inlineLabel="right" label="send-email-entry-updated" labelCssClass="simple-toggle-switch" name="sendEmailEntryUpdated" type="toggle-switch" value='<%= ParamUtil.getBoolean(request, "sendEmailEntryUpdated") %>' />
+=======
+						<aui:input helpMessage="comments-regarding-the-blog-entry-update" label="send-email-entry-updated" name="sendEmailEntryUpdated" type="toggle-switch" value='<%= ParamUtil.getBoolean(request, "sendEmailEntryUpdated") %>' />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						<div id="<portlet:namespace />emailEntryUpdatedCommentWrapper">
 							<aui:input label="" name="emailEntryUpdatedComment" type="textarea" value='<%= ParamUtil.getString(request, "emailEntryUpdatedComment") %>' />

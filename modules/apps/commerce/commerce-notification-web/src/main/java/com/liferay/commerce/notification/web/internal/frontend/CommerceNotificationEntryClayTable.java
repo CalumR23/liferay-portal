@@ -109,6 +109,7 @@ public class CommerceNotificationEntryClayTable
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
@@ -120,6 +121,14 @@ public class CommerceNotificationEntryClayTable
 		).setParameter(
 			Constants.CMD, "resend"
 		).setParameter(
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_channels/edit_commerce_notification_queue_entry");
+		portletURL.setParameter(Constants.CMD, "resend");
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commerceNotificationQueueEntryId",
 			() -> {
 				NotificationEntry notificationEntry = (NotificationEntry)model;

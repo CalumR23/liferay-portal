@@ -23,7 +23,11 @@ import com.liferay.commerce.shipping.engine.fixed.constants.CommerceShippingEngi
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionService;
 import com.liferay.commerce.shipping.engine.fixed.web.internal.FixedCommerceShippingEngine;
+<<<<<<< HEAD
 import com.liferay.commerce.shipping.engine.fixed.web.internal.frontend.taglib.servlet.taglib.CommerceShippingMethodFixedOptionsScreenNavigationCategory;
+=======
+import com.liferay.commerce.shipping.engine.fixed.web.internal.servlet.taglib.ui.CommerceShippingMethodFixedOptionsScreenNavigationCategory;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -63,6 +67,7 @@ public class CommerceShippingFixedOptionsDisplayContext
 	}
 
 	public String getAddShippingFixedOptionURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				renderRequest, CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
@@ -74,6 +79,22 @@ public class CommerceShippingFixedOptionsDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			renderRequest, CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option");
+		portletURL.setParameter(
+			"commerceShippingMethodId",
+			String.valueOf(getCommerceShippingMethodId()));
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceShippingFixedOption getCommerceShippingFixedOption()

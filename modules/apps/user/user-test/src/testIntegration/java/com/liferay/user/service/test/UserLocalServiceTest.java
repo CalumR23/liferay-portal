@@ -352,6 +352,45 @@ public class UserLocalServiceTest {
 	}
 
 	@Test
+	public void testSearchCounts() throws Exception {
+
+		// LPS-119805
+
+		_userLocalService.searchCounts(
+			TestPropsValues.getCompanyId(), WorkflowConstants.STATUS_APPROVED,
+			LongStream.rangeClosed(
+				1000, 3000
+			).toArray());
+	}
+
+	@Test
+	public void testSearchCountsUserRole() throws Exception {
+		Group group = GroupTestUtil.addGroup();
+
+		PermissionChecker oldPermissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(UserTestUtil.addUser()));
+
+		try {
+			Map<Long, Integer> counts = _userLocalService.searchCounts(
+				TestPropsValues.getCompanyId(),
+				WorkflowConstants.STATUS_APPROVED,
+				new long[] {group.getGroupId()});
+
+			Integer count = counts.get(group.getGroupId());
+
+			Assert.assertNotNull(count);
+
+			Assert.assertEquals(1, count.intValue());
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(oldPermissionChecker);
+		}
+	}
+
+	@Test
 	public void testSearchUsersFromDatabase() throws Exception {
 		Field propsValuesField = ReflectionUtil.getDeclaredField(
 			PropsValues.class, "USERS_SEARCH_WITH_INDEX");

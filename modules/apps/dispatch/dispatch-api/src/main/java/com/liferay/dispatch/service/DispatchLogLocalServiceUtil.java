@@ -63,7 +63,11 @@ public class DispatchLogLocalServiceUtil {
 			long userId, long dispatchTriggerId, java.util.Date endDate,
 			String error, String output, java.util.Date startDate,
 			com.liferay.dispatch.executor.DispatchTaskStatus dispatchTaskStatus)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addDispatchLog(
 			userId, dispatchTriggerId, endDate, error, output, startDate,
@@ -220,11 +224,21 @@ public class DispatchLogLocalServiceUtil {
 		return getService().fetchDispatchLog(dispatchLogId);
 	}
 
+<<<<<<< HEAD
 	public static DispatchLog fetchLatestDispatchLog(long dispatchTriggerId) {
 		return getService().fetchLatestDispatchLog(dispatchTriggerId);
 	}
 
 	public static DispatchLog fetchLatestDispatchLog(
+=======
+	public static com.liferay.dispatch.model.DispatchLog fetchLatestDispatchLog(
+		long dispatchTriggerId) {
+
+		return getService().fetchLatestDispatchLog(dispatchTriggerId);
+	}
+
+	public static com.liferay.dispatch.model.DispatchLog fetchLatestDispatchLog(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		long dispatchTriggerId,
 		com.liferay.dispatch.executor.DispatchTaskStatus dispatchTaskStatus) {
 
@@ -328,7 +342,11 @@ public class DispatchLogLocalServiceUtil {
 			long dispatchLogId, java.util.Date endDate, String error,
 			String output,
 			com.liferay.dispatch.executor.DispatchTaskStatus dispatchTaskStatus)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().updateDispatchLog(
 			dispatchLogId, endDate, error, output, dispatchTaskStatus);

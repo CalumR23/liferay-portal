@@ -46,7 +46,11 @@ else {
 
 <portlet:actionURL name="/cp_measurement_unit/edit_cp_measurement_unit" var="editCPMeasurementUnitActionURL" />
 
+<<<<<<< HEAD
 <aui:form action="<%= editCPMeasurementUnitActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCPMeasurementUnit();" %>'>
+=======
+<aui:form action="<%= editCPMeasurementUnitActionURL %>" cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "saveCPMeasurementUnit();" %>'>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (cpMeasurementUnit == null) ? Constants.ADD : Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="cpMeasurementUnitId" type="hidden" value="<%= (cpMeasurementUnit == null) ? 0 : cpMeasurementUnit.getCPMeasurementUnitId() %>" />
@@ -63,7 +67,11 @@ else {
 
 				<aui:input name="key" />
 
+<<<<<<< HEAD
 				<aui:input inlineLabel="right" labelCssClass="simple-toggle-switch" name="primary" type="toggle-switch" value="<%= primary %>" />
+=======
+				<aui:input name="primary" type="toggle-switch" value="<%= primary %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				<%
 				String taglibLabel = "ratio-to-primary";

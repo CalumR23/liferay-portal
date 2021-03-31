@@ -31,8 +31,14 @@ DLViewFileEntryMetadataSetsDisplayContext dLViewFileEntryMetadataSetsDisplayCont
 	<portlet:param name="mvcPath" value="/view_file_entry_metadata_sets.jsp" />
 </portlet:actionURL>
 
+<<<<<<< HEAD
 <aui:form action="<%= deleteDataDefinitionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
 	<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
+=======
+				rowURL.setParameter("mvcRenderCommandName", "/document_library/edit_ddm_structure");
+				rowURL.setParameter("redirect", currentURL);
+				rowURL.setParameter("ddmStructureId", String.valueOf(ddmStructure.getStructureId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	<clay:container-fluid>
 		<liferay-ui:error exception="<%= RequiredStructureException.MustNotDeleteStructureReferencedByStructureLinks.class %>" message="the-structure-cannot-be-deleted-because-it-is-required-by-one-or-more-structure-links" />

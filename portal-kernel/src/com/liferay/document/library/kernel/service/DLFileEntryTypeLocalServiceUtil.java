@@ -360,8 +360,20 @@ public class DLFileEntryTypeLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+<<<<<<< HEAD
 	public static DLFileEntryType fetchDataDefinitionFileEntryType(
 		long groupId, long dataDefinitionId) {
+=======
+	public static com.liferay.document.library.kernel.model.DLFileEntryType
+		fetchDataDefinitionFileEntryType(long groupId, long dataDefinitionId) {
+
+		return getService().fetchDataDefinitionFileEntryType(
+			groupId, dataDefinitionId);
+	}
+
+	public static com.liferay.document.library.kernel.model.DLFileEntryType
+		fetchDLFileEntryType(long fileEntryTypeId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().fetchDataDefinitionFileEntryType(
 			groupId, dataDefinitionId);

@@ -76,11 +76,19 @@ public abstract class BaseAddLayoutMVCActionCommand
 		LiferayPortletResponse liferayPortletResponse =
 			portal.getLiferayPortletResponse(actionResponse);
 
+<<<<<<< HEAD
 		PortletURL configureLayoutURL = PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
 			"/layout_admin/edit_layout"
 		).build();
+=======
+		PortletURL configureLayoutURL =
+			liferayPortletResponse.createRenderURL();
+
+		configureLayoutURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String backURL = ParamUtil.getString(actionRequest, "backURL");
 

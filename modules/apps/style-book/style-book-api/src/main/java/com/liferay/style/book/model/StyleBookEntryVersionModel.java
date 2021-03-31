@@ -17,7 +17,10 @@ package com.liferay.style.book.model;
 import com.liferay.portal.kernel.bean.AutoEscape;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.model.GroupedModel;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.model.MVCCModel;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
 import com.liferay.portal.kernel.model.version.VersionModel;
@@ -39,8 +42,12 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface StyleBookEntryVersionModel
+<<<<<<< HEAD
 	extends BaseModel<StyleBookEntryVersion>, CTModel<StyleBookEntryVersion>,
 			GroupedModel, MVCCModel, ShardedModel,
+=======
+	extends BaseModel<StyleBookEntryVersion>, GroupedModel, ShardedModel,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			VersionModel<StyleBookEntry> {
 
 	/*

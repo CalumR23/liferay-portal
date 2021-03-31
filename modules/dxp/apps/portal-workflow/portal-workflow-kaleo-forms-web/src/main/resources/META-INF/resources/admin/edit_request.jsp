@@ -36,7 +36,11 @@ renderResponse.setTitle(LanguageUtil.format(request, "new-x", kaleoProcess.getNa
 <clay:container-fluid
 	cssClass="sidenav-container sidenav-right"
 >
+<<<<<<< HEAD
 	<portlet:actionURL name="/kaleo_forms_admin/start_workflow_instance" var="startWorkflowInstanceURL" />
+=======
+	<portlet:actionURL name="/kaleo_forms/start_workflow_instance" var="startWorkflowInstanceURL" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	<aui:form action="<%= startWorkflowInstanceURL %>" cssClass="lfr-dynamic-form" enctype="multipart/form-data" method="post" name="fm1">
 		<aui:input name="redirect" type="hidden" value="<%= redirect %>" />

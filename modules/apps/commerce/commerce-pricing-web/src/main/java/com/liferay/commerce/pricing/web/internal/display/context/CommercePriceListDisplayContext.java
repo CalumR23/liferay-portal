@@ -88,6 +88,7 @@ public class CommercePriceListDisplayContext
 	}
 
 	public String getAddCommercePriceListRenderURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -107,6 +108,29 @@ public class CommercePriceListDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_price_list/add_commerce_price_list");
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public String getAddCommercePriceModifierRenderURL() throws Exception {
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_price_list/add_commerce_price_modifier");
+		portletURL.setParameter(
+			"commercePriceListId", String.valueOf(getCommercePriceListId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<CommerceCatalog> getCommerceCatalogs() throws PortalException {

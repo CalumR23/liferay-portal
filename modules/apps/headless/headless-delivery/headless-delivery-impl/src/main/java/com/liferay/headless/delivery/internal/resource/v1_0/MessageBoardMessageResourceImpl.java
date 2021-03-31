@@ -26,6 +26,9 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.CustomFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.EntityFieldsUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.MessageBoardMessageEntityModel;
+import com.liferay.headless.delivery.internal.search.aggregation.AggregationUtil;
+import com.liferay.headless.delivery.internal.search.filter.FilterUtil;
+import com.liferay.headless.delivery.internal.search.sort.SortUtil;
 import com.liferay.headless.delivery.resource.v1_0.MessageBoardMessageResource;
 import com.liferay.headless.delivery.search.aggregation.AggregationUtil;
 import com.liferay.headless.delivery.search.filter.FilterUtil;
@@ -626,6 +629,12 @@ public class MessageBoardMessageResourceImpl
 
 		return _toMessageBoardMessage(mbMessage);
 	}
+
+	@Reference
+	private Aggregations _aggregations;
+
+	@Reference
+	private DDMIndexer _ddmIndexer;
 
 	@Reference
 	private Aggregations _aggregations;

@@ -20,7 +20,10 @@ import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTy
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactory;
 import com.liferay.portal.kernel.portlet.RequestBackedPortletURLFactoryUtil;
@@ -29,6 +32,11 @@ import com.liferay.portal.kernel.util.HashMapBuilder;
 
 import java.util.Map;
 
+<<<<<<< HEAD
+=======
+import javax.portlet.PortletURL;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -102,6 +110,7 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(httpServletRequest);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			requestBackedPortletURLFactory.createActionURL(
 				ConfigurationAdminPortletKeys.SYSTEM_SETTINGS)
@@ -112,6 +121,19 @@ public class CheckboxDDMFormFieldTemplateContextContributor
 			"com.liferay.dynamic.data.mapping.form.web.internal." +
 				"configuration.DDMFormWebConfiguration"
 		).buildString();
+=======
+		PortletURL portletURL = requestBackedPortletURLFactory.createActionURL(
+			ConfigurationAdminPortletKeys.SYSTEM_SETTINGS);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/configuration_admin/edit_configuration");
+		portletURL.setParameter(
+			"factoryPid",
+			"com.liferay.dynamic.data.mapping.form.web.internal." +
+				"configuration.DDMFormWebConfiguration");
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

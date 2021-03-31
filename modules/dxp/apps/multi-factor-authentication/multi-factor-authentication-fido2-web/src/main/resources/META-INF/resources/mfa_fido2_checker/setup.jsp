@@ -67,13 +67,21 @@ List<MFAFIDO2CredentialEntry> mfaIDO2CredentialEntries = MFAFIDO2CredentialEntry
 		modelVar="mfaFIDO2CredentialEntry"
 	>
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			name="authenticator-id"
 			value="<%= String.valueOf(mfaFIDO2CredentialEntry.getPrimaryKey()) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			name="registered-date"
 			value="<%= String.valueOf(mfaFIDO2CredentialEntry.getCreateDate()) %>"
 		/>

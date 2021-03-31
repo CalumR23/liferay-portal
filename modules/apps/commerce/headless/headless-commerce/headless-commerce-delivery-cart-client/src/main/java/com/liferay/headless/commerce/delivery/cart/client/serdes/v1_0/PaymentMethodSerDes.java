@@ -174,6 +174,12 @@ public class PaymentMethodSerDes {
 					paymentMethod.setName((String)jsonParserFieldValue);
 				}
 			}
+<<<<<<< HEAD
+=======
+			else if (jsonParserFieldName.equals("status")) {
+				throw new IllegalArgumentException();
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 	}
@@ -202,7 +208,11 @@ public class PaymentMethodSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
+<<<<<<< HEAD
 			sb.append("\": ");
+=======
+			sb.append("\":");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Object value = entry.getValue();
 
@@ -238,7 +248,11 @@ public class PaymentMethodSerDes {
 			}
 
 			if (iterator.hasNext()) {
+<<<<<<< HEAD
 				sb.append(", ");
+=======
+				sb.append(",");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

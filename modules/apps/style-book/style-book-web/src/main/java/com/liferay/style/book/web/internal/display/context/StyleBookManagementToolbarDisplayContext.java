@@ -63,6 +63,13 @@ public class StyleBookManagementToolbarDisplayContext
 
 	@Override
 	public List<DropdownItem> getActionDropdownItems() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (!StyleBookPermission.contains(
 				_themeDisplay.getPermissionChecker(),
 				_themeDisplay.getScopeGroupId(),
@@ -100,7 +107,24 @@ public class StyleBookManagementToolbarDisplayContext
 		).build();
 	}
 
+<<<<<<< HEAD
 	public Map<String, Object> getAdditionalProps() {
+=======
+	@Override
+	public String getClearResultsURL() {
+		PortletURL clearResultsURL = getPortletURL();
+
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+
+		return clearResultsURL.toString();
+	}
+
+	public Map<String, Object> getComponentContext() {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return HashMapBuilder.<String, Object>put(
 			"copyStyleBookEntryURL",
 			() -> PortletURLBuilder.createActionURL(
@@ -170,6 +194,13 @@ public class StyleBookManagementToolbarDisplayContext
 
 	@Override
 	public Boolean isShowCreationMenu() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (StyleBookPermission.contains(
 				_themeDisplay.getPermissionChecker(),
 				_themeDisplay.getScopeGroupId(),

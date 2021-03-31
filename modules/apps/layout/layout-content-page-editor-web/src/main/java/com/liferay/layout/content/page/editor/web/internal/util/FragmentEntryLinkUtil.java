@@ -161,6 +161,7 @@ public class FragmentEntryLinkUtil {
 			DefaultFragmentRendererContext defaultFragmentRendererContext =
 				new DefaultFragmentRendererContext(fragmentEntryLink);
 
+<<<<<<< HEAD
 			String languageId = ParamUtil.getString(
 				portletRequest, "languageId", themeDisplay.getLanguageId());
 
@@ -183,6 +184,25 @@ public class FragmentEntryLinkUtil {
 			String icon = null;
 			String name = null;
 
+=======
+			defaultFragmentRendererContext.setLocale(themeDisplay.getLocale());
+			defaultFragmentRendererContext.setMode(
+				FragmentEntryLinkConstants.EDIT);
+			defaultFragmentRendererContext.setSegmentsExperienceIds(
+				new long[] {SegmentsExperienceConstants.ID_DEFAULT});
+
+			String configuration = fragmentRendererController.getConfiguration(
+				defaultFragmentRendererContext);
+
+			FragmentEntry fragmentEntry = _getFragmentEntry(
+				fragmentEntryLink, fragmentCollectionContributorTracker,
+				themeDisplay.getLocale());
+
+			String fragmentEntryKey = null;
+			String icon = null;
+			String name = null;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (fragmentEntry != null) {
 				fragmentEntryKey = fragmentEntry.getFragmentEntryKey();
 				icon = fragmentEntry.getIcon();

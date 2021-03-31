@@ -20,7 +20,10 @@ import com.liferay.asset.kernel.model.BaseAssetRendererFactory;
 import com.liferay.info.item.InfoItemServiceTracker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.resource.bundle.ResourceBundleLoader;
+<<<<<<< HEAD
 import com.liferay.translation.constants.TranslationPortletKeys;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.translation.info.field.TranslationInfoFieldChecker;
 import com.liferay.translation.model.TranslationEntry;
 import com.liferay.translation.service.TranslationEntryLocalService;

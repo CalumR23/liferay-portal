@@ -151,4 +151,59 @@ PortletURL portletURL = ddmFormViewFormInstanceRecordsDisplayContext.getPortletU
 	/>
 </clay:container-fluid>
 
+<<<<<<< HEAD
 <%@ include file="/admin/export_form_instance.jspf" %>
+=======
+<%@ include file="/admin/export_form_instance.jspf" %>
+
+<aui:script sandbox="<%= true %>">
+	var deleteRecords = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace />ddmFormInstanceRecord'
+			);
+
+			if (searchContainer) {
+				Liferay.Util.postForm(
+					document.<portlet:namespace />searchContainerForm,
+					{
+						data: {
+							deleteFormInstanceRecordIds: Liferay.Util.listCheckedExcept(
+								searchContainer,
+								'<portlet:namespace />allRowIds'
+							),
+						},
+
+						<portlet:actionURL name="/dynamic_data_mapping_form/delete_form_instance_record" var="deleteFormInstanceRecordURL">
+							<portlet:param name="mvcPath" value="/admin/view_form_instance_records.jsp" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+						</portlet:actionURL>
+
+						url: '<%= deleteFormInstanceRecordURL %>',
+					}
+				);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteRecords: deleteRecords,
+	};
+
+	Liferay.componentReady('ddmFormInstanceRecordsManagementToolbar').then(
+		function (managementToolbar) {
+			managementToolbar.on(['actionItemClicked'], function (event) {
+				var itemData = event.data.item.data;
+
+				if (itemData && itemData.action && ACTIONS[itemData.action]) {
+					ACTIONS[itemData.action]();
+				}
+			});
+		}
+	);
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

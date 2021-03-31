@@ -2168,6 +2168,20 @@ public class AssetPublisherDisplayContext {
 			_themeDisplay.getScopeGroupId(), _themeDisplay.getUserId(),
 			_requestContextMapper.map(
 				PortalUtil.getHttpServletRequest(_portletRequest)));
+<<<<<<< HEAD
+=======
+	}
+
+	private boolean _isShowRelatedAssets() {
+		if (_showRelatedAssets != null) {
+			return _showRelatedAssets;
+		}
+
+		_showRelatedAssets = ParamUtil.getBoolean(
+			_httpServletRequest, "showRelatedAssets");
+
+		return _showRelatedAssets;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private boolean _isShowRelatedAssets() {

@@ -19,15 +19,21 @@ import com.liferay.portal.kernel.search.SearchEngineHelper;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.search.internal.asset.AssetRendererFactoryRegistry;
 import com.liferay.portal.search.internal.asset.SearchableAssetClassNamesProviderImpl;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Matchers;
@@ -40,11 +46,14 @@ import org.mockito.MockitoAnnotations;
  */
 public class TypeFacetPortletPreferencesImplTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);

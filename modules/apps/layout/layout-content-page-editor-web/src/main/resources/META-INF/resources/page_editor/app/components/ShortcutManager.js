@@ -45,6 +45,9 @@ const isEditableField = (element) =>
 const isEditingEditableField = () =>
 	!!document.activeElement.getAttribute('contenteditable');
 
+const isEditingEditableField = () =>
+	!!document.activeElement.getAttribute('contenteditable');
+
 const isInteractiveElement = (element) => {
 	return (
 		['INPUT', 'OPTION', 'SELECT', 'TEXTAREA'].includes(element.tagName) ||

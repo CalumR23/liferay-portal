@@ -166,12 +166,20 @@ if ((dispatchTrigger != null) && (dispatchTrigger.getEndDate() != null)) {
 	Liferay.provide(
 		window,
 		'<portlet:namespace />updateEndDateTimeInputsDisabled',
+<<<<<<< HEAD
 		(checked) => {
+=======
+		function (checked) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			document
 				.querySelectorAll(
 					'.end-date-input-selector input, .end-time-input-selector input'
 				)
+<<<<<<< HEAD
 				.forEach((input) => {
+=======
+				.forEach(function (input) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					input.disabled = checked;
 				});
 		}

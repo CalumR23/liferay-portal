@@ -16,7 +16,11 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {Align, ClayDropDownWithItems} from '@clayui/drop-down';
 import React from 'react';
 
+<<<<<<< HEAD
 export default ({dropdownItems, spritemap}) => {
+=======
+export default function DropdownMenu({dropdownItems, spritemap}) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	return (
 		<>
 			<ClayDropDownWithItems
@@ -34,4 +38,8 @@ export default ({dropdownItems, spritemap}) => {
 			/>
 		</>
 	);
+<<<<<<< HEAD
 };
+=======
+}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

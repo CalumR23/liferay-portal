@@ -86,7 +86,10 @@ public abstract class BaseDiscountCategoryResourceImpl
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-categories/{discountCategoryId}'  -u 'test@liferay.com:test'
 	 */
 	@DELETE
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "discountCategoryId")}
 	)
@@ -114,8 +117,13 @@ public abstract class BaseDiscountCategoryResourceImpl
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DiscountCategory")})
 	public Response deleteDiscountCategoryBatch(
+<<<<<<< HEAD
 			@Parameter(hidden = true) @QueryParam("callbackURL")
 				String callbackURL,
+=======
+			@Parameter(hidden = true) @QueryParam("callbackURL") String
+				callbackURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Object object)
 		throws Exception {
 

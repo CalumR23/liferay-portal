@@ -107,10 +107,17 @@ public class CommerceSubscriptionsNotificationTest {
 			_company.getCompanyId(), _group.getGroupId(), _user.getUserId());
 
 		_commerceChannel = _commerceChannelLocalService.addCommerceChannel(
+<<<<<<< HEAD
 			StringPool.BLANK, _group.getGroupId(),
 			_group.getName(_serviceContext.getLanguageId()) + " Portal",
 			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
 			_commerceCurrency.getCode(), _serviceContext);
+=======
+			_group.getGroupId(),
+			_group.getName(_serviceContext.getLanguageId()) + " Portal",
+			CommerceChannelConstants.CHANNEL_TYPE_SITE, null,
+			_commerceCurrency.getCode(), StringPool.BLANK, _serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_toUser = UserTestUtil.addUser(
 			_user.getCompanyId(), _user.getUserId(), "businessUser",
@@ -120,9 +127,14 @@ public class CommerceSubscriptionsNotificationTest {
 
 		_commerceAccount = CommerceAccountTestUtil.addBusinessCommerceAccount(
 			_user.getUserId(), RandomTestUtil.randomString(),
+<<<<<<< HEAD
 			RandomTestUtil.randomString() + "@liferay.com",
 			RandomTestUtil.randomString(), new long[] {_toUser.getUserId()},
 			null, _serviceContext);
+=======
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			new long[] {_toUser.getUserId()}, null, _serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		CommerceAccountTestUtil.addCommerceAccountGroupAndAccountRel(
 			_company.getCompanyId(), RandomTestUtil.randomString(),

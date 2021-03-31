@@ -1131,7 +1131,11 @@ public class CommerceOrderLocalServiceImpl
 				CommerceMoney shippingDiscountAmountCommerceMoney =
 					shippingDiscountValue.getDiscountAmount();
 
+<<<<<<< HEAD
 				commerceOrder.setShippingDiscountAmount(
+=======
+				shippingAmount = shippingAmount.subtract(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					shippingDiscountAmountCommerceMoney.getPrice());
 			}
 
@@ -1143,7 +1147,11 @@ public class CommerceOrderLocalServiceImpl
 					shippingWithTaxAmountCommerceDiscountValue.
 						getDiscountAmount();
 
+<<<<<<< HEAD
 				commerceOrder.setShippingDiscountWithTaxAmount(
+=======
+				shippingWithTaxAmount = shippingWithTaxAmount.subtract(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					shippingDiscountWithTaxAmountCommerceMoney.getPrice());
 			}
 		}
@@ -1211,7 +1219,11 @@ public class CommerceOrderLocalServiceImpl
 				CommerceMoney shippingDiscountAmountCommerceMoney =
 					shippingDiscountValue.getDiscountAmount();
 
+<<<<<<< HEAD
 				commerceOrder.setShippingDiscountAmount(
+=======
+				shippingAmount = shippingAmount.subtract(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					shippingDiscountAmountCommerceMoney.getPrice());
 			}
 		}

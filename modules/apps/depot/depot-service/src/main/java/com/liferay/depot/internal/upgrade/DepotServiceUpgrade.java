@@ -29,17 +29,29 @@ public class DepotServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.0.0", "1.1.0",
 			new com.liferay.depot.internal.upgrade.v1_1_0.
+<<<<<<< HEAD
 				DepotEntryGroupRelUpgradeProcess());
+=======
+				UpgradeDepotEntryGroupRel());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"1.1.0", "1.2.0",
 			new com.liferay.depot.internal.upgrade.v1_2_0.
+<<<<<<< HEAD
 				DepotEntryGroupRelUpgradeProcess());
+=======
+				UpgradeDepotEntryGroupRel());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"1.2.0", "2.0.0",
 			new com.liferay.depot.internal.upgrade.v2_0_0.
+<<<<<<< HEAD
 				DepotEntryGroupRelUpgradeProcess());
+=======
+				UpgradeDepotEntryGroupRel());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

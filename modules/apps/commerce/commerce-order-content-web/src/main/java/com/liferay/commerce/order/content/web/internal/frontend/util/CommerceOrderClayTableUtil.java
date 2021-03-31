@@ -71,6 +71,7 @@ public class CommerceOrderClayTableUtil {
 		HttpServletRequest originalHttpServletRequest =
 			PortalUtil.getOriginalServletRequest(httpServletRequest);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				originalHttpServletRequest, portletDisplay.getId(),
@@ -86,6 +87,26 @@ public class CommerceOrderClayTableUtil {
 		).setParameter(
 			"commerceOrderId", commerceOrderId
 		).buildString();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			originalHttpServletRequest, portletDisplay.getId(),
+			themeDisplay.getPlid(), PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter(Constants.CMD, "setCurrent");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(commerceOrderId));
+
+		String redirect = ParamUtil.getString(
+			httpServletRequest, "currentUrl",
+			PortalUtil.getCurrentURL(httpServletRequest));
+
+		portletURL.setParameter("redirect", redirect);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public static List<Order> getOrders(
@@ -184,6 +205,7 @@ public class CommerceOrderClayTableUtil {
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				themeDisplay.getRequest(), portletDisplay.getId(),
@@ -193,6 +215,17 @@ public class CommerceOrderClayTableUtil {
 		).setParameter(
 			"commerceOrderItemId", commerceOrderItemId
 		).build();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			themeDisplay.getRequest(), portletDisplay.getId(),
+			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_order_content/view_commerce_order_shipments");
+		portletURL.setParameter(
+			"commerceOrderItemId", String.valueOf(commerceOrderItemId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

@@ -45,6 +45,7 @@ public class RemoteAppAdminDisplayContext {
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
 				PortletURL addRemoteAppEntryURL =
+<<<<<<< HEAD
 					PortletURLBuilder.createRenderURL(
 						_renderResponse
 					).setMVCRenderCommandName(
@@ -52,6 +53,14 @@ public class RemoteAppAdminDisplayContext {
 					).setRedirect(
 						_getRedirect()
 					).build();
+=======
+					_renderResponse.createRenderURL();
+
+				addRemoteAppEntryURL.setParameter(
+					"mvcRenderCommandName",
+					"/remote_app_admin/edit_remote_app_entry");
+				addRemoteAppEntryURL.setParameter("redirect", _getRedirect());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.setHref(addRemoteAppEntryURL);
 

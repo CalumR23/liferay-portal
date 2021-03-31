@@ -167,11 +167,23 @@ public class BaseCommerceTaxFixedRateDisplayContext {
 	}
 
 	public PortletURL getPortletURL() throws PortalException {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			commerceTaxFixedRateRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
 			"/commerce_tax_methods/edit_commerce_tax_method"
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			commerceTaxFixedRateRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_tax_methods/edit_commerce_tax_method");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			getSelectedScreenNavigationCategoryKey()
 		).build();

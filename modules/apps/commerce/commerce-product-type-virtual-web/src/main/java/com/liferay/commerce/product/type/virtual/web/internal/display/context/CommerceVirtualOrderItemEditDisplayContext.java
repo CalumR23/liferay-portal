@@ -118,6 +118,7 @@ public class CommerceVirtualOrderItemEditDisplayContext {
 			_cpDefinitionVirtualSettingRequestHelper.
 				getLiferayPortletResponse();
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -127,6 +128,18 @@ public class CommerceVirtualOrderItemEditDisplayContext {
 		).setParameter(
 			"screenNavigationCategoryKey", "items"
 		).build();
+=======
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(getCommerceOrderId()));
+		portletURL.setParameter("screenNavigationCategoryKey", "items");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceVirtualOrderItem getCommerceVirtualOrderItem() {

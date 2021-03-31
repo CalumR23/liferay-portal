@@ -13,7 +13,12 @@
  */
 
 import ExperienceService from '../../../app/services/ExperienceService';
+<<<<<<< HEAD
 import createExperienceAction from '../actions/createExperience';
+=======
+import duplicateExperienceAction from '../actions/duplicateExperience';
+import selectExperienceAction from '../actions/selectExperience';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 export default function duplicateExperience({segmentsExperienceId}) {
 	return (dispatch) => {
@@ -23,7 +28,11 @@ export default function duplicateExperience({segmentsExperienceId}) {
 			},
 			dispatch,
 		}).then(({fragmentEntryLinks, layoutData, segmentsExperience}) => {
+<<<<<<< HEAD
 			return ExperienceService.selectExperience({
+=======
+			ExperienceService.selectExperience({
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				body: {
 					segmentsExperienceId:
 						segmentsExperience.segmentsExperienceId,
@@ -32,17 +41,35 @@ export default function duplicateExperience({segmentsExperienceId}) {
 			})
 				.then((portletIds) => {
 					return dispatch(
+<<<<<<< HEAD
 						createExperienceAction({
 							fragmentEntryLinks,
 							layoutData,
 							portletIds,
 							segmentsExperience,
+=======
+						selectExperienceAction({
+							portletIds,
+							segmentsExperienceId:
+								segmentsExperience.segmentsExperienceId,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						})
 					);
 				})
 				.catch((error) => {
 					return error;
 				});
+<<<<<<< HEAD
+=======
+
+			return dispatch(
+				duplicateExperienceAction({
+					fragmentEntryLinks,
+					layoutData,
+					segmentsExperience,
+				})
+			);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		});
 	};
 }

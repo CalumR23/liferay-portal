@@ -45,7 +45,10 @@ public class CommercePaymentMethodGroupRelsDisplayContext {
 		_commercePaymentMethodGroupRelService =
 			commercePaymentMethodGroupRelService;
 		_commercePaymentMethodRegistry = commercePaymentMethodRegistry;
+<<<<<<< HEAD
 		_countryService = countryService;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_commercePaymentMethodRequestHelper =
 			new CommercePaymentMethodRequestHelper(httpServletRequest);

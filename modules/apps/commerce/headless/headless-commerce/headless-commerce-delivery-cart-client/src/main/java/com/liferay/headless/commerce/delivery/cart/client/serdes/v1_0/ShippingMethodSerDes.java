@@ -217,6 +217,12 @@ public class ShippingMethodSerDes {
 						));
 				}
 			}
+<<<<<<< HEAD
+=======
+			else if (jsonParserFieldName.equals("status")) {
+				throw new IllegalArgumentException();
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 	}
@@ -245,7 +251,11 @@ public class ShippingMethodSerDes {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
+<<<<<<< HEAD
 			sb.append("\": ");
+=======
+			sb.append("\":");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Object value = entry.getValue();
 
@@ -281,7 +291,11 @@ public class ShippingMethodSerDes {
 			}
 
 			if (iterator.hasNext()) {
+<<<<<<< HEAD
 				sb.append(", ");
+=======
+				sb.append(",");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

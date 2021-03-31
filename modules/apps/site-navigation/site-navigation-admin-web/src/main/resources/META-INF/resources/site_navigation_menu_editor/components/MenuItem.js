@@ -42,6 +42,10 @@ export const MenuItem = ({item}) => {
 	const {
 		deleteSiteNavigationMenuItemURL,
 		editSiteNavigationMenuItemParentURL,
+<<<<<<< HEAD
+=======
+		languageDirection,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		languageId,
 		portletNamespace,
 	} = useConstants();
@@ -96,6 +100,7 @@ export const MenuItem = ({item}) => {
 	const {handlerRef, isDragging} = useDragItem(item, updateMenuItemParent);
 	const {targetRef} = useDropTarget(item);
 
+<<<<<<< HEAD
 	const rtl = Liferay.Language.direction[languageId] === 'rtl';
 	const itemStyle = rtl
 		? {marginRight: (itemPath.length - 1) * NESTING_MARGIN}
@@ -113,19 +118,35 @@ export const MenuItem = ({item}) => {
 			ref={targetRef}
 			role="listitem"
 		>
+=======
+	const rtl = languageDirection[languageId] === 'rtl';
+	const itemStyle = rtl
+		? {marginRight: (itemPath.length - 1) * NESTING_MARGIN}
+		: {marginLeft: (itemPath.length - 1) * NESTING_MARGIN};
+
+	return (
+		<div ref={targetRef}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<ClayCard
 				className={classNames('site_navigation_menu_editor_MenuItem', {
 					dragging: isDragging,
 					'site_navigation_menu_editor_MenuItem--selected': selected,
 				})}
+<<<<<<< HEAD
+=======
+				horizontal
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				selectable
 				style={itemStyle}
 			>
 				<ClayCheckbox
+<<<<<<< HEAD
 					aria-label={Liferay.Util.sub(
 						Liferay.Language.get('select-x'),
 						`${title} (${type})`
 					)}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					checked={selected}
 					onChange={() => {
 						setSelectedMenuItemId(siteNavigationMenuItemId);
@@ -150,10 +171,13 @@ export const MenuItem = ({item}) => {
 
 							<ClayLayout.ContentCol gutters>
 								<ClayButtonWithIcon
+<<<<<<< HEAD
 									aria-label={Liferay.Util.sub(
 										Liferay.Language.get('delete-x'),
 										`${title} (${type})`
 									)}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									displayType="unstyled"
 									onClick={deleteMenuItem}
 									small

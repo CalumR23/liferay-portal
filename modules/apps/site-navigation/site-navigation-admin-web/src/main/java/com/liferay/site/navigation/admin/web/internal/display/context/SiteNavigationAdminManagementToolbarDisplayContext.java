@@ -103,12 +103,27 @@ public class SiteNavigationAdminManagementToolbarDisplayContext
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
+<<<<<<< HEAD
+=======
+
+		PortletURL addSiteNavigationMenuURL =
+			liferayPortletResponse.createActionURL();
+
+		addSiteNavigationMenuURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/navigation_menu/add_site_navigation_menu");
+		addSiteNavigationMenuURL.setParameter(
+			"mvcPath", "/edit_site_navigation_menu.jsp");
+		addSiteNavigationMenuURL.setParameter(
+			"redirect", themeDisplay.getURLCurrent());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
 				dropdownItem.putData("action", "addSiteNavigationMenu");
 				dropdownItem.putData(
 					"addSiteNavigationMenuURL",
+<<<<<<< HEAD
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
 					).setMVCPath(
@@ -118,6 +133,9 @@ public class SiteNavigationAdminManagementToolbarDisplayContext
 					).setRedirect(
 						themeDisplay.getURLCurrent()
 					).buildString());
+=======
+					addSiteNavigationMenuURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "add"));
 			}

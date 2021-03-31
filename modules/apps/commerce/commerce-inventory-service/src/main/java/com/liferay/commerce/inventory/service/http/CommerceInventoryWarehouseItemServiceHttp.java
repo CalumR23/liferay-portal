@@ -319,8 +319,13 @@ public class CommerceInventoryWarehouseItemServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				CommerceInventoryWarehouseItemServiceUtil.class,
+<<<<<<< HEAD
 				"fetchCommerceInventoryWarehouseItemByExternalReferenceCode",
 				_fetchCommerceInventoryWarehouseItemByExternalReferenceCodeParameterTypes6);
+=======
+				"fetchCommerceInventoryWarehouseItemByReferenceCode",
+				_fetchCommerceInventoryWarehouseItemByReferenceCodeParameterTypes6);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, externalReferenceCode, companyId);
@@ -1233,8 +1238,13 @@ public class CommerceInventoryWarehouseItemServiceHttp {
 			long.class, String.class
 		};
 	private static final Class<?>[]
+<<<<<<< HEAD
 		_fetchCommerceInventoryWarehouseItemByExternalReferenceCodeParameterTypes6 =
 			new Class[] {String.class, long.class};
+=======
+		_fetchCommerceInventoryWarehouseItemByReferenceCodeParameterTypes6 =
+			new Class[] {long.class, String.class};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final Class<?>[]
 		_getCommerceInventoryWarehouseItemParameterTypes7 = new Class[] {
 			long.class

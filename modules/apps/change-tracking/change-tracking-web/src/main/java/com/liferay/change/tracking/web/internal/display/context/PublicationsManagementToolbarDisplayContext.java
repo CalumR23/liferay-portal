@@ -20,7 +20,10 @@ import com.liferay.change.tracking.web.internal.security.permission.resource.CTP
 import com.liferay.frontend.taglib.clay.servlet.taglib.display.context.SearchContainerManagementToolbarDisplayContext;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -55,11 +58,19 @@ public class PublicationsManagementToolbarDisplayContext
 
 	@Override
 	public String getClearResultsURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			getPortletURL()
 		).setParameter(
 			"keywords", StringPool.BLANK
 		).buildString();
+=======
+		PortletURL clearResultsURL = getPortletURL();
+
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+
+		return clearResultsURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

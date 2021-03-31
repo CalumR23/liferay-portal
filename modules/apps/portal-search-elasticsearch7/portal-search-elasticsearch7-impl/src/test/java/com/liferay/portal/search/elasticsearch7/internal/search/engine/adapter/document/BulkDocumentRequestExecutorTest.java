@@ -53,7 +53,11 @@ public class BulkDocumentRequestExecutorTest {
 			new DefaultElasticsearchDocumentFactory();
 
 		ElasticsearchBulkableDocumentRequestTranslator
+<<<<<<< HEAD
 			elasticsearchBulkableDocumentRequestTranslator =
+=======
+			bulkableDocumentRequestTranslator =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				new ElasticsearchBulkableDocumentRequestTranslatorImpl() {
 					{
 						setElasticsearchDocumentFactory(
@@ -65,7 +69,11 @@ public class BulkDocumentRequestExecutorTest {
 			new BulkDocumentRequestExecutorImpl() {
 				{
 					setElasticsearchBulkableDocumentRequestTranslator(
+<<<<<<< HEAD
 						elasticsearchBulkableDocumentRequestTranslator);
+=======
+						bulkableDocumentRequestTranslator);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					setElasticsearchClientResolver(elasticsearchFixture);
 				}
 			};

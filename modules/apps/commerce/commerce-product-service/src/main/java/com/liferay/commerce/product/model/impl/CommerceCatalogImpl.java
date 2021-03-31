@@ -37,8 +37,12 @@ public class CommerceCatalogImpl extends CommerceCatalogBaseImpl {
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
+<<<<<<< HEAD
 					_log.warn(
 						"Unable to get commerce catalog group", exception);
+=======
+					_log.warn("Unable to get commerce catalog group");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				}
 			}
 		}

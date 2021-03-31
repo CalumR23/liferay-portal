@@ -24,7 +24,11 @@ import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.test.aspects.ReflectionUtilAdvice;
 import com.liferay.portal.test.rule.AdviseWith;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.test.rule.AspectJNewEnvTestRule;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.util.PropsImpl;
 
 import java.util.Collections;
@@ -53,6 +57,11 @@ public class ConfigurableUtilTest {
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
+
+	@Before
+	public void setUp() {
+		PropsUtil.setProps(new PropsImpl());
+	}
 
 	@Before
 	public void setUp() {

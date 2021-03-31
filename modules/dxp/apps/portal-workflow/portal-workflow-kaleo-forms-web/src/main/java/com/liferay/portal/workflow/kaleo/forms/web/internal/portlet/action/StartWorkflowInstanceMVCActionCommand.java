@@ -35,7 +35,11 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoFormsPortletKeys.KALEO_FORMS_ADMIN,
+<<<<<<< HEAD
 		"mvc.command.name=/kaleo_forms_admin/start_workflow_instance"
+=======
+		"mvc.command.name=/kaleo_forms/start_workflow_instance"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	},
 	service = MVCActionCommand.class
 )

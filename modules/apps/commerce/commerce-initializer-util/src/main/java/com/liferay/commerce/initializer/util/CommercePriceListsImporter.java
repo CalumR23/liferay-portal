@@ -165,13 +165,22 @@ public class CommercePriceListsImporter {
 
 			CommercePriceList commercePriceList =
 				_commercePriceListLocalService.upsertCommercePriceList(
+<<<<<<< HEAD
 					externalReferenceCode, catalogGroupId, user.getUserId(), 0,
+=======
+					catalogGroupId, user.getUserId(), 0,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					commerceCurrency.getCommerceCurrencyId(), parentPriceListId,
 					name, priority, displayDateMonth, displayDateDay,
 					displayDateYear, displayDateHour, displayDateMinute,
 					expirationDateMonth, expirationDateDay, expirationDateYear,
+<<<<<<< HEAD
 					expirationDateHour, expirationDateMinute, neverExpire,
 					serviceContext);
+=======
+					expirationDateHour, expirationDateMinute,
+					externalReferenceCode, neverExpire, serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			for (int i = 0; i < accountGroupsJSONArray.length(); i++) {
 				try {

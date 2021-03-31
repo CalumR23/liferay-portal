@@ -44,10 +44,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @generated
  */
 @Generated("")
+<<<<<<< HEAD
 @GraphQLName(
 	description = "Describes a specific language in the platform",
 	value = "Language"
 )
+=======
+@GraphQLName("Language")
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 @JsonFilter("Liferay.Vulcan")
 @XmlRootElement(name = "Language")
 public class Language implements Serializable {
@@ -329,7 +333,10 @@ public class Language implements Serializable {
 	}
 
 	@Schema(
+<<<<<<< HEAD
 		accessMode = Schema.AccessMode.READ_ONLY,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		defaultValue = "com.liferay.headless.delivery.dto.v1_0.Language",
 		name = "x-class-name"
 	)
@@ -365,7 +372,11 @@ public class Language implements Serializable {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
+<<<<<<< HEAD
 			sb.append("\": ");
+=======
+			sb.append("\":");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Object value = entry.getValue();
 
@@ -404,7 +415,11 @@ public class Language implements Serializable {
 			}
 
 			if (iterator.hasNext()) {
+<<<<<<< HEAD
 				sb.append(", ");
+=======
+				sb.append(",");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

@@ -194,6 +194,7 @@ public class CPDefinitionsDisplayContext
 		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
 			new ArrayList<>();
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -203,6 +204,16 @@ public class CPDefinitionsDisplayContext
 		).setParameter(
 			"cpDefinitionId", "{id}"
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter("cpDefinitionId", "{id}");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CPDefinitionScreenNavigationConstants.CATEGORY_KEY_DETAILS
 		).build();
@@ -308,6 +319,7 @@ public class CPDefinitionsDisplayContext
 	public List<DropdownItem> getDropdownItems() throws Exception {
 		List<DropdownItem> dropdownItems = new ArrayList<>();
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				cpRequestHelper.getRenderRequest(),
@@ -315,6 +327,15 @@ public class CPDefinitionsDisplayContext
 		).setMVCRenderCommandName(
 			"/cp_definitions/duplicate_cp_definition"
 		).setParameter(
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			cpRequestHelper.getRenderRequest(), cpRequestHelper.getPortletId(),
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/duplicate_cp_definition");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"cpDefinitionId",
 			ParamUtil.getString(httpServletRequest, "cpDefinitionId")
 		).setWindowState(

@@ -161,12 +161,15 @@ public class AddSegmentsExperienceMVCActionCommand
 			ServiceContext serviceContext)
 		throws PortalException {
 
+<<<<<<< HEAD
 		UnicodeProperties typeSettingsUnicodeProperties = new UnicodeProperties(
 			true);
 
 		typeSettingsUnicodeProperties.setProperty(
 			PropsKeys.LOCALES, StringUtil.merge(languageIds));
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (segmentsExperiment != null) {
 			long segmentsEntryId = SegmentsEntryConstants.ID_DEFAULT;
 
@@ -185,7 +188,11 @@ public class AddSegmentsExperienceMVCActionCommand
 				Collections.singletonMap(
 					LocaleUtil.getSiteDefault(),
 					ParamUtil.getString(actionRequest, "name")),
+<<<<<<< HEAD
 				false, typeSettingsUnicodeProperties, serviceContext);
+=======
+				false, serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		return _segmentsExperienceService.addSegmentsExperience(
@@ -195,7 +202,11 @@ public class AddSegmentsExperienceMVCActionCommand
 				LocaleUtil.getSiteDefault(),
 				ParamUtil.getString(actionRequest, "name")),
 			ParamUtil.getBoolean(actionRequest, "active", true),
+<<<<<<< HEAD
 			typeSettingsUnicodeProperties, serviceContext);
+=======
+			serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private SegmentsExperimentRel _addSegmentsExperimentRel(

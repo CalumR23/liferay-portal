@@ -18,11 +18,19 @@ import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.model.CTEntryTable;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.model.UserTable;
+=======
+import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -39,7 +47,7 @@ import javax.portlet.ActionRequest;
 import javax.portlet.ActionURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-import javax.portlet.ResourceURL;
+import javax.portlet.RenderURL;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -89,6 +97,7 @@ public class ViewDiscardDisplayContext {
 					JSONFactoryUtil.createJSONArray();
 
 				for (CTEntry ctEntry : ctEntries) {
+<<<<<<< HEAD
 					ResourceURL dataURL = _renderResponse.createResourceURL();
 
 					dataURL.setResourceID(
@@ -96,6 +105,18 @@ public class ViewDiscardDisplayContext {
 					dataURL.setParameter(
 						"ctEntryId", String.valueOf(ctEntry.getCtEntryId()));
 
+=======
+					RenderURL viewURL = _renderResponse.createRenderURL();
+
+					viewURL.setParameter(
+						"mvcRenderCommandName", "/change_tracking/view_diff");
+					viewURL.setParameter(
+						"ctEntryId", String.valueOf(ctEntry.getCtEntryId()));
+
+					PublicationsPortletURLUtil.setWindowState(
+						viewURL, LiferayWindowState.POP_UP);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					ctEntriesJSONArray.put(
 						JSONUtil.put(
 							"ctEntryId", ctEntry.getCtEntryId()
@@ -116,6 +137,8 @@ public class ViewDiscardDisplayContext {
 								_themeDisplay.getLocale())
 						).put(
 							"userId", ctEntry.getUserId()
+						).put(
+							"viewURL", viewURL.toString()
 						));
 				}
 
@@ -144,6 +167,7 @@ public class ViewDiscardDisplayContext {
 			return redirect;
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -151,6 +175,16 @@ public class ViewDiscardDisplayContext {
 		).setParameter(
 			"ctCollectionId", _ctCollectionId
 		).buildString();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/view_changes");
+		portletURL.setParameter(
+			"ctCollectionId", String.valueOf(_ctCollectionId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getSubmitURL() {

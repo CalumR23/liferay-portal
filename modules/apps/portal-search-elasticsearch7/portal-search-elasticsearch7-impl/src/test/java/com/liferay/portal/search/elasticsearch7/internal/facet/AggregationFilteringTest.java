@@ -19,19 +19,25 @@ import com.liferay.portal.search.test.util.facet.BaseAggregationFilteringTestCas
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 /**
  * @author André de Oliveira
  */
 public class AggregationFilteringTest extends BaseAggregationFilteringTestCase {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	protected IndexingFixture createIndexingFixture() {
 		return LiferayElasticsearchIndexingFixtureFactory.getInstance();

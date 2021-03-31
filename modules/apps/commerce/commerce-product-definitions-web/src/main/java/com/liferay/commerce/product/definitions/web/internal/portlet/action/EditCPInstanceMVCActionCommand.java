@@ -176,6 +176,7 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, themeDisplay.getScopeGroup(),
@@ -189,6 +190,22 @@ public class EditCPInstanceMVCActionCommand extends BaseMVCActionCommand {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, themeDisplay.getScopeGroup(),
+			CPDefinition.class.getName(), PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_instance");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpInstance.getCPDefinitionId()));
+		portletURL.setParameter(
+			"cpInstanceId", String.valueOf(cpInstance.getCPInstanceId()));
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	protected CPInstance updateCPInstance(ActionRequest actionRequest)

@@ -232,7 +232,11 @@ const SaveFragmentCompositionModal = ({onCloseModal}) => {
 										checked={saveMappingConfiguration}
 										id={`${config.portletNamespace}saveMappingConfiguration`}
 										label={Liferay.Language.get(
+<<<<<<< HEAD
 											'save-mapping-configuration-and-link'
+=======
+											'save-mapping-configuration'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 										)}
 										onChange={(event) =>
 											setSaveMappingConfiguration(

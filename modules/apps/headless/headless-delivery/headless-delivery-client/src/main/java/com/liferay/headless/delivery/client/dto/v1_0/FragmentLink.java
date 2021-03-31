@@ -19,7 +19,10 @@ import com.liferay.headless.delivery.client.serdes.v1_0.FragmentLinkSerDes;
 
 import java.io.Serializable;
 
+<<<<<<< HEAD
 import java.util.Map;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.Objects;
 
 import javax.annotation.Generated;

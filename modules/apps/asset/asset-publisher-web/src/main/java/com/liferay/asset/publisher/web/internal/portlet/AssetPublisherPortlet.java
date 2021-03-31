@@ -424,6 +424,7 @@ public class AssetPublisherPortlet extends MVCPortlet {
 	@Reference
 	protected SegmentsEntryRetriever segmentsEntryRetriever;
 
+<<<<<<< HEAD
 	private String _getDisplayFieldValue(Field field, ThemeDisplay themeDisplay)
 		throws Exception {
 
@@ -450,6 +451,8 @@ public class AssetPublisherPortlet extends MVCPortlet {
 		return fieldValue;
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetPublisherPortlet.class);
 

@@ -78,6 +78,20 @@ public class CommerceDiscountQualifiersDisplayContext
 			getAccountClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceAccount.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_account");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceAccountId", "{account.id}");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getClayHeadlessDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
@@ -154,6 +168,19 @@ public class CommerceDiscountQualifiersDisplayContext
 			getDiscountChannelClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceChannel.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_channels/edit_commerce_channel");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceChannelId", "{channel.id}");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getClayHeadlessDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(

@@ -49,6 +49,7 @@ public class CommerceNotificationQueueEntriesDisplayContext {
 	}
 
 	public String getAddNotificationTemplateURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				_commerceNotificationsRequestHelper.getRequest(),
@@ -60,6 +61,21 @@ public class CommerceNotificationQueueEntriesDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			_commerceNotificationsRequestHelper.getRequest(),
+			CommerceChannel.class.getName(), PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_channels/edit_commerce_notification_template");
+		portletURL.setParameter(
+			"commerceChannelId", String.valueOf(getCommerceChannelId()));
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceChannel getCommerceChannel() throws PortalException {

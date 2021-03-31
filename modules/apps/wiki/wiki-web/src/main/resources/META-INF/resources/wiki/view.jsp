@@ -172,6 +172,7 @@ if (portletTitleBasedNavigation) {
 	</c:if>
 
 	<div class="sidenav-content">
+<<<<<<< HEAD
 		<clay:container-fluid>
 			<div <%= portletTitleBasedNavigation ? "class=\"container-form-lg\"" : StringPool.BLANK %>>
 				<div <%= portletTitleBasedNavigation ? "class=\"sheet\"" : StringPool.BLANK %>>
@@ -246,6 +247,82 @@ if (portletTitleBasedNavigation) {
 						displayStyleGroupId="<%= wikiPortletInstanceSettingsHelper.getDisplayStyleGroupId() %>"
 						entries="<%= entries %>"
 					>
+=======
+		<div <%= portletTitleBasedNavigation ? "class=\"panel main-content-card\"" : StringPool.BLANK %>>
+			<div <%= portletTitleBasedNavigation ? "class=\"panel-body\"" : StringPool.BLANK %>>
+				<c:if test="<%= !portletTitleBasedNavigation %>">
+					<c:choose>
+						<c:when test="<%= print %>">
+							<aui:script>
+								window.onafterprint = function () {
+									window.close();
+								};
+
+								window.onfocus = function () {
+									window.close();
+								};
+
+								print();
+							</aui:script>
+						</c:when>
+						<c:otherwise>
+							<aui:script>
+								function <portlet:namespace />printPage() {
+									window.open(
+										'<%= printPageURL %>',
+										'',
+										'directories=0,height=480,left=80,location=1,menubar=1,resizable=1,scrollbars=yes,status=0,toolbar=0,top=180,width=640'
+									);
+								}
+							</aui:script>
+						</c:otherwise>
+					</c:choose>
+
+					<liferay-util:include page="/wiki/top_links.jsp" servletContext="<%= application %>" />
+				</c:if>
+
+				<%
+				List<WikiPage> entries = new ArrayList<>();
+
+				entries.add(wikiPage);
+
+				String formattedContent = null;
+
+				WikiEngineRenderer wikiEngineRenderer = (WikiEngineRenderer)request.getAttribute(WikiWebKeys.WIKI_ENGINE_RENDERER);
+
+				try {
+					formattedContent = WikiUtil.getFormattedContent(wikiEngineRenderer, renderRequest, renderResponse, wikiPage, viewPageURL, editPageURL, title, preview);
+				}
+				catch (Exception e) {
+					formattedContent = wikiPage.getContent();
+				}
+				%>
+
+				<c:if test="<%= !portletTitleBasedNavigation %>">
+					<div class="lfr-alert-container"></div>
+				</c:if>
+
+				<liferay-ddm:template-renderer
+					className="<%= WikiPage.class.getName() %>"
+					contextObjects='<%=
+						HashMapBuilder.<String, Object>put(
+							"assetEntry", layoutAssetEntry
+						).put(
+							"formattedContent", formattedContent
+						).put(
+							"viewURL", viewPageURL.toString()
+						).put(
+							"wikiPortletInstanceConfiguration", wikiPortletInstanceConfiguration
+						).put(
+							"wikiPortletInstanceOverriddenConfiguration", wikiPortletInstanceConfiguration
+						).build()
+					%>'
+					displayStyle="<%= wikiPortletInstanceSettingsHelper.getDisplayStyle() %>"
+					displayStyleGroupId="<%= wikiPortletInstanceSettingsHelper.getDisplayStyleGroupId() %>"
+					entries="<%= entries %>"
+				>
+					<div class="main-content-body">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						<c:choose>
 							<c:when test="<%= !portletTitleBasedNavigation %>">
 								<liferay-ui:header
@@ -453,8 +530,15 @@ if (portletTitleBasedNavigation) {
 
 						List<WikiPage> parentPages = wikiPage.getViewableParentPages();
 
+<<<<<<< HEAD
 						for (WikiPage curParentPage : parentPages) {
 							viewPageURL.setParameter("title", curParentPage.getTitle());
+=======
+						PortalUtil.setPageDescription(description, request);
+
+						PortalUtil.setPageKeywords(assetHelper.getAssetKeywords(WikiPage.class.getName(), wikiPage.getResourcePrimKey()), request);
+					}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							PortalUtil.addPortletBreadcrumbEntry(request, curParentPage.getTitle(), viewPageURL.toString());
 						}

@@ -12,9 +12,12 @@
  * details.
  */
 
+<<<<<<< HEAD
 const ADMINISTRATION_SCOPE_VALUE = 'site_administration.content';
 const APPLICATIONS_SCOPE_VALUE = 'applications_menu.applications';
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const COLORS = {
 	secondary: '#A7A9BC',
 };

@@ -126,10 +126,23 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 
 			String oldFriendlyURL = layout.getFriendlyURL();
 
+<<<<<<< HEAD
 			Collection<String> values = friendlyURLMap.values();
+=======
+		Layout layout = _layoutLocalService.getLayout(
+			groupId, privateLayout, layoutId);
+
+		long masterLayoutPlid = ParamUtil.getLong(
+			uploadPortletRequest, "masterLayoutPlid",
+			layout.getMasterLayoutPlid());
+		long styleBookEntryId = ParamUtil.getLong(
+			uploadPortletRequest, "styleBookEntryId",
+			layout.getStyleBookEntryId());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			values.removeIf(value -> Validator.isNull(value));
 
+<<<<<<< HEAD
 			if (friendlyURLMap.isEmpty()) {
 				friendlyURLMap = layout.getFriendlyURLMap();
 			}
@@ -138,6 +151,9 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 				serviceContext.setAttribute(
 					"layout.instanceable.allowed", Boolean.TRUE);
 			}
+=======
+		String oldFriendlyURL = layout.getFriendlyURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			layout = _layoutService.updateLayout(
 				groupId, privateLayout, layoutId, layout.getParentLayoutId(),

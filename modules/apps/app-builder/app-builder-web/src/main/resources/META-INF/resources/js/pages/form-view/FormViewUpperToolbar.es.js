@@ -61,6 +61,18 @@ export default function FormViewUpperToolbar({newCustomObject, popUpWindow}) {
 		[dispatch]
 	);
 
+	const onEditingLanguageIdChange = useCallback(
+		(editingLanguageId) => {
+			setEditingLanguageId(editingLanguageId);
+
+			dispatch({
+				payload: editingLanguageId,
+				type: DataLayoutBuilderActions.UPDATE_EDITING_LANGUAGE_ID,
+			});
+		},
+		[dispatch]
+	);
+
 	useEffect(() => {
 		if (dataDefinition.defaultLanguageId) {
 			setDefaultLanguageId(dataDefinition.defaultLanguageId);
@@ -82,6 +94,7 @@ export default function FormViewUpperToolbar({newCustomObject, popUpWindow}) {
 			},
 			type: DataLayoutBuilderActions.UPDATE_DATA_LAYOUT_NAME,
 		});
+<<<<<<< HEAD
 
 		if (!dataDefinition.availableLanguageIds.includes(editingLanguageId)) {
 			dispatch({
@@ -90,6 +103,8 @@ export default function FormViewUpperToolbar({newCustomObject, popUpWindow}) {
 					DataLayoutBuilderActions.UPDATE_DATA_DEFINITION_AVAILABLE_LANGUAGE,
 			});
 		}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	};
 
 	const onKeyDown = (event) => {

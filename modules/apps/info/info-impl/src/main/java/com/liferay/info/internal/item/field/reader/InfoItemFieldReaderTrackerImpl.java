@@ -165,6 +165,7 @@ public class InfoItemFieldReaderTrackerImpl
 			_infoDisplayContributorField = infoDisplayContributorField;
 		}
 
+<<<<<<< HEAD
 		/**
 		 *   @deprecated As of Cavanaugh (7.4.x), replaced by {@link
 		 *          #getInfoField()}
@@ -181,6 +182,10 @@ public class InfoItemFieldReaderTrackerImpl
 
 		@Override
 		public InfoField<?> getInfoField() {
+=======
+		@Override
+		public InfoField<?> getField() {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			InfoFieldType infoFieldType = TextInfoFieldType.INSTANCE;
 
 			InfoDisplayContributorFieldType infoDisplayContributorFieldType =
@@ -208,6 +213,13 @@ public class InfoItemFieldReaderTrackerImpl
 			).build();
 		}
 
+<<<<<<< HEAD
+=======
+		public InfoDisplayContributorField<?> getInfoDisplayContributorField() {
+			return _infoDisplayContributorField;
+		}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		@Override
 		public String getKey() {
 			return _infoDisplayContributorField.getKey();

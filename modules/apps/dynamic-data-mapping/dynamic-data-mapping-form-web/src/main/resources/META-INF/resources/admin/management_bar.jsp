@@ -48,4 +48,94 @@
 	sortingOrder="<%= ddmFormAdminDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmFormAdminDisplayContext.getSortingURL() %>"
 	viewTypeItems="<%= ddmFormAdminDisplayContext.getViewTypesItems() %>"
+<<<<<<< HEAD
 />
+=======
+/>
+
+<aui:script sandbox="<%= true %>">
+	var deleteFormInstances = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace /><%= ddmFormAdminDisplayContext.getSearchContainerId() %>'
+			);
+
+			if (searchContainer) {
+				Liferay.Util.postForm(
+					document.<portlet:namespace />searchContainerForm,
+					{
+						data: {
+							deleteFormInstanceIds: Liferay.Util.listCheckedExcept(
+								searchContainer,
+								'<portlet:namespace />allRowIds'
+							),
+						},
+
+						<portlet:actionURL name="/dynamic_data_mapping_form/delete_form_instance" var="deleteFormInstanceURL">
+							<portlet:param name="mvcPath" value="/admin/view.jsp" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+						</portlet:actionURL>
+
+						url: '<%= deleteFormInstanceURL %>',
+					}
+				);
+			}
+		}
+	};
+
+	var deleteStructures = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace /><%= ddmFormAdminDisplayContext.getSearchContainerId() %>'
+			);
+
+			if (searchContainer) {
+				Liferay.Util.postForm(
+					document.<portlet:namespace />searchContainerForm,
+					{
+						data: {
+							deleteStructureIds: Liferay.Util.listCheckedExcept(
+								searchContainer,
+								'<portlet:namespace />allRowIds'
+							),
+						},
+
+						<portlet:actionURL name="/dynamic_data_mapping_form/delete_structure" var="deleteStructureURL">
+							<portlet:param name="mvcPath" value="/admin/view.jsp" />
+							<portlet:param name="currentTab" value="element-set" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+						</portlet:actionURL>
+
+						url: '<%= deleteStructureURL %>',
+					}
+				);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteFormInstances: deleteFormInstances,
+		deleteStructures: deleteStructures,
+	};
+
+	Liferay.componentReady('ddmFormManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

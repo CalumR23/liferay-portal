@@ -78,7 +78,11 @@ public class StyleBookEntryVersionCacheModel
 
 	@Override
 	public String toString() {
+<<<<<<< HEAD
 		StringBundler sb = new StringBundler(35);
+=======
+		StringBundler sb = new StringBundler(31);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);

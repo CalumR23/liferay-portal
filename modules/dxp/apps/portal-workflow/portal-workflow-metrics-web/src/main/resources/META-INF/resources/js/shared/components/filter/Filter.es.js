@@ -73,6 +73,8 @@ const Filter = ({
 
 	const getSelectedItems = (items) => items.filter((item) => item.active);
 
+	const getSelectedItems = (items) => items.filter((item) => item.active);
+
 	const applyFilterChanges = useCallback(() => {
 		if (!withoutRouteParams) {
 			const query = getSelectedItemsQuery(

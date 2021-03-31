@@ -19,7 +19,11 @@ import React, {useContext} from 'react';
 import MiniCartContext from './MiniCartContext';
 import {ADD_PRODUCT} from './util/constants';
 
+<<<<<<< HEAD
 function CartItemsList() {
+=======
+function CartItemsList({items}) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const {
 		CartViews,
 		cartState,
@@ -29,16 +33,30 @@ function CartItemsList() {
 		summaryDataMapper,
 	} = useContext(MiniCartContext);
 
+<<<<<<< HEAD
 	const {cartItems = [], summary = {}} = cartState;
 
 	return (
 		<div className="mini-cart-items-list">
 			<CartViews.ItemsListActions numberOfItems={cartItems.length} />
+=======
+	const {summary = {}} = cartState;
+	const numberOfItems = items?.length || 0;
+
+	return (
+		<div className={'mini-cart-items-list'}>
+			<CartViews.ItemsListActions numberOfItems={numberOfItems} />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			{cartItems.length > 0 ? (
 				<>
+<<<<<<< HEAD
 					<div className="mini-cart-cart-items">
 						{cartItems.map((item) => (
+=======
+					<div className={'mini-cart-cart-items'}>
+						{items.map((item) => (
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							<CartViews.Item item={item} key={item.id} />
 						))}
 					</div>

@@ -13,7 +13,19 @@ import ClayButton, {ClayButtonWithIcon} from '@clayui/button';
 import ClayLabel from '@clayui/label';
 import {usePrevious, useTimeout} from '@liferay/frontend-js-react-web';
 import {AppContext} from 'app-builder-web/js/AppContext.es';
+<<<<<<< HEAD
 import NoPermissionState from 'app-builder-web/js/components/empty-state/NoPermissionState.es';
+=======
+import Button from 'app-builder-web/js/components/button/Button.es';
+import NoPermissionState from 'app-builder-web/js/components/empty-state/NoPermissionState.es';
+import {Loading} from 'app-builder-web/js/components/loading/Loading.es';
+import ManagementToolbar from 'app-builder-web/js/components/management-toolbar/ManagementToolbar.es';
+import ManagementToolbarResultsBar from 'app-builder-web/js/components/management-toolbar/ManagementToolbarResultsBar.es';
+import SearchContext, {
+	reducer,
+} from 'app-builder-web/js/components/management-toolbar/SearchContext.es';
+import TableWithPagination from 'app-builder-web/js/components/table/TableWithPagination.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import useDataListView from 'app-builder-web/js/hooks/useDataListView.es';
 import useEntriesActions from 'app-builder-web/js/hooks/useEntriesActions.es';
 import usePermissions from 'app-builder-web/js/hooks/usePermissions.es';
@@ -22,6 +34,7 @@ import {
 	navigateToEditPage,
 } from 'app-builder-web/js/pages/entry/utils.es';
 import {getLocalizedUserPreferenceValue} from 'app-builder-web/js/utils/lang.es';
+<<<<<<< HEAD
 import Loading from 'data-engine-js-components-web/js/components/loading/Loading.es';
 import ManagementToolbar from 'data-engine-js-components-web/js/components/management-toolbar/ManagementToolbar.es';
 import ManagementToolbarResultsBar from 'data-engine-js-components-web/js/components/management-toolbar/ManagementToolbarResultsBar.es';
@@ -36,6 +49,11 @@ import {
 	concatValues,
 	isEqualObjects,
 } from 'data-engine-js-components-web/js/utils/utils.es';
+=======
+import {errorToast} from 'app-builder-web/js/utils/toast.es';
+import {concatValues, isEqualObjects} from 'app-builder-web/js/utils/utils.es';
+import {usePrevious, useTimeout} from 'frontend-js-react-web';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 
 import useAppWorkflow from '../../hooks/useAppWorkflow.es';

@@ -143,6 +143,7 @@ public class CPDefinitionAssetRenderer
 		Group group = GroupLocalServiceUtil.fetchGroup(
 			_cpDefinition.getGroupId());
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
 				liferayPortletRequest, group, CPPortletKeys.CP_DEFINITIONS, 0,
@@ -152,6 +153,19 @@ public class CPDefinitionAssetRenderer
 		).setParameter(
 			"cpDefinitionId", _cpDefinition.getCPDefinitionId()
 		).build();
+=======
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, group, CPPortletKeys.CP_DEFINITIONS, 0, 0,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+			"cpDefinitionId",
+			String.valueOf(_cpDefinition.getCPDefinitionId()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

@@ -285,9 +285,12 @@ const CustomObjectFieldsList = ({keywords}) => {
 				{...fieldTypeListProps}
 				dataDefinition={dataDefinition}
 				fieldTypes={customFieldTypes}
+<<<<<<< HEAD
 				onDelete={(fieldName) =>
 					onDeleteDefinitionField({activePage: 0, fieldName})
 				}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				showEmptyState={false}
 			/>
 

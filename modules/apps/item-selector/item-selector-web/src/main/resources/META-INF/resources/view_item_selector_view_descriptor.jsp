@@ -144,6 +144,7 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 				</c:when>
 				<c:otherwise>
 					<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 						cssClass="table-cell-expand table-cell-minw-200"
 						name="title"
 					>
@@ -151,6 +152,12 @@ SearchContainer<Object> searchContainer = itemSelectorViewDescriptorRendererDisp
 							<%= itemDescriptor.getTitle(locale) %>
 						</a>
 					</liferay-ui:search-container-column-text>
+=======
+						cssClass="table-cell-expand table-cell-minw-200 table-title"
+						name="title"
+						value="<%= itemDescriptor.getTitle(locale) %>"
+					/>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 					<liferay-ui:search-container-column-text
 						cssClass="table-cell-expand-smaller table-cell-minw-150"

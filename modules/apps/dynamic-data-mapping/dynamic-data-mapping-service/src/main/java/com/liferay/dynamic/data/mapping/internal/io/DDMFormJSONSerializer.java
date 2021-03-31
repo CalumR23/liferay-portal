@@ -114,6 +114,90 @@ public class DDMFormJSONSerializer implements DDMFormSerializer {
 		jsonObject.put("successPage", toJSONObject(ddmFormSuccessPageSettings));
 	}
 
+<<<<<<< HEAD
+=======
+	protected JSONArray fieldsToJSONArray(List<DDMFormField> ddmFormFields) {
+		JSONArray jsonArray = _jsonFactory.createJSONArray();
+
+		for (DDMFormField ddmFormField : ddmFormFields) {
+			jsonArray.put(toJSONObject(ddmFormField));
+		}
+
+		return jsonArray;
+	}
+
+	protected DDMForm getDDMFormFieldTypeSettingsDDMForm(String type) {
+		DDMFormFieldType ddmFormFieldType =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(type);
+
+		Class<? extends DDMFormFieldTypeSettings> ddmFormFieldTypeSettings =
+			DefaultDDMFormFieldTypeSettings.class;
+
+		if (ddmFormFieldType != null) {
+			ddmFormFieldTypeSettings =
+				ddmFormFieldType.getDDMFormFieldTypeSettings();
+		}
+
+		return DDMFormFactory.create(ddmFormFieldTypeSettings);
+	}
+
+	protected JSONArray optionsToJSONArray(
+		DDMFormFieldOptions ddmFormFieldOptions) {
+
+		Set<String> optionsValues = ddmFormFieldOptions.getOptionsValues();
+
+		if (optionsValues.isEmpty()) {
+			return null;
+		}
+
+		JSONArray jsonArray = _jsonFactory.createJSONArray();
+
+		for (String optionValue : optionsValues) {
+			JSONObject jsonObject = _jsonFactory.createJSONObject();
+
+			jsonObject.put(
+				"label",
+				toJSONObject(ddmFormFieldOptions.getOptionLabels(optionValue))
+			).put(
+				"reference", ddmFormFieldOptions.getOptionReference(optionValue)
+			).put(
+				"value", optionValue
+			);
+
+			jsonArray.put(jsonObject);
+		}
+
+		return jsonArray;
+	}
+
+	protected Object serializeDDMFormFieldProperty(
+		Object property, DDMFormField ddmFormFieldTypeSetting) {
+
+		if (ddmFormFieldTypeSetting.isLocalizable()) {
+			return toJSONObject((LocalizedValue)property);
+		}
+
+		String dataType = ddmFormFieldTypeSetting.getDataType();
+
+		if (Objects.equals(dataType, "boolean")) {
+			return GetterUtil.getBoolean(property);
+		}
+		else if (Objects.equals(dataType, "ddm-options")) {
+			return optionsToJSONArray((DDMFormFieldOptions)property);
+		}
+		else if (Objects.equals(
+					ddmFormFieldTypeSetting.getType(), "validation")) {
+
+			return toJSONObject((DDMFormFieldValidation)property);
+		}
+		else if (_isArray(property)) {
+			return _jsonFactory.createJSONArray((Object[])property);
+		}
+
+		return String.valueOf(property);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference(unbind = "-")
 	protected void setDDMFormFieldTypeServicesTracker(
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {

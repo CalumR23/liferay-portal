@@ -205,7 +205,11 @@ public abstract class BaseShippingMethodResourceTestCase {
 		Long irrelevantCartId =
 			testGetCartShippingMethodsPage_getIrrelevantCartId();
 
+<<<<<<< HEAD
 		if (irrelevantCartId != null) {
+=======
+		if ((irrelevantCartId != null)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			ShippingMethod irrelevantShippingMethod =
 				testGetCartShippingMethodsPage_addShippingMethod(
 					irrelevantCartId, randomIrrelevantShippingMethod());
@@ -703,12 +707,21 @@ public abstract class BaseShippingMethodResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
+<<<<<<< HEAD
 					sb.append(": ");
 					sb.append(entry.getValue());
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(":");
+					sb.append(entry.getValue());
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append(")");
 			}
@@ -718,10 +731,17 @@ public abstract class BaseShippingMethodResourceTestCase {
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
+<<<<<<< HEAD
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append("}");
 			}

@@ -12,24 +12,34 @@
  * details.
  */
 
+<<<<<<< HEAD
 import {getItem} from 'data-engine-js-components-web/js/utils/client.es';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {TranslationManager} from 'data-engine-taglib';
 import React, {useContext, useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 
 import {AppContext} from '../../AppContext.es';
 import usePermissions from '../../hooks/usePermissions.es';
+<<<<<<< HEAD
+=======
+import {getItem} from '../../utils/client.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {getLocalizedUserPreferenceValue} from '../../utils/lang.es';
 import PersonalMenu from './PersonalMenuEntry.es';
 
 const STORAGE_KEY = '@app-builder/standalone/language';
 
+<<<<<<< HEAD
 const portalKeys = {
 	APP_STANDALONE_NAME: '#appStandaloneName',
 	PERSONAL_MENU: ' #app-personal-menu',
 	TRANSLATION_MANAGER: '#appTranslationManager',
 };
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const setStorageLanguageId = (appId, value) => {
 	localStorage.setItem(`${STORAGE_KEY}/${appId}`, value);
 };
@@ -49,11 +59,14 @@ const TranslationManagerPortal = ({
 	userLanguageId,
 }) => {
 	const {view: viewPermission} = usePermissions();
+<<<<<<< HEAD
 	const [standaloneNameContainer, setStandaloneNameContainer] = useState();
 	const [
 		translationManagerContainer,
 		setTranslationManagerContainer,
 	] = useState();
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const [{app, dataDefinition}, setState] = useState({
 		app: {
@@ -73,6 +86,7 @@ const TranslationManagerPortal = ({
 	};
 
 	useEffect(() => {
+<<<<<<< HEAD
 		if (standaloneNameContainer) {
 			return;
 		}
@@ -93,6 +107,8 @@ const TranslationManagerPortal = ({
 	}, [translationManagerContainer]);
 
 	useEffect(() => {
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (viewPermission && showAppName) {
 			getItem(`/o/app-builder/v1.0/apps/${appId}`).then((app) =>
 				setState((prevState) => ({
@@ -133,6 +149,14 @@ const TranslationManagerPortal = ({
 		return defaultLanguageId;
 	};
 
+<<<<<<< HEAD
+=======
+	const appStandaloneName = document.querySelector('#appStandaloneName');
+	const appTranslationManager = document.querySelector(
+		'#appTranslationManager'
+	);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	if (!viewPermission) {
 		return <></>;
 	}
@@ -140,17 +164,28 @@ const TranslationManagerPortal = ({
 	return (
 		<div>
 			{showAppName &&
+<<<<<<< HEAD
 				standaloneNameContainer &&
+=======
+				appStandaloneName &&
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				createPortal(
 					getLocalizedUserPreferenceValue(
 						app.name,
 						userLanguageId,
 						defaultLanguageId
 					),
+<<<<<<< HEAD
 					standaloneNameContainer
 				)}
 
 			{translationManagerContainer &&
+=======
+					appStandaloneName
+				)}
+
+			{appTranslationManager &&
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				createPortal(
 					<TranslationManager
 						availableLanguageIds={availableLanguageIds}
@@ -158,7 +193,11 @@ const TranslationManagerPortal = ({
 						onEditingLanguageIdChange={onEditingLanguageIdChange}
 						showUserView
 					/>,
+<<<<<<< HEAD
 					translationManagerContainer
+=======
+					appTranslationManager
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				)}
 		</div>
 	);
@@ -166,6 +205,7 @@ const TranslationManagerPortal = ({
 
 export default (props) => {
 	const {appId, portraitURL} = useContext(AppContext);
+<<<<<<< HEAD
 	const [appPersonalContainer, setAppPersonalContainer] = useState(null);
 
 	useEffect(() => {
@@ -180,6 +220,13 @@ export default (props) => {
 	return (
 		<>
 			{appPersonalContainer &&
+=======
+	const appPersonalMenu = document.querySelector('#app-personal-menu');
+
+	return (
+		<>
+			{appPersonalMenu &&
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				themeDisplay.isSignedIn() &&
 				createPortal(
 					<PersonalMenu
@@ -200,7 +247,11 @@ export default (props) => {
 						]}
 						portraitURL={portraitURL}
 					/>,
+<<<<<<< HEAD
 					appPersonalContainer
+=======
+					appPersonalMenu
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				)}
 			<TranslationManagerPortal appId={appId} {...props} />
 		</>

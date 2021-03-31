@@ -421,6 +421,7 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 				MultiSessionMessages.add(
 					actionRequest, portletResource + "requestProcessed");
 			}
+<<<<<<< HEAD
 		}
 
 		String friendlyURLChangedMessage = _getFriendlyURLChangedMessage(
@@ -429,6 +430,8 @@ public class UpdateArticleMVCActionCommand extends BaseMVCActionCommand {
 		if (Validator.isNotNull(friendlyURLChangedMessage)) {
 			MultiSessionMessages.add(
 				actionRequest, "friendlyURLChanged", friendlyURLChangedMessage);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		sendEditArticleRedirect(actionRequest, article, oldUrlTitle);

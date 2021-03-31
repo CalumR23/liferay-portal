@@ -16,7 +16,10 @@ package com.liferay.portal.settings.authentication.ldap.web.internal.portlet.act
 
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.counter.kernel.service.CounterLocalService;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.portlet.PortletContextFactory;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -95,6 +98,7 @@ public class EditLDAPServerMVCActionCommand extends BaseMVCActionCommand {
 
 				SessionErrors.add(actionRequest, exception.getClass());
 
+<<<<<<< HEAD
 				PortletURL portletURL = PortletURLBuilder.create(
 					PortletURLFactoryUtil.create(
 						actionRequest,
@@ -104,6 +108,17 @@ public class EditLDAPServerMVCActionCommand extends BaseMVCActionCommand {
 					"/portal_settings_authentication_ldap" +
 						"/portal_settings_edit_ldap_server"
 				).build();
+=======
+				PortletURL portletURL = PortletURLFactoryUtil.create(
+					actionRequest,
+					ConfigurationAdminPortletKeys.INSTANCE_SETTINGS,
+					PortletRequest.RENDER_PHASE);
+
+				portletURL.setParameter(
+					"mvcRenderCommandName",
+					"/portal_settings_authentication_ldap" +
+						"/portal_settings_edit_ldap_server");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				String redirect = ParamUtil.getString(
 					actionRequest, "redirect");

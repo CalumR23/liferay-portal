@@ -117,9 +117,14 @@ export default ({data, fields}) => {
 		const chartContent = {
 			field,
 			structure,
+<<<<<<< HEAD
 			sumTotalValues,
 			summary,
 			totalEntries,
+=======
+			summary,
+			totalEntries: sumTotalValues,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			values,
 		};
 

@@ -21,10 +21,16 @@ import ClayIcon from '@clayui/icon';
 import ClayManagementToolbar from '@clayui/management-toolbar';
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
 import ClayTable from '@clayui/table';
+<<<<<<< HEAD
 import React from 'react';
 
 import ChangeTrackingRenderView from './ChangeTrackingRenderView';
 
+=======
+import {fetch} from 'frontend-js-web';
+import React from 'react';
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 class ChangeTrackingChangesView extends React.Component {
 	constructor(props) {
 		super(props);
@@ -34,12 +40,21 @@ class ChangeTrackingChangesView extends React.Component {
 			changes,
 			contextView,
 			ctCollectionId,
+<<<<<<< HEAD
 			dataURL,
 			discardURL,
 			expired,
 			models,
 			namespace,
 			pathParam,
+=======
+			discardURL,
+			models,
+			namespace,
+			pathParam,
+			renderCTEntryURL,
+			renderDiffURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			rootDisplayClasses,
 			showHideableParam,
 			siteNames,
@@ -70,17 +85,27 @@ class ChangeTrackingChangesView extends React.Component {
 		this.changes = changes;
 		this.contextView = contextView;
 		this.ctCollectionId = ctCollectionId;
+<<<<<<< HEAD
 		this.dataURL = dataURL;
 		this.discardURL = discardURL;
 		this.expired = expired;
 		this.namespace = namespace;
 		this.models = models;
+=======
+		this.discardURL = discardURL;
+		this.models = models;
+		this.renderCTEntryURL = renderCTEntryURL;
+		this.renderDiffURL = renderDiffURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		this.rootDisplayClasses = rootDisplayClasses;
 		this.spritemap = spritemap;
 		this.userInfo = userInfo;
 
+<<<<<<< HEAD
 		this.renderCache = {};
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		this._populateModelInfo(siteNames, typeNames);
 
 		const pathState = this._getPathState(pathParam);
@@ -109,6 +134,16 @@ class ChangeTrackingChangesView extends React.Component {
 				senna: true,
 			};
 
+<<<<<<< HEAD
+=======
+			if (node.modelClassNameId) {
+				state.modelClassNameId = node.modelClassNameId;
+				state.modelClassPK = node.modelClassPK;
+
+				this.initialNode = node;
+			}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			window.history.replaceState(state, document.title);
 		}
 
@@ -117,6 +152,15 @@ class ChangeTrackingChangesView extends React.Component {
 
 		this.basePath = pathname + '?' + params.toString();
 
+<<<<<<< HEAD
+=======
+		let loading = false;
+
+		if (node.modelClassNameId) {
+			loading = true;
+		}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		let showHideable = showHideableParam;
 
 		if (
@@ -133,9 +177,18 @@ class ChangeTrackingChangesView extends React.Component {
 			children: this._filterHideableNodes(node.children, showHideable),
 			column: this.COLUMN_TITLE,
 			delta: 20,
+<<<<<<< HEAD
 			filterClass,
 			node,
 			page: 1,
+=======
+			dropdownItems: null,
+			filterClass,
+			loading,
+			node,
+			page: 1,
+			renderInnerHTML: null,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			showHideable,
 			sortDirectionClass: 'order-arrow-down-active',
 			viewType,
@@ -150,6 +203,73 @@ class ChangeTrackingChangesView extends React.Component {
 		if (Liferay.SPA && Liferay.SPA.app) {
 			Liferay.SPA.app.skipLoadPopstate = true;
 		}
+<<<<<<< HEAD
+=======
+
+		if (
+			!this.initialNode ||
+			!this.state.node.modelClassNameId ||
+			this.state.node.modelClassNameId !==
+				this.initialNode.modelClassNameId ||
+			this.state.node.modelClassPK !== this.initialNode.modelClassPK
+		) {
+			return;
+		}
+
+		AUI().use('liferay-portlet-url', () => {
+			fetch(this._getRenderURL(this.state.node))
+				.then((response) => response.text())
+				.then((text) => {
+					if (
+						!this._isWithinApp(
+							new URLSearchParams(window.location.search)
+						)
+					) {
+						return;
+					}
+
+					const dropdownItems = this._getDropdownItems(
+						this.state.node
+					);
+
+					const oldState = window.history.state;
+
+					if (
+						oldState &&
+						oldState.modelClassNameId &&
+						oldState.modelClassNameId ===
+							this.initialNode.modelClassNameId &&
+						oldState.modelClassPK === this.initialNode.modelClassPK
+					) {
+						window.history.replaceState(
+							{
+								dropdownItems,
+								modelClassNameId: oldState.modelClassNameId,
+								modelClassPK: oldState.modelClassPK,
+								path: oldState.path,
+								renderInnerHTML: {__html: text},
+								senna: true,
+							},
+							document.title
+						);
+					}
+
+					if (
+						this.state.node.modelClassNameId &&
+						this.state.node.modelClassNameId ===
+							this.initialNode.modelClassNameId &&
+						this.state.node.modelClassPK ===
+							this.initialNode.modelClassPK
+					) {
+						this.setState({
+							dropdownItems,
+							loading: false,
+							renderInnerHTML: {__html: text},
+						});
+					}
+				});
+		});
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	componentWillUnmount() {
@@ -163,10 +283,13 @@ class ChangeTrackingChangesView extends React.Component {
 	_clone(json) {
 		const clone = {};
 
+<<<<<<< HEAD
 		if (typeof json !== 'object') {
 			return null;
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		const keys = Object.keys(json);
 
 		for (let i = 0; i < keys.length; i++) {
@@ -197,8 +320,13 @@ class ChangeTrackingChangesView extends React.Component {
 					return -1;
 				}
 
+<<<<<<< HEAD
 				const typeNameA = a.typeName.toLowerCase();
 				const typeNameB = b.typeName.toLowerCase();
+=======
+				const typeNameA = a.typeName.toUpperCase();
+				const typeNameB = b.typeName.toUpperCase();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				if (typeNameA < typeNameB) {
 					return -1;
@@ -208,6 +336,7 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				const titleA = a.title.toLowerCase();
 				const titleB = b.title.toLowerCase();
 
@@ -216,6 +345,13 @@ class ChangeTrackingChangesView extends React.Component {
 				}
 
 				if (titleA > titleB) {
+=======
+				if (a.title < b.title) {
+					return -1;
+				}
+
+				if (a.title > b.title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					return 1;
 				}
 
@@ -224,11 +360,16 @@ class ChangeTrackingChangesView extends React.Component {
 		}
 		else if (this._getColumn() === this.COLUMN_SITE) {
 			nodes.sort((a, b) => {
+<<<<<<< HEAD
 				const siteNameA = a.siteName.toLowerCase();
 				const siteNameB = b.siteName.toLowerCase();
 
 				if (
 					siteNameA < siteNameB ||
+=======
+				if (
+					a.siteName < b.siteName ||
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					(a.siteName === this.GLOBAL_SITE_NAME &&
 						b.siteName !== this.GLOBAL_SITE_NAME)
 				) {
@@ -240,7 +381,11 @@ class ChangeTrackingChangesView extends React.Component {
 				}
 
 				if (
+<<<<<<< HEAD
 					siteNameA > siteNameB ||
+=======
+					a.siteName > b.siteName ||
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					(a.siteName !== this.GLOBAL_SITE_NAME &&
 						b.siteName === this.GLOBAL_SITE_NAME)
 				) {
@@ -251,8 +396,13 @@ class ChangeTrackingChangesView extends React.Component {
 					return -1;
 				}
 
+<<<<<<< HEAD
 				const typeNameA = a.typeName.toLowerCase();
 				const typeNameB = b.typeName.toLowerCase();
+=======
+				const typeNameA = a.typeName.toUpperCase();
+				const typeNameB = b.typeName.toUpperCase();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				if (typeNameA < typeNameB) {
 					return -1;
@@ -262,6 +412,7 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				const titleA = a.title.toLowerCase();
 				const titleB = b.title.toLowerCase();
 
@@ -270,6 +421,13 @@ class ChangeTrackingChangesView extends React.Component {
 				}
 
 				if (titleA > titleB) {
+=======
+				if (a.title < b.title) {
+					return -1;
+				}
+
+				if (a.title > b.title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					return 1;
 				}
 
@@ -278,8 +436,13 @@ class ChangeTrackingChangesView extends React.Component {
 		}
 		else if (this._getColumn() === this.COLUMN_TITLE) {
 			nodes.sort((a, b) => {
+<<<<<<< HEAD
 				const typeNameA = a.typeName.toLowerCase();
 				const typeNameB = b.typeName.toLowerCase();
+=======
+				const typeNameA = a.typeName.toUpperCase();
+				const typeNameB = b.typeName.toUpperCase();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				if (typeNameA < typeNameB) {
 					return -1;
@@ -289,10 +452,14 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				const titleA = a.title.toLowerCase();
 				const titleB = b.title.toLowerCase();
 
 				if (titleA < titleB) {
+=======
+				if (a.title < b.title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					if (ascending) {
 						return -1;
 					}
@@ -300,7 +467,11 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				if (titleA > titleB) {
+=======
+				if (a.title > b.title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					if (ascending) {
 						return 1;
 					}
@@ -313,10 +484,14 @@ class ChangeTrackingChangesView extends React.Component {
 		}
 		else if (this._getColumn() === this.COLUMN_USER) {
 			nodes.sort((a, b) => {
+<<<<<<< HEAD
 				const userNameA = a.userName.toLowerCase();
 				const userNameB = b.userName.toLowerCase();
 
 				if (userNameA < userNameB) {
+=======
+				if (a.userName < b.userName) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					if (ascending) {
 						return -1;
 					}
@@ -324,7 +499,11 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				if (userNameA > userNameB) {
+=======
+				if (a.userName > b.userName) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					if (ascending) {
 						return 1;
 					}
@@ -332,8 +511,13 @@ class ChangeTrackingChangesView extends React.Component {
 					return -1;
 				}
 
+<<<<<<< HEAD
 				const typeNameA = a.typeName.toLowerCase();
 				const typeNameB = b.typeName.toLowerCase();
+=======
+				const typeNameA = a.typeName.toUpperCase();
+				const typeNameB = b.typeName.toUpperCase();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				if (typeNameA < typeNameB) {
 					return -1;
@@ -343,6 +527,7 @@ class ChangeTrackingChangesView extends React.Component {
 					return 1;
 				}
 
+<<<<<<< HEAD
 				const titleA = a.title.toLowerCase();
 				const titleB = b.title.toLowerCase();
 
@@ -351,6 +536,13 @@ class ChangeTrackingChangesView extends React.Component {
 				}
 
 				if (titleA > titleB) {
+=======
+				if (a.title < b.title) {
+					return -1;
+				}
+
+				if (a.title > b.title) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					return 1;
 				}
 
@@ -388,8 +580,13 @@ class ChangeTrackingChangesView extends React.Component {
 
 		if (this._getColumn() === this.COLUMN_MODIFIED_DATE) {
 			nodes.sort((a, b) => {
+<<<<<<< HEAD
 				const typeNameA = a.typeName.toLowerCase();
 				const typeNameB = b.typeName.toLowerCase();
+=======
+				const typeNameA = a.typeName.toUpperCase();
+				const typeNameB = b.typeName.toUpperCase();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				if (typeNameA < typeNameB) {
 					return -1;
@@ -592,6 +789,7 @@ class ChangeTrackingChangesView extends React.Component {
 		return this.state.column;
 	}
 
+<<<<<<< HEAD
 	_getDataURL(node) {
 		if (node.ctEntryId) {
 			return this._setParameter(
@@ -626,6 +824,36 @@ class ChangeTrackingChangesView extends React.Component {
 			'modelClassPK',
 			node.modelClassPK.toString()
 		);
+=======
+	_getDiscardURL(node) {
+		const portletURL = Liferay.PortletURL.createURL(this.discardURL);
+
+		portletURL.setParameter('modelClassNameId', node.modelClassNameId);
+		portletURL.setParameter('modelClassPK', node.modelClassPK);
+
+		return portletURL.toString();
+	}
+
+	_getDropdownItems(node) {
+		let dropdownItems = node.dropdownItems;
+
+		if (!dropdownItems) {
+			dropdownItems = [];
+		}
+		else {
+			dropdownItems = dropdownItems.slice(0);
+		}
+
+		if (this.activeCTCollection) {
+			dropdownItems.push({
+				href: this._getDiscardURL(node),
+				label: Liferay.Language.get('discard'),
+				symbolLeft: 'times-circle',
+			});
+		}
+
+		return dropdownItems;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	_getModels(nodes) {
@@ -648,10 +876,13 @@ class ChangeTrackingChangesView extends React.Component {
 
 			const model = this._clone(this.models[modelKey.toString()]);
 
+<<<<<<< HEAD
 			if (model === null) {
 				continue;
 			}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			model.nodeId = nodeId;
 
 			models.push(model);
@@ -782,6 +1013,26 @@ class ChangeTrackingChangesView extends React.Component {
 		return this.userInfo[node.userId.toString()].portraitURL;
 	}
 
+<<<<<<< HEAD
+=======
+	_getRenderURL(node) {
+		if (node.ctEntryId) {
+			const portletURL = Liferay.PortletURL.createURL(this.renderDiffURL);
+
+			portletURL.setParameter('ctEntryId', node.ctEntryId);
+
+			return portletURL.toString();
+		}
+
+		const portletURL = Liferay.PortletURL.createURL(this.renderCTEntryURL);
+
+		portletURL.setParameter('modelClassNameId', node.modelClassNameId);
+		portletURL.setParameter('modelClassPK', node.modelClassPK);
+
+		return portletURL.toString();
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	_getRootDisplayOptions() {
 		const rootDisplayOptions = [];
 
@@ -1012,19 +1263,37 @@ class ChangeTrackingChangesView extends React.Component {
 			const cells = [];
 
 			if (this.state.viewType === this.VIEW_TYPE_CONTEXT) {
+<<<<<<< HEAD
+=======
+				let descriptionMarkup = '';
+
+				if (node.description) {
+					descriptionMarkup = (
+						<div className="publication-description">
+							{node.description}
+						</div>
+					);
+				}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				cells.push(
 					<ClayTable.Cell>
 						<div className="publication-name">{node.title}</div>
 
+<<<<<<< HEAD
 						{node.description && (
 							<div className="publication-description">
 								{node.description}
 							</div>
 						)}
+=======
+						{descriptionMarkup}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					</ClayTable.Cell>
 				);
 			}
 			else {
+<<<<<<< HEAD
 				cells.push(
 					<ClayTable.Cell>
 						<div
@@ -1036,6 +1305,55 @@ class ChangeTrackingChangesView extends React.Component {
 						/>
 					</ClayTable.Cell>
 				);
+=======
+				const portraitURL = this._getPortraitURL(node);
+
+				if (portraitURL) {
+					cells.push(
+						<ClayTable.Cell>
+							<span
+								className="lfr-portal-tooltip"
+								title={node.userName}
+							>
+								<span className="rounded-circle sticker sticker-primary">
+									<span className="sticker-overlay">
+										<img
+											alt="thumbnail"
+											className="img-fluid"
+											src={portraitURL}
+										/>
+									</span>
+								</span>
+							</span>
+						</ClayTable.Cell>
+					);
+				}
+				else {
+					let userPortraitCss =
+						'sticker sticker-circle sticker-light user-icon-color-';
+
+					userPortraitCss += node.userId % 10;
+
+					cells.push(
+						<ClayTable.Cell>
+							<span
+								className="lfr-portal-tooltip"
+								title={node.userName}
+							>
+								<span className={userPortraitCss}>
+									<span className="inline-item">
+										<svg className="lexicon-icon">
+											<use
+												href={this.spritemap + '#user'}
+											/>
+										</svg>
+									</span>
+								</span>
+							</span>
+						</ClayTable.Cell>
+					);
+				}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				cells.push(<ClayTable.Cell>{node.siteName}</ClayTable.Cell>);
 
@@ -1077,10 +1395,13 @@ class ChangeTrackingChangesView extends React.Component {
 		return rows;
 	}
 
+<<<<<<< HEAD
 	_getUserPortraitHTML(node) {
 		return {__html: this.userInfo[node.userId.toString()].userPortraitHTML};
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	_getViewTypes() {
 		if (!this.contextView) {
 			return '';
@@ -1113,7 +1434,11 @@ class ChangeTrackingChangesView extends React.Component {
 
 		return (
 			<ClayManagementToolbar.Item
+<<<<<<< HEAD
 				data-tooltip-align="top"
+=======
+				className="lfr-portal-tooltip"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				title={Liferay.Language.get('display-style')}
 			>
 				<ClayDropDownWithItems
@@ -1149,10 +1474,13 @@ class ChangeTrackingChangesView extends React.Component {
 	}
 
 	_handleNavigationUpdate(json) {
+<<<<<<< HEAD
 		if (Liferay.SPA && Liferay.SPA.app) {
 			Liferay.SPA.app.skipLoadPopstate = true;
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		let filterClass = json.filterClass;
 
 		if (!filterClass) {
@@ -1178,6 +1506,10 @@ class ChangeTrackingChangesView extends React.Component {
 			this.contextView.errorMessage
 		) {
 			this.setState({
+<<<<<<< HEAD
+=======
+				renderInnerHTML: null,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				viewType,
 			});
 
@@ -1206,6 +1538,7 @@ class ChangeTrackingChangesView extends React.Component {
 			senna: true,
 		};
 
+<<<<<<< HEAD
 		window.history.pushState(state, document.title, path);
 
 		this.setState({
@@ -1219,6 +1552,30 @@ class ChangeTrackingChangesView extends React.Component {
 		});
 
 		window.scrollTo(0, 0);
+=======
+		if (node.modelClassNameId) {
+			state.modelClassNameId = node.modelClassNameId;
+			state.modelClassPK = node.modelClassPK;
+		}
+
+		window.history.pushState(state, document.title, path);
+
+		this.setState(
+			{
+				breadcrumbItems,
+				children: this._filterHideableNodes(
+					node.children,
+					showHideable
+				),
+				filterClass,
+				node,
+				page: 1,
+				showHideable,
+				viewType,
+			},
+			() => this._updateRenderContent(true, node, path)
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	_handlePageChange(page) {
@@ -1230,11 +1587,20 @@ class ChangeTrackingChangesView extends React.Component {
 	_handlePopState(event) {
 		const state = event.state;
 
+<<<<<<< HEAD
+=======
+		let pathname = window.location.pathname;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		let search = window.location.search;
 
 		if (state) {
 			const index = state.path.indexOf('?');
 
+<<<<<<< HEAD
+=======
+			pathname = state.path.substring(0, index);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (index < 0) {
 				if (Liferay.SPA && Liferay.SPA.app) {
 					Liferay.SPA.app.skipLoadPopstate = false;
@@ -1245,7 +1611,11 @@ class ChangeTrackingChangesView extends React.Component {
 				return;
 			}
 
+<<<<<<< HEAD
 			search = state.path.substring(index);
+=======
+			search = state.path.substring(index, state.path.length);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		const params = new URLSearchParams(search);
@@ -1271,6 +1641,10 @@ class ChangeTrackingChangesView extends React.Component {
 			this.contextView.errorMessage
 		) {
 			this.setState({
+<<<<<<< HEAD
+=======
+				renderInnerHTML: null,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				viewType,
 			});
 
@@ -1296,6 +1670,7 @@ class ChangeTrackingChangesView extends React.Component {
 			showHideable = true;
 		}
 
+<<<<<<< HEAD
 		this.setState({
 			breadcrumbItems,
 			children: this._filterHideableNodes(node.children, showHideable),
@@ -1305,6 +1680,43 @@ class ChangeTrackingChangesView extends React.Component {
 			showHideable,
 			viewType,
 		});
+=======
+		this.setState(
+			{
+				breadcrumbItems,
+				children: this._filterHideableNodes(
+					node.children,
+					showHideable
+				),
+				filterClass,
+				node,
+				page: 1,
+				showHideable,
+				viewType,
+			},
+			() => {
+				if (!state || !state.renderInnerHTML) {
+					this._updateRenderContent(true, node, pathname + search);
+
+					return;
+				}
+
+				this.setState(
+					{
+						dropdownItems: state.dropdownItems,
+						renderInnerHTML: state.renderInnerHTML,
+					},
+					() => {
+						this._updateRenderContent(
+							false,
+							node,
+							pathname + search
+						);
+					}
+				);
+			}
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	_handleShowHideableToggle(showHideable) {
@@ -1516,6 +1928,7 @@ class ChangeTrackingChangesView extends React.Component {
 		}
 	}
 
+<<<<<<< HEAD
 	_renderDropdown() {
 		if (!this.state.node.modelClassNameId) {
 			return '';
@@ -1597,10 +2010,21 @@ class ChangeTrackingChangesView extends React.Component {
 
 	_renderEntry() {
 		if (!this.state.node.modelClassNameId) {
+=======
+	_renderEntry() {
+		if (this.state.renderInnerHTML === null) {
+			if (this.state.loading) {
+				return (
+					<span aria-hidden="true" className="loading-animation" />
+				);
+			}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			return '';
 		}
 
 		return (
+<<<<<<< HEAD
 			<div className="sheet">
 				<div className="autofit-row sheet-title">
 					<div className="autofit-col autofit-col-expand">
@@ -1635,6 +2059,54 @@ class ChangeTrackingChangesView extends React.Component {
 							] = data;
 						}}
 					/>
+=======
+			<div
+				className={
+					this.state.loading
+						? 'sheet publications-sheet-loading'
+						: 'sheet'
+				}
+			>
+				<h2 className="autofit-row sheet-title">
+					<div className="autofit-col autofit-col-expand">
+						<span className="heading-text">
+							{this.state.node.description
+								? this.state.node.description
+								: this.state.node.title}
+						</span>
+					</div>
+
+					{this.state.dropdownItems &&
+						this.state.dropdownItems.length > 0 && (
+							<div className="autofit-col">
+								<ClayDropDownWithItems
+									alignmentPosition={Align.BottomLeft}
+									items={this.state.dropdownItems}
+									spritemap={this.spritemap}
+									trigger={
+										<ClayButtonWithIcon
+											displayType="unstyled"
+											small
+											spritemap={this.spritemap}
+											symbol="ellipsis-v"
+										/>
+									}
+								/>
+							</div>
+						)}
+				</h2>
+				<div className="sheet-section">
+					{this.state.loading && (
+						<div className="publications-loading-animation-wrapper">
+							<span
+								aria-hidden="true"
+								className="loading-animation"
+							/>
+						</div>
+					)}
+
+					<div dangerouslySetInnerHTML={this.state.renderInnerHTML} />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				</div>
 			</div>
 		);
@@ -1731,7 +2203,11 @@ class ChangeTrackingChangesView extends React.Component {
 					</ClayManagementToolbar.Item>
 
 					<ClayManagementToolbar.Item
+<<<<<<< HEAD
 						data-tooltip-align="top"
+=======
+						className="lfr-portal-tooltip"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						title={Liferay.Language.get('reverse-sort-direction')}
 					>
 						<ClayButton
@@ -1819,7 +2295,11 @@ class ChangeTrackingChangesView extends React.Component {
 			) {
 				return (
 					<div className="sheet taglib-empty-result-message">
+<<<<<<< HEAD
 						<div className="taglib-empty-search-result-message-header" />
+=======
+						<div className="taglib-empty-result-message-header" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						<div className="sheet-text text-center">
 							{Liferay.Language.get(
 								'there-are-no-changes-to-display-in-this-view'
@@ -1854,8 +2334,84 @@ class ChangeTrackingChangesView extends React.Component {
 		);
 	}
 
+<<<<<<< HEAD
 	_setParameter(url, name, value) {
 		return url + '&' + this.namespace + name + '=' + value;
+=======
+	_updateRenderContent(loading, node, path) {
+		if (!node.modelClassNameId) {
+			this.setState({
+				dropdownItems: null,
+				loading: false,
+				renderInnerHTML: null,
+			});
+
+			return;
+		}
+
+		this.setState(
+			{
+				loading,
+			},
+			() => {
+				AUI().use('liferay-portlet-url', () => {
+					fetch(this._getRenderURL(node))
+						.then((response) => response.text())
+						.then((text) => {
+							if (
+								!this._isWithinApp(
+									new URLSearchParams(window.location.search)
+								)
+							) {
+								return;
+							}
+
+							const dropdownItems = this._getDropdownItems(
+								this.state.node
+							);
+
+							const oldState = window.history.state;
+
+							if (
+								oldState &&
+								oldState.modelClassNameId &&
+								oldState.modelClassNameId ===
+									node.modelClassNameId &&
+								oldState.modelClassPK === node.modelClassPK &&
+								oldState.path === path
+							) {
+								window.history.replaceState(
+									{
+										dropdownItems,
+										modelClassNameId:
+											oldState.modelClassNameId,
+										modelClassPK: oldState.modelClassPK,
+										path: oldState.path,
+										renderInnerHTML: {__html: text},
+										senna: true,
+									},
+									document.title
+								);
+							}
+
+							if (
+								this.state.node.modelClassNameId &&
+								this.state.node.modelClassNameId ===
+									node.modelClassNameId &&
+								this.state.node.modelClassPK ===
+									node.modelClassPK
+							) {
+								this.setState({
+									dropdownItems,
+									loading: false,
+									renderInnerHTML: {__html: text},
+								});
+							}
+						});
+				});
+			}
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	render() {
@@ -1871,6 +2427,7 @@ class ChangeTrackingChangesView extends React.Component {
 				</ClayAlert>
 			);
 		}
+<<<<<<< HEAD
 		else if (this.changes.length === 0) {
 			return (
 				<div className="container-fluid container-fluid-max-xl">
@@ -1898,6 +2455,11 @@ class ChangeTrackingChangesView extends React.Component {
 						</ClayAlert>
 					)}
 
+=======
+		else {
+			content = (
+				<div className="container-fluid container-fluid-max-xl">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<ClayBreadcrumb
 						ellipsisBuffer={1}
 						items={this.state.breadcrumbItems}

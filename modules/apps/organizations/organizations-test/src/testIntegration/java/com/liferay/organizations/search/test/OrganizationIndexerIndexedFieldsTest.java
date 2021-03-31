@@ -261,6 +261,7 @@ public class OrganizationIndexerIndexedFieldsTest {
 				return StringUtil.toLowerCase(region.getName());
 			}
 		).put(
+<<<<<<< HEAD
 			Field.getSortableFieldName("region"),
 			() -> {
 				Region region = regionService.getRegion(
@@ -269,6 +270,8 @@ public class OrganizationIndexerIndexedFieldsTest {
 				return StringUtil.toLowerCase(region.getName());
 			}
 		).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Field.getSortableFieldName("type_String"), organization.getType()
 		).build();
 	}

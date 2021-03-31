@@ -604,6 +604,61 @@ public class DiscountResourceImpl extends BaseDiscountResourceImpl {
 		return commerceDiscount;
 	}
 
+<<<<<<< HEAD
+=======
+	private CommerceDiscount _upsertCommerceDiscount(Discount discount)
+		throws Exception {
+
+		ServiceContext serviceContext =
+			_serviceContextHelper.getServiceContext();
+
+		DateConfig displayDateConfig = _getDisplayDateConfig(
+			discount.getDisplayDate(), serviceContext.getTimeZone());
+
+		DateConfig expirationDateConfig = _getExpirationDateConfig(
+			discount.getExpirationDate(), serviceContext.getTimeZone());
+
+		CommerceDiscount commerceDiscount =
+			_commerceDiscountService.upsertCommerceDiscount(
+				discount.getExternalReferenceCode(), contextUser.getUserId(),
+				GetterUtil.getLong(discount.getId()), discount.getTitle(),
+				discount.getTarget(),
+				GetterUtil.getBoolean(discount.getUseCouponCode()),
+				discount.getCouponCode(),
+				GetterUtil.getBoolean(discount.getUsePercentage()),
+				discount.getMaximumDiscountAmount(), discount.getLevel(),
+				discount.getPercentageLevel1(), discount.getPercentageLevel2(),
+				discount.getPercentageLevel3(), discount.getPercentageLevel4(),
+				discount.getLimitationType(),
+				GetterUtil.getInteger(discount.getLimitationTimes()),
+				GetterUtil.getInteger(discount.getLimitationTimesPerAccount()),
+				GetterUtil.getBoolean(discount.getRulesConjunction()),
+				GetterUtil.getBoolean(discount.getActive()),
+				displayDateConfig.getMonth(), displayDateConfig.getDay(),
+				displayDateConfig.getYear(), displayDateConfig.getHour(),
+				displayDateConfig.getMinute(), expirationDateConfig.getMonth(),
+				expirationDateConfig.getDay(), expirationDateConfig.getYear(),
+				expirationDateConfig.getHour(),
+				expirationDateConfig.getMinute(),
+				GetterUtil.getBoolean(discount.getNeverExpire(), true),
+				serviceContext);
+
+		// Expando
+
+		Map<String, ?> customFields = discount.getCustomFields();
+
+		if ((customFields != null) && !customFields.isEmpty()) {
+			ExpandoUtil.updateExpando(
+				serviceContext.getCompanyId(), CommerceDiscount.class,
+				commerceDiscount.getPrimaryKey(), customFields);
+		}
+
+		// Update nested resources
+
+		return _updateNestedResources(discount, commerceDiscount);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final EntityModel _entityModel = new DiscountEntityModel();
 
 	@Reference

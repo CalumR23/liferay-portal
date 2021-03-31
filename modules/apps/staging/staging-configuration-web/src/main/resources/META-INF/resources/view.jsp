@@ -102,7 +102,11 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 							</div>
 						</clay:sheet-footer>
 
+<<<<<<< HEAD
 						<aui:script require="frontend-js-web/liferay/delegate/delegate.es as delegateModule">
+=======
+						<aui:script require="metal-dom/src/dom as dom">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							var pwcWarning = document.getElementById('<portlet:namespace />pwcWarning');
 							var remoteStagingOptions = document.getElementById(
 								'<portlet:namespace />remoteStagingOptions'
@@ -120,10 +124,15 @@ BackgroundTask lastCompletedInitialPublicationBackgroundTask = BackgroundTaskMan
 								remoteStagingOptions &&
 								trashWarning
 							) {
+<<<<<<< HEAD
 								var delegate = delegateModule.default;
 
 								delegate(stagingTypes, 'click', 'input', (event) => {
 									var value = event.target.closest('input').value;
+=======
+								dom.delegate(stagingTypes, 'click', 'input', function (event) {
+									var value = event.delegateTarget.value;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 									if (value != '<%= StagingConstants.TYPE_LOCAL_STAGING %>') {
 										pwcWarning.classList.add('hide');

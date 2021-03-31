@@ -14,16 +14,22 @@
 
 package com.liferay.portal.vulcan.pagination;
 
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**

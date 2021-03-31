@@ -92,7 +92,11 @@ export const mergePages = (
 					sourceField.displayErrors || field.fieldName === fieldName,
 				editingLanguageId,
 				valid: field.valid !== false,
+<<<<<<< HEAD
 				value: fieldValue,
+=======
+				value: field.valueChanged ? field.value : sourceField.value,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			};
 
 			if (newField.type === 'options') {
@@ -125,7 +129,10 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 		groupId,
 		pages,
 		portletNamespace,
+<<<<<<< HEAD
 		viewMode,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	} = evaluatorContext;
 
 	if (controller) {
@@ -157,8 +164,12 @@ const doEvaluate = debounce((fieldName, evaluatorContext, callback) => {
 				editingLanguageId,
 				fieldName,
 				newPages,
+<<<<<<< HEAD
 				pages,
 				viewMode
+=======
+				pages
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			);
 
 			callback(null, mergedPages);

@@ -75,11 +75,20 @@ public class MillerColumnsDisplayContext {
 	}
 
 	public String getLayoutChildrenURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse
 		).setActionName(
 			"/layout_admin/get_layout_children"
 		).buildString();
+=======
+		PortletURL itemChildrenURL = _liferayPortletResponse.createActionURL();
+
+		itemChildrenURL.setParameter(
+			ActionRequest.ACTION_NAME, "/layout_admin/get_layout_children");
+
+		return itemChildrenURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public JSONArray getLayoutColumnsJSONArray() throws Exception {

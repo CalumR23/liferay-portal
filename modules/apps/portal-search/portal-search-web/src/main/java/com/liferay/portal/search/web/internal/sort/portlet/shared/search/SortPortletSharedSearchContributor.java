@@ -14,7 +14,10 @@
 
 package com.liferay.portal.search.web.internal.sort.portlet.shared.search;
 
+<<<<<<< HEAD
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -160,9 +163,12 @@ public class SortPortletSharedSearchContributor
 		}
 	}
 
+<<<<<<< HEAD
 	@Reference
 	protected DDMIndexer ddmIndexer;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference
 	private SortBuilderFactory _sortBuilderFactory;
 

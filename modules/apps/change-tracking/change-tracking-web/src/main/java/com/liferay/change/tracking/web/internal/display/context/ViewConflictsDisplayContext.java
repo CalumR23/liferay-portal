@@ -20,7 +20,11 @@ import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.web.internal.display.CTDisplayRendererRegistry;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.change.tracking.sql.CTSQLModeThreadLocal;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -29,6 +33,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.BaseModel;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -46,10 +54,17 @@ import java.util.TimeZone;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionURL;
+<<<<<<< HEAD
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderURL;
 import javax.portlet.ResourceURL;
+=======
+import javax.portlet.PortletURL;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.RenderURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -110,6 +125,7 @@ public class ViewConflictsDisplayContext {
 
 		return HashMapBuilder.<String, Object>put(
 			"publishURL",
+<<<<<<< HEAD
 			() -> PortletURLBuilder.createActionURL(
 				_renderResponse
 			).setActionName(
@@ -119,6 +135,21 @@ public class ViewConflictsDisplayContext {
 			).setParameter(
 				"name", _ctCollection.getName()
 			).buildString()
+=======
+			() -> {
+				PortletURL publishURL = _renderResponse.createActionURL();
+
+				publishURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/change_tracking/publish_ct_collection");
+				publishURL.setParameter(
+					"ctCollectionId",
+					String.valueOf(_ctCollection.getCtCollectionId()));
+				publishURL.setParameter("name", _ctCollection.getName());
+
+				return publishURL.toString();
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		).put(
 			"redirect", getRedirect()
 		).put(
@@ -127,6 +158,7 @@ public class ViewConflictsDisplayContext {
 			"schedule", ParamUtil.getBoolean(_renderRequest, "schedule")
 		).put(
 			"scheduleURL",
+<<<<<<< HEAD
 			() -> PortletURLBuilder.createActionURL(
 				_renderResponse
 			).setActionName(
@@ -136,6 +168,21 @@ public class ViewConflictsDisplayContext {
 			).setParameter(
 				"ctCollectionId", _ctCollection.getCtCollectionId()
 			).buildString()
+=======
+			() -> {
+				PortletURL scheduleURL = _renderResponse.createActionURL();
+
+				scheduleURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/change_tracking/schedule_publication");
+				scheduleURL.setParameter("redirect", getRedirect());
+				scheduleURL.setParameter(
+					"ctCollectionId",
+					String.valueOf(_ctCollection.getCtCollectionId()));
+
+				return scheduleURL.toString();
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		).put(
 			"spritemap", _themeDisplay.getPathThemeImages() + "/clay/icons.svg"
 		).put(
@@ -164,6 +211,7 @@ public class ViewConflictsDisplayContext {
 			return redirect;
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -171,6 +219,17 @@ public class ViewConflictsDisplayContext {
 		).setParameter(
 			"ctCollectionId", _ctCollection.getCtCollectionId()
 		).buildString();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/view_changes");
+		portletURL.setParameter(
+			"ctCollectionId",
+			String.valueOf(_ctCollection.getCtCollectionId()));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private <T extends BaseModel<T>> JSONObject _getConflictJSONObject(
@@ -204,18 +263,24 @@ public class ViewConflictsDisplayContext {
 			jsonObject.put("dismissURL", dismissURL.toString());
 		}
 
+<<<<<<< HEAD
 		ResourceURL dataURL = _renderResponse.createResourceURL();
 
 		dataURL.setResourceID("/change_tracking/get_entry_render_data");
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		CTEntry ctEntry = _ctEntryLocalService.fetchCTEntry(
 			_ctCollection.getCtCollectionId(), modelClassNameId,
 			conflictInfo.getSourcePrimaryKey());
 
 		if (ctEntry != null) {
+<<<<<<< HEAD
 			dataURL.setParameter(
 				"ctEntryId", String.valueOf(ctEntry.getCtEntryId()));
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			jsonObject.put(
 				"description",
 				_ctDisplayRendererRegistry.getEntryDescription(
@@ -276,6 +341,7 @@ public class ViewConflictsDisplayContext {
 
 				jsonObject.put("actions", actionsJSONArray);
 			}
+<<<<<<< HEAD
 		}
 		else {
 			dataURL.setParameter(
@@ -284,6 +350,17 @@ public class ViewConflictsDisplayContext {
 				"modelClassPK",
 				String.valueOf(conflictInfo.getTargetPrimaryKey()));
 
+=======
+
+			String viewURL = _getViewURL(
+				_renderResponse, ctEntry,
+				conflictInfo.getSourcePrimaryKey() ==
+					conflictInfo.getTargetPrimaryKey());
+
+			jsonObject.put("viewURL", viewURL);
+		}
+		else {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			T model = _ctDisplayRendererRegistry.fetchCTModel(
 				modelClassNameId, conflictInfo.getTargetPrimaryKey());
 
@@ -306,6 +383,7 @@ public class ViewConflictsDisplayContext {
 					_themeDisplay.getLocale(), modelClassNameId)
 			).put(
 				"title", title
+<<<<<<< HEAD
 			);
 		}
 
@@ -314,6 +392,60 @@ public class ViewConflictsDisplayContext {
 		return jsonObject;
 	}
 
+=======
+			).put(
+				"viewURL",
+				_getViewURL(
+					_renderResponse, modelClassNameId,
+					conflictInfo.getTargetPrimaryKey())
+			);
+		}
+
+		return jsonObject;
+	}
+
+	private String _getViewURL(
+		RenderResponse renderResponse, CTEntry ctEntry, boolean viewDiff) {
+
+		RenderURL viewURL = renderResponse.createRenderURL();
+
+		if (viewDiff) {
+			viewURL.setParameter(
+				"mvcRenderCommandName", "/change_tracking/view_diff");
+		}
+		else {
+			viewURL.setParameter(
+				"mvcRenderCommandName", "/change_tracking/view_entry");
+		}
+
+		viewURL.setParameter(
+			"ctEntryId", String.valueOf(ctEntry.getCtEntryId()));
+
+		PublicationsPortletURLUtil.setWindowState(
+			viewURL, LiferayWindowState.POP_UP);
+
+		return viewURL.toString();
+	}
+
+	private <T extends BaseModel<T>> String _getViewURL(
+		RenderResponse renderResponse, long modelClassNameId,
+		long modelClassPK) {
+
+		RenderURL viewURL = renderResponse.createRenderURL();
+
+		viewURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/view_entry");
+		viewURL.setParameter(
+			"modelClassNameId", String.valueOf(modelClassNameId));
+		viewURL.setParameter("modelClassPK", String.valueOf(modelClassPK));
+
+		PublicationsPortletURLUtil.setWindowState(
+			viewURL, LiferayWindowState.POP_UP);
+
+		return viewURL.toString();
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final long _activeCtCollectionId;
 	private final Map<Long, List<ConflictInfo>> _conflictInfoMap;
 	private final CTCollection _ctCollection;

@@ -125,6 +125,7 @@ public class DisplayPageManagementToolbarDisplayContext
 	public CreationMenu getCreationMenu() {
 		return CreationMenuBuilder.addDropdownItem(
 			dropdownItem -> {
+<<<<<<< HEAD
 				dropdownItem.setHref(
 					PortletURLBuilder.createRenderURL(
 						liferayPortletResponse
@@ -133,6 +134,17 @@ public class DisplayPageManagementToolbarDisplayContext
 					).setRedirect(
 						_themeDisplay.getURLCurrent()
 					).buildString());
+=======
+				PortletURL selectMasterLayoutURL =
+					liferayPortletResponse.createRenderURL();
+
+				selectMasterLayoutURL.setParameter(
+					"mvcPath", "/select_display_page_master_layout.jsp");
+				selectMasterLayoutURL.setParameter(
+					"redirect", _themeDisplay.getURLCurrent());
+
+				dropdownItem.setHref(selectMasterLayoutURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.setLabel(
 					LanguageUtil.get(httpServletRequest, "add"));

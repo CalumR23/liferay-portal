@@ -107,6 +107,7 @@ public class CommercePriceModifierDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest,
@@ -119,6 +120,14 @@ public class CommercePriceModifierDataSetActionProvider
 		).setParameter(
 			Constants.CMD, Constants.DELETE
 		).setParameter(
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_price_list/edit_commerce_price_modifier");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commercePriceModifierId",
 			commercePriceModifier.getCommercePriceModifierId()
 		).setParameter(
@@ -132,6 +141,7 @@ public class CommercePriceModifierDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommercePriceList.class.getName(),
@@ -141,6 +151,18 @@ public class CommercePriceModifierDataSetActionProvider
 		).setRedirect(
 			_portal.getCurrentURL(httpServletRequest)
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommercePriceList.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_price_list/edit_commerce_price_modifier");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commercePriceModifierId",
 			commercePriceModifier.getCommercePriceModifierId()
 		).setParameter(

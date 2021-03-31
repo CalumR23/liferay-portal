@@ -41,12 +41,18 @@ import org.osgi.service.component.annotations.Component;
 
 /**
  * @author Carlos Sierra Andrés
+<<<<<<< HEAD
  * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
  */
 @Component(
 	property = "service.ranking:Integer=100", service = JavaScriptMinifier.class
 )
+<<<<<<< HEAD
 @Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 public class GoogleJavaScriptMinifier implements JavaScriptMinifier {
 
 	@Override

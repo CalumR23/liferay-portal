@@ -49,6 +49,7 @@ Role role = usersDisplayContext.getRole();
 	</liferay-frontend:sidebar-panel>
 
 	<div class="sidenav-content">
+<<<<<<< HEAD
 		<clay:container-fluid>
 			<portlet:actionURL name="deleteGroupUsers" var="deleteGroupUsersURL">
 				<portlet:param name="redirect" value="<%= currentURL %>" />
@@ -63,6 +64,46 @@ Role role = usersDisplayContext.getRole();
 				<liferay-ui:breadcrumb
 					showLayout="<%= false %>"
 				/>
+=======
+		<portlet:actionURL name="deleteGroupUsers" var="deleteGroupUsersURL">
+			<portlet:param name="redirect" value="<%= currentURL %>" />
+		</portlet:actionURL>
+
+		<aui:form action="<%= deleteGroupUsersURL %>" cssClass="portlet-site-memberships-users" method="post" name="fm">
+			<aui:input name="tabs1" type="hidden" value="users" />
+			<aui:input name="navigation" type="hidden" value="<%= usersDisplayContext.getNavigation() %>" />
+			<aui:input name="addUserIds" type="hidden" />
+			<aui:input name="roleId" type="hidden" value="<%= (role != null) ? role.getRoleId() : 0 %>" />
+
+			<liferay-ui:breadcrumb
+				showLayout="<%= false %>"
+			/>
+
+			<liferay-ui:membership-policy-error />
+
+			<liferay-ui:search-container
+				id="users"
+				searchContainer="<%= usersDisplayContext.getUserSearchContainer() %>"
+			>
+				<liferay-ui:search-container-row
+					className="com.liferay.portal.kernel.model.User"
+					escapedModel="<%= true %>"
+					keyProperty="userId"
+					modelVar="user2"
+					rowIdProperty="screenName"
+				>
+
+					<%
+					String displayStyle = usersDisplayContext.getDisplayStyle();
+
+					boolean selectUsers = false;
+
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", usersManagementToolbarDisplayContext.getAvailableActions(user2)
+						).build());
+					%>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				<liferay-ui:membership-policy-error />
 

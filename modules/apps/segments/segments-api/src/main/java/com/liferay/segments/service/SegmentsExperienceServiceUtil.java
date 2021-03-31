@@ -51,6 +51,7 @@ public class SegmentsExperienceServiceUtil {
 			serviceContext);
 	}
 
+<<<<<<< HEAD
 	public static SegmentsExperience addSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
@@ -69,12 +70,21 @@ public class SegmentsExperienceServiceUtil {
 			Map<java.util.Locale, String> nameMap, boolean active,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
+=======
+	public static com.liferay.segments.model.SegmentsExperience
+			appendSegmentsExperience(
+				long segmentsEntryId, long classNameId, long classPK,
+				java.util.Map<java.util.Locale, String> nameMap, boolean active,
+				com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().appendSegmentsExperience(
 			segmentsEntryId, classNameId, classPK, nameMap, active,
 			serviceContext);
 	}
 
+<<<<<<< HEAD
 	public static SegmentsExperience appendSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<java.util.Locale, String> nameMap, boolean active,
@@ -91,6 +101,11 @@ public class SegmentsExperienceServiceUtil {
 	public static SegmentsExperience deleteSegmentsExperience(
 			long segmentsExperienceId)
 		throws PortalException {
+=======
+	public static com.liferay.segments.model.SegmentsExperience
+			deleteSegmentsExperience(long segmentsExperienceId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().deleteSegmentsExperience(segmentsExperienceId);
 	}

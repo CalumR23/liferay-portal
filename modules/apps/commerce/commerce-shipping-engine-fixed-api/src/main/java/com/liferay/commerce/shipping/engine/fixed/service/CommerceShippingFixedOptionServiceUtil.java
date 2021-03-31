@@ -126,7 +126,11 @@ public class CommerceShippingFixedOptionServiceUtil {
 	public static long getCommerceShippingFixedOptionsCount(
 			long companyId, long groupId, long commerceShippingMethodId,
 			String keywords)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getCommerceShippingFixedOptionsCount(
 			companyId, groupId, commerceShippingMethodId, keywords);

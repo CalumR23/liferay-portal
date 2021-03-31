@@ -5331,6 +5331,10 @@ public class DataFactory {
 		_defaultAssetPublisherPortletPreferencesImpl;
 	private final long _defaultDLDDMStructureId;
 	private final long _defaultDLDDMStructureVersionId;
+<<<<<<< HEAD
+=======
+	private String _defaultJournalArticleId;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final long _defaultJournalDDMStructureId;
 	private final long _defaultJournalDDMStructureVersionId;
 	private final long _defaultJournalDDMTemplateId;

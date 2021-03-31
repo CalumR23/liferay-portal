@@ -101,11 +101,16 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 
 	@Test
 	public void testVisibitityTypeInternal() throws Exception {
+<<<<<<< HEAD
 		AssetCategory assetCategory = _addAssetCategory(
+=======
+		AssetCategory assetCategory = addAssetCategory(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			AssetVocabularyConstants.VISIBILITY_TYPE_INTERNAL);
 
 		String keyword = "example";
 
+<<<<<<< HEAD
 		_addJournalArticle(assetCategory, keyword);
 
 		_assertSearchInternalFields(
@@ -113,15 +118,30 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 			_getAssetCategoryTitles(assetCategory));
 		_assertSearchPublicFields(
 			keyword, Collections.emptyList(), Collections.emptyList());
+=======
+		addJournalArticle(assetCategory, keyword);
+
+		assertSearchPublicFields(
+			keyword, Collections.emptyList(), Collections.emptyList());
+
+		assertSearchInternalFields(
+			keyword, getAssetCategoryIds(assetCategory),
+			getAssetCategoryTitles(assetCategory));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test
 	public void testVisibitityTypePublic() throws Exception {
+<<<<<<< HEAD
 		AssetCategory assetCategory = _addAssetCategory(
+=======
+		AssetCategory assetCategory = addAssetCategory(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			AssetVocabularyConstants.VISIBILITY_TYPE_PUBLIC);
 
 		String keyword = "example";
 
+<<<<<<< HEAD
 		_addJournalArticle(assetCategory, keyword);
 
 		_assertSearchInternalFields(
@@ -129,12 +149,26 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		_assertSearchPublicFields(
 			keyword, _getAssetCategoryIds(assetCategory),
 			_getAssetCategoryTitles(assetCategory));
+=======
+		addJournalArticle(assetCategory, keyword);
+
+		assertSearchPublicFields(
+			keyword, getAssetCategoryIds(assetCategory),
+			getAssetCategoryTitles(assetCategory));
+
+		assertSearchInternalFields(
+			keyword, Collections.emptyList(), Collections.emptyList());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Rule
 	public SearchTestRule searchTestRule = new SearchTestRule();
 
+<<<<<<< HEAD
 	private AssetCategory _addAssetCategory(int visibilityType)
+=======
+	protected AssetCategory addAssetCategory(int visibilityType)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		ServiceContext serviceContext =
@@ -149,10 +183,17 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		LocaleThreadLocal.setSiteDefaultLocale(LocaleUtil.US);
 
 		try {
+<<<<<<< HEAD
 			AssetVocabulary assetVocabulary = _addAssetVocabulary(
 				visibilityType);
 
 			AssetCategory assetCategory = _assetCategoryService.addCategory(
+=======
+			AssetVocabulary assetVocabulary = addAssetVocabulary(
+				visibilityType);
+
+			AssetCategory assetCategory = assetCategoryService.addCategory(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				_group.getGroupId(),
 				AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, titleMap,
 				new HashMap<>(), assetVocabulary.getVocabularyId(),
@@ -167,17 +208,29 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		}
 	}
 
+<<<<<<< HEAD
 	private AssetVocabulary _addAssetVocabulary(int visibilityType)
 		throws Exception {
 
 		AssetVocabulary assetVocabulary =
 			_assetVocabularyLocalService.addDefaultVocabulary(
+=======
+	protected AssetVocabulary addAssetVocabulary(int visibilityType)
+		throws Exception {
+
+		AssetVocabulary assetVocabulary =
+			assetVocabularyLocalService.addDefaultVocabulary(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				_group.getGroupId());
 
 		assetVocabulary.setTitle(RandomTestUtil.randomString());
 		assetVocabulary.setVisibilityType(visibilityType);
 
+<<<<<<< HEAD
 		assetVocabulary = _assetVocabularyLocalService.updateAssetVocabulary(
+=======
+		assetVocabulary = assetVocabularyLocalService.updateAssetVocabulary(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			assetVocabulary);
 
 		_assetVocabularies.add(assetVocabulary);
@@ -185,7 +238,13 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		return assetVocabulary;
 	}
 
+<<<<<<< HEAD
 	private void _addJournalArticle(AssetCategory assetCategory, String title) {
+=======
+	protected void addJournalArticle(
+		AssetCategory assetCategory, String title) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_journalArticleSearchFixture.addArticle(
 			new JournalArticleBlueprint() {
 				{
@@ -213,7 +272,11 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 			});
 	}
 
+<<<<<<< HEAD
 	private void _assertSearch(
+=======
+	protected void assertSearch(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			String keyword, String assetCategoryIdsFieldName,
 			List<Long> expectedAssetCategoryIds,
 			String assetCategoryTitlesFieldName,
@@ -230,41 +293,69 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		queryConfig.addSelectedFieldNames(
 			assetCategoryIdsFieldName, Field.ASSET_CATEGORY_TITLES);
 
+<<<<<<< HEAD
 		Hits hits = _indexer.search(searchContext);
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
 			(String)searchContext.getAttribute("queryString"), hits.getDocs(),
 			assetCategoryIdsFieldName, _asStringList(expectedAssetCategoryIds));
+=======
+		Hits hits = indexer.search(searchContext);
+
+		DocumentsAssert.assertValuesIgnoreRelevance(
+			(String)searchContext.getAttribute("queryString"), hits.getDocs(),
+			assetCategoryIdsFieldName, asStringList(expectedAssetCategoryIds));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		DocumentsAssert.assertValuesIgnoreRelevance(
 			(String)searchContext.getAttribute("queryString"), hits.getDocs(),
 			assetCategoryTitlesFieldName, expectedAssetCategoryTitles);
 	}
 
+<<<<<<< HEAD
 	private void _assertSearchInternalFields(
+=======
+	protected void assertSearchInternalFields(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			String keyword, List<Long> assetCategoryIds,
 			List<String> assetCategoryTitles)
 		throws Exception, SearchException {
 
+<<<<<<< HEAD
 		_assertSearch(
+=======
+		assertSearch(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			keyword, Field.ASSET_INTERNAL_CATEGORY_IDS, assetCategoryIds,
 			Field.getLocalizedName(
 				LocaleUtil.US, Field.ASSET_INTERNAL_CATEGORY_TITLES),
 			assetCategoryTitles);
 	}
 
+<<<<<<< HEAD
 	private void _assertSearchPublicFields(
+=======
+	protected void assertSearchPublicFields(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			String keyword, List<Long> assetCategoryIds,
 			List<String> assetCategoryTitles)
 		throws Exception, SearchException {
 
+<<<<<<< HEAD
 		_assertSearch(
+=======
+		assertSearch(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			keyword, Field.ASSET_CATEGORY_IDS, assetCategoryIds,
 			Field.getLocalizedName(LocaleUtil.US, Field.ASSET_CATEGORY_TITLES),
 			assetCategoryTitles);
 	}
 
+<<<<<<< HEAD
 	private List<String> _asStringList(List<Long> expectedAssetCategoryIds) {
+=======
+	protected List<String> asStringList(List<Long> expectedAssetCategoryIds) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Stream<Long> stream = expectedAssetCategoryIds.stream();
 
 		return stream.map(
@@ -274,11 +365,19 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		);
 	}
 
+<<<<<<< HEAD
 	private List<Long> _getAssetCategoryIds(AssetCategory assetCategory) {
 		return Arrays.asList(assetCategory.getCategoryId());
 	}
 
 	private List<String> _getAssetCategoryTitles(AssetCategory assetCategory) {
+=======
+	protected List<Long> getAssetCategoryIds(AssetCategory assetCategory) {
+		return Arrays.asList(assetCategory.getCategoryId());
+	}
+
+	protected List<String> getAssetCategoryTitles(AssetCategory assetCategory) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Map<Locale, String> titleMap = assetCategory.getTitleMap();
 
 		Collection<String> titles = titleMap.values();
@@ -292,16 +391,41 @@ public class AssetCategoryVocabularyVisibilitySearchTest {
 		);
 	}
 
+<<<<<<< HEAD
 	@Inject
 	private static AssetCategoryService _assetCategoryService;
 
 	@Inject
 	private static AssetVocabularyLocalService _assetVocabularyLocalService;
+=======
+	protected SearchContext getSearchContext(
+		String keywords, Locale locale, Group group) {
+
+		SearchContext searchContext = new SearchContext();
+
+		searchContext.setCompanyId(group.getCompanyId());
+		searchContext.setGroupIds(new long[] {group.getGroupId()});
+		searchContext.setKeywords(keywords);
+		searchContext.setLocale(locale);
+
+		return searchContext;
+	}
+
+	@Inject
+	protected static AssetCategoryService assetCategoryService;
+
+	@Inject
+	protected static AssetVocabularyLocalService assetVocabularyLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Inject(
 		filter = "component.name=com.liferay.journal.internal.search.JournalArticleIndexer"
 	)
+<<<<<<< HEAD
 	private static Indexer<JournalArticle> _indexer;
+=======
+	protected static Indexer<JournalArticle> indexer;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@DeleteAfterTestRun
 	private List<AssetCategory> _assetCategories = new ArrayList<>();

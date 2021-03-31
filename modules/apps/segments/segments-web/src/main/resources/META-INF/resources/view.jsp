@@ -132,6 +132,39 @@ request.setAttribute("view.jsp-eventName", eventName);
 	</liferay-ui:search-container>
 </aui:form>
 
+<<<<<<< HEAD
+=======
+<aui:script sandbox="<%= true %>">
+	var deleteSegmentsEntries = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			submitForm(
+				document.querySelector('#<portlet:namespace />fmSegmentsEntries')
+			);
+		}
+	};
+
+	var ACTIONS = {
+		deleteSegmentsEntries: deleteSegmentsEntries,
+	};
+
+	Liferay.componentReady('segmentsEntriesManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <portlet:actionURL name="/segments/update_segments_entry_site_roles" var="updateSegmentsEntrySiteRolesURL">
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 </portlet:actionURL>

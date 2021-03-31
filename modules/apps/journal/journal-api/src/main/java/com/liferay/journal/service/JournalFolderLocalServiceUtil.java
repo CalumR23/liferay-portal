@@ -298,6 +298,7 @@ public class JournalFolderLocalServiceUtil {
 			groupIds, folderId, restrictionType);
 	}
 
+<<<<<<< HEAD
 	public static List<com.liferay.dynamic.data.mapping.model.DDMStructure>
 			getDDMStructures(
 				long[] groupIds, long folderId, int restrictionType,
@@ -305,6 +306,15 @@ public class JournalFolderLocalServiceUtil {
 					<com.liferay.dynamic.data.mapping.model.DDMStructure>
 						orderByComparator)
 		throws PortalException {
+=======
+	public static java.util.List
+		<com.liferay.dynamic.data.mapping.model.DDMStructure> getDDMStructures(
+				long[] groupIds, long folderId, int restrictionType,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.dynamic.data.mapping.model.DDMStructure>
+						orderByComparator)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getDDMStructures(
 			groupIds, folderId, restrictionType, orderByComparator);

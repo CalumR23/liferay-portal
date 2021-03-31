@@ -142,6 +142,7 @@ public class UADExportProcessDisplayContext {
 			(PortletResponse)_httpServletRequest.getAttribute(
 				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLUtil.getCurrent(
 				PortalUtil.getLiferayPortletRequest(portletRequest),
@@ -163,6 +164,25 @@ public class UADExportProcessDisplayContext {
 		).setParameter(
 			"orderByType", getOrderByType()
 		).build();
+=======
+		PortletURL portletURL = PortletURLUtil.getCurrent(
+			PortalUtil.getLiferayPortletRequest(portletRequest),
+			PortalUtil.getLiferayPortletResponse(portletResponse));
+
+		User selectedUser = PortalUtil.getSelectedUser(_httpServletRequest);
+
+		portletURL.setParameter(
+			"p_u_i_d", String.valueOf(selectedUser.getUserId()));
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/user_associated_data/view_uad_export_processes");
+		portletURL.setParameter("navigation", getNavigation());
+		portletURL.setParameter("orderByCol", getOrderByCol());
+		portletURL.setParameter("orderByType", getOrderByType());
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public SearchContainer<BackgroundTask> getSearchContainer()

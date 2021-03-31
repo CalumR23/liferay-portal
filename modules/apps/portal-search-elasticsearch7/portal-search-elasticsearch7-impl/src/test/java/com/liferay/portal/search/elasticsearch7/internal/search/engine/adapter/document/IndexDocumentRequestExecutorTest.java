@@ -21,14 +21,20 @@ import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.t
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentRequest;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentResponse;
 import com.liferay.portal.search.internal.document.DocumentBuilderImpl;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+<<<<<<< HEAD
 import org.junit.ClassRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -36,10 +42,13 @@ import org.junit.Test;
  */
 public class IndexDocumentRequestExecutorTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		_elasticsearchFixture = new ElasticsearchFixture();

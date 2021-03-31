@@ -47,6 +47,8 @@ const Text = ({
 
 	const inputRef = useRef(null);
 
+	const inputRef = useRef(null);
+
 	const prevEditingLanguageId = usePrevious(editingLanguageId);
 
 	useEffect(() => {
@@ -91,7 +93,10 @@ const Text = ({
 			dir={Liferay.Language.direction[editingLanguageId]}
 			disabled={disabled}
 			id={id}
+<<<<<<< HEAD
 			lang={editingLanguageId}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			name={name}
 			onBlur={(event) => {
 				if (fieldName == 'fieldReference') {

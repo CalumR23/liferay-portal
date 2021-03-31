@@ -76,7 +76,11 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
+<<<<<<< HEAD
 	<div class="container-fluid container-fluid-max-xl">
+=======
+	<div class="container-fluid-1280">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<portlet:actionURL name="/cp_measurement_unit/edit_cp_measurement_unit" var="editCPMeasurementUnitActionURL" />
 
 		<aui:form action="<%= editCPMeasurementUnitActionURL %>" method="post" name="fm">
@@ -93,6 +97,19 @@ CPMeasurementUnitsDisplayContext cpMeasurementUnitsDisplayContext = (CPMeasureme
 					keyProperty="CPMeasurementUnitId"
 					modelVar="cpMeasurementUnit"
 				>
+<<<<<<< HEAD
+=======
+
+					<%
+					PortletURL rowURL = renderResponse.createRenderURL();
+
+					rowURL.setParameter("mvcRenderCommandName", "/cp_measurement_unit/edit_cp_measurement_unit");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("cpMeasurementUnitId", String.valueOf(cpMeasurementUnit.getCPMeasurementUnitId()));
+					rowURL.setParameter("type", String.valueOf(cpMeasurementUnitsDisplayContext.getType()));
+					%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<liferay-ui:search-container-column-text
 						cssClass="important table-cell-expand"
 						href='<%=

@@ -49,11 +49,22 @@ public class SegmentsSimulationDisplayContext {
 	}
 
 	public PortletURL getDeactivateSimulationURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse, SegmentsPortletKeys.SEGMENTS_SIMULATION
 		).setActionName(
 			"/segments_simulation/deactivate_simulation"
 		).build();
+=======
+		PortletURL portletURL = _liferayPortletResponse.createActionURL(
+			SegmentsPortletKeys.SEGMENTS_SIMULATION);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/segments_simulation/deactivate_simulation");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getPortletNamespace() {
@@ -73,11 +84,22 @@ public class SegmentsSimulationDisplayContext {
 	}
 
 	public PortletURL getSimulateSegmentsEntriesURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_liferayPortletResponse, SegmentsPortletKeys.SEGMENTS_SIMULATION
 		).setActionName(
 			"/segments_simulation/simulate_segments_entries"
 		).build();
+=======
+		PortletURL portletURL = _liferayPortletResponse.createActionURL(
+			SegmentsPortletKeys.SEGMENTS_SIMULATION);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/segments_simulation/simulate_segments_entries");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public boolean isShowEmptyMessage() {

@@ -17,7 +17,11 @@ import ClayList from '@clayui/list';
 import PropTypes from 'prop-types';
 import React, {useContext, useMemo, useState} from 'react';
 
+<<<<<<< HEAD
 import {StoreStateContext} from '../context/StoreContext';
+=======
+import {StoreContext} from '../context/StoreContext';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {numberFormat} from '../utils/numberFormat';
 import Hint from './Hint';
 
@@ -179,6 +183,7 @@ export default function Keywords({currentPage}) {
 								<ClayList.Item flex key={keyword}>
 									<ClayList.ItemField expand>
 										<ClayList.ItemText>
+<<<<<<< HEAD
 											<span
 												className="text-truncate-inline"
 												data-tooltip-align="top"
@@ -186,6 +191,17 @@ export default function Keywords({currentPage}) {
 											>
 												<span className="text-secondary text-truncate">
 													{keyword}
+=======
+											<ClayTooltipProvider>
+												<span
+													className="text-truncate-inline"
+													data-tooltip-align="top"
+													title={keyword}
+												>
+													<span className="text-secondary text-truncate">
+														{keyword}
+													</span>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 												</span>
 											</span>
 										</ClayList.ItemText>

@@ -58,15 +58,27 @@ public class CommercePriceListChannelRelServiceUtil {
 
 	public static void deleteCommercePriceListChannelRelsByCommercePriceListId(
 			long commercePriceListId)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		getService().deleteCommercePriceListChannelRelsByCommercePriceListId(
 			commercePriceListId);
 	}
 
+<<<<<<< HEAD
 	public static CommercePriceListChannelRel fetchCommercePriceListChannelRel(
 			long commerceChannelId, long commercePriceListId)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.price.list.model.CommercePriceListChannelRel
+				fetchCommercePriceListChannelRel(
+					long commerceChannelId, long commercePriceListId)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().fetchCommercePriceListChannelRel(
 			commerceChannelId, commercePriceListId);

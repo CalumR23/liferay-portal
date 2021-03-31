@@ -606,6 +606,7 @@ describe('LayoutProvider', () => {
 
 								const visitor = new PagesVisitor(pages);
 
+<<<<<<< HEAD
 								newPages = visitor.mapFields((field) => {
 									const newField = {
 										...field,
@@ -632,6 +633,17 @@ describe('LayoutProvider', () => {
 
 									return newField;
 								});
+=======
+								newPages = visitor.mapFields((field) => ({
+									...field,
+
+									// Overrides the fieldName because it is generated when a field is duplicated,
+									// toMatchSnapshot has problems with deep arrays so we override it here to
+									// avoid this.
+
+									instanceId: 'Any<String>',
+								}));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							}
 
 							const name = `name${fieldIndex}${columnIndex}${rowIndex}${pageIndex}`;

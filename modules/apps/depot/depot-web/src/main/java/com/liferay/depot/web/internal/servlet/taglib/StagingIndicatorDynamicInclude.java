@@ -19,7 +19,10 @@ import com.liferay.depot.service.DepotEntryLocalService;
 import com.liferay.depot.web.internal.constants.DepotPortletKeys;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -60,6 +63,10 @@ import java.util.Map;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequest;
+<<<<<<< HEAD
+=======
+import javax.portlet.PortletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -132,6 +139,7 @@ public class StagingIndicatorDynamicInclude extends BaseDynamicInclude {
 			return null;
 		}
 
+<<<<<<< HEAD
 		DepotEntry depotEntry = _depotEntryLocalService.getGroupDepotEntry(
 			group.getGroupId());
 
@@ -144,6 +152,22 @@ public class StagingIndicatorDynamicInclude extends BaseDynamicInclude {
 		).setParameter(
 			"depotEntryId", depotEntry.getDepotEntryId()
 		).buildString();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, group, DepotPortletKeys.DEPOT_ADMIN, 0, 0,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/depot/view_depot_dashboard");
+
+		DepotEntry depotEntry = _depotEntryLocalService.getGroupDepotEntry(
+			group.getGroupId());
+
+		portletURL.setParameter(
+			"depotEntryId", String.valueOf(depotEntry.getDepotEntryId()));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private JSONObject _getLiveGroupItemJSONObject(
@@ -215,7 +239,11 @@ public class StagingIndicatorDynamicInclude extends BaseDynamicInclude {
 			PortletRequest.RENDER_PHASE);
 
 		liferayPortletURL.setParameter(
+<<<<<<< HEAD
 			"mvcRenderCommandName", "/export_import/publish_layouts_simple");
+=======
+			"mvcRenderCommandName", "publishLayoutsSimple");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String cmd = Constants.PUBLISH_TO_LIVE;
 

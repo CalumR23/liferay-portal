@@ -20,6 +20,11 @@ import com.liferay.portal.kernel.model.impl.BaseModelImpl;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.BaseLocalService;
 import com.liferay.portal.kernel.service.BaseService;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.test.CaptureHandler;
+import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
@@ -28,10 +33,13 @@ import com.liferay.portal.kernel.transaction.TransactionInvoker;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.spring.aop.AopCacheManager;
+<<<<<<< HEAD
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.registry.BasicRegistryImpl;
 import com.liferay.registry.RegistryUtil;
 
@@ -72,6 +80,17 @@ public class RestrictedLiferayObjectWrapperTest
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
 			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
+
+	@BeforeClass
+	public static void setUpClass() {
+		RegistryUtil.setRegistry(new BasicRegistryImpl());
+
+		TransactionInvokerUtil transactionInvokerUtil =
+			new TransactionInvokerUtil();
+
+		transactionInvokerUtil.setTransactionInvoker(
+			new TestTransactionInvoker());
+	}
 
 	@BeforeClass
 	public static void setUpClass() {
@@ -398,8 +417,14 @@ public class RestrictedLiferayObjectWrapperTest
 			StringModel.class.cast(
 				objectWrapper.wrap(new TestBaseModel(123L))));
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
 				CompanyThreadLocal.class.getName(), Level.OFF)) {
+=======
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					CompanyThreadLocal.class.getName(), Level.OFF)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			try {
 				CompanyThreadLocal.setCompanyId(1L);

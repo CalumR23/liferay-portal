@@ -383,6 +383,7 @@ public class DefaultUserResolver implements UserResolver {
 		if (attributesMap.containsKey(authType)) {
 			subjectNameIdentifier = getValueAsString(authType, attributesMap);
 		}
+<<<<<<< HEAD
 
 		if (_samlProviderConfigurationHelper.isLDAPImportEnabled()) {
 			user = importLdapUser(companyId, subjectNameIdentifier, authType);
@@ -404,9 +405,30 @@ public class DefaultUserResolver implements UserResolver {
 		else {
 			user = addUser(
 				companyId, samlSpIdpConnection, attributesMap, serviceContext);
+=======
 
-			if (_log.isDebugEnabled()) {
-				_log.debug("Added user " + user.toString());
+		if (_samlProviderConfigurationHelper.isLDAPImportEnabled()) {
+			user = importLdapUser(companyId, subjectNameIdentifier, authType);
+		}
+		else {
+			user = getUser(companyId, subjectNameIdentifier, authType);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
+			if (user != null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("Found user " + user.toString());
+				}
+
+				user = updateUser(user, attributesMap, serviceContext);
+			}
+			else {
+				user = addUser(
+					companyId, samlSpIdpConnection, attributesMap,
+					serviceContext);
+
+				if (_log.isDebugEnabled()) {
+					_log.debug("Added user " + user.toString());
+				}
 			}
 		}
 

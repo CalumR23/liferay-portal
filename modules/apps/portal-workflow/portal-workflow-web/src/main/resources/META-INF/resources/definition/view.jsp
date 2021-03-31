@@ -28,11 +28,17 @@ else if (StringUtil.equals(definitionsNavigation, "not-published")) {
 	displayedStatus = WorkflowConstants.STATUS_DRAFT;
 }
 
+<<<<<<< HEAD
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
 ).setParameter(
 	"definitionsNavigation", definitionsNavigation
 ).build();
+=======
+PortletURL portletURL = renderResponse.createRenderURL();
+
+portletURL.setParameter("definitionsNavigation", definitionsNavigation);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <clay:management-toolbar

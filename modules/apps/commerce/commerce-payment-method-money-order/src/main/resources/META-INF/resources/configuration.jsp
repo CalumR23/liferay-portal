@@ -19,7 +19,15 @@
 <%
 MoneyOrderGroupServiceConfiguration moneyOrderGroupServiceConfiguration = (MoneyOrderGroupServiceConfiguration)request.getAttribute(MoneyOrderGroupServiceConfiguration.class.getName());
 
+<<<<<<< HEAD
 String messageAsLocalizedXML = moneyOrderGroupServiceConfiguration.messageAsLocalizedXML();
+=======
+LocalizedValuesMap messageLocalizedValuesMap = moneyOrderGroupServiceConfiguration.message();
+
+if (messageLocalizedValuesMap != null) {
+	messageXml = LocalizationUtil.getXml(messageLocalizedValuesMap, "message");
+}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <portlet:actionURL name="/commerce_payment_methods/edit_money_order_commerce_payment_method_configuration" var="editCommercePaymentMethodActionURL" />

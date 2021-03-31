@@ -79,7 +79,10 @@ public abstract class BaseProductGroupResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-product-groups/{discountProductGroupId}/product-group'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "discountProductGroupId")
@@ -90,8 +93,12 @@ public abstract class BaseProductGroupResourceImpl
 	@Tags(value = {@Tag(name = "ProductGroup")})
 	public ProductGroup getDiscountProductGroupProductGroup(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("discountProductGroupId")
 				Long discountProductGroupId)
+=======
+			@PathParam("discountProductGroupId") Long discountProductGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new ProductGroup();
@@ -103,7 +110,10 @@ public abstract class BaseProductGroupResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifier-product-groups/{priceModifierProductGroupId}/product-group'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(
@@ -118,8 +128,13 @@ public abstract class BaseProductGroupResourceImpl
 	@Tags(value = {@Tag(name = "ProductGroup")})
 	public ProductGroup getPriceModifierProductGroupProductGroup(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("priceModifierProductGroupId")
 				Long priceModifierProductGroupId)
+=======
+			@PathParam("priceModifierProductGroupId") Long
+				priceModifierProductGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new ProductGroup();

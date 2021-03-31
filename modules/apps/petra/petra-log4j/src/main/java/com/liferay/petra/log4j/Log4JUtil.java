@@ -18,6 +18,11 @@ import com.liferay.petra.io.StreamUtil;
 import com.liferay.petra.log4j.internal.Log4jConfigUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactory;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -94,7 +99,15 @@ public class Log4JUtil {
 		for (Map.Entry<String, String> entry : priorities.entrySet()) {
 			Logger jdkLogger = Logger.getLogger(entry.getKey());
 
+<<<<<<< HEAD
 			jdkLogger.setLevel(Log4jConfigUtil.getJDKLevel(entry.getValue()));
+=======
+				jdkLogger.setLevel(_getJdkLevel(priority));
+			}
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 	}
 
@@ -181,6 +194,66 @@ public class Log4JUtil {
 		return _liferayHome;
 	}
 
+<<<<<<< HEAD
+=======
+	private static String _getURLContent(URL url) {
+		Map<String, String> variables = new HashMap<>();
+
+		variables.put("@liferay.home@", _getLiferayHome());
+
+		String spiId = System.getProperty("spi.id");
+
+		if (spiId == null) {
+			spiId = StringPool.BLANK;
+		}
+
+		variables.put("@spi.id@", spiId);
+
+		String urlContent = null;
+
+		try (InputStream inputStream = url.openStream()) {
+			byte[] bytes = _getBytes(inputStream);
+
+			urlContent = new String(bytes, StringPool.UTF8);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+
+			return null;
+		}
+
+		for (Map.Entry<String, String> variable : variables.entrySet()) {
+			urlContent = StringUtil.replace(
+				urlContent, variable.getKey(), variable.getValue());
+		}
+
+		if (ServerDetector.getServerId() != null) {
+			return urlContent;
+		}
+
+		urlContent = _removeAppender(urlContent, "TEXT_FILE");
+
+		return _removeAppender(urlContent, "XML_FILE");
+	}
+
+	private static String _removeAppender(String content, String appenderName) {
+		int x = content.indexOf("<appender name=\"" + appenderName + "\"");
+
+		int y = content.indexOf("</appender>", x);
+
+		if (y != -1) {
+			y = content.indexOf("<", y + 1);
+		}
+
+		if ((x != -1) && (y != -1)) {
+			content = content.substring(0, x) + content.substring(y);
+		}
+
+		return StringUtil.removeSubstring(
+			content, "<appender-ref ref=\"" + appenderName + "\" />");
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final Log _log = LogFactoryUtil.getLog(Log4JUtil.class);
 
 	private static final Map<String, String> _customLogSettings =

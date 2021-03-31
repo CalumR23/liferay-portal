@@ -47,16 +47,27 @@ else {
 />
 
 <liferay-frontend:screen-navigation
+<<<<<<< HEAD
 	containerWrapperCssClass="container"
 	key="<%= CommerceDiscountScreenNavigationConstants.SCREEN_NAVIGATION_KEY_DISCOUNT_GENERAL %>"
 	modelBean="<%= commerceDiscount %>"
+=======
+	containerCssClass="col-md-10"
+	key="<%= CommerceDiscountScreenNavigationConstants.SCREEN_NAVIGATION_KEY_DISCOUNT_GENERAL %>"
+	modelBean="<%= commerceDiscount %>"
+	navCssClass="col-md-2"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	portletURL="<%= currentURLObj %>"
 />
 
 <aui:script>
 	document
 		.getElementById('<portlet:namespace />publishButton')
+<<<<<<< HEAD
 		.addEventListener('click', (e) => {
+=======
+		.addEventListener('click', function (e) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			e.preventDefault();
 
 			var form = document.getElementById('<portlet:namespace />fm');

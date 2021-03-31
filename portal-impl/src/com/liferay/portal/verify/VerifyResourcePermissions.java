@@ -226,8 +226,12 @@ public class VerifyResourcePermissions extends VerifyProcess {
 					StringBundler.concat(
 						"Unable to add resource for {", _companyId, ", ",
 						_modelName, ", ", ResourceConstants.SCOPE_INDIVIDUAL,
+<<<<<<< HEAD
 						", ", _primKey, ", ", _roleId, "}"),
 					exception);
+=======
+						", ", _primKey, ", ", _roleId, "}"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 
 			return null;

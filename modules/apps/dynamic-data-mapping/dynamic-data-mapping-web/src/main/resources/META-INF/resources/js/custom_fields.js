@@ -523,6 +523,202 @@ AUI.add(
 			},
 		});
 
+<<<<<<< HEAD
+=======
+		var JournalArticleCellEditor = A.Component.create({
+			EXTENDS: A.BaseCellEditor,
+
+			NAME: 'journal-article-cell-editor',
+
+			prototype: {
+				_defInitToolbarFn() {
+					var instance = this;
+
+					JournalArticleCellEditor.superclass._defInitToolbarFn.apply(
+						instance,
+						arguments
+					);
+
+					instance.toolbar.add(
+						{
+							label: Liferay.Language.get('select'),
+							on: {
+								click: A.bind('_onClickChoose', instance),
+							},
+						},
+						1
+					);
+
+					instance.toolbar.add(
+						{
+							label: Liferay.Language.get('clear'),
+							on: {
+								click: A.bind('_onClickClear', instance),
+							},
+						},
+						2
+					);
+				},
+
+				_getWebContentSelectorURL() {
+					var instance = this;
+
+					var portletNamespace = instance.get('portletNamespace');
+
+					var criterionJSON = {
+						desiredItemSelectorReturnTypes:
+							'com.liferay.item.selector.criteria.JournalArticleItemSelectorReturnType',
+					};
+
+					var webContentSelectorParameters = {
+						'0_json': JSON.stringify(criterionJSON),
+						criteria:
+							'com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelectorCriterion',
+						itemSelectedEventName:
+							portletNamespace + 'selectDocumentLibrary',
+						p_auth: Liferay.authToken,
+						p_p_id: Liferay.PortletKeys.ITEM_SELECTOR,
+						p_p_mode: 'view',
+						p_p_state: 'pop_up',
+					};
+
+					var webContentSelectorURL = Liferay.Util.PortletURL.createRenderURL(
+						themeDisplay.getLayoutRelativeControlPanelURL(),
+						webContentSelectorParameters
+					);
+
+					return webContentSelectorURL.toString();
+				},
+
+				_handleCancelEvent() {
+					var instance = this;
+
+					instance.get('boundingBox').hide();
+				},
+
+				_handleSaveEvent() {
+					var instance = this;
+
+					JournalArticleCellEditor.superclass._handleSaveEvent.apply(
+						instance,
+						arguments
+					);
+
+					instance.get('boundingBox').hide();
+				},
+
+				_onClickChoose() {
+					var instance = this;
+
+					var portletNamespace = instance.get('portletNamespace');
+
+					Liferay.Util.openSelectionModal({
+						onSelect: (selectedItem) => {
+							if (selectedItem) {
+								var itemValue = JSON.parse(selectedItem.value);
+
+								instance.setValue({
+									className: itemValue.className,
+									classPK: itemValue.classPK,
+									title: itemValue.title,
+								});
+							}
+						},
+						selectEventName:
+							portletNamespace + 'selectDocumentLibrary',
+						title: Liferay.Language.get('journal-article'),
+						url: instance._getWebContentSelectorURL(),
+					});
+				},
+
+				_onClickClear() {
+					var instance = this;
+
+					instance.set('value', STR_BLANK);
+				},
+
+				_onDocMouseDownExt(event) {
+					var instance = this;
+
+					var boundingBox = instance.get('boundingBox');
+
+					if (!boundingBox.contains(event.target)) {
+						instance._handleCancelEvent(event);
+					}
+				},
+
+				_syncJournalArticleLabel(title) {
+					var instance = this;
+
+					var contentBox = instance.get('contentBox');
+
+					var linkNode = contentBox.one('span');
+
+					if (!linkNode) {
+						linkNode = A.Node.create('<span></span>');
+
+						contentBox.prepend(linkNode);
+					}
+
+					linkNode.setContent(Liferay.Util.escapeHTML(title));
+				},
+
+				_uiSetValue(val) {
+					var instance = this;
+
+					if (val) {
+						val = JSON.parse(val);
+						var title =
+							Liferay.Language.get('journal-article') +
+							': ' +
+							val.classPK;
+
+						instance._syncJournalArticleLabel(title);
+					}
+					else {
+						instance._syncJournalArticleLabel(STR_BLANK);
+					}
+				},
+
+				ELEMENT_TEMPLATE: '<input type="hidden" />',
+
+				getElementsValue() {
+					var instance = this;
+
+					return instance.get('value');
+				},
+
+				getParsedValue(value) {
+					if (Lang.isString(value)) {
+						if (value !== '') {
+							value = JSON.parse(value);
+						}
+						else {
+							value = {};
+						}
+					}
+
+					return value;
+				},
+
+				setValue(value) {
+					var instance = this;
+
+					var parsedValue = instance.getParsedValue(value);
+
+					if (!parsedValue.className && !parsedValue.classPK) {
+						value = '';
+					}
+					else {
+						value = JSON.stringify(parsedValue);
+					}
+
+					instance.set('value', value);
+				},
+			},
+		});
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Liferay.FormBuilder.CUSTOM_CELL_EDITORS = {};
 
 		var customCellEditors = [ColorCellEditor, DLFileEntryCellEditor];

@@ -19,7 +19,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBu
 import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.message.boards.settings.MBGroupServiceSettings;
 import com.liferay.message.boards.web.internal.security.permission.MBResourcePermission;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
@@ -135,6 +138,7 @@ public class MBNavigationDisplayContext {
 	}
 
 	private PortletURL _getViewBannedUsersPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -182,6 +186,60 @@ public class MBNavigationDisplayContext {
 		).setMVCRenderCommandName(
 			"/message_boards/view_statistics"
 		).build();
+=======
+		PortletURL bannedUsersURL = _renderResponse.createRenderURL();
+
+		bannedUsersURL.setParameter(
+			"mvcRenderCommandName", "/message_boards_admin/view_banned_users");
+
+		return bannedUsersURL;
+	}
+
+	private PortletURL _getViewCategoriesPortletURL() {
+		PortletURL messageBoardsHomeURL = _renderResponse.createRenderURL();
+
+		messageBoardsHomeURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view");
+		messageBoardsHomeURL.setParameter("tag", StringPool.BLANK);
+
+		return messageBoardsHomeURL;
+	}
+
+	private PortletURL _getViewMyPostsPortletURL() {
+		PortletURL viewMyPostsURL = _renderResponse.createRenderURL();
+
+		viewMyPostsURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_my_posts");
+
+		return viewMyPostsURL;
+	}
+
+	private PortletURL _getViewMySubscriptionsPortletURL() {
+		PortletURL viewMySubscriptionsURL = _renderResponse.createRenderURL();
+
+		viewMySubscriptionsURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_my_subscriptions");
+
+		return viewMySubscriptionsURL;
+	}
+
+	private PortletURL _getViewRecentPostsPortletURL() {
+		PortletURL viewRecentPostsURL = _renderResponse.createRenderURL();
+
+		viewRecentPostsURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_recent_posts");
+
+		return viewRecentPostsURL;
+	}
+
+	private PortletURL _getViewStatisticsPortletURL() {
+		PortletURL viewStatisticsURL = _renderResponse.createRenderURL();
+
+		viewStatisticsURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_statistics");
+
+		return viewStatisticsURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private boolean _isMBPortlet() {

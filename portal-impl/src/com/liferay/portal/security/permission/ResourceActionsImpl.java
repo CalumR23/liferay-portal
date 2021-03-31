@@ -84,6 +84,24 @@ import javax.servlet.http.HttpSession;
  */
 public class ResourceActionsImpl implements ResourceActions {
 
+<<<<<<< HEAD
+=======
+	public void afterPropertiesSet() {
+		try {
+			Class<?> clazz = getClass();
+
+			ClassLoader classLoader = clazz.getClassLoader();
+
+			for (String config : PropsValues.RESOURCE_ACTIONS_CONFIGS) {
+				read(classLoader, config);
+			}
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+		}
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #check(String)}
 	 */
@@ -570,6 +588,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		return false;
 	}
 
+<<<<<<< HEAD
 	public void populateModelResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -618,6 +637,8 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void populatePortletResource(
 			Portlet portlet, ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -644,6 +665,7 @@ public class ResourceActionsImpl implements ResourceActions {
 			_getPortletResourceActions(portletResourceName, portlet));
 	}
 
+<<<<<<< HEAD
 	public void populatePortletResources(
 			ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -674,16 +696,22 @@ public class ResourceActionsImpl implements ResourceActions {
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	public void read(ClassLoader classLoader, String source)
 		throws ResourceActionsException {
 
+<<<<<<< HEAD
 		_read(
 			classLoader, source,
 			rootElement -> {
 				_readModelResources(rootElement, null);
 				_readPortletResources(rootElement, null);
 			});
+=======
+		_read(classLoader, source, rootElement -> _read(rootElement, null));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	/**
@@ -719,7 +747,11 @@ public class ResourceActionsImpl implements ResourceActions {
 			}
 		}
 
+<<<<<<< HEAD
 		_readModelResources(document.getRootElement(), resourceNames);
+=======
+		_read(document.getRootElement(), resourceNames);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	/**
@@ -760,10 +792,13 @@ public class ResourceActionsImpl implements ResourceActions {
 		read(document, resourceNames);
 	}
 
+<<<<<<< HEAD
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	public void readAndCheck(ClassLoader classLoader, String... sources)
 		throws ResourceActionsException {
@@ -773,10 +808,14 @@ public class ResourceActionsImpl implements ResourceActions {
 		for (String source : sources) {
 			_read(
 				classLoader, source,
+<<<<<<< HEAD
 				rootElement -> {
 					_readModelResources(rootElement, resourceNames);
 					_readPortletResources(rootElement, resourceNames);
 				});
+=======
+				rootElement -> _read(rootElement, resourceNames));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		for (String resourceName : resourceNames) {
@@ -798,6 +837,7 @@ public class ResourceActionsImpl implements ResourceActions {
 		readAndCheck(classLoader, sources);
 	}
 
+<<<<<<< HEAD
 	public void readModelResources(ClassLoader classLoader, String source)
 		throws ResourceActionsException {
 
@@ -806,6 +846,8 @@ public class ResourceActionsImpl implements ResourceActions {
 			rootElement -> _readModelResources(rootElement, null));
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
 	 */
@@ -997,10 +1039,17 @@ public class ResourceActionsImpl implements ResourceActions {
 				portletResourceActionsBag.getGroupDefaultActions();
 
 			groupDefaultActions.add(ActionKeys.VIEW);
+<<<<<<< HEAD
 
 			Set<String> guestDefaultActions =
 				portletResourceActionsBag.getGuestDefaultActions();
 
+=======
+
+			Set<String> guestDefaultActions =
+				portletResourceActionsBag.getGuestDefaultActions();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			guestDefaultActions.add(ActionKeys.VIEW);
 
 			_checkPortletGuestUnsupportedActions(
@@ -1184,14 +1233,42 @@ public class ResourceActionsImpl implements ResourceActions {
 		}
 	}
 
+<<<<<<< HEAD
 	private void _readActionKeys(
 		Collection<String> actions, Element parentElement) {
+=======
+	private void _read(Element rootElement, Set<String> resourceNames)
+		throws ResourceActionsException {
+
+		if (PropsValues.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES) {
+			for (Element portletResourceElement :
+					rootElement.elements("portlet-resource")) {
+
+				String portletName = portletResourceElement.elementTextTrim(
+					"portlet-name");
+
+				Portlet portlet = portletLocalService.getPortletById(
+					portletName);
+
+				Set<String> portletActions = _getPortletMimeTypeActions(
+					portletName, portlet);
+
+				if (!portletName.equals(PortletKeys.PORTAL)) {
+					_checkPortletLayoutManagerActions(portletActions);
+				}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		for (Element actionKeyElement : parentElement.elements("action-key")) {
 			String actionKey = actionKeyElement.getTextTrim();
 
+<<<<<<< HEAD
 			if (Validator.isNull(actionKey)) {
 				continue;
+=======
+				if (resourceNames != null) {
+					resourceNames.add(portletName);
+				}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 
 			actions.add(actionKey);
@@ -1329,6 +1406,33 @@ public class ResourceActionsImpl implements ResourceActions {
 					resourceNames.add(portletName);
 				}
 			}
+		}
+	}
+
+	private void _readPortletResource(Element rootElement, Portlet portlet)
+		throws ResourceActionsException {
+
+		String deployPortletName = PortletIdCodec.decodePortletName(
+			portlet.getPortletId());
+
+		for (Element portletResourceElement :
+				rootElement.elements("portlet-resource")) {
+
+			String portletName = portletResourceElement.elementTextTrim(
+				"portlet-name");
+
+			if (!portletName.equals(deployPortletName)) {
+				continue;
+			}
+
+			Set<String> portletActions = _getPortletMimeTypeActions(
+				portletName, portlet);
+
+			if (!portletName.equals(PortletKeys.PORTAL)) {
+				_checkPortletLayoutManagerActions(portletActions);
+			}
+
+			_readResource(portletResourceElement, portletName, portletActions);
 		}
 	}
 

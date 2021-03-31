@@ -89,8 +89,13 @@ String keywords = ParamUtil.getString(request, "keywords");
 		</c:when>
 		<c:otherwise>
 			<clay:management-toolbar
+<<<<<<< HEAD
 				cssClass="custom-management-toolbar"
 				managementToolbarDisplayContext="<%= new ChannelManagementToolbarDisplayContext(channelDisplayContext, request, liferayPortletRequest, liferayPortletResponse) %>"
+=======
+				displayContext="<%= new ChannelManagementToolbarDisplayContext(channelDisplayContext, request, liferayPortletRequest, liferayPortletResponse) %>"
+				elementClasses="custom-management-toolbar"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			/>
 
 			<liferay-ui:search-container

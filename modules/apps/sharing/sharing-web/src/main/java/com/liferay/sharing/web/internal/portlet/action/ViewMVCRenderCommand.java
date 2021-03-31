@@ -94,11 +94,20 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	private String _getShareActionURL(RenderResponse renderResponse) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			renderResponse
 		).setActionName(
 			"/sharing/share_entry"
 		).buildString();
+=======
+		PortletURL shareActionURL = renderResponse.createActionURL();
+
+		shareActionURL.setParameter(
+			ActionRequest.ACTION_NAME, "/sharing/share_entry");
+
+		return shareActionURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getSharingVerifyEmailAddressURL(

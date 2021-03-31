@@ -191,7 +191,11 @@ const ExperienceModal = ({
 						)}
 					</ClayForm.Group>
 
+<<<<<<< HEAD
 					<ClayForm.Group className="c-mb-4">
+=======
+					<ClayForm.Group className="my-2">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						<label htmlFor={segmentSelectId}>
 							{Liferay.Language.get('audience')}
 
@@ -241,6 +245,7 @@ const ExperienceModal = ({
 								</Button>
 							)}
 						</div>
+<<<<<<< HEAD
 					</ClayForm.Group>
 
 					<ClayForm.Group>
@@ -302,6 +307,8 @@ const ExperienceModal = ({
 								}
 							)}
 						</ClayLayout.Row>
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					</ClayForm.Group>
 				</ClayForm>
 			</ClayModal.Body>

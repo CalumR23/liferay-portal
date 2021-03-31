@@ -22,13 +22,22 @@ import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.product.model.CPMeasurementUnit;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.service.CommerceCountryService;
+import com.liferay.commerce.service.CommerceRegionService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.service.CommerceShippingMethodService;
 import com.liferay.commerce.shipping.engine.fixed.constants.CommerceShippingEngineFixedWebKeys;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption;
 import com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOptionRel;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionRelService;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionService;
+<<<<<<< HEAD
 import com.liferay.commerce.shipping.engine.fixed.web.internal.frontend.taglib.servlet.taglib.CommerceShippingMethodFixedOptionSettingsScreenNavigationCategory;
+=======
+import com.liferay.commerce.shipping.engine.fixed.web.internal.servlet.taglib.ui.CommerceShippingMethodFixedOptionSettingsScreenNavigationCategory;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenuBuilder;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -60,6 +69,10 @@ public class CommerceShippingFixedOptionRelsDisplayContext
 
 	public CommerceShippingFixedOptionRelsDisplayContext(
 		CommerceChannelLocalService commerceChannelLocalService,
+<<<<<<< HEAD
+=======
+		CommerceCountryService commerceCountryService,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		CommerceCurrencyLocalService commerceCurrencyLocalService,
 		CommerceInventoryWarehouseService commerceInventoryWarehouseService,
 		CommerceShippingFixedOptionRelService
@@ -90,6 +103,7 @@ public class CommerceShippingFixedOptionRelsDisplayContext
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				renderRequest, CommercePortletKeys.COMMERCE_SHIPPING_METHODS,
+<<<<<<< HEAD
 				PortletRequest.RENDER_PHASE)
 		).setMVCRenderCommandName(
 			"/commerce_shipping_methods/edit_commerce_shipping_fixed_option_rel"
@@ -98,6 +112,43 @@ public class CommerceShippingFixedOptionRelsDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+				PortletRequest.RENDER_PHASE);
+
+		editCommerceChannelPortletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipping_methods" +
+				"/edit_commerce_shipping_fixed_option_rel");
+		editCommerceChannelPortletURL.setParameter(
+			"commerceShippingMethodId",
+			String.valueOf(getCommerceShippingMethodId()));
+
+		editCommerceChannelPortletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return editCommerceChannelPortletURL.toString();
+	}
+
+	public List<CommerceCountry> getCommerceCountries() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return _commerceCountryService.getCommerceCountries(
+			themeDisplay.getCompanyId(), true);
+	}
+
+	public long getCommerceCountryId() throws PortalException {
+		long commerceCountryId = 0;
+
+		CommerceShippingFixedOptionRel commerceShippingFixedOptionRel =
+			getCommerceShippingFixedOptionRel();
+
+		if (commerceShippingFixedOptionRel != null) {
+			commerceCountryId =
+				commerceShippingFixedOptionRel.getCommerceCountryId();
+		}
+
+		return commerceCountryId;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<CommerceInventoryWarehouse> getCommerceInventoryWarehouses()

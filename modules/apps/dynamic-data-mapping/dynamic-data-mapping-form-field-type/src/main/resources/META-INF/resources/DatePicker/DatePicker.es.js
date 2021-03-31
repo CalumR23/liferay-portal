@@ -91,6 +91,7 @@ const getDateFormat = (locale) => {
 	};
 };
 
+<<<<<<< HEAD
 const transformToDate = (
 	defaultLanguageId,
 	date,
@@ -109,6 +110,11 @@ const transformToDate = (
 			getLocaleDateFormat(defaultLanguageId),
 			'YYYY-MM-DD',
 		]).toDate();
+=======
+const transformToDate = (date, locale) => {
+	if (typeof date === 'string' && date.indexOf('_') === -1 && date !== '') {
+		return moment(date).locale(locale).toDate();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	return date;
@@ -133,7 +139,10 @@ const getValueForHidden = (value) => {
 const DatePicker = ({
 	defaultLanguageId,
 	disabled,
+<<<<<<< HEAD
 	formatInEditingLocale,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	locale,
 	name,
 	onChange,
@@ -145,6 +154,7 @@ const DatePicker = ({
 
 	const [expanded, setExpand] = useState(false);
 
+<<<<<<< HEAD
 	const [localizedValue, setLocalizedValue] = useState({});
 
 	const initialValueMemoized = useMemo(
@@ -156,6 +166,11 @@ const DatePicker = ({
 				formatInEditingLocale
 			),
 		[defaultLanguageId, formatInEditingLocale, initialValue, locale]
+=======
+	const initialValueMemoized = useMemo(
+		() => transformToDate(initialValue, locale),
+		[initialValue, locale]
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	);
 
 	const [value, setValue] = useSyncValue(initialValueMemoized);
@@ -181,6 +196,7 @@ const DatePicker = ({
 				showMask: true,
 			});
 
+<<<<<<< HEAD
 			if (localizedValue[locale]) {
 				if (typeof localizedValue[locale] === 'string') {
 					inputRef.current.value = localizedValue[locale];
@@ -192,10 +208,14 @@ const DatePicker = ({
 				}
 			}
 			else if (initialValueMemoized) {
+=======
+			if (initialValueMemoized) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				inputRef.current.value = moment(initialValueMemoized).format(
 					dateMask.toUpperCase()
 				);
 			}
+<<<<<<< HEAD
 			else {
 				inputRef.current.value = '';
 			}
@@ -210,6 +230,12 @@ const DatePicker = ({
 		localizedValue,
 		locale,
 	]);
+=======
+
+			maskInstance.current.update(inputRef.current.value);
+		}
+	}, [dateMask, inputMask, inputRef, initialValueMemoized]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const handleNavigation = (date) => {
 		const currentYear = date.getFullYear();
@@ -266,9 +292,13 @@ const DatePicker = ({
 
 					if (moment(value).isValid()) {
 						onChange(
+<<<<<<< HEAD
 							moment(value, getLocaleDateFormat(locale)).format(
 								'L'
 							)
+=======
+							moment(value).locale(locale).format('MM/DD/YYYY')
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						);
 					}
 				}}
@@ -282,9 +312,13 @@ const DatePicker = ({
 };
 
 const Main = ({
+<<<<<<< HEAD
 	defaultLanguageId,
 	locale = themeDisplay.getDefaultLanguageId(),
 	localizedValue,
+=======
+	locale = themeDisplay.getDefaultLanguageId(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	name,
 	onChange,
 	placeholder,
@@ -304,9 +338,12 @@ const Main = ({
 		<DatePicker
 			defaultLanguageId={defaultLanguageId}
 			disabled={readOnly}
+<<<<<<< HEAD
 			formatInEditingLocale={
 				localizedValue && localizedValue[locale] != undefined
 			}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			locale={locale}
 			name={name}
 			onChange={(value) => onChange({}, value)}

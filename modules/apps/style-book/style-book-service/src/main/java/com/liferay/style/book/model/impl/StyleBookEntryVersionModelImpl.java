@@ -105,7 +105,11 @@ public class StyleBookEntryVersionModelImpl
 	}
 
 	public static final String TABLE_SQL_CREATE =
+<<<<<<< HEAD
 		"create table StyleBookEntryVersion (mvccVersion LONG default 0 not null,ctCollectionId LONG default 0 not null,styleBookEntryVersionId LONG not null,version INTEGER,uuid_ VARCHAR(75) null,styleBookEntryId LONG,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,defaultStyleBookEntry BOOLEAN,frontendTokensValues TEXT null,name VARCHAR(75) null,previewFileEntryId LONG,styleBookEntryKey VARCHAR(75) null,primary key (styleBookEntryVersionId, ctCollectionId))";
+=======
+		"create table StyleBookEntryVersion (styleBookEntryVersionId LONG not null primary key,version INTEGER,uuid_ VARCHAR(75) null,styleBookEntryId LONG,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,defaultStyleBookEntry BOOLEAN,frontendTokensValues TEXT null,name VARCHAR(75) null,previewFileEntryId LONG,styleBookEntryKey VARCHAR(75) null)";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	public static final String TABLE_SQL_DROP =
 		"drop table StyleBookEntryVersion";
@@ -159,13 +163,21 @@ public class StyleBookEntryVersionModelImpl
 	public static final long STYLEBOOKENTRYKEY_COLUMN_BITMASK = 32L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long UUID_COLUMN_BITMASK = 64L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long VERSION_COLUMN_BITMASK = 128L;
@@ -430,7 +442,10 @@ public class StyleBookEntryVersionModelImpl
 
 	@Override
 	public void populateVersionedModel(StyleBookEntry styleBookEntry) {
+<<<<<<< HEAD
 		styleBookEntry.setCtCollectionId(getCtCollectionId());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		styleBookEntry.setUuid(getUuid());
 		styleBookEntry.setGroupId(getGroupId());
 		styleBookEntry.setCompanyId(getCompanyId());
@@ -1261,6 +1276,7 @@ public class StyleBookEntryVersionModelImpl
 
 		columnBitmasks.put("styleBookEntryId", 32L);
 
+<<<<<<< HEAD
 		columnBitmasks.put("groupId", 64L);
 
 		columnBitmasks.put("companyId", 128L);
@@ -1282,6 +1298,33 @@ public class StyleBookEntryVersionModelImpl
 		columnBitmasks.put("previewFileEntryId", 32768L);
 
 		columnBitmasks.put("styleBookEntryKey", 65536L);
+=======
+		columnBitmasks.put("uuid_", 4L);
+
+		columnBitmasks.put("styleBookEntryId", 8L);
+
+		columnBitmasks.put("groupId", 16L);
+
+		columnBitmasks.put("companyId", 32L);
+
+		columnBitmasks.put("userId", 64L);
+
+		columnBitmasks.put("userName", 128L);
+
+		columnBitmasks.put("createDate", 256L);
+
+		columnBitmasks.put("modifiedDate", 512L);
+
+		columnBitmasks.put("defaultStyleBookEntry", 1024L);
+
+		columnBitmasks.put("frontendTokensValues", 2048L);
+
+		columnBitmasks.put("name", 4096L);
+
+		columnBitmasks.put("previewFileEntryId", 8192L);
+
+		columnBitmasks.put("styleBookEntryKey", 16384L);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

@@ -119,7 +119,11 @@ const FieldsTabContent = ({keywords, onAddFieldName}) => {
 
 	return (
 		<FieldTypeList
+<<<<<<< HEAD
 			dragType={DragTypes.DRAG_FIELD_TYPE_ADD}
+=======
+			dragType={DragTypes.DRAG_FIELD_TYPE}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			emptyState={{
 				description: Liferay.Language.get(
 					'columns-are-needed-to-create-table-views-for-this-object'

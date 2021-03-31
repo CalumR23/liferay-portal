@@ -23,7 +23,10 @@ import com.liferay.commerce.product.display.context.util.CPRequestHelper;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.commerce.product.servlet.taglib.ui.constants.CPDefinitionScreenNavigationConstants;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -68,6 +71,7 @@ public class CommerceInventoryWarehouseItemsDisplayContext {
 		String lifecycle = (String)renderRequest.getAttribute(
 			LiferayPortletRequest.LIFECYCLE_PHASE);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				renderRequest, CPPortletKeys.CP_DEFINITIONS, lifecycle)
@@ -81,6 +85,20 @@ public class CommerceInventoryWarehouseItemsDisplayContext {
 				return cpInstance.getCPDefinitionId();
 			}
 		).setParameter(
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			renderRequest, CPPortletKeys.CP_DEFINITIONS, lifecycle);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+
+		CPInstance cpInstance = getCPInstance();
+
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpInstance.getCPDefinitionId()));
+
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CPDefinitionScreenNavigationConstants.CATEGORY_KEY_SKUS
 		).buildString();

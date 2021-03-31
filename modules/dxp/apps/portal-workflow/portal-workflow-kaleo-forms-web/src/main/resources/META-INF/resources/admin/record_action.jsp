@@ -51,7 +51,11 @@ DDLRecordVersion ddlRecordVersion = ddlRecord.getLatestRecordVersion();
 	/>
 
 	<c:if test="<%= KaleoProcessPermission.contains(permissionChecker, kaleoProcessId, ActionKeys.UPDATE) %>">
+<<<<<<< HEAD
 		<portlet:actionURL name="/kaleo_forms_admin/delete_record" var="deleteDDLRecordURL">
+=======
+		<portlet:actionURL name="/kaleo_forms/delete_record" var="deleteDDLRecordURL">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<portlet:param name="redirect" value="<%= redirect %>" />
 			<portlet:param name="ddlRecordId" value="<%= String.valueOf(ddlRecord.getRecordId()) %>" />
 			<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />

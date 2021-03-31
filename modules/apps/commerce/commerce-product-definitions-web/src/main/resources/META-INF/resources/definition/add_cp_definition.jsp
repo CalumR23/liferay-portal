@@ -19,7 +19,11 @@
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "create-new-product") %>'
 >
+<<<<<<< HEAD
 	<aui:form cssClass="container-fluid container-fluid-max-xl" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit();" %>'>
+=======
+	<aui:form cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit();" %>'>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input autoFocus="<%= true %>" name="name" required="<%= true %>" type="text" />
 
 		<label class="control-label" for="catalogId"><%= LanguageUtil.get(request, "catalog") %></label>
@@ -43,7 +47,11 @@
 		Liferay.provide(
 			window,
 			'<portlet:namespace />apiSubmit',
+<<<<<<< HEAD
 			() => {
+=======
+			function () {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				ModalUtils.isSubmitting();
 
 				var formattedData = Object.assign(
@@ -60,7 +68,11 @@
 				] = document.getElementById('<portlet:namespace />name').value;
 
 				AdminCatalogResource.createProduct(formattedData)
+<<<<<<< HEAD
 					.then((cpDefinition) => {
+=======
+					.then(function (cpDefinition) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						var redirectURL = new Liferay.PortletURL.createURL(
 							'<%= editProductDefinitionURL %>'
 						);

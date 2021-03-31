@@ -38,39 +38,28 @@ if (cpDefinitionGroupedEntries == null) {
 		%>
 
 		<div class="sidebar-header">
-			<div class="autofit-row sidebar-section">
-				<div class="autofit-col autofit-col-expand">
-					<h4 class="component-title"><%= HtmlUtil.escape(cProductCPDefinition.getName(themeDisplay.getLanguageId())) %></h4>
-				</div>
+			<ul class="sidebar-header-actions">
+				<li>
+					<liferay-util:include page="/definition_grouped_entry_action.jsp" servletContext="<%= application %>" />
+				</li>
+			</ul>
 
-				<div class="autofit-col">
-					<ul class="autofit-padded-no-gutters autofit-row">
-						<li class="autofit-col">
-							<liferay-util:include page="/cp_definition_grouped_entry_action.jsp" servletContext="<%= application %>" />
-						</li>
-					</ul>
-				</div>
-			</div>
+			<h4><%= HtmlUtil.escape(cProductCPDefinition.getName(themeDisplay.getLanguageId())) %></h4>
 		</div>
 
 		<div class="sidebar-body">
-			<dl class="sidebar-dl sidebar-section">
-				<dt class="sidebar-dt"><liferay-ui:message key="id" /></dt>
+			<h5><liferay-ui:message key="id" /></h5>
 
-				<dd class="sidebar-dd">
-					<%= HtmlUtil.escape(String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId())) %>
-				</dd>
-				<dt class="sidebar-dt"><liferay-ui:message key="status" /></dt>
-			</dl>
+			<p>
+				<%= HtmlUtil.escape(String.valueOf(cpDefinitionGroupedEntry.getCPDefinitionGroupedEntryId())) %>
+			</p>
+
+			<h5><liferay-ui:message key="status" /></h5>
 		</div>
 	</c:when>
 	<c:otherwise>
 		<div class="sidebar-header">
-			<div class="autofit-row sidebar-section">
-				<div class="autofit-col autofit-col-expand">
-					<h4 class="component-title"><liferay-ui:message arguments="<%= cpDefinitionGroupedEntries.size() %>" key="x-items-are-selected" /></h4>
-				</div>
-			</div>
+			<h4><liferay-ui:message arguments="<%= cpDefinitionGroupedEntries.size() %>" key="x-items-are-selected" /></h4>
 		</div>
 	</c:otherwise>
 </c:choose>

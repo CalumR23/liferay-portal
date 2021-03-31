@@ -12,9 +12,14 @@
  * details.
  */
 
+<<<<<<< HEAD
 import {findInvalidFieldReference} from '../util/fields.es';
 import {updateField, updateFieldReference} from '../util/settingsContext.es';
 import {updateState} from './fieldEditedHandler.es';
+=======
+import {updateField, updateFieldReference} from '../util/settingsContext.es';
+import {findInvalidFieldReference, updateState} from './fieldEditedHandler.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 export const handleFieldBlurred = (props, state, event) => {
 	let newState = {

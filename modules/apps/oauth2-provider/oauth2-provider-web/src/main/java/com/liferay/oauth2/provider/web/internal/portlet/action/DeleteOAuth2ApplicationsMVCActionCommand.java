@@ -38,7 +38,11 @@ import org.osgi.service.component.annotations.Reference;
 	configurationPid = "com.liferay.oauth2.provider.configuration.OAuth2ProviderConfiguration",
 	property = {
 		"javax.portlet.name=" + OAuth2ProviderPortletKeys.OAUTH2_ADMIN,
+<<<<<<< HEAD
 		"mvc.command.name=/oauth2_provider/delete_oauth2_applications"
+=======
+		"mvc.command.name=/oauth2_provider/delete_o_auth2_applications"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	},
 	service = MVCActionCommand.class
 )

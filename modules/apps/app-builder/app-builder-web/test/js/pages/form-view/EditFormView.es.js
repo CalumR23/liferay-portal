@@ -14,21 +14,31 @@
 
 import {ClayModalProvider} from '@clayui/modal';
 import {act, cleanup, fireEvent, render} from '@testing-library/react';
+<<<<<<< HEAD
 import * as toast from 'data-engine-js-components-web/js/utils/toast.es';
 import {DataConverter, DataLayoutVisitor} from 'data-engine-taglib';
+=======
+import {DataLayoutVisitor} from 'data-engine-taglib';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import React from 'react';
 import {DndProvider} from 'react-dnd';
 import {HTML5Backend} from 'react-dnd-html5-backend';
 
 import {AppContextProvider} from '../../../../src/main/resources/META-INF/resources/js/AppContext.es';
 import EditFormView from '../../../../src/main/resources/META-INF/resources/js/pages/form-view/EditFormView.es';
+<<<<<<< HEAD
 import {ENTRY, FORM_VIEW, dataDefinitionNativeField} from '../../constants.es';
+=======
+import * as toast from '../../../../src/main/resources/META-INF/resources/js/utils/toast.es';
+import {FORM_VIEW} from '../../constants.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 const {
 	EDIT_FORM_VIEW_PROPS,
 	FORM_VIEW_CONTEXT,
 	getDataLayoutBuilderProps,
 } = FORM_VIEW;
+<<<<<<< HEAD
 
 const setDataLayoutBuilderMock = (props) => {
 	window.Liferay = {
@@ -54,6 +64,8 @@ const EditFormViewWrapper = ({trackingIndicator = false, ...otherProps}) => (
 		</ClayModalProvider>
 	</AppContextProvider>
 );
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 describe('EditFormView', () => {
 	let dataLayoutBuilderMock;
@@ -64,12 +76,16 @@ describe('EditFormView', () => {
 	beforeEach(() => {
 		jest.useFakeTimers();
 
+<<<<<<< HEAD
 		dataLayoutBuilderMock = getDataLayoutBuilderProps();
 
 		jest.spyOn(
 			DataConverter,
 			'getDDMSettingsContextWithVisualProperties'
 		).mockReturnValue({});
+=======
+		dataLayoutBuilderProps = getDataLayoutBuilderProps();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		dataLayoutVisitorSpy = jest
 			.spyOn(DataLayoutVisitor, 'isDataLayoutEmpty')
@@ -79,8 +95,19 @@ describe('EditFormView', () => {
 			.spyOn(toast, 'successToast')
 			.mockImplementation(() => {});
 
+<<<<<<< HEAD
 		dispatchAction = dataLayoutBuilderMock.props.appContext[1];
 		setDataLayoutBuilderMock(dataLayoutBuilderMock);
+=======
+		window.Liferay = {
+			...window.Liferay,
+			componentReady: () => {
+				return new Promise((resolve) => {
+					resolve(dataLayoutBuilderProps);
+				});
+			},
+		};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	});
 
 	afterEach(() => {
@@ -278,18 +305,44 @@ describe('EditFormView', () => {
 			queryAllByText,
 			queryByText,
 		} = render(
+<<<<<<< HEAD
 			<EditFormViewWrapper
 				dataLayoutId={0}
 				newCustomObject={false}
 				trackingIndicator
 			/>
+=======
+			<AppContextProvider>
+				<div className="tools-control-group">
+					<div className="control-menu-level-1-heading" />
+				</div>
+
+				<div className="change-tracking-indicator" />
+
+				<DndProvider backend={HTML5Backend}>
+					<div
+						id={EDIT_FORM_VIEW_PROPS.customObjectSidebarElementId}
+					/>
+
+					<EditFormView
+						{...EDIT_FORM_VIEW_PROPS}
+						dataLayoutId={0}
+						newCustomObject={false}
+					/>
+				</DndProvider>
+			</AppContextProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		);
 
 		await act(async () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		expect(container.querySelector('.menu-indicator-enabled')).toBeTruthy();
+=======
+		expect(container.querySelector('.publications-enabled')).toBeTruthy();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		expect(queryByText('new-form-view')).toBeTruthy();
 
@@ -320,16 +373,45 @@ describe('EditFormView', () => {
 				],
 			})
 		);
+<<<<<<< HEAD
 		const {container, queryByText} = render(<EditFormViewWrapper />);
+=======
+		const {container, queryByText} = render(
+			<AppContextProvider>
+				<ClayModalProvider>
+					<div className="tools-control-group">
+						<div className="control-menu-level-1-heading" />
+					</div>
+
+					<DndProvider backend={HTML5Backend}>
+						<div
+							id={
+								EDIT_FORM_VIEW_PROPS.customObjectSidebarElementId
+							}
+						/>
+
+						<EditFormView {...EDIT_FORM_VIEW_PROPS} />
+					</DndProvider>
+				</ClayModalProvider>
+			</AppContextProvider>
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		await act(async () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		expect(dispatchAction.mock.calls.length).toBe(2);
 		expect(dataLayoutVisitorSpy.mock.calls.length).toBe(1);
 
 		expect(container.querySelector('.menu-indicator-enabled')).toBeFalsy();
+=======
+		expect(dataLayoutBuilderProps.dispatchAction.mock.calls.length).toBe(1);
+		expect(dataLayoutVisitorSpy.mock.calls.length).toBe(1);
+
+		expect(container.querySelector('.publications-enabled')).toBeFalsy();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		const [, deleteButton] = container.querySelectorAll(
 			'.field-type-remove-icon button'
@@ -353,7 +435,13 @@ describe('EditFormView', () => {
 			fireEvent.click(deleteField);
 		});
 
+<<<<<<< HEAD
 		expect(dispatchAction.mock.calls[2][0]).toStrictEqual({
+=======
+		expect(
+			dataLayoutBuilderProps.dispatchAction.mock.calls[1][0]
+		).toStrictEqual({
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			payload: {
 				fieldName: 'SelectFromList',
 			},
@@ -369,6 +457,7 @@ describe('EditFormView', () => {
 		expect(modal).toBeFalsy();
 	});
 
+<<<<<<< HEAD
 	it('renders as new-form-view with native objects', async () => {
 		const context = {
 			...FORM_VIEW_CONTEXT,
@@ -413,6 +502,8 @@ describe('EditFormView', () => {
 		).toHaveLength(3);
 	});
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	it('delete field from Layout', async () => {
 		fetch.mockResponse(
 			JSON.stringify({
@@ -439,13 +530,39 @@ describe('EditFormView', () => {
 				],
 			})
 		);
+<<<<<<< HEAD
 		const {container, queryByText} = render(<EditFormViewWrapper />);
+=======
+		const {container, queryByText} = render(
+			<AppContextProvider>
+				<ClayModalProvider>
+					<div className="tools-control-group">
+						<div className="control-menu-level-1-heading" />
+					</div>
+
+					<DndProvider backend={HTML5Backend}>
+						<div
+							id={
+								EDIT_FORM_VIEW_PROPS.customObjectSidebarElementId
+							}
+						/>
+
+						<EditFormView {...EDIT_FORM_VIEW_PROPS} />
+					</DndProvider>
+				</ClayModalProvider>
+			</AppContextProvider>
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		await act(async () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		expect(dispatchAction.mock.calls.length).toBe(2);
+=======
+		expect(dataLayoutBuilderProps.dispatchAction.mock.calls.length).toBe(1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		expect(dataLayoutVisitorSpy.mock.calls.length).toBe(1);
 
 		const deleteButton = container.querySelector(
@@ -473,10 +590,14 @@ describe('EditFormView', () => {
 			fireEvent.click(deleteField);
 		});
 
+<<<<<<< HEAD
 		const [
 			action,
 			payload,
 		] = dataLayoutBuilderMock.formBuilderWithLayoutProvider.refs.layoutProvider.dispatch.mock.calls[0];
+=======
+		const [action, payload] = dataLayoutBuilderProps.dispatch.mock.calls[0];
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		expect(action).toEqual('fieldDeleted');
 		expect(payload).toStrictEqual({activePage: 0, fieldName: 'Text'});

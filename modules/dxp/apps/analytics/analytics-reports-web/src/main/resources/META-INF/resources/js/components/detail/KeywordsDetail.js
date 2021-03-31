@@ -9,7 +9,11 @@
  * distribution rights of the Software.
  */
 
+<<<<<<< HEAD
 import {ALIGN_POSITIONS} from 'frontend-js-web';
+=======
+import {Align} from 'metal-position';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -18,6 +22,10 @@ import TotalCount from '../TotalCount';
 
 export default function KeywordsDetail({
 	currentPage,
+<<<<<<< HEAD
+=======
+	languageTag,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	trafficShareDataProvider,
 	trafficVolumeDataProvider,
 }) {
@@ -27,7 +35,12 @@ export default function KeywordsDetail({
 				className="mb-2"
 				dataProvider={trafficVolumeDataProvider}
 				label={Liferay.Util.sub(Liferay.Language.get('traffic-volume'))}
+<<<<<<< HEAD
 				popoverAlign={ALIGN_POSITIONS.Bottom}
+=======
+				languageTag={languageTag}
+				popoverAlign={Align.Bottom}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				popoverHeader={Liferay.Language.get('traffic-volume')}
 				popoverMessage={Liferay.Language.get(
 					'traffic-volume-is-the-number-of-page-views-coming-from-one-channel'
@@ -46,13 +59,21 @@ export default function KeywordsDetail({
 				)}
 			/>
 
+<<<<<<< HEAD
 			<Keywords currentPage={currentPage} />
+=======
+			<Keywords currentPage={currentPage} languageTag={languageTag} />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</div>
 	);
 }
 
 KeywordsDetail.proptypes = {
 	currentPage: PropTypes.object.isRequired,
+<<<<<<< HEAD
+=======
+	languageTag: PropTypes.string.isRequired,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	trafficShareDataProvider: PropTypes.func.isRequired,
 	trafficVolumeDataProvider: PropTypes.func.isRequired,
 };

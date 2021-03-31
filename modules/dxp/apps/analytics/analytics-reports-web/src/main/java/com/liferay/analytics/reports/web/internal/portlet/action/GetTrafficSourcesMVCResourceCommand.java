@@ -16,12 +16,23 @@ package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
+<<<<<<< HEAD
+=======
+import com.liferay.analytics.reports.web.internal.info.display.contributor.util.LayoutDisplayPageProviderUtil;
+import com.liferay.analytics.reports.web.internal.layout.seo.CanonicalURLProvider;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.analytics.reports.web.internal.model.DirectTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.OrganicTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.PaidTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.ReferralTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.SocialTrafficChannelImpl;
 import com.liferay.analytics.reports.web.internal.model.TrafficChannel;
+<<<<<<< HEAD
+=======
+import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -52,6 +63,8 @@ import java.util.stream.Stream;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -81,6 +94,29 @@ public class GetTrafficSourcesMVCResourceCommand
 			themeDisplay.getLocale(), getClass());
 
 		try {
+			HttpServletRequest httpServletRequest =
+				_portal.getHttpServletRequest(resourceRequest);
+
+			LayoutDisplayPageObjectProvider<Object>
+				layoutDisplayPageObjectProvider =
+					(LayoutDisplayPageObjectProvider<Object>)
+						LayoutDisplayPageProviderUtil.
+							getLayoutDisplayPageObjectProvider(
+								httpServletRequest,
+								_layoutDisplayPageProviderTracker, _portal);
+
+			if (layoutDisplayPageObjectProvider == null) {
+				JSONPortletResponseUtil.writeJSON(
+					resourceRequest, resourceResponse,
+					JSONUtil.put(
+						"error",
+						_language.get(
+							httpServletRequest,
+							"an-unexpected-error-occurred")));
+
+				return;
+			}
+
 			AnalyticsReportsDataProvider analyticsReportsDataProvider =
 				new AnalyticsReportsDataProvider(_http);
 			String canonicalURL = ParamUtil.getString(
@@ -183,6 +219,15 @@ public class GetTrafficSourcesMVCResourceCommand
 
 	@Reference
 	private Language _language;
+<<<<<<< HEAD
+=======
+
+	@Reference
+	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
+
+	@Reference
+	private LayoutSEOLinkManager _layoutSEOLinkManager;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private Portal _portal;

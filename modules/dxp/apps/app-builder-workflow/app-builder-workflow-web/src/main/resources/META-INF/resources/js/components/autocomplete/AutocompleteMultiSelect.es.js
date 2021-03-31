@@ -163,6 +163,7 @@ function AutocompleteMultiSelect({
 			</div>
 
 			{selectedItems.length > 0 && (
+<<<<<<< HEAD
 				<ClayButton
 					borderless
 					className="ml-2 pl-0 pr-1 py-0"
@@ -178,6 +179,25 @@ function AutocompleteMultiSelect({
 						title={Liferay.Language.get('clear-all')}
 					/>
 				</ClayButton>
+=======
+				<ClayTooltipProvider>
+					<ClayButton
+						borderless
+						className="ml-2 pl-0 pr-1 py-0"
+						displayType="light"
+						onClick={() => onChange([])}
+						style={{position: 'absolute', right: '1rem'}}
+					>
+						<ClayIcon
+							className="text-secondary tooltip-icon"
+							data-tooltip-align="top"
+							data-tooltip-delay="0"
+							symbol="times-circle"
+							title={Liferay.Language.get('clear-all')}
+						/>
+					</ClayButton>
+				</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			)}
 
 			<AutocompleteDropDown

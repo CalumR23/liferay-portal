@@ -70,6 +70,7 @@ public class UnpublishDefinitionPortletConfigurationIcon
 	public String getURL(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				portletRequest, WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
@@ -83,6 +84,22 @@ public class UnpublishDefinitionPortletConfigurationIcon
 		).setParameter(
 			"version", portletRequest.getParameter("version")
 		).buildString();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			portletRequest, WorkflowPortletKeys.CONTROL_PANEL_WORKFLOW,
+			PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/portal_workflow/deactivate_workflow_definition");
+		portletURL.setParameter(
+			"mvcPath", portletRequest.getParameter("mvcPath"));
+		portletURL.setParameter("name", portletRequest.getParameter("name"));
+		portletURL.setParameter(
+			"version", portletRequest.getParameter("version"));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

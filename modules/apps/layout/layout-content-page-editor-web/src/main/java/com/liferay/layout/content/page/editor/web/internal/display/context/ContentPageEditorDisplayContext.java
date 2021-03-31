@@ -241,6 +241,9 @@ public class ContentPageEditorDisplayContext {
 		return HashMapBuilder.<String, Object>put(
 			"config",
 			HashMapBuilder.<String, Object>put(
+				"adaptiveMediaEnabled",
+				_ffLayoutContentPageEditorConfiguration.adaptiveMediaEnabled()
+			).put(
 				"addFragmentCompositionURL",
 				getFragmentEntryActionURL(
 					"/layout_content_page_editor/add_fragment_composition")
@@ -355,6 +358,10 @@ public class ContentPageEditorDisplayContext {
 				"duplicateItemURL",
 				getFragmentEntryActionURL(
 					"/layout_content_page_editor/duplicate_item")
+			).put(
+				"duplicateSegmentsExperienceURL",
+				getFragmentEntryActionURL(
+					"/layout_content_page_editor/duplicate_segments_experience")
 			).put(
 				"duplicateSegmentsExperienceURL",
 				getFragmentEntryActionURL(
@@ -536,9 +543,12 @@ public class ContentPageEditorDisplayContext {
 			).put(
 				"sidebarPanels", getSidebarPanels()
 			).put(
+<<<<<<< HEAD
 				"siteNavigationMenuItemSelectorURL",
 				_getSiteNavigationMenuItemSelectorURL()
 			).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				"styleBookEnabled",
 				() -> {
 					Layout layout = themeDisplay.getLayout();
@@ -1035,6 +1045,7 @@ public class ContentPageEditorDisplayContext {
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
 				httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+<<<<<<< HEAD
 				PortletRequest.ACTION_PHASE)
 		).setActionName(
 			"/layout_admin/delete_layout"
@@ -1049,6 +1060,41 @@ public class ContentPageEditorDisplayContext {
 		).setParameter(
 			"selPlid", themeDisplay.getPlid()
 		).buildString();
+=======
+				PortletRequest.ACTION_PHASE);
+
+			discardDraftURL.setParameter(
+				ActionRequest.ACTION_NAME,
+				"/layout_admin/discard_draft_layout");
+			discardDraftURL.setParameter(
+				"redirect", themeDisplay.getURLCurrent());
+			discardDraftURL.setParameter(
+				"selPlid", String.valueOf(themeDisplay.getPlid()));
+
+			return discardDraftURL.toString();
+		}
+
+		PortletURL deleteLayoutURL = PortalUtil.getControlPanelPortletURL(
+			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.ACTION_PHASE);
+
+		deleteLayoutURL.setParameter(
+			ActionRequest.ACTION_NAME, "/layout_admin/delete_layout");
+
+		PortletURL redirectURL = PortalUtil.getControlPanelPortletURL(
+			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		redirectURL.setParameter(
+			"selPlid", String.valueOf(publishedLayout.getPlid()));
+
+		deleteLayoutURL.setParameter("redirect", redirectURL.toString());
+
+		deleteLayoutURL.setParameter(
+			"selPlid", String.valueOf(themeDisplay.getPlid()));
+
+		return deleteLayoutURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private List<Map<String, Object>> _getDynamicFragments() {
@@ -1760,6 +1806,22 @@ public class ContentPageEditorDisplayContext {
 	}
 
 	private Object _getLookAndFeelURL() {
+<<<<<<< HEAD
+=======
+		PortletURL lookAndFeelURL = PortalUtil.getControlPanelPortletURL(
+			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		lookAndFeelURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
+
+		lookAndFeelURL.setParameter(
+			"redirect",
+			ParamUtil.getString(
+				PortalUtil.getOriginalServletRequest(httpServletRequest),
+				"p_l_back_url"));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);

@@ -126,7 +126,12 @@ public class CommerceInventoryWarehousesImporter {
 					addCommerceInventoryWarehouse(
 						externalReferenceCode, name, description, active,
 						street1, street2, street3, city, zip,
+<<<<<<< HEAD
 						region.getRegionCode(), country.getA2(), latitude,
+=======
+						commerceRegion.getCode(),
+						commerceCountry.getTwoLettersISOCode(), latitude,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						longitude, serviceContext);
 		}
 

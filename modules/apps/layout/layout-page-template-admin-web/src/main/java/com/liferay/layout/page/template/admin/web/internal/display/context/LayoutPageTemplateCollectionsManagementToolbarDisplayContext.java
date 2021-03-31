@@ -57,6 +57,7 @@ public class LayoutPageTemplateCollectionsManagementToolbarDisplayContext
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -65,6 +66,16 @@ public class LayoutPageTemplateCollectionsManagementToolbarDisplayContext
 		).setRedirect(
 			themeDisplay.getURLCurrent()
 		).buildString();
+=======
+		PortletURL searchActionURL = liferayPortletResponse.createRenderURL();
+
+		searchActionURL.setParameter(
+			"mvcRenderCommandName",
+			"/layout_page_template/select_layout_page_template_collections");
+		searchActionURL.setParameter("redirect", themeDisplay.getURLCurrent());
+
+		return searchActionURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

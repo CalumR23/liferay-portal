@@ -44,4 +44,59 @@ PortletURL portletURL = ddmDataProviderDisplayContext.getPortletURL();
 	sortingOrder="<%= ddmDataProviderDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDataProviderDisplayContext.getSortingURL() %>"
 	viewTypeItems="<%= ddmDataProviderDisplayContext.getViewTypesItems() %>"
+<<<<<<< HEAD
 />
+=======
+/>
+
+<aui:script>
+	var deleteDataProviderInstances = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace />dataProviderInstance'
+			);
+
+			if (searchContainer) {
+				Liferay.Util.postForm(
+					document.<portlet:namespace />searchContainerForm,
+					{
+						data: {
+							deleteDataProviderInstanceIds: Liferay.Util.listCheckedExcept(
+								searchContainer,
+								'<portlet:namespace />allRowIds'
+							),
+						},
+
+						<portlet:actionURL name="/dynamic_data_mapping_data_provider/delete_data_provider" var="deleteDataProviderURL">
+							<portlet:param name="mvcPath" value="/view.jsp" />
+							<portlet:param name="redirect" value="<%= currentURL %>" />
+						</portlet:actionURL>
+
+						url: '<%= deleteDataProviderURL %>',
+					}
+				);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteDataProviderInstances: deleteDataProviderInstances,
+	};
+
+	Liferay.componentReady('ddmDataProviderManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on(['actionItemClicked'], function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

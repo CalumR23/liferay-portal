@@ -175,7 +175,16 @@ function FieldBase({
 				<div className="lfr-ddm-form-field-repeatable-toolbar">
 					{repeatable && repeatedIndex > 0 && (
 						<ClayButton
+<<<<<<< HEAD
 							className="ddm-form-field-repeatable-delete-button p-0"
+=======
+							className={classNames(
+								'ddm-form-field-repeatable-add-button p-0',
+								{
+									hide: overMaximumRepetitionsLimit,
+								}
+							)}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							disabled={readOnly}
 							onClick={() =>
 								dispatch({
@@ -189,6 +198,7 @@ function FieldBase({
 						>
 							<ClayIcon symbol="hr" />
 						</ClayButton>
+<<<<<<< HEAD
 					)}
 
 					<ClayButton
@@ -268,6 +278,89 @@ function FieldBase({
 								? convertInputValue(type, language.value)
 								: ''
 						}
+=======
+					</div>
+				)}
+
+				{renderLabel && (
+					<>
+						{showLegend ? (
+							<fieldset>
+								<legend
+									aria-labelledby={fieldDetailsId}
+									className="lfr-ddm-legend"
+									tabIndex="0"
+								>
+									{label && showLabel && label}
+
+									<FieldProperties
+										required={required}
+										tooltip={tooltip}
+									/>
+								</legend>
+								{children}
+							</fieldset>
+						) : (
+							<>
+								<label
+									aria-describedby={fieldDetailsId}
+									className={classNames({
+										'ddm-empty': !showLabel && !required,
+										'ddm-label': showLabel || required,
+									})}
+									tabIndex="0"
+								>
+									{label && showLabel && label}
+
+									<FieldProperties
+										required={required}
+										tooltip={tooltip}
+									/>
+								</label>
+								{children}
+							</>
+						)}
+					</>
+				)}
+
+				{!renderLabel && children}
+
+				{localizedValueArray.length > 0 &&
+					localizedValueArray.map((language) => (
+						<input
+							key={language.name}
+							name={language.name}
+							type="hidden"
+							value={
+								language.value
+									? convertInputValue(type, language.value)
+									: ''
+							}
+						/>
+					))}
+
+				{tip && (
+					<span aria-hidden="true" className="form-text">
+						{tip}
+					</span>
+				)}
+
+				{hasError && (
+					<span className="form-feedback-group">
+						<div aria-hidden="true" className="form-feedback-item">
+							{errorMessage}
+						</div>
+					</span>
+				)}
+
+				{fieldDetails && (
+					<span
+						className="sr-only"
+						dangerouslySetInnerHTML={{
+							__html: fieldDetails,
+						}}
+						id={fieldDetailsId}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					/>
 				))}
 

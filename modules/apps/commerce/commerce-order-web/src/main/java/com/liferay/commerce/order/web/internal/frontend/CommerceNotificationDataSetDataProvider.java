@@ -158,6 +158,7 @@ public class CommerceNotificationDataSetDataProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceOrder.class.getName(),
@@ -167,6 +168,17 @@ public class CommerceNotificationDataSetDataProvider
 		).setRedirect(
 			_portal.getCurrentURL(httpServletRequest)
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceOrder.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_order/view_commerce_notification_queue_entry");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceOrderId = ParamUtil.getLong(
 			httpServletRequest, "commerceOrderId");

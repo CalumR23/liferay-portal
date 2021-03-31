@@ -823,6 +823,12 @@ public class RenderLayoutStructureDisplayContext {
 		String cssVariable = styleValueJSONObject.getString(
 			FrontendTokenMapping.TYPE_CSS_VARIABLE);
 
+<<<<<<< HEAD
+=======
+		String cssVariable = styleValueJSONObject.getString(
+			FrontendTokenMapping.TYPE_CSS_VARIABLE);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return "var(--" + cssVariable + ")";
 	}
 

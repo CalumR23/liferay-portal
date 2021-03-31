@@ -143,6 +143,16 @@ public class LayoutsTreeDisplayContext {
 	}
 
 	public String getConfigureLayoutSetURL() throws PortalException {
+<<<<<<< HEAD
+=======
+		PortletURL configureLayoutSetURL = PortalUtil.getControlPanelPortletURL(
+			_liferayPortletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		configureLayoutSetURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout_set");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Layout layout = _themeDisplay.getLayout();
 
 		return PortletURLBuilder.create(
@@ -163,6 +173,7 @@ public class LayoutsTreeDisplayContext {
 	}
 
 	public String getConfigureLayoutURL() throws PortalException {
+<<<<<<< HEAD
 		PortletURL configureLayoutURL = PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
 				_liferayPortletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
@@ -170,6 +181,14 @@ public class LayoutsTreeDisplayContext {
 		).setMVCRenderCommandName(
 			"/layout_admin/edit_layout"
 		).build();
+=======
+		PortletURL configureLayoutURL = PortalUtil.getControlPanelPortletURL(
+			_liferayPortletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		configureLayoutURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Layout layout = _themeDisplay.getLayout();
 

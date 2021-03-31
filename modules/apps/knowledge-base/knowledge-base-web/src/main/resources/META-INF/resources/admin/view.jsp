@@ -95,6 +95,7 @@ if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			<%
 			KBAdminViewDisplayContext kbAdminViewDisplayContext = new KBAdminViewDisplayContext(parentResourceClassNameId, parentResourcePrimKey, request, liferayPortletResponse);
 
+<<<<<<< HEAD
 			kbAdminViewDisplayContext.populatePortletBreadcrumbEntries(currentURLObj);
 			%>
 
@@ -104,6 +105,12 @@ if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				showLayout="<%= false %>"
 				showParentGroups="<%= false %>"
 			/>
+=======
+							row.setData(
+								HashMapBuilder.<String, Object>put(
+									"actions", StringUtil.merge(kbAdminManagementToolbarDisplayContext.getAvailableActions(kbFolder))
+								).build());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<liferay-portlet:actionURL name="deleteKBArticlesAndFolders" varImpl="deleteKBArticlesAndFoldersURL" />
 
@@ -228,6 +235,7 @@ if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 							</c:when>
 							<c:otherwise>
 
+<<<<<<< HEAD
 								<%
 								KBArticle kbArticle = (KBArticle)kbObject;
 
@@ -235,6 +243,12 @@ if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 									HashMapBuilder.<String, Object>put(
 										"actions", StringUtil.merge(kbAdminManagementToolbarDisplayContext.getAvailableActions(kbArticle))
 									).build());
+=======
+							row.setData(
+								HashMapBuilder.<String, Object>put(
+									"actions", StringUtil.merge(kbAdminManagementToolbarDisplayContext.getAvailableActions(kbArticle))
+								).build());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 								row.setPrimaryKey(String.valueOf(kbArticle.getResourcePrimKey()));
 								%>
@@ -318,4 +332,40 @@ if (parentResourcePrimKey != KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 			</aui:form>
 		</clay:container-fluid>
 	</div>
+<<<<<<< HEAD
 </div>
+=======
+</clay:container-fluid>
+
+<script>
+	var deleteEntries = function () {
+		if (
+			confirm(
+				'<liferay-ui:message key="are-you-sure-you-want-to-delete-the-selected-entries" />'
+			)
+		) {
+			var form = document.getElementById('<portlet:namespace />fm');
+
+			if (form) {
+				submitForm(form);
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteEntries: deleteEntries,
+	};
+
+	Liferay.componentReady('kbAdminManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

@@ -125,7 +125,11 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCode(externalReferenceCode: ___){accountAddresses, accountMembers, accountOrganizations, customFields, dateCreated, dateModified, defaultBillingAccountAddressId, defaultShippingAccountAddressId, emailAddresses, externalReferenceCode, id, logoId, logoURL, name, root, taxId, type}}"}' -u 'test@liferay.com:test'
+=======
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {accountByExternalReferenceCode(externalReferenceCode: ___){accountAddresses, accountMembers, accountOrganizations, customFields, emailAddresses, externalReferenceCode, id, logoId, logoURL, name, root, taxId, type}}"}' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@GraphQLField
 	public Account accountByExternalReferenceCode(
@@ -143,7 +147,11 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {account(id: ___){accountAddresses, accountMembers, accountOrganizations, customFields, dateCreated, dateModified, defaultBillingAccountAddressId, defaultShippingAccountAddressId, emailAddresses, externalReferenceCode, id, logoId, logoURL, name, root, taxId, type}}"}' -u 'test@liferay.com:test'
+=======
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {account(id: ___){accountAddresses, accountMembers, accountOrganizations, customFields, emailAddresses, externalReferenceCode, id, logoId, logoURL, name, root, taxId, type}}"}' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@GraphQLField
 	public Account account(@GraphQLName("id") Long id) throws Exception {

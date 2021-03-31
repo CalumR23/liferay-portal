@@ -15,6 +15,7 @@
 import {
 	CREATE_SEGMENTS_EXPERIENCE,
 	DELETE_SEGMENTS_EXPERIENCE,
+	DUPLICATE_SEGMENTS_EXPERIENCE,
 	SELECT_SEGMENTS_EXPERIENCE,
 	UPDATE_SEGMENTS_EXPERIENCE,
 	UPDATE_SEGMENTS_EXPERIENCES_LIST,
@@ -42,9 +43,16 @@ const reducer = (state, action) => {
 			});
 			break;
 		case DELETE_SEGMENTS_EXPERIENCE:
+<<<<<<< HEAD
 			nextState = deleteExperienceReducer(nextState, {
 				segmentsExperienceId: action.payload.segmentsExperienceId,
 			});
+=======
+			nextState = deleteExperienceReducer(nextState, action.payload);
+			break;
+		case DUPLICATE_SEGMENTS_EXPERIENCE:
+			nextState = createExperienceReducer(nextState, action.payload);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			break;
 		case SELECT_SEGMENTS_EXPERIENCE:
 			nextState = selectExperienceReducer(nextState, {
@@ -57,11 +65,19 @@ const reducer = (state, action) => {
 				updatedExperience: action.payload,
 			});
 			break;
+<<<<<<< HEAD
 		case UPDATE_SEGMENTS_EXPERIENCES_LIST:
 			nextState = updateExperiencesListReducer(nextState, {
 				availableSegmentsExperiences:
 					action.payload.availableSegmentsExperiences,
 			});
+=======
+		case UPDATE_SEGMENTS_EXPERIENCE:
+			nextState = updateExperienceReducer(nextState, action.payload);
+			break;
+		case UPDATE_SEGMENTS_EXPERIENCES_LIST:
+			nextState = updateExperiencesListReducer(nextState, action.payload);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			break;
 		default:
 			break;

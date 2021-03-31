@@ -91,7 +91,14 @@ public class CPCompareContentDisplayContext {
 		}
 
 		if (hasCommerceChannel()) {
+<<<<<<< HEAD
 			_cpDefinitionIds = cpCompareHelper.getCPDefinitionIds(
+=======
+			HttpServletRequest originalHttpServletRequest =
+				PortalUtil.getOriginalServletRequest(httpServletRequest);
+
+			_cpDefinitionIds = CPCompareHelperUtil.getCPDefinitionIds(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				commerceContext.getCommerceChannelGroupId(), commerceAccountId,
 				CookieKeys.getCookie(
 					httpServletRequest,

@@ -12,10 +12,131 @@
  * details.
  */
 
+<<<<<<< HEAD
 import {FormSupport, PagesVisitor} from 'dynamic-data-mapping-form-renderer';
 
 import {createDuplicatedField} from '../util/fields.es';
 import {updateField} from '../util/settingsContext.es';
+=======
+import {
+	FormSupport,
+	PagesVisitor,
+	generateInstanceId,
+} from 'dynamic-data-mapping-form-renderer';
+
+import {getDefaultFieldName} from '../../../util/fieldSupport.es';
+import {sub} from '../../../util/strings.es';
+import {getFieldLocalizedValue} from '../util/fields.es';
+import {
+	getSettingsContextProperty,
+	updateField,
+	updateSettingsContextInstanceId,
+	updateSettingsContextProperty,
+} from '../util/settingsContext.es';
+
+export const getLabel = (originalField, editingLanguageId) => {
+	return sub(Liferay.Language.get('copy-of-x'), [
+		getFieldLocalizedValue(
+			originalField.settingsContext.pages,
+			'label',
+			editingLanguageId
+		),
+	]);
+};
+
+export const getValidation = (originalField) => {
+	const validation = getSettingsContextProperty(
+		originalField.settingsContext,
+		'validation'
+	);
+
+	return validation;
+};
+
+export const createDuplicatedField = (originalField, props, blacklist = []) => {
+	const {editingLanguageId, fieldNameGenerator} = props;
+	const newFieldName = fieldNameGenerator(
+		getDefaultFieldName(),
+		null,
+		blacklist
+	);
+
+	let duplicatedField = updateField(
+		props,
+		originalField,
+		'name',
+		newFieldName
+	);
+
+	duplicatedField = updateField(
+		props,
+		duplicatedField,
+		'fieldReference',
+		newFieldName
+	);
+
+	duplicatedField.instanceId = generateInstanceId(8);
+
+	const label = getLabel(originalField, editingLanguageId);
+
+	duplicatedField = updateField(props, duplicatedField, 'label', label);
+
+	if (duplicatedField.nestedFields?.length > 0) {
+		duplicatedField.nestedFields = duplicatedField.nestedFields.map(
+			(field) => {
+				const newDuplicatedNestedField = createDuplicatedField(
+					field,
+					props,
+					blacklist
+				);
+
+				blacklist.push(newDuplicatedNestedField.fieldName);
+
+				const visitor = new PagesVisitor([
+					{
+						rows: duplicatedField.rows ?? [],
+					},
+				]);
+
+				const layout = visitor.mapColumns((column) => {
+					return {
+						...column,
+						fields: column.fields.map((fieldName) => {
+							if (fieldName === field.fieldName) {
+								return newDuplicatedNestedField.fieldName;
+							}
+
+							return fieldName;
+						}),
+					};
+				});
+
+				duplicatedField.rows = layout[0].rows;
+
+				return newDuplicatedNestedField;
+			}
+		);
+
+		duplicatedField.settingsContext = updateSettingsContextProperty(
+			props.editingLanguageId,
+			duplicatedField.settingsContext,
+			'rows',
+			duplicatedField.rows
+		);
+	}
+
+	duplicatedField.settingsContext = updateSettingsContextInstanceId(
+		duplicatedField
+	);
+
+	return updateField(
+		props,
+		duplicatedField,
+		'validation',
+		getValidation(duplicatedField)
+	);
+};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 export const duplicateField = (
 	activePage,

@@ -86,9 +86,13 @@ import org.springframework.mock.web.MockHttpServletRequest;
 /**
  * @author Adam Brandizzi
  */
+<<<<<<< HEAD
 @PrepareForTest(
 	{LocaleUtil.class, PortletPermissionUtil.class, ResourceBundleUtil.class}
 )
+=======
+@PrepareForTest({LocaleUtil.class, PortletPermissionUtil.class})
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 @RunWith(PowerMockRunner.class)
 public class DDMFormDisplayContextTest extends PowerMockito {
 
@@ -504,6 +508,34 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		return ddmFormDisplayContext;
 	}
 
+	protected DDMFormDisplayContext createSpy(
+			boolean formShared, boolean preview, boolean sharedURL)
+		throws PortalException {
+
+		DDMFormDisplayContext ddmFormDisplayContext = spy(
+			createDDMFormDisplayContext());
+
+		Mockito.doReturn(
+			formShared
+		).when(
+			ddmFormDisplayContext
+		).isFormShared();
+
+		Mockito.doReturn(
+			preview
+		).when(
+			ddmFormDisplayContext
+		).isPreview();
+
+		Mockito.doReturn(
+			sharedURL
+		).when(
+			ddmFormDisplayContext
+		).isSharedURL();
+
+		return ddmFormDisplayContext;
+	}
+
 	protected DDMFormInstance mockDDMFormInstance() throws PortalException {
 		DDMFormInstance formInstance = mock(DDMFormInstance.class);
 
@@ -570,6 +602,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		return ddmFormInstanceSettings;
 	}
 
+<<<<<<< HEAD
 	protected DDMStructure mockDDMStructure() throws PortalException {
 		DDMStructure ddmStructure = mock(DDMStructure.class);
 
@@ -595,6 +628,8 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	protected void mockPortletPermissionUtil() throws PortalException {
 		mockStatic(PortletPermissionUtil.class);
 
@@ -608,7 +643,11 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		);
 	}
 
+<<<<<<< HEAD
 	protected MockRenderRequest mockRenderRequest() throws PortalException {
+=======
+	protected MockRenderRequest mockRenderRequest() {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		MockRenderRequest mockRenderRequest = new MockRenderRequest();
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
@@ -733,6 +772,7 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		).thenReturn(
 			_mockHttpServletRequest
 		);
+<<<<<<< HEAD
 	}
 
 	protected void setUpResourceBundleUtil() {
@@ -745,6 +785,8 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		).thenReturn(
 			ResourceBundleUtil.EMPTY_RESOURCE_BUNDLE
 		);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private static final String _DEFAULT_LANGUAGE_ID = "es_ES";

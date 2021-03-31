@@ -1209,10 +1209,18 @@ public class CTSQLTransformerTest {
 					_classNameLocalService.getClassNameId(ReferenceTable.class))
 			).build());
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.change.tracking.internal." +
 					"CTSQLTransformerImpl",
 				LoggerTestUtil.WARN)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"com.liferay.portal.change.tracking.internal." +
+						"CTSQLTransformerImpl",
+					Level.WARN)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			String newSQL = _ctSQLTransformer.transform(inputSQL);
 
@@ -1221,7 +1229,11 @@ public class CTSQLTransformerTest {
 			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			if (expectedOutputSQLFile.endsWith("_ct.sql")) {
+<<<<<<< HEAD
 				Assert.assertFalse(newSQL, logEntries.isEmpty());
+=======
+				Assert.assertFalse(newSQL, loggingEvents.isEmpty());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			else {
 				Assert.assertTrue(newSQL, logEntries.isEmpty());

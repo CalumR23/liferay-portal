@@ -53,6 +53,16 @@ OAuth2AuthorizationsManagementToolbarDisplayContext oAuth2AuthorizationsManageme
 	sortingURL="<%= String.valueOf(oAuth2AuthorizationsManagementToolbarDisplayContext.getSortingURL()) %>"
 />
 
+<<<<<<< HEAD
+=======
+<portlet:actionURL name="/admin/revoke_oauth2_authorizations" var="revokeOAuth2AuthorizationsURL">
+	<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/view_o_auth2_authorizations" />
+	<portlet:param name="navigation" value="application_authorizations" />
+	<portlet:param name="backURL" value="<%= redirect %>" />
+	<portlet:param name="oAuth2ApplicationId" value="<%= String.valueOf(oAuth2ApplicationId) %>" />
+</portlet:actionURL>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <clay:container-fluid>
 	<aui:form action="<%= revokeOAuth2AuthorizationsURL %>" name="fm">
 		<aui:input name="oAuth2ApplicationId" type="hidden" value="<%= oAuth2ApplicationId %>" />

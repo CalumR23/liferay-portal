@@ -46,6 +46,8 @@ import com.liferay.portal.model.impl.GroupImpl;
 import com.liferay.portal.service.impl.GroupLocalServiceImpl;
 import com.liferay.util.dao.orm.CustomSQLUtil;
 
+import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -347,6 +349,13 @@ public class GroupFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	@Override
+	public Map<Serializable, Group> fetchByPrimaryKeys(
+		Set<Serializable> primaryKeys) {
+
+		return super.fetchByPrimaryKeys(primaryKeys);
 	}
 
 	@Override

@@ -64,6 +64,7 @@ public interface SegmentsExperienceService extends BaseService {
 			ServiceContext serviceContext)
 		throws PortalException;
 
+<<<<<<< HEAD
 	public SegmentsExperience addSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<Locale, String> nameMap, boolean active,
@@ -81,6 +82,11 @@ public interface SegmentsExperienceService extends BaseService {
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<Locale, String> nameMap, boolean active,
 			UnicodeProperties typeSettingsUnicodeProperties,
+=======
+	public SegmentsExperience appendSegmentsExperience(
+			long segmentsEntryId, long classNameId, long classPK,
+			Map<Locale, String> nameMap, boolean active,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			ServiceContext serviceContext)
 		throws PortalException;
 

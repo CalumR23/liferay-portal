@@ -51,6 +51,7 @@ export const getDefaultFieldName = (isOptionField = false, fieldType = '') => {
 	return defaultFieldName + generateId(8, true);
 };
 
+<<<<<<< HEAD
 export const removeField = (
 	props,
 	pages,
@@ -122,6 +123,8 @@ export const removeField = (
 	}));
 };
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 export const getFieldProperties = (
 	{pages},
 	defaultLanguageId,
@@ -182,7 +185,11 @@ export const normalizeSettingsContextPages = (
 
 	return visitor.mapFields(
 		(field) => {
+<<<<<<< HEAD
 			const {fieldName, instanceId} = field;
+=======
+			const {fieldName} = field;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if (fieldName === 'fieldReference' || fieldName === 'name') {
 				field = {
@@ -226,6 +233,7 @@ export const normalizeSettingsContextPages = (
 				};
 			}
 
+<<<<<<< HEAD
 			if (field.dataType === 'ddm-options') {
 				field = {
 					...field,
@@ -282,6 +290,13 @@ export const normalizeSettingsContextPages = (
 				defaultLanguageId,
 				instanceId: newInstanceId,
 				locale: defaultLanguageId,
+=======
+			const newInstanceId = generateInstanceId(8);
+
+			return {
+				...field,
+				instanceId: newInstanceId,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				name: generateName(field.name, {
 					instanceId: newInstanceId,
 					repeatedIndex: getRepeatedIndex(field.name),
@@ -320,9 +335,13 @@ export const createField = (props, event) => {
 			});
 		}
 		else {
+<<<<<<< HEAD
 			newFieldName = fieldNameGenerator(
 				getDefaultFieldName(false, fieldType)
 			);
+=======
+			newFieldName = fieldNameGenerator(getDefaultFieldName());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 	}
 
@@ -333,10 +352,15 @@ export const createField = (props, event) => {
 		name: newFieldName,
 		settingsContext: {
 			...fieldType.settingsContext,
+<<<<<<< HEAD
 			defaultLanguageId,
 			editingLanguageId,
 			pages: normalizeSettingsContextPages(
 				[...fieldType.settingsContext.pages],
+=======
+			pages: normalizeSettingsContextPages(
+				fieldType.settingsContext.pages,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				defaultLanguageId,
 				editingLanguageId,
 				fieldType,
@@ -346,6 +370,7 @@ export const createField = (props, event) => {
 		},
 	};
 
+<<<<<<< HEAD
 	const {
 		editorConfig,
 		fieldName,
@@ -353,6 +378,9 @@ export const createField = (props, event) => {
 		name,
 		settingsContext,
 	} = newField;
+=======
+	const {fieldName, fieldReference, name, settingsContext} = newField;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	return {
 		...getFieldProperties(
@@ -360,7 +388,10 @@ export const createField = (props, event) => {
 			defaultLanguageId,
 			editingLanguageId
 		),
+<<<<<<< HEAD
 		editorConfig,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		fieldName,
 		fieldReference,
 		instanceId: generateInstanceId(8),
@@ -422,6 +453,7 @@ export const isFieldSetChild = (pages, fieldName) => {
 export const localizeField = (field, defaultLanguageId, editingLanguageId) => {
 	let value = field.value;
 
+<<<<<<< HEAD
 	if (
 		field.dataType === 'json' &&
 		field.fieldName !== 'rows' &&
@@ -438,6 +470,12 @@ export const localizeField = (field, defaultLanguageId, editingLanguageId) => {
 		value = JSON.parse(value);
 	}
 
+=======
+	if (field.dataType === 'json' && typeof value === 'object') {
+		value = JSON.stringify(value);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	if (field.localizable && field.localizedValue) {
 		let localizedValue = field.localizedValue[editingLanguageId];
 
@@ -449,6 +487,7 @@ export const localizeField = (field, defaultLanguageId, editingLanguageId) => {
 			value = localizedValue;
 		}
 	}
+<<<<<<< HEAD
 	else if (field.dataType === 'ddm-options') {
 		if (value[editingLanguageId] === undefined) {
 			value = {
@@ -481,6 +520,16 @@ export const localizeField = (field, defaultLanguageId, editingLanguageId) => {
 				],
 			};
 		}
+=======
+	else if (
+		field.dataType === 'ddm-options' &&
+		value[editingLanguageId] === undefined
+	) {
+		value = {
+			...value,
+			[editingLanguageId]: value[defaultLanguageId],
+		};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	return {

@@ -122,6 +122,7 @@ public class CPDefinitionAssetRendererFactory
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse, long classTypeId) {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				liferayPortletRequest, getGroup(liferayPortletRequest),
@@ -129,6 +130,16 @@ public class CPDefinitionAssetRendererFactory
 		).setMVCRenderCommandName(
 			"/cp_definitions/edit_cp_definition"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			liferayPortletRequest, getGroup(liferayPortletRequest),
+			CPPortletKeys.CP_DEFINITIONS, 0, 0, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

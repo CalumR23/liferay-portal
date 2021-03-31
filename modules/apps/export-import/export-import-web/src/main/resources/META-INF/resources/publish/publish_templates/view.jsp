@@ -50,11 +50,17 @@ int exportImportConfigurationsCount = ExportImportConfigurationLocalServiceUtil.
 exportImportConfigurationSearchContainer.setResults(exportImportConfigurations);
 exportImportConfigurationSearchContainer.setTotal(exportImportConfigurationsCount);
 
+<<<<<<< HEAD
 PortletURL clearResultsURL = PortletURLBuilder.create(
 	PortletURLUtil.clone(currentURLObj, renderResponse)
 ).setParameter(
 	"keywords", StringPool.BLANK
 ).build();
+=======
+PortletURL clearResultsURL = PortletURLUtil.clone(currentURLObj, renderResponse);
+
+clearResultsURL.setParameter("keywords", StringPool.BLANK);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <div class="export-dialog-tree">

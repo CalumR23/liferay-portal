@@ -1951,7 +1951,11 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 			new String[] {Long.class.getName()}, new String[] {"userId"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByCredentialKeyHash = new FinderPath(
+=======
+		_finderPathWithPaginationFindByCredentialKeyHash = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCredentialKeyHash",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -1959,12 +1963,20 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 			},
 			new String[] {"credentialKeyHash"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByCredentialKeyHash = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByCredentialKeyHash = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"findByCredentialKeyHash", new String[] {Long.class.getName()},
 			new String[] {"credentialKeyHash"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByCredentialKeyHash = new FinderPath(
+=======
+		_finderPathCountByCredentialKeyHash = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByCredentialKeyHash", new String[] {Long.class.getName()},
 			new String[] {"credentialKeyHash"}, false);
@@ -2045,11 +2057,33 @@ public class MFAFIDO2CredentialEntryPersistenceImpl
 	private static final Log _log = LogFactoryUtil.getLog(
 		MFAFIDO2CredentialEntryPersistenceImpl.class);
 
+<<<<<<< HEAD
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+=======
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

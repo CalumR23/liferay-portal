@@ -73,6 +73,7 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 		long plid = _portal.getPlidFromPortletId(
 			calendarBooking.getGroupId(), CalendarPortletKeys.CALENDAR);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				serviceContext.getRequest(), CalendarPortletKeys.CALENDAR, plid,
@@ -86,6 +87,19 @@ public class CalendarActivityInterpreter extends BaseSocialActivityInterpreter {
 		).setWindowState(
 			WindowState.MAXIMIZED
 		).buildString();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			serviceContext.getRequest(), CalendarPortletKeys.CALENDAR, plid,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("mvcPath", "/view_calendar_booking.jsp");
+		portletURL.setParameter("backURL", serviceContext.getCurrentURL());
+		portletURL.setParameter(
+			"calendarBookingId", String.valueOf(activity.getClassPK()));
+		portletURL.setWindowState(WindowState.MAXIMIZED);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

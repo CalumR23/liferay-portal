@@ -120,6 +120,7 @@ public class SegmentsExperienceLocalServiceWrapper
 			serviceContext);
 	}
 
+<<<<<<< HEAD
 	@Override
 	public SegmentsExperience appendSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
@@ -134,6 +135,8 @@ public class SegmentsExperienceLocalServiceWrapper
 			typeSettingsUnicodeProperties, serviceContext);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * @throws PortalException
 	 */

@@ -67,7 +67,10 @@ import com.liferay.portal.model.impl.PublicRenderParameterImpl;
 import com.liferay.portal.osgi.web.servlet.context.helper.ServletContextHelperFactory;
 import com.liferay.portal.osgi.web.servlet.context.helper.ServletContextHelperRegistration;
 import com.liferay.portal.service.impl.ResourcePermissionLocalServiceImpl.IndividualPortletResourcePermissionProvider;
+<<<<<<< HEAD
 import com.liferay.portal.util.PropsValues;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.util.WebAppPool;
 import com.liferay.portlet.PortletBagFactory;
 import com.liferay.portlet.PortletContextBag;
@@ -1529,6 +1532,7 @@ public class PortletTracker
 
 				_sources = StringUtil.split(
 					properties.getProperty(PropsKeys.RESOURCE_ACTIONS_CONFIGS));
+<<<<<<< HEAD
 
 				if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
 					try {
@@ -1542,6 +1546,8 @@ public class PortletTracker
 							resourceActionsException);
 					}
 				}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

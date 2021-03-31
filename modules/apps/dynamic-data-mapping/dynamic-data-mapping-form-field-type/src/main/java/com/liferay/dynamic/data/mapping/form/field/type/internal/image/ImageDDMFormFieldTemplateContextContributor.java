@@ -151,7 +151,18 @@ public class ImageDDMFormFieldTemplateContextContributor
 				return value;
 			}
 
+<<<<<<< HEAD
 			FileEntry fileEntry = _getFileEntry(valueJSONObject);
+=======
+				jsonObject.put(
+					"description", jsonObject.getString("alt")
+				).put(
+					"url",
+					_dlURLHelper.getDownloadURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK)
+				);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if (fileEntry == null) {
 				return value;

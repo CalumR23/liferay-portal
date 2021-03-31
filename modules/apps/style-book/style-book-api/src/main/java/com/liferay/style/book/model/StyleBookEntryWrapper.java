@@ -46,7 +46,10 @@ public class StyleBookEntryWrapper
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
 		attributes.put("mvccVersion", getMvccVersion());
+<<<<<<< HEAD
 		attributes.put("ctCollectionId", getCtCollectionId());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		attributes.put("uuid", getUuid());
 		attributes.put("headId", getHeadId());
 		attributes.put("styleBookEntryId", getStyleBookEntryId());
@@ -73,12 +76,15 @@ public class StyleBookEntryWrapper
 			setMvccVersion(mvccVersion);
 		}
 
+<<<<<<< HEAD
 		Long ctCollectionId = (Long)attributes.get("ctCollectionId");
 
 		if (ctCollectionId != null) {
 			setCtCollectionId(ctCollectionId);
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		String uuid = (String)attributes.get("uuid");
 
 		if (uuid != null) {
@@ -557,6 +563,7 @@ public class StyleBookEntryWrapper
 	}
 
 	@Override
+<<<<<<< HEAD
 	public Map<String, Function<StyleBookEntry, Object>>
 		getAttributeGetterFunctions() {
 
@@ -571,6 +578,8 @@ public class StyleBookEntryWrapper
 	}
 
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public StagedModelType getStagedModelType() {
 		return model.getStagedModelType();
 	}

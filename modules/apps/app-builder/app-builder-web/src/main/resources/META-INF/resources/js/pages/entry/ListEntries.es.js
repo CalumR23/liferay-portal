@@ -22,8 +22,14 @@ import {AppContext} from '../../AppContext.es';
 import useDataListView from '../../hooks/useDataListView.es';
 import useEntriesActions from '../../hooks/useEntriesActions.es';
 import usePermissions from '../../hooks/usePermissions.es';
+import useQuery from '../../hooks/useQuery.es';
 import {getLocalizedUserPreferenceValue} from '../../utils/lang.es';
+<<<<<<< HEAD
 import {buildEntries, getStatusLabel, navigateToEditPage} from './utils.es';
+=======
+import NoPermissionEntry from './NoPermissionEntry.es';
+import {buildEntries, navigateToEditPage} from './utils.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 export default function ListEntries({history}) {
 	const actions = useEntriesActions();
@@ -42,6 +48,7 @@ export default function ListEntries({history}) {
 		dataDefinition,
 		dataListView: {fieldNames},
 		isLoading,
+<<<<<<< HEAD
 	} = useDataListView(dataListViewId, dataDefinitionId);
 
 	const formColumns = [
@@ -58,6 +65,18 @@ export default function ListEntries({history}) {
 			value: Liferay.Language.get('status'),
 		},
 	];
+=======
+	} = useDataListView(dataListViewId, dataDefinitionId, permissions.view);
+
+	const formColumns = columns.map(({value, ...column}) => ({
+		...column,
+		value: getLocalizedUserPreferenceValue(
+			value,
+			userLanguageId,
+			dataDefinition.defaultLanguageId
+		),
+	}));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const onClickEditPage = () => {
 		navigateToEditPage(basePortletURL, {
@@ -77,6 +96,13 @@ export default function ListEntries({history}) {
 		appId
 	);
 
+<<<<<<< HEAD
+=======
+	if (!permissions.view) {
+		return <NoPermissionEntry />;
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	return (
 		<Loading className="loading-wrapper" isLoading={isLoading}>
 			<ListView
@@ -114,6 +140,7 @@ export default function ListEntries({history}) {
 				queryParams={{dataListViewId}}
 				scope={appId}
 			>
+<<<<<<< HEAD
 				{(entry, index) => ({
 					...buildEntries({
 						dataDefinition,
@@ -122,6 +149,13 @@ export default function ListEntries({history}) {
 						query,
 					})(entry, index),
 					status: getStatusLabel(entry.status),
+=======
+				{buildEntries({
+					dataDefinition,
+					fieldNames,
+					permissions,
+					query,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				})}
 			</ListView>
 		</Loading>

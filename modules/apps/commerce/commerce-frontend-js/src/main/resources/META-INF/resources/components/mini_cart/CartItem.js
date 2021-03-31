@@ -63,6 +63,11 @@ function CartItem({item: cartItem}) {
 
 	const {id: orderId} = cartState;
 	const [itemState, setItemState] = useState(INITIAL_ITEM_STATE);
+<<<<<<< HEAD
+=======
+	const [itemQuantity, setItemQuantity] = useState(quantity);
+	const [itemPrice, updateItemPrice] = useState(price);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const options = parseOptions(rawOptions);
 
@@ -94,6 +99,8 @@ function CartItem({item: cartItem}) {
 			}, REMOVAL_CANCELING_TIMEOUT),
 		});
 	};
+<<<<<<< HEAD
+=======
 
 	const removeItem = () => {
 		setItemState({
@@ -102,6 +109,35 @@ function CartItem({item: cartItem}) {
 			removalTimeoutRef: setTimeout(() => {
 				setIsUpdating(true);
 
+				setItemState({
+					...INITIAL_ITEM_STATE,
+					isGettingRemoved: true,
+					isRemoved: true,
+					removalTimeoutRef: setTimeout(() => {
+						CartResource.deleteItemById(cartItemId)
+							.then(() => updateCartModel({orderId}))
+							.then(() => {
+								setIsUpdating(false);
+								Liferay.fire(PRODUCT_REMOVED, {
+									skuId,
+								});
+							})
+							.catch(showErrors);
+					}, REMOVAL_CANCELING_TIMEOUT),
+				});
+			}, REMOVAL_TIMEOUT),
+		});
+	};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
+	const removeItem = () => {
+		setItemState({
+			...INITIAL_ITEM_STATE,
+			isGettingRemoved: true,
+			removalTimeoutRef: setTimeout(() => {
+				setIsUpdating(true);
+
+<<<<<<< HEAD
 				setItemState({
 					...INITIAL_ITEM_STATE,
 					isGettingRemoved: true,
@@ -122,6 +158,46 @@ function CartItem({item: cartItem}) {
 			}, REMOVAL_TIMEOUT),
 		});
 	};
+=======
+				CartResource.updateItemById(cartItemId, {
+					...cartItem,
+					quantity,
+				})
+					.catch(showErrors)
+					.then(({quantity: updatedQuantity, ...updatedItem}) => {
+						setItemQuantity(updatedQuantity);
+
+						return Promise.resolve(updatedItem);
+					})
+					.then(({price: updatedPrice}) => {
+						const {price: currentPriceValue} = itemPrice;
+						const {price: updatedPriceValue} = updatedPrice;
+
+						/**
+						 * The unit price of an item may change based
+						 * on the change of its quantity
+						 * @type {boolean}
+						 */
+
+						const priceValueChanged =
+							!currentPriceValue ||
+							currentPriceValue !== updatedPriceValue;
+
+						if (priceValueChanged) {
+							return updateItemPrice(updatedPrice);
+						}
+
+						return Promise.resolve();
+					})
+					.then(() => updateCartModel({orderId}))
+					.then(() => setIsUpdating(false));
+			}
+
+			return Promise.resolve();
+		}, // eslint-disable-next-line react-hooks/exhaustive-deps
+		[CartResource, cartItem, cartItemId, orderId]
+	);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const {
 		isGettingRemoved,
@@ -198,10 +274,17 @@ function CartItem({item: cartItem}) {
 			</div>
 
 			{errorMessages && (
+<<<<<<< HEAD
 				<div className="mini-cart-item-errors">
 					<ClayIcon
 						spritemap={spritemap}
 						symbol="exclamation-circle"
+=======
+				<div className={'mini-cart-item-errors'}>
+					<ClayIcon
+						spritemap={spritemap}
+						symbol={'exclamation-circle'}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					/>
 
 					<span>{errorMessages}</span>

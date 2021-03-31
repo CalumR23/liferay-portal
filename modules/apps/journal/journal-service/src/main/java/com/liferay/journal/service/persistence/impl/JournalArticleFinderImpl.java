@@ -1233,6 +1233,15 @@ public class JournalArticleFinderImpl
 
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
+			if (_isKeywordsDefined(titles) ||
+				_isKeywordsDefined(descriptions)) {
+
+				queryPos.add(1);
+			}
+			else {
+				queryPos.add(0);
+			}
+
 			queryPos.add(companyId);
 
 			if (groupId > 0) {
@@ -1906,8 +1915,15 @@ public class JournalArticleFinderImpl
 
 			sql = _customSQL.replaceAndOperator(sql, andOperator);
 
+<<<<<<< HEAD
 			sql = _customSQL.replaceOrderBy(
 				sql, queryDefinition.getOrderByComparator());
+=======
+			OrderByComparator<JournalArticle> orderByComparator =
+				queryDefinition.getOrderByComparator();
+
+			sql = _customSQL.replaceOrderBy(sql, orderByComparator);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if (inlineSQLHelper) {
 				sql = InlineSQLHelperUtil.replacePermissionCheck(
@@ -1925,6 +1941,22 @@ public class JournalArticleFinderImpl
 
 			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
 
+<<<<<<< HEAD
+=======
+			if (_isOrderByTitle(orderByComparator) ||
+				_isKeywordsDefined(titles) ||
+				_isKeywordsDefined(descriptions)) {
+
+				queryPos.add(1);
+			}
+			else {
+				queryPos.add(0);
+			}
+
+			queryPos.add(titles, 2);
+			queryPos.add(descriptions, 2);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			queryPos.add(companyId);
 
 			if (groupId > 0) {
@@ -2149,6 +2181,20 @@ public class JournalArticleFinderImpl
 		}
 
 		return StringUtil.replace(sql, "[$STRUCTURE_TEMPLATE$]", sb.toString());
+	}
+
+	private boolean _isKeywordsDefined(String[] keywords) {
+		if (ArrayUtil.isEmpty(keywords)) {
+			return false;
+		}
+
+		for (String keyword : keywords) {
+			if (Validator.isNotNull(keyword)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean _isOrderByTitle(

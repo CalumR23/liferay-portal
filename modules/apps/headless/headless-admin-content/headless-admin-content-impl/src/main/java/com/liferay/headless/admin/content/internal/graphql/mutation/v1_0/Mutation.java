@@ -60,7 +60,11 @@ public class Mutation {
 			@GraphQLName("siteKey") @NotEmpty String siteKey,
 			@GraphQLName("pageDefinition")
 				com.liferay.headless.delivery.dto.v1_0.PageDefinition
+<<<<<<< HEAD
 				pageDefinition)
+=======
+					pageDefinition)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return _applyComponentServiceObjects(

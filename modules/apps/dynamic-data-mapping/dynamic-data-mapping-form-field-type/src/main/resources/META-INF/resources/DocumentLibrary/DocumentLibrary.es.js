@@ -18,12 +18,17 @@ import {ClayInput} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import ClayProgressBar from '@clayui/progress-bar';
 import axios from 'axios';
+<<<<<<< HEAD
 import {
 	PagesVisitor,
 	convertToFormData,
 	useConfig,
 	useFormState,
 } from 'dynamic-data-mapping-form-renderer';
+=======
+import {PagesVisitor, usePage} from 'dynamic-data-mapping-form-renderer';
+import {convertToFormData} from 'dynamic-data-mapping-form-renderer/js/util/fetch.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {ItemSelectorDialog} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -160,10 +165,15 @@ const DocumentLibrary = ({
 				name={name}
 				placeholder={placeholder}
 				type="hidden"
+<<<<<<< HEAD
 				value={getValue(value)}
 			/>
 
 			{message && <div className="form-feedback-item">{message}</div>}
+=======
+				value={value || ''}
+			/>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</div>
 	);
 };
@@ -172,7 +182,10 @@ const GuestUploadFile = ({
 	fileEntryTitle = '',
 	fileEntryURL = '',
 	id,
+<<<<<<< HEAD
 	message,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	name,
 	onClearButtonClicked,
 	onUploadSelectButtonClicked,
@@ -196,9 +209,13 @@ const GuestUploadFile = ({
 			<ClayInput.Group>
 				<ClayInput.GroupItem prepend>
 					<ClayInput
+<<<<<<< HEAD
 						className="bg-light"
 						disabled={readOnly}
 						onClick={onUploadSelectButtonClicked}
+=======
+						disabled
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						type="text"
 						value={transformedFileEntryTitle || ''}
 					/>
@@ -225,6 +242,7 @@ const GuestUploadFile = ({
 					/>
 				</ClayInput.GroupItem>
 				{transformedFileEntryTitle && (
+<<<<<<< HEAD
 					<ClayInput.GroupItem shrink>
 						<ClayButton
 							aria-label={Liferay.Language.get('unselect-file')}
@@ -235,6 +253,15 @@ const GuestUploadFile = ({
 							{Liferay.Language.get('clear')}
 						</ClayButton>
 					</ClayInput.GroupItem>
+=======
+					<ClayButtonWithIcon
+						aria-label={Liferay.Language.get('unselect-file')}
+						className="clear-button-upload"
+						displayType="secondary"
+						onClick={onClearButtonClicked}
+						symbol="times"
+					/>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				)}
 			</ClayInput.Group>
 
@@ -247,8 +274,11 @@ const GuestUploadFile = ({
 			/>
 
 			{progress !== 0 && <ClayProgressBar value={progress} />}
+<<<<<<< HEAD
 
 			{message && <div className="form-feedback-item">{message}</div>}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</div>
 	);
 };
@@ -256,7 +286,10 @@ const GuestUploadFile = ({
 const Main = ({
 	allowGuestUsers,
 	displayErrors: initialDisplayErrors,
+<<<<<<< HEAD
 	editingLanguageId,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	errorMessage: initialErrorMessage,
 	fieldName,
 	fileEntryTitle,
@@ -266,7 +299,10 @@ const Main = ({
 	itemSelectorURL,
 	maximumRepetitions,
 	maximumSubmissionLimitReached,
+<<<<<<< HEAD
 	message,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	name,
 	onBlur,
 	onChange,
@@ -277,9 +313,13 @@ const Main = ({
 	value = '{}',
 	...otherProps
 }) => {
+<<<<<<< HEAD
 	const {portletNamespace} = useConfig();
 	const {pages} = useFormState();
 
+=======
+	const {pages, portletNamespace} = usePage();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [currentValue, setCurrentValue] = useState(value);
 	const [errorMessage, setErrorMessage] = useState(initialErrorMessage);
 	const [displayErrors, setDisplayErrors] = useState(initialDisplayErrors);
@@ -310,13 +350,20 @@ const Main = ({
 	const isSignedIn = Liferay.ThemeDisplay.isSignedIn();
 
 	useEffect(() => {
+<<<<<<< HEAD
 		setCurrentValue(value);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		setDisplayErrors(initialDisplayErrors);
 		setErrorMessage(getErrorMessages(initialErrorMessage, isSignedIn));
 		setValid(initialValid);
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
+<<<<<<< HEAD
 	}, [initialDisplayErrors, initialErrorMessage, initialValid, value]);
+=======
+	}, [initialDisplayErrors, initialErrorMessage, initialValid]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const checkMaximumRepetitions = () => {
 		const visitor = new PagesVisitor(pages);
@@ -397,6 +444,7 @@ const Main = ({
 
 		if (fileSize <= uploadRequestSizeLimit) {
 			return false;
+<<<<<<< HEAD
 		}
 
 		const errorMessage = Liferay.Util.sub(
@@ -461,6 +509,72 @@ const Main = ({
 			});
 	};
 
+=======
+		}
+
+		const errorMessage = Liferay.Util.sub(
+			Liferay.Language.get(
+				'please-enter-a-file-with-a-valid-file-size-no-larger-than-x'
+			),
+			[Liferay.Util.formatStorage(uploadRequestSizeLimit)]
+		);
+
+		handleGuestUploadFileChanged(errorMessage, {}, null);
+
+		return true;
+	};
+
+	const handleUploadSelectButtonClicked = (event) => {
+		const file = event.target.files[0];
+
+		if (isExceededUploadRequestSizeLimit(file.size)) {
+			return;
+		}
+
+		const data = {
+			[`${portletNamespace}file`]: file,
+		};
+
+		axios
+			.post(guestUploadURL, convertToFormData(data), {
+				onUploadProgress: (event) => {
+					const progress = Math.round(
+						(event.loaded * 100) / event.total
+					);
+
+					setCurrentValue(null);
+
+					setProgress(progress);
+
+					disableSubmitButton();
+				},
+			})
+			.then((response) => {
+				const {error, file} = response.data;
+
+				disableSubmitButton(false);
+
+				if (error) {
+					handleGuestUploadFileChanged(error.message, event, null);
+				}
+				else {
+					handleGuestUploadFileChanged(
+						'',
+						event,
+						JSON.stringify(file)
+					);
+				}
+
+				setProgress(0);
+			})
+			.catch(() => {
+				disableSubmitButton(false);
+
+				setProgress(0);
+			});
+	};
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const hasCustomError =
 		(!isSignedIn && !allowGuestUsers) || maximumSubmissionLimitReached;
 
@@ -482,12 +596,16 @@ const Main = ({
 					fileEntryTitle={fileEntryTitle}
 					fileEntryURL={fileEntryURL}
 					id={id}
+<<<<<<< HEAD
 					message={message}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					name={name}
 					onClearButtonClicked={(event) => {
 						setCurrentValue(null);
 
 						onChange(event, '{}');
+<<<<<<< HEAD
 
 						const guestUploadInput = document.getElementById(
 							`${name}inputFileGuestUpload`
@@ -496,6 +614,8 @@ const Main = ({
 						if (guestUploadInput) {
 							guestUploadInput.value = '';
 						}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					}}
 					onUploadSelectButtonClicked={(event) =>
 						handleUploadSelectButtonClicked(event)
@@ -507,11 +627,17 @@ const Main = ({
 				/>
 			) : (
 				<DocumentLibrary
+<<<<<<< HEAD
 					editingLanguageId={editingLanguageId}
 					fileEntryTitle={fileEntryTitle}
 					fileEntryURL={fileEntryURL}
 					id={id}
 					message={message}
+=======
+					fileEntryTitle={fileEntryTitle}
+					fileEntryURL={fileEntryURL}
+					id={id}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					name={name}
 					onClearButtonClicked={(event) => {
 						setCurrentValue(null);

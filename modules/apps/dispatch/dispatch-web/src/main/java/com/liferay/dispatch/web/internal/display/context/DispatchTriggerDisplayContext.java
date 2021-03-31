@@ -52,13 +52,39 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 		DispatchTriggerLocalService dispatchTriggerLocalService,
 		RenderRequest renderRequest) {
 
+<<<<<<< HEAD
 		super(renderRequest);
+=======
+		_dispatchTaskExecutorRegistry = dispatchTaskExecutorRegistry;
+		_dispatchTriggerLocalService = dispatchTriggerLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_dispatchTaskExecutorRegistry = dispatchTaskExecutorRegistry;
 		_dispatchTriggerLocalService = dispatchTriggerLocalService;
 
 		_dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(
 			dispatchRequestHelper.getLocale());
+	}
+
+	public String getDispatchTaskExecutorName(
+		String dispatchTaskExecutorType, Locale locale) {
+
+		DispatchTaskExecutor dispatchTaskExecutor =
+			_dispatchTaskExecutorRegistry.fetchDispatchTaskExecutor(
+				dispatchTaskExecutorType);
+
+		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
+			locale, dispatchTaskExecutor.getClass());
+
+		String name =
+			_dispatchTaskExecutorRegistry.fetchDispatchTaskExecutorName(
+				dispatchTaskExecutorType);
+
+		return LanguageUtil.get(resourceBundle, name);
+	}
+
+	public Set<String> getDispatchTaskExecutorTypes() {
+		return _dispatchTaskExecutorRegistry.getDispatchTaskExecutorTypes();
 	}
 
 	public String getDispatchTaskExecutorName(
@@ -177,6 +203,10 @@ public class DispatchTriggerDisplayContext extends BaseDisplayContext {
 	}
 
 	private final Format _dateFormatDateTime;
+<<<<<<< HEAD
+=======
+	private final DispatchRequestHelper _dispatchRequestHelper;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final DispatchTaskExecutorRegistry _dispatchTaskExecutorRegistry;
 	private final DispatchTriggerLocalService _dispatchTriggerLocalService;
 	private RowChecker _rowChecker;

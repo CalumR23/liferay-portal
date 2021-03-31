@@ -52,10 +52,16 @@ import com.liferay.dynamic.data.mapping.form.field.type.DefaultDDMFormFieldTypeS
 							size = 12,
 							value = {
 								"label", "name", "fieldReference",
+<<<<<<< HEAD
 								"collapsible", "labelAtStructureLevel",
 								"repeatable", "showLabel", "rows", "type",
 								"ddmStructureId", "ddmStructureLayoutId",
 								"upgradedStructure"
+=======
+								"collapsible", "repeatable", "showLabel",
+								"rows", "type", "ddmStructureId",
+								"ddmStructureLayoutId", "upgradedStructure"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							}
 						)
 					}

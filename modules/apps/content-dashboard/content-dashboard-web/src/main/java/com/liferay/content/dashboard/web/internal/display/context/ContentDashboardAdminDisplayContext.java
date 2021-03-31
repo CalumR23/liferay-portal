@@ -323,6 +323,7 @@ public class ContentDashboardAdminDisplayContext {
 			ResourceBundleUtil.getString(_resourceBundle, "configuration"));
 		sb.append("', url: '");
 
+<<<<<<< HEAD
 		sb.append(
 			HtmlUtil.escapeJS(
 				PortletURLBuilder.createRenderURL(
@@ -332,6 +333,15 @@ public class ContentDashboardAdminDisplayContext {
 				).setWindowState(
 					LiferayWindowState.POP_UP
 				).buildString()));
+=======
+		PortletURL renderURL = _liferayPortletResponse.createRenderURL();
+
+		renderURL.setParameter(
+			"mvcRenderCommandName", "/edit_content_dashboard_configuration");
+		renderURL.setWindowState(LiferayWindowState.POP_UP);
+
+		sb.append(HtmlUtil.escapeJS(renderURL.toString()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		sb.append("'}); return false;");
 

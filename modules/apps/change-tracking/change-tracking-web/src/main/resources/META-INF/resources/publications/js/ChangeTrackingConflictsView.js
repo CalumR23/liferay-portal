@@ -25,7 +25,10 @@ import ClayTimePicker from '@clayui/time-picker';
 import React, {useState} from 'react';
 
 import ChangeTrackingBaseScheduleView from './ChangeTrackingBaseScheduleView';
+<<<<<<< HEAD
 import ChangeTrackingRenderView from './ChangeTrackingRenderView';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 class ChangeTrackingConflictsView extends ChangeTrackingBaseScheduleView {
 	constructor(props) {
@@ -116,7 +119,11 @@ class ChangeTrackingConflictsView extends ChangeTrackingBaseScheduleView {
 								this.unresolvedConflicts.length +
 								')'
 							}
+<<<<<<< HEAD
 							showCollapseIcon
+=======
+							showCollapseIcon={true}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							spritemap={this.spritemap}
 						>
 							<ClayPanel.Body>
@@ -365,7 +372,11 @@ const ConflictsTable = ({conflicts, spritemap}) => {
 
 			items.push(
 				<ClayList.QuickActionMenu.Item
+<<<<<<< HEAD
 					data-tooltip-align="top"
+=======
+					className="lfr-portal-tooltip"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					href={action.href}
 					spritemap={spritemap}
 					symbol={action.symbol}
@@ -497,12 +508,16 @@ const ConflictsTable = ({conflicts, spritemap}) => {
 						{getAlertFooter(viewConflict)}
 					</ClayAlert>
 				</ClayModal.Header>
+<<<<<<< HEAD
 				<div className="publications-modal-body">
 					<ChangeTrackingRenderView
 						dataURL={viewConflict.dataURL}
 						spritemap={spritemap}
 					/>
 				</div>
+=======
+				<ClayModal.Body url={viewConflict.viewURL}></ClayModal.Body>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			</ClayModal>
 		);
 	};

@@ -98,6 +98,12 @@ public class DLViewFileEntryMetadataSetsDisplayContext {
 
 		renderURL.setParameter(
 			"mvcRenderCommandName", "/document_library/edit_ddm_structure");
+<<<<<<< HEAD
+=======
+
+		PortletURL currentPortletURL = PortletURLUtil.getCurrent(
+			_liferayPortletRequest, _liferayPortletResponse);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		PortletURL currentPortletURL = PortletURLBuilder.create(
 			PortletURLUtil.getCurrent(
@@ -391,6 +397,11 @@ public class DLViewFileEntryMetadataSetsDisplayContext {
 		actionURL.setParameter(
 			ActionRequest.ACTION_NAME,
 			"/document_library/delete_data_definition");
+<<<<<<< HEAD
+=======
+		actionURL.setParameter(
+			"mvcRenderCommandName", "/document_library/view");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		actionURL.setParameter("navigation", "file_entry_metadata_sets");
 		actionURL.setParameter("redirect", String.valueOf(_getRedirect()));
 		actionURL.setParameter(
@@ -407,8 +418,19 @@ public class DLViewFileEntryMetadataSetsDisplayContext {
 
 		_keywords = ParamUtil.getString(_liferayPortletRequest, "keywords");
 
+<<<<<<< HEAD
 		return _keywords;
 	}
+=======
+		actionURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/document_library/delete_ddm_structure");
+		actionURL.setParameter(
+			"mvcRenderCommandName", "/document_library/view");
+		actionURL.setParameter("navigation", "file_entry_metadata_sets");
+		actionURL.setParameter(
+			"ddmStructureId", String.valueOf(ddmStructure.getStructureId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	private String _getRedirect() {
 		ThemeDisplay themeDisplay =

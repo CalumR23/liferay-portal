@@ -230,9 +230,20 @@ public class DDMStorageLinkLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery, projection);
 	}
 
+<<<<<<< HEAD
 	public static DDMStorageLink fetchClassStorageLink(long classPK) {
 		return getService().fetchClassStorageLink(classPK);
 	}
+=======
+	public static com.liferay.dynamic.data.mapping.model.DDMStorageLink
+		fetchClassStorageLink(long classPK) {
+
+		return getService().fetchClassStorageLink(classPK);
+	}
+
+	public static com.liferay.dynamic.data.mapping.model.DDMStorageLink
+		fetchDDMStorageLink(long storageLinkId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	public static DDMStorageLink fetchDDMStorageLink(long storageLinkId) {
 		return getService().fetchDDMStorageLink(storageLinkId);

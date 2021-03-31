@@ -129,7 +129,11 @@ export default ({data, field, height, structure, width}) => {
 			>
 				<BarChart
 					data={data}
+<<<<<<< HEAD
 					layout="horizontal"
+=======
+					layout={'horizontal'}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					margin={{
 						bottom: 20,
 						left: 20,

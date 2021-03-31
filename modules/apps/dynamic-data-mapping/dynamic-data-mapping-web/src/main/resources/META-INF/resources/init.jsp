@@ -106,7 +106,10 @@ page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
 page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableDefinition" %><%@
 page import="com.liferay.portal.kernel.template.TemplateVariableGroup" %><%@
+<<<<<<< HEAD
 page import="com.liferay.portal.kernel.util.HashMapBuilder" %><%@
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.portal.kernel.util.HtmlUtil" %><%@
 page import="com.liferay.portal.kernel.util.LocaleUtil" %><%@
 page import="com.liferay.portal.kernel.util.ParamUtil" %><%@

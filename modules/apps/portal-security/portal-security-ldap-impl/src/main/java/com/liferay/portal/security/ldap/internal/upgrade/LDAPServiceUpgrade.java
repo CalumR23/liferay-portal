@@ -16,7 +16,11 @@ package com.liferay.portal.security.ldap.internal.upgrade;
 
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
+<<<<<<< HEAD
 import com.liferay.portal.security.ldap.internal.upgrade.v1_0_0.LDAPSystemConfigurationsUpgradeProcess;
+=======
+import com.liferay.portal.security.ldap.internal.upgrade.v1_0_0.UpgradeLDAPSystemConfigurations;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.cm.ConfigurationAdmin;

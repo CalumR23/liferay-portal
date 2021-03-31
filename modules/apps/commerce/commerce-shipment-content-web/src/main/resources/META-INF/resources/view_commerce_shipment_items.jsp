@@ -41,10 +41,17 @@ if (commerceAddress != null) {
 	zip = commerceAddress.getZip();
 	phoneNumber = commerceAddress.getPhoneNumber();
 
+<<<<<<< HEAD
 	Region region = commerceAddress.getRegion();
 
 	if (region != null) {
 		regionCode = region.getRegionCode();
+=======
+	CommerceRegion commerceRegion = commerceAddress.getCommerceRegion();
+
+	if (commerceRegion != null) {
+		regionCode = commerceRegion.getCode();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 }
 %>
@@ -214,6 +221,10 @@ if (commerceAddress != null) {
 >
 	<liferay-ui:search-container-row
 		className="com.liferay.commerce.model.CommerceShipmentItem"
+<<<<<<< HEAD
+=======
+		cssClass="entry-display-style"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		escapedModel="<%= true %>"
 		keyProperty="commerceShipmentItemId"
 		modelVar="commerceShipmentItem"
@@ -224,24 +235,40 @@ if (commerceAddress != null) {
 		%>
 
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			name="sku"
 			value="<%= (commerceOrderItem == null) ? StringPool.BLANK : HtmlUtil.escape(commerceOrderItem.getSku()) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			name="name"
 			value="<%= (commerceOrderItem == null) ? StringPool.BLANK : commerceOrderItem.getName(languageId) %>"
 		/>
 
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			property="quantity"
 		/>
 
 		<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 			cssClass="table-cell-expand"
+=======
+			cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		>
 
 			<%

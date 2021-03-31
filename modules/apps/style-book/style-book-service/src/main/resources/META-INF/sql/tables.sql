@@ -1,6 +1,9 @@
 create table StyleBookEntry (
 	mvccVersion LONG default 0 not null,
+<<<<<<< HEAD
 	ctCollectionId LONG default 0 not null,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	uuid_ VARCHAR(75) null,
 	headId LONG,
 	head BOOLEAN,

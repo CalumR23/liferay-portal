@@ -19,19 +19,27 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.util.FastDateFormatFactoryImpl;
 import com.liferay.portal.util.FileImpl;
 
 import java.io.File;
 import java.io.IOException;
 
+<<<<<<< HEAD
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+import org.junit.Assert;
+import org.junit.BeforeClass;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -39,11 +47,14 @@ import org.junit.Test;
  */
 public class TalendArchiveParserUtilTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() {
 		ReflectionTestUtil.setFieldValue(
@@ -76,6 +87,7 @@ public class TalendArchiveParserUtilTest {
 
 		Assert.assertTrue(classPath.startsWith(sb.toString()));
 
+<<<<<<< HEAD
 		Properties contextProperties = talendArchive.getContextProperties();
 
 		Assert.assertNotNull(contextProperties);
@@ -83,6 +95,8 @@ public class TalendArchiveParserUtilTest {
 			"2011", contextProperties.getProperty("multiplier"));
 		Assert.assertEquals("Liferay", contextProperties.getProperty("prefix"));
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		Assert.assertEquals(
 			jobDirectory + _JOB_JAR_PATH, talendArchive.getJobJarPath());
 

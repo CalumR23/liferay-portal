@@ -58,7 +58,11 @@ const Main = ({
 	onReferenceChange,
 	placeholder,
 	readOnly,
+<<<<<<< HEAD
 	reference,
+=======
+	reference: initalReference,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	required,
 	showKeyword = false,
 	showLabel,
@@ -68,6 +72,7 @@ const Main = ({
 	...otherProps
 }) => {
 	const [keyword, setKeyword] = useSyncValue(initialKeyword);
+	const [reference, setReference] = useSyncValue(initalReference);
 
 	const generateKeywordRef = useRef(generateKeyword);
 
@@ -125,6 +130,10 @@ const Main = ({
 				onBlur={onReferenceBlur}
 				onChange={(event) => {
 					onReferenceChange(event);
+<<<<<<< HEAD
+=======
+					setReference(event.target.value);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				}}
 				value={reference}
 			/>

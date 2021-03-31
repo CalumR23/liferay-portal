@@ -54,22 +54,40 @@ public class CommerceInventoryWarehouseItemServiceUtil {
 	 long, long, String, int)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			addCommerceInventoryWarehouseItem(
 				long userId, long commerceInventoryWarehouseId,
 				String externalReferenceCode, String sku, int quantity)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				addCommerceInventoryWarehouseItem(
+					long userId, long commerceInventoryWarehouseId,
+					String externalReferenceCode, String sku, int quantity)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addCommerceInventoryWarehouseItem(
 			userId, commerceInventoryWarehouseId, externalReferenceCode, sku,
 			quantity);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			addCommerceInventoryWarehouseItem(
 				String externalReferenceCode, long userId,
 				long commerceInventoryWarehouseId, String sku, int quantity)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				addCommerceInventoryWarehouseItem(
+					String externalReferenceCode, long userId,
+					long commerceInventoryWarehouseId, String sku, int quantity)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addCommerceInventoryWarehouseItem(
 			externalReferenceCode, userId, commerceInventoryWarehouseId, sku,
@@ -125,28 +143,52 @@ public class CommerceInventoryWarehouseItemServiceUtil {
 	 long)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			getCommerceInventoryWarehouseItemByReferenceCode(
 				long companyId, String externalReferenceCode)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				getCommerceInventoryWarehouseItemByReferenceCode(
+					long companyId, String externalReferenceCode)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getCommerceInventoryWarehouseItemByReferenceCode(
 			companyId, externalReferenceCode);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			getCommerceInventoryWarehouseItemByReferenceCode(
 				String externalReferenceCode, long companyId)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				getCommerceInventoryWarehouseItemByReferenceCode(
+					String externalReferenceCode, long companyId)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getCommerceInventoryWarehouseItemByReferenceCode(
 			externalReferenceCode, companyId);
 	}
 
+<<<<<<< HEAD
 	public static List<CommerceInventoryWarehouseItem>
 			getCommerceInventoryWarehouseItems(
 				long commerceInventoryWarehouseId, int start, int end)
 		throws PortalException {
+=======
+	public static java.util.List
+		<com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem>
+				getCommerceInventoryWarehouseItems(
+					long commerceInventoryWarehouseId, int start, int end)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getCommerceInventoryWarehouseItems(
 			commerceInventoryWarehouseId, start, end);
@@ -278,11 +320,21 @@ public class CommerceInventoryWarehouseItemServiceUtil {
 	 long, long, long, String, int)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			upsertCommerceInventoryWarehouseItem(
 				long companyId, long userId, long commerceInventoryWarehouseId,
 				String externalReferenceCode, String sku, int quantity)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				upsertCommerceInventoryWarehouseItem(
+					long companyId, long userId,
+					long commerceInventoryWarehouseId,
+					String externalReferenceCode, String sku, int quantity)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().upsertCommerceInventoryWarehouseItem(
 			companyId, userId, commerceInventoryWarehouseId,
@@ -299,11 +351,29 @@ public class CommerceInventoryWarehouseItemServiceUtil {
 			userId, commerceInventoryWarehouseId, sku, quantity);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouseItem
 			upsertCommerceInventoryWarehouseItem(
 				String externalReferenceCode, long companyId, long userId,
 				long commerceInventoryWarehouseId, String sku, int quantity)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouseItem
+				upsertCommerceInventoryWarehouseItem(
+					String externalReferenceCode, long companyId, long userId,
+					long commerceInventoryWarehouseId, String sku, int quantity)
+			throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().upsertCommerceInventoryWarehouseItem(
+			externalReferenceCode, companyId, userId,
+			commerceInventoryWarehouseId, sku, quantity);
+	}
+
+	public static CommerceInventoryWarehouseItemService getService() {
+		return _serviceTracker.getService();
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().upsertCommerceInventoryWarehouseItem(
 			externalReferenceCode, companyId, userId,

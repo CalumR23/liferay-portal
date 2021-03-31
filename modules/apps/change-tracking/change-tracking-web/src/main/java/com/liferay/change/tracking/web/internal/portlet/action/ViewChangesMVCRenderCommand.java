@@ -100,7 +100,11 @@ public class ViewChangesMVCRenderCommand implements MVCRenderCommand {
 					themeDisplay.getPermissionChecker(), ctCollection,
 					ActionKeys.VIEW)) {
 
+<<<<<<< HEAD
 				return "/publications/view_publications.jsp";
+=======
+				return "/publications/view.jsp";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 		catch (PortalException portalException) {
@@ -108,7 +112,11 @@ public class ViewChangesMVCRenderCommand implements MVCRenderCommand {
 				_log.warn(portalException, portalException);
 			}
 
+<<<<<<< HEAD
 			return "/publications/view_publications.jsp";
+=======
+			return "/publications/view.jsp";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		ViewChangesDisplayContext viewChangesDisplayContext =

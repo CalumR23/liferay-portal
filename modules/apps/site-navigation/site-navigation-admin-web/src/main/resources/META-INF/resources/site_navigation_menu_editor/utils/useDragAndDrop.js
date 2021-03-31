@@ -108,8 +108,13 @@ export function useDropTarget(item) {
 	const itemPath = getItemPath(siteNavigationMenuItemId, items);
 	const setItems = useSetItems();
 
+<<<<<<< HEAD
 	const {languageId} = useConstants();
 	const rtl = Liferay.Language.direction[languageId] === 'rtl';
+=======
+	const {languageDirection, languageId} = useConstants();
+	const rtl = languageDirection[languageId] === 'rtl';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const {
 		horizontalOffset,

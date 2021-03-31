@@ -18,6 +18,10 @@
 export const DEFAULT_ORDER_DETAILS_PORTLET_ID =
 	'com_liferay_commerce_order_content_web_internal_portlet_' +
 	'CommerceOpenOrderContentPortlet';
+<<<<<<< HEAD
+=======
+export const DISCOUNT_LEVEL_PREFIX = 'discountPercentageLevel';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 export const ORDER_DETAILS_ENDPOINT = '/pending-orders';
 export const ORDER_UUID_PARAMETER = 'commerceOrderUuid';
 export const WORKFLOW_STATUS_APPROVED = 0;

@@ -22,7 +22,10 @@ import com.liferay.depot.web.internal.servlet.taglib.util.DepotActionDropdownIte
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.BaseBaseClayCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.soy.VerticalCard;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -41,6 +44,10 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
+<<<<<<< HEAD
+=======
+import javax.portlet.PortletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 /**
  * @author Alejandro Tardín
@@ -83,6 +90,7 @@ public class DepotEntryVerticalCard
 	@Override
 	public String getHref() {
 		try {
+<<<<<<< HEAD
 			return PortletURLBuilder.create(
 				PortalUtil.getControlPanelPortletURL(
 					_liferayPortletRequest, _depotEntry.getGroup(),
@@ -93,6 +101,19 @@ public class DepotEntryVerticalCard
 			).setParameter(
 				"depotEntryId", _depotEntry.getDepotEntryId()
 			).buildString();
+=======
+			PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+				_liferayPortletRequest, _depotEntry.getGroup(),
+				DepotPortletKeys.DEPOT_ADMIN, 0, 0,
+				PortletRequest.RENDER_PHASE);
+
+			portletURL.setParameter(
+				"mvcRenderCommandName", "/depot/view_depot_dashboard");
+			portletURL.setParameter(
+				"depotEntryId", String.valueOf(_depotEntry.getDepotEntryId()));
+
+			return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (PortalException portalException) {
 			return ReflectionUtil.throwException(portalException);

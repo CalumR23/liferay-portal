@@ -195,6 +195,7 @@ public class CommerceCategoryDisplayPageClayTable
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
@@ -208,12 +209,24 @@ public class CommerceCategoryDisplayPageClayTable
 		).setParameter(
 			"cpDisplayLayoutId", categoryDisplayPageId
 		).buildString();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_channels/edit_cp_display_layout");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"cpDisplayLayoutId", String.valueOf(categoryDisplayPageId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getCategoryDisplayPageEditURL(
 			HttpServletRequest httpServletRequest, long categoryDisplayPageId)
 		throws Exception {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceChannel.class.getName(),
@@ -221,6 +234,15 @@ public class CommerceCategoryDisplayPageClayTable
 		).setMVCRenderCommandName(
 			"/commerce_channels/edit_asset_category_cp_display_layout"
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceChannel.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_channels/edit_cp_display_layout");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceChannelId = ParamUtil.getLong(
 			httpServletRequest, "commerceChannelId");

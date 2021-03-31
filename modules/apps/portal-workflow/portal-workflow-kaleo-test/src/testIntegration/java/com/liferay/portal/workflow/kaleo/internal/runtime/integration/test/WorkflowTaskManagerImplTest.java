@@ -1440,8 +1440,14 @@ public class WorkflowTaskManagerImplTest {
 	}
 
 	private void _createJoinXorWorkflow() throws Exception {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_PROXY_MESSAGE_LISTENER, LoggerTestUtil.OFF)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_PROXY_MESSAGE_LISTENER, Level.OFF)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			_workflowDefinitionManager.getWorkflowDefinition(
 				_adminUser.getCompanyId(), _JOIN_XOR, 1);
@@ -1474,8 +1480,14 @@ public class WorkflowTaskManagerImplTest {
 	}
 
 	private void _createScriptedAssignmentWorkflow() throws Exception {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_PROXY_MESSAGE_LISTENER, LoggerTestUtil.OFF)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_PROXY_MESSAGE_LISTENER, Level.OFF)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			_workflowDefinitionManager.getWorkflowDefinition(
 				_adminUser.getCompanyId(), _SCRIPTED_SINGLE_APPROVER, 1);
@@ -1496,8 +1508,14 @@ public class WorkflowTaskManagerImplTest {
 	}
 
 	private void _createSiteMemberWorkflow() throws Exception {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				_CLASS_NAME_PROXY_MESSAGE_LISTENER, LoggerTestUtil.OFF)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					_CLASS_NAME_PROXY_MESSAGE_LISTENER, Level.OFF)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			_workflowDefinitionManager.getWorkflowDefinition(
 				_adminUser.getCompanyId(), _SITE_MEMBER_SINGLE_APPROVER, 1);

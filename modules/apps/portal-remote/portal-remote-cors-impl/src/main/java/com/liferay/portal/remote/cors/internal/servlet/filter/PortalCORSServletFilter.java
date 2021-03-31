@@ -207,18 +207,32 @@ public class PortalCORSServletFilter
 			if (corsSupport != null) {
 				if (StringUtil.equals(
 						HttpMethods.OPTIONS, httpServletRequest.getMethod())) {
+<<<<<<< HEAD
 
 					if (corsSupport.isValidCORSPreflightRequest(
 							httpServletRequest::getHeader)) {
 
+=======
+
+					if (corsSupport.isValidCORSPreflightRequest(
+							httpServletRequest::getHeader)) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						corsSupport.writeResponseHeaders(
 							httpServletRequest::getHeader,
 							httpServletResponse::setHeader);
 					}
+<<<<<<< HEAD
 
 					return;
 				}
 
+=======
+
+					return;
+				}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				if (corsSupport.isValidCORSRequest(
 						httpServletRequest.getMethod(),
 						httpServletRequest::getHeader) &&

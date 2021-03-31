@@ -31,6 +31,7 @@ String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "add-product-group") %>'
 >
+<<<<<<< HEAD
 	<aui:form method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>' useNamespace="<%= false %>">
 		<aui:input label="name" name="title" required="<%= true %>" />
 
@@ -79,4 +80,56 @@ String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
 			['liferay-portlet-url']
 		);
 	</aui:script>
+=======
+	<div class="col-12 lfr-form-content">
+		<aui:form cssClass="container-fluid-1280" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>' useNamespace="<%= false %>">
+			<aui:input label="name" name="title" required="<%= true %>" />
+
+			<aui:input name="description" type="textarea" />
+		</aui:form>
+
+		<aui:script require="commerce-frontend-js/utilities/eventsDefinitions as events, commerce-frontend-js/utilities/forms/index as FormUtils, commerce-frontend-js/ServiceProvider/index as ServiceProvider">
+			var CommerceProductGroupsResource = ServiceProvider.default.AdminCatalogAPI(
+				'v1'
+			);
+
+			Liferay.provide(
+				window,
+				'<portlet:namespace />apiSubmit',
+				function (form) {
+					var description = form.querySelector('#description').value;
+					var title = form.querySelector('#title').value;
+
+					var productGroupData = {
+						description: {<%= defaultLanguageId %>: description},
+						title: {<%= defaultLanguageId %>: title},
+					};
+
+					return CommerceProductGroupsResource.addProductGroup(productGroupData)
+						.then(function (payload) {
+							var redirectURL = new Liferay.PortletURL.createURL(
+								'<%= editPricingClassPortletURL.toString() %>'
+							);
+
+							redirectURL.setParameter('commercePricingClassId', payload.id);
+							redirectURL.setParameter('p_auth', Liferay.authToken);
+
+							window.parent.Liferay.fire(events.CLOSE_MODAL, {
+								redirectURL: redirectURL.toString(),
+								successNotification: {
+									message:
+										'<liferay-ui:message key="your-request-completed-successfully" />',
+									showSuccessNotification: true,
+								},
+							});
+						})
+						.catch(function (error) {
+							return Promise.reject(error);
+						});
+				},
+				['liferay-portlet-url']
+			);
+		</aui:script>
+	</div>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 </commerce-ui:modal-content>

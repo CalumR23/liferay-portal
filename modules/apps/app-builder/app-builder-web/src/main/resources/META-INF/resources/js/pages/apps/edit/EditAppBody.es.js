@@ -16,6 +16,7 @@ import ClayLayout from '@clayui/layout';
 import ClayLink from '@clayui/link';
 import React, {useContext} from 'react';
 
+<<<<<<< HEAD
 import {AppContext} from '../../../AppContext.es';
 import MultiStepNav from '../../../components/multi-step-nav/MultiStepNav.es';
 import DeployApp from './DeployApp.es';
@@ -25,6 +26,11 @@ import EditAppContext, {
 	UPDATE_WORKFLOW_PROCESS_ID,
 } from './EditAppContext.es';
 import EditAppStepContent from './EditAppStepContent.es';
+=======
+import {useRequest} from '../../../hooks/index.es';
+import {getLocalizedValue} from '../../../utils/lang.es';
+import ListItems from './ListItems.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 const queryFields = ['dateCreated', 'dateModified', 'id', 'name'].join(',');
 
@@ -37,12 +43,20 @@ const EditAppBody = ({currentStep, dataDefinitionId, defaultLanguageId}) => {
 		},
 	} = useContext(EditAppContext);
 
+<<<<<<< HEAD
 	const dispatchSelection = (type) => (item) => {
 		dispatch({
 			...item,
 			type,
 		});
 	};
+=======
+	const filteredItems = items.filter((item) =>
+		new RegExp(searchText, 'ig').test(
+			getLocalizedValue(defaultLanguageId, item.name)
+		)
+	);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const stepProps = [
 		{

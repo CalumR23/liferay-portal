@@ -124,9 +124,25 @@ const ExperienceItem = ({
 											{experience.name}
 										</span>
 
+<<<<<<< HEAD
 										{experience.hasLockedSegmentsExperiment && (
 											<ExperienceLockIcon />
 										)}
+=======
+									{experience.hasLockedSegmentsExperiment && (
+										<ExperienceLockIcon />
+									)}
+
+									{experience.active && (
+										<ClayLabel
+											className="inline-item-after"
+											displayType="success"
+										>
+											{Liferay.Language.get('active')}
+										</ClayLabel>
+									)}
+								</span>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 										{experience.active && (
 											<ClayLabel
@@ -138,9 +154,16 @@ const ExperienceItem = ({
 										)}
 									</span>
 
+<<<<<<< HEAD
 									<span className="text-truncate">
 										<span className="mr-1 text-secondary">
 											{Liferay.Language.get('audience')}
+=======
+								{experience.segmentsExperimentStatus && (
+									<div>
+										<span className="font-weight-normal inline-item-before text-secondary">
+											{Liferay.Language.get('ab-test')}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 										</span>
 										{experience.segmentsEntryName}
 									</span>

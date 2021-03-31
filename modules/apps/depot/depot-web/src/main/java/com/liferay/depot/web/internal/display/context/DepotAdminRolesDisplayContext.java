@@ -107,12 +107,21 @@ public class DepotAdminRolesDisplayContext {
 		RequestBackedPortletURLFactory requestBackedPortletURLFactory =
 			RequestBackedPortletURLFactoryUtil.create(_liferayPortletRequest);
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			requestBackedPortletURLFactory.createRenderURL(
 				DepotPortletKeys.DEPOT_ADMIN)
 		).setMVCRenderCommandName(
 			"/depot/select_depot_role"
 		).setParameter(
+=======
+		PortletURL portletURL = requestBackedPortletURLFactory.createRenderURL(
+			DepotPortletKeys.DEPOT_ADMIN);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/depot/select_depot_role");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"p_u_i_d",
 			Optional.ofNullable(
 				_user

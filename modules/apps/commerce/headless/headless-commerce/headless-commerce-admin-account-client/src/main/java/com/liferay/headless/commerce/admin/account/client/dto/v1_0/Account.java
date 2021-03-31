@@ -19,7 +19,10 @@ import com.liferay.headless.commerce.admin.account.client.serdes.v1_0.AccountSer
 
 import java.io.Serializable;
 
+<<<<<<< HEAD
 import java.util.Date;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.Map;
 import java.util.Objects;
 

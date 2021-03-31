@@ -162,6 +162,7 @@ public class CommerceSubscriptionShipmentsDataSetDataProvider
 			long commerceOrderId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceOrder.class.getName(),
@@ -173,12 +174,28 @@ public class CommerceSubscriptionShipmentsDataSetDataProvider
 		).setParameter(
 			"commerceOrderId", commerceOrderId
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceOrder.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(commerceOrderId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getEditShipmentURL(
 			long commerceShipmentId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceShipment.class.getName(),
@@ -190,6 +207,21 @@ public class CommerceSubscriptionShipmentsDataSetDataProvider
 		).setParameter(
 			"commerceShipmentId", commerceShipmentId
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceShipment.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/edit_commerce_shipment");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceShipmentId", String.valueOf(commerceShipmentId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private Label _getShipmentStatus(CommerceShipment commerceShipment) {

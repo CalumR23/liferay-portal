@@ -87,6 +87,7 @@ public class TalendArchiveParserUtil {
 		}
 	}
 
+<<<<<<< HEAD
 	private static Properties _getContextProperties(
 			String contextName, String jobExecutableJarPath)
 		throws IOException {
@@ -112,6 +113,8 @@ public class TalendArchiveParserUtil {
 		return properties;
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static File _getJobDirectory(InputStream jobArchiveInputStream)
 		throws IOException {
 
@@ -318,20 +321,29 @@ public class TalendArchiveParserUtil {
 
 		talendArchiveBuilder.classPathEntries(
 			_getJobLibEntries(jobDirectoryPath));
+<<<<<<< HEAD
 
 		String contextName = (String)jobProperties.get("contextName");
 
 		talendArchiveBuilder.contextName(contextName);
+=======
+		talendArchiveBuilder.contextName(
+			(String)jobProperties.get("contextName"));
+		talendArchiveBuilder.jobDirectory(jobDirectory.getAbsolutePath());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String jobName = (String)jobProperties.get("job");
 
 		Path jobJarPath = _getJobJarPath(jobName, jobDirectoryPath);
 
+<<<<<<< HEAD
 		talendArchiveBuilder.contextProperties(
 			_getContextProperties(contextName, jobJarPath.toString()));
 
 		talendArchiveBuilder.jobDirectory(jobDirectory.getAbsolutePath());
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		talendArchiveBuilder.jobJarPath(jobJarPath.toString());
 		talendArchiveBuilder.jobMainClassFQN(
 			_getJobMainClassFQN(jobName, jobJarPath.toString()));

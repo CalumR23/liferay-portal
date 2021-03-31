@@ -31,7 +31,11 @@ int mfaCheckerIndex = ParamUtil.getInteger(request, "mfaCheckerIndex");
 	<portlet:param name="mvcRenderCommandName" value="/mfa_verify/view" />
 </portlet:actionURL>
 
+<<<<<<< HEAD
 <aui:form action="<%= verifyURL %>" cssClass="container-fluid container-fluid-max-xl sign-in-form" data-senna-off="true" method="post" name="fm">
+=======
+<aui:form action="<%= verifyURL %>" cssClass="container-fluid-1280 sign-in-form" data-senna-off="true" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:input name="saveLastPath" type="hidden" value="<%= false %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="mfaCheckerIndex" type="hidden" value="<%= mfaCheckerIndex %>" />

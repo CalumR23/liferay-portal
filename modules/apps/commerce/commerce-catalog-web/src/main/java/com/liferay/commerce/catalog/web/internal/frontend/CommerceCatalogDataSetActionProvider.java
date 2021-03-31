@@ -105,6 +105,7 @@ public class CommerceCatalogDataSetActionProvider
 	private PortletURL _getCatalogDeleteURL(
 		long catalogId, HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CATALOGS,
@@ -114,6 +115,16 @@ public class CommerceCatalogDataSetActionProvider
 		).setParameter(
 			Constants.CMD, Constants.DELETE
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, CPPortletKeys.COMMERCE_CATALOGS,
+			PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_catalogs/edit_commerce_catalog");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = ParamUtil.getString(
 			httpServletRequest, "currentUrl",
@@ -129,6 +140,7 @@ public class CommerceCatalogDataSetActionProvider
 	private PortletURL _getCatalogEditURL(
 		long catalogId, HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CATALOGS,
@@ -136,6 +148,14 @@ public class CommerceCatalogDataSetActionProvider
 		).setMVCRenderCommandName(
 			"/commerce_catalogs/edit_commerce_catalog"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, CPPortletKeys.COMMERCE_CATALOGS,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_catalogs/edit_commerce_catalog");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = ParamUtil.getString(
 			httpServletRequest, "currentUrl",

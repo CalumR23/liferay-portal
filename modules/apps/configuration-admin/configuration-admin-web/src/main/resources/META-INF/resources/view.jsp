@@ -25,7 +25,11 @@ ConfigurationScopeDisplayContext configurationScopeDisplayContext = Configuratio
 <portlet:renderURL var="redirectURL" />
 
 <portlet:renderURL var="searchURL">
+<<<<<<< HEAD
 	<portlet:param name="mvcRenderCommandName" value="/configuration_admin/search_results" />
+=======
+	<portlet:param name="mvcRenderCommandName" value="/configuration_admin/search" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<portlet:param name="redirect" value="<%= redirectURL %>" />
 </portlet:renderURL>
 

@@ -70,7 +70,11 @@ CPTaxCategoryDisplayContext cpTaxCategoryDisplayContext = (CPTaxCategoryDisplayC
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
+<<<<<<< HEAD
 	<div class="container-fluid container-fluid-max-xl">
+=======
+	<div class="container-fluid-1280">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<portlet:actionURL name="/cp_tax_category/edit_cp_tax_category" var="editCPTaxCategoryActionURL" />
 
 		<aui:form action="<%= editCPTaxCategoryActionURL %>" method="post" name="fm">
@@ -87,6 +91,18 @@ CPTaxCategoryDisplayContext cpTaxCategoryDisplayContext = (CPTaxCategoryDisplayC
 					keyProperty="CPTaxCategoryId"
 					modelVar="cpTaxCategory"
 				>
+<<<<<<< HEAD
+=======
+
+					<%
+					PortletURL rowURL = renderResponse.createRenderURL();
+
+					rowURL.setParameter("mvcRenderCommandName", "/cp_tax_category/edit_cp_tax_category");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("cpTaxCategoryId", String.valueOf(cpTaxCategory.getCPTaxCategoryId()));
+					%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<liferay-ui:search-container-column-text
 						cssClass="important table-cell-expand"
 						href='<%=

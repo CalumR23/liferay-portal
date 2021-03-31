@@ -39,4 +39,54 @@
 	selectable="<%= !user.isDefaultUser() %>"
 	sortingOrder="<%= ddmDisplayContext.getOrderByType() %>"
 	sortingURL="<%= ddmDisplayContext.getSortingURL() %>"
+<<<<<<< HEAD
 />
+=======
+/>
+
+<aui:script sandbox="<%= true %>">
+	var deleteStructures = function () {
+		if (
+			confirm(
+				'<%= UnicodeLanguageUtil.get(request, "are-you-sure-you-want-to-delete-this") %>'
+			)
+		) {
+			var searchContainer = document.getElementById(
+				'<portlet:namespace />entriesContainer'
+			);
+
+			if (searchContainer) {
+				<portlet:actionURL name="/dynamic_data_mapping/delete_structure" var="deleteStructuresURL">
+					<portlet:param name="mvcPath" value="/view.jsp" />
+				</portlet:actionURL>
+
+				Liferay.Util.postForm(document.<portlet:namespace />fm, {
+					data: {
+						deleteStructureIds: Liferay.Util.listCheckedExcept(
+							searchContainer,
+							'<portlet:namespace />allRowIds'
+						),
+					},
+					url: '<%= deleteStructuresURL %>',
+				});
+			}
+		}
+	};
+
+	var ACTIONS = {
+		deleteStructures: deleteStructures,
+	};
+
+	Liferay.componentReady('ddmStructureManagementToolbar').then(function (
+		managementToolbar
+	) {
+		managementToolbar.on('actionItemClicked', function (event) {
+			var itemData = event.data.item.data;
+
+			if (itemData && itemData.action && ACTIONS[itemData.action]) {
+				ACTIONS[itemData.action]();
+			}
+		});
+	});
+</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

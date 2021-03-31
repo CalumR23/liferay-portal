@@ -102,6 +102,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 	}
 
 	public String getAddCommerceDiscountRenderURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			commercePricingRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -121,6 +122,34 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			commercePricingRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_discount/add_commerce_discount");
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public String getAddCommerceDiscountRuleRenderURL() throws Exception {
+		LiferayPortletResponse liferayPortletResponse =
+			commercePricingRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_discount/add_commerce_discount_rule");
+		portletURL.setParameter(
+			"commerceDiscountId", String.valueOf(getCommerceDiscountId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceDiscount getCommerceDiscount() throws PortalException {
@@ -262,6 +291,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		List<ClayDataSetActionDropdownItem> clayDataSetActionDropdownItems =
 			new ArrayList<>();
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceDiscount.class.getName(),
@@ -275,6 +305,20 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		).setParameter(
 			"usePercentage", "{usePercentage}"
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceDiscount.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_discount/edit_commerce_discount");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceDiscountId", "{id}");
+		portletURL.setParameter("usePercentage", "{usePercentage}");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceDiscountScreenNavigationConstants.CATEGORY_KEY_DETAILS
 		).build();
@@ -309,6 +353,20 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getDiscountCPDefinitionClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("cpDefinitionId", "{product.id}");
+		portletURL.setParameter("screenNavigationCategoryKey", "details");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getClayHeadlessDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
@@ -348,6 +406,21 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getDiscountPricingClassClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommercePricingClass.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_pricing_classes/edit_commerce_pricing_class");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commercePricingClassId", "{productGroupId}");
+		portletURL.setParameter("screenNavigationCategoryKey", "details");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return getClayHeadlessDataSetActionTemplates(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
@@ -398,6 +471,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getDiscountRulesClayDataSetActionDropdownItem()
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceDiscount.class.getName(),
@@ -409,6 +483,19 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		).setParameter(
 			"commerceDiscountRuleId", "{id}"
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceDiscount.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_discount/edit_commerce_discount_rule");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceDiscountRuleId", "{id}");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceDiscountScreenNavigationConstants.CATEGORY_KEY_DETAILS
 		).build();
@@ -431,6 +518,7 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			return StringPool.BLANK;
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				commercePricingRequestHelper.getRequest(),
@@ -456,6 +544,36 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 		).setMVCRenderCommandName(
 			"/commerce_discount/edit_commerce_discount"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			commercePricingRequestHelper.getRequest(),
+			CommercePricingPortletKeys.COMMERCE_DISCOUNT,
+			PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_discount/edit_commerce_discount");
+		portletURL.setParameter(Constants.CMD, Constants.UPDATE);
+		portletURL.setParameter(
+			"commerceDiscountId",
+			String.valueOf(commerceDiscount.getCommerceDiscountId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public PortletURL getEditCommerceDiscountRenderURL() {
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			commercePricingRequestHelper.getRequest(),
+			CommercePricingPortletKeys.COMMERCE_DISCOUNT,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_discount/edit_commerce_discount");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels() throws Exception {

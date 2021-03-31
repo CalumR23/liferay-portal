@@ -132,7 +132,15 @@ else {
 				>
 					<aui:input name="fileEntryTypeId" type="hidden" value="<%= (fileEntryTypeId > 0) ? fileEntryTypeId : 0 %>" />
 
+<<<<<<< HEAD
 					<aui:input name="defaultLanguageId" type="hidden" value="<%= LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()) %>" />
+=======
+					<%
+					String defaultLanguageId = LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault());
+					%>
+
+					<aui:input name="defaultLanguageId" type="hidden" value="<%= defaultLanguageId %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 					<div class="document-type-selector" id="<portlet:namespace />documentTypeSelector">
 						<liferay-ui:icon-menu
@@ -192,12 +200,25 @@ else {
 						%>
 
 								<div class="document-type-fields">
+<<<<<<< HEAD
 									<liferay-data-engine:data-layout-renderer
 										containerId='<%= liferayPortletResponse.getNamespace() + "dataEngineLayoutRenderer" + ddmStructure.getStructureId() %>'
 										dataDefinitionId="<%= ddmStructure.getStructureId() %>"
 										dataRecordValues="<%= DataRecordValuesUtil.getDataRecordValues(ddmFormValues, ddmStructure) %>"
 										namespace="<%= liferayPortletResponse.getNamespace() + ddmStructure.getStructureId() + StringPool.UNDERLINE %>"
 										persisted="<%= fileEntry != null %>"
+=======
+									<liferay-ddm:html
+										classNameId="<%= PortalUtil.getClassNameId(com.liferay.dynamic.data.mapping.model.DDMStructure.class) %>"
+										classPK="<%= ddmStructure.getPrimaryKey() %>"
+										ddmFormValues="<%= ddmFormValues %>"
+										defaultEditLocale="<%= LocaleUtil.fromLanguageId(defaultLanguageId) %>"
+										fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
+										groupId="<%= groupId %>"
+										localizable="<%= true %>"
+										requestedLocale="<%= locale %>"
+										synchronousFormSubmission="<%= false %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									/>
 								</div>
 

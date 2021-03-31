@@ -16,12 +16,19 @@ package com.liferay.change.tracking.web.internal.portlet.action;
 
 import com.liferay.change.tracking.web.internal.constants.CTPortletKeys;
 import com.liferay.change.tracking.web.internal.scheduler.PublishScheduler;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -108,12 +115,23 @@ public class SchedulePublicationMVCActionCommand extends BaseMVCActionCommand {
 			return;
 		}
 
+<<<<<<< HEAD
 		PortletURL redirectURL = PortletURLBuilder.createRenderURL(
 			_portal.getLiferayPortletResponse(actionResponse)
 		).setMVCRenderCommandName(
 			"/change_tracking/view_scheduled"
 		).build();
 
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_portal.getLiferayPortletResponse(actionResponse);
+
+		PortletURL redirectURL = liferayPortletResponse.createRenderURL();
+
+		redirectURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/view_scheduled");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		JSONPortletResponseUtil.writeJSON(
 			actionRequest, actionResponse,
 			JSONUtil.put("redirect", redirectURL.toString()));

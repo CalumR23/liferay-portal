@@ -81,7 +81,11 @@ const SummaryCard = ({
 						</span>
 					)}
 
+<<<<<<< HEAD
 					<span>{getTitle(completed)}</span>
+=======
+					<span>{title}</span>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				</div>
 
 				{!disabled && (

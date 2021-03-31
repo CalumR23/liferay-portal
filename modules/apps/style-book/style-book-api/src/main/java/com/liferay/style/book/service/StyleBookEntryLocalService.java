@@ -15,7 +15,10 @@
 package com.liferay.style.book.service;
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+<<<<<<< HEAD
 import com.liferay.petra.function.UnsafeFunction;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;

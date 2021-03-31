@@ -113,6 +113,7 @@ public class ProcessingCommerceShipmentItemDataSetActionProvider
 	private String _getShipmentItemDeleteURL(
 		long commerceShipmentItemId, HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
@@ -124,6 +125,19 @@ public class ProcessingCommerceShipmentItemDataSetActionProvider
 		).setParameter(
 			"commerceShipmentItemId", commerceShipmentItemId
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
+			ActionRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/delete_commerce_shipment");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceShipmentItemId", String.valueOf(commerceShipmentItemId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);
@@ -139,6 +153,7 @@ public class ProcessingCommerceShipmentItemDataSetActionProvider
 		CommerceShipmentItem commerceShipmentItem,
 		HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
@@ -150,6 +165,21 @@ public class ProcessingCommerceShipmentItemDataSetActionProvider
 		).setParameter(
 			"commerceShipmentId", commerceShipmentItem.getCommerceShipmentId()
 		).setParameter(
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/edit_commerce_shipment_item");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceShipmentId",
+			String.valueOf(commerceShipmentItem.getCommerceShipmentId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commerceShipmentItemId",
 			commerceShipmentItem.getCommerceShipmentItemId()
 		).build();

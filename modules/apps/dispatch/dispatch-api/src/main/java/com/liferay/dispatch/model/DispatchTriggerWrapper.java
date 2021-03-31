@@ -249,6 +249,7 @@ public class DispatchTriggerWrapper
 		return model.getDispatchTaskSettingsUnicodeProperties();
 	}
 
+<<<<<<< HEAD
 	@Override
 	public com.liferay.dispatch.executor.DispatchTaskStatus
 		getDispatchTaskStatus() {
@@ -256,6 +257,8 @@ public class DispatchTriggerWrapper
 		return model.getDispatchTaskStatus();
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * Returns the dispatch trigger ID of this dispatch trigger.
 	 *

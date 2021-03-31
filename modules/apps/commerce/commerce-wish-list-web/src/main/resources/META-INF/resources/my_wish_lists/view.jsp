@@ -40,7 +40,11 @@ CommerceWishListDisplayContext commerceWishListDisplayContext = (CommerceWishLis
 	</div>
 </div>
 
+<<<<<<< HEAD
 <div class="container-fluid container-fluid-max-xl">
+=======
+<div class="container-fluid-1280">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<portlet:actionURL name="/commerce_wish_list_content/edit_commerce_wish_list" var="editCommerceWishListActionURL" />
 
 	<aui:form action="<%= editCommerceWishListActionURL %>" method="post" name="fm">

@@ -61,6 +61,7 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 
 	@Test
 	public void testCORSUsingBasicWithDefaultConfig() throws Exception {
+<<<<<<< HEAD
 		assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, true);
 		assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
 	}
@@ -92,6 +93,40 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 			"user", "get-current-user"
 		).request();
 
+=======
+		assertJsonWSUrl("/user/get-current-user", HttpMethod.OPTIONS, false);
+		assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
+	}
+
+	@Test
+	public void testCORSUsingBasicWithDisableAuthorization() throws Exception {
+		boolean corsDisableAuthorizationContextCheck =
+			ReflectionTestUtil.getAndSetFieldValue(
+				PropsValues.class, "CORS_DISABLE_AUTHORIZATION_CONTEXT_CHECK",
+				true);
+
+		try {
+			assertJsonWSUrl(
+				"/user/get-current-user", HttpMethod.OPTIONS, false);
+			assertJsonWSUrl("/user/get-current-user", HttpMethod.GET, false);
+		}
+		finally {
+			ReflectionTestUtil.setFieldValue(
+				PropsValues.class, "CORS_DISABLE_AUTHORIZATION_CONTEXT_CHECK",
+				corsDisableAuthorizationContextCheck);
+		}
+	}
+
+	@Test
+	public void testNoCORSUsingPortalSession() throws Exception {
+		Cookie authenticatedCookie = _getAuthenticatedCookie(
+			"test@liferay.com", "test");
+
+		Invocation.Builder invocationBuilder = _getJsonWebTarget(
+			"user", "get-current-user"
+		).request();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		invocationBuilder = invocationBuilder.cookie(authenticatedCookie);
 
 		invocationBuilder = invocationBuilder.header(
@@ -141,6 +176,7 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 		}
 
 		return newCookie.toCookie();
+<<<<<<< HEAD
 	}
 
 	private WebTarget _getJsonWebTarget(String... paths) {
@@ -156,6 +192,23 @@ public class PortalConfigurationCORSClientTest extends BaseCORSClientTestCase {
 		return webTarget.queryParam("p_auth", _pAuth);
 	}
 
+=======
+	}
+
+	private WebTarget _getJsonWebTarget(String... paths) {
+		WebTarget webTarget = _getLocalhostWebTarget();
+
+		webTarget = webTarget.path("api");
+		webTarget = webTarget.path("jsonws");
+
+		for (String path : paths) {
+			webTarget = webTarget.path(path);
+		}
+
+		return webTarget.queryParam("p_auth", _pAuth);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private WebTarget _getLocalhostWebTarget() {
 		ClientBuilder clientBuilder = new ClientBuilderImpl();
 

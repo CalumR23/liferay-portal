@@ -318,11 +318,18 @@ public class SelectSegmentsEntryDisplayContext {
 	}
 
 	private PortletURL _getPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
 			"/segments/select_segments_entry"
 		).build();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/segments/select_segments_entry");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String keywords = _getKeywords();
 

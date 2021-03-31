@@ -77,7 +77,11 @@ jest.mock('data-engine-js-components-web/js/utils/client.es', () => ({
 
 const mockToast = jest.fn();
 
+<<<<<<< HEAD
 jest.mock('data-engine-js-components-web/js/utils/toast.es', () => ({
+=======
+jest.mock('app-builder-web/js/utils/toast.es', () => ({
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	__esModule: true,
 	successToast: (message) => mockToast(message),
 }));

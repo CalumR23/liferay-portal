@@ -120,7 +120,11 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 
 	var form = document.<portlet:namespace />fm;
 
+<<<<<<< HEAD
 	form.addEventListener('submit', (event) => {
+=======
+	form.addEventListener('submit', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		event.preventDefault();
 		event.stopPropagation();
 

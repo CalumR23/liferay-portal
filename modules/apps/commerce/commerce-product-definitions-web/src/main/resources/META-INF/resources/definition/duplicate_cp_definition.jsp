@@ -25,7 +25,11 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "duplicate-product") %>'
 >
+<<<<<<< HEAD
 	<aui:form cssClass="container-fluid container-fluid-max-xl p-0" method="post" name="duplicatefm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>'>
+=======
+	<aui:form cssClass="container-fluid-1280 p-0" method="post" name="duplicatefm" onSubmit='<%= "event.preventDefault(); " + liferayPortletResponse.getNamespace() + "apiSubmit(this.form);" %>'>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 		<aui:input name="name" required="<%= true %>" type="text" value='<%= LanguageUtil.format(locale, "copy-of-x", cpDefinition.getName(languageId)) %>' />
@@ -49,13 +53,21 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 		Liferay.provide(
 			window,
 			'<portlet:namespace />apiSubmit',
+<<<<<<< HEAD
 			(form) => {
+=======
+			function (form) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				var API_URL =
 					'/o/headless-commerce-admin-catalog/v1.0/products/<%= cpDefinition.getCProductId() %>/clone?catalogId=' +
 					<portlet:namespace />product.catalogId;
 
 				FormUtils.apiSubmit(form, API_URL)
+<<<<<<< HEAD
 					.then((payload) => {
+=======
+					.then(function (payload) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						var headers = new Headers({
 							Accept: 'application/json',
 							'Content-Type': 'application/json',
@@ -80,7 +92,11 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 								headers: headers,
 								method: 'patch',
 							}
+<<<<<<< HEAD
 						).then(() => {
+=======
+						).then(function () {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							var redirectURL = new Liferay.PortletURL.createURL(
 								'<%= editProductDefinitionURL %>'
 							);
@@ -101,7 +117,11 @@ CPDefinition cpDefinition = cpDefinitionsDisplayContext.getCPDefinition();
 							});
 						});
 					})
+<<<<<<< HEAD
 					.catch(() => {
+=======
+					.catch(function () {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						window.parent.Liferay.fire(events.IS_LOADING_MODAL, {
 							isLoading: false,
 						});

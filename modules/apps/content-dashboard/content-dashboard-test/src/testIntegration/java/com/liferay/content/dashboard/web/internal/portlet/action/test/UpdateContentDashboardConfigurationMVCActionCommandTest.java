@@ -103,7 +103,11 @@ public class UpdateContentDashboardConfigurationMVCActionCommandTest {
 	}
 
 	@Inject(
+<<<<<<< HEAD
 		filter = "mvc.command.name=/content_dashboard/update_content_dashboard_configuration",
+=======
+		filter = "mvc.command.name=/update_content_dashboard_configuration",
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		type = MVCActionCommand.class
 	)
 	private MVCActionCommand _mvcActionCommand;

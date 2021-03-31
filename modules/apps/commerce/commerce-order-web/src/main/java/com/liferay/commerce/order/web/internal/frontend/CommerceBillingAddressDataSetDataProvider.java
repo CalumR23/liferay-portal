@@ -17,6 +17,10 @@ package com.liferay.commerce.order.web.internal.frontend;
 import com.liferay.commerce.account.model.CommerceAccount;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.model.CommerceRegion;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.order.web.internal.frontend.constants.CommerceOrderDataSetConstants;
 import com.liferay.commerce.order.web.internal.model.Address;
 import com.liferay.commerce.service.CommerceAddressService;

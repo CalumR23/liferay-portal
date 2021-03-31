@@ -19,7 +19,10 @@ import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+<<<<<<< HEAD
 import com.liferay.petra.function.UnsafeFunction;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.sql.dsl.query.DSLQuery;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.dao.db.DB;
@@ -873,8 +876,11 @@ public abstract class StyleBookEntryLocalServiceBaseImpl
 
 		StyleBookEntry draftStyleBookEntry = create();
 
+<<<<<<< HEAD
 		draftStyleBookEntry.setCtCollectionId(
 			publishedStyleBookEntry.getCtCollectionId());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		draftStyleBookEntry.setUuid(publishedStyleBookEntry.getUuid());
 		draftStyleBookEntry.setHeadId(publishedStyleBookEntry.getPrimaryKey());
 		draftStyleBookEntry.setGroupId(publishedStyleBookEntry.getGroupId());

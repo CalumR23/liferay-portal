@@ -71,6 +71,7 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 					>
 
 						<%
+<<<<<<< HEAD
 						row.setData(
 							HashMapBuilder.<String, Object>put(
 								"actions", redirectManagementToolbarDisplayContext.getAvailableActions(redirectEntry)
@@ -81,6 +82,15 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 							cssClass="table-cell-expand"
 							name="source-url"
 						>
+=======
+						String sourceURL = HtmlUtil.escape(RedirectUtil.getGroupBaseURL(themeDisplay) + StringPool.SLASH + redirectEntry.getSourceURL());
+						%>
+
+						<span data-title="<%= HtmlUtil.escapeAttribute(sourceURL) %>">
+							<%= sourceURL %>
+						</span>
+					</liferay-ui:search-container-column-text>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							<%
 							String sourceURL = HtmlUtil.escape(RedirectUtil.getGroupBaseURL(themeDisplay) + StringPool.SLASH + redirectEntry.getSourceURL());
@@ -91,10 +101,17 @@ RedirectManagementToolbarDisplayContext redirectManagementToolbarDisplayContext 
 							</span>
 						</liferay-ui:search-container-column-text>
 
+<<<<<<< HEAD
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand"
 							name="destination-url"
 						>
+=======
+						<span data-title="<%= HtmlUtil.escapeAttribute(destinationURL) %>">
+							<%= destinationURL %>
+						</span>
+					</liferay-ui:search-container-column-text>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							<%
 							String destinationURL = HtmlUtil.escape(redirectEntry.getDestinationURL());

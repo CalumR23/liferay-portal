@@ -40,7 +40,11 @@ public class ViewPublicationsMVCRenderCommand implements MVCRenderCommand {
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
+<<<<<<< HEAD
 		return "/publications/view_publications.jsp";
+=======
+		return "/publications/view.jsp";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

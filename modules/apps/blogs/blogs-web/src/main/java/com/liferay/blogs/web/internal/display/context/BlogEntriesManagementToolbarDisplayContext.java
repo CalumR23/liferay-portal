@@ -183,6 +183,7 @@ public class BlogEntriesManagementToolbarDisplayContext
 		String navigation = ParamUtil.getString(
 			httpServletRequest, "navigation", "entries");
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -194,6 +195,14 @@ public class BlogEntriesManagementToolbarDisplayContext
 		).setParameter(
 			"orderByType", getOrderByType()
 		).buildString();
+=======
+		searchURL.setParameter("navigation", navigation);
+
+		searchURL.setParameter("orderByCol", getOrderByCol());
+		searchURL.setParameter("orderByType", getOrderByType());
+
+		return searchURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

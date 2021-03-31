@@ -48,7 +48,27 @@ for (Map.Entry<String, String> entry : priorities.entrySet()) {
 	String loggerName = entry.getKey();
 
 	if (Validator.isNull(keywords) || loggerName.contains(keywords)) {
+<<<<<<< HEAD
 		currentPriorities.put(loggerName, entry.getValue());
+=======
+		currentLoggerNames.put(loggerName, logger);
+	}
+}
+
+List<Map.Entry<String, Logger>> currentLoggerNamesList = ListUtil.fromCollection(currentLoggerNames.entrySet());
+
+Iterator<Map.Entry<String, Logger>> itr = currentLoggerNamesList.iterator();
+
+while (itr.hasNext()) {
+	Map.Entry<String, Logger> entry = itr.next();
+
+	Logger logger = entry.getValue();
+
+	Level level = logger.getLevel();
+
+	if (level == null) {
+		itr.remove();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 }
 

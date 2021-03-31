@@ -20,7 +20,10 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.ArrayUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.Optional;
 
@@ -47,6 +50,7 @@ public class GridDDMFormFieldValueRequestParameterRetriever
 
 		JSONObject jsonObject = jsonFactory.createJSONObject();
 
+<<<<<<< HEAD
 		String[] parameterValues = httpServletRequest.getParameterValues(
 			ddmFormFieldParameterName);
 
@@ -68,6 +72,37 @@ public class GridDDMFormFieldValueRequestParameterRetriever
 							parameterValueParts[0], parameterValueParts[1]);
 					}
 				}
+=======
+		Map<String, String[]> parameterMap =
+			httpServletRequest.getParameterMap();
+
+		if (!parameterMap.containsKey(ddmFormFieldParameterName)) {
+			return jsonObject.toString();
+		}
+
+		String[] parameterValues = parameterMap.get(ddmFormFieldParameterName);
+
+		if (parameterValues.length == 1) {
+			try {
+				jsonObject = jsonFactory.createJSONObject(parameterValues[0]);
+
+				return jsonObject.toString();
+			}
+			catch (JSONException jsonException) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(jsonException, jsonException);
+				}
+
+				jsonObject = jsonFactory.createJSONObject();
+			}
+		}
+
+		for (String parameterValue : parameterValues) {
+			if (!parameterValue.isEmpty()) {
+				String[] parameterValueParts = parameterValue.split(";");
+
+				jsonObject.put(parameterValueParts[0], parameterValueParts[1]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

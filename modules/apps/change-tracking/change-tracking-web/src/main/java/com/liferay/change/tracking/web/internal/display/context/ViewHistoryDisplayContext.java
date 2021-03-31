@@ -291,7 +291,12 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 				navigationItem.setActive(false);
 				navigationItem.setHref(
 					_renderResponse.createRenderURL(), "mvcRenderCommandName",
+<<<<<<< HEAD
 					"/change_tracking/view_scheduled");
+=======
+					"/change_tracking/view_scheduled", "displayStyle",
+					getDisplayStyle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				navigationItem.setLabel(
 					_language.get(_httpServletRequest, "scheduled"));
 			}
@@ -300,7 +305,12 @@ public class ViewHistoryDisplayContext extends BasePublicationsDisplayContext {
 				navigationItem.setActive(true);
 				navigationItem.setHref(
 					_renderResponse.createRenderURL(), "mvcRenderCommandName",
+<<<<<<< HEAD
 					"/change_tracking/view_history");
+=======
+					"/change_tracking/view_history", "displayStyle",
+					getDisplayStyle());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				navigationItem.setLabel(
 					_language.get(_httpServletRequest, "history"));
 			}

@@ -32,8 +32,12 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+=======
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -77,6 +81,7 @@ public class CommerceInventoryDisplayContext {
 	}
 
 	public String getAddQuantityActionURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_cpRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -86,6 +91,21 @@ public class CommerceInventoryDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_inventory/edit_commerce_inventory_warehouse");
+		portletURL.setParameter("sku", _sku);
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceInventoryReplenishmentItem
@@ -156,6 +176,7 @@ public class CommerceInventoryDisplayContext {
 	}
 
 	public String getCreateInventoryItemActionURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_cpRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -175,6 +196,36 @@ public class CommerceInventoryDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_inventory/add_commerce_inventory_item");
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public String getCreateReplenishmentActionURL() throws Exception {
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_inventory/edit_commerce_inventory_replenishment_item");
+		portletURL.setParameter("sku", _sku);
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels()
@@ -186,7 +237,14 @@ public class CommerceInventoryDisplayContext {
 			return headerActionModels;
 		}
 
+<<<<<<< HEAD
 		if (_hasPermission()) {
+=======
+		if (PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY)) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			RenderResponse renderResponse =
 				_cpRequestHelper.getRenderResponse();
 
@@ -203,7 +261,14 @@ public class CommerceInventoryDisplayContext {
 	public CreationMenu getInventoryItemCreationMenu() throws Exception {
 		CreationMenu creationMenu = new CreationMenu();
 
+<<<<<<< HEAD
 		if (_hasPermission()) {
+=======
+		if (PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY)) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
 					dropdownItem.setHref(getCreateInventoryItemActionURL());
@@ -241,7 +306,14 @@ public class CommerceInventoryDisplayContext {
 	public CreationMenu getReplenishmentCreationMenu() throws Exception {
 		CreationMenu creationMenu = new CreationMenu();
 
+<<<<<<< HEAD
 		if (_hasPermission()) {
+=======
+		if (PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY)) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
 					dropdownItem.setHref(getCreateReplenishmentActionURL());
@@ -260,6 +332,7 @@ public class CommerceInventoryDisplayContext {
 	}
 
 	public String getTransferQuantitiesActionURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_cpRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -283,12 +356,49 @@ public class CommerceInventoryDisplayContext {
 		).setParameter(
 			"sku", _sku
 		).build();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_inventory/transfer_quantities");
+		portletURL.setParameter("sku", _sku);
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public PortletURL getTransitionInventoryPortletURL() {
+		LiferayPortletResponse liferayPortletResponse =
+			_cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_inventory/edit_commerce_inventory_item");
+		portletURL.setParameter(Constants.CMD, "transition");
+		portletURL.setParameter("sku", _sku);
+		portletURL.setParameter("redirect", _cpRequestHelper.getCurrentURL());
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CreationMenu getWarehousesCreationMenu() throws Exception {
 		CreationMenu creationMenu = new CreationMenu();
 
+<<<<<<< HEAD
 		if (_hasPermission()) {
+=======
+		if (PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY)) {
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			creationMenu.addDropdownItem(
 				dropdownItem -> {
 					dropdownItem.setHref(getAddQuantityActionURL());

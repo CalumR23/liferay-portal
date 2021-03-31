@@ -31,7 +31,11 @@ import org.osgi.service.component.annotations.Component;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + KaleoFormsPortletKeys.KALEO_FORMS_ADMIN,
+<<<<<<< HEAD
 		"mvc.command.name=/kaleo_forms_admin/delete_kaleo_process"
+=======
+		"mvc.command.name=/kaleo_forms/delete_kaleo_process"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	},
 	service = MVCActionCommand.class
 )

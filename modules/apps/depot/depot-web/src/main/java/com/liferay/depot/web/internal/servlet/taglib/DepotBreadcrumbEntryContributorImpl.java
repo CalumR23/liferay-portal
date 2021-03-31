@@ -149,6 +149,18 @@ public class DepotBreadcrumbEntryContributorImpl
 		throws PortalException {
 
 		Group group = depotEntry.getGroup();
+<<<<<<< HEAD
+=======
+
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, group, DepotPortletKeys.DEPOT_ADMIN, 0, 0,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/depot/view_depot_dashboard");
+		portletURL.setParameter(
+			"depotEntryId", String.valueOf(depotEntry.getDepotEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
@@ -160,8 +172,11 @@ public class DepotBreadcrumbEntryContributorImpl
 			"depotEntryId", depotEntry.getDepotEntryId()
 		).build();
 
+<<<<<<< HEAD
 		BreadcrumbEntry breadcrumbEntry = new BreadcrumbEntry();
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		breadcrumbEntry.setTitle(
 			group.getDescriptiveName(_portal.getLocale(httpServletRequest)));
 

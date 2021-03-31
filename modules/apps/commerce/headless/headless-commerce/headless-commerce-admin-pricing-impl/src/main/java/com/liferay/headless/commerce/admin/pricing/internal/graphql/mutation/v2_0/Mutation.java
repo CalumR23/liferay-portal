@@ -1139,8 +1139,13 @@ public class Mutation {
 
 	@GraphQLField
 	public boolean deletePriceListAccountGroup(
+<<<<<<< HEAD
 			@GraphQLName("priceListAccountGroupId")
 				Long priceListAccountGroupId)
+=======
+			@GraphQLName("priceListAccountGroupId") Long
+				priceListAccountGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -1487,8 +1492,13 @@ public class Mutation {
 
 	@GraphQLField
 	public boolean deletePriceModifierCategory(
+<<<<<<< HEAD
 			@GraphQLName("priceModifierCategoryId")
 				Long priceModifierCategoryId)
+=======
+			@GraphQLName("priceModifierCategoryId") Long
+				priceModifierCategoryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(
@@ -1646,8 +1656,13 @@ public class Mutation {
 
 	@GraphQLField
 	public boolean deletePriceModifierProductGroup(
+<<<<<<< HEAD
 			@GraphQLName("priceModifierProductGroupId")
 				Long priceModifierProductGroupId)
+=======
+			@GraphQLName("priceModifierProductGroupId") Long
+				priceModifierProductGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		_applyVoidComponentServiceObjects(

@@ -70,10 +70,13 @@ public class LabelItem extends HashMap<String, Object> {
 		put("label", label);
 	}
 
+<<<<<<< HEAD
 	public void setLarge(boolean large) {
 		put("large", large);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void setStatus(int status) {
 		setLabel(
 			LanguageUtil.get(

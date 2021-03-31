@@ -54,6 +54,7 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 		Map<String, String> data = new HashMap<>();
 
 		try {
+<<<<<<< HEAD
 			data.put(
 				"data-add-layout-url",
 				PortletURLBuilder.createRenderURL(
@@ -76,6 +77,38 @@ public class SelectGlobalTemplatesVerticalCard implements VerticalCard {
 				).setWindowState(
 					LiferayWindowState.POP_UP
 				).buildString());
+=======
+			PortletURL addLayoutURL = _renderResponse.createRenderURL();
+
+			addLayoutURL.setParameter(
+				"mvcRenderCommandName", "/layout_admin/add_layout");
+
+			String redirect = ParamUtil.getString(_renderRequest, "redirect");
+
+			addLayoutURL.setParameter("backURL", redirect);
+
+			long selPlid = ParamUtil.getLong(_renderRequest, "selPlid");
+
+			addLayoutURL.setParameter("selPlid", String.valueOf(selPlid));
+
+			boolean privateLayout = ParamUtil.getBoolean(
+				_renderRequest, "privateLayout");
+
+			addLayoutURL.setParameter(
+				"privateLayout", String.valueOf(privateLayout));
+
+			addLayoutURL.setParameter(
+				"layoutPageTemplateEntryId",
+				String.valueOf(
+					_layoutPageTemplateEntry.getLayoutPageTemplateEntryId()));
+			addLayoutURL.setParameter(
+				"layoutPrototypeId",
+				String.valueOf(
+					_layoutPageTemplateEntry.getLayoutPrototypeId()));
+			addLayoutURL.setWindowState(LiferayWindowState.POP_UP);
+
+			data.put("add-layout-url", addLayoutURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {

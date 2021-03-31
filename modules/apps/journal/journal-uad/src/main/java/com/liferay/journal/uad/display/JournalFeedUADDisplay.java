@@ -16,13 +16,20 @@ package com.liferay.journal.uad.display;
 
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalFeed;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.user.associated.data.display.UADDisplay;
 
 import javax.portlet.PortletRequest;
+<<<<<<< HEAD
+=======
+import javax.portlet.PortletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,6 +47,7 @@ public class JournalFeedUADDisplay extends BaseJournalFeedUADDisplay {
 			LiferayPortletResponse liferayPortletResponse)
 		throws Exception {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				liferayPortletRequest, JournalPortletKeys.JOURNAL,
@@ -53,6 +61,21 @@ public class JournalFeedUADDisplay extends BaseJournalFeedUADDisplay {
 		).setParameter(
 			"feedId", journalFeed.getFeedId()
 		).buildString();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			liferayPortletRequest, JournalPortletKeys.JOURNAL,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("mvcPath", "/edit_feed.jsp");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(liferayPortletRequest));
+		portletURL.setParameter(
+			"groupId", String.valueOf(journalFeed.getGroupId()));
+		portletURL.setParameter(
+			"feedId", String.valueOf(journalFeed.getFeedId()));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference

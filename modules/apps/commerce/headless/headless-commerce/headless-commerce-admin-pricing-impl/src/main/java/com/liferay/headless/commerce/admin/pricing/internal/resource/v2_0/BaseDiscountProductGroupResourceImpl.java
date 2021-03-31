@@ -86,7 +86,10 @@ public abstract class BaseDiscountProductGroupResourceImpl
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-product-groups/{discountProductGroupId}'  -u 'test@liferay.com:test'
 	 */
 	@DELETE
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "discountProductGroupId")
@@ -97,8 +100,12 @@ public abstract class BaseDiscountProductGroupResourceImpl
 	@Tags(value = {@Tag(name = "DiscountProductGroup")})
 	public void deleteDiscountProductGroup(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("discountProductGroupId")
 				Long discountProductGroupId)
+=======
+			@PathParam("discountProductGroupId") Long discountProductGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 	}
 
@@ -117,8 +124,13 @@ public abstract class BaseDiscountProductGroupResourceImpl
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "DiscountProductGroup")})
 	public Response deleteDiscountProductGroupBatch(
+<<<<<<< HEAD
 			@Parameter(hidden = true) @QueryParam("callbackURL")
 				String callbackURL,
+=======
+			@Parameter(hidden = true) @QueryParam("callbackURL") String
+				callbackURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Object object)
 		throws Exception {
 

@@ -295,12 +295,22 @@ public class StagingProcessesWebToolbarDisplayContext {
 			"groupId", ParamUtil.getLong(_httpServletRequest, "groupId")
 		).setParameter(
 			"privateLayout",
+<<<<<<< HEAD
 			ParamUtil.getBoolean(_httpServletRequest, "privateLayout")
 		).setParameter(
 			"displayStyle", getDisplayStyle()
 		).setParameter(
 			"orderByCol", ParamUtil.getString(_httpServletRequest, "orderByCol")
 		).setParameter(
+=======
+			String.valueOf(
+				ParamUtil.getBoolean(_httpServletRequest, "privateLayout")));
+		renderURL.setParameter("displayStyle", getDisplayStyle());
+		renderURL.setParameter(
+			"orderByCol",
+			ParamUtil.getString(_httpServletRequest, "orderByCol"));
+		renderURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"orderByType",
 			ParamUtil.getString(_httpServletRequest, "orderByType", "asc")
 		).setParameter(

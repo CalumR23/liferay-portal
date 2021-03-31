@@ -95,10 +95,24 @@ public class AvailabilityCPContentContributor implements CPContentContributor {
 					cpDefinitionInventoryEngine.getMinStockQuantity(cpInstance),
 					cpInstance.getSku());
 
+<<<<<<< HEAD
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)httpServletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
 
+=======
+		int stockQuantity = _commerceInventoryEngine.getStockQuantity(
+			cpInstance.getCompanyId(), commerceChannel.getGroupId(),
+			cpInstance.getSku());
+		int minStockQuantity = cpDefinitionInventoryEngine.getMinStockQuantity(
+			cpInstance);
+
+		if (stockQuantity > minStockQuantity) {
+			available = true;
+		}
+
+		if (displayAvailability && available) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			jsonObject.put(
 				CPContentContributorConstants.AVAILABILITY_NAME,
 				LanguageUtil.get(themeDisplay.getLocale(), availabilityStatus));

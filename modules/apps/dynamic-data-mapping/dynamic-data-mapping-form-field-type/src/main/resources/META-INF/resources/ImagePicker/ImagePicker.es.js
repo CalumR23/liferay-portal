@@ -115,11 +115,16 @@ const ImagePicker = ({
 					<ClayInput.GroupItem className="d-none d-sm-block" prepend>
 						<ClayInput
 							className="field"
+<<<<<<< HEAD
 							dir={Liferay.Language.direction[editingLanguageId]}
 							disabled={readOnly}
 							id={id}
 							lang={editingLanguageId}
 							onClick={handleItemSelectorTriggerClick}
+=======
+							disabled
+							id={id}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							type="text"
 							value={imageValues.title || ''}
 						/>

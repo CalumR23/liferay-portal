@@ -24,7 +24,11 @@ CommerceWishList commerceWishList = commerceWishListDisplayContext.getCommerceWi
 
 <portlet:actionURL name="/commerce_wish_list_content/edit_commerce_wish_list" var="editCommerceWishListActionURL" />
 
+<<<<<<< HEAD
 <aui:form action="<%= editCommerceWishListActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+<aui:form action="<%= editCommerceWishListActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (commerceWishList == null) ? Constants.ADD : Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="commerceWishListId" type="hidden" value="<%= commerceWishListDisplayContext.getCommerceWishListId() %>" />
@@ -37,7 +41,11 @@ CommerceWishList commerceWishList = commerceWishListDisplayContext.getCommerceWi
 		<aui:fieldset>
 			<aui:input name="name" />
 
+<<<<<<< HEAD
 			<aui:input checked='<%= BeanParamUtil.getBoolean(commerceWishList, request, "defaultWishList") %>' inlineLabel="right" label="default" labelCssClass="simple-toggle-switch" name="defaultWishList" type="toggle-switch" />
+=======
+			<aui:input checked='<%= BeanParamUtil.getBoolean(commerceWishList, request, "defaultWishList") %>' label="default" name="defaultWishList" type="toggle-switch" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</aui:fieldset>
 	</aui:fieldset-group>
 

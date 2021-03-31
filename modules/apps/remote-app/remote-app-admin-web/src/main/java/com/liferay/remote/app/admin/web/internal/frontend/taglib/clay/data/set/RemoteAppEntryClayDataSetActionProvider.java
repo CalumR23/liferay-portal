@@ -73,6 +73,7 @@ public class RemoteAppEntryClayDataSetActionProvider
 		DropdownItem dropdownItem, HttpServletRequest httpServletRequest,
 		RemoteAppClayDataSetEntry remoteAppClayDataSetEntry) {
 
+<<<<<<< HEAD
 		dropdownItem.setHref(
 			PortletURLBuilder.create(
 				_getActionURL(httpServletRequest)
@@ -82,6 +83,18 @@ public class RemoteAppEntryClayDataSetActionProvider
 				"remoteAppEntryId",
 				remoteAppClayDataSetEntry.getRemoteAppEntryId()
 			).buildString());
+=======
+		PortletURL deleteRemoteAppEntryURL = _getActionURL(httpServletRequest);
+
+		deleteRemoteAppEntryURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/remote_app_admin/delete_remote_app_entry");
+		deleteRemoteAppEntryURL.setParameter(
+			"remoteAppEntryId",
+			String.valueOf(remoteAppClayDataSetEntry.getRemoteAppEntryId()));
+
+		dropdownItem.setHref(deleteRemoteAppEntryURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		dropdownItem.setIcon("times-circle");
 		dropdownItem.setLabel(_getMessage(httpServletRequest, "delete"));
@@ -91,6 +104,7 @@ public class RemoteAppEntryClayDataSetActionProvider
 		DropdownItem dropdownItem, HttpServletRequest httpServletRequest,
 		RemoteAppClayDataSetEntry remoteAppClayDataSetEntry) {
 
+<<<<<<< HEAD
 		PortletURL editRemoteAppEntryURL = PortletURLBuilder.create(
 			_getRenderURL(httpServletRequest)
 		).setMVCRenderCommandName(
@@ -98,6 +112,15 @@ public class RemoteAppEntryClayDataSetActionProvider
 		).setParameter(
 			"remoteAppEntryId", remoteAppClayDataSetEntry.getRemoteAppEntryId()
 		).build();
+=======
+		PortletURL editRemoteAppEntryURL = _getRenderURL(httpServletRequest);
+
+		editRemoteAppEntryURL.setParameter(
+			"mvcRenderCommandName", "/remote_app_admin/edit_remote_app_entry");
+		editRemoteAppEntryURL.setParameter(
+			"remoteAppEntryId",
+			String.valueOf(remoteAppClayDataSetEntry.getRemoteAppEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String currentURL = ParamUtil.getString(
 			httpServletRequest, "currentURL",

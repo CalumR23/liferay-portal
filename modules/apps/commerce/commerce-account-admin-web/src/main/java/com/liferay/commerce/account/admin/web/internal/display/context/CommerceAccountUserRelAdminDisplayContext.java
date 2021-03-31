@@ -101,11 +101,21 @@ public class CommerceAccountUserRelAdminDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setMVCRenderCommandName(
 			"/commerce_account_admin/edit_commerce_account"
 		).build();
+=======
+		PortletURL portletURL = super.getPortletURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_account");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

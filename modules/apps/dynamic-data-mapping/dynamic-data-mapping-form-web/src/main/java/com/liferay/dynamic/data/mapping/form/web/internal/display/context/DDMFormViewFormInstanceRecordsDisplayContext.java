@@ -137,8 +137,14 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 		return availableActions;
 	}
 
+<<<<<<< HEAD
 	public int getAvailableLocalesCount() throws Exception {
 		DDMFormInstance ddmFormInstance = getDDMFormInstance();
+=======
+	public String getClearResultsURL() throws PortletException {
+		PortletURL clearResultsURL = PortletURLUtil.clone(
+			getPortletURL(), _renderResponse);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		DDMForm ddmForm = ddmFormInstance.getDDMForm();
 

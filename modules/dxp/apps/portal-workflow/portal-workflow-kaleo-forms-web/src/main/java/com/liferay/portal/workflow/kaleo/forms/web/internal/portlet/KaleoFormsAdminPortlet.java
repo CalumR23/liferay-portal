@@ -29,8 +29,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.model.WorkflowInstanceLink;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -295,10 +298,13 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 			return rootElement.elementTextTrim("name");
 		}
 		catch (DocumentException documentException) {
+<<<<<<< HEAD
 			if (_log.isDebugEnabled()) {
 				_log.debug(documentException, documentException);
 			}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			return defaultName;
 		}
 	}
@@ -519,9 +525,12 @@ public class KaleoFormsAdminPortlet extends MVCPortlet {
 	@Reference
 	protected StorageEngine storageEngine;
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		KaleoFormsAdminPortlet.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference
 	private DDLExporterFactory _ddlExporterFactory;
 

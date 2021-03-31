@@ -100,9 +100,13 @@ public class DuplicateSegmentsExperienceMVCActionCommand
 				segmentsExperience.getClassPK(),
 				Collections.singletonMap(
 					LocaleUtil.getSiteDefault(), sb.toString()),
+<<<<<<< HEAD
 				segmentsExperience.isActive(),
 				segmentsExperience.getTypeSettingsUnicodeProperties(),
 				serviceContext);
+=======
+				segmentsExperience.isActive(), serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		SegmentsExperienceUtil.copySegmentsExperienceData(
 			themeDisplay.getPlid(), _commentManager,

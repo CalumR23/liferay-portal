@@ -55,7 +55,11 @@ ConfigurationCategoryMenuDisplay configurationCategoryMenuDisplay = (Configurati
 							for (ConfigurationEntry curConfigurationEntry : configurationEntries) {
 							%>
 
+<<<<<<< HEAD
 								<li class="nav-item">
+=======
+								<li>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									<aui:a cssClass='<%= configurationEntry.equals(curConfigurationEntry) ? "active nav-link" : "nav-link" %>' href="<%= curConfigurationEntry.getEditURL(renderRequest, renderResponse) %>"><%= curConfigurationEntry.getName() %></aui:a>
 								</li>
 

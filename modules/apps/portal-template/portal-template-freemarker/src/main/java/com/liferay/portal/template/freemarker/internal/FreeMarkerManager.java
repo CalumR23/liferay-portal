@@ -658,9 +658,19 @@ public class FreeMarkerManager extends BaseTemplateManager {
 
 	private Bundle _bundle;
 	private BundleTracker<Set<String>> _bundleTracker;
+<<<<<<< HEAD
 	private volatile Configuration _configuration;
 	private volatile BeansWrapper _defaultBeanWrapper;
 	private FreeMarkerBundleClassloader _freeMarkerBundleClassloader;
+=======
+
+	// Set initial to -2 because -1 has significance to bundle trackers
+
+	private volatile int _bundleTrackingCount = -2;
+	private volatile Configuration _configuration;
+	private volatile BeansWrapper _defaultBeanWrapper;
+	private volatile FreeMarkerBundleClassloader _freeMarkerBundleClassloader;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private volatile FreeMarkerEngineConfiguration
 		_freeMarkerEngineConfiguration;
 

@@ -246,7 +246,10 @@ public class ShippingOption implements Serializable {
 	}
 
 	@Schema(
+<<<<<<< HEAD
 		accessMode = Schema.AccessMode.READ_ONLY,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		defaultValue = "com.liferay.headless.commerce.delivery.cart.dto.v1_0.ShippingOption",
 		name = "x-class-name"
 	)
@@ -282,7 +285,11 @@ public class ShippingOption implements Serializable {
 
 			sb.append("\"");
 			sb.append(entry.getKey());
+<<<<<<< HEAD
 			sb.append("\": ");
+=======
+			sb.append("\":");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Object value = entry.getValue();
 
@@ -321,7 +328,11 @@ public class ShippingOption implements Serializable {
 			}
 
 			if (iterator.hasNext()) {
+<<<<<<< HEAD
 				sb.append(", ");
+=======
+				sb.append(",");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 

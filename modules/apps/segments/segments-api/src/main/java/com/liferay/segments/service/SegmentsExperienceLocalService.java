@@ -121,6 +121,7 @@ public interface SegmentsExperienceLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+<<<<<<< HEAD
 	public SegmentsExperience appendSegmentsExperience(
 			long segmentsEntryId, long classNameId, long classPK,
 			Map<Locale, String> nameMap, boolean active,
@@ -128,6 +129,8 @@ public interface SegmentsExperienceLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * @throws PortalException
 	 */

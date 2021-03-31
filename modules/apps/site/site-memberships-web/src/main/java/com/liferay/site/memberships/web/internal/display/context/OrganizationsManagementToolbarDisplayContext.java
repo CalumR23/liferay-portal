@@ -125,6 +125,7 @@ public class OrganizationsManagementToolbarDisplayContext
 
 					dropdownItem.putData(
 						"selectOrganizationsURL",
+<<<<<<< HEAD
 						PortletURLBuilder.createRenderURL(
 							liferayPortletResponse
 						).setMVCPath(
@@ -132,6 +133,9 @@ public class OrganizationsManagementToolbarDisplayContext
 						).setWindowState(
 							LiferayWindowState.POP_UP
 						).buildString());
+=======
+						selectOrganizationsURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					dropdownItem.setLabel(
 						LanguageUtil.get(httpServletRequest, "add"));
 				}

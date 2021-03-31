@@ -188,6 +188,7 @@ public class ContentFieldUtil {
 				};
 			}
 			else if (Objects.equals(
+<<<<<<< HEAD
 						DDMFormFieldTypeConstants.GEOLOCATION,
 						ddmFormField.getType())) {
 
@@ -206,6 +207,8 @@ public class ContentFieldUtil {
 				};
 			}
 			else if (Objects.equals(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						DDMFormFieldType.GEOLOCATION, ddmFormField.getType())) {
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
@@ -223,10 +226,14 @@ public class ContentFieldUtil {
 				};
 			}
 			else if (Objects.equals(
+<<<<<<< HEAD
 						DDMFormFieldType.IMAGE, ddmFormField.getType()) ||
 					 Objects.equals(
 						 DDMFormFieldTypeConstants.IMAGE,
 						 ddmFormField.getType())) {
+=======
+						DDMFormFieldType.IMAGE, ddmFormField.getType())) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					valueString);
@@ -261,11 +268,15 @@ public class ContentFieldUtil {
 			}
 			else if (Objects.equals(
 						DDMFormFieldType.JOURNAL_ARTICLE,
+<<<<<<< HEAD
 						ddmFormField.getType()) ||
 					 Objects.equals(
 						 ddmFormField.getType(),
 						 JournalArticleDDMFormFieldTypeConstants.
 							 JOURNAL_ARTICLE)) {
+=======
+						ddmFormField.getType())) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					valueString);
@@ -296,10 +307,14 @@ public class ContentFieldUtil {
 			}
 			else if (Objects.equals(
 						DDMFormFieldType.LINK_TO_PAGE,
+<<<<<<< HEAD
 						ddmFormField.getType()) ||
 					 Objects.equals(
 						 LayoutDDMFormFieldTypeConstants.LINK_TO_LAYOUT,
 						 ddmFormField.getType())) {
+=======
+						ddmFormField.getType())) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 					valueString);
@@ -323,6 +338,7 @@ public class ContentFieldUtil {
 				};
 			}
 			else if (Objects.equals(
+<<<<<<< HEAD
 						DDMFormFieldTypeConstants.SELECT,
 						ddmFormField.getType()) ||
 					 Objects.equals(
@@ -364,6 +380,9 @@ public class ContentFieldUtil {
 			else if (Objects.equals(
 						DDMFormFieldTypeConstants.RADIO,
 						ddmFormField.getType())) {
+=======
+						DDMFormFieldType.RADIO, ddmFormField.getType())) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				DDMFormFieldOptions ddmFormFieldOptions =
 					ddmFormField.getDDMFormFieldOptions();

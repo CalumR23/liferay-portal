@@ -220,9 +220,111 @@ public class CommercePriceEntryLocalServiceImpl
 			serviceContext);
 	}
 
+<<<<<<< HEAD
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public CommercePriceEntry addCommercePriceEntry(
+=======
+	@Override
+	public CommercePriceEntry addCommercePriceEntry(
+			long cProductId, String cpInstanceUuid, long commercePriceListId,
+			BigDecimal price, BigDecimal promoPrice,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addCommercePriceEntry(
+			cProductId, cpInstanceUuid, commercePriceListId, null, price,
+			promoPrice, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #addCommercePriceEntry(String, long, String, long,
+	 *             BigDecimal, BigDecimal, boolean, BigDecimal, BigDecimal,
+	 *             BigDecimal, BigDecimal, int, int, int, int, int, int, int,
+	 *             int, int, int, boolean, ServiceContext)}
+	 */
+	@Deprecated
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public CommercePriceEntry addCommercePriceEntry(
+			long cProductId, String cpInstanceUuid, long commercePriceListId,
+			String externalReferenceCode, BigDecimal price,
+			BigDecimal promoPrice, boolean discountDiscovery,
+			BigDecimal discountLevel1, BigDecimal discountLevel2,
+			BigDecimal discountLevel3, BigDecimal discountLevel4,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addCommercePriceEntry(
+			externalReferenceCode, cProductId, cpInstanceUuid,
+			commercePriceListId, price, promoPrice, discountDiscovery,
+			discountLevel1, discountLevel2, discountLevel3, discountLevel4,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			neverExpire, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #addCommercePriceEntry(String, long, String, long,
+	 *             BigDecimal, BigDecimal, ServiceContext)}
+	 */
+	@Deprecated
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public CommercePriceEntry addCommercePriceEntry(
+			long cProductId, String cpInstanceUuid, long commercePriceListId,
+			String externalReferenceCode, BigDecimal price,
+			BigDecimal promoPrice, ServiceContext serviceContext)
+		throws PortalException {
+
+		return addCommercePriceEntry(
+			externalReferenceCode, cProductId, cpInstanceUuid,
+			commercePriceListId, price, promoPrice, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #addCommercePriceEntry(String, long, String, long,
+	 *             BigDecimal, boolean, BigDecimal, BigDecimal, BigDecimal,
+	 *             BigDecimal, int, int, int, int, int, int, int, int, int,
+	 *             int, boolean, ServiceContext)}
+	 */
+	@Deprecated
+	@Override
+	public CommercePriceEntry addCommercePriceEntry(
+			long cProductId, String cpInstanceUuid, long commercePriceListId,
+			String externalReferenceCode, BigDecimal price,
+			boolean discountDiscovery, BigDecimal discountLevel1,
+			BigDecimal discountLevel2, BigDecimal discountLevel3,
+			BigDecimal discountLevel4, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, boolean neverExpire,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return addCommercePriceEntry(
+			externalReferenceCode, cProductId, cpInstanceUuid,
+			commercePriceListId, price, discountDiscovery, discountLevel1,
+			discountLevel2, discountLevel3, discountLevel4, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, neverExpire,
+			serviceContext);
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public CommercePriceEntry addCommercePriceEntry(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			String externalReferenceCode, long cProductId,
 			String cpInstanceUuid, long commercePriceListId, BigDecimal price,
 			BigDecimal promoPrice, boolean discountDiscovery,
@@ -343,12 +445,15 @@ public class CommercePriceEntryLocalServiceImpl
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, neverExpire,
 			serviceContext);
+<<<<<<< HEAD
 	}
 
 	@Override
 	public void checkCommercePriceEntries() throws PortalException {
 		checkCommercePriceEntriesByDisplayDate();
 		checkCommercePriceEntriesByExpirationDate();
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -969,10 +1074,94 @@ public class CommercePriceEntryLocalServiceImpl
 	 *             int, int, int, boolean, String, ServiceContext)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	@Override
 	public CommercePriceEntry upsertCommercePriceEntry(
 			long commercePriceEntryId, long cProductId, String cpInstanceUuid,
 			long commercePriceListId, String externalReferenceCode,
+			BigDecimal price, BigDecimal promoPrice, boolean discountDiscovery,
+			BigDecimal discountLevel1, BigDecimal discountLevel2,
+			BigDecimal discountLevel3, BigDecimal discountLevel4,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, String skuExternalReferenceCode,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return upsertCommercePriceEntry(
+			externalReferenceCode, commercePriceEntryId, cProductId,
+			cpInstanceUuid, commercePriceListId, price, promoPrice,
+			discountDiscovery, discountLevel1, discountLevel2, discountLevel3,
+			discountLevel4, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, skuExternalReferenceCode,
+			serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #upsertCommercePriceEntry(String, long, long, String, long,
+	 *             BigDecimal, BigDecimal, String, ServiceContext)}
+	 */
+	@Deprecated
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public CommercePriceEntry upsertCommercePriceEntry(
+			long commercePriceEntryId, long cProductId, String cpInstanceUuid,
+			long commercePriceListId, String externalReferenceCode,
+			BigDecimal price, BigDecimal promoPrice,
+			String skuExternalReferenceCode, ServiceContext serviceContext)
+		throws PortalException {
+
+		return upsertCommercePriceEntry(
+			externalReferenceCode, commercePriceEntryId, cProductId,
+			cpInstanceUuid, commercePriceListId, price, promoPrice,
+			skuExternalReferenceCode, serviceContext);
+	}
+
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 *             #upsertCommercePriceEntry(String, long, long, String, long,
+	 *             BigDecimal, BigDecimal, BigDecimal, BigDecimal, int, int,
+	 *             int, int, int, int, int, int, int, int, boolean, String,
+	 *             ServiceContext)}
+	 */
+	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+	@Override
+	public CommercePriceEntry upsertCommercePriceEntry(
+			long commercePriceEntryId, long cProductId, String cpInstanceUuid,
+			long commercePriceListId, String externalReferenceCode,
+			BigDecimal price, boolean discountDiscovery,
+			BigDecimal discountLevel1, BigDecimal discountLevel2,
+			BigDecimal discountLevel3, BigDecimal discountLevel4,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute,
+			boolean neverExpire, String skuExternalReferenceCode,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return upsertCommercePriceEntry(
+			commercePriceEntryId, cProductId, cpInstanceUuid,
+			commercePriceListId, externalReferenceCode, price,
+			discountDiscovery, discountLevel1, discountLevel2, discountLevel3,
+			discountLevel4, displayDateMonth, displayDateDay, displayDateYear,
+			displayDateHour, displayDateMinute, expirationDateMonth,
+			expirationDateDay, expirationDateYear, expirationDateHour,
+			expirationDateMinute, neverExpire, skuExternalReferenceCode,
+			serviceContext);
+	}
+
+	@Override
+	public CommercePriceEntry upsertCommercePriceEntry(
+			String externalReferenceCode, long commercePriceEntryId,
+			long cProductId, String cpInstanceUuid, long commercePriceListId,
 			BigDecimal price, BigDecimal promoPrice, boolean discountDiscovery,
 			BigDecimal discountLevel1, BigDecimal discountLevel2,
 			BigDecimal discountLevel3, BigDecimal discountLevel4,

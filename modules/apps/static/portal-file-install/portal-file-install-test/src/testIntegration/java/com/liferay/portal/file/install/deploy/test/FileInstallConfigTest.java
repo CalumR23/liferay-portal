@@ -20,9 +20,14 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTestUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.MapUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
+=======
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
@@ -36,6 +41,9 @@ import java.nio.file.Paths;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -155,26 +163,48 @@ public class FileInstallConfigTest {
 			PropsValues.MODULE_FRAMEWORK_CONFIGS_DIR,
 			configurationPidDeprecated.concat(".cfg"));
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureLog4JLogger(
 				"com.liferay.portal.file.install.internal.configuration." +
 					"ConfigurationFileInstaller",
 				LoggerTestUtil.WARN)) {
+=======
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"com.liferay.portal.file.install.internal.configuration." +
+						"ConfigurationFileInstaller",
+					Level.WARN)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Files.write(configPathDeprecated, contentDeprecated.getBytes());
 
 			_configuration = _createConfiguration(configurationPid, content);
 
+<<<<<<< HEAD
 			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
 
 			LogEntry logEntry = logEntries.get(0);
+=======
+			List<LoggingEvent> loggingEvents =
+				captureAppender.getLoggingEvents();
+
+			Assert.assertEquals(
+				loggingEvents.toString(), 1, loggingEvents.size());
+
+			LoggingEvent loggingEvent = loggingEvents.get(0);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals(
 				StringBundler.concat(
 					"Unable to install .cfg file ", configPathDeprecated,
 					", please use .config file instead."),
+<<<<<<< HEAD
 				logEntry.getMessage());
+=======
+				loggingEvent.getMessage());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Configuration configurationDeprecated =
 				_configurationAdmin.getConfiguration(

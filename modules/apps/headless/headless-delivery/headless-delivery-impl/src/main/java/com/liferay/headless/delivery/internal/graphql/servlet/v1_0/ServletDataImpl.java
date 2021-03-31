@@ -255,8 +255,11 @@ public class ServletDataImpl implements ServletData {
 	private ComponentServiceObjects<LanguageResource>
 		_languageResourceComponentServiceObjects;
 
+<<<<<<< HEAD
 	@Reference(scope = ReferenceScope.PROTOTYPE_REQUIRED)
 	private ComponentServiceObjects<SitePageResource>
 		_sitePageResourceComponentServiceObjects;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 }

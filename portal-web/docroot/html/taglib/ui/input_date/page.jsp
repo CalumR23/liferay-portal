@@ -116,7 +116,11 @@ else {
 <span class="lfr-input-date" id="<%= randomNamespace %>displayDate">
 	<c:choose>
 		<c:when test="<%= BrowserSnifferUtil.isMobile(request) %>">
+<<<<<<< HEAD
 			<input <%= Validator.isNotNull(autoComplete) ? "autocomplete=\"" + autoComplete + "\"" : StringPool.BLANK %> class="form-control <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<%= nameId %>" name="<%= namespace + HtmlUtil.escapeAttribute(name) %>" type="date" value="<%= dateString %>" />
+=======
+			<input class="form-control <%= cssClass %>" <%= disabled ? "disabled=\"disabled\"" : "" %> id="<%= nameId %>" name="<%= namespace + HtmlUtil.escapeAttribute(name) %>" type="date" value="<%= dateString %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</c:when>
 		<c:otherwise>
 			<c:choose>

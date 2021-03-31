@@ -474,8 +474,15 @@ public class ResourcePermissionLocalServiceUtil {
 		return getService().getIndexableActionableDynamicQuery();
 	}
 
+<<<<<<< HEAD
 	public static Map<String, List<ResourcePermission>>
 		getIndividualPortletResourcePermissions(long companyId) {
+=======
+	public static java.util.Map
+		<String,
+		 java.util.List<com.liferay.portal.kernel.model.ResourcePermission>>
+			getIndividualPortletResourcePermissions(long companyId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getIndividualPortletResourcePermissions(companyId);
 	}

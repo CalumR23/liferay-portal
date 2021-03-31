@@ -175,6 +175,7 @@ export default function ViewEntry({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [entryIndex, query]);
 
+<<<<<<< HEAD
 	useEffect(() => {
 		if (dataRecordId && status !== ENTRY_STATUS.APPROVED) {
 			getItem(`/o/headless-admin-workflow/v1.0/workflow-instances`, {
@@ -193,6 +194,8 @@ export default function ViewEntry({
 		}
 	}, [dataRecordId, status, workflowClassName]);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const getBackURL = () => {
 		const urlParams = new URLSearchParams(window.location.hash);
 		const backURL = urlParams.get('backURL') || '../../';

@@ -142,6 +142,7 @@ public abstract class BaseCPDefinitionsDisplayContext {
 	}
 
 	public PortletURL getEditProductDefinitionURL() throws PortalException {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -149,6 +150,16 @@ public abstract class BaseCPDefinitionsDisplayContext {
 		).setParameter(
 			"cpDefinitionId", getCPDefinitionId()
 		).build();
+=======
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(getCPDefinitionId()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public PortletURL getPortletURL() throws PortalException {

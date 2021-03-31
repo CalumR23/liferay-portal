@@ -270,11 +270,19 @@ describe('Field DocumentLibrary', () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		const guestUploadFieldInput = document.getElementById(
 			'uploadFieldinputFileGuestUpload'
 		);
 
 		expect(guestUploadFieldInput).not.toBe(null);
+=======
+		const guestUploadFileInput = document.getElementById(
+			'textFieldinputFileGuestUpload'
+		);
+
+		expect(guestUploadFileInput).not.toBe(null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	});
 
 	it('hide guest upload field if allowGuestUsers property is disabled', () => {
@@ -294,11 +302,19 @@ describe('Field DocumentLibrary', () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		const guestUploadFieldInput = document.getElementById(
 			'uploadFieldinputFileGuestUpload'
 		);
 
 		expect(guestUploadFieldInput).toBe(null);
+=======
+		const guestUploadFileInput = document.getElementById(
+			'textFieldinputFileGuestUpload'
+		);
+
+		expect(guestUploadFileInput).toBe(null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	});
 
 	it('disables guest upload field if maximumSubmissionLimitReached property is true', () => {
@@ -318,6 +334,7 @@ describe('Field DocumentLibrary', () => {
 			jest.runAllTimers();
 		});
 
+<<<<<<< HEAD
 		const guestUploadFieldInput = document.getElementById(
 			'uploadFieldinputFileGuestUpload'
 		);
@@ -329,5 +346,18 @@ describe('Field DocumentLibrary', () => {
 		);
 
 		expect(guestUploadFieldInputLabel.classList).toContain('disabled');
+=======
+		const guestUploadFileInput = document.getElementById(
+			'textFieldinputFileGuestUpload'
+		);
+
+		expect(guestUploadFileInput.disabled).toBeTruthy();
+
+		const guestUploadFileInputLabel = document.querySelector(
+			'.select-button'
+		);
+
+		expect(guestUploadFileInputLabel.classList).toContain('disabled');
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	});
 });

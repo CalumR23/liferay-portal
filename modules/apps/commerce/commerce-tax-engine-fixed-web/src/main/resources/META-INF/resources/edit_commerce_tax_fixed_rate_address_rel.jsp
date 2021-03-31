@@ -21,8 +21,13 @@ CommerceTaxFixedRateAddressRelsDisplayContext commerceTaxFixedRateAddressRelsDis
 
 CommerceTaxFixedRateAddressRel commerceTaxFixedRateAddressRel = commerceTaxFixedRateAddressRelsDisplayContext.getCommerceTaxFixedRateAddressRel();
 
+<<<<<<< HEAD
 long countryId = commerceTaxFixedRateAddressRelsDisplayContext.getCountryId();
 long regionId = commerceTaxFixedRateAddressRelsDisplayContext.getRegionId();
+=======
+long commerceCountryId = commerceTaxFixedRateAddressRelsDisplayContext.getCommerceCountryId();
+long commerceRegionId = commerceTaxFixedRateAddressRelsDisplayContext.getCommerceRegionId();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 %>
 
 <portlet:actionURL name="/commerce_tax_methods/edit_commerce_tax_fixed_rate_address_rel" var="editCommerceTaxFixedRateAddressRelActionURL" />
@@ -57,6 +62,7 @@ long regionId = commerceTaxFixedRateAddressRelsDisplayContext.getRegionId();
 <aui:script use="aui-base,liferay-dynamic-select">
 	new Liferay.DynamicSelect([
 		{
+<<<<<<< HEAD
 			select: '<portlet:namespace />countryId',
 			selectData: function (callback) {
 				Liferay.Service(
@@ -64,11 +70,21 @@ long regionId = commerceTaxFixedRateAddressRelsDisplayContext.getRegionId();
 					{
 						active: true,
 						companyId: <%= company.getCompanyId() %>,
+=======
+			select: '<portlet:namespace />commerceCountryId',
+			selectData: function (callback) {
+				Liferay.Service(
+					'/commerce.commercecountry/get-commerce-countries',
+					{
+						companyId: <%= company.getCompanyId() %>,
+						active: true,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					},
 					callback
 				);
 			},
 			selectDesc: 'nameCurrentValue',
+<<<<<<< HEAD
 			selectId: 'countryId',
 			selectSort: '<%= true %>',
 			selectVal: '<%= countryId %>',
@@ -81,13 +97,32 @@ long regionId = commerceTaxFixedRateAddressRelsDisplayContext.getRegionId();
 					{
 						active: true,
 						countryId: Number(selectKey),
+=======
+			selectId: 'commerceCountryId',
+			selectSort: '<%= true %>',
+			selectVal: '<%= commerceCountryId %>',
+		},
+		{
+			select: '<portlet:namespace />commerceRegionId',
+			selectData: function (callback, selectKey) {
+				Liferay.Service(
+					'/commerce.commerceregion/get-commerce-regions',
+					{
+						commerceCountryId: Number(selectKey),
+						active: true,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					},
 					callback
 				);
 			},
 			selectDesc: 'name',
+<<<<<<< HEAD
 			selectId: 'regionId',
 			selectVal: '<%= regionId %>',
+=======
+			selectId: 'commerceRegionId',
+			selectVal: '<%= commerceRegionId %>',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		},
 	]);
 </aui:script>

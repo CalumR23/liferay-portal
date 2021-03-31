@@ -139,8 +139,12 @@ public class UserCommerceMLRecommendationManagerImpl
 				new UserCommerceMLRecommendationImpl(), document);
 
 		userCommerceMLRecommendation.setAssetCategoryIds(
+<<<<<<< HEAD
 			GetterUtil.getLongValues(
 				document.getValues(Field.ASSET_CATEGORY_IDS)));
+=======
+			GetterUtil.getLongValues(document.get(Field.ASSET_CATEGORY_IDS)));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		userCommerceMLRecommendation.setEntryClassPK(
 			GetterUtil.getLong(document.get(Field.ENTRY_CLASS_PK)));
 

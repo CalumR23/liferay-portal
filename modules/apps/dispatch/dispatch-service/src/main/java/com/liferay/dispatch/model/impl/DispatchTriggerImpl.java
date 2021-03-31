@@ -14,9 +14,12 @@
 
 package com.liferay.dispatch.model.impl;
 
+<<<<<<< HEAD
 import com.liferay.dispatch.executor.DispatchTaskStatus;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.service.DispatchLogLocalServiceUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.UnicodeProperties;
 
 /**
@@ -33,6 +36,7 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 		if (_dispatchTaskSettingsUnicodeProperties == null) {
 			_dispatchTaskSettingsUnicodeProperties = new UnicodeProperties(
 				true);
+<<<<<<< HEAD
 
 			_dispatchTaskSettingsUnicodeProperties.fastLoad(
 				getDispatchTaskSettings());
@@ -59,6 +63,14 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 			dispatchLog.getStatus());
 
 		return _dispatchTaskStatus;
+=======
+
+			_dispatchTaskSettingsUnicodeProperties.fastLoad(
+				getDispatchTaskSettings());
+		}
+
+		return _dispatchTaskSettingsUnicodeProperties;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -84,6 +96,9 @@ public class DispatchTriggerImpl extends DispatchTriggerBaseImpl {
 	}
 
 	private transient UnicodeProperties _dispatchTaskSettingsUnicodeProperties;
+<<<<<<< HEAD
 	private transient DispatchTaskStatus _dispatchTaskStatus;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 }

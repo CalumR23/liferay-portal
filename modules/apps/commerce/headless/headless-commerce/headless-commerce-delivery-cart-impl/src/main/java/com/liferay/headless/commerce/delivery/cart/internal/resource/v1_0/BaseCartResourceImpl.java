@@ -347,6 +347,27 @@ public abstract class BaseCartResourceImpl
 	 * Invoke this method with the command line:
 	 *
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}/checkout'  -u 'test@liferay.com:test'
+<<<<<<< HEAD
+=======
+	 */
+	@Override
+	@POST
+	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "cartId")})
+	@Path("/carts/{cartId}/checkout")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "Cart")})
+	public Cart postCartCheckout(
+			@NotNull @Parameter(hidden = true) @PathParam("cartId") Long cartId)
+		throws Exception {
+
+		return new Cart();
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-delivery-cart/v1.0/carts/{cartId}/coupon-code' -d $'{"code": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Override
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "cartId")})

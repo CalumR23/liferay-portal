@@ -144,7 +144,11 @@ public class JournalArticleFinderByKeywordsTest {
 			_journalArticleFinder.findByKeywords(
 				_group.getCompanyId(), _group.getGroupId(), new ArrayList<>(),
 				0, keywords, null, _ddmStructure.getStructureKey(), null, null,
+<<<<<<< HEAD
 				null, null, WorkflowConstants.STATUS_APPROVED, -1, -1, null);
+=======
+				null, WorkflowConstants.STATUS_APPROVED, null, -1, -1, null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertEquals(
 			journalArticles.toString(), expectedCount, journalArticles.size());
@@ -152,7 +156,11 @@ public class JournalArticleFinderByKeywordsTest {
 		int count = _journalArticleFinder.countByKeywords(
 			_group.getCompanyId(), _group.getGroupId(), new ArrayList<>(), 0,
 			keywords, null, _ddmStructure.getStructureKey(), null, null, null,
+<<<<<<< HEAD
 			null, WorkflowConstants.STATUS_APPROVED);
+=======
+			WorkflowConstants.STATUS_APPROVED, null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Assert.assertEquals(expectedCount, count);
 	}

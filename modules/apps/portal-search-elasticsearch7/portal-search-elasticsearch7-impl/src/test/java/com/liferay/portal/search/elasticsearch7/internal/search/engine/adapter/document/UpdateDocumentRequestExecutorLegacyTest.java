@@ -17,18 +17,29 @@ package com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.DocumentImpl;
 import com.liferay.portal.kernel.search.Field;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.util.PropsUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.search.elasticsearch7.internal.connection.ElasticsearchFixture;
 import com.liferay.portal.search.elasticsearch7.internal.search.engine.adapter.test.util.RequestExecutorFixture;
 import com.liferay.portal.search.engine.adapter.document.IndexDocumentResponse;
 import com.liferay.portal.search.engine.adapter.document.UpdateDocumentRequest;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.util.PropsImpl;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+<<<<<<< HEAD
 import org.junit.ClassRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -37,10 +48,13 @@ import org.junit.Test;
 @SuppressWarnings("deprecation")
 public class UpdateDocumentRequestExecutorLegacyTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@BeforeClass
 	public static void setUpClass() throws Exception {
 		_elasticsearchFixture = new ElasticsearchFixture();
@@ -51,6 +65,11 @@ public class UpdateDocumentRequestExecutorLegacyTest {
 			_elasticsearchFixture);
 
 		_requestExecutorFixture.setUp();
+<<<<<<< HEAD
+=======
+
+		PropsUtil.setProps(new PropsImpl());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@AfterClass

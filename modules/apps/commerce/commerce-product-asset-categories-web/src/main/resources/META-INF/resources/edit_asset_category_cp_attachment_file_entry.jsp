@@ -31,7 +31,11 @@ renderResponse.setTitle((cpAttachmentFileEntry == null) ? LanguageUtil.get(reque
 
 <portlet:actionURL name="/commerce_product_asset_categories/edit_asset_category_cp_attachment_file_entry" var="editAssetCategoryCPAttachmentFileEntryActionURL" />
 
+<<<<<<< HEAD
 <aui:form action="<%= editAssetCategoryCPAttachmentFileEntryActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+<aui:form action="<%= editAssetCategoryCPAttachmentFileEntryActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (cpAttachmentFileEntry == null) ? Constants.ADD : Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="categoryId" type="hidden" value="<%= categoryId %>" />
@@ -78,7 +82,11 @@ renderResponse.setTitle((cpAttachmentFileEntry == null) ? LanguageUtil.get(reque
 </aui:form>
 
 <aui:script use="aui-base,event-input">
+<<<<<<< HEAD
 	A.one('#<portlet:namespace />publishButton').on('click', () => {
+=======
+	A.one('#<portlet:namespace />publishButton').on('click', function () {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		var workflowActionInput = A.one('#<portlet:namespace />workflowAction');
 
 		if (workflowActionInput) {

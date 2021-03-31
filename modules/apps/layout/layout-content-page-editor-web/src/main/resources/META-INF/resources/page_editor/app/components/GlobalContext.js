@@ -136,7 +136,11 @@ export function GlobalContextFrame({children, useIframe}) {
 		<>
 			{content}
 			<RawDOM TagName="iframe" elementRef={setIframeElement} />
+<<<<<<< HEAD
 		</>
+=======
+		</GlobalContext.Provider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	);
 }
 

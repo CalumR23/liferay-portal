@@ -15,8 +15,11 @@
 package com.liferay.portal.startup.monitor.internal;
 
 import com.liferay.petra.string.StringBundler;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.util.ThreadUtil;
 
@@ -65,11 +68,14 @@ public class PortalStartupMonitor {
 						Thread.sleep(_SLEEP);
 					}
 					catch (InterruptedException interruptedException) {
+<<<<<<< HEAD
 						if (_log.isDebugEnabled()) {
 							_log.debug(
 								interruptedException, interruptedException);
 						}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						break;
 					}
 
@@ -98,9 +104,12 @@ public class PortalStartupMonitor {
 
 	private static final long _SLEEP = 600000;
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		PortalStartupMonitor.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ComponentContext _componentContext;
 	private Thread _thread;
 

@@ -849,6 +849,7 @@ export const getSectionBySectionTitle = (siteKey, sectionTitle) =>
 				siteKey,
 			},
 		})
+<<<<<<< HEAD
 		.then(({data}) => {
 			if (
 				data.messageBoardSections &&
@@ -859,6 +860,9 @@ export const getSectionBySectionTitle = (siteKey, sectionTitle) =>
 
 			return Promise.reject(new Error('Section not found'));
 		});
+=======
+		.then(({data}) => data.messageBoardSections.items[0]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 export const getSectionsByRootSection = (siteKey, sectionTitle) => {
 	if (!sectionTitle || sectionTitle === '0') {

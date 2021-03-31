@@ -672,6 +672,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 			String lifecycle, WindowState windowState, Object... parameters)
 		throws Exception {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				httpServletRequest, portlet, themeDisplay.getLayout(),
@@ -685,6 +686,16 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		).setWindowState(
 			windowState
 		).build();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			httpServletRequest, portlet, themeDisplay.getLayout(), lifecycle);
+
+		portletURL.setParameter("action", action);
+		portletURL.setParameter("controller", controller);
+
+		portletURL.setPortletMode(portletMode);
+		portletURL.setWindowState(windowState);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (parameters == null) {
 			return portletURL;

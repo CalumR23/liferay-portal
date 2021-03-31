@@ -61,12 +61,20 @@ public class DispatchTriggerLocalServiceUtil {
 		return getService().addDispatchTrigger(dispatchTrigger);
 	}
 
+<<<<<<< HEAD
 	public static DispatchTrigger addDispatchTrigger(
+=======
+	public static com.liferay.dispatch.model.DispatchTrigger addDispatchTrigger(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			long userId, String dispatchTaskExecutorType,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				dispatchTaskSettingsUnicodeProperties,
 			String name, boolean system)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addDispatchTrigger(
 			userId, dispatchTaskExecutorType,
@@ -254,10 +262,18 @@ public class DispatchTriggerLocalServiceUtil {
 		return getService().getDispatchTrigger(dispatchTriggerId);
 	}
 
+<<<<<<< HEAD
 	public static List<DispatchTrigger> getDispatchTriggers(
 		boolean active,
 		com.liferay.dispatch.executor.DispatchTaskClusterMode
 			dispatchTaskClusterMode) {
+=======
+	public static java.util.List<com.liferay.dispatch.model.DispatchTrigger>
+		getDispatchTriggers(
+			boolean active,
+			com.liferay.dispatch.executor.DispatchTaskClusterMode
+				dispatchTaskClusterMode) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getDispatchTriggers(
 			active, dispatchTaskClusterMode);
@@ -307,7 +323,11 @@ public class DispatchTriggerLocalServiceUtil {
 	}
 
 	public static java.util.Date getNextFireDate(long dispatchTriggerId)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getNextFireDate(dispatchTriggerId);
 	}
@@ -331,13 +351,23 @@ public class DispatchTriggerLocalServiceUtil {
 	}
 
 	public static java.util.Date getPreviousFireDate(long dispatchTriggerId)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getPreviousFireDate(dispatchTriggerId);
 	}
 
+<<<<<<< HEAD
 	public static List<DispatchTrigger> getUserDispatchTriggers(
 		long companyId, long userId, int start, int end) {
+=======
+	public static java.util.List<com.liferay.dispatch.model.DispatchTrigger>
+		getUserDispatchTriggers(
+			long companyId, long userId, int start, int end) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getUserDispatchTriggers(
 			companyId, userId, start, end);
@@ -365,6 +395,7 @@ public class DispatchTriggerLocalServiceUtil {
 		return getService().updateDispatchTrigger(dispatchTrigger);
 	}
 
+<<<<<<< HEAD
 	public static DispatchTrigger updateDispatchTrigger(
 			long dispatchTriggerId, boolean active, String cronExpression,
 			com.liferay.dispatch.executor.DispatchTaskClusterMode
@@ -374,6 +405,18 @@ public class DispatchTriggerLocalServiceUtil {
 			int startDateMonth, int startDateDay, int startDateYear,
 			int startDateHour, int startDateMinute)
 		throws PortalException {
+=======
+	public static com.liferay.dispatch.model.DispatchTrigger
+			updateDispatchTrigger(
+				long dispatchTriggerId, boolean active, String cronExpression,
+				com.liferay.dispatch.executor.DispatchTaskClusterMode
+					dispatchTaskClusterMode,
+				int endDateMonth, int endDateDay, int endDateYear,
+				int endDateHour, int endDateMinute, boolean neverEnd,
+				boolean overlapAllowed, int startDateMonth, int startDateDay,
+				int startDateYear, int startDateHour, int startDateMinute)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().updateDispatchTrigger(
 			dispatchTriggerId, active, cronExpression, dispatchTaskClusterMode,
@@ -382,12 +425,22 @@ public class DispatchTriggerLocalServiceUtil {
 			startDateYear, startDateHour, startDateMinute);
 	}
 
+<<<<<<< HEAD
 	public static DispatchTrigger updateDispatchTrigger(
 			long dispatchTriggerId,
 			com.liferay.portal.kernel.util.UnicodeProperties
 				taskSettingsUnicodeProperties,
 			String name)
 		throws PortalException {
+=======
+	public static com.liferay.dispatch.model.DispatchTrigger
+			updateDispatchTrigger(
+				long dispatchTriggerId,
+				com.liferay.portal.kernel.util.UnicodeProperties
+					taskSettingsUnicodeProperties,
+				String name)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().updateDispatchTrigger(
 			dispatchTriggerId, taskSettingsUnicodeProperties, name);

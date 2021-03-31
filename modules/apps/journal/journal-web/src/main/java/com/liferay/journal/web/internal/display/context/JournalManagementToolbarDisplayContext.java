@@ -520,6 +520,7 @@ public class JournalManagementToolbarDisplayContext
 
 					for (DDMStructure ddmStructure : ddmStructures) {
 						PortletURL portletURL =
+<<<<<<< HEAD
 							PortletURLBuilder.createRenderURL(
 								liferayPortletResponse
 							).setMVCPath(
@@ -534,6 +535,23 @@ public class JournalManagementToolbarDisplayContext
 								"ddmStructureKey",
 								ddmStructure.getStructureKey()
 							).build();
+=======
+							liferayPortletResponse.createRenderURL();
+
+						portletURL.setParameter("mvcPath", "/edit_article.jsp");
+						portletURL.setParameter(
+							"redirect",
+							PortalUtil.getCurrentURL(httpServletRequest));
+						portletURL.setParameter(
+							"groupId",
+							String.valueOf(_themeDisplay.getScopeGroupId()));
+						portletURL.setParameter(
+							"folderId",
+							String.valueOf(
+								_journalDisplayContext.getFolderId()));
+						portletURL.setParameter(
+							"ddmStructureKey", ddmStructure.getStructureKey());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						UnsafeConsumer<DropdownItem, Exception> unsafeConsumer =
 							dropdownItem -> {

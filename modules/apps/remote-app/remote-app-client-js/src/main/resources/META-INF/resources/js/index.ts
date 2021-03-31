@@ -88,8 +88,13 @@ type Payload = {[key: string]: StructuredClonable};
 
 type PromiseMap<T = unknown> = {
 	[key: string]: {
+<<<<<<< HEAD
 		reject: (reason: any) => void;
 		resolve: (value: T | PromiseLike<T>) => void;
+=======
+		reject: (reason?: any) => void;
+		resolve: (value?: T) => void;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	};
 };
 
@@ -501,6 +506,7 @@ function Client({debug}: ClientOptions = {debug: false}) {
 	function log(...messages: Array<unknown>) {
 		if (debug) {
 			logger(`[CLIENT: ${appID.slice(0, 8)}...]`, ...messages);
+<<<<<<< HEAD
 		}
 	}
 
@@ -514,6 +520,21 @@ function Client({debug}: ClientOptions = {debug: false}) {
 		else if (state === 'registered' || force) {
 			log('posting message...', data);
 
+=======
+		}
+	}
+
+	function postMessage(
+		data: Payload,
+		{force}: {force: boolean} = {force: false}
+	) {
+		if (state === 'disposed') {
+			log('ignoring message (disposed client)...', data);
+		}
+		else if (state === 'registered' || force) {
+			log('posting message...', data);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (window.parent) {
 				try {
 					window.parent.postMessage(
@@ -778,9 +799,15 @@ function Client({debug}: ClientOptions = {debug: false}) {
 
 	function register() {
 		state = 'registering';
+<<<<<<< HEAD
 
 		window.addEventListener('message', receiveMessage);
 
+=======
+
+		window.addEventListener('message', receiveMessage);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		retry({
 			callback() {
 				postMessage({command: 'register'}, {force: true});

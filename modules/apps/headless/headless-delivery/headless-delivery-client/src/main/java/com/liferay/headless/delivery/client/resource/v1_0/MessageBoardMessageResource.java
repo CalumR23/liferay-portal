@@ -1909,6 +1909,7 @@ public interface MessageBoardMessageResource {
 						"/o/headless-delivery/v1.0/sites/{siteId}/message-board-messages");
 
 			httpInvoker.path("siteId", siteId);
+<<<<<<< HEAD
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -2171,6 +2172,8 @@ public interface MessageBoardMessageResource {
 
 			httpInvoker.path("externalReferenceCode", externalReferenceCode);
 			httpInvoker.path("siteId", siteId);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

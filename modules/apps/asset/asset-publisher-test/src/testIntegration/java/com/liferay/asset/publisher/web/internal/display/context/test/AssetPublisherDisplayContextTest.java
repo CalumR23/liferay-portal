@@ -39,12 +39,19 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.util.ProxyUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
+<<<<<<< HEAD
 import com.liferay.portlet.test.MockLiferayPortletContext;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.segments.constants.SegmentsEntryConstants;
 import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.CriteriaSerializer;
@@ -53,9 +60,18 @@ import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.test.util.SegmentsTestUtil;
 
 import java.util.Arrays;
+<<<<<<< HEAD
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletPreferences;
+=======
+import java.util.Objects;
+
+import javax.portlet.Portlet;
+import javax.portlet.PortletContext;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequestDispatcher;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -176,7 +192,31 @@ public class AssetPublisherDisplayContextTest {
 		mockLiferayPortletRenderRequest.setAttribute(
 			MVCRenderConstants.
 				PORTLET_CONTEXT_OVERRIDE_REQUEST_ATTIBUTE_NAME_PREFIX + path,
+<<<<<<< HEAD
 			new MockLiferayPortletContext(path));
+=======
+			ProxyUtil.newProxyInstance(
+				PortletContext.class.getClassLoader(),
+				new Class<?>[] {PortletContext.class},
+				(PortletContextProxy, portletContextMethod,
+				 portletContextArgs) -> {
+
+					if (Objects.equals(
+							portletContextMethod.getName(),
+							"getRequestDispatcher") &&
+						Objects.equals(portletContextArgs[0], path)) {
+
+						return ProxyUtil.newProxyInstance(
+							PortletRequestDispatcher.class.getClassLoader(),
+							new Class<?>[] {PortletRequestDispatcher.class},
+							(portletRequestDispatcherProxy,
+							 portletRequestDispatcherMethod,
+							 portletRequestDispatcherArgs) -> null);
+					}
+
+					throw new UnsupportedOperationException();
+				}));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		mockLiferayPortletRenderRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, _getThemeDisplay());

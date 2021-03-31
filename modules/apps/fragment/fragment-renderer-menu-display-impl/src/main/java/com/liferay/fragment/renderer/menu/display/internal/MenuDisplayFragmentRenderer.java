@@ -19,6 +19,7 @@ import com.liferay.dynamic.data.mapping.service.DDMTemplateService;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.renderer.FragmentRenderer;
 import com.liferay.fragment.renderer.FragmentRendererContext;
+<<<<<<< HEAD
 import com.liferay.fragment.renderer.menu.display.internal.MenuDisplayFragmentConfiguration.ContextualMenu;
 import com.liferay.fragment.renderer.menu.display.internal.MenuDisplayFragmentConfiguration.DisplayStyle;
 import com.liferay.fragment.renderer.menu.display.internal.MenuDisplayFragmentConfiguration.SiteNavigationMenuSource;
@@ -52,6 +53,22 @@ import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+=======
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.theme.NavItem;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.site.navigation.taglib.servlet.taglib.NavigationMenuTag;
+
+import java.util.Locale;
+import java.util.Objects;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
@@ -59,16 +76,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
+<<<<<<< HEAD
 import org.osgi.service.component.annotations.Modified;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Víctor Galán
  */
+<<<<<<< HEAD
 @Component(
 	configurationPid = "com.liferay.fragment.renderer.menu.display.internal.configuration.FFFragmentRendererMenuDisplayConfiguration",
 	service = FragmentRenderer.class
 )
+=======
+@Component(service = FragmentRenderer.class)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 
 	@Override
@@ -83,6 +107,7 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", getClass());
 
+<<<<<<< HEAD
 		try {
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				StringUtil.read(
@@ -101,6 +126,43 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 	@Override
 	public String getIcon() {
 		return "sites";
+=======
+		return JSONUtil.put(
+			"fieldSets",
+			JSONUtil.putAll(
+				JSONUtil.put(
+					"fields",
+					JSONUtil.putAll(
+						JSONUtil.put(
+							"defaultValue", "horizontal"
+						).put(
+							"label", "display-style"
+						).put(
+							"name", "displayStyle"
+						).put(
+							"type", "select"
+						).put(
+							"typeOptions",
+							JSONUtil.put(
+								"validValues",
+								JSONUtil.putAll(
+									JSONUtil.put(
+										"label",
+										LanguageUtil.get(
+											resourceBundle, "horizontal")
+									).put(
+										"value", "horizontal"
+									),
+									JSONUtil.put(
+										"label",
+										LanguageUtil.get(
+											resourceBundle, "stacked")
+									).put(
+										"value", "stacked"
+									)))
+						))))
+		).toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -113,7 +175,11 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 
 	@Override
 	public boolean isSelectable(HttpServletRequest httpServletRequest) {
+<<<<<<< HEAD
 		return _ffFragmentRendererMenuDisplayConfiguration.enabled();
+=======
+		return true;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -123,6 +189,7 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 		HttpServletResponse httpServletResponse) {
 
 		try {
+<<<<<<< HEAD
 			PrintWriter printWriter = httpServletResponse.getWriter();
 
 			FragmentEntryLink fragmentEntryLink =
@@ -151,6 +218,31 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 			navigationMenuTag.doTag(httpServletRequest, httpServletResponse);
 
 			printWriter.write("</div>");
+=======
+			NavigationMenuTag navigationMenuTag = new NavigationMenuTag();
+
+			if (Objects.equals(
+					_getDisplayStyle(fragmentRendererContext), "stacked")) {
+
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				Group companyGroup = _groupLocalService.getCompanyGroup(
+					themeDisplay.getCompanyId());
+
+				DDMTemplate ddmTemplate = _ddmTemplateService.fetchTemplate(
+					companyGroup.getGroupId(),
+					_portal.getClassNameId(NavItem.class), "LIST-MENU-FTL");
+
+				navigationMenuTag.setDdmTemplateGroupId(
+					ddmTemplate.getGroupId());
+				navigationMenuTag.setDdmTemplateKey(
+					ddmTemplate.getTemplateKey());
+			}
+
+			navigationMenuTag.doTag(httpServletRequest, httpServletResponse);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -165,6 +257,7 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 		_servletContext = servletContext;
 	}
 
+<<<<<<< HEAD
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_ffFragmentRendererMenuDisplayConfiguration =
@@ -326,14 +419,28 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 			).build());
 
 		printWriter.write(styles);
+=======
+	private String _getDisplayStyle(
+		FragmentRendererContext fragmentRendererContext) {
+
+		FragmentEntryLink fragmentEntryLink =
+			fragmentRendererContext.getFragmentEntryLink();
+
+		return (String)_fragmentEntryConfigurationParser.getFieldValue(
+			getConfiguration(fragmentRendererContext),
+			fragmentEntryLink.getEditableValues(), "displayStyle");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference
 	private DDMTemplateService _ddmTemplateService;
 
+<<<<<<< HEAD
 	private FFFragmentRendererMenuDisplayConfiguration
 		_ffFragmentRendererMenuDisplayConfiguration;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference
 	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
@@ -341,6 +448,7 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
+<<<<<<< HEAD
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
@@ -348,6 +456,8 @@ public class MenuDisplayFragmentRenderer implements FragmentRenderer {
 		_menuDisplayFragmentConfigurationParser;
 
 	@Reference
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private Portal _portal;
 
 	private ServletContext _servletContext;

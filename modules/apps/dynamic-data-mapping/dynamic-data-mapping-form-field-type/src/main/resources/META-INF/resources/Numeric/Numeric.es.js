@@ -50,6 +50,7 @@ const getMaskConfig = (dataType, symbols) => {
 	return config;
 };
 
+<<<<<<< HEAD
 const getValue = (dataType, symbols, value = '') => {
 	let decimalSymbol = symbols.decimalSymbol;
 
@@ -66,15 +67,27 @@ const getValue = (dataType, symbols, value = '') => {
 	newValue = newValue.replace('$[DECIMAL_SYMBOL]', decimalSymbol);
 
 	if (newValue && !newValue.includes('.') && decimalSymbol != ',') {
+=======
+const getValue = (dataType, symbols, value) => {
+	let newValue = value;
+
+	let decimalSymbol = symbols.decimalSymbol;
+
+	if (newValue && !newValue.includes('.') && symbols.decimalSymbol != ',') {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		decimalSymbol = ',';
 	}
 
 	if (dataType === 'integer' && newValue) {
+<<<<<<< HEAD
 		newValue = newValue.replace(decimalSymbol, '.');
 
 		if (!isNaN(Number(newValue))) {
 			newValue = String(Math.round(newValue.replace(decimalSymbol, '.')));
 		}
+=======
+		newValue = String(Math.round(newValue.replace(decimalSymbol, '.')));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	return newValue;
@@ -107,10 +120,14 @@ const Numeric = ({
 			let newValue =
 				localizedValue[editingLanguageId] !== undefined
 					? localizedValue[editingLanguageId]
+<<<<<<< HEAD
 					: getGenericValue(
 							defaultSymbols,
 							localizedValue[defaultLanguageId]
 					  );
+=======
+					: localizedValue[defaultLanguageId];
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			newValue = getValue(dataType, symbols, newValue);
 
@@ -212,6 +229,7 @@ const Main = ({
 	symbols,
 	value = '',
 	...otherProps
+<<<<<<< HEAD
 }) => {
 	const [edited, setEdited] = useState(false);
 
@@ -219,6 +237,23 @@ const Main = ({
 		<FieldBase
 			{...otherProps}
 			id={id}
+=======
+}) => (
+	<FieldBase
+		{...otherProps}
+		id={id}
+		localizedValue={localizedValue}
+		name={name}
+		readOnly={readOnly}
+	>
+		<Numeric
+			dataType={dataType}
+			defaultLanguageId={defaultLanguageId}
+			disabled={readOnly}
+			editingLanguageId={editingLanguageId}
+			id={id}
+			localizable={localizable}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}

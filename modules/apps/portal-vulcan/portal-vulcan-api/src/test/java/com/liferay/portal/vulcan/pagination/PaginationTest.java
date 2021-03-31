@@ -14,7 +14,12 @@
 
 package com.liferay.portal.vulcan.pagination;
 
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.Is;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;

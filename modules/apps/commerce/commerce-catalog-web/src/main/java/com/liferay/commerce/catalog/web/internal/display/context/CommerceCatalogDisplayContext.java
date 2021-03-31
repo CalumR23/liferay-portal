@@ -102,6 +102,7 @@ public class CommerceCatalogDisplayContext {
 	}
 
 	public String getAddCommerceCatalogRenderURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			cpRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -109,6 +110,18 @@ public class CommerceCatalogDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			cpRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_catalogs/add_commerce_catalog");
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommercePriceList getBaseCommercePriceList(String type)
@@ -202,6 +215,7 @@ public class CommerceCatalogDisplayContext {
 			return StringPool.BLANK;
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CATALOGS,
@@ -225,6 +239,33 @@ public class CommerceCatalogDisplayContext {
 		).setMVCRenderCommandName(
 			"/commerce_catalogs/edit_commerce_catalog"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CATALOGS,
+			PortletRequest.ACTION_PHASE);
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_catalogs/edit_commerce_catalog");
+		portletURL.setParameter(Constants.CMD, Constants.UPDATE);
+		portletURL.setParameter(
+			"commerceCatalogId",
+			String.valueOf(commerceCatalog.getCommerceCatalogId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+	}
+
+	public PortletURL getEditCommerceCatalogRenderURL() {
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CATALOGS,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_catalogs/edit_commerce_catalog");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels() throws Exception {

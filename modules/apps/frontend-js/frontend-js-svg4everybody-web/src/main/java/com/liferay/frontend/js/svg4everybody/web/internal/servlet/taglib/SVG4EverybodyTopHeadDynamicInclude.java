@@ -17,6 +17,10 @@ package com.liferay.frontend.js.svg4everybody.web.internal.servlet.taglib;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.servlet.BrowserSniffer;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.servlet.taglib.BaseDynamicInclude;
 import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.util.Portal;
@@ -77,7 +81,11 @@ public class SVG4EverybodyTopHeadDynamicInclude extends BaseDynamicInclude {
 			}
 		}
 
+<<<<<<< HEAD
 		if (cdnHostEnabled) {
+=======
+		if (cdnHostEnabled || _browserSniffer.isIe(httpServletRequest)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			PrintWriter printWriter = httpServletResponse.getWriter();
 
 			AbsolutePortalURLBuilder absolutePortalURLBuilder =
@@ -114,6 +122,12 @@ public class SVG4EverybodyTopHeadDynamicInclude extends BaseDynamicInclude {
 	}
 
 	private static final String[] _JS_FILE_NAMES = {"/index.js"};
+<<<<<<< HEAD
+=======
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		SVG4EverybodyTopHeadDynamicInclude.class);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SVG4EverybodyTopHeadDynamicInclude.class);

@@ -15,6 +15,10 @@
 import ActionsLinkRenderer from './ActionLinkRenderer';
 import ActionsDropdownRenderer from './ActionsDropdownRenderer';
 import BooleanRenderer from './BooleanRenderer';
+<<<<<<< HEAD
+=======
+import CheckboxRenderer from './CheckboxRenderer';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import DateRenderer from './DateRenderer';
 import DefaultRenderer from './DefaultRenderer';
 import ImageRenderer from './ImageRenderer';
@@ -32,6 +36,10 @@ const dataRenderers = {
 	actionLink: ActionsLinkRenderer,
 	actionsDropdown: ActionsDropdownRenderer,
 	boolean: BooleanRenderer,
+<<<<<<< HEAD
+=======
+	checkbox: CheckboxRenderer,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	date: DateRenderer,
 	default: DefaultRenderer,
 	image: ImageRenderer,

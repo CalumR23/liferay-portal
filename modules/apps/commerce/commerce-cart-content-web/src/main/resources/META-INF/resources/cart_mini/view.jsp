@@ -161,6 +161,7 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 				>
 					<c:if test="<%= commerceCartContentMiniDisplayContext.hasViewPricePermission() %>">
 
+<<<<<<< HEAD
 						<%
 						CommerceMoney unitPriceCommerceMoney = commerceCartContentMiniDisplayContext.getUnitPriceCommerceMoney(commerceOrderItem);
 						CommerceMoney unitPromoPriceCommerceMoney = commerceCartContentMiniDisplayContext.getUnitPromoPriceCommerceMoney(commerceOrderItem);
@@ -176,6 +177,18 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						</c:choose>
 					</c:if>
 				</liferay-ui:search-container-column-text>
+=======
+					<%
+					CommerceMoney unitPriceCommerceMoney = commerceOrderItem.getUnitPriceMoney();
+					%>
+
+					<liferay-ui:search-container-column-text>
+						<div class="mt-3">
+							<%= HtmlUtil.escape(unitPriceCommerceMoney.format(locale)) %>
+						</div>
+					</liferay-ui:search-container-column-text>
+				</c:if>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			</liferay-ui:search-container-row>
 
 			<liferay-ui:search-iterator

@@ -81,6 +81,17 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.putData("action", "convertSelectedPages");
 
+<<<<<<< HEAD
+=======
+				PortletURL convertLayoutURL =
+					liferayPortletResponse.createActionURL();
+
+				convertLayoutURL.setParameter(
+					ActionRequest.ACTION_NAME, "/layout_admin/convert_layout");
+				convertLayoutURL.setParameter(
+					"redirect", _themeDisplay.getURLCurrent());
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				dropdownItem.putData(
 					"convertLayoutURL",
 					PortletURLBuilder.createActionURL(
@@ -101,6 +112,17 @@ public class LayoutsAdminManagementToolbarDisplayContext
 			dropdownItem -> {
 				dropdownItem.putData("action", "deleteSelectedPages");
 
+<<<<<<< HEAD
+=======
+				PortletURL deleteLayoutURL =
+					liferayPortletResponse.createActionURL();
+
+				deleteLayoutURL.setParameter(
+					ActionRequest.ACTION_NAME, "/layout_admin/delete_layout");
+				deleteLayoutURL.setParameter(
+					"redirect", _themeDisplay.getURLCurrent());
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				dropdownItem.putData(
 					"deleteLayoutURL",
 					PortletURLBuilder.createActionURL(

@@ -14,7 +14,10 @@
 
 package com.liferay.portal.vulcan.internal.jaxrs.context.provider;
 
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.vulcan.fields.FieldsQueryParam;
 
 import java.util.Set;
@@ -27,8 +30,11 @@ import org.apache.cxf.message.Message;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Mockito;

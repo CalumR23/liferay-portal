@@ -34,46 +34,26 @@ if (cpOptionCategories == null) {
 		%>
 
 		<div class="sidebar-header">
-			<clay:content-row
-				cssClass="sidebar-section"
-			>
-				<clay:content-col
-					expand="<%= true %>"
-				>
-					<h4 class="component-title"><%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %></h4>
-				</clay:content-col>
+			<ul class="sidebar-header-actions">
+				<li>
+					<liferay-util:include page="/option_category_action.jsp" servletContext="<%= application %>" />
+				</li>
+			</ul>
 
-				<clay:content-col>
-					<ul class="autofit-padded-no-gutters autofit-row">
-						<li class="autofit-col">
-							<liferay-util:include page="/option_category_action.jsp" servletContext="<%= application %>" />
-						</li>
-					</ul>
-				</clay:content-col>
-			</clay:content-row>
+			<h4><%= HtmlUtil.escape(cpOptionCategory.getTitle(locale)) %></h4>
 		</div>
 
 		<div class="sidebar-body">
-			<dl class="sidebar-dl">
-				<dt class="sidebar-dt"><liferay-ui:message key="id" /></dt>
+			<h5><liferay-ui:message key="id" /></h5>
 
-				<dd class="sidebar-dd">
-					<%= HtmlUtil.escape(String.valueOf(cpOptionCategory.getCPOptionCategoryId())) %>
-				</dd>
-			</dl>
+			<p>
+				<%= HtmlUtil.escape(String.valueOf(cpOptionCategory.getCPOptionCategoryId())) %>
+			</p>
 		</div>
 	</c:when>
 	<c:otherwise>
 		<div class="sidebar-header">
-			<clay:content-row
-				cssClass="sidebar-section"
-			>
-				<clay:content-col
-					expand="<%= true %>"
-				>
-					<h4 class="component-title"><liferay-ui:message arguments="<%= cpOptionCategories.size() %>" key="x-items-are-selected" /></h4>
-				</clay:content-col>
-			</clay:content-row>
+			<h4><liferay-ui:message arguments="<%= cpOptionCategories.size() %>" key="x-items-are-selected" /></h4>
 		</div>
 	</c:otherwise>
 </c:choose>

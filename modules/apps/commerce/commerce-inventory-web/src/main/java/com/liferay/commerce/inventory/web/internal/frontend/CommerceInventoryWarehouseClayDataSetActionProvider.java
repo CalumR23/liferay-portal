@@ -15,7 +15,10 @@
 package com.liferay.commerce.inventory.web.internal.frontend;
 
 import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
+<<<<<<< HEAD
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.inventory.web.internal.frontend.constants.CommerceInventoryDataSetConstants;
 import com.liferay.commerce.inventory.web.internal.model.Warehouse;
 import com.liferay.commerce.product.constants.CPPortletKeys;
@@ -29,10 +32,15 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+=======
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -71,7 +79,13 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 		Warehouse warehouse = (Warehouse)model;
 
 		return DropdownItemListBuilder.add(
+<<<<<<< HEAD
 			() -> _hasPermission(),
+=======
+			() -> PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			dropdownItem -> {
 				dropdownItem.setHref(
 					_getWarehouseEditURL(
@@ -82,7 +96,13 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 				dropdownItem.setTarget("sidePanel");
 			}
 		).add(
+<<<<<<< HEAD
 			() -> _hasPermission(),
+=======
+			() -> PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			dropdownItem -> {
 				dropdownItem.setHref(
 					_getWarehouseDeleteURL(
@@ -102,6 +122,7 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				_portal.getOriginalServletRequest(httpServletRequest),
@@ -115,6 +136,18 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 		).setParameter(
 			"commerceInventoryWarehouseItemId", commerceInventoryWarehouseItemId
 		).buildString();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_inventory/edit_commerce_inventory_warehouse_item");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceInventoryWarehouseItemId",
+			String.valueOf(commerceInventoryWarehouseItemId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getWarehouseEditURL(
@@ -127,6 +160,7 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				themeDisplay.getRequest(), portletDisplay.getId(),
@@ -138,6 +172,19 @@ public class CommerceInventoryWarehouseClayDataSetActionProvider
 		).setParameter(
 			"commerceInventoryWarehouseItemId", commerceInventoryWarehouseItemId
 		).build();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			themeDisplay.getRequest(), portletDisplay.getId(),
+			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_inventory/edit_commerce_inventory_warehouse_item");
+		portletURL.setParameter("redirect", themeDisplay.getURLCurrent());
+		portletURL.setParameter(
+			"commerceInventoryWarehouseItemId",
+			String.valueOf(commerceInventoryWarehouseItemId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

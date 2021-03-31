@@ -239,7 +239,11 @@ public class CommerceShippingMethodLocalServiceImpl
 					isCommerceAddressRestricted(
 						CommerceShippingMethod.class.getName(),
 						commerceShippingMethod.getCommerceShippingMethodId(),
+<<<<<<< HEAD
 						countryId);
+=======
+						commerceCountryId);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if (!restricted) {
 				filteredCommerceShippingMethods.add(commerceShippingMethod);

@@ -61,6 +61,7 @@ public class CPInstanceSubscriptionInfoDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() throws PortalException {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -70,6 +71,17 @@ public class CPInstanceSubscriptionInfoDisplayContext
 		).setParameter(
 			"cpInstanceId", getCPInstanceId()
 		).setParameter(
+=======
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_instance");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(getCPDefinitionId()));
+		portletURL.setParameter(
+			"cpInstanceId", String.valueOf(getCPInstanceId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CPInstanceScreenNavigationConstants.
 				CATEGORY_KEY_SUBSCRIPTION_OVERRIDE

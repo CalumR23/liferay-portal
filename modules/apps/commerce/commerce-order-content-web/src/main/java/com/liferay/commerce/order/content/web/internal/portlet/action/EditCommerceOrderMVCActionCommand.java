@@ -231,6 +231,27 @@ public class EditCommerceOrderMVCActionCommand extends BaseMVCActionCommand {
 
 				setCurrentCommerceOrder(actionRequest, commerceOrderId);
 
+<<<<<<< HEAD
+=======
+				PortletURL openOrdersPortletURL =
+					PortletProviderUtil.getPortletURL(
+						actionRequest, CommerceOrder.class.getName(),
+						PortletProvider.Action.EDIT);
+
+				String redirect = ParamUtil.getString(
+					actionRequest, "redirect");
+
+				openOrdersPortletURL.setParameter(
+					PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE + "backURL",
+					redirect);
+
+				openOrdersPortletURL.setParameter(
+					"mvcRenderCommandName",
+					"/commerce_open_order_content/edit_commerce_order");
+				openOrdersPortletURL.setParameter(
+					"commerceOrderId", String.valueOf(commerceOrderId));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				hideDefaultSuccessMessage(actionRequest);
 
 				sendRedirect(

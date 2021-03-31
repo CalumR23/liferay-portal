@@ -64,11 +64,19 @@
 		}
 	}
 
+<<<<<<< HEAD
 	Liferay.once('destroyPortlet', () => {
 		document.body.removeEventListener('click', handleDownloadClick);
 	});
 
 	Liferay.once('portletReady', () => {
+=======
+	Liferay.once('destroyPortlet', function () {
+		document.body.removeEventListener('click', handleDownloadClick);
+	});
+
+	Liferay.once('portletReady', function () {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		document.body.addEventListener('click', handleDownloadClick);
 	});
 </aui:script>

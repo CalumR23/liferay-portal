@@ -19,10 +19,14 @@ import com.liferay.dispatch.exception.DispatchTriggerNameException;
 import com.liferay.dispatch.exception.DispatchTriggerSchedulerException;
 import com.liferay.dispatch.exception.DuplicateDispatchTriggerException;
 import com.liferay.dispatch.executor.DispatchTaskClusterMode;
+<<<<<<< HEAD
 import com.liferay.dispatch.executor.DispatchTaskStatus;
 import com.liferay.dispatch.model.DispatchLog;
 import com.liferay.dispatch.model.DispatchTrigger;
 import com.liferay.dispatch.service.DispatchLogLocalService;
+=======
+import com.liferay.dispatch.model.DispatchTrigger;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.dispatch.service.DispatchTriggerLocalService;
 import com.liferay.dispatch.service.test.util.CronExpressionUtil;
 import com.liferay.dispatch.service.test.util.DispatchTriggerTestUtil;
@@ -164,9 +168,12 @@ public class DispatchTriggerLocalServiceTest {
 			for (DispatchTrigger dispatchTrigger : userDispatchTriggers) {
 				Assert.assertEquals(
 					user.getUserId(), dispatchTrigger.getUserId());
+<<<<<<< HEAD
 				Assert.assertEquals(
 					DispatchTaskStatus.NEVER_RAN,
 					dispatchTrigger.getDispatchTaskStatus());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 	}
@@ -321,6 +328,7 @@ public class DispatchTriggerLocalServiceTest {
 		Assert.assertEquals(
 			expectedDispatchTrigger.getDispatchTaskClusterMode(),
 			actualDispatchTrigger.getDispatchTaskClusterMode());
+<<<<<<< HEAD
 
 		DispatchLog dispatchLog =
 			_dispatchLogLocalService.fetchLatestDispatchLog(
@@ -335,6 +343,8 @@ public class DispatchTriggerLocalServiceTest {
 
 		Assert.assertEquals(
 			dispatchTaskStatus, actualDispatchTrigger.getDispatchTaskStatus());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private void _basicAssertEquals(
@@ -379,9 +389,12 @@ public class DispatchTriggerLocalServiceTest {
 	}
 
 	@Inject
+<<<<<<< HEAD
 	private DispatchLogLocalService _dispatchLogLocalService;
 
 	@Inject
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private DispatchTriggerLocalService _dispatchTriggerLocalService;
 
 	@Inject

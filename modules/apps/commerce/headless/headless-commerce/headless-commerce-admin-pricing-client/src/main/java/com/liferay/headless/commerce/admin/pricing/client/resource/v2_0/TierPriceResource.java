@@ -464,7 +464,11 @@ public interface TierPriceResource {
 					_builder._port +
 						"/o/headless-commerce-admin-pricing/v2.0/price-entries/{priceEntryId}/tier-prices");
 
+<<<<<<< HEAD
 			httpInvoker.path("priceEntryId", priceEntryId);
+=======
+			httpInvoker.path("id", id);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

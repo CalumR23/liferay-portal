@@ -362,6 +362,7 @@ public class EditSegmentsEntryDisplayContext {
 	}
 
 	private String _getPreviewMembersURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -371,6 +372,17 @@ public class EditSegmentsEntryDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/segments/preview_segments_entry_users");
+		portletURL.setParameter(
+			"segmentsEntryId", String.valueOf(getSegmentsEntryId()));
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private JSONArray _getPropertyGroupsJSONArray() throws Exception {

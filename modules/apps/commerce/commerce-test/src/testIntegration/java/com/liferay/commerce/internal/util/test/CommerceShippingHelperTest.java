@@ -202,7 +202,30 @@ public class CommerceShippingHelperTest {
 	@Rule
 	public FrutillaRule frutillaRule = new FrutillaRule();
 
+<<<<<<< HEAD
 	private CPInstance _addDimensions(CPInstance cpInstance, double dimension) {
+=======
+	private void _addAvailability(CPInstance cpInstance) throws Exception {
+		cpInstance.setPrice(BigDecimal.valueOf(RandomTestUtil.randomDouble()));
+
+		CommerceInventoryTestUtil.addCommerceInventoryWarehouseItem(
+			cpInstance.getUserId(), _commerceInventoryWarehouse,
+			cpInstance.getSku(), 10);
+	}
+
+	private void _addCPDefinitionProperties(CPInstance cpInstance)
+		throws Exception {
+
+		CPDefinition cpDefinition = cpInstance.getCPDefinition();
+
+		cpDefinition.setShippable(true);
+		cpDefinition.setFreeShipping(false);
+
+		_cpDefinitionLocalService.updateCPDefinition(cpDefinition);
+	}
+
+	private void _addDimensions(CPInstance cpInstance, double dimension) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		cpInstance.setWidth(dimension);
 		cpInstance.setHeight(dimension);
 		cpInstance.setDepth(dimension);

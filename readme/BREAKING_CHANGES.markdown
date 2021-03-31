@@ -17,7 +17,7 @@ Here are some of the types of changes documented in this file:
 * Deprecations or end of support: For example, warning that a certain
   feature or API will be dropped in an upcoming version.
 
-*This document has been reviewed through commit `4334fc6cc349`.*
+*This document has been reviewed through commit `ac8f7b9b47639`.*
 
 ## Breaking Changes Contribution Guidelines
 
@@ -178,6 +178,7 @@ If you were using the portal impl version of Clamd integration, you need to go
 to Control Panel -> System Settings -> Security -> category.antivirus to
 configure the new Clamd remote service.
 
+<<<<<<< HEAD
 If you were providing your own AntivirusScanner implementation by hook, you need
 to update your implementation as an OSGi service with a service ranking higher
 than Clamd remote service AntivirusScanner implementation which is default to 0.
@@ -186,6 +187,33 @@ than Clamd remote service AntivirusScanner implementation which is default to 0.
 
 This change was made to better support container environment and unify the api
 to do OSGi integration.
+=======
+### Replaced OSGi configuration Property autoUpgrade
+- **Date:** 2020-Jan-03
+- **JIRA Ticket:** [LPS-102842](https://issues.liferay.com/browse/LPS-102842)
+
+#### What changed?
+
+The OSGi property `autoUpgrade` defined in `com.liferay.portal.upgrade.internal.configuration.ReleaseManagerConfiguration.config` was replaced with the portal property `upgrade.database.auto.run`.
+
+Unlike the old property, which only controlled the upgrade processes in modules, the new one also affects the Core upgrade processes. The default value is `false`, so upgrade processes won't run on startup or module deployment. You can execute module upgrade processes anytime via the Gogo Shell console or via Database Upgrade Tool when the server is down.
+
+This property is set to `true` in the `portal-developer.properties`
+
+#### Who is affected?
+
+This change affects any environment where you're expecting to run upgrades automatically on server startup or on module deployment. Setting `upgrade.database.auto.run` to `true` is not recommended in production environments. If you must, however, upgrade on server startup, first back up your Liferay database and File Store (Document Library).
+
+If you set `upgrade.database.auto.run` to `false` (default value) but database upgrade is required, Liferay prints information about the required upgrade and halts startup. Database upgrade is typically required by major/minor Liferay releases and may be required by early CE Portal GA releases and certain Service Packs (in exceptional cases)--Fix Packs never require database upgrade. On startup, Liferay prints information about any pending micro changes. You can always use the Gogo Shell console and release notes to check such changes and then decide whether to execute them.
+
+#### How should I update my code?
+
+This change doesn't affect your code.
+
+#### Why was this change made?
+
+This change was made to unify the auto-upgrade feature between the Core and modules. The default value was also changed to avoid executing new upgrade processes on startup in production environments.
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 ---------------------------------------
 
@@ -297,6 +325,7 @@ on providing a smaller but higher quality set of compoentns.
 
 #### What changed?
 
+<<<<<<< HEAD
 The CSS class `.container-fluid-1280` has been replaced with `.container-fluid.container-fluid-max-xl` and the compatibility layer that had its style has been removed from Portal.
 
 #### Who is affected?
@@ -310,6 +339,21 @@ The first recommendation is to use the updated CSS classes from Clay `.container
 #### Why was this change made?
 
 This change was made to remove deprecated legacy code from Portal and improve the code consistency and performance
+=======
+The `addAction` methods with signatures `String, Class, GroupedModel, String, UriInfo` and `String, Class, Long, String, String, Long, UriInfo` were removed.
+
+#### Who is affected?
+
+This affects anyone using the removed `addAction` methods or anyone that has dependencies like `compileOnly group: "com.liferay", name: "com.liferay.portal.vulcan.api", version: "[1.0.0, 2.0.0)"`.
+
+#### How should I update my code?
+
+Use `addAction` methods with the signature `String, Class, GroupedModel, String, Object, UriInfo` or `String, Class, Long, String, String, Object, Long, UriInfo`.
+
+#### Why was this change made?
+
+These methods were removed as part of a cleanup refactor.
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 ---------------------------------------
 
@@ -383,6 +427,7 @@ away from Soy:
 
 ---------------------------------------
 
+<<<<<<< HEAD
 ### Server-side Closure Templates (Soy) Support has been removed
 - **Date:** 2020-Dec-14
 - **JIRA Ticket:** [LPS-122956](https://issues.liferay.com/browse/LPS-122956)
@@ -394,6 +439,63 @@ server-side have been removed:
 - `portal-template-soy-api`
 - `portal-template-soy-impl`
 - `portal-template-soy-context-contributor`
+=======
+### The ContentField value Property Name Was Changed to contentFieldValue
+- **Date:** 2020-Mar-18
+- **JIRA Ticket:** [LPS-106886](https://issues.liferay.com/browse/LPS-106886)
+
+#### What changed?
+
+In Headless Delivery API, the property name `value` inside the ContentField schema was changed to `contentFieldValue`.
+
+#### Who is affected?
+
+This affects REST clients depending in the ContentField `value` property name.
+
+#### How should I update my code?
+
+Change the property name to `contentFieldValue` in the REST client.
+
+#### Why was this change made?
+
+This change restores consistency with all value property names in the Headless APIs, called `{schemaName}+Value`.
+
+---------------------------------------
+
+### Removed liferay-editor-image-uploader Plugin
+- **Date:** 2020-Mar-27
+- **JIRA Ticket:** [LPS-110734](https://issues.liferay.com/browse/LPS-110734)
+
+### What changed?
+
+`liferay-editor-image-uploader` AUI plugin was removed. Its code was merged into `addimages` CKEditor plugin, used by Alloy Editor and CKEditor.
+
+### Who is affected
+
+This affects custom solutions that use the plugin directly.
+
+### How should I update my code?
+
+There's no direct replacement for the `liferay-editor-image-uploader` plugin. If you have a component that relies on it, you can co-locate a copy of the old implementation and use it locally within your module.
+
+#### Why was this change made?
+
+This change enables image drag and drop handling in CKEditor and provides a common image uploader for both Alloy Editor and CKEditor.
+
+---------------------------------------
+
+### TinyMCE Editor Is No Longer Bundled by Default
+- **Date:** 2020-Mar-27
+- **JIRA Ticket:** [LPS-110733](https://issues.liferay.com/browse/LPS-110733)
+
+### What changed?
+
+As of 7.3, CKEditor is the default and only supported WYSIWYG editor.
+
+### Who is affected
+
+This affects anyone who uses TinyMCE.
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 To simplify the migration, the following modules remain available in a deprecated
 deprecated fashion providing only client-side initialization of previous Soy
@@ -546,4 +648,68 @@ If your markup is based on Boostrap 3, you can update it with new Boostrap 4 mar
 
 #### Why was this change made?
 
+<<<<<<< HEAD
 We included a "small" configurable CSS compatibility layer to simplify the migration from Liferay 7.0 to 7.1. Now it has been removed in order to fix conflicts with new styles and improve general CSS weight.
+=======
+This method was removed as part of a clean up refactor.
+
+---------------------------------------
+
+### Moving Lexicon icons path
+- **Date:** 2020-Aug-17
+- **JIRA Ticket:** [LPS-115812](https://issues.liferay.com/browse/LPS-115812)
+
+### What changed?
+
+The path for the Lexicon icons has been changed from `themeDisplay.getPathThemeImages() + "/lexicon/icons.svg` to `themeDisplay.getPathThemeImages() + "/clay/icons.svg`
+
+### Who is affected
+
+This affects custom solutions that use the Lexicon icons path directly. The Gradle task for building the icons on the `lexicon` path will be removed.
+
+### How should I update my code?
+
+Update the path to reference `clay` instead of `lexicon`
+
+#### Why was this change made?
+
+This change was made to unify references to the icon sprite map.
+
+---------------------------------------
+
+### Replaced portal properties: view.count.enabled and buffered.increment.enabled
+- **Date:** 2020-Oct-01
+- **JIRA Ticket:** [LPS-120626](https://issues.liferay.com/browse/LPS-120626) and [LPS-121145](https://issues.liferay.com/browse/LPS-121145)
+
+#### What changed?
+
+Enabling and disabling view counts globally and specifically for entities has been removed from portal properties and is now configured as system settings. View counts can be configured in the UI at *System Settings* &rarr; *Infrastructure* &rarr; *View Count* or using a configuration file named `com.liferay.view.count.configuration.ViewCountConfiguration.config`.
+
+Here are the portal property changes:
+
+The `buffered.increment.enabled` portal property has been removed. Enabling and disabling view counts globally is now done using the `enabled` property on the View Count page.
+
+Disabling view count behavior for a specific entity is no longer done in portal properties, for example, by setting `view.count.enabled[SomeEntity]=false` in 7.3 or `buffered.increment.enabled[SomeEntity]=false` in 7.2, but is now done by adding the entity class name to the `Disabled Class Name` value list on the View Count page.
+
+#### Who is affected?
+
+This affects anyone who has the portal property setting `view.count.enabled=false` or `buffered.increment.enabled=false`.
+
+This affects anyone who has disabled view counts for some entity (e.g., `SomeEntity`) using portal property settings `view.count.enabled[SomeEntity]=false` in early 7.3 versions or `buffered.increment.enabled[SomeEntity]=false` in 7.2 portal.
+
+#### How should I update my code?
+
+Remove `view.count.enabled` or `buffered.increment.enabled` portal properties and entity-specific properties such as `view.count.enabled[SomeEntity]=false` or `buffered.increment.enabled[SomeEntity]=false`.
+
+Configure view count behavior in System Settings or using a configuration file:
+
+In *System Settings* &rarr; *Infrastructure* &rarr; *View Count*, set `enabled` to `false` to disable view counts globally, or set `enabled` to `true` to enable view counts globally and disable view counts for specific entities by adding the entity class names to the `Disabled Class Name` value list.
+
+To use a configuration file, configure view counts in System Settings, save the settings, and export them to a `com.liferay.view.count.configuration.ViewCountConfiguration.config` file. Then deploy the configuration by placing the file in your `[Liferay Home]/osgi/configs` folder.
+
+#### Why was this change made?
+
+This change was made to facilitate managing view count behavior.
+
+---------------------------------------
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

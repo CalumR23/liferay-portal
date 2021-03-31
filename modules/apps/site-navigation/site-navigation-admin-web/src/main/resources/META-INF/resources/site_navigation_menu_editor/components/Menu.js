@@ -21,7 +21,11 @@ export const Menu = () => {
 	const items = useItems();
 
 	return (
+<<<<<<< HEAD
 		<div className="container p-3" role="list">
+=======
+		<div className="container p-3">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			{items.map((item) => (
 				<MenuItem item={item} key={item.siteNavigationMenuItemId} />
 			))}

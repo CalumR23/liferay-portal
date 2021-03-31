@@ -90,7 +90,11 @@ export default function FragmentContentProcessor({
 					...config,
 				};
 
+<<<<<<< HEAD
 				return dispatch(
+=======
+				dispatch(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					updateEditableValues({
 						editableValues: {
 							...editableValues,

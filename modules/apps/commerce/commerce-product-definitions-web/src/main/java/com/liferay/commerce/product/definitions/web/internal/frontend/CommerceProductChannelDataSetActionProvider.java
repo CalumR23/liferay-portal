@@ -91,6 +91,7 @@ public class CommerceProductChannelDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.CP_DEFINITIONS,
@@ -106,6 +107,19 @@ public class CommerceProductChannelDataSetActionProvider
 		).setParameter(
 			"cpDefinitionId", commerceChannelRel.getClassPK()
 		).build();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(Constants.CMD, "deleteChannel");
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceChannelRelId",
+			String.valueOf(commerceChannelRel.getCommerceChannelRelId()));
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(commerceChannelRel.getClassPK()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference

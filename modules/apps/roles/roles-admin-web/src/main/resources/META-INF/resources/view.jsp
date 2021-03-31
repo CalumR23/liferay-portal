@@ -90,6 +90,7 @@ PortletURL portletURL = viewRolesManagementToolbarDisplayContext.getPortletURL()
 			if (RolePermissionUtil.contains(permissionChecker, role.getRoleId(), ActionKeys.UPDATE)) {
 				PortletURL searchContainerPortletURL = roleSearchContainer.getIteratorURL();
 
+<<<<<<< HEAD
 				rowURL = PortletURLBuilder.createRenderURL(
 					renderResponse
 				).setMVCPath(
@@ -101,6 +102,11 @@ PortletURL portletURL = viewRolesManagementToolbarDisplayContext.getPortletURL()
 				).setParameter(
 					"roleId", String.valueOf(role.getRoleId())
 				).build();
+=======
+				rowURL.setParameter("backURL", searchContainerPortletURL.toString());
+
+				rowURL.setParameter("roleId", String.valueOf(role.getRoleId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 			%>
 

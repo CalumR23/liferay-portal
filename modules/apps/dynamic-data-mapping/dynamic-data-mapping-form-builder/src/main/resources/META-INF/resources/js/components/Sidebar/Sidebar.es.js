@@ -697,7 +697,11 @@ class Sidebar extends Component {
 
 				if (
 					rules &&
+<<<<<<< HEAD
 					RulesSupport.findRuleByFieldName(fieldName, null, rules)
+=======
+					RulesSupport.findRuleByFieldName(fieldName, rules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				) {
 					const dropdown = document.querySelector(
 						'.dropdown-menu.show'

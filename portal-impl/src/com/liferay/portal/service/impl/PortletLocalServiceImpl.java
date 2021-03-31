@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.image.SpriteProcessor;
 import com.liferay.portal.kernel.image.SpriteProcessorUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.EventDefinition;
 import com.liferay.portal.kernel.model.Portlet;
@@ -326,9 +327,50 @@ public class PortletLocalServiceImpl extends PortletLocalServiceBaseImpl {
 
 		clearCache();
 
+<<<<<<< HEAD
 		companyLocalService.forEachCompanyId(
 			companyId -> _deployRemotePortlet(
 				portlet, categoryNames, companyId));
+=======
+		for (Company company : companyLocalService.getCompanies()) {
+			Portlet companyPortletModel = (Portlet)portlet.clone();
+
+			companyPortletModel.setCompanyId(company.getCompanyId());
+
+			PortletCategory portletCategory = (PortletCategory)WebAppPool.get(
+				companyPortletModel.getCompanyId(), WebKeys.PORTLET_CATEGORY);
+
+			if (portletCategory == null) {
+				_log.error(
+					"Unable to register remote portlet for company " +
+						companyPortletModel.getCompanyId() +
+							" because it does not exist");
+
+				return portlet;
+			}
+
+			portletCategory.separate(companyPortletModel.getPortletId());
+
+			for (String categoryName : categoryNames) {
+				PortletCategory newPortletCategory = new PortletCategory(
+					categoryName);
+
+				if (newPortletCategory.getParentCategory() == null) {
+					PortletCategory rootPortletCategory = new PortletCategory();
+
+					rootPortletCategory.addCategory(newPortletCategory);
+				}
+
+				Set<String> portletIds = newPortletCategory.getPortletIds();
+
+				portletIds.add(companyPortletModel.getPortletId());
+
+				portletCategory.merge(newPortletCategory.getRootCategory());
+			}
+
+			checkPortlet(companyPortletModel);
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return portlet;
 	}

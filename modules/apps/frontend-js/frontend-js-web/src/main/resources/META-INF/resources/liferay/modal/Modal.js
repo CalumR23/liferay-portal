@@ -334,7 +334,10 @@ const openSelectionModal = ({
 	multiple = false,
 	onClose,
 	onSelect,
+<<<<<<< HEAD
 	searchContainerId,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	selectEventName,
 	selectedData,
 	size,
@@ -378,9 +381,13 @@ const openSelectionModal = ({
 				onClose();
 			}
 		},
+<<<<<<< HEAD
 		onOpen: ({iframeWindow, processClose}) => {
 			const container = iframeWindow.document.body;
 
+=======
+		onOpen: ({container, processClose}) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			const selectEventHandler = Liferay.on(selectEventName, (event) => {
 				selectedItem = event.data || event;
 
@@ -418,6 +425,7 @@ const openSelectionModal = ({
 					}
 				});
 			}
+<<<<<<< HEAD
 
 			if (searchContainerId && multiple) {
 				iframeWindow.Liferay.componentReady(searchContainerId).then(
@@ -437,6 +445,8 @@ const openSelectionModal = ({
 					}
 				);
 			}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		},
 		size,
 		title,

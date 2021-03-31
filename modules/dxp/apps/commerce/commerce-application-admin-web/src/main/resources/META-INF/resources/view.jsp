@@ -136,7 +136,11 @@ renderResponse.setTitle(LanguageUtil.get(request, "applications"));
 	}
 </aui:script>
 
+<<<<<<< HEAD
 <c:if test="<%= commerceApplicationAdminDisplayContext.hasBrandPermissions(CommerceApplicationActionKeys.ADD_COMMERCE_BRAND) %>">
+=======
+<c:if test="<%= commerceApplicationAdminDisplayContext.hasPermissions(CommerceApplicationActionKeys.ADD_COMMERCE_BRAND) %>">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<portlet:actionURL name="/commerce_application_admin/edit_commerce_application_brand" var="editCommerceApplicationBrandActionURL">
 		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.ADD %>" />
 		<portlet:param name="redirect" value="<%= currentURL %>" />

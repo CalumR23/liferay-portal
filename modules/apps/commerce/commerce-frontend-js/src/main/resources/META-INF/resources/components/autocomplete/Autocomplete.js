@@ -24,6 +24,7 @@ import {debouncePromise} from '../../utilities/debounce';
 import {AUTOCOMPLETE_VALUE_UPDATED} from '../../utilities/eventsDefinitions';
 import {useLiferayModule} from '../../utilities/hooks';
 import {getData, getValueFromItem} from '../../utilities/index';
+import {useLiferayModule} from '../../utilities/modules';
 import {showErrorNotification} from '../../utilities/notifications';
 import InfiniteScroller from '../infinite_scroller/InfiniteScroller';
 
@@ -44,8 +45,11 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 	const dropdownNode = useRef();
 	const inputNode = useRef();
 	const FetchedCustomView = useLiferayModule(props.customViewModuleUrl);
+<<<<<<< HEAD
 	const isMounted = useIsMounted();
 	const [debouncedGetItems, updateDebouncedGetItems] = useState(null);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	useEffect(() => {
 		updateDebouncedGetItems(() =>
@@ -90,6 +94,7 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 		if (query) {
 			setInitialised(true);
 		}
+<<<<<<< HEAD
 
 		if (props.infiniteScrollMode) {
 			updateItems(null);
@@ -102,10 +107,17 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 
 	useEffect(() => {
 		if (initialised && debouncedGetItems && !props.disabled) {
+=======
+	}, [query]);
+
+	useEffect(() => {
+		if (initialised) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			setLoading(true);
 
 			debouncedGetItems(props.apiUrl, query, page, pageSize)
 				.then((jsonResponse) => {
+<<<<<<< HEAD
 					if (!isMounted()) {
 						return;
 					}
@@ -124,6 +136,21 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 
 					updateTotalCount(jsonResponse.totalCount);
 					updateLastPage(jsonResponse.lastPage);
+=======
+					if (props.infinityScrollMode) {
+						updateItems((prevItems) => {
+							return prevItems?.length && page > 1
+								? [...prevItems, ...jsonResponse.items]
+								: jsonResponse.items;
+						});
+					}
+					else {
+						updateItems(jsonResponse.items);
+					}
+					updateTotalCount(jsonResponse.totalCount);
+					updateLastPage(jsonResponse.lastPage);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					setLoading(false);
 
 					if (!query) {
@@ -149,20 +176,27 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 		query,
 		page,
 		pageSize,
+<<<<<<< HEAD
 		props.disabled,
 		props.infiniteScrollMode,
+=======
+		props.infinityScrollMode,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		props.apiUrl,
 		props.itemsLabel,
 		props.showErrorNotification,
 	]);
 
 	useEffect(() => {
+<<<<<<< HEAD
 		if (onItemsUpdated) {
 			onItemsUpdated(items);
 		}
 	}, [items, onItemsUpdated]);
 
 	useEffect(() => {
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		function handleClick(e) {
 			if (
 				node.current.contains(e.target) ||
@@ -246,10 +280,16 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 			results
 		);
 
+	const CustomView = props.customView || FetchedCustomView;
+
 	return (
 		<>
 			<FocusScope>
+<<<<<<< HEAD
 				<ClayAutocomplete className={props.inputClass} ref={node}>
+=======
+				<ClayAutocomplete ref={node}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<input
 						id={props.inputId || props.inputName}
 						name={props.inputName}
@@ -267,30 +307,76 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 							setInitialised(true);
 						}}
 						onKeyUp={(e) => {
+<<<<<<< HEAD
 							setActive(e.keyCode !== 27);
+=======
+							if (e.keyCode === 27) {
+								setActive(false);
+							}
+							else {
+								setActive(true);
+							}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						}}
 						placeholder={props.inputPlaceholder}
 						ref={inputNode}
 						required={props.required || false}
 						value={currentLabel || query}
 					/>
+<<<<<<< HEAD
 					{!CustomView && !props.disabled && (
 						<ClayAutocomplete.DropDown
 							active={
 								active && ((items && page === 1) || page > 1)
 							}
 						>
+=======
+					{!CustomView && (
+						<ClayAutocomplete.DropDown active={active && !loading}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							<div
 								className="autocomplete-items"
 								ref={dropdownNode}
 							>
+<<<<<<< HEAD
 								{wrappedResults}
+=======
+								<ClayDropDown.ItemList className="mb-0">
+									{items && items.length === 0 && (
+										<ClayDropDown.Item className="disabled">
+											{Liferay.Language.get(
+												'no-items-were-found'
+											)}
+										</ClayDropDown.Item>
+									)}
+									{items &&
+										items.length > 0 &&
+										items.map((item) => (
+											<ClayAutocomplete.Item
+												key={String(
+													item[props.itemsKey]
+												)}
+												onClick={() => {
+													updateSelectedItem(item);
+													setActive(false);
+												}}
+												value={String(
+													getValueFromItem(
+														item,
+														props.itemsLabel
+													)
+												)}
+											/>
+										))}
+								</ClayDropDown.ItemList>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							</div>
 						</ClayAutocomplete.DropDown>
 					)}
 					{loading && <ClayAutocomplete.LoadingIndicator />}
 				</ClayAutocomplete>
 			</FocusScope>
+<<<<<<< HEAD
 			{CustomView &&
 				!props.disabled &&
 				(props.contentWrapperRef
@@ -300,6 +386,19 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 							props.contentWrapperRef.current
 					  )
 					: wrappedResults)}
+=======
+			{CustomView && (
+				<CustomView
+					items={items}
+					lastPage={lastPage}
+					page={page}
+					pageSize={pageSize}
+					totalCount={totalCount}
+					updatePage={updatePage}
+					updatePageSize={updatePageSize}
+				/>
+			)}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</>
 	);
 }
@@ -307,6 +406,7 @@ function Autocomplete({onItemsUpdated, onValueUpdated, ...props}) {
 Autocomplete.propTypes = {
 	apiUrl: PropTypes.string.isRequired,
 	autofill: PropTypes.bool,
+<<<<<<< HEAD
 	contentWrapperRef: PropTypes.object,
 	customView: PropTypes.func,
 	customViewModuleUrl: PropTypes.string,
@@ -314,6 +414,13 @@ Autocomplete.propTypes = {
 	fetchDataDebounce: PropTypes.number,
 	id: PropTypes.string,
 	infiniteScrollMode: PropTypes.bool,
+=======
+	customView: PropTypes.func,
+	customViewModuleUrl: PropTypes.string,
+	fetchDataDebounce: PropTypes.number,
+	id: PropTypes.string,
+	infinityScrollMode: PropTypes.bool,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	initialLabel: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 		.isRequired,
 	initialValue: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -337,11 +444,19 @@ Autocomplete.defaultProps = {
 	autofill: false,
 	disabled: false,
 	fetchDataDebounce: 200,
+<<<<<<< HEAD
 	infiniteScrollMode: false,
 	initialLabel: '',
 	initialValue: '',
 	inputPlaceholder: Liferay.Language.get('type-here'),
 	pageSize: 10,
+=======
+	infinityScrollMode: false,
+	initialLabel: '',
+	initialValue: '',
+	inputPlaceholder: Liferay.Language.get('type-here'),
+	pageSize: 20,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };
 
 export default Autocomplete;

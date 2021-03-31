@@ -481,6 +481,7 @@ export const DATA_DEFINITION_RESPONSES = {
 			dataDefinitionField,
 			dataDefinitionSelectField,
 			dataDefinitionFieldSet,
+<<<<<<< HEAD
 		],
 	},
 	TWO_ITEMS: {
@@ -575,6 +576,8 @@ export const ENTRY = {
 					en_US: '',
 				},
 			},
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		],
 		dataRules: [],
 		dateCreated: '2020-06-22T21:14:44Z',
@@ -586,6 +589,7 @@ export const ENTRY = {
 		},
 		paginationMode: 'wizard',
 	},
+<<<<<<< HEAD
 	DATA_LIST_VIEW: {
 		appliedFilters: {},
 		dataDefinitionId: 1,
@@ -614,6 +618,12 @@ export const ENTRY = {
 		pageSize: size,
 		totalCount: size,
 	}),
+=======
+	TWO_ITEMS: {
+		...dataDefinition,
+		dataDefinitionFields: [dataDefinitionField, dataDefinitionSelectField],
+	},
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };
 
 const fieldTypes = [
@@ -659,6 +669,56 @@ const fieldTypes = [
 	},
 ];
 
+<<<<<<< HEAD
+=======
+export const dataLayoutBuilderConfig = {
+	config: {
+		allowFieldSets: true,
+		allowMultiplePages: false,
+		allowRules: false,
+		allowSuccessPage: false,
+		disabledProperties: ['predefinedValue'],
+		disabledTabs: ['Autocomplete'],
+		unimplementedProperties: [
+			'fieldNamespace',
+			'indexType',
+			'readOnly',
+			'validation',
+			'visibilityExpression',
+		],
+	},
+	context: {},
+	dataLayoutBuilderId:
+		'_com_liferay_journal_web_portlet_JournalPortlet_dataLayoutBuilder',
+	fieldTypes: [],
+	localizable: true,
+	portletNamespace: 'com_liferay_journal_web_portlet_JournalPortlet',
+};
+
+const dataLayoutBuilder = new DataLayoutBuilder.default(
+	dataLayoutBuilderConfig
+);
+
+const pages = [
+	{
+		rows: [
+			{
+				columns: [
+					{
+						fields: [
+							{
+								fieldName: 'Text',
+							},
+						],
+						size: 12,
+					},
+				],
+			},
+		],
+	},
+];
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const FORM_VIEW_CONTEXT = {
 	appProps: {},
 	config: {
@@ -721,6 +781,7 @@ const FORM_VIEW_CONTEXT = {
 	spritemap: 'icons.svg',
 };
 
+<<<<<<< HEAD
 export const dataLayoutBuilderConfig = {
 	appContext: [FORM_VIEW_CONTEXT],
 	config: {
@@ -774,6 +835,8 @@ const pages = [
 	},
 ];
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 export const FORM_VIEW = {
 	EDIT_FORM_VIEW_PROPS: {
 		basePortletURL: 'localhost',
@@ -786,6 +849,7 @@ export const FORM_VIEW = {
 	},
 	FORM_VIEW_CONTEXT,
 	getDataLayoutBuilderProps() {
+<<<<<<< HEAD
 		const props = {
 			...dataLayoutBuilder.props,
 			appContext: [FORM_VIEW_CONTEXT, jest.fn()],
@@ -810,6 +874,36 @@ export const FORM_VIEW = {
 			on: jest.fn(),
 			onEditingLanguageIdChange: jest.fn(),
 			props,
+=======
+		return {
+			...dataLayoutBuilder,
+			dispatch: jest.fn(),
+			dispatchAction: jest.fn(),
+			getDDMFormFieldSettingsContext: jest.fn(),
+			getFieldTypes: () => {
+				return [
+					{
+						name: 'Text',
+					},
+				];
+			},
+			getLayoutProvider: () => ({
+				getEvents: () => ({
+					fieldHovered: jest.fn(),
+				}),
+			}),
+			getState: () => {
+				return FORM_VIEW_CONTEXT;
+			},
+			getStore: () => {
+				return {
+					activePage: 0,
+					pages,
+				};
+			},
+			on: jest.fn(),
+			onEditingLanguageIdChange: jest.fn(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			removeEventListener: jest.fn(),
 		};
 	},

@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
@@ -57,7 +58,10 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.Constants;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -72,6 +76,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +85,13 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.portlet.Portlet;
+<<<<<<< HEAD
 import javax.portlet.PortletPreferences;
+=======
+import javax.portlet.PortletContext;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequestDispatcher;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -155,6 +166,7 @@ public class ContentDashboardAdminPortletTest {
 				childAssetVocabulary.getVocabularyId(), serviceContext);
 
 		try {
+<<<<<<< HEAD
 			JournalTestUtil.addArticle(
 				_group.getGroupId(), 0,
 				ServiceContextTestUtil.getServiceContext(
@@ -163,6 +175,18 @@ public class ContentDashboardAdminPortletTest {
 						assetCategory.getCategoryId(),
 						childAssetCategory.getCategoryId()
 					}));
+=======
+			JournalArticle journalArticle = JournalTestUtil.addArticle(
+				_user.getUserId(), _group.getGroupId(), 0);
+
+			_journalArticleLocalService.updateAsset(
+				_user.getUserId(), journalArticle,
+				new long[] {
+					assetCategory.getCategoryId(),
+					childAssetCategory.getCategoryId()
+				},
+				new String[0], new long[0], null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals(
 				String.format(
@@ -207,11 +231,21 @@ public class ContentDashboardAdminPortletTest {
 			serviceContext);
 
 		try {
+<<<<<<< HEAD
 			JournalTestUtil.addArticle(
 				_group.getGroupId(), 0,
 				ServiceContextTestUtil.getServiceContext(
 					_group.getGroupId(), _user.getUserId(),
 					new long[] {assetCategory.getCategoryId()}));
+=======
+			JournalArticle journalArticle = JournalTestUtil.addArticle(
+				_user.getUserId(), _group.getGroupId(), 0);
+
+			_journalArticleLocalService.updateAsset(
+				_user.getUserId(), journalArticle,
+				new long[] {assetCategory.getCategoryId()}, new String[0],
+				new long[0], null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals(
 				String.format(
@@ -254,6 +288,35 @@ public class ContentDashboardAdminPortletTest {
 	@Test
 	public void testGetOnClickConfiguration() throws Exception {
 		MVCPortlet mvcPortlet = (MVCPortlet)_portlet;
+<<<<<<< HEAD
+=======
+
+		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+			_getMockLiferayPortletRenderRequest();
+
+		mvcPortlet.render(
+			mockLiferayPortletRenderRequest,
+			new MockLiferayPortletRenderResponse());
+
+		String onClickConfiguration = ReflectionTestUtil.invoke(
+			mockLiferayPortletRenderRequest.getAttribute(
+				"CONTENT_DASHBOARD_ADMIN_DISPLAY_CONTEXT"),
+			"getOnClickConfiguration", new Class<?>[0]);
+
+		Assert.assertTrue(
+			onClickConfiguration.contains(
+				HtmlUtil.escapeJS(
+					"mvcRenderCommandName=/edit_content_dashboard_" +
+						"configuration")));
+	}
+
+	@Test
+	public void testGetProps() throws Exception {
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(
+				_company.getCompanyId(), _company.getGroupId(),
+				_user.getUserId());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest();
@@ -281,12 +344,17 @@ public class ContentDashboardAdminPortletTest {
 		Group group = GroupTestUtil.addGroup(
 			_company.getCompanyId(), _user.getUserId(), 0);
 
+<<<<<<< HEAD
 		try {
 			MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 				_getMockLiferayPortletRenderRequest();
 
 			SearchContainer<Object> searchContainer = _getSearchContainer(
 				mockLiferayPortletRenderRequest);
+=======
+			Map<String, Object> data = _getData(
+				_getMockLiferayPortletRenderRequest());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			int initialCount = searchContainer.getTotal();
 
@@ -335,12 +403,17 @@ public class ContentDashboardAdminPortletTest {
 			JournalTestUtil.addArticle(
 				_user.getUserId(), _group.getGroupId(), 0);
 
+<<<<<<< HEAD
 			MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 				_getMockLiferayPortletRenderRequest();
 
 			mockLiferayPortletRenderRequest.setParameter(
 				"assetCategoryId",
 				String.valueOf(assetCategory.getCategoryId()));
+=======
+			Map<String, Object> data = _getData(
+				_getMockLiferayPortletRenderRequest());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			SearchContainer<Object> searchContainer = _getSearchContainer(
 				mockLiferayPortletRenderRequest);
@@ -402,11 +475,21 @@ public class ContentDashboardAdminPortletTest {
 			JournalTestUtil.addArticle(
 				_user.getUserId(), _group.getGroupId(), 0);
 
+<<<<<<< HEAD
 			MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 				_getMockLiferayPortletRenderRequest();
 
 			mockLiferayPortletRenderRequest.setParameter(
 				"authorIds", String.valueOf(user.getUserId()));
+=======
+			_journalArticleLocalService.updateAsset(
+				_user.getUserId(), journalArticle,
+				new long[] {childAssetCategory.getCategoryId()}, new String[0],
+				new long[0], null);
+
+			Map<String, Object> data = _getData(
+				_getMockLiferayPortletRenderRequest());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			SearchContainer<Object> searchContainer = _getSearchContainer(
 				mockLiferayPortletRenderRequest);
@@ -416,10 +499,27 @@ public class ContentDashboardAdminPortletTest {
 			List<Object> results = searchContainer.getResults();
 
 			Assert.assertEquals(
+<<<<<<< HEAD
 				journalArticle.getTitle(LocaleUtil.US),
 				ReflectionTestUtil.invoke(
 					results.get(0), "getTitle", new Class<?>[] {Locale.class},
 					LocaleUtil.US));
+=======
+				JSONUtil.put(
+					JSONUtil.put(
+						"key",
+						String.valueOf(childAssetCategory.getCategoryId())
+					).put(
+						"name", childAssetCategory.getTitle(LocaleUtil.US)
+					).put(
+						"value", 1L
+					).put(
+						"vocabularyName",
+						childAssetVocabulary.getTitle(LocaleUtil.US)
+					)
+				).toString(),
+				vocabulariesJSONArray.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		finally {
 			_userLocalService.deleteUser(user);
@@ -458,6 +558,7 @@ public class ContentDashboardAdminPortletTest {
 
 		JournalTestUtil.addArticle(_user.getUserId(), _group.getGroupId(), 0);
 
+<<<<<<< HEAD
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest();
 
@@ -489,6 +590,10 @@ public class ContentDashboardAdminPortletTest {
 			_user.getUserId(), _group.getGroupId(), 0);
 		JournalArticle journalArticle2 = JournalTestUtil.addArticle(
 			_user.getUserId(), _group.getGroupId(), 0);
+=======
+		Map<String, Object> data = _getData(
+			_getMockLiferayPortletRenderRequest());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		SearchContainer<Object> searchContainer = _getSearchContainer(
 			_getMockLiferayPortletRenderRequest());
@@ -532,11 +637,16 @@ public class ContentDashboardAdminPortletTest {
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 			LocaleUtil.getSiteDefault(), false, false, serviceContext);
 
+<<<<<<< HEAD
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest();
 
 		mockLiferayPortletRenderRequest.addParameter(
 			SearchContainer.DEFAULT_ORDER_BY_COL_PARAM, "title");
+=======
+			Map<String, Object> data = _getData(
+				_getMockLiferayPortletRenderRequest());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		SearchContainer<Object> searchContainer = _getSearchContainer(
 			mockLiferayPortletRenderRequest);
@@ -764,14 +874,17 @@ public class ContentDashboardAdminPortletTest {
 				_group.getGroupId(), _user.getUserId(),
 				new String[] {"tag1", "tag2"}));
 
+<<<<<<< HEAD
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			_getMockLiferayPortletRenderRequest();
 
 		mockLiferayPortletRenderRequest.addParameter("assetTagId", "tag1");
 		mockLiferayPortletRenderRequest.addParameter("assetTagId", "tag2");
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		SearchContainer<Object> searchContainer = _getSearchContainer(
-			mockLiferayPortletRenderRequest);
+			_getMockLiferayPortletRenderRequest());
 
 		Assert.assertEquals(1, searchContainer.getTotal());
 
@@ -785,8 +898,87 @@ public class ContentDashboardAdminPortletTest {
 	}
 
 	@Test
+<<<<<<< HEAD
 	public void testGetSearchContainerWithMultipleAuthors() throws Exception {
 		User user = UserTestUtil.addGroupAdminUser(_group);
+=======
+	public void testGetSearchContainerWithExpiredJournalArticle()
+		throws Exception {
+
+		User user = UserTestUtil.addGroupAdminUser(_group);
+
+		Group group = GroupTestUtil.addGroup(
+			_company.getCompanyId(), _user.getUserId(), 0);
+
+		try {
+			MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+				_getMockLiferayPortletRenderRequest();
+
+			SearchContainer<Object> searchContainer = _getSearchContainer(
+				mockLiferayPortletRenderRequest);
+
+			int initialCount = searchContainer.getTotal();
+
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext(
+					group.getGroupId(), user.getUserId());
+
+			DDMForm ddmForm = DDMStructureTestUtil.getSampleDDMForm(
+				"content", "string", "text", true, "textarea",
+				new Locale[] {LocaleUtil.getSiteDefault()},
+				LocaleUtil.getSiteDefault());
+
+			DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+				group.getGroupId(), JournalArticle.class.getName(), 0, ddmForm,
+				LocaleUtil.getSiteDefault(),
+				ServiceContextTestUtil.getServiceContext());
+
+			DDMTemplate ddmTemplate = DDMTemplateTestUtil.addTemplate(
+				group.getGroupId(),
+				PortalUtil.getClassNameId(DDMStructure.class),
+				ddmStructure.getStructureId(),
+				PortalUtil.getClassNameId(JournalArticle.class));
+
+			JournalArticle journalArticle =
+				_journalArticleLocalService.addArticle(
+					serviceContext.getUserId(),
+					serviceContext.getScopeGroupId(), 0,
+					JournalArticleConstants.CLASS_NAME_ID_DEFAULT, 0,
+					StringPool.BLANK, true, 2.0,
+					Collections.singletonMap(
+						LocaleUtil.getSiteDefault(), "Test Article"),
+					null,
+					DDMStructureTestUtil.getSampleStructuredContent(
+						Collections.singletonMap(
+							LocaleUtil.getSiteDefault(),
+							RandomTestUtil.randomString()),
+						LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault())),
+					ddmStructure.getStructureKey(),
+					ddmTemplate.getTemplateKey(), null, 1, 1, 1965, 0, 0, 0, 0,
+					0, 0, 0, true, 0, 0, 0, 0, 0, true, true, false, null, null,
+					null, null, serviceContext);
+
+			JournalTestUtil.expireArticle(
+				_group.getGroupId(), journalArticle, 2.0);
+
+			searchContainer = _getSearchContainer(
+				mockLiferayPortletRenderRequest);
+
+			int actualCount = searchContainer.getTotal();
+
+			Assert.assertEquals(initialCount + 1, actualCount);
+		}
+		finally {
+			GroupTestUtil.deleteGroup(group);
+			_userLocalService.deleteUser(user);
+		}
+	}
+
+	@Test
+	public void testGetSearchContainerWithKeywords() throws Exception {
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			_user.getUserId(), _group.getGroupId(), 0);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			JournalArticle journalArticle1 = JournalTestUtil.addArticle(
@@ -1501,7 +1693,11 @@ public class ContentDashboardAdminPortletTest {
 			mockLiferayPortletRenderRequest.getPreferences();
 
 		portletPreferences.setValues(
+<<<<<<< HEAD
 			"assetVocabularyNames", assetVocabularyNames);
+=======
+			"assetVocabularyNames", "audience", "stage");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return mockLiferayPortletRenderRequest;
 	}

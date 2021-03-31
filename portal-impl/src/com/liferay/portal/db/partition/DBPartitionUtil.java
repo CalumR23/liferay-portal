@@ -341,6 +341,21 @@ public class DBPartitionUtil {
 		};
 	}
 
+<<<<<<< HEAD
+=======
+	private static void _copyData(
+			String tableName, String fromSchemaName, String toSchemaName,
+			Statement statement, String whereClause)
+		throws Exception {
+
+		statement.executeUpdate(
+			StringBundler.concat(
+				"insert ", toSchemaName, StringPool.PERIOD, tableName,
+				" select * from ", fromSchemaName, StringPool.PERIOD, tableName,
+				whereClause));
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static String _getCreateTableSQL(long companyId, String tableName) {
 		return StringBundler.concat(
 			"create table if not exists ", _getSchemaName(companyId),
@@ -409,6 +424,49 @@ public class DBPartitionUtil {
 			_copyData(
 				tableName, _defaultSchemaName, _getSchemaName(companyId),
 				statement, StringPool.BLANK);
+<<<<<<< HEAD
+=======
+		}
+	}
+
+	private static void _moveCompanyData(
+			long companyId, String tableName, String fromSchemaName,
+			String toSchemaName, Statement statement)
+		throws Exception {
+
+		String whereClause = " where companyId = " + companyId;
+
+		_copyData(
+			tableName, fromSchemaName, toSchemaName, statement, whereClause);
+
+		if (!whereClause.isEmpty()) {
+			statement.executeUpdate(
+				StringBundler.concat(
+					"delete from ", fromSchemaName, StringPool.PERIOD,
+					tableName, whereClause));
+		}
+	}
+
+	private static void _restoreTable(
+			long companyId, String tableName, Statement statement,
+			DBInspector dbInspector)
+		throws Exception {
+
+		if (dbInspector.hasColumn(tableName, "companyId")) {
+			_moveCompanyData(
+				companyId, tableName, _getSchemaName(companyId),
+				_defaultSchemaName, statement);
+		}
+
+		statement.executeUpdate(_getDropTableSQL(companyId, tableName));
+
+		statement.executeUpdate(_getCreateViewSQL(companyId, tableName));
+	}
+
+	private static void _useSchema(Connection connection) throws SQLException {
+		if (connection.isReadOnly()) {
+			return;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 	}
 

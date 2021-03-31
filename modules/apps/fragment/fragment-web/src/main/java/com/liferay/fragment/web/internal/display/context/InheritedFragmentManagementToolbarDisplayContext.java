@@ -92,6 +92,7 @@ public class InheritedFragmentManagementToolbarDisplayContext
 					(ThemeDisplay)httpServletRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 				return PortletURLBuilder.createActionURL(
 					liferayPortletResponse
 				).setActionName(
@@ -99,6 +100,17 @@ public class InheritedFragmentManagementToolbarDisplayContext
 				).setRedirect(
 					themeDisplay.getURLCurrent()
 				).buildString();
+=======
+				PortletURL copyFragmentEntryURL =
+					liferayPortletResponse.createActionURL();
+
+				copyFragmentEntryURL.setParameter(
+					ActionRequest.ACTION_NAME, "/fragment/copy_fragment_entry");
+				copyFragmentEntryURL.setParameter(
+					"redirect", themeDisplay.getURLCurrent());
+
+				return copyFragmentEntryURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		).put(
 			"exportFragmentEntriesURL",

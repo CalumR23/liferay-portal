@@ -139,6 +139,76 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		return availableLocales;
 	}
 
+<<<<<<< HEAD
+=======
+	protected static DDMFormField getDDMFormField(JSONObject jsonObject)
+		throws PortalException {
+
+		String name = jsonObject.getString("name");
+		String type = jsonObject.getString("type");
+
+		DDMFormField ddmFormField = new DDMFormField(name, type);
+
+		setDDMFormFieldProperties(jsonObject, ddmFormField);
+
+		setNestedDDMFormField(
+			jsonObject.getJSONArray("nestedFields"), ddmFormField);
+
+		return ddmFormField;
+	}
+
+	protected static DDMFormFieldOptions getDDMFormFieldOptions(
+		JSONArray jsonArray) {
+
+		DDMFormFieldOptions ddmFormFieldOptions = new DDMFormFieldOptions();
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			String value = jsonObject.getString("value");
+
+			ddmFormFieldOptions.addOption(value);
+			ddmFormFieldOptions.addOptionReference(
+				value, jsonObject.getString("reference"));
+
+			addOptionValueLabels(
+				jsonObject.getJSONObject("label"), ddmFormFieldOptions, value);
+		}
+
+		return ddmFormFieldOptions;
+	}
+
+	protected static List<DDMFormField> getDDMFormFields(JSONArray jsonArray)
+		throws PortalException {
+
+		List<DDMFormField> ddmFormFields = new ArrayList<>();
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			DDMFormField ddmFormField = getDDMFormField(
+				jsonArray.getJSONObject(i));
+
+			ddmFormFields.add(ddmFormField);
+		}
+
+		return ddmFormFields;
+	}
+
+	protected static DDMForm getDDMFormFieldTypeSettingsDDMForm(String type) {
+		DDMFormFieldType ddmFormFieldType =
+			_ddmFormFieldTypeServicesTracker.getDDMFormFieldType(type);
+
+		Class<? extends DDMFormFieldTypeSettings> ddmFormFieldTypeSettings =
+			DefaultDDMFormFieldTypeSettings.class;
+
+		if (ddmFormFieldType != null) {
+			ddmFormFieldTypeSettings =
+				ddmFormFieldType.getDDMFormFieldTypeSettings();
+		}
+
+		return DDMFormFactory.create(ddmFormFieldTypeSettings);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	protected static void setDDMFormAvailableLocales(
 		JSONArray jsonArray, DDMForm ddmForm) {
 
@@ -236,6 +306,20 @@ public class DDMFormJSONDeserializer implements DDMFormDeserializer {
 		ddmForm.setDDMFormSuccessPageSettings(ddmFormSuccessPageSettings);
 	}
 
+<<<<<<< HEAD
+=======
+	protected static void setNestedDDMFormField(
+			JSONArray jsonArray, DDMFormField ddmFormField)
+		throws PortalException {
+
+		if ((jsonArray == null) || (jsonArray.length() == 0)) {
+			return;
+		}
+
+		ddmFormField.setNestedDDMFormFields(getDDMFormFields(jsonArray));
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference(unbind = "-")
 	protected void setDDMFormFieldTypeServicesTracker(
 		DDMFormFieldTypeServicesTracker ddmFormFieldTypeServicesTracker) {

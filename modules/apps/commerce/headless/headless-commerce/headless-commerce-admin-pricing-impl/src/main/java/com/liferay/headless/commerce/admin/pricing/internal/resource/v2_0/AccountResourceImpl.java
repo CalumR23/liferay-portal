@@ -26,6 +26,11 @@ import com.liferay.headless.commerce.admin.pricing.resource.v2_0.AccountResource
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
+<<<<<<< HEAD
+=======
+
+import javax.validation.constraints.NotNull;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +50,16 @@ public class AccountResourceImpl
 
 	@NestedField(parentClass = DiscountAccount.class, value = "account")
 	@Override
+<<<<<<< HEAD
 	public Account getDiscountAccountAccount(Long id) throws Exception {
+		CommerceDiscountAccountRel commerceDiscountAccountRel =
+			_commerceDiscountAccountRelService.getCommerceDiscountAccountRel(
+				id);
+=======
+	public Account getDiscountAccountAccount(@NotNull Long id)
+		throws Exception {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
 		CommerceDiscountAccountRel commerceDiscountAccountRel =
 			_commerceDiscountAccountRelService.getCommerceDiscountAccountRel(
 				id);
@@ -58,7 +72,16 @@ public class AccountResourceImpl
 
 	@NestedField(parentClass = PriceListAccount.class, value = "account")
 	@Override
+<<<<<<< HEAD
 	public Account getPriceListAccountAccount(Long id) throws Exception {
+		CommercePriceListAccountRel commercePriceListAccountRel =
+			_commercePriceListAccountRelService.getCommercePriceListAccountRel(
+				id);
+=======
+	public Account getPriceListAccountAccount(@NotNull Long id)
+		throws Exception {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
 		CommercePriceListAccountRel commercePriceListAccountRel =
 			_commercePriceListAccountRelService.getCommercePriceListAccountRel(
 				id);

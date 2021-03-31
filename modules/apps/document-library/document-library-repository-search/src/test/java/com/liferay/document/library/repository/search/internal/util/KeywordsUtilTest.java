@@ -14,11 +14,15 @@
 
 package com.liferay.document.library.repository.search.internal.util;
 
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+import org.junit.Assert;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -26,11 +30,14 @@ import org.junit.Test;
  */
 public class KeywordsUtilTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Test
 	public void testEscapeEspecial() {
 		Assert.assertEquals(

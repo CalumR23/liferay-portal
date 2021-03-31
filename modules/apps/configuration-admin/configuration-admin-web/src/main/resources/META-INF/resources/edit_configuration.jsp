@@ -27,6 +27,13 @@ if (Validator.isNull(redirect)) {
 
 String bindRedirectURL = currentURL;
 
+<<<<<<< HEAD
+=======
+PortletURL viewFactoryInstancesURL = renderResponse.createRenderURL();
+
+viewFactoryInstancesURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_factory_instances");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 ConfigurationModel configurationModel = (ConfigurationModel)request.getAttribute(ConfigurationAdminWebKeys.CONFIGURATION_MODEL);
 
 PortletURL viewFactoryInstancesURL = PortletURLBuilder.createRenderURL(

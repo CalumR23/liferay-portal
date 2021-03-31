@@ -17,7 +17,10 @@ package com.liferay.portal.file.install.internal.properties;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.file.install.properties.ConfigurationHandler;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.IOException;
 

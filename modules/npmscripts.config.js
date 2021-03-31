@@ -25,6 +25,7 @@ const CHECK_AND_FIX_GLOBS = [
 ];
 
 module.exports = {
+<<<<<<< HEAD
 	build: {
 		bundler: {
 			config: {
@@ -422,4 +423,9 @@ module.exports = {
 		check: CHECK_AND_FIX_GLOBS,
 		fix: CHECK_AND_FIX_GLOBS,
 	},
+=======
+	check: CHECK_AND_FIX_GLOBS,
+	fix: CHECK_AND_FIX_GLOBS,
+	preset: '@liferay/npm-scripts/src/presets/standard',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };

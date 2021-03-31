@@ -14,7 +14,10 @@
 
 package com.liferay.change.tracking.web.internal.portlet.action;
 
+<<<<<<< HEAD
 import com.liferay.change.tracking.exception.CTLocalizedException;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTCollectionService;
@@ -80,9 +83,15 @@ public class UndoCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 			CTCollection ctCollection = _ctCollectionService.undoCTCollection(
 				ctCollectionId, themeDisplay.getUserId(), name, description);
 
+<<<<<<< HEAD
 			PortletURL redirectURL = PortletURLFactoryUtil.create(
 				actionRequest, CTPortletKeys.PUBLICATIONS,
 				PortletRequest.RENDER_PHASE);
+=======
+		PortletURL redirectURL = PortletURLFactoryUtil.create(
+			actionRequest, CTPortletKeys.PUBLICATIONS,
+			PortletRequest.RENDER_PHASE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			String publishTime = ParamUtil.get(
 				actionRequest, "publishTime", "now");
@@ -96,11 +105,21 @@ public class UndoCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 					"mvcRenderCommandName", "/change_tracking/view_changes");
 			}
 
+<<<<<<< HEAD
 			redirectURL.setParameter(
 				"ctCollectionId",
 				String.valueOf(ctCollection.getCtCollectionId()));
 
 			sendRedirect(actionRequest, actionResponse, redirectURL.toString());
+=======
+		if (publishTime.equals("now")) {
+			redirectURL.setParameter(
+				"mvcRenderCommandName", "/change_tracking/view_conflicts");
+		}
+		else {
+			redirectURL.setParameter(
+				"mvcRenderCommandName", "/change_tracking/view_changes");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (CTLocalizedException ctLocalizedException) {
 			_log.error(ctLocalizedException, ctLocalizedException);

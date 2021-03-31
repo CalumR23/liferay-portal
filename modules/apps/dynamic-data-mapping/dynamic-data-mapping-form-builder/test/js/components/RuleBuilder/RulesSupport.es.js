@@ -76,7 +76,11 @@ describe('RulesSupport', () => {
 		expect(condition.operands[1].value).toEqual('');
 	});
 
+<<<<<<< HEAD
 	describe('findRuleByFieldName(fieldName, pages, rules)', () => {
+=======
+	describe('findRuleByFieldName(fieldName, rules)', () => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		it('returns false if field does not belong to rule', () => {
 			const rules = [
 				{
@@ -105,7 +109,11 @@ describe('RulesSupport', () => {
 			];
 
 			expect(
+<<<<<<< HEAD
 				RulesSupport.findRuleByFieldName('text3', null, rules)
+=======
+				RulesSupport.findRuleByFieldName('text3', rules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			).toBeFalsy();
 		});
 
@@ -137,6 +145,7 @@ describe('RulesSupport', () => {
 			];
 
 			expect(
+<<<<<<< HEAD
 				RulesSupport.findRuleByFieldName('date1', null, rules)
 			).toBeTruthy();
 
@@ -146,6 +155,17 @@ describe('RulesSupport', () => {
 
 			expect(
 				RulesSupport.findRuleByFieldName('text2', null, rules)
+=======
+				RulesSupport.findRuleByFieldName('date1', rules)
+			).toBeTruthy();
+
+			expect(
+				RulesSupport.findRuleByFieldName('text1', rules)
+			).toBeTruthy();
+
+			expect(
+				RulesSupport.findRuleByFieldName('text2', rules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			).toBeTruthy();
 		});
 
@@ -174,11 +194,19 @@ describe('RulesSupport', () => {
 			];
 
 			expect(
+<<<<<<< HEAD
 				RulesSupport.findRuleByFieldName('num1', null, rules)
 			).toBeTruthy();
 
 			expect(
 				RulesSupport.findRuleByFieldName('num2', null, rules)
+=======
+				RulesSupport.findRuleByFieldName('num1', rules)
+			).toBeTruthy();
+
+			expect(
+				RulesSupport.findRuleByFieldName('num2', rules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			).toBeTruthy();
 		});
 
@@ -211,11 +239,19 @@ describe('RulesSupport', () => {
 			];
 
 			expect(
+<<<<<<< HEAD
 				RulesSupport.findRuleByFieldName('select1', null, rules)
 			).toBeTruthy();
 
 			expect(
 				RulesSupport.findRuleByFieldName('text2', null, rules)
+=======
+				RulesSupport.findRuleByFieldName('select1', rules)
+			).toBeTruthy();
+
+			expect(
+				RulesSupport.findRuleByFieldName('text2', rules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			).toBeTruthy();
 		});
 	});

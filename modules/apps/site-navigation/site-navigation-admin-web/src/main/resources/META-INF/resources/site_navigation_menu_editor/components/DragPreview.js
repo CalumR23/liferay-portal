@@ -19,8 +19,11 @@ import {useConstants} from '../contexts/ConstantsContext';
 import {useItems} from '../contexts/ItemsContext';
 import getDescendantsCount from '../utils/getDescendantsCount';
 
+<<<<<<< HEAD
 const HANDLER_OFFSET = 10;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 const getItemStyles = (currentOffset, ref, rtl) => {
 	if (!currentOffset || !ref.current) {
 		return {
@@ -30,8 +33,13 @@ const getItemStyles = (currentOffset, ref, rtl) => {
 
 	const rect = ref.current.getBoundingClientRect();
 	const x = rtl
+<<<<<<< HEAD
 		? currentOffset.x + HANDLER_OFFSET - window.innerWidth
 		: currentOffset.x - HANDLER_OFFSET;
+=======
+		? currentOffset.x + rect.width * 0.5 - window.innerWidth
+		: currentOffset.x - rect.width * 0.5;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const y = currentOffset.y - rect.height * 0.5;
 
 	const transform = `translate(${x}px, ${y}px)`;
@@ -45,9 +53,15 @@ const getItemStyles = (currentOffset, ref, rtl) => {
 export default function DragPreview() {
 	const ref = useRef();
 
+<<<<<<< HEAD
 	const {languageId} = useConstants();
 	const items = useItems();
 	const rtl = Liferay.Language.direction[languageId] === 'rtl';
+=======
+	const {languageDirection, languageId} = useConstants();
+	const items = useItems();
+	const rtl = languageDirection[languageId] === 'rtl';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const {currentOffset, isDragging, itemId} = useDragLayer((monitor) => ({
 		currentOffset: monitor.getClientOffset(),

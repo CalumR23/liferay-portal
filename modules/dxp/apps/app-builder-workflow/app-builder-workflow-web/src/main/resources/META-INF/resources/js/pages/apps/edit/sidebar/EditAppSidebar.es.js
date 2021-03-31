@@ -20,7 +20,10 @@ import React, {useContext, useEffect, useState} from 'react';
 
 import AutocompleteMultiSelect from '../../../../components/autocomplete/AutocompleteMultiSelect.es';
 import ButtonInfo from '../../../../components/button-info/ButtonInfo.es';
+<<<<<<< HEAD
 import MissingRequiredFieldsPopover from '../MissingRequiredFieldsPopover.es';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {REMOVE_STEP_EMPTY_FORM_VIEWS, UPDATE_STEP} from '../configReducer.es';
 import ActionsTab from './ActionsTab.es';
 import DataAndViewsTab from './DataAndViewsTab.es';

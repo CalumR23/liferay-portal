@@ -114,11 +114,19 @@ public class UADHierarchyDisplay {
 			baseURL.setParameter("scope", scope);
 		}
 
+<<<<<<< HEAD
 		PortletURL applicationURL = PortletURLBuilder.create(
 			PortletURLUtil.clone(baseURL, renderResponse)
 		).setMVCRenderCommandName(
 			"/user_associated_data/review_uad_data"
 		).build();
+=======
+		PortletURL applicationURL = PortletURLUtil.clone(
+			baseURL, renderResponse);
+
+		applicationURL.setParameter(
+			"mvcRenderCommandName", "/user_associated_data/review_uad_data");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String className = ParamUtil.getString(
 			httpServletRequest, "parentContainerClass");
@@ -146,6 +154,16 @@ public class UADHierarchyDisplay {
 		while (!parentContainerId.equals("0") &&
 			   !parentContainerId.equals("-1")) {
 
+<<<<<<< HEAD
+=======
+			PortletURL portletURL = PortletURLUtil.clone(
+				baseURL, renderResponse);
+
+			portletURL.setParameter(
+				"mvcRenderCommandName",
+				"/user_associated_data/view_uad_hierarchy");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			UADDisplay<Object> parentContainerUADDisplay =
 				(UADDisplay<Object>)_getUADDisplayByTypeClass(
 					parentContainerClass);
@@ -387,6 +405,7 @@ public class UADHierarchyDisplay {
 			return null;
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			liferayPortletResponse
 		).setMVCRenderCommandName(
@@ -402,6 +421,24 @@ public class UADHierarchyDisplay {
 		).setParameter(
 			"scope", ParamUtil.getString(liferayPortletRequest, "scope")
 		).buildString();
+=======
+		PortletURL renderURL = liferayPortletResponse.createRenderURL();
+
+		renderURL.setParameter("p_u_i_d", String.valueOf(selectedUserId));
+		renderURL.setParameter(
+			"mvcRenderCommandName", "/user_associated_data/view_uad_hierarchy");
+		renderURL.setParameter("applicationKey", applicationKey);
+		renderURL.setParameter("parentContainerClass", typeClass.getName());
+		renderURL.setParameter(
+			"parentContainerId",
+			String.valueOf(uadDisplay.getPrimaryKey(unwrappedObject)));
+
+		String scope = ParamUtil.getString(liferayPortletRequest, "scope");
+
+		renderURL.setParameter("scope", scope);
+
+		return renderURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public <T> boolean isInTrash(T object)

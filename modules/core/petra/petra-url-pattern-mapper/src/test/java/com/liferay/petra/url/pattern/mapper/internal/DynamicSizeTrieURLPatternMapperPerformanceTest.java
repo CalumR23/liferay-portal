@@ -15,6 +15,7 @@
 package com.liferay.petra.url.pattern.mapper.internal;
 
 import com.liferay.petra.url.pattern.mapper.URLPatternMapper;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Map;
@@ -22,17 +23,25 @@ import java.util.Map;
 import org.junit.ClassRule;
 import org.junit.Rule;
 
+=======
+
+import java.util.Map;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 /**
  * @author Arthur Chan
  */
 public class DynamicSizeTrieURLPatternMapperPerformanceTest
 	extends BaseURLPatternMapperPerformanceTestCase {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	protected URLPatternMapper<Integer> createURLPatternMapper(
 		Map<String, Integer> values) {

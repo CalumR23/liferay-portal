@@ -121,9 +121,13 @@ const EditCategoriesModal = ({
 			};
 
 			return fetch(`${pathModule}${url}`, init)
+<<<<<<< HEAD
 				.then((response) =>
 					response.status === 204 ? '' : response.json()
 				)
+=======
+				.then((response) => response.json())
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				.catch(() => {
 					onModalClose();
 				});

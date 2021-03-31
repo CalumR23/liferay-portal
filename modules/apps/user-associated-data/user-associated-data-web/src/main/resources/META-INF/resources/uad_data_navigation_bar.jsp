@@ -37,11 +37,17 @@ PortletURL baseURL = PortletURLBuilder.createRenderURL(
 						PortletURL reviewDataURL = null;
 
 						try {
+<<<<<<< HEAD
 							reviewDataURL = PortletURLBuilder.create(
 								PortletURLUtil.clone(baseURL, renderResponse)
 							).setMVCRenderCommandName(
 								"/user_associated_data/review_uad_data"
 							).build();
+=======
+							reviewDataURL = PortletURLUtil.clone(baseURL, renderResponse);
+
+							reviewDataURL.setParameter("mvcRenderCommandName", "/user_associated_data/review_uad_data");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						}
 						catch (PortletException e) {
 							reviewDataURL = baseURL;
@@ -58,11 +64,17 @@ PortletURL baseURL = PortletURLBuilder.createRenderURL(
 						PortletURL nonreviewableDataURL = null;
 
 						try {
+<<<<<<< HEAD
 							nonreviewableDataURL = PortletURLBuilder.create(
 								PortletURLUtil.clone(baseURL, renderResponse)
 							).setMVCRenderCommandName(
 								"/user_associated_data/anonymize_nonreviewable_uad_data"
 							).build();
+=======
+							nonreviewableDataURL = PortletURLUtil.clone(baseURL, renderResponse);
+
+							nonreviewableDataURL.setParameter("mvcRenderCommandName", "/user_associated_data/anonymize_nonreviewable_uad_data");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						}
 						catch (PortletException e) {
 							nonreviewableDataURL = baseURL;

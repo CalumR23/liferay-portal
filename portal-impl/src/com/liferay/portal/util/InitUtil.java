@@ -140,6 +140,7 @@ public class InitUtil {
 				Method method = clazz.getMethod(
 					"setClassLoader", ClassLoader.class);
 
+<<<<<<< HEAD
 				method.invoke(null, PortalClassLoaderUtil.getClassLoader());
 			}
 			catch (Exception exception) {
@@ -151,6 +152,8 @@ public class InitUtil {
 
 		com.liferay.portal.kernel.util.PropsUtil.setProps(new PropsImpl());
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		// Shared log
 
 		try {

@@ -41,7 +41,11 @@ else {
 
 <portlet:actionURL name="/cp_specification_options/edit_cp_specification_option" var="editProductSpecificationOptionActionURL" />
 
+<<<<<<< HEAD
 <aui:form action="<%= editProductSpecificationOptionActionURL %>" cssClass="container-fluid container-fluid-max-xl" method="post" name="fm">
+=======
+<aui:form action="<%= editProductSpecificationOptionActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (cpSpecificationOption == null) ? Constants.ADD : Constants.UPDATE %>" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="cpSpecificationOptionId" type="hidden" value="<%= String.valueOf(cpSpecificationOptionId) %>" />

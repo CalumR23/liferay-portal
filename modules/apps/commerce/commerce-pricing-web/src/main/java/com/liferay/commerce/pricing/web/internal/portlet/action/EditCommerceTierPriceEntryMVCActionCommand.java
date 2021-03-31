@@ -149,6 +149,7 @@ public class EditCommerceTierPriceEntryMVCActionCommand
 			ActionRequest actionRequest, long commerceTierPriceEntryId)
 		throws Exception {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				actionRequest, CommercePriceListPortletKeys.COMMERCE_PRICE_LIST,
@@ -156,6 +157,15 @@ public class EditCommerceTierPriceEntryMVCActionCommand
 		).setMVCRenderCommandName(
 			"/commerce_price_list/edit_commerce_tier_price_entry"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			actionRequest, CommercePriceListPortletKeys.COMMERCE_PRICE_LIST,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_price_list/edit_commerce_tier_price_entry");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commercePriceEntryId = ParamUtil.getLong(
 			actionRequest, "commercePriceEntryId");

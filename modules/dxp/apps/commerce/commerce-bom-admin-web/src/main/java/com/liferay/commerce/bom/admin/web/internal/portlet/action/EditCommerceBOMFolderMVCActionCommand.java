@@ -144,6 +144,7 @@ public class EditCommerceBOMFolderMVCActionCommand
 			ActionRequest actionRequest, CommerceBOMFolder commerceBOMFolder)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, CommerceBOMFolder.class.getName(),
@@ -153,6 +154,19 @@ public class EditCommerceBOMFolderMVCActionCommand
 		).setParameter(
 			"commerceBOMFolderId", commerceBOMFolder.getCommerceBOMFolderId()
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, CommerceBOMFolder.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_bom_admin/edit_commerce_bom_folder");
+
+		portletURL.setParameter(
+			"commerceBOMFolderId",
+			String.valueOf(commerceBOMFolder.getCommerceBOMFolderId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 

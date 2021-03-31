@@ -29,7 +29,11 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.format(request, "edit-x", "shipping-address") %>'
 >
+<<<<<<< HEAD
 	<aui:form action="<%= editCommerceShipmentURL %>" cssClass="container-fluid container-fluid-max-xl p-0" method="post" name="fm">
+=======
+	<aui:form action="<%= editCommerceShipmentURL %>" cssClass="container-fluid-1280 p-0" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="address" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="commerceShipmentId" type="hidden" value="<%= commerceShipment.getCommerceShipmentId() %>" />
@@ -48,6 +52,7 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 
 		<aui:input label="postal-code" name="zip" />
 
+<<<<<<< HEAD
 		<aui:select label="country" name="countryId" showEmptyOption="<%= true %>">
 
 			<%
@@ -57,6 +62,17 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 			%>
 
 				<aui:option label="<%= country.getTitle(locale) %>" selected="<%= shippingAddress.getCountryId() == country.getCountryId() %>" value="<%= country.getCountryId() %>" />
+=======
+		<aui:select label="country" name="commerceCountryId" showEmptyOption="<%= true %>">
+
+			<%
+			List<CommerceCountry> commerceCountries = commerceShipmentDisplayContext.getCommerceCountries();
+
+			for (CommerceCountry commerceCountry : commerceCountries) {
+			%>
+
+				<aui:option label="<%= commerceCountry.getName(LanguageUtil.getLanguageId(locale)) %>" selected="<%= shippingAddress.getCommerceCountryId() == commerceCountry.getCommerceCountryId() %>" value="<%= commerceCountry.getCommerceCountryId() %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<%
 			}
@@ -64,6 +80,7 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 
 		</aui:select>
 
+<<<<<<< HEAD
 		<aui:select label="region" name="regionId" showEmptyOption="<%= true %>">
 
 			<%
@@ -73,6 +90,17 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 			%>
 
 				<aui:option label="<%= region.getName() %>" selected="<%= shippingAddress.getRegionId() == region.getRegionId() %>" value="<%= shippingAddress.getRegionId() %>" />
+=======
+		<aui:select label="region" name="commerceRegionId" showEmptyOption="<%= true %>">
+
+			<%
+			List<CommerceRegion> commerceRegions = commerceShipmentDisplayContext.getCommerceRegions(shippingAddress.getCommerceCountryId());
+
+			for (CommerceRegion commerceRegion : commerceRegions) {
+			%>
+
+				<aui:option label="<%= commerceRegion.getName() %>" selected="<%= shippingAddress.getCommerceRegionId() == commerceRegion.getCommerceRegionId() %>" value="<%= shippingAddress.getCommerceRegionId() %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<%
 			}
@@ -87,10 +115,17 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 <aui:script use="aui-base,liferay-dynamic-select">
 	new Liferay.DynamicSelect([
 		{
+<<<<<<< HEAD
 			select: '<portlet:namespace />countryId',
 			selectData: function (callback) {
 				Liferay.Service(
 					'/commerce.commercecountrymanagerimpl/get-shipping-countries',
+=======
+			select: '<portlet:namespace />commerceCountryId',
+			selectData: function (callback) {
+				Liferay.Service(
+					'/commerce.commercecountry/get-shipping-commerce-countries',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					{
 						active: true,
 						companyId: <%= company.getCompanyId() %>,
@@ -100,6 +135,7 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 				);
 			},
 			selectDesc: 'nameCurrentValue',
+<<<<<<< HEAD
 			selectId: 'countryId',
 			selectSort: '<%= true %>',
 			selectVal: '<%= shippingAddress.getCountryId() %>',
@@ -112,13 +148,32 @@ CommerceAddress shippingAddress = commerceShipmentDisplayContext.getShippingAddr
 					{
 						active: true,
 						countryId: Number(selectKey),
+=======
+			selectId: 'commerceCountryId',
+			selectSort: '<%= true %>',
+			selectVal: '<%= shippingAddress.getCommerceCountryId() %>',
+		},
+		{
+			select: '<portlet:namespace />commerceRegionId',
+			selectData: function (callback, selectKey) {
+				Liferay.Service(
+					'/commerce.commerceregion/get-commerce-regions',
+					{
+						active: true,
+						commerceCountryId: Number(selectKey),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					},
 					callback
 				);
 			},
 			selectDesc: 'name',
+<<<<<<< HEAD
 			selectId: 'regionId',
 			selectVal: '<%= shippingAddress.getRegionId() %>',
+=======
+			selectId: 'commerceRegionId',
+			selectVal: '<%= shippingAddress.getCommerceRegionId() %>',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		},
 	]);
 </aui:script>

@@ -307,7 +307,11 @@ public class AssetDisplayPageEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				AssetDisplayPageEntryServiceUtil.class,
 				"getAssetDisplayPageEntriesByLayoutPageTemplateEntryId",
+<<<<<<< HEAD
 				_getAssetDisplayPageEntriesByLayoutPageTemplateEntryIdParameterTypes6);
+=======
+				_getAssetDisplayPageEntriesByLayoutPageTemplateEntryIdParameterTypes5);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, layoutPageTemplateEntryId, start, end,
@@ -336,6 +340,7 @@ public class AssetDisplayPageEntryServiceHttp {
 		}
 	}
 
+<<<<<<< HEAD
 	public static int getAssetDisplayPageEntriesCount(
 		HttpPrincipal httpPrincipal, long classNameId, long classTypeId,
 		long layoutPageTemplateEntryId, boolean defaultTemplate) {
@@ -371,6 +376,8 @@ public class AssetDisplayPageEntryServiceHttp {
 		}
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static int
 		getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryId(
 			HttpPrincipal httpPrincipal, long layoutPageTemplateEntryId) {
@@ -379,7 +386,11 @@ public class AssetDisplayPageEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				AssetDisplayPageEntryServiceUtil.class,
 				"getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryId",
+<<<<<<< HEAD
 				_getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryIdParameterTypes8);
+=======
+				_getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryIdParameterTypes6);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, layoutPageTemplateEntryId);
@@ -415,7 +426,11 @@ public class AssetDisplayPageEntryServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				AssetDisplayPageEntryServiceUtil.class,
 				"updateAssetDisplayPageEntry",
+<<<<<<< HEAD
 				_updateAssetDisplayPageEntryParameterTypes9);
+=======
+				_updateAssetDisplayPageEntryParameterTypes7);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, assetDisplayPageEntryId, layoutPageTemplateEntryId,
@@ -475,12 +490,17 @@ public class AssetDisplayPageEntryServiceHttp {
 		_getAssetDisplayPageEntriesByLayoutPageTemplateEntryIdParameterTypes5 =
 			new Class[] {long.class};
 	private static final Class<?>[]
+<<<<<<< HEAD
 		_getAssetDisplayPageEntriesByLayoutPageTemplateEntryIdParameterTypes6 =
+=======
+		_getAssetDisplayPageEntriesByLayoutPageTemplateEntryIdParameterTypes5 =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			new Class[] {
 				long.class, int.class, int.class,
 				com.liferay.portal.kernel.util.OrderByComparator.class
 			};
 	private static final Class<?>[]
+<<<<<<< HEAD
 		_getAssetDisplayPageEntriesCountParameterTypes7 = new Class[] {
 			long.class, long.class, long.class, boolean.class
 		};
@@ -489,6 +509,12 @@ public class AssetDisplayPageEntryServiceHttp {
 			new Class[] {long.class};
 	private static final Class<?>[]
 		_updateAssetDisplayPageEntryParameterTypes9 = new Class[] {
+=======
+		_getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryIdParameterTypes6 =
+			new Class[] {long.class};
+	private static final Class<?>[]
+		_updateAssetDisplayPageEntryParameterTypes7 = new Class[] {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			long.class, long.class, int.class
 		};
 

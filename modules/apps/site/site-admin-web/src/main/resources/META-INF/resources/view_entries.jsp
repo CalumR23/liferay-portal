@@ -39,7 +39,14 @@ SiteAdminDisplayContext siteAdminDisplayContext = (SiteAdminDisplayContext)reque
 				"actions", siteAdminManagementToolbarDisplayContext.getAvailableActions(curGroup)
 			).build());
 
+<<<<<<< HEAD
 		List<Group> childSites = curGroup.getChildren(true);
+=======
+		row.setData(
+			HashMapBuilder.<String, Object>put(
+				"actions", siteAdminManagementToolbarDisplayContext.getAvailableActions(curGroup)
+			).build());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		%>
 
 		<portlet:renderURL var="viewSubsitesURL">

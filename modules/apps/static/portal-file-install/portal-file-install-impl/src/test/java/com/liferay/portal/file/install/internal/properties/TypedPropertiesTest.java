@@ -16,6 +16,7 @@ package com.liferay.portal.file.install.internal.properties;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
@@ -23,6 +24,14 @@ import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.log.LogEntry;
 import com.liferay.portal.test.log.LoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.kernel.test.CaptureHandler;
+import com.liferay.portal.kernel.test.JDKLoggerTestUtil;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
+import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
+import com.liferay.portal.kernel.test.rule.NewEnv;
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,6 +41,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+<<<<<<< HEAD
+=======
+import java.util.logging.LogRecord;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.junit.Assert;
 import org.junit.ClassRule;
@@ -47,7 +60,11 @@ public class TypedPropertiesTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
+<<<<<<< HEAD
 			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
+=======
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Test
 	public void testKeySet() throws IOException {
@@ -151,12 +168,19 @@ public class TypedPropertiesTest {
 
 	@Test
 	public void testLoadandSaveMultipleComments() throws IOException {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
 				TypedProperties.class.getName(), Level.WARNING)) {
+=======
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					TypedProperties.class.getName(), Level.WARNING)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			TypedProperties typedProperties = _createTypedProperties(
 				"#comment1\n#comment2\ntestKey = \"testValue\"");
 
+<<<<<<< HEAD
 			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
@@ -166,6 +190,17 @@ public class TypedPropertiesTest {
 			Assert.assertEquals(
 				"Multiple comment lines found: [#comment1, #comment2]",
 				logEntry.getMessage());
+=======
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+
+			LogRecord logRecord = logRecords.get(0);
+
+			Assert.assertEquals(
+				"Multiple comment lines found: [#comment1, #comment2]",
+				logRecord.getMessage());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals("testValue", typedProperties.get("testKey"));
 
@@ -205,12 +240,19 @@ public class TypedPropertiesTest {
 
 	@Test
 	public void testLoadandSaveTrailingComment() throws IOException {
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
 				TypedProperties.class.getName(), Level.WARNING)) {
+=======
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					TypedProperties.class.getName(), Level.WARNING)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			TypedProperties typedProperties = _createTypedProperties(
 				"testKey = \"testValue\"\n#comment");
 
+<<<<<<< HEAD
 			List<LogEntry> logEntries = logCapture.getLogEntries();
 
 			Assert.assertEquals(logEntries.toString(), 1, logEntries.size());
@@ -220,6 +262,17 @@ public class TypedPropertiesTest {
 			Assert.assertEquals(
 				"Comment must be at beginning of config file: #comment",
 				logEntry.getMessage());
+=======
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+
+			LogRecord logRecord = logRecords.get(0);
+
+			Assert.assertEquals(
+				"Comment must be at beginning of config file: #comment",
+				logRecord.getMessage());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals("testValue", typedProperties.get("testKey"));
 
@@ -243,6 +296,7 @@ public class TypedPropertiesTest {
 	public void testLoadBadLine() throws IOException {
 		String line = "testKey = K\"testValue\"";
 
+<<<<<<< HEAD
 		try (LogCapture logCapture = LoggerTestUtil.configureJDKLogger(
 				TypedProperties.class.getName(), Level.WARNING)) {
 
@@ -256,6 +310,22 @@ public class TypedPropertiesTest {
 
 			Assert.assertEquals(
 				"Unable to parse config line: " + line, logEntry.getMessage());
+=======
+		try (CaptureHandler captureHandler =
+				JDKLoggerTestUtil.configureJDKLogger(
+					TypedProperties.class.getName(), Level.WARNING)) {
+
+			TypedProperties typedProperties = _createTypedProperties(line);
+
+			List<LogRecord> logRecords = captureHandler.getLogRecords();
+
+			Assert.assertEquals(logRecords.toString(), 1, logRecords.size());
+
+			LogRecord logRecord = logRecords.get(0);
+
+			Assert.assertEquals(
+				"Unable to parse config line: " + line, logRecord.getMessage());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			Assert.assertEquals(null, typedProperties.get("testKey"));
 

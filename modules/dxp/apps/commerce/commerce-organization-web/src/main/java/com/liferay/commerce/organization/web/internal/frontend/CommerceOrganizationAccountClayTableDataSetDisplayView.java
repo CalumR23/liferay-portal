@@ -202,6 +202,7 @@ public class CommerceOrganizationAccountClayTableDataSetDisplayView
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceAccount.class.getName(),
@@ -209,6 +210,29 @@ public class CommerceOrganizationAccountClayTableDataSetDisplayView
 		).setParameter(
 			"commerceAccountId", commerceAccountId
 		).setParameter(
+=======
+		PortletURL viewURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceAccount.class.getName(),
+			PortletProvider.Action.VIEW);
+
+		viewURL.setParameter(
+			"commerceAccountId", String.valueOf(commerceAccountId));
+
+		PortletURL backURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, Organization.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		backURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_organization/view_commerce_organization");
+		backURL.setParameter("organizationId", String.valueOf(organizationId));
+		backURL.setParameter(
+			"screenNavigationCategoryKey",
+			CommerceOrganizationScreenNavigationConstants.
+				CATEGORY_KEY_ORGANIZATION_ACCOUNTS);
+
+		viewURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			PortletQName.PUBLIC_RENDER_PARAMETER_NAMESPACE + "backURL",
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(

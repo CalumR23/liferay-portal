@@ -105,8 +105,13 @@ public class CommerceMLRecommendationImporter {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
+<<<<<<< HEAD
 					productExternalReferenceCode,
 					serviceContext.getCompanyId());
+=======
+					serviceContext.getCompanyId(),
+					productExternalReferenceCode);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (cpDefinition == null) {
 			if (_log.isDebugEnabled()) {
@@ -127,8 +132,13 @@ public class CommerceMLRecommendationImporter {
 		CPDefinition recommendedCPDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
+<<<<<<< HEAD
 					recommendedProductExternalReferenceCode,
 					serviceContext.getCompanyId());
+=======
+					serviceContext.getCompanyId(),
+					recommendedProductExternalReferenceCode);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (recommendedCPDefinition == null) {
 			if (_log.isDebugEnabled()) {
@@ -177,8 +187,13 @@ public class CommerceMLRecommendationImporter {
 		CPDefinition cpDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
+<<<<<<< HEAD
 					productExternalReferenceCode,
 					serviceContext.getCompanyId());
+=======
+					serviceContext.getCompanyId(),
+					productExternalReferenceCode);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (cpDefinition == null) {
 			if (_log.isDebugEnabled()) {
@@ -199,8 +214,13 @@ public class CommerceMLRecommendationImporter {
 		CPDefinition recommendedCPDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
+<<<<<<< HEAD
 					recommendedProductExternalReferenceCode,
 					serviceContext.getCompanyId());
+=======
+					serviceContext.getCompanyId(),
+					recommendedProductExternalReferenceCode);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (recommendedCPDefinition == null) {
 			if (_log.isDebugEnabled()) {
@@ -268,8 +288,13 @@ public class CommerceMLRecommendationImporter {
 		CPDefinition recommendedCPDefinition =
 			_cpDefinitionLocalService.
 				fetchCPDefinitionByCProductExternalReferenceCode(
+<<<<<<< HEAD
 					recommendedProductExternalReferenceCode,
 					serviceContext.getCompanyId());
+=======
+					serviceContext.getCompanyId(),
+					recommendedProductExternalReferenceCode);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (recommendedCPDefinition == null) {
 			if (_log.isDebugEnabled()) {

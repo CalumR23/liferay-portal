@@ -87,7 +87,11 @@ const Overlay = ({
 					displayType="secondary"
 					onClick={() => onRemoveFieldName(name)}
 					symbol="trash"
+<<<<<<< HEAD
 					title={Liferay.Language.get('remove')}
+=======
+					tooltip={Liferay.Language.get('remove')}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				/>
 			</header>
 		</div>

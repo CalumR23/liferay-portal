@@ -404,6 +404,27 @@ public class InsuranceSiteInitializer implements SiteInitializer {
 				0, 0, 0, true, true, false, null, null, null, null,
 				_serviceContext);
 
+<<<<<<< HEAD
+=======
+			long resourceClassNameId = _portal.getClassNameId(
+				JournalArticle.class);
+
+			DDMStructure ddmStructure =
+				_ddmStructureLocalService.fetchStructure(
+					_serviceContext.getScopeGroupId(), resourceClassNameId,
+					journalArticleJSONObject.getString("ddmStructureKey"));
+
+			long defaultLayoutPageTemplateEntryId =
+				_getDefaultLayoutPageTemplateEntryId(
+					resourceClassNameId, ddmStructure.getStructureId());
+
+			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
+				_serviceContext.getUserId(), _serviceContext.getScopeGroupId(),
+				resourceClassNameId, article.getResourcePrimKey(),
+				defaultLayoutPageTemplateEntryId,
+				AssetDisplayPageConstants.TYPE_DEFAULT, _serviceContext);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			_serviceContext.setAssetTagNames(null);
 		}
 	}
@@ -675,6 +696,23 @@ public class InsuranceSiteInitializer implements SiteInitializer {
 		return zipWriter.getFile();
 	}
 
+<<<<<<< HEAD
+=======
+	private long _getDefaultLayoutPageTemplateEntryId(
+		long classNameId, long classTypeId) {
+
+		LayoutPageTemplateEntry defaultAssetDisplayPage =
+			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
+				_serviceContext.getScopeGroupId(), classNameId, classTypeId);
+
+		if (defaultAssetDisplayPage == null) {
+			return 0;
+		}
+
+		return defaultAssetDisplayPage.getLayoutPageTemplateEntryId();
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private String _getDynamicCollectionTypeSettings(
 			String ddmStructureKey, String[] assetTagNames)
 		throws Exception {
@@ -878,6 +916,7 @@ public class InsuranceSiteInitializer implements SiteInitializer {
 		layoutPageTemplateEntry =
 			_layoutPageTemplateEntryLocalService.fetchLayoutPageTemplateEntry(
 				_serviceContext.getScopeGroupId(), "claim");
+<<<<<<< HEAD
 
 		if (layoutPageTemplateEntry != null) {
 			_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
@@ -890,6 +929,20 @@ public class InsuranceSiteInitializer implements SiteInitializer {
 			_styleBookEntryLocalService.fetchStyleBookEntry(
 				_serviceContext.getScopeGroupId(), "raylife");
 
+=======
+
+		if (layoutPageTemplateEntry != null) {
+			_layoutPageTemplateEntryLocalService.updateLayoutPageTemplateEntry(
+				layoutPageTemplateEntry.getLayoutPageTemplateEntryId(), true);
+		}
+	}
+
+	private void _setDefaultStyleBookEntry() throws PortalException {
+		StyleBookEntry styleBookEntry =
+			_styleBookEntryLocalService.fetchStyleBookEntry(
+				_serviceContext.getScopeGroupId(), "raylife");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_styleBookEntryLocalService.updateDefaultStyleBookEntry(
 			styleBookEntry.getStyleBookEntryId(), true);
 	}
@@ -973,7 +1026,11 @@ public class InsuranceSiteInitializer implements SiteInitializer {
 		String themeName = settingsJSONObject.getString("themeName");
 
 		if (Validator.isNotNull(themeName)) {
+<<<<<<< HEAD
 			themeId = _getThemeId(layout.getCompanyId(), themeName);
+=======
+			layout.setThemeId(_getThemeId(layout.getCompanyId(), themeName));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		String colorSchemeName = settingsJSONObject.getString(

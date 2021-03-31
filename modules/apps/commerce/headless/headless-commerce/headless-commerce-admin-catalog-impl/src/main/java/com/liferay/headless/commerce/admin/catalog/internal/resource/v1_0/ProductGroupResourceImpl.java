@@ -300,6 +300,25 @@ public class ProductGroupResourceImpl
 		return _updateNestedResources(productGroup, commercePricingClass);
 	}
 
+<<<<<<< HEAD
+=======
+	private CommercePricingClass _upsertProductGroup(ProductGroup productGroup)
+		throws Exception {
+
+		CommercePricingClass commercePricingClass =
+			_commercePricingClassService.upsertCommercePricingClass(
+				0L, contextUser.getUserId(),
+				LanguageUtils.getLocalizedMap(productGroup.getTitle()),
+				LanguageUtils.getLocalizedMap(productGroup.getDescription()),
+				productGroup.getExternalReferenceCode(),
+				_serviceContextHelper.getServiceContext());
+
+		// Update nested resources
+
+		return _updateNestedResources(productGroup, commercePricingClass);
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final EntityModel _entityModel =
 		new ProductGroupEntityModel();
 

@@ -176,11 +176,23 @@ public abstract class BaseTierPriceResourceImpl
 	)
 	@Path("/price-entries/{priceEntryId}/tier-prices")
 	@POST
+<<<<<<< HEAD
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "TierPrice")})
 	public TierPrice postPriceEntryIdTierPrice(
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId,
+=======
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
+	)
+	@Path("/price-entries/{priceEntryId}/tier-prices")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "TierPrice")})
+	public TierPrice postPriceEntryIdTierPrice(
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			TierPrice tierPrice)
 		throws Exception {
 
@@ -201,6 +213,7 @@ public abstract class BaseTierPriceResourceImpl
 		}
 	)
 	@Path("/price-entries/{priceEntryId}/tier-prices/batch")
+<<<<<<< HEAD
 	@POST
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "TierPrice")})
@@ -209,6 +222,15 @@ public abstract class BaseTierPriceResourceImpl
 				Long priceEntryId,
 			@Parameter(hidden = true) @QueryParam("callbackURL")
 				String callbackURL,
+=======
+	@Produces("application/json")
+	@Tags(value = {@Tag(name = "TierPrice")})
+	public Response postPriceEntryIdTierPriceBatch(
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId,
+			@Parameter(hidden = true) @QueryParam("callbackURL") String
+				callbackURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Object object)
 		throws Exception {
 

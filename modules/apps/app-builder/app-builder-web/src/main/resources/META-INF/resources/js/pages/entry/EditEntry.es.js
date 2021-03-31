@@ -35,6 +35,7 @@ export const EditEntry = ({
 	redirect,
 	userLanguageId,
 }) => {
+<<<<<<< HEAD
 	const {
 		appId,
 		basePortletURL,
@@ -45,6 +46,14 @@ export const EditEntry = ({
 		showTableView,
 	} = useContext(AppContext);
 	const {defaultLanguageId} = useDataDefinition({dataDefinitionId});
+=======
+	const {basePortletURL, portletId, showFormView, showTableView} = useContext(
+		AppContext
+	);
+	const {availableLanguageIds, defaultLanguageId} = useDataDefinition(
+		dataDefinitionId
+	);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [submitting, setSubmitting] = useState(false);
 
 	const isFormViewOnly = showFormView && !showTableView;
@@ -177,9 +186,15 @@ export const EditEntry = ({
 				</ClayButton>
 
 				{!isFormViewOnly && (
+<<<<<<< HEAD
 					<ClayButton displayType="secondary" onClick={onCancel}>
 						{Liferay.Language.get('cancel')}
 					</ClayButton>
+=======
+					<Button displayType="secondary" onClick={onCancel}>
+						{Liferay.Language.get('cancel')}
+					</Button>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				)}
 			</ClayButton.Group>
 		</>

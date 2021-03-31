@@ -161,6 +161,7 @@ public class EditCommerceApplicationBrandMVCActionCommand
 			CommerceApplicationBrand commerceApplicationBrand)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, CommerceApplicationBrand.class.getName(),
@@ -168,6 +169,17 @@ public class EditCommerceApplicationBrandMVCActionCommand
 		).setMVCRenderCommandName(
 			"/commerce_application_admin/edit_commerce_application_brand"
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, CommerceApplicationBrand.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_application_admin/edit_commerce_application_brand");
+
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"commerceApplicationBrandId",
 			commerceApplicationBrand.getCommerceApplicationBrandId()
 		).build();

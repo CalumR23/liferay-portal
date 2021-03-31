@@ -47,6 +47,7 @@ public class CommerceInventoryWarehouseServiceUtil {
 	 String, double, double, serviceContext)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
 			String name, String description, boolean active, String street1,
 			String street2, String street3, String city, String zip,
@@ -54,6 +55,19 @@ public class CommerceInventoryWarehouseServiceUtil {
 			double latitude, double longitude, String externalReferenceCode,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				addCommerceInventoryWarehouse(
+					String name, String description, boolean active,
+					String street1, String street2, String street3, String city,
+					String zip, String commerceRegionCode,
+					String commerceCountryCode, double latitude,
+					double longitude, String externalReferenceCode,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addCommerceInventoryWarehouse(
 			name, description, active, street1, street2, street3, city, zip,
@@ -61,6 +75,7 @@ public class CommerceInventoryWarehouseServiceUtil {
 			externalReferenceCode, serviceContext);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
 			String externalReferenceCode, String name, String description,
 			boolean active, String street1, String street2, String street3,
@@ -68,6 +83,19 @@ public class CommerceInventoryWarehouseServiceUtil {
 			String commerceCountryCode, double latitude, double longitude,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				addCommerceInventoryWarehouse(
+					String externalReferenceCode, String name,
+					String description, boolean active, String street1,
+					String street2, String street3, String city, String zip,
+					String commerceRegionCode, String commerceCountryCode,
+					double latitude, double longitude,
+					com.liferay.portal.kernel.service.ServiceContext
+						serviceContext)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addCommerceInventoryWarehouse(
 			externalReferenceCode, name, description, active, street1, street2,
@@ -75,9 +103,17 @@ public class CommerceInventoryWarehouseServiceUtil {
 			latitude, longitude, serviceContext);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse deleteCommerceInventoryWarehouse(
 			long commerceInventoryWarehouseId)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				deleteCommerceInventoryWarehouse(
+					long commerceInventoryWarehouseId)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().deleteCommerceInventoryWarehouse(
 			commerceInventoryWarehouseId);
@@ -88,27 +124,52 @@ public class CommerceInventoryWarehouseServiceUtil {
 	 #fetchByExternalReferenceCode(String, long)}
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse fetchByExternalReferenceCode(
 			long companyId, String externalReferenceCode)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				fetchByExternalReferenceCode(
+					long companyId, String externalReferenceCode)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().fetchByExternalReferenceCode(
 			companyId, externalReferenceCode);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse fetchByExternalReferenceCode(
 			String externalReferenceCode, long companyId)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				fetchByExternalReferenceCode(
+					String externalReferenceCode, long companyId)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().fetchByExternalReferenceCode(
 			externalReferenceCode, companyId);
 	}
 
+<<<<<<< HEAD
 	public static CommerceInventoryWarehouse
 			geolocateCommerceInventoryWarehouse(
 				long commerceInventoryWarehouseId, double latitude,
 				double longitude)
 		throws PortalException {
+=======
+	public static
+		com.liferay.commerce.inventory.model.CommerceInventoryWarehouse
+				geolocateCommerceInventoryWarehouse(
+					long commerceInventoryWarehouseId, double latitude,
+					double longitude)
+			throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().geolocateCommerceInventoryWarehouse(
 			commerceInventoryWarehouseId, latitude, longitude);

@@ -79,7 +79,11 @@ CommerceAccountGroupAdminDisplayContext commerceAccountGroupAdminDisplayContext 
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
+<<<<<<< HEAD
 	<div class="container-fluid container-fluid-max-xl">
+=======
+	<div class="container-fluid-1280">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<portlet:actionURL name="/commerce_account_group_admin/edit_commerce_account_group" var="editCommerceAccountGroupActionURL" />
 
 		<aui:form action="<%= editCommerceAccountGroupActionURL %>" method="post" name="fm">

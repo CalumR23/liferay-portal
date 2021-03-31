@@ -17,6 +17,7 @@ package com.liferay.portal.workflow.kaleo.internal.upgrade;
 import com.liferay.portal.kernel.upgrade.BaseUpgradeSQLServerDatetime;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeProcess;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
+<<<<<<< HEAD
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_0_0.KaleoTaskInstanceTokenUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_1_0.WorkflowContextUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_0.UpgradePortletId;
@@ -24,6 +25,13 @@ import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_1.KaleoLogUpgrade
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_1.KaleoNotificationRecipientUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_0.KaleoActionUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_0.KaleoDefinitionUpgradeProcess;
+=======
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_0_0.UpgradeKaleoTaskInstanceToken;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_1_0.UpgradeWorkflowContext;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_0.UpgradePortletId;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_1.UpgradeKaleoLog;
+import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_1.UpgradeKaleoNotificationRecipient;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_0.UpgradeClassNames;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_2.KaleoClassNameAndKaleoClassPKUpgradeProcess;
 import com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_3.UpgradeBlogsClassName;
@@ -74,7 +82,11 @@ public class KaleoServiceUpgrade implements UpgradeStepRegistrator {
 		registry.register(
 			"1.1.0", "1.2.0",
 			new com.liferay.portal.workflow.kaleo.internal.upgrade.v1_2_0.
+<<<<<<< HEAD
 				SchemaUpgradeProcess(),
+=======
+				UpgradeSchema(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			new UpgradePortletId());
 
 		registry.register(
@@ -104,6 +116,8 @@ public class KaleoServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"1.4.0", "1.4.1", new KaleoDefinitionVersionUpgradeProcess());
+
+		registry.register("1.4.1", "1.4.2", new DummyUpgradeProcess());
 
 		registry.register("1.4.1", "1.4.2", new DummyUpgradeProcess());
 

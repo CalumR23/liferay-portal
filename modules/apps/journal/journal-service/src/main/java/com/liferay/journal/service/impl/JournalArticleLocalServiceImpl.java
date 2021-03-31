@@ -14,6 +14,8 @@
 
 package com.liferay.journal.service.impl;
 
+import com.liferay.asset.display.page.constants.AssetDisplayPageConstants;
+import com.liferay.asset.display.page.service.AssetDisplayPageEntryLocalService;
 import com.liferay.asset.display.page.util.AssetDisplayPageUtil;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -80,6 +82,8 @@ import com.liferay.journal.util.comparator.ArticleVersionComparator;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
+import com.liferay.layout.page.template.service.LayoutPageTemplateEntryService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.xml.XMLUtil;
@@ -451,7 +455,16 @@ public class JournalArticleLocalServiceImpl
 		article.setArticleId(articleId);
 		article.setVersion(version);
 		article.setUrlTitle(urlTitleMap.get(LocaleUtil.toLanguageId(locale)));
+<<<<<<< HEAD
 		article.setContent(_formatContent(article, content, groupId, user));
+=======
+
+		content = format(user, groupId, article, content);
+		content = _replaceTempImages(article, content);
+
+		article.setContent(content);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		article.setDDMStructureKey(ddmStructureKey);
 		article.setDDMTemplateKey(ddmTemplateKey);
 		article.setDefaultLanguageId(LocaleUtil.toLanguageId(locale));
@@ -514,6 +527,14 @@ public class JournalArticleLocalServiceImpl
 			serviceContext.getAssetTagNames(),
 			serviceContext.getAssetLinkEntryIds(),
 			serviceContext.getAssetPriority());
+
+		if (!ExportImportThreadLocal.isImportInProcess() &&
+			!ExportImportThreadLocal.isStagingInProcess()) {
+
+			_setDefaultAssetDisplayPage(
+				userId, groupId, resourcePrimKey, ddmStructureKey,
+				serviceContext);
+		}
 
 		// Dynamic data mapping
 
@@ -6830,6 +6851,7 @@ public class JournalArticleLocalServiceImpl
 
 					fileEntry = tempFileEntries.get(
 						tempFileEntry.getFileEntryId());
+<<<<<<< HEAD
 
 					if (fileEntry == null) {
 						Folder folder = article.addImagesFolder();
@@ -6846,6 +6868,24 @@ public class JournalArticleLocalServiceImpl
 							tempFileEntry.getContentStream(), fileEntryName,
 							tempFileEntry.getMimeType(), false);
 
+=======
+
+					if (fileEntry == null) {
+						Folder folder = article.addImagesFolder();
+
+						String fileEntryName = DLUtil.getUniqueFileName(
+							folder.getGroupId(), folder.getFolderId(),
+							tempFileEntry.getFileName());
+
+						fileEntry = _portletFileRepository.addPortletFileEntry(
+							folder.getGroupId(), tempFileEntry.getUserId(),
+							JournalArticle.class.getName(),
+							article.getResourcePrimKey(),
+							JournalConstants.SERVICE_NAME, folder.getFolderId(),
+							tempFileEntry.getContentStream(), fileEntryName,
+							tempFileEntry.getMimeType(), false);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						tempFileEntries.put(
 							tempFileEntry.getFileEntryId(), fileEntry);
 					}
@@ -9052,6 +9092,32 @@ public class JournalArticleLocalServiceImpl
 			});
 	}
 
+	private void _setDefaultAssetDisplayPage(
+			long userId, long groupId, long resourcePrimKey,
+			String ddmStructureKey, ServiceContext serviceContext)
+		throws PortalException {
+
+		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+			_portal.getSiteGroupId(groupId),
+			classNameLocalService.getClassNameId(JournalArticle.class),
+			ddmStructureKey, true);
+
+		LayoutPageTemplateEntry defaultAssetDisplayPage =
+			_layoutPageTemplateEntryService.fetchDefaultLayoutPageTemplateEntry(
+				serviceContext.getScopeGroupId(),
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				ddmStructure.getStructureId());
+
+		if (defaultAssetDisplayPage != null) {
+			_assetDisplayPageEntryLocalService.addAssetDisplayPageEntry(
+				userId, groupId,
+				classNameLocalService.getClassNameId(JournalArticle.class),
+				resourcePrimKey,
+				defaultAssetDisplayPage.getLayoutPageTemplateEntryId(),
+				AssetDisplayPageConstants.TYPE_DEFAULT, serviceContext);
+		}
+	}
+
 	private List<JournalArticleLocalization> _updateArticleLocalizedFields(
 		long companyId, long articleId, Map<Locale, String> titleMap,
 		Map<Locale, String> descriptionMap) {
@@ -9102,6 +9168,10 @@ public class JournalArticleLocalServiceImpl
 		JournalArticleLocalServiceImpl.class);
 
 	@Reference
+	private AssetDisplayPageEntryLocalService
+		_assetDisplayPageEntryLocalService;
+
+	@Reference
 	private AttachmentContentUpdater _attachmentContentUpdater;
 
 	@Reference
@@ -9135,6 +9205,9 @@ public class JournalArticleLocalServiceImpl
 
 	@Reference
 	private LayoutDisplayPageProviderTracker _layoutDisplayPageProviderTracker;
+
+	@Reference
+	private LayoutPageTemplateEntryService _layoutPageTemplateEntryService;
 
 	@Reference
 	private Portal _portal;

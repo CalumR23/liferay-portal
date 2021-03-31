@@ -2055,7 +2055,11 @@ public class WikiPagePersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<WikiPage>)finderCache.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (WikiPage wikiPage : list) {
@@ -2412,7 +2416,11 @@ public class WikiPagePersistenceImpl
 
 		Object[] finderArgs = new Object[] {companyId};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -22843,7 +22851,11 @@ public class WikiPagePersistenceImpl
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByCompanyId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByCompanyId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -22851,17 +22863,29 @@ public class WikiPagePersistenceImpl
 			},
 			new String[] {"companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByCompanyId = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			true);
 
+<<<<<<< HEAD
 		_finderPathCountByCompanyId = new FinderPath(
+=======
+		_finderPathCountByCompanyId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByCompanyId",
 			new String[] {Long.class.getName()}, new String[] {"companyId"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByNodeId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByNodeId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByNodeId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -23616,11 +23640,33 @@ public class WikiPagePersistenceImpl
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
 
+<<<<<<< HEAD
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+=======
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+
+		return finderPath;
+	}
+
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

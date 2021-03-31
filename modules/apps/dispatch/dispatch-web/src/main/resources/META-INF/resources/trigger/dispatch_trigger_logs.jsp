@@ -20,6 +20,11 @@
 DispatchLogDisplayContext dispatchLogDisplayContext = (DispatchLogDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 
 DispatchTrigger dispatchTrigger = dispatchLogDisplayContext.getDispatchTrigger();
+<<<<<<< HEAD
+=======
+
+PortletURL portletURL = dispatchLogDisplayContext.getPortletURL();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 PortletURL portletURL = PortletURLBuilder.create(
 	dispatchLogDisplayContext.getPortletURL()
@@ -51,6 +56,18 @@ request.setAttribute("view.jsp-portletURL", portletURL);
 						keyProperty="dispatchLogId"
 						modelVar="dispatchLog"
 					>
+<<<<<<< HEAD
+=======
+
+						<%
+						PortletURL rowURL = renderResponse.createRenderURL();
+
+						rowURL.setParameter("mvcRenderCommandName", "/dispatch/view_dispatch_log");
+						rowURL.setParameter("redirect", currentURL);
+						rowURL.setParameter("dispatchLogId", String.valueOf(dispatchLog.getDispatchLogId()));
+						%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						<liferay-ui:search-container-column-text
 							cssClass="important table-cell-expand"
 							href='<%=

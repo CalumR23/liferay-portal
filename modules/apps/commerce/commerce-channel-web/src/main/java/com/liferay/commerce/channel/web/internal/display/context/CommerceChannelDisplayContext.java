@@ -156,6 +156,7 @@ public class CommerceChannelDisplayContext
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
+<<<<<<< HEAD
 				PortletRequest.RENDER_PHASE)
 		).setMVCRenderCommandName(
 			"/commerce_channels/add_commerce_channel"
@@ -168,11 +169,27 @@ public class CommerceChannelDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+				PortletRequest.RENDER_PHASE);
+
+		editCommerceChannelPortletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_channels/add_commerce_channel");
+
+		editCommerceChannelPortletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		PortletURL portletURL = getPortletURL();
+
+		editCommerceChannelPortletURL.setParameter(
+			"redirect", portletURL.toString());
+
+		return editCommerceChannelPortletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getAddPaymentMethodURL(String commercePaymentMethodEngineKey)
 		throws Exception {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest,
@@ -187,6 +204,24 @@ public class CommerceChannelDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommercePaymentMethodGroupRel.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_payment_methods/edit_commerce_payment_method_group_rel");
+		portletURL.setParameter(
+			"commerceChannelId", String.valueOf(getCommerceChannelId()));
+
+		portletURL.setParameter(
+			"commercePaymentMethodEngineKey", commercePaymentMethodEngineKey);
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getChannelURL(CommerceChannel commerceChannel)
@@ -269,6 +304,7 @@ public class CommerceChannelDisplayContext
 	}
 
 	public PortletURL getEditCommerceChannelRenderURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CHANNELS,
@@ -276,6 +312,16 @@ public class CommerceChannelDisplayContext
 		).setMVCRenderCommandName(
 			"/commerce_channels/edit_commerce_channel"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			cpRequestHelper.getRequest(), CPPortletKeys.COMMERCE_CHANNELS,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_channels/edit_commerce_channel");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<HeaderActionModel> getHeaderActionModels() {

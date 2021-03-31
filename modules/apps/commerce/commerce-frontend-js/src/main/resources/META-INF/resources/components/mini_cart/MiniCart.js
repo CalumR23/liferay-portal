@@ -57,6 +57,7 @@ function MiniCart({
 	summaryDataMapper,
 	toggleable,
 }) {
+<<<<<<< HEAD
 	const CartResource = useMemo(
 		() => ServiceProvider.DeliveryCartAPI('v1'),
 		[]
@@ -65,6 +66,13 @@ function MiniCart({
 	const [isOpen, setIsOpen] = useState(!toggleable);
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [cartState, updateCartState] = useState({id: orderId, itemsQuantity});
+=======
+	const CartResource = ServiceProvider.DeliveryCartAPI('v1');
+
+	const [isOpen, setIsOpen] = useState(!toggleable);
+	const [isUpdating, setIsUpdating] = useState(false);
+	const [cartState, updateCartState] = useState({itemsQuantity});
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [actionURLs, setActionURLs] = useState(cartActionURLs);
 	const [CartViews, setCartViews] = useState({});
 
@@ -74,6 +82,7 @@ function MiniCart({
 		updateCartState,
 	]);
 
+<<<<<<< HEAD
 	const updateCartModel = useCallback(
 		({id: cartId}) => {
 			CartResource.getCartByIdWithItems(cartId)
@@ -102,8 +111,25 @@ function MiniCart({
 						latestCartState = {...currentState, ...model};
 
 						return latestCartState;
+=======
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const updateCartModel = ({orderId: cartId}) =>
+		CartResource.getCartByIdWithItems(cartId)
+			.then((model) => {
+				if (orderId !== cartId) {
+					const {orderUUID} = model,
+						{checkoutURL, orderDetailURL} = actionURLs;
+
+					setActionURLs({
+						checkoutURL,
+						orderDetailURL: regenerateOrderDetailURL(
+							orderDetailURL,
+							orderUUID
+						),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					});
 
+<<<<<<< HEAD
 					return Promise.resolve({
 						actionURLs: latestActionURLs,
 						cartState: latestCartState,
@@ -116,6 +142,12 @@ function MiniCart({
 		},
 		[CartResource, cartState.id, onAddToCart]
 	);
+=======
+				updateCartState({...cartState, ...model});
+				onAddToCart(actionURLs, cartState);
+			})
+			.catch(showErrorNotification);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	useEffect(() => {
 		resolveCartViews({
@@ -133,10 +165,18 @@ function MiniCart({
 	}, [updateCartModel]);
 
 	useEffect(() => {
+<<<<<<< HEAD
 		if (orderId) {
 			updateCartModel({id: orderId});
 		}
 	}, [orderId, updateCartModel]);
+=======
+		if (orderId && orderId !== 0 && isOpen) {
+			updateCartModel({orderId});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isOpen, orderId]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	useEffect(() => {
 		Liferay.on(CURRENT_ACCOUNT_UPDATED, resetCartState);
@@ -175,7 +215,11 @@ function MiniCart({
 					{toggleable && (
 						<>
 							<div
+<<<<<<< HEAD
 								className="mini-cart-overlay"
+=======
+								className={'mini-cart-overlay'}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								onClick={() => setIsOpen(false)}
 							/>
 
@@ -197,7 +241,10 @@ MiniCart.defaultProps = {
 	itemsQuantity: 0,
 	labels: DEFAULT_LABELS,
 	onAddToCart: () => {},
+<<<<<<< HEAD
 	orderId: 0,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	summaryDataMapper,
 	toggleable: true,
 };

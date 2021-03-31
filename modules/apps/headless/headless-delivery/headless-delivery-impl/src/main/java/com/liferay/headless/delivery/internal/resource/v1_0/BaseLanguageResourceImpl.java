@@ -72,7 +72,11 @@ import javax.ws.rs.core.UriInfo;
 @Generated("")
 @Path("/v1.0")
 public abstract class BaseLanguageResourceImpl
+<<<<<<< HEAD
 	implements EntityModelResource, LanguageResource,
+=======
+	implements LanguageResource, EntityModelResource,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			   VulcanBatchEngineTaskItemDelegate<Language> {
 
 	/**
@@ -80,9 +84,15 @@ public abstract class BaseLanguageResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/asset-libraries/{assetLibraryId}/languages'  -u 'test@liferay.com:test'
 	 */
+<<<<<<< HEAD
 	@GET
 	@Operation(description = "Retrieves the asset libraries languages.")
 	@Override
+=======
+	@Override
+	@GET
+	@Operation(description = "Retrieves the asset libraries languages.")
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "assetLibraryId")}
 	)
@@ -90,8 +100,13 @@ public abstract class BaseLanguageResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Language")})
 	public Page<Language> getAssetLibraryLanguagesPage(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId")
 				Long assetLibraryId)
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("assetLibraryId") Long
+				assetLibraryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return Page.of(Collections.emptyList());
@@ -102,9 +117,15 @@ public abstract class BaseLanguageResourceImpl
 	 *
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-delivery/v1.0/sites/{siteId}/languages'  -u 'test@liferay.com:test'
 	 */
+<<<<<<< HEAD
 	@GET
 	@Operation(description = "Retrieves the site's languages.")
 	@Override
+=======
+	@Override
+	@GET
+	@Operation(description = "Retrieves the site's languages.")
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(value = {@Parameter(in = ParameterIn.PATH, name = "siteId")})
 	@Path("/sites/{siteId}/languages")
 	@Produces({"application/json", "application/xml"})

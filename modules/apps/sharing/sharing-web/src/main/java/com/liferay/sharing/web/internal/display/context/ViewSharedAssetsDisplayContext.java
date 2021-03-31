@@ -19,7 +19,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemListBuil
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.NavigationItemListBuilder;
 import com.liferay.item.selector.ItemSelector;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -148,11 +151,19 @@ public class ViewSharedAssetsDisplayContext {
 			navigationItem -> {
 				navigationItem.setActive(_isIncoming());
 
+<<<<<<< HEAD
 				PortletURL sharedWithMeURL = PortletURLBuilder.createRenderURL(
 					_liferayPortletResponse
 				).setParameter(
 					"incoming", Boolean.TRUE.toString()
 				).build();
+=======
+				PortletURL sharedWithMeURL =
+					_liferayPortletResponse.createRenderURL();
+
+				sharedWithMeURL.setParameter(
+					"incoming", Boolean.TRUE.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				navigationItem.setHref(sharedWithMeURL);
 
@@ -163,11 +174,19 @@ public class ViewSharedAssetsDisplayContext {
 			navigationItem -> {
 				navigationItem.setActive(!_isIncoming());
 
+<<<<<<< HEAD
 				PortletURL sharedByMeURL = PortletURLBuilder.createRenderURL(
 					_liferayPortletResponse
 				).setParameter(
 					"incoming", Boolean.FALSE.toString()
 				).build();
+=======
+				PortletURL sharedByMeURL =
+					_liferayPortletResponse.createRenderURL();
+
+				sharedByMeURL.setParameter(
+					"incoming", Boolean.FALSE.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				navigationItem.setHref(sharedByMeURL);
 
@@ -252,6 +271,7 @@ public class ViewSharedAssetsDisplayContext {
 	}
 
 	public PortletURL getSortingURL() throws PortletException {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_getCurrentSortingURL()
 		).setParameter(
@@ -266,6 +286,16 @@ public class ViewSharedAssetsDisplayContext {
 				return "asc";
 			}
 		).build();
+=======
+		String orderByType = getSortingOrder();
+
+		PortletURL sortingURL = _getCurrentSortingURL();
+
+		sortingURL.setParameter(
+			"orderByType", Objects.equals(orderByType, "asc") ? "desc" : "asc");
+
+		return sortingURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getTitle(SharingEntry sharingEntry) {
@@ -392,12 +422,19 @@ public class ViewSharedAssetsDisplayContext {
 			dropdownItem -> {
 				dropdownItem.setActive(Validator.isNull(className));
 
+<<<<<<< HEAD
 				PortletURL viewAllClassNamesURL = PortletURLBuilder.create(
 					PortletURLUtil.clone(
 						_currentURLObj, _liferayPortletResponse)
 				).setParameter(
 					"className", (String)null
 				).build();
+=======
+				PortletURL viewAllClassNamesURL = PortletURLUtil.clone(
+					_currentURLObj, _liferayPortletResponse);
+
+				viewAllClassNamesURL.setParameter("className", (String)null);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.setHref(viewAllClassNamesURL);
 

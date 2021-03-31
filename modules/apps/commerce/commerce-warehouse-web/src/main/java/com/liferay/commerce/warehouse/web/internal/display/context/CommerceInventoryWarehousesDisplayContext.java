@@ -291,9 +291,17 @@ public class CommerceInventoryWarehousesDisplayContext {
 		PortletURL portletURL = PortletURLUtil.clone(
 			getPortletURL(), _cpRequestHelper.getRenderResponse());
 
+<<<<<<< HEAD
 		if (countryId > 0) {
 			String countryTwoLettersIsoCode = getCountryTwoLettersIsoCode();
 			Country country = getCountry(countryId);
+=======
+		if (commerceCountryId > 0) {
+			String commerceCountryTwoLettersIsoCode =
+				getCommerceCountryTwoLettersIsoCode();
+			CommerceCountry commerceCountry = getCommerceCountry(
+				commerceCountryId);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if (Validator.isNotNull(countryTwoLettersIsoCode) &&
 				countryTwoLettersIsoCode.equals(country.getA2())) {

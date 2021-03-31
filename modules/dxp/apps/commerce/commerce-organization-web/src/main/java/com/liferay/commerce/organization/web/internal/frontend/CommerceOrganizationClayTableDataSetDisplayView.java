@@ -257,6 +257,7 @@ public class CommerceOrganizationClayTableDataSetDisplayView
 			long organizationId, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL viewURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest,
@@ -267,6 +268,17 @@ public class CommerceOrganizationClayTableDataSetDisplayView
 		).setParameter(
 			"organizationId", organizationId
 		).build();
+=======
+		PortletURL viewURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest,
+			com.liferay.portal.kernel.model.Organization.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		viewURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_organization/view_commerce_organization");
+		viewURL.setParameter("organizationId", String.valueOf(organizationId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		PortletURL backURL = PortletProviderUtil.getPortletURL(
 			httpServletRequest,

@@ -16,9 +16,15 @@ package com.liferay.layout.page.template.internal.upgrade;
 
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
+<<<<<<< HEAD
 import com.liferay.layout.page.template.internal.upgrade.v1_1_0.LayoutPrototypeUpgradeProcess;
 import com.liferay.layout.page.template.internal.upgrade.v1_1_1.LayoutPageTemplateEntryUpgradeProcess;
 import com.liferay.layout.page.template.internal.upgrade.v1_2_0.LayoutPageTemplateStructureUpgradeProcess;
+=======
+import com.liferay.layout.page.template.internal.upgrade.v1_1_0.UpgradeLayoutPrototype;
+import com.liferay.layout.page.template.internal.upgrade.v1_1_1.UpgradeLayoutPageTemplateEntry;
+import com.liferay.layout.page.template.internal.upgrade.v1_2_0.UpgradeLayoutPageTemplateStructure;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateCollectionTable;
 import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateEntryTable;
 import com.liferay.layout.page.template.internal.upgrade.v2_1_0.LayoutUpgradeProcess;
@@ -143,15 +149,24 @@ public class LayoutPageTemplateServiceUpgrade
 		registry.register(
 			"3.4.0", "3.4.1",
 			new com.liferay.layout.page.template.internal.upgrade.v3_4_1.
+<<<<<<< HEAD
 				LayoutPageTemplateEntryUpgradeProcess(_portal),
 			new FragmentEntryLinkEditableValuesUpgradeProcess());
+=======
+				UpgradeLayoutPageTemplateEntry(_portal),
+			new UpgradeFragmentEntryLinkEditableValues());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"3.4.1", "3.4.2",
 			new com.liferay.layout.page.template.internal.upgrade.v3_4_2.
+<<<<<<< HEAD
 				FragmentEntryLinkEditableValuesUpgradeProcess(),
 			new com.liferay.layout.page.template.internal.upgrade.v3_4_2.
 				LayoutPageTemplateStructureRelUpgradeProcess(
+=======
+				UpgradeLayoutPageTemplateStructureRel(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					_fragmentEntryConfigurationParser));
 	}
 

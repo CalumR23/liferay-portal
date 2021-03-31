@@ -27,6 +27,7 @@ const HeaderReindexStatus = ({container}) => {
 					position="after"
 				>
 					<div className="control-menu-icon px-2">
+<<<<<<< HEAD
 						<span
 							aria-hidden="true"
 							className="loading-animation loading-animation-sm m-0"
@@ -35,6 +36,18 @@ const HeaderReindexStatus = ({container}) => {
 								'the-workflow-metrics-data-is-currently-reindexing'
 							)}
 						></span>
+=======
+						<ClayTooltipProvider>
+							<span
+								aria-hidden="true"
+								className="loading-animation loading-animation-sm m-0"
+								data-tooltip-align="bottom"
+								title={Liferay.Language.get(
+									'the-workflow-metrics-data-is-currently-reindexing'
+								)}
+							></span>
+						</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					</div>
 				</Portal>
 			)}

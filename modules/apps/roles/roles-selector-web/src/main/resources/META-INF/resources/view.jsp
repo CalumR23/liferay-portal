@@ -171,11 +171,17 @@ String methodName = null;
 </liferay-util:buffer>
 
 <%
+<<<<<<< HEAD
 PortletURL clearResultsURL = PortletURLBuilder.create(
 	(PortletURL)request.getAttribute("edit_roles.jsp-portletURL")
 ).setParameter(
 	"keywords", StringPool.BLANK
 ).build();
+=======
+PortletURL clearResultsURL = (PortletURL)request.getAttribute("edit_roles.jsp-portletURL");
+
+clearResultsURL.setParameter("keywords", StringPool.BLANK);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("liferay-ui:search:searchContainer");
 %>
@@ -183,6 +189,10 @@ SearchContainer<?> searchContainer = (SearchContainer<?>)request.getAttribute("l
 <clay:management-toolbar
 	clearResultsURL="<%= clearResultsURL.toString() %>"
 	itemsTotal="<%= searchContainer.getTotal() %>"
+<<<<<<< HEAD
+=======
+	namespace="<%= liferayPortletResponse.getNamespace() %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	searchActionURL="<%= portletURL.toString() %>"
 	selectable="<%= false %>"
 	showCreationMenu="<%= false %>"

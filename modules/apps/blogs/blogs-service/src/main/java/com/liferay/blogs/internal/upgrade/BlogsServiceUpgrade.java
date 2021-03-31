@@ -15,7 +15,11 @@
 package com.liferay.blogs.internal.upgrade;
 
 import com.liferay.blogs.internal.upgrade.v1_1_0.UpgradeClassNames;
+<<<<<<< HEAD
 import com.liferay.blogs.internal.upgrade.v1_1_2.BlogsImagesUpgradeProcess;
+=======
+import com.liferay.blogs.internal.upgrade.v1_1_2.UpgradeBlogsImages;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.blogs.internal.upgrade.v2_0_0.util.BlogsEntryTable;
 import com.liferay.blogs.internal.upgrade.v2_0_0.util.BlogsStatsUserTable;
 import com.liferay.blogs.model.BlogsEntry;
@@ -57,6 +61,7 @@ public class BlogsServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"1.0.0", "1.1.0",
+<<<<<<< HEAD
 			new com.liferay.blogs.internal.upgrade.v1_1_0.
 				BlogsEntryUpgradeProcess(_friendlyURLEntryLocalService));
 
@@ -64,6 +69,14 @@ public class BlogsServiceUpgrade implements UpgradeStepRegistrator {
 			"1.1.0", "1.1.1",
 			new com.liferay.blogs.internal.upgrade.v1_1_1.
 				BlogsEntryUpgradeProcess());
+=======
+			new com.liferay.blogs.internal.upgrade.v1_1_0.UpgradeBlogsEntry(
+				_friendlyURLEntryLocalService));
+
+		registry.register(
+			"1.1.0", "1.1.1",
+			new com.liferay.blogs.internal.upgrade.v1_1_1.UpgradeBlogsEntry());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		registry.register(
 			"1.1.1", "1.1.2",
@@ -99,10 +112,14 @@ public class BlogsServiceUpgrade implements UpgradeStepRegistrator {
 
 		registry.register(
 			"2.1.0", "2.1.1",
+<<<<<<< HEAD
 			new com.liferay.blogs.internal.upgrade.v2_1_1.
 				BlogsEntryUpgradeProcess());
 
 		registry.register("2.1.1", "2.1.2", new DummyUpgradeStep());
+=======
+			new com.liferay.blogs.internal.upgrade.v2_1_1.UpgradeBlogsEntry());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private UnsafeBiFunction<String, Connection, Boolean, Exception>

@@ -27,7 +27,10 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
@@ -75,8 +78,12 @@ public class AppPortlet extends MVCPortlet {
 		_showFormView = showFormView;
 		_showTableView = showTableView;
 
+<<<<<<< HEAD
 		_viewTemplate =
 			showTableView ? "/view_app_entries.jsp" : "/edit_app_entry.jsp";
+=======
+		_viewTemplate = showTableView ? "/view_entries.jsp" : "/edit_entry.jsp";
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public Dictionary<String, Object> getProperties(
@@ -154,6 +161,22 @@ public class AppPortlet extends MVCPortlet {
 			appBuilderAppPortletTab.getAppBuilderAppPortletTabContext(
 				_appBuilderApp,
 				ParamUtil.getLong(renderRequest, "dataRecordId")));
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		User user = themeDisplay.getUser();
+
+		try {
+			renderRequest.setAttribute(
+				AppBuilderWebKeys.APP_PORTRAIT_URL,
+				user.getPortraitURL(themeDisplay));
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException, portalException);
+			}
+		}
 
 		renderRequest.setAttribute(
 			AppBuilderWebKeys.SHOW_FORM_VIEW, _showFormView);

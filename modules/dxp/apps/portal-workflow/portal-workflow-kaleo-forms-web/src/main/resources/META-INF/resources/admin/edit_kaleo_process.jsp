@@ -71,7 +71,11 @@ renderResponse.setTitle(title);
 	</clay:container-fluid>
 </c:if>
 
+<<<<<<< HEAD
 <portlet:actionURL name="/kaleo_forms_admin/update_kaleo_process" var="editKaleoProcessURL">
+=======
+<portlet:actionURL name="/kaleo_forms/update_kaleo_process" var="editKaleoProcessURL">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<portlet:param name="mvcPath" value="/admin/edit_kaleo_process.jsp" />
 	<portlet:param name="redirect" value="<%= backPortletURL.toString() %>" />
 </portlet:actionURL>

@@ -35,13 +35,17 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.portlet.PortletIdCodec;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferenceValueLocalServiceUtil;
 import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HttpUtil;
@@ -52,6 +56,14 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+=======
+import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -124,9 +136,12 @@ public class SegmentsExperienceUtil {
 		boolean addedDefault = false;
 
 		for (SegmentsExperience segmentsExperience : segmentsExperiences) {
+<<<<<<< HEAD
 			UnicodeProperties typeSettingsUnicodeProperties =
 				segmentsExperience.getTypeSettingsUnicodeProperties();
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if ((segmentsExperience.getPriority() <
 					SegmentsExperienceConstants.PRIORITY_DEFAULT) &&
 				!addedDefault) {
@@ -138,6 +153,7 @@ public class SegmentsExperienceUtil {
 				addedDefault = true;
 			}
 
+<<<<<<< HEAD
 			Set<String> languageIds = SetUtil.fromArray(
 				StringUtil.split(
 					typeSettingsUnicodeProperties.getProperty(
@@ -146,14 +162,19 @@ public class SegmentsExperienceUtil {
 			languageIds.add(
 				LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()));
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			availableSegmentsExperiences.put(
 				String.valueOf(segmentsExperience.getSegmentsExperienceId()),
 				HashMapBuilder.<String, Object>put(
 					"hasLockedSegmentsExperiment",
 					segmentsExperience.hasSegmentsExperiment()
 				).put(
+<<<<<<< HEAD
 					"languageIds", languageIds.toArray()
 				).put(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					"name", segmentsExperience.getName(themeDisplay.getLocale())
 				).put(
 					"priority", segmentsExperience.getPriority()
@@ -188,6 +209,7 @@ public class SegmentsExperienceUtil {
 	public static JSONObject getSegmentsExperienceJSONObject(
 		SegmentsExperience segmentsExperience) {
 
+<<<<<<< HEAD
 		UnicodeProperties typeSettingsUnicodeProperties =
 			segmentsExperience.getTypeSettingsUnicodeProperties();
 
@@ -206,6 +228,11 @@ public class SegmentsExperienceUtil {
 		).put(
 			"languageIds", languageIds
 		).put(
+=======
+		return JSONUtil.put(
+			"active", segmentsExperience.isActive()
+		).put(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"name", segmentsExperience.getNameCurrentValue()
 		).put(
 			"priority", segmentsExperience.getPriority()
@@ -427,6 +454,33 @@ public class SegmentsExperienceUtil {
 				existingPortletPreferences.getPlid(),
 				existingPortletPreferences.getPortletId(),
 				jxPortletPreferences));
+	}
+
+	private static Optional<SegmentsExperiment> _getSegmentsExperimentOptional(
+			ThemeDisplay themeDisplay, long segmentsExperienceId)
+		throws Exception {
+
+		Layout draftLayout = themeDisplay.getLayout();
+
+		Layout layout = LayoutLocalServiceUtil.getLayout(
+			draftLayout.getClassPK());
+
+		return Optional.ofNullable(
+			SegmentsExperimentLocalServiceUtil.fetchSegmentsExperiment(
+				segmentsExperienceId, PortalUtil.getClassNameId(Layout.class),
+				layout.getPlid(),
+				SegmentsExperimentConstants.Status.getExclusiveStatusValues()));
+	}
+
+	private static String _getSegmentsExperimentURL(
+		ThemeDisplay themeDisplay, String layoutFullURL,
+		long segmentsExperienceId) {
+
+		HttpUtil.addParameter(
+			layoutFullURL, "p_l_back_url", themeDisplay.getURLCurrent());
+
+		return HttpUtil.addParameter(
+			layoutFullURL, "segmentsExperienceId", segmentsExperienceId);
 	}
 
 	private static Optional<SegmentsExperiment> _getSegmentsExperimentOptional(

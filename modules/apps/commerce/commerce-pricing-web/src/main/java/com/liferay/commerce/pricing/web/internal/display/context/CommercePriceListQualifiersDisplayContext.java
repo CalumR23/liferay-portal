@@ -88,9 +88,15 @@ public class CommercePriceListQualifiersDisplayContext
 	}
 
 	public String getActiveChannelEligibility() throws PortalException {
+<<<<<<< HEAD
 		int commercePriceListChannelRelsCount =
 			_commercePriceListChannelRelService.
 				getCommercePriceListChannelRelsCount(getCommercePriceListId());
+=======
+		long commerceChannelRelsCount =
+			_commerceChannelRelService.getCommerceChannelRelsCount(
+				CommercePriceList.class.getName(), getCommercePriceListId());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (commercePriceListChannelRelsCount > 0) {
 			return "channels";
@@ -103,6 +109,7 @@ public class CommercePriceListQualifiersDisplayContext
 			getPriceListAccountClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
 		return getClayDataSetActionDropdownItems(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
@@ -116,6 +123,20 @@ public class CommercePriceListQualifiersDisplayContext
 				"commerceAccountId", "{account.id}"
 			).buildString(),
 			false);
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceAccount.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_account");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceAccountId", "{account.id}");
+
+		return getClayDataSetActionDropdownItems(portletURL.toString(), false);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public List<ClayDataSetActionDropdownItem>
@@ -145,6 +166,7 @@ public class CommercePriceListQualifiersDisplayContext
 			getPriceListChannelClayDataSetActionDropdownItems()
 		throws PortalException {
 
+<<<<<<< HEAD
 		return getClayDataSetActionDropdownItems(
 			PortletURLBuilder.create(
 				PortletProviderUtil.getPortletURL(
@@ -158,6 +180,19 @@ public class CommercePriceListQualifiersDisplayContext
 				"commerceChannelId", "{channel.id}"
 			).buildString(),
 			false);
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceChannel.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_channels/edit_commerce_channel");
+		portletURL.setParameter(
+			"redirect", commercePricingRequestHelper.getCurrentURL());
+		portletURL.setParameter("commerceChannelId", "{channel.id}");
+
+		return getClayDataSetActionDropdownItems(portletURL.toString(), false);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getPriceListChannelsApiURL() throws PortalException {

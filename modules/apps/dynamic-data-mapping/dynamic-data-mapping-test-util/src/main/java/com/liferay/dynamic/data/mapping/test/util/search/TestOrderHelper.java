@@ -442,7 +442,11 @@ public abstract class TestOrderHelper {
 				"a" + dummyText, "B" + dummyText, "c" + dummyText,
 				"D" + dummyText
 			},
+<<<<<<< HEAD
 			FieldConstants.STRING, indexType, DDMFormFieldTypeConstants.TEXT);
+=======
+			FieldConstants.STRING, indexType, DDMFormFieldType.TEXT);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _dataType;

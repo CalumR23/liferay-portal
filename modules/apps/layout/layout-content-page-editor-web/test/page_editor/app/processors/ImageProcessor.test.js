@@ -16,6 +16,18 @@ import ImageProcessor from '../../../../src/main/resources/META-INF/resources/pa
 import {openImageSelector} from '../../../../src/main/resources/META-INF/resources/page_editor/core/openImageSelector';
 
 jest.mock(
+<<<<<<< HEAD
+=======
+	'../../../../src/main/resources/META-INF/resources/page_editor/app/config',
+	() => ({
+		config: {
+			adaptiveMediaEnabled: true,
+		},
+	})
+);
+
+jest.mock(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	'../../../../src/main/resources/META-INF/resources/page_editor/core/openImageSelector',
 	() => ({
 		openImageSelector: jest.fn(),

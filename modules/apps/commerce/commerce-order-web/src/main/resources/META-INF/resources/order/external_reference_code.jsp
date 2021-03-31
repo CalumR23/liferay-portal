@@ -23,7 +23,11 @@ CommerceOrderEditDisplayContext commerceOrderEditDisplayContext = (CommerceOrder
 <portlet:actionURL name="/commerce_order/edit_commerce_order_external_reference_code" var="editCommerceOrderExternalReferenceCodeURL" />
 
 <commerce-ui:modal-content>
+<<<<<<< HEAD
 	<aui:form action="<%= editCommerceOrderExternalReferenceCodeURL %>" cssClass="container-fluid container-fluid-max-xl p-0" method="post" name="fm">
+=======
+	<aui:form action="<%= editCommerceOrderExternalReferenceCodeURL %>" cssClass="container-fluid-1280 p-0" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:model-context bean="<%= commerceOrderEditDisplayContext.getCommerceOrder() %>" model="<%= CommerceOrder.class %>" />
 
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />

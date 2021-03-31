@@ -87,10 +87,13 @@ public interface DocumentLibraryDDMFormFieldTypeSettings
 	)
 	public boolean allowGuestUsers();
 
+<<<<<<< HEAD
 	@DDMFormField(predefinedValue = "document-library", required = true)
 	@Override
 	public String dataType();
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@DDMFormField(
 		label = "%repeatable",
 		properties = {"showAsSwitcher=true", "showMaximumRepetitionsInfo=true"}

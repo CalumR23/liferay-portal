@@ -104,7 +104,11 @@ public class CartItemResourceImpl
 	}
 
 	@Override
+<<<<<<< HEAD
 	public CartItem postCartItem(Long cartId, CartItem cartItem)
+=======
+	public CartItem postCartItem(@NotNull Long cartId, CartItem cartItem)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(

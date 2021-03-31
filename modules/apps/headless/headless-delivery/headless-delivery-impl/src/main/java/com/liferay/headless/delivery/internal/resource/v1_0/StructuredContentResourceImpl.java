@@ -30,7 +30,10 @@ import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
+<<<<<<< HEAD
 import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidator;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
@@ -50,6 +53,9 @@ import com.liferay.headless.delivery.internal.dto.v1_0.util.RatingUtil;
 import com.liferay.headless.delivery.internal.dto.v1_0.util.RenderedContentValueUtil;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.EntityFieldsProvider;
 import com.liferay.headless.delivery.internal.odata.entity.v1_0.StructuredContentEntityModel;
+import com.liferay.headless.delivery.internal.search.aggregation.AggregationUtil;
+import com.liferay.headless.delivery.internal.search.filter.FilterUtil;
+import com.liferay.headless.delivery.internal.search.sort.SortUtil;
 import com.liferay.headless.delivery.resource.v1_0.StructuredContentResource;
 import com.liferay.headless.delivery.search.aggregation.AggregationUtil;
 import com.liferay.headless.delivery.search.filter.FilterUtil;
@@ -1148,6 +1154,9 @@ public class StructuredContentResourceImpl
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StructuredContentResourceImpl.class);
+
+	@Reference
+	private Aggregations _aggregations;
 
 	@Reference
 	private Aggregations _aggregations;

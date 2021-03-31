@@ -147,19 +147,31 @@ public class DepotEntryGroupRelModelImpl
 	public static final long GROUPID_COLUMN_BITMASK = 8L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long SEARCHABLE_COLUMN_BITMASK = 16L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long TOGROUPID_COLUMN_BITMASK = 32L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long UUID_COLUMN_BITMASK = 64L;

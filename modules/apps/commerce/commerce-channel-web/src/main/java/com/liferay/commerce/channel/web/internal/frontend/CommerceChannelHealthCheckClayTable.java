@@ -97,6 +97,7 @@ public class CommerceChannelHealthCheckClayTable
 					httpServletRequest, "currentUrl",
 					_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 				PortletURL portletURL = PortletURLBuilder.create(
 					_portal.getControlPanelPortletURL(
 						httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
@@ -113,6 +114,14 @@ public class CommerceChannelHealthCheckClayTable
 						return healthCheck.getKey();
 					}
 				).build();
+=======
+				portletURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/commerce_channels/edit_commerce_channel_health_status");
+				portletURL.setParameter("redirect", redirect);
+				portletURL.setParameter(
+					"commerceChannelHealthStatusKey", healthCheck.getKey());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				long commerceChannelId = ParamUtil.getLong(
 					httpServletRequest, "commerceChannelId");

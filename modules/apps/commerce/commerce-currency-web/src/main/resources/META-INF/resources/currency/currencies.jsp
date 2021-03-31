@@ -76,6 +76,7 @@ CommerceCurrenciesDisplayContext commerceCurrenciesDisplayContext = (CommerceCur
 		</liferay-frontend:management-bar-action-buttons>
 	</liferay-frontend:management-bar>
 
+<<<<<<< HEAD
 	<portlet:actionURL name="/commerce_currency/edit_commerce_currency" var="editCommerceCurrencyActionURL" />
 
 	<aui:form action="<%= editCommerceCurrencyActionURL %>" method="post" name="fm">
@@ -109,6 +110,10 @@ CommerceCurrenciesDisplayContext commerceCurrenciesDisplayContext = (CommerceCur
 					name="name"
 					value="<%= HtmlUtil.escape(commerceCurrency.getName(locale)) %>"
 				/>
+=======
+	<div class="container-fluid-1280">
+		<portlet:actionURL name="/commerce_currency/edit_commerce_currency" var="editCommerceCurrencyActionURL" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-expand"
@@ -121,6 +126,7 @@ CommerceCurrenciesDisplayContext commerceCurrenciesDisplayContext = (CommerceCur
 					value="<%= commerceCurrenciesDisplayContext.format(commerceCurrency.getRate()) %>"
 				/>
 
+<<<<<<< HEAD
 				<liferay-ui:search-container-column-text
 					name="primary"
 				>
@@ -138,6 +144,38 @@ CommerceCurrenciesDisplayContext commerceCurrenciesDisplayContext = (CommerceCur
 				>
 					<c:choose>
 						<c:when test="<%= commerceCurrency.isActive() %>">
+=======
+					<%
+					PortletURL rowURL = renderResponse.createRenderURL();
+
+					rowURL.setParameter("mvcRenderCommandName", "/commerce_currency/edit_commerce_currency");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("commerceCurrencyId", String.valueOf(commerceCurrency.getCommerceCurrencyId()));
+					%>
+
+					<liferay-ui:search-container-column-text
+						cssClass="important table-cell-content"
+						href="<%= rowURL %>"
+						name="name"
+						value="<%= HtmlUtil.escape(commerceCurrency.getName(locale)) %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						cssClass="table-cell-content"
+						name="code"
+						value="<%= HtmlUtil.escape(commerceCurrency.getCode()) %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						name="exchange-rate"
+						value="<%= commerceCurrenciesDisplayContext.format(commerceCurrency.getRate()) %>"
+					/>
+
+					<liferay-ui:search-container-column-text
+						name="primary"
+					>
+						<c:if test="<%= commerceCurrency.isPrimary() %>">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							<liferay-ui:icon
 								cssClass="commerce-admin-icon-check"
 								icon="check"

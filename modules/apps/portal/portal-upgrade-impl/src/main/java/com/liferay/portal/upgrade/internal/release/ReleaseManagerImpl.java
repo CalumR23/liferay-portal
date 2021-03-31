@@ -110,8 +110,12 @@ public class ReleaseManagerImpl implements ReleaseManager {
 		catch (SQLException sqlException) {
 			if (_log.isWarnEnabled()) {
 				_log.warn(
+<<<<<<< HEAD
 					"Unable to get pending upgrade information for the portal",
 					sqlException);
+=======
+					"Unable to get pending upgrade information for the portal");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 
@@ -315,8 +319,12 @@ public class ReleaseManagerImpl implements ReleaseManager {
 					if (_log.isDebugEnabled()) {
 						_log.debug(
 							"Unable to read service.properties for " +
+<<<<<<< HEAD
 								serviceReference,
 							exception);
+=======
+								serviceReference);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					}
 				}
 			}

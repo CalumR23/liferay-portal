@@ -15,12 +15,18 @@
 package com.liferay.portal.vulcan.util;
 
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import junit.framework.Assert;
 
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+
+import junit.framework.Assert;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -29,11 +35,14 @@ import org.junit.Test;
  */
 public class EntityExtensionUtilTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Test
 	public void testExtend() throws Exception {
 		BaseEntity baseEntity = new BaseEntity();

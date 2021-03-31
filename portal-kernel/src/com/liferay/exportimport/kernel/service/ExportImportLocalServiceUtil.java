@@ -131,7 +131,11 @@ public class ExportImportLocalServiceUtil {
 			com.liferay.exportimport.kernel.model.ExportImportConfiguration
 				exportImportConfiguration,
 			java.io.File file)
+<<<<<<< HEAD
 		throws PortalException {
+=======
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().importLayoutSetPrototypeInBackground(
 			userId, exportImportConfiguration, file);

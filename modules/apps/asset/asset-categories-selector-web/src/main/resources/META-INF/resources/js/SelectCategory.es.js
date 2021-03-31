@@ -200,7 +200,11 @@ function SelectCategory({
 						{flattenedNodes.length > 0 ? (
 							<Treeview
 								NodeComponent={Treeview.Card}
+<<<<<<< HEAD
 								filter={getFilter(filterQuery)}
+=======
+								filterQuery={filterQuery}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 								initialSelectedNodeIds={initialSelectedNodeIds}
 								multiSelection={multiSelection}
 								nodes={flattenedNodes}

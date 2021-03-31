@@ -619,6 +619,7 @@ public class PropsValues {
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL = PropsUtil.get(
 		PropsKeys.CUSTOM_SQL_FUNCTION_ISNULL);
 
+<<<<<<< HEAD
 	public static final long DATA_LIMIT_DL_STORAGE_MAX_SIZE =
 		GetterUtil.getLong(
 			PropsUtil.get(PropsKeys.DATA_LIMIT_DL_STORAGE_MAX_SIZE));
@@ -631,6 +632,8 @@ public class PropsValues {
 		GetterUtil.getLong(
 			PropsUtil.get(PropsKeys.DATA_LIMIT_MAX_DL_STORAGE_SIZE));
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
@@ -1032,6 +1035,16 @@ public class PropsValues {
 	public static boolean DL_STORE_ANTIVIRUS_ENABLED = GetterUtil.getBoolean(
 		PropsUtil.get(PropsKeys.DL_STORE_ANTIVIRUS_ENABLED));
 
+<<<<<<< HEAD
+=======
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final String DL_STORE_ANTIVIRUS_IMPL = PropsUtil.get(
+		PropsKeys.DL_STORE_ANTIVIRUS_IMPL);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND =
 		PropsUtil.get(PropsKeys.DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND);
 
@@ -3104,7 +3117,11 @@ public class PropsValues {
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+<<<<<<< HEAD
 	 *             com.liferay.view.count.configuration.ViewCountConfiguration
+=======
+	 *             com.liferay.view.count.configuration.ViewCountsConfiguration
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 *             #enabled()}
 	 */
 	@Deprecated

@@ -20,13 +20,22 @@ import com.liferay.document.library.kernel.exception.InvalidFileException;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.DDMFormWebConfiguration;
 import com.liferay.dynamic.data.mapping.form.web.internal.configuration.activator.DDMFormWebConfigurationActivator;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.util.FileImpl;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.File;
 
 import org.junit.Before;
+<<<<<<< HEAD
 import org.junit.ClassRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 import org.mockito.Mockito;
@@ -39,6 +48,7 @@ import org.powermock.api.support.membermodification.MemberMatcher;
  */
 public class DDMFormUploadValidatorTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	public static LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
@@ -46,6 +56,12 @@ public class DDMFormUploadValidatorTest {
 	@Before
 	public void setUp() throws Exception {
 		setUpDDMFormWebConfigurationActivator();
+=======
+	@Before
+	public void setUp() throws Exception {
+		setUpDDMFormWebConfigurationActivator();
+		setUpFileUtil();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test(expected = InvalidFileException.class)
@@ -106,6 +122,15 @@ public class DDMFormUploadValidatorTest {
 		);
 	}
 
+<<<<<<< HEAD
+=======
+	protected void setUpFileUtil() {
+		FileUtil fileUtil = new FileUtil();
+
+		fileUtil.setFile(FileImpl.getInstance());
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private static final long _FILE_LENGTH_MB = 1024 * 1024;
 
 	private final DDMFormUploadValidator _ddmFormUploadValidator =

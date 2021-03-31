@@ -134,6 +134,94 @@ public class ContentDashboardDropdownItemsProviderTest {
 	}
 
 	@Test
+<<<<<<< HEAD
+=======
+	public void testGetURLBackURL() {
+		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+			new MockLiferayPortletRenderRequest();
+
+		MockLiferayPortletURL mockLiferayPortletURL =
+			new MockLiferayPortletURL();
+
+		mockLiferayPortletRenderRequest.setAttribute(
+			"null-" + WebKeys.CURRENT_PORTLET_URL, mockLiferayPortletURL);
+
+		ContentDashboardDropdownItemsProvider
+			contentDashboardDropdownItemsProvider =
+				new ContentDashboardDropdownItemsProvider(
+					_http, _language, mockLiferayPortletRenderRequest,
+					new MockLiferayPortletRenderResponse(), new PortalImpl());
+
+		ContentDashboardItem contentDashboardItem = _getContentDashboardItem(
+			Collections.singletonList(
+				_getContentDashboardItemAction(
+					"view", ContentDashboardItemAction.Type.VIEW, "validURL")));
+
+		List<DropdownItem> dropdownItems =
+			contentDashboardDropdownItemsProvider.getDropdownItems(
+				contentDashboardItem);
+
+		Stream<DropdownItem> stream = dropdownItems.stream();
+
+		DropdownItem viewDropdownItem = stream.filter(
+			dropdownItem -> Objects.equals(
+				String.valueOf(dropdownItem.get("label")), "view")
+		).findFirst(
+		).orElseThrow(
+			() -> new AssertionError()
+		);
+
+		Assert.assertEquals(
+			HtmlUtil.escapeURL(String.valueOf(mockLiferayPortletURL)),
+			_http.getParameter(
+				String.valueOf(viewDropdownItem.get("href")), "p_l_back_url"));
+	}
+
+	@Test
+	public void testGetURLBackURLWithBackURLParameter() {
+		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
+			new MockLiferayPortletRenderRequest();
+
+		mockLiferayPortletRenderRequest.setAttribute(
+			"null-" + WebKeys.CURRENT_PORTLET_URL, new MockLiferayPortletURL());
+
+		String backURL = RandomTestUtil.randomString();
+
+		mockLiferayPortletRenderRequest.setParameter("backURL", backURL);
+
+		ContentDashboardDropdownItemsProvider
+			contentDashboardDropdownItemsProvider =
+				new ContentDashboardDropdownItemsProvider(
+					_http, _language, mockLiferayPortletRenderRequest,
+					new MockLiferayPortletRenderResponse(), new PortalImpl());
+
+		ContentDashboardItem contentDashboardItem = _getContentDashboardItem(
+			Collections.singletonList(
+				_getContentDashboardItemAction(
+					"view", ContentDashboardItemAction.Type.VIEW, "validURL")));
+
+		List<DropdownItem> dropdownItems =
+			contentDashboardDropdownItemsProvider.getDropdownItems(
+				contentDashboardItem);
+
+		Stream<DropdownItem> stream = dropdownItems.stream();
+
+		DropdownItem viewDropdownItem = stream.filter(
+			dropdownItem -> Objects.equals(
+				String.valueOf(dropdownItem.get("label")), "view")
+		).findFirst(
+		).orElseThrow(
+			() -> new AssertionError()
+		);
+
+		Assert.assertEquals(
+			backURL,
+			_http.getParameter(
+				String.valueOf(viewDropdownItem.get("href")), "p_l_back_url"));
+	}
+
+	@Test
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void testGetViewInPanelURL() {
 		MockLiferayPortletRenderRequest mockLiferayPortletRenderRequest =
 			new MockLiferayPortletRenderRequest();

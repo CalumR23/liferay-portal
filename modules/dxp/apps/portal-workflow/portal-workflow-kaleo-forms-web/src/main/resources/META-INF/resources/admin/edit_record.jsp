@@ -51,7 +51,11 @@ portletDisplay.setURLBack(redirect);
 renderResponse.setTitle((ddlRecord != null) ? LanguageUtil.format(request, "edit-x", kaleoProcess.getName(locale), false) : LanguageUtil.format(request, "new-x", kaleoProcess.getName(locale), false));
 %>
 
+<<<<<<< HEAD
 <portlet:actionURL name="/kaleo_forms_admin/update_record" var="updateDDLRecordURL">
+=======
+<portlet:actionURL name="/kaleo_forms/update_record" var="updateDDLRecordURL">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<portlet:param name="redirect" value="<%= currentURL %>" />
 	<portlet:param name="kaleoProcessId" value="<%= String.valueOf(kaleoProcessId) %>" />
 </portlet:actionURL>

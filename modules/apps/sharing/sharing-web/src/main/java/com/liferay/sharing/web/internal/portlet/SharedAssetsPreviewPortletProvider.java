@@ -48,11 +48,20 @@ public class SharedAssetsPreviewPortletProvider
 			HttpServletRequest httpServletRequest, Group group)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			super.getPortletURL(httpServletRequest, group)
 		).setMVCRenderCommandName(
 			"/sharing/view_sharing_entry"
 		).build();
+=======
+		PortletURL portletURL = super.getPortletURL(httpServletRequest, group);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/sharing/view_sharing_entry");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

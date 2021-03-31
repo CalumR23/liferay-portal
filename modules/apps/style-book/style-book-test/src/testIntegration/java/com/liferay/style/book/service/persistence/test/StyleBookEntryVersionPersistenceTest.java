@@ -392,12 +392,20 @@ public class StyleBookEntryVersionPersistenceTest {
 
 	protected OrderByComparator<StyleBookEntryVersion> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
+<<<<<<< HEAD
 			"StyleBookEntryVersion", "mvccVersion", true, "ctCollectionId",
 			true, "styleBookEntryVersionId", true, "version", true, "uuid",
 			true, "styleBookEntryId", true, "groupId", true, "companyId", true,
 			"userId", true, "userName", true, "createDate", true,
 			"modifiedDate", true, "defaultStyleBookEntry", true, "name", true,
 			"previewFileEntryId", true, "styleBookEntryKey", true);
+=======
+			"StyleBookEntryVersion", "styleBookEntryVersionId", true, "version",
+			true, "uuid", true, "styleBookEntryId", true, "groupId", true,
+			"companyId", true, "userId", true, "userName", true, "createDate",
+			true, "modifiedDate", true, "defaultStyleBookEntry", true, "name",
+			true, "previewFileEntryId", true, "styleBookEntryKey", true);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test

@@ -43,6 +43,7 @@ const FieldTypeList = ({
 	onDoubleClick,
 	showEmptyState = true,
 }) => {
+<<<<<<< HEAD
 	const regex = getSearchRegex(keywords);
 
 	const filteredFieldTypes = fieldTypes.filter(
@@ -50,6 +51,13 @@ const FieldTypeList = ({
 			if (system) {
 				return false;
 			}
+=======
+	const regex = new RegExp(keywords, 'ig');
+
+	const filteredFieldTypes = fieldTypes
+		.filter(({system}) => !system)
+		.filter(({description, label}) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (!keywords) {
 				return true;
 			}

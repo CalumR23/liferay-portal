@@ -26,7 +26,11 @@ renderResponse.setTitle(LanguageUtil.get(request, "applications"));
 
 <portlet:actionURL name="/commerce_application_admin/edit_commerce_application_model" var="editCommerceApplicationModelActionURL" />
 
+<<<<<<< HEAD
 <div class="container-fluid container-fluid-max-xl entry-body">
+=======
+<div class="container-fluid-1280 entry-body">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<aui:form action="<%= editCommerceApplicationModelActionURL %>" method="post" name="fm">
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= (commerceApplicationModel == null) ? Constants.ADD : Constants.UPDATE %>" />
 		<aui:input name="redirect" type="hidden" value="<%= backURL %>" />

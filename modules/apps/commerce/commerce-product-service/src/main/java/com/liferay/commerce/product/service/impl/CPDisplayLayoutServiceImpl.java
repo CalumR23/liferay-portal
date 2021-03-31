@@ -52,6 +52,31 @@ public class CPDisplayLayoutServiceImpl extends CPDisplayLayoutServiceBaseImpl {
 	}
 
 	@Override
+<<<<<<< HEAD
+=======
+	public void deleteCPDisplayLayout(Class<?> clazz, long classPK)
+		throws PortalException {
+
+		CPDisplayLayout cpDisplayLayout =
+			cpDisplayLayoutLocalService.fetchCPDisplayLayout(clazz, classPK);
+
+		if (cpDisplayLayout == null) {
+			return;
+		}
+
+		GroupPermissionUtil.check(
+			getPermissionChecker(), cpDisplayLayout.getGroupId(),
+			ActionKeys.ADD_LAYOUT);
+
+		_checkCPDisplayLayout(
+			cpDisplayLayout.getClassName(), cpDisplayLayout.getClassPK(),
+			ActionKeys.VIEW);
+
+		cpDisplayLayoutLocalService.deleteCPDisplayLayout(cpDisplayLayout);
+	}
+
+	@Override
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void deleteCPDisplayLayout(long cpDisplayLayoutId)
 		throws PortalException {
 

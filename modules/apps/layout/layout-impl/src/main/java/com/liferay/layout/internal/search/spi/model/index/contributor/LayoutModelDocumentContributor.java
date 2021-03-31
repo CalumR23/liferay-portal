@@ -83,6 +83,7 @@ public class LayoutModelDocumentContributor
 
 		for (Locale locale : locales) {
 			String content = _html.stripHtml(
+<<<<<<< HEAD
 				_getWrapper(_layoutCrawler.getLayoutContent(layout, locale)));
 
 			if (Validator.isNull(content)) {
@@ -107,6 +108,19 @@ public class LayoutModelDocumentContributor
 
 	private static final String _WRAPPER_ELEMENT = "id=\"wrapper\">";
 
+=======
+				_layoutCrawler.getLayoutContent(layout, locale));
+
+			if (Validator.isNull(content)) {
+				continue;
+			}
+
+			document.addText(
+				Field.getLocalizedName(locale, Field.CONTENT), content);
+		}
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference
 	private Html _html;
 

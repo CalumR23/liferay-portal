@@ -116,6 +116,15 @@ AnnouncementsAdminViewManagementToolbarDisplayContext announcementsAdminViewMana
 					HashMapBuilder.<String, Object>put(
 						"actions", StringUtil.merge(announcementsAdminViewManagementToolbarDisplayContext.getAvailableActions(entry))
 					).build());
+<<<<<<< HEAD
+=======
+
+				PortletURL rowURL = renderResponse.createRenderURL();
+
+				rowURL.setParameter("mvcRenderCommandName", "/announcements/view_entry");
+				rowURL.setParameter("redirect", currentURL);
+				rowURL.setParameter("entryId", String.valueOf(entry.getEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				%>
 
 				<liferay-ui:search-container-column-text

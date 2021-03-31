@@ -55,6 +55,7 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 					String editURL = StringPool.BLANK;
 
 					if (AssetListEntryPermission.contains(permissionChecker, assetListEntry, ActionKeys.UPDATE) || AssetListEntryPermission.contains(permissionChecker, assetListEntry, ActionKeys.VIEW)) {
+<<<<<<< HEAD
 						PortletURL editAssetListEntryURL = PortletURLBuilder.createRenderURL(
 							liferayPortletResponse
 						).setMVCPath(
@@ -64,6 +65,13 @@ AssetListManagementToolbarDisplayContext assetListManagementToolbarDisplayContex
 						).setParameter(
 							"assetListEntryId", String.valueOf(assetListEntry.getAssetListEntryId())
 						).build();
+=======
+						PortletURL editAssetListEntryURL = liferayPortletResponse.createRenderURL();
+
+						editAssetListEntryURL.setParameter("mvcPath", "/edit_asset_list_entry.jsp");
+						editAssetListEntryURL.setParameter("redirect", currentURL);
+						editAssetListEntryURL.setParameter("assetListEntryId", String.valueOf(assetListEntry.getAssetListEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						editURL = editAssetListEntryURL.toString();
 					}

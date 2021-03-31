@@ -259,6 +259,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		}
 		catch (NoSuchLayoutException noSuchLayoutException) {
 			Layout redirectLayout = null;
+<<<<<<< HEAD
 
 			if (layoutFriendlyURL == null) {
 				redirectLayout = defaultLayout;
@@ -272,6 +273,21 @@ public class FriendlyURLServlet extends HttpServlet {
 					if (layout.matches(httpServletRequest, layoutFriendlyURL)) {
 						redirectLayout = layout;
 
+=======
+
+			if (layoutFriendlyURL == null) {
+				redirectLayout = defaultLayout;
+			}
+			else {
+				List<Layout> layouts = layoutLocalService.getLayouts(
+					group.getGroupId(), _private,
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+
+				for (Layout layout : layouts) {
+					if (layout.matches(httpServletRequest, layoutFriendlyURL)) {
+						redirectLayout = layout;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						break;
 					}
 				}

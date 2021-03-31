@@ -478,7 +478,11 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = (List<AssetRend
 		'<portlet:namespace />ddmStructureFieldValue'
 	);
 
+<<<<<<< HEAD
 	assetSelector.addEventListener('change', (event) => {
+=======
+	assetSelector.addEventListener('change', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (ddmStructureFieldNameInput) {
 			ddmStructureFieldNameInput.value = '';
 		}
@@ -489,8 +493,11 @@ List<AssetRendererFactory<?>> classTypesAssetRendererFactories = (List<AssetRend
 
 		<portlet:namespace />toggleSubclasses(true);
 	});
+<<<<<<< HEAD
 
 	var delegate = delegateModule.default;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	delegate(
 		sourcePanel,

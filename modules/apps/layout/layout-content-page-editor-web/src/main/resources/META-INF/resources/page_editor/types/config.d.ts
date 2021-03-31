@@ -116,7 +116,10 @@ export interface Config {
 			value: string;
 		};
 	};
+<<<<<<< HEAD
 	getAvailableImageConfigurationsURL: string;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	getAvailableListRenderersURL: string;
 	getAvailableListItemRenderersURL: string;
 	getAvailableTemplatesURL: string;
@@ -172,7 +175,10 @@ export interface Config {
 	};
 
 	singleSegmentsExperienceMode: boolean;
+<<<<<<< HEAD
 	siteNavigationMenuItemSelectorURL: string;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	styleBookEnabled: boolean;
 	stylebookEntryId: string;
 	styleBooks: Array<{

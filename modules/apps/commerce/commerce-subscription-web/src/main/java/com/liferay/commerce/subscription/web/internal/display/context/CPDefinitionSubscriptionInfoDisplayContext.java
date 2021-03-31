@@ -46,11 +46,19 @@ public class CPDefinitionSubscriptionInfoDisplayContext
 
 	@Override
 	public PortletURL getPortletURL() throws PortalException {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setMVCRenderCommandName(
 			"/cp_definitions/edit_cp_definition"
 		).setParameter(
+=======
+		PortletURL portletURL = super.getPortletURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_definition");
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			getSelectedScreenNavigationCategoryKey()
 		).build();

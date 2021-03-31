@@ -16,6 +16,15 @@ package com.liferay.analytics.reports.web.internal.portlet.action;
 
 import com.liferay.analytics.reports.web.internal.constants.AnalyticsReportsPortletKeys;
 import com.liferay.analytics.reports.web.internal.data.provider.AnalyticsReportsDataProvider;
+<<<<<<< HEAD
+=======
+import com.liferay.analytics.reports.web.internal.info.display.contributor.util.LayoutDisplayPageProviderUtil;
+import com.liferay.analytics.reports.web.internal.layout.seo.CanonicalURLProvider;
+import com.liferay.asset.display.page.portlet.AssetDisplayPageFriendlyURLProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
+import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
+import com.liferay.layout.seo.kernel.LayoutSEOLinkManager;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.Language;
@@ -57,6 +66,31 @@ public class GetTotalReadsMVCResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
+<<<<<<< HEAD
+=======
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
+			resourceRequest);
+
+		LayoutDisplayPageObjectProvider<Object>
+			layoutDisplayPageObjectProvider =
+				(LayoutDisplayPageObjectProvider<Object>)
+					LayoutDisplayPageProviderUtil.
+						getLayoutDisplayPageObjectProvider(
+							httpServletRequest,
+							_layoutDisplayPageProviderTracker, _portal);
+
+		if (layoutDisplayPageObjectProvider == null) {
+			JSONPortletResponseUtil.writeJSON(
+				resourceRequest, resourceResponse,
+				JSONUtil.put(
+					"error",
+					_language.get(
+						httpServletRequest, "an-unexpected-error-occurred")));
+
+			return;
+		}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		AnalyticsReportsDataProvider analyticsReportsDataProvider =
 			new AnalyticsReportsDataProvider(_http);
 		String canonicalURL = ParamUtil.getString(

@@ -60,17 +60,30 @@ public class DepotEntryLocalServiceUtil {
 		return getService().addDepotEntry(depotEntry);
 	}
 
+<<<<<<< HEAD
 	public static DepotEntry addDepotEntry(
 			com.liferay.portal.kernel.model.Group group,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
+=======
+	public static com.liferay.depot.model.DepotEntry addDepotEntry(
+			com.liferay.portal.kernel.model.Group group,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().addDepotEntry(group, serviceContext);
 	}
 
+<<<<<<< HEAD
 	public static DepotEntry addDepotEntry(
 			Map<java.util.Locale, String> nameMap,
 			Map<java.util.Locale, String> descriptionMap,
+=======
+	public static com.liferay.depot.model.DepotEntry addDepotEntry(
+			java.util.Map<java.util.Locale, String> nameMap,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
@@ -334,8 +347,13 @@ public class DepotEntryLocalServiceUtil {
 	 * @deprecated As of Cavanaugh (7.4.x)
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static List<DepotEntry> getDepotEntryGroupRelsByUuidAndCompanyId(
 		String uuid, long companyId) {
+=======
+	public static java.util.List<com.liferay.depot.model.DepotEntry>
+		getDepotEntryGroupRelsByUuidAndCompanyId(String uuid, long companyId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().getDepotEntryGroupRelsByUuidAndCompanyId(
 			uuid, companyId);

@@ -91,9 +91,16 @@ public class CommerceInventoryTestUtil {
 				null, name, RandomTestUtil.randomString(), active,
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+<<<<<<< HEAD
 				RandomTestUtil.randomString(), region.getRegionCode(),
 				country.getA2(), RandomTestUtil.nextDouble(),
 				RandomTestUtil.nextDouble(), serviceContext);
+=======
+				RandomTestUtil.randomString(), commerceRegion.getCode(),
+				commerceCountry.getTwoLettersISOCode(),
+				RandomTestUtil.nextDouble(), RandomTestUtil.nextDouble(),
+				serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
@@ -109,9 +116,16 @@ public class CommerceInventoryTestUtil {
 				null, name, RandomTestUtil.randomString(), active,
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+<<<<<<< HEAD
 				RandomTestUtil.randomString(), region.getRegionCode(),
 				country.getA2(), RandomTestUtil.nextDouble(),
 				RandomTestUtil.nextDouble(), serviceContext);
+=======
+				RandomTestUtil.randomString(), commerceRegion.getCode(),
+				commerceCountry.getTwoLettersISOCode(),
+				RandomTestUtil.nextDouble(), RandomTestUtil.nextDouble(),
+				serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public static CommerceInventoryWarehouse addCommerceInventoryWarehouse(
@@ -174,9 +188,16 @@ public class CommerceInventoryTestUtil {
 				RandomTestUtil.randomString(), true,
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+<<<<<<< HEAD
 				RandomTestUtil.randomString(), region.getRegionCode(),
 				country.getA2(), RandomTestUtil.randomDouble(),
 				RandomTestUtil.randomDouble(), serviceContext);
+=======
+				RandomTestUtil.randomString(), commerceRegion.getCode(),
+				commerceCountry.getTwoLettersISOCode(),
+				RandomTestUtil.randomDouble(), RandomTestUtil.randomDouble(),
+				serviceContext);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public static Country addCountry(ServiceContext serviceContext)

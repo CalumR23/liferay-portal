@@ -58,6 +58,7 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 						navigationItem -> {
 							navigationItem.setActive(navigation.equals("credentials"));
 
+<<<<<<< HEAD
 							PortletURL portletURL = PortletURLBuilder.createRenderURL(
 								renderResponse
 							).setMVCRenderCommandName(
@@ -69,6 +70,14 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 							).setParameter(
 								"oAuth2ApplicationId", oAuth2ApplicationIdString
 							).build();
+=======
+							PortletURL portletURL = renderResponse.createRenderURL();
+
+							portletURL.setParameter("mvcRenderCommandName", "/oauth2_provider/update_o_auth2_application");
+							portletURL.setParameter("navigation", "credentials");
+							portletURL.setParameter("redirect", redirect);
+							portletURL.setParameter("oAuth2ApplicationId", oAuth2ApplicationIdString);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							navigationItem.setHref(portletURL.toString());
 
@@ -79,6 +88,7 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 						navigationItem -> {
 							navigationItem.setActive(navigation.equals("assign_scopes"));
 
+<<<<<<< HEAD
 							PortletURL portletURL = PortletURLBuilder.createRenderURL(
 								renderResponse
 							).setMVCRenderCommandName(
@@ -90,6 +100,14 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 							).setParameter(
 								"oAuth2ApplicationId", oAuth2ApplicationIdString
 							).build();
+=======
+							PortletURL portletURL = renderResponse.createRenderURL();
+
+							portletURL.setParameter("mvcRenderCommandName", "/oauth2_provider/assign_scopes");
+							portletURL.setParameter("navigation", "assign_scopes");
+							portletURL.setParameter("redirect", redirect);
+							portletURL.setParameter("oAuth2ApplicationId", oAuth2ApplicationIdString);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 							navigationItem.setHref(portletURL.toString());
 
@@ -101,6 +119,7 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 							navigationItem -> {
 								navigationItem.setActive(navigation.equals("application_authorizations"));
 
+<<<<<<< HEAD
 								PortletURL portletURL = PortletURLBuilder.createRenderURL(
 									renderResponse
 								).setMVCRenderCommandName(
@@ -112,6 +131,14 @@ if (request.getAttribute(OAuth2ProviderWebKeys.ASSIGN_SCOPES_TREE_DISPLAY_CONTEX
 								).setParameter(
 									"oAuth2ApplicationId", oAuth2ApplicationIdString
 								).build();
+=======
+								PortletURL portletURL = renderResponse.createRenderURL();
+
+								portletURL.setParameter("mvcRenderCommandName", "/oauth2_provider/view_o_auth2_authorizations");
+								portletURL.setParameter("navigation", "application_authorizations");
+								portletURL.setParameter("redirect", redirect);
+								portletURL.setParameter("oAuth2ApplicationId", oAuth2ApplicationIdString);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 								navigationItem.setHref(portletURL.toString());
 

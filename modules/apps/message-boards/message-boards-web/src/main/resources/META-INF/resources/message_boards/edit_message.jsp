@@ -380,6 +380,11 @@ if (portletTitleBasedNavigation) {
 
 							try {
 								String priorityName = priority[0];
+<<<<<<< HEAD
+=======
+
+								double priorityValue = GetterUtil.getDouble(priority[2]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 								double priorityValue = GetterUtil.getDouble(priority[2]);
 						%>

@@ -31,6 +31,7 @@ import {
 	dedupValue,
 	getDefaultOptionValue,
 	isOptionValueGenerated,
+	normalizeFieldReference,
 	normalizeFields,
 	normalizeReference,
 	random,
@@ -150,8 +151,13 @@ const Options = ({
 				);
 			}
 
+<<<<<<< HEAD
 			formattedValue[languageId] = normalizeFields(
 				formattedValue[languageId].map((option) => {
+=======
+			formattedValue[languageId] = formattedValue[languageId].map(
+				(option) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					let newOption = {
 						id: random(),
 						...option,
@@ -175,8 +181,12 @@ const Options = ({
 					}
 
 					return newOption;
+<<<<<<< HEAD
 				}),
 				generateOptionValueUsingOptionLabel
+=======
+				}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			);
 		});
 
@@ -337,12 +347,16 @@ const Options = ({
 	};
 
 	const checkValidReference = (fields, value, fieldName) => {
+<<<<<<< HEAD
 		const field = fields
 			.filter(({value}) => value !== fieldName)
 			.find(
 				({reference}) =>
 					reference?.toLowerCase() === value?.toLowerCase()
 			);
+=======
+		const field = fields.find((field) => field['reference'] === value);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return field ? fieldName : null;
 	};
@@ -416,6 +430,7 @@ const Options = ({
 		fields.splice(index, 1);
 
 		return [fields];
+<<<<<<< HEAD
 	};
 
 	const move = (fields, data) => {
@@ -447,6 +462,38 @@ const Options = ({
 		return [normalizeFields(fields, generateOptionValueUsingOptionLabel)];
 	};
 
+=======
+	};
+
+	const move = (fields, data) => {
+		const {itemPosition, targetPosition} = data;
+
+		if (itemPosition === fields.length - 1) {
+			return [fields];
+		}
+
+		const item = {...fields[itemPosition]};
+		const newTargetPosition =
+			targetPosition > itemPosition ? targetPosition - 1 : targetPosition;
+
+		fields.splice(itemPosition, 1);
+		fields.splice(newTargetPosition, 0, item);
+
+		return [fields];
+	};
+
+	const normalize = (fields, index) => {
+		clearError();
+
+		return [
+			normalizeFields(
+				normalizeFieldReference(index, fields),
+				generateOptionValueUsingOptionLabel
+			),
+		];
+	};
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const composedAdd = compose(clone, dedup, add, set);
 	const composedBlur = compose(clone, normalize, set);
 	const composedChange = compose(clone, dedup, change, set);
@@ -456,7 +503,11 @@ const Options = ({
 	const handleConfirmDelete = (index, option) => {
 		if (
 			builderRules &&
+<<<<<<< HEAD
 			RulesSupport.findRuleByFieldName(option, null, builderRules)
+=======
+			RulesSupport.findRuleByFieldName(option, builderRules)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		) {
 			openModal({
 				bodyHTML: Liferay.Language.get(
@@ -559,7 +610,10 @@ const Main = ({
 							displayErrors={
 								fieldError && fieldError === option.value
 							}
+<<<<<<< HEAD
 							editingLanguageId={editingLanguageId}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							errorMessage={Liferay.Language.get(
 								'this-reference-is-already-being-used'
 							)}

@@ -356,6 +356,7 @@ const Select = ({
 	const [expand, setExpand] = useState(false);
 
 	useEffect(() => {
+<<<<<<< HEAD
 		const newValue = currentValue?.filter((item) => {
 			return options.some(({value}) => value === item);
 		});
@@ -368,6 +369,8 @@ const Select = ({
 	}, [currentValue, onDropdownItemClicked, options, setCurrentValue]);
 
 	useEffect(() => {
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		const getDocumentHeight = () => {
 			const heights = [
 				document.body.clientHeight,

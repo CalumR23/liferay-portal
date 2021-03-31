@@ -42,11 +42,30 @@ public class JSONDDMStorageAdapter implements DDMStorageAdapter {
 			DDMStorageAdapterDeleteRequest ddmStorageAdapterDeleteRequest)
 		throws StorageException {
 
+<<<<<<< HEAD
 		if (_log.isWarnEnabled()) {
 			_log.warn(
 				"JSON dynamic data mapping storage adapter is deprecated, " +
 					"using default dynamic data mapping storage storage " +
 						"adapter");
+=======
+		try {
+			DDMContent ddmContent = ddmContentLocalService.fetchDDMContent(
+				ddmStorageAdapterDeleteRequest.getPrimaryKey());
+
+			if (ddmContent != null) {
+				ddmContentLocalService.deleteDDMContent(
+					ddmContent.getPrimaryKey());
+			}
+
+			DDMStorageAdapterDeleteResponse.Builder builder =
+				DDMStorageAdapterDeleteResponse.Builder.newBuilder();
+
+			return builder.build();
+		}
+		catch (Exception exception) {
+			throw new StorageException(exception);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		return _ddmStorageAdapter.delete(ddmStorageAdapterDeleteRequest);

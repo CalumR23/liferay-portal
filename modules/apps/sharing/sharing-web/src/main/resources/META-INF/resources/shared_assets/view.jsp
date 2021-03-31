@@ -36,6 +36,7 @@ PortletURL selectAssetTypeURL = viewSharedAssetsDisplayContext.getSelectAssetTyp
 %>
 
 <clay:management-toolbar
+<<<<<<< HEAD
 	additionalProps='<%=
 		HashMapBuilder.<String, Object>put(
 			"selectAssetTypeURL", selectAssetTypeURL.toString()
@@ -45,6 +46,10 @@ PortletURL selectAssetTypeURL = viewSharedAssetsDisplayContext.getSelectAssetTyp
 	%>'
 	filterDropdownItems="<%= viewSharedAssetsDisplayContext.getFilterDropdownItems() %>"
 	propsTransformer="shared_assets/js/SharedAssetsManagementToolbarPropsTransformer"
+=======
+	defaultEventHandler='<%= liferayPortletResponse.getNamespace() + "SharedAssets" %>'
+	filterDropdownItems="<%= viewSharedAssetsDisplayContext.getFilterDropdownItems() %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	selectable="<%= false %>"
 	showSearch="<%= false %>"
 	sortingOrder="<%= viewSharedAssetsDisplayContext.getSortingOrder() %>"
@@ -81,7 +86,11 @@ viewSharedAssetsDisplayContext.populateResults(sharingEntriesSearchContainer);
 			</liferay-portlet:renderURL>
 
 			<liferay-ui:search-container-column-text
+<<<<<<< HEAD
 				cssClass="table-cell-expand"
+=======
+				cssClass="table-cell-content"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				href="<%= viewSharedAssetsDisplayContext.isVisible(sharingEntry) ? rowURL : null %>"
 				name="title"
 				orderable="<%= false %>"
@@ -125,6 +134,17 @@ viewSharedAssetsDisplayContext.populateResults(sharingEntriesSearchContainer);
 	</liferay-ui:search-container>
 </clay:container-fluid>
 
+<<<<<<< HEAD
+=======
+<%
+PortletURL viewAssetTypeURL = PortletURLUtil.clone(currentURLObj, liferayPortletResponse);
+
+viewAssetTypeURL.setParameter("className", (String)null);
+
+PortletURL selectAssetTypeURL = viewSharedAssetsDisplayContext.getSelectAssetTypeURL();
+%>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 <liferay-frontend:component
 	module="shared_assets/js/SharedAssets"
 />

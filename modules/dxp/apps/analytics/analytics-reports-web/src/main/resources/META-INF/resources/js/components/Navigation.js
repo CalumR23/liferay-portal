@@ -15,7 +15,11 @@ import React, {useCallback, useContext, useState} from 'react';
 
 import {useChartState} from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
+<<<<<<< HEAD
 import {StoreStateContext} from '../context/StoreContext';
+=======
+import {StoreContext} from '../context/StoreContext';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import APIService from '../utils/APIService';
 import Detail from './Detail';
 import Main from './Main';
@@ -25,7 +29,15 @@ const noop = () => {};
 export default function Navigation({
 	author,
 	canonicalURL,
+<<<<<<< HEAD
 	onSelectedLanguageClick = noop,
+=======
+	endpoints,
+	languageTag,
+	namespace,
+	onSelectedLanguageClick = noop,
+	page,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	pagePublishDate,
 	pageTitle,
 	timeSpanOptions,
@@ -45,7 +57,11 @@ export default function Navigation({
 
 	const chartState = useChartState();
 
+<<<<<<< HEAD
 	const {timeSpanKey, timeSpanOffset} = chartState;
+=======
+	const {getHistoricalReads, getHistoricalViews, getTrafficSources} = api;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const handleCurrentPage = useCallback((currentPage) => {
 		setCurrentPage({view: currentPage.view});
@@ -91,6 +107,7 @@ export default function Navigation({
 		).then(({analyticsReportsTotalViews}) => analyticsReportsTotalViews);
 	}, [endpoints.analyticsReportsTotalViewsURL, namespace, page.plid]);
 
+<<<<<<< HEAD
 	const handleTrafficSources = useCallback(() => {
 		return APIService.getTrafficSources(
 			endpoints.analyticsReportsTrafficSourcesURL,
@@ -98,6 +115,8 @@ export default function Navigation({
 		).then(({trafficSources}) => trafficSources);
 	}, [endpoints.analyticsReportsTrafficSourcesURL, namespace, page.plid]);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const handleTrafficSourceClick = (trafficSources, trafficSourceName) => {
 		setTrafficSources(trafficSources);
 		setTrafficSourceName(trafficSourceName);
@@ -177,7 +196,7 @@ export default function Navigation({
 							handleTotalReads
 						}
 						totalViewsDataProvider={handleTotalViews}
-						trafficSourcesDataProvider={handleTrafficSources}
+						trafficSourcesDataProvider={getTrafficSources}
 						viewURLs={viewURLs}
 					/>
 				</div>
@@ -186,6 +205,10 @@ export default function Navigation({
 			{currentPage.view !== 'main' && (
 				<Detail
 					currentPage={currentPage}
+<<<<<<< HEAD
+=======
+					languageTag={languageTag}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					onCurrentPageChange={handleCurrentPage}
 					onTrafficSourceNameChange={handleTrafficSourceName}
 					timeSpanOptions={timeSpanOptions}

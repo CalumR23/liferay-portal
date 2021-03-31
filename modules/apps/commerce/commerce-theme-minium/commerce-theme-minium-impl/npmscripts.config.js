@@ -11,9 +11,23 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+<<<<<<< HEAD
 
 module.exports = {
 	build: {
 		dependencies: ['commerce-frontend-taglib'],
 	},
+=======
+
+const preset = require('@liferay/npm-scripts/src/presets/standard');
+
+module.exports = {
+	build: {
+		dependencies: [
+			...preset.build.dependencies,
+			'commerce-frontend-taglib',
+		],
+	},
+	preset: '@liferay/npm-scripts/src/presets/standard',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };

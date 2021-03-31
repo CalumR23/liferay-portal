@@ -23,6 +23,11 @@ import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
@@ -228,7 +233,15 @@ public class AnalyticsReportsProductNavigationControlMenuEntryTest {
 		themeDisplay.setCompany(
 			_companyLocalService.getCompany(TestPropsValues.getCompanyId()));
 		themeDisplay.setLayout(_layout);
+<<<<<<< HEAD
 		themeDisplay.setUser(TestPropsValues.getUser());
+=======
+
+		themeDisplay.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		themeDisplay.setUser(user);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return themeDisplay;
 	}

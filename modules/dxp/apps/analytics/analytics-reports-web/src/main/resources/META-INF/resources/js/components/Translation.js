@@ -19,11 +19,20 @@ import PropTypes from 'prop-types';
 import React, {useContext, useMemo, useState} from 'react';
 
 import {useChartState} from '../context/ChartStateContext';
+<<<<<<< HEAD
 import {StoreStateContext} from '../context/StoreContext';
 
 export default function Translation({onSelectedLanguageClick, viewURLs}) {
 	const {languageTag: defaultLanguage} = useContext(StoreStateContext);
 
+=======
+
+export default function Translation({
+	defaultLanguage,
+	onSelectedLanguageClick,
+	viewURLs,
+}) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [active, setActive] = useState(false);
 
 	const selectedLanguage = useMemo(() => {
@@ -33,7 +42,11 @@ export default function Translation({onSelectedLanguageClick, viewURLs}) {
 		);
 	}, [defaultLanguage, viewURLs]);
 
+<<<<<<< HEAD
 	const chartState = useChartState();
+=======
+	const {state: chartState} = useChartState();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	return (
 		<ClayLayout.ContentRow>

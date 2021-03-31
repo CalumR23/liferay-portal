@@ -22,6 +22,10 @@ import com.liferay.change.tracking.service.CTCollectionLocalService;
 import com.liferay.change.tracking.service.CTEntryLocalService;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.change.tracking.web.internal.constants.CTPortletKeys;
+<<<<<<< HEAD
+=======
+import com.liferay.change.tracking.web.internal.util.PublicationsPortletURLUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.petra.reflect.ReflectionUtil;
@@ -57,7 +61,10 @@ import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
+<<<<<<< HEAD
 import javax.portlet.ResourceURL;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -189,6 +196,7 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 			CTPreferences ctPreferences, ThemeDisplay themeDisplay)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL checkoutURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, themeDisplay.getScopeGroup(),
@@ -202,6 +210,27 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 		PortalPreferences portalPreferences =
 			PortletPreferencesFactoryUtil.getPortalPreferences(
 				httpServletRequest);
+=======
+		PortletURL checkoutURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, themeDisplay.getScopeGroup(),
+			CTPortletKeys.PUBLICATIONS, 0, 0, PortletRequest.ACTION_PHASE);
+
+		checkoutURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/change_tracking/checkout_ct_collection");
+		checkoutURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+
+		PortletURL selectURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, themeDisplay.getScopeGroup(),
+			CTPortletKeys.PUBLICATIONS, 0, 0, PortletRequest.RENDER_PHASE);
+
+		selectURL.setParameter(
+			"mvcPath", "/publications/select_publication.jsp");
+
+		PublicationsPortletURLUtil.setWindowState(
+			selectURL, LiferayWindowState.POP_UP);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		Map<String, Object> data = HashMapBuilder.<String, Object>put(
 			"getSelectPublicationsURL",
@@ -218,9 +247,13 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 				return getSelectPublicationsURL.toString();
 			}
 		).put(
+<<<<<<< HEAD
 			"orderByAscending",
 			portalPreferences.getValue(
 				CTPortletKeys.PUBLICATIONS, "select-order-by-ascending")
+=======
+			"namespace", _portal.getPortletNamespace(CTPortletKeys.PUBLICATIONS)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		).put(
 			"orderByColumn",
 			portalPreferences.getValue(
@@ -312,6 +345,7 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 			}
 		}
 
+<<<<<<< HEAD
 		PortletURL addURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, themeDisplay.getScopeGroup(),
@@ -319,6 +353,27 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 		).setMVCRenderCommandName(
 			"/change_tracking/add_ct_collection"
 		).build();
+=======
+		jsonArray.put(
+			JSONUtil.put(
+				"href",
+				StringBundler.concat(
+					"javascript:Liferay.fire('",
+					_portal.getPortletNamespace(CTPortletKeys.PUBLICATIONS),
+					"openDialog', {}); void(0);")
+			).put(
+				"label", _language.get(resourceBundle, "select-a-publication")
+			).put(
+				"symbolLeft", "cards2"
+			));
+
+		PortletURL addURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, themeDisplay.getScopeGroup(),
+			CTPortletKeys.PUBLICATIONS, 0, 0, PortletRequest.RENDER_PHASE);
+
+		addURL.setParameter(
+			"mvcRenderCommandName", "/change_tracking/add_ct_collection");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		PortletURL redirectURL = _portal.getControlPanelPortletURL(
 			httpServletRequest, themeDisplay.getScopeGroup(),
@@ -337,8 +392,23 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 			));
 
 		if (ctCollection != null) {
+<<<<<<< HEAD
 			data.put(
 				"reviewDropdownItem",
+=======
+			PortletURL reviewURL = _portal.getControlPanelPortletURL(
+				httpServletRequest, themeDisplay.getScopeGroup(),
+				CTPortletKeys.PUBLICATIONS, 0, 0, PortletRequest.RENDER_PHASE);
+
+			reviewURL.setParameter(
+				"mvcRenderCommandName", "/change_tracking/view_changes");
+			reviewURL.setParameter(
+				"ctCollectionId", String.valueOf(ctCollectionId));
+
+			jsonArray.put(
+				JSONUtil.put("type", "divider")
+			).put(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				JSONUtil.put(
 					"href",
 					PortletURLBuilder.create(
@@ -365,6 +435,7 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 					themeDisplay.getPermissionChecker(), ctCollection,
 					CTActionKeys.PUBLISH)) {
 
+<<<<<<< HEAD
 				PortletURL publishURL = PortletURLBuilder.create(
 					_portal.getControlPanelPortletURL(
 						httpServletRequest, themeDisplay.getScopeGroup(),
@@ -378,6 +449,22 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 
 				data.put(
 					"publishDropdownItem",
+=======
+				jsonArray.put(JSONUtil.put("type", "divider"));
+
+				PortletURL publishURL = _portal.getControlPanelPortletURL(
+					httpServletRequest, themeDisplay.getScopeGroup(),
+					CTPortletKeys.PUBLICATIONS, 0, 0,
+					PortletRequest.RENDER_PHASE);
+
+				publishURL.setParameter(
+					"mvcRenderCommandName", "/change_tracking/view_conflicts");
+				publishURL.setParameter(
+					"ctCollectionId",
+					String.valueOf(ctCollection.getCtCollectionId()));
+
+				jsonArray.put(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					JSONUtil.put(
 						"href", publishURL.toString()
 					).put(
@@ -390,8 +477,12 @@ public class ChangeTrackingIndicatorDynamicInclude extends BaseDynamicInclude {
 					publishURL.setParameter(
 						"schedule", Boolean.TRUE.toString());
 
+<<<<<<< HEAD
 					data.put(
 						"scheduleDropdownItem",
+=======
+					jsonArray.put(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						JSONUtil.put(
 							"href", publishURL.toString()
 						).put(

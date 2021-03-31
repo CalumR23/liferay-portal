@@ -218,11 +218,23 @@ public class EditCommerceAccountUserMVCActionCommand
 						"mvcRenderCommandName",
 						"/commerce_account/view_commerce_account");
 
+<<<<<<< HEAD
 					backPortletURL.setParameter(
 						"screenNavigationCategoryKey",
 						CommerceAccountScreenNavigationConstants.
 							ENTRY_KEY_ACCOUNT_MEMBERS);
 				}
+=======
+			backPortletURL.setParameter(
+				"mvcRenderCommandName",
+				"/commerce_account/view_commerce_account");
+
+			backPortletURL.setParameter(
+				"screenNavigationCategoryKey",
+				CommerceAccountScreenNavigationConstants.
+					ENTRY_KEY_ACCOUNT_MEMBERS);
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				return backPortletURL.toString();
 			}

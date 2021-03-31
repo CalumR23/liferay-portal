@@ -19,6 +19,11 @@ import com.liferay.commerce.currency.service.CommerceCurrencyLocalService;
 import com.liferay.commerce.inventory.service.CommerceInventoryWarehouseService;
 import com.liferay.commerce.product.service.CPMeasurementUnitLocalService;
 import com.liferay.commerce.product.service.CommerceChannelLocalService;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.service.CommerceCountryService;
+import com.liferay.commerce.service.CommerceRegionService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.service.CommerceShippingMethodService;
 import com.liferay.commerce.shipping.engine.fixed.exception.NoSuchShippingFixedOptionRelException;
 import com.liferay.commerce.shipping.engine.fixed.service.CommerceShippingFixedOptionRelService;
@@ -70,8 +75,15 @@ public class EditCommerceShippingFixedOptionRelMVCRenderCommand
 			CommerceShippingFixedOptionRelsDisplayContext
 				commerceShippingFixedOptionRelsDisplayContext =
 					new CommerceShippingFixedOptionRelsDisplayContext(
+<<<<<<< HEAD
 						_commerceChannelLocalService,
 						_commerceCurrencyLocalService,
+=======
+						_commerceChannelLocalService, _commerceCountryService,
+						_commerceCurrencyLocalService, _commerceRegionService,
+						_commerceShippingMethodService,
+						_commerceShippingFixedOptionService,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						_commerceInventoryWarehouseService,
 						_commerceShippingFixedOptionRelService,
 						_commerceShippingFixedOptionService,
@@ -106,6 +118,12 @@ public class EditCommerceShippingFixedOptionRelMVCRenderCommand
 
 	@Reference
 	private CommerceChannelLocalService _commerceChannelLocalService;
+<<<<<<< HEAD
+=======
+
+	@Reference
+	private CommerceCountryService _commerceCountryService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private CommerceCurrencyLocalService _commerceCurrencyLocalService;

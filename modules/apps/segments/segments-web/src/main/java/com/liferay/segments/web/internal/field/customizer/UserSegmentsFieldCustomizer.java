@@ -16,7 +16,10 @@ package com.liferay.segments.web.internal.field.customizer;
 
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.item.selector.criteria.UUIDItemSelectorReturnType;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.ClassedModel;
@@ -94,6 +97,16 @@ public class UserSegmentsFieldCustomizer extends BaseSegmentsFieldCustomizer {
 
 			userItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
 				Collections.singletonList(new UUIDItemSelectorReturnType()));
+<<<<<<< HEAD
+=======
+
+			PortletURL portletURL = _itemSelector.getItemSelectorURL(
+				RequestBackedPortletURLFactoryUtil.create(portletRequest),
+				"selectEntity", userItemSelectorCriterion);
+
+			portletURL.setParameter(
+				"checkedUserIdsEnabled", String.valueOf(Boolean.TRUE));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			return new Field.SelectEntity(
 				"selectEntity",

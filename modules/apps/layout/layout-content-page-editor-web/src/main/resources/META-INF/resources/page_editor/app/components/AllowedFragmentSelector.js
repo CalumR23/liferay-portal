@@ -146,7 +146,11 @@ const AllowedFragmentSelector = ({dropZoneConfig, onSelectedFragment}) => {
 				<div className="mb-2 page-editor__allowed-fragment__tree">
 					<Treeview
 						NodeComponent={AllowedFragmentTreeNode}
+<<<<<<< HEAD
 						filter={filter}
+=======
+						filterQuery={filter}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						inheritSelection
 						initialSelectedNodeIds={[...fragmentEntryKeys]}
 						nodes={nodes}

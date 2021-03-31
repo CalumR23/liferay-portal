@@ -35,7 +35,11 @@ int oAuth2AuthorizationsCount = oAuth2AdminPortletDisplayContext.getOAuth2Author
 >
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasUpdatePermission(oAuth2Application) %>">
 		<portlet:renderURL var="editURL">
+<<<<<<< HEAD
 			<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/update_oauth2_application" />
+=======
+			<portlet:param name="mvcRenderCommandName" value="/oauth2_provider/update_o_auth2_application" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<portlet:param name="oAuth2ApplicationId" value="<%= oAuth2ApplicationId %>" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
 		</portlet:renderURL>
@@ -84,7 +88,11 @@ int oAuth2AuthorizationsCount = oAuth2AdminPortletDisplayContext.getOAuth2Author
 	</c:if>
 
 	<c:if test="<%= oAuth2AdminPortletDisplayContext.hasDeletePermission(oAuth2Application) %>">
+<<<<<<< HEAD
 		<portlet:actionURL name="/oauth2_provider/delete_oauth2_applications" var="deleteURL">
+=======
+		<portlet:actionURL name="/oauth2_provider/delete_o_auth2_applications" var="deleteURL">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<portlet:param name="oAuth2ApplicationIds" value="<%= oAuth2ApplicationId %>" />
 		</portlet:actionURL>
 

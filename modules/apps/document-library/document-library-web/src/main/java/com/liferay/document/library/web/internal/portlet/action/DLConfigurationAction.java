@@ -17,6 +17,10 @@ package com.liferay.document.library.web.internal.portlet.action;
 import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.web.internal.display.context.DLAdminDisplayContext;
 import com.liferay.document.library.web.internal.display.context.DLAdminDisplayContextProvider;
+<<<<<<< HEAD
+=======
+import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.servlet.SessionErrors;
@@ -58,6 +62,12 @@ public class DLConfigurationAction
 			DLAdminDisplayContext.class.getName(),
 			_dlAdminDisplayContextProvider.getDLAdminDisplayContext(
 				httpServletRequest, httpServletResponse));
+<<<<<<< HEAD
+=======
+		httpServletRequest.setAttribute(
+			DLRequestHelper.class.getName(),
+			new DLRequestHelper(httpServletRequest));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}

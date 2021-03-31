@@ -95,7 +95,10 @@ public class EditInGoogleDocsMVCActionCommand extends BaseMVCActionCommand {
 
 		String title = _uniqueFileEntryTitleProvider.provide(
 			serviceContext.getScopeGroupId(), folderId,
+<<<<<<< HEAD
 			DLOpenerMimeTypes.getMimeTypeExtension(contentType),
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			serviceContext.getLocale());
 
 		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);

@@ -237,8 +237,15 @@ public class EditCommerceShipmentMVCActionCommand extends BaseMVCActionCommand {
 			String street3 = ParamUtil.getString(actionRequest, "street3");
 			String city = ParamUtil.getString(actionRequest, "city");
 			String zip = ParamUtil.getString(actionRequest, "zip");
+<<<<<<< HEAD
 			long regionId = ParamUtil.getLong(actionRequest, "regionId");
 			long countryId = ParamUtil.getLong(actionRequest, "countryId");
+=======
+			long commerceRegionId = ParamUtil.getLong(
+				actionRequest, "commerceRegionId");
+			long commerceCountryId = ParamUtil.getLong(
+				actionRequest, "commerceCountryId");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			String phoneNumber = ParamUtil.getString(
 				actionRequest, "phoneNumber");
 			String carrier = ParamUtil.getString(actionRequest, "carrier");

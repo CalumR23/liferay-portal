@@ -137,6 +137,7 @@ public class EditCommerceOrganizationMVCActionCommand
 			ActionRequest actionRequest, Organization organization)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				actionRequest, Organization.class.getName(),
@@ -146,6 +147,18 @@ public class EditCommerceOrganizationMVCActionCommand
 		).setParameter(
 			"organizationId", organization.getOrganizationId()
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			actionRequest, Organization.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_organization/edit_commerce_organization");
+
+		portletURL.setParameter(
+			"organizationId", String.valueOf(organization.getOrganizationId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
 

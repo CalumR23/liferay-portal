@@ -768,6 +768,23 @@ public class DDMIndexerImpl implements DDMIndexer {
 		document.addKeyword(_getSortableFieldName(name), sortableValueString);
 	}
 
+	private void _createSortableTextField(
+		Document document, String name, String sortableValueString) {
+
+		if (Validator.isNull(sortableValueString)) {
+			return;
+		}
+
+		if (sortableValueString.length() >
+				_SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH) {
+
+			sortableValueString = sortableValueString.substring(
+				0, _SORTABLE_TEXT_FIELDS_TRUNCATED_LENGTH);
+		}
+
+		document.addKeyword(_getSortableFieldName(name), sortableValueString);
+	}
+
 	private String _getSortableFieldName(String name) {
 		return com.liferay.portal.kernel.search.Field.getSortableFieldName(
 			name + "_String");

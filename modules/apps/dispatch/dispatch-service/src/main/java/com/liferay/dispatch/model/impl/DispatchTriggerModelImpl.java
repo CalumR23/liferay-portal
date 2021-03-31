@@ -144,19 +144,31 @@ public class DispatchTriggerModelImpl
 	public static final long DISPATCHTASKCLUSTERMODE_COLUMN_BITMASK = 4L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long DISPATCHTASKEXECUTORTYPE_COLUMN_BITMASK = 8L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long NAME_COLUMN_BITMASK = 16L;
 
 	/**
+<<<<<<< HEAD
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+=======
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Deprecated
 	public static final long USERID_COLUMN_BITMASK = 32L;
@@ -819,6 +831,7 @@ public class DispatchTriggerModelImpl
 		}
 
 		_startDate = startDate;
+<<<<<<< HEAD
 	}
 
 	@JSON
@@ -831,9 +844,26 @@ public class DispatchTriggerModelImpl
 	@Override
 	public boolean isSystem() {
 		return _system;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+	}
+
+	@JSON
+	@Override
+<<<<<<< HEAD
+=======
+	public boolean getSystem() {
+		return _system;
+	}
+
+	@JSON
+	@Override
+	public boolean isSystem() {
+		return _system;
 	}
 
 	@Override
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void setSystem(boolean system) {
 		if (_columnOriginalValues == Collections.EMPTY_MAP) {
 			_setColumnOriginalValues();

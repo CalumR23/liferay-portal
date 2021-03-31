@@ -97,6 +97,7 @@ public class SegmentsExperienceServiceHttp {
 	}
 
 	public static com.liferay.segments.model.SegmentsExperience
+<<<<<<< HEAD
 			addSegmentsExperience(
 				HttpPrincipal httpPrincipal, long segmentsEntryId,
 				long classNameId, long classPK,
@@ -144,6 +145,8 @@ public class SegmentsExperienceServiceHttp {
 	}
 
 	public static com.liferay.segments.model.SegmentsExperience
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			appendSegmentsExperience(
 				HttpPrincipal httpPrincipal, long segmentsEntryId,
 				long classNameId, long classPK,
@@ -154,7 +157,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "appendSegmentsExperience",
+<<<<<<< HEAD
 				_appendSegmentsExperienceParameterTypes2);
+=======
+				_appendSegmentsExperienceParameterTypes1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, segmentsEntryId, classNameId, classPK, nameMap,
@@ -189,6 +196,7 @@ public class SegmentsExperienceServiceHttp {
 	}
 
 	public static com.liferay.segments.model.SegmentsExperience
+<<<<<<< HEAD
 			appendSegmentsExperience(
 				HttpPrincipal httpPrincipal, long segmentsEntryId,
 				long classNameId, long classPK,
@@ -236,6 +244,8 @@ public class SegmentsExperienceServiceHttp {
 	}
 
 	public static com.liferay.segments.model.SegmentsExperience
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			deleteSegmentsExperience(
 				HttpPrincipal httpPrincipal, long segmentsExperienceId)
 		throws com.liferay.portal.kernel.exception.PortalException {
@@ -243,7 +253,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "deleteSegmentsExperience",
+<<<<<<< HEAD
 				_deleteSegmentsExperienceParameterTypes4);
+=======
+				_deleteSegmentsExperienceParameterTypes2);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, segmentsExperienceId);
@@ -285,7 +299,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "fetchSegmentsExperience",
+<<<<<<< HEAD
 				_fetchSegmentsExperienceParameterTypes5);
+=======
+				_fetchSegmentsExperienceParameterTypes3);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, segmentsExperienceKey);
@@ -326,7 +344,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "getSegmentsExperience",
+<<<<<<< HEAD
 				_getSegmentsExperienceParameterTypes6);
+=======
+				_getSegmentsExperienceParameterTypes4);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, segmentsExperienceId);
@@ -368,7 +390,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "getSegmentsExperiences",
+<<<<<<< HEAD
 				_getSegmentsExperiencesParameterTypes7);
+=======
+				_getSegmentsExperiencesParameterTypes5);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, classNameId, classPK, active);
@@ -414,7 +440,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "getSegmentsExperiences",
+<<<<<<< HEAD
 				_getSegmentsExperiencesParameterTypes8);
+=======
+				_getSegmentsExperiencesParameterTypes6);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, classNameId, classPK, active, start, end,
@@ -458,7 +488,11 @@ public class SegmentsExperienceServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class,
 				"getSegmentsExperiencesCount",
+<<<<<<< HEAD
 				_getSegmentsExperiencesCountParameterTypes9);
+=======
+				_getSegmentsExperiencesCountParameterTypes7);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, classNameId, classPK, active);
@@ -501,7 +535,11 @@ public class SegmentsExperienceServiceHttp {
 		try {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class, "updateSegmentsExperience",
+<<<<<<< HEAD
 				_updateSegmentsExperienceParameterTypes10);
+=======
+				_updateSegmentsExperienceParameterTypes8);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, segmentsExperienceId, segmentsEntryId, nameMap,
@@ -590,7 +628,11 @@ public class SegmentsExperienceServiceHttp {
 			MethodKey methodKey = new MethodKey(
 				SegmentsExperienceServiceUtil.class,
 				"updateSegmentsExperiencePriority",
+<<<<<<< HEAD
 				_updateSegmentsExperiencePriorityParameterTypes12);
+=======
+				_updateSegmentsExperiencePriorityParameterTypes9);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, segmentsExperienceId, newPriority);
@@ -628,6 +670,7 @@ public class SegmentsExperienceServiceHttp {
 			boolean.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
+<<<<<<< HEAD
 	private static final Class<?>[] _addSegmentsExperienceParameterTypes1 =
 		new Class[] {
 			long.class, long.class, long.class, java.util.Map.class,
@@ -657,15 +700,39 @@ public class SegmentsExperienceServiceHttp {
 	private static final Class<?>[] _getSegmentsExperiencesParameterTypes7 =
 		new Class[] {long.class, long.class, long.class, boolean.class};
 	private static final Class<?>[] _getSegmentsExperiencesParameterTypes8 =
+=======
+	private static final Class<?>[] _appendSegmentsExperienceParameterTypes1 =
+		new Class[] {
+			long.class, long.class, long.class, java.util.Map.class,
+			boolean.class,
+			com.liferay.portal.kernel.service.ServiceContext.class
+		};
+	private static final Class<?>[] _deleteSegmentsExperienceParameterTypes2 =
+		new Class[] {long.class};
+	private static final Class<?>[] _fetchSegmentsExperienceParameterTypes3 =
+		new Class[] {long.class, String.class};
+	private static final Class<?>[] _getSegmentsExperienceParameterTypes4 =
+		new Class[] {long.class};
+	private static final Class<?>[] _getSegmentsExperiencesParameterTypes5 =
+		new Class[] {long.class, long.class, long.class, boolean.class};
+	private static final Class<?>[] _getSegmentsExperiencesParameterTypes6 =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		new Class[] {
 			long.class, long.class, long.class, boolean.class, int.class,
 			int.class, com.liferay.portal.kernel.util.OrderByComparator.class
 		};
 	private static final Class<?>[]
+<<<<<<< HEAD
 		_getSegmentsExperiencesCountParameterTypes9 = new Class[] {
 			long.class, long.class, long.class, boolean.class
 		};
 	private static final Class<?>[] _updateSegmentsExperienceParameterTypes10 =
+=======
+		_getSegmentsExperiencesCountParameterTypes7 = new Class[] {
+			long.class, long.class, long.class, boolean.class
+		};
+	private static final Class<?>[] _updateSegmentsExperienceParameterTypes8 =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		new Class[] {
 			long.class, long.class, java.util.Map.class, boolean.class
 		};
@@ -675,7 +742,11 @@ public class SegmentsExperienceServiceHttp {
 			com.liferay.portal.kernel.util.UnicodeProperties.class
 		};
 	private static final Class<?>[]
+<<<<<<< HEAD
 		_updateSegmentsExperiencePriorityParameterTypes12 = new Class[] {
+=======
+		_updateSegmentsExperiencePriorityParameterTypes9 = new Class[] {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			long.class, int.class
 		};
 

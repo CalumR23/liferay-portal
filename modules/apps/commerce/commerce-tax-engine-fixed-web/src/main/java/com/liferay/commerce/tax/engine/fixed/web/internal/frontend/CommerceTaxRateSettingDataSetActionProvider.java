@@ -108,6 +108,7 @@ public class CommerceTaxRateSettingDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CommercePortletKeys.COMMERCE_TAX_METHODS,
@@ -121,12 +122,25 @@ public class CommerceTaxRateSettingDataSetActionProvider
 		).setParameter(
 			"commerceTaxFixedRateAddressRelId", taxRateSettingId
 		).buildString();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_tax_methods/edit_commerce_tax_fixed_rate_address_rel");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceTaxFixedRateAddressRelId",
+			String.valueOf(taxRateSettingId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getTaxRateSettingEditURL(
 			HttpServletRequest httpServletRequest, long taxRateSettingId)
 		throws Exception {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceTaxMethod.class.getName(),
@@ -134,6 +148,15 @@ public class CommerceTaxRateSettingDataSetActionProvider
 		).setMVCRenderCommandName(
 			"/commerce_tax_methods/edit_commerce_tax_fixed_rate_address_rel"
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceTaxMethod.class.getName(),
+			PortletProvider.Action.EDIT);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_tax_methods/edit_commerce_tax_fixed_rate_address_rel");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		long commerceTaxMethodId = ParamUtil.getLong(
 			httpServletRequest, "commerceTaxMethodId");

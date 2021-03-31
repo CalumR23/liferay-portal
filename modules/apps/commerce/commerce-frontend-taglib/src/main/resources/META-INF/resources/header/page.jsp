@@ -49,9 +49,98 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 
 					<c:if test="<%= isWorkflowedModel %>">
 
+<<<<<<< HEAD
 						<%
 						WorkflowedModel workflowedModel = (WorkflowedModel)bean;
 						%>
+=======
+					<div class="col">
+						<div class="row">
+							<div class="col-auto">
+								<h3 class="commerce-header-title mb-0 truncate-text">
+									<%= HtmlUtil.escape(title) %>
+								</h3>
+
+								<c:if test="<%= isWorkflowedModel %>">
+
+									<%
+									WorkflowedModel workflowedModel = (WorkflowedModel)bean;
+									%>
+
+									<c:if test="<%= workflowedModel != null %>">
+										<div>
+											<aui:workflow-status bean="<%= bean %>" model="<%= model %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= workflowedModel.getStatus() %>" />
+										</div>
+									</c:if>
+								</c:if>
+							</div>
+
+							<div class="col d-flex flex-column justify-content-center separator-left">
+								<c:if test="<%= Validator.isNotNull(beanIdLabel) %>">
+									<small class="d-block">
+										<span class="header-info-title">
+											<liferay-ui:message key="<%= beanIdLabel %>" />:
+										</span>
+
+										<strong class="header-info-value">
+											<%= beanId %>
+										</strong>
+
+										<span class="lfr-portal-tooltip ml-1 text-secondary" title="<%= LanguageUtil.get(request, "identification-number") %>">
+											<clay:icon
+												symbol="question-circle"
+											/>
+										</span>
+									</small>
+								</c:if>
+
+								<c:if test="<%= Validator.isNotNull(externalReferenceCode) || Validator.isNotNull(externalReferenceCodeEditUrl) %>">
+									<small class="d-block">
+										<span class="header-info-title">
+											<liferay-ui:message key="erc" />:
+										</span>
+
+										<strong class="header-info-value">
+											<%= externalReferenceCode %>
+										</strong>
+
+										<span class="lfr-portal-tooltip ml-1 text-secondary" title="<%= LanguageUtil.get(request, "external-reference-code") %>">
+											<clay:icon
+												symbol="question-circle"
+											/>
+										</span>
+
+										<c:if test="<%= Validator.isNotNull(externalReferenceCodeEditUrl) %>">
+											<clay:button
+												cssClass="h-auto ml-1 p-0 text-secondary w-auto"
+												displayType="link"
+												icon="pencil"
+												id="erc-edit-modal-opener"
+												small="<%= true %>"
+											/>
+
+											<aui:script require="commerce-frontend-js/utilities/eventsDefinitions as events">
+												document
+													.querySelector('#erc-edit-modal-opener')
+													.addEventListener('click', function (e) {
+														e.preventDefault();
+														Liferay.fire(events.OPEN_MODAL, {id: 'erc-edit-modal'});
+													});
+											</aui:script>
+
+											<commerce-ui:modal
+												id="erc-edit-modal"
+												refreshPageOnClose="<%= true %>"
+												title='<%= LanguageUtil.format(request, "edit-x", "external-reference-code") %>'
+												url="<%= externalReferenceCodeEditUrl %>"
+											/>
+										</c:if>
+									</small>
+								</c:if>
+							</div>
+						</div>
+					</div>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						<c:if test="<%= workflowedModel != null %>">
 							<aui:workflow-status bean="<%= bean %>" model="<%= model %>" showHelpMessage="<%= false %>" showIcon="<%= false %>" showLabel="<%= false %>" status="<%= workflowedModel.getStatus() %>" />
@@ -138,10 +227,15 @@ String myWorkflowTasksPortletNamespace = PortalUtil.getPortletNamespace(PortletK
 
 					String assignee = PortalUtil.getUserName(reviewWorkflowTask.getAssigneeUserId(), "nobody");
 
+<<<<<<< HEAD
 					if (assignedToCurrentUser) {
 						assignee = "me";
 					}
 					%>
+=======
+								String actionId = Validator.isNotNull(action.getId()) ? action.getId() : "header-action_" + PortalUtil.generateRandomKey(request, "taglib_step_tracker");
+							%>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 					<div class="border-right c-mr-1 c-mr-sm-3 c-pr-sm-3 position-relative">
 						<div class="bg-white c-px-1 header-assign-label position-absolute text-secondary">

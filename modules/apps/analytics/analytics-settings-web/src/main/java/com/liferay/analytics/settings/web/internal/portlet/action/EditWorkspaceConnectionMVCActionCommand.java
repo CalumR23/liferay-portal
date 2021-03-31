@@ -227,10 +227,13 @@ public class EditWorkspaceConnectionMVCActionCommand
 			}
 		}
 		catch (Exception exception) {
+<<<<<<< HEAD
 			if (_log.isDebugEnabled()) {
 				_log.debug(exception, exception);
 			}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			SessionErrors.add(actionRequest, "unableToNotifyAnalyticsCloud");
 		}
 

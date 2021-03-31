@@ -128,6 +128,7 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 			sendRedirect(actionRequest, actionResponse, redirect);
 		}
 		catch (Exception exception) {
+<<<<<<< HEAD
 			PortletURL renderURL = PortletURLBuilder.createRenderURL(
 				portal.getLiferayPortletResponse(actionResponse)
 			).setMVCRenderCommandName(
@@ -135,6 +136,18 @@ public class EditRankingMVCActionCommand extends BaseMVCActionCommand {
 			).setRedirect(
 				editRankingMVCActionRequest.getRedirect()
 			).build();
+=======
+			LiferayPortletResponse liferayPortletResponse =
+				portal.getLiferayPortletResponse(actionResponse);
+
+			PortletURL renderURL = liferayPortletResponse.createRenderURL();
+
+			renderURL.setParameter(
+				"mvcRenderCommandName",
+				"/result_rankings/add_results_rankings");
+			renderURL.setParameter(
+				"redirect", editRankingMVCActionRequest.getRedirect());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			actionRequest.setAttribute(WebKeys.REDIRECT, renderURL.toString());
 

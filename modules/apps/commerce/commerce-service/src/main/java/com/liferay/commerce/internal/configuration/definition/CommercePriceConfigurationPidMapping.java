@@ -34,7 +34,11 @@ public class CommercePriceConfigurationPidMapping
 
 	@Override
 	public String getConfigurationPid() {
+<<<<<<< HEAD
 		return CommerceConstants.SERVICE_NAME_PRICE;
+=======
+		return CommerceConstants.PRICE_SERVICE_NAME;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

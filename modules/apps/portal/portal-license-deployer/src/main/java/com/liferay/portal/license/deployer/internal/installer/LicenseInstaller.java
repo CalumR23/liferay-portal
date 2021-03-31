@@ -86,9 +86,12 @@ public class LicenseInstaller implements FileInstaller {
 	public void uninstall(File file) {
 	}
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		LicenseInstaller.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference(target = ModuleServiceLifecycle.LICENSE_INSTALL)
 	private ModuleServiceLifecycle _moduleServiceLifecycle;
 

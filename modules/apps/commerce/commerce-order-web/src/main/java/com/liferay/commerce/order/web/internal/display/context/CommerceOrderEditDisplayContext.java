@@ -192,6 +192,7 @@ public class CommerceOrderEditDisplayContext {
 	}
 
 	public PortletURL getCommerceNotificationQueueEntriesPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -199,6 +200,18 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", getCommerceOrderId()
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_commerceOrderRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_order/edit_commerce_order");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(getCommerceOrderId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceOrderScreenNavigationConstants.
 				CATEGORY_KEY_COMMERCE_ORDER_EMAILS
@@ -267,6 +280,7 @@ public class CommerceOrderEditDisplayContext {
 	}
 
 	public PortletURL getCommerceOrderItemsPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -274,6 +288,18 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", getCommerceOrderId()
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_commerceOrderRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_order/edit_commerce_order");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(getCommerceOrderId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceOrderScreenNavigationConstants.
 				CATEGORY_KEY_COMMERCE_ORDER_GENERAL
@@ -333,6 +359,7 @@ public class CommerceOrderEditDisplayContext {
 	}
 
 	public PortletURL getCommerceOrderPaymentsPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -340,6 +367,18 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", getCommerceOrderId()
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_commerceOrderRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_order/edit_commerce_order");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(getCommerceOrderId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceOrderScreenNavigationConstants.
 				CATEGORY_KEY_COMMERCE_ORDER_PAYMENTS
@@ -381,6 +420,7 @@ public class CommerceOrderEditDisplayContext {
 	}
 
 	public PortletURL getCommerceShipmentsPortletURL() {
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -388,6 +428,18 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", getCommerceOrderId()
 		).setParameter(
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_commerceOrderRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/commerce_order/edit_commerce_order");
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(getCommerceOrderId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"screenNavigationCategoryKey",
 			CommerceOrderScreenNavigationConstants.
 				CATEGORY_KEY_COMMERCE_ORDER_SHIPMENTS
@@ -595,6 +647,7 @@ public class CommerceOrderEditDisplayContext {
 	}
 
 	public PortletURL getTransitionOrderPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			_commerceOrderRequestHelper.getLiferayPortletResponse()
 		).setActionName(
@@ -606,6 +659,23 @@ public class CommerceOrderEditDisplayContext {
 		).setParameter(
 			"commerceOrderId", _commerceOrder.getCommerceOrderId()
 		).build();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			_commerceOrderRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/commerce_order/edit_commerce_order");
+		portletURL.setParameter(Constants.CMD, "transition");
+		portletURL.setParameter(
+			"commerceOrderId",
+			String.valueOf(_commerceOrder.getCommerceOrderId()));
+		portletURL.setParameter(
+			"redirect", _commerceOrderRequestHelper.getCurrentURL());
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private List<StepModel> _getWorkflowSteps() {

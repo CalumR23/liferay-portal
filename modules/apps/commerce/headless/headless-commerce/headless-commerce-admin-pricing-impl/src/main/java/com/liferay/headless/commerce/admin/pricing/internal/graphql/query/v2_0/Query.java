@@ -366,8 +366,13 @@ public class Query {
 	 */
 	@GraphQLField
 	public AccountGroup priceListAccountGroupAccountGroup(
+<<<<<<< HEAD
 			@GraphQLName("priceListAccountGroupId")
 				Long priceListAccountGroupId)
+=======
+			@GraphQLName("priceListAccountGroupId") Long
+				priceListAccountGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -402,8 +407,13 @@ public class Query {
 	 */
 	@GraphQLField
 	public Category priceModifierCategoryCategory(
+<<<<<<< HEAD
 			@GraphQLName("priceModifierCategoryId")
 				Long priceModifierCategoryId)
+=======
+			@GraphQLName("priceModifierCategoryId") Long
+				priceModifierCategoryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1509,8 +1519,13 @@ public class Query {
 	 */
 	@GraphQLField
 	public ProductGroup priceModifierProductGroupProductGroup(
+<<<<<<< HEAD
 			@GraphQLName("priceModifierProductGroupId")
 				Long priceModifierProductGroupId)
+=======
+			@GraphQLName("priceModifierProductGroupId") Long
+				priceModifierProductGroupId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return _applyComponentServiceObjects(
@@ -1609,6 +1624,7 @@ public class Query {
 
 	@GraphQLTypeExtension(PriceEntry.class)
 	public class GetPriceEntryIdProductTypeExtension {
+<<<<<<< HEAD
 
 		public GetPriceEntryIdProductTypeExtension(PriceEntry priceEntry) {
 			_priceEntry = priceEntry;
@@ -1633,10 +1649,15 @@ public class Query {
 		public GetPriceEntryIdTierPricesPageTypeExtension(
 			PriceEntry priceEntry) {
 
+=======
+
+		public GetPriceEntryIdProductTypeExtension(PriceEntry priceEntry) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			_priceEntry = priceEntry;
 		}
 
 		@GraphQLField
+<<<<<<< HEAD
 		public TierPricePage idTierPrices(
 				@GraphQLName("pageSize") int pageSize,
 				@GraphQLName("page") int page)
@@ -1649,6 +1670,14 @@ public class Query {
 					tierPriceResource.getPriceEntryIdTierPricesPage(
 						_priceEntry.getPriceEntryId(),
 						Pagination.of(page, pageSize))));
+=======
+		public Product idProduct() throws Exception {
+			return _applyComponentServiceObjects(
+				_productResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				productResource -> productResource.getPriceEntryIdProduct(
+					_priceEntry.getPriceEntryId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		private PriceEntry _priceEntry;

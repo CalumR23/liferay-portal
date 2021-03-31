@@ -35,7 +35,19 @@ import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.util.JournalConverter;
 import com.liferay.petra.string.StringBundler;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.model.Group;
+=======
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -45,6 +57,7 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.UnsecureSAXReaderUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -94,9 +107,42 @@ public class JournalConverterUtilTest {
 		DDMForm ddmForm = deserialize(definition);
 
 		_ddmStructure = _ddmStructureTestHelper.addStructure(
+<<<<<<< HEAD
 			PortalUtil.getClassNameId(JournalArticle.class), null,
 			"Test Structure", ddmForm, StorageType.DEFAULT.getValue(),
 			DDMStructureConstants.TYPE_DEFAULT);
+=======
+			_classNameId, null, "Test Structure", ddmForm,
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+
+		Registry registry = RegistryUtil.getRegistry();
+
+		_ddmXML = registry.getService(
+			registry.getServiceReference(DDMXML.class));
+		_journalConverter = registry.getService(
+			registry.getServiceReference(JournalConverter.class));
+	}
+
+	@Test
+	public void testGetContentFromBooleanField() throws Exception {
+		Fields fields = new Fields();
+
+		fields.put(getBooleanField(_ddmStructure.getStructureId()));
+
+		Field fieldsDisplayField = getFieldsDisplayField(
+			_ddmStructure.getStructureId(),
+			"boolean_INSTANCE_Okhyj6Ni,boolean_INSTANCE_1SYNQuhg");
+
+		fields.put(fieldsDisplayField);
+
+		String expectedContent = read(
+			"test-journal-content-boolean-repeatable-field.xml");
+
+		String actualContent = _journalConverter.getContent(
+			_ddmStructure, fields);
+
+		assertEquals(expectedContent, actualContent);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test
@@ -264,6 +310,7 @@ public class JournalConverterUtilTest {
 	}
 
 	@Test
+<<<<<<< HEAD
 	public void testGetFieldsFromContentWithMultiListElement()
 		throws Exception {
 
@@ -296,6 +343,17 @@ public class JournalConverterUtilTest {
 	@Test
 	public void testGetFieldsFromContentWithNestedElements() throws Exception {
 		Fields expectedFields = getNestedFields(_ddmStructure.getStructureId());
+=======
+	public void testGetFieldsFromContentWithListElement() throws Exception {
+		Fields expectedFields = new Fields();
+
+		expectedFields.put(getListField(_ddmStructure.getStructureId()));
+
+		Field fieldsDisplayField = getFieldsDisplayField(
+			_ddmStructure.getStructureId(), "list_INSTANCE_pcm9WPVX");
+
+		expectedFields.put(fieldsDisplayField);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String content = read("test-journal-content-nested-fields.xml");
 
@@ -403,6 +461,58 @@ public class JournalConverterUtilTest {
 		Assert.assertEquals(expectedFields, actualFields);
 	}
 
+<<<<<<< HEAD
+=======
+	@Test
+	public void testGetJournalXSD() throws Exception {
+		String expectedXSD = read("test-journal-structure-all-fields.xml");
+
+		Map<String, Map<String, String>> expectedMap =
+			JournalTestUtil.getXsdMap(expectedXSD);
+
+		String actualXSD = _journalConverter.getJournalXSD(
+			read("test-ddm-structure-all-fields.xml"));
+
+		Map<String, Map<String, String>> actualMap = JournalTestUtil.getXsdMap(
+			actualXSD);
+
+		Assert.assertEquals(expectedMap, actualMap);
+	}
+
+	@Test
+	public void testGetLinkToLayoutValue() throws Exception {
+		Document document = SAXReaderUtil.createDocument();
+
+		Element element = document.addElement("dynamic-element");
+
+		Layout layout = LayoutTestUtil.addLayout(_group);
+
+		StringBundler sb = new StringBundler(5);
+
+		sb.append(layout.getLayoutId());
+		sb.append(StringPool.AT);
+		sb.append(layout.isPublicLayout() ? "public" : "private");
+		sb.append(StringPool.AT);
+		sb.append(layout.getGroupId());
+
+		element.addText(sb.toString());
+
+		String value = ReflectionTestUtil.invoke(
+			_journalConverter, "_getLinkToLayoutValue",
+			new Class<?>[] {Locale.class, Element.class}, LocaleUtil.US,
+			element);
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(value);
+
+		Assert.assertEquals(layout.getGroupId(), jsonObject.getLong("groupId"));
+		Assert.assertEquals(
+			layout.getLayoutId(), jsonObject.getLong("layoutId"));
+		Assert.assertEquals(
+			layout.getName(LocaleUtil.US), jsonObject.getString("name"));
+		Assert.assertFalse(jsonObject.getBoolean("privateLayout"));
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	protected void assertEquals(
 		DDMForm expectedDDMForm, DDMForm actualDDMForm) {
 

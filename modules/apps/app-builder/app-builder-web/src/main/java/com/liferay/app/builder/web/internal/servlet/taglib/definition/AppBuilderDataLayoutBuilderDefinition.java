@@ -55,10 +55,14 @@ public class AppBuilderDataLayoutBuilderDefinition
 
 	@Override
 	public String[] getUnimplementedProperties() {
+<<<<<<< HEAD
 		return new String[] {
 			"allowGuestUsers", "fieldNamespace", "readOnly",
 			"visibilityExpression"
 		};
+=======
+		return new String[] {"allowGuestUsers"};
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 }

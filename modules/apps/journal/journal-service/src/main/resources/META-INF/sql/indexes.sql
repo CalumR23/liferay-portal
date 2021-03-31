@@ -37,7 +37,10 @@ create unique index IX_4D5E99B9 on JournalArticle (uuid_[$COLUMN_LENGTH:75$], gr
 
 create index IX_E69312A1 on JournalArticleLocalization (articlePK, ctCollectionId);
 create unique index IX_5593D868 on JournalArticleLocalization (articlePK, languageId[$COLUMN_LENGTH:75$], ctCollectionId);
+<<<<<<< HEAD
 create index IX_F1F3A975 on JournalArticleLocalization (companyId, articlePK, ctCollectionId);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 create index IX_429AC23C on JournalArticleLocalization (ctCollectionId);
 
 create index IX_B332E3F1 on JournalArticleResource (ctCollectionId);

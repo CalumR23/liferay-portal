@@ -77,17 +77,35 @@ export const isOptionValueGenerated = (
  * value in the fields, always incrementing an integer
  * in front of the value to be friendly for the user.
  */
+<<<<<<< HEAD
 export const dedupValue = (fields, value, id, generateValueUsingLabel) => {
+=======
+export const dedupValue = (
+	fields,
+	value,
+	id,
+	generateOptionValueUsingOptionLabel,
+	propertyName
+) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	let counter = 0;
 
 	const recursive = (fields, currentValue) => {
 		const field = fields.find(
+<<<<<<< HEAD
 			(field) =>
 				field.value?.toLowerCase() === currentValue?.toLowerCase()
 		);
 
 		if (field && field.id !== id) {
 			if (generateValueUsingLabel) {
+=======
+			(field) => field[propertyName] === currentValue
+		);
+
+		if (field && field.id !== id) {
+			if (generateOptionValueUsingOptionLabel) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				counter += 1;
 				recursive(fields, value + counter);
 			}
@@ -149,6 +167,7 @@ export const normalizeReference = (fields, currentField, index) => {
 export const normalizeValue = (
 	fields,
 	currentField,
+<<<<<<< HEAD
 	generateValueUsingLabel
 ) => {
 	const {label, value: prevValue} = currentField;
@@ -156,16 +175,36 @@ export const normalizeValue = (
 	let value = prevValue
 		? prevValue
 		: getDefaultOptionValue(generateValueUsingLabel, label);
+=======
+	generateOptionValueUsingOptionLabel,
+	propertyName
+) => {
+	const {label} = currentField;
+	let value = currentField[propertyName]
+		? currentField[propertyName]
+		: getDefaultOptionValue(generateOptionValueUsingOptionLabel, label);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	if (!value) {
 		value = Liferay.Language.get('option');
 	}
 
+<<<<<<< HEAD
 	value = dedupValue(fields, value, currentField.id, generateValueUsingLabel);
+=======
+	value = dedupValue(
+		fields,
+		value,
+		currentField.id,
+		generateOptionValueUsingOptionLabel,
+		propertyName
+	);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	return normalizeFieldName(value);
 };
 
+<<<<<<< HEAD
 export const normalizeFields = (fields, generateValueUsingLabel) => {
 	return fields.map((field, index) => {
 		const value = normalizeValue(fields, field, generateValueUsingLabel);
@@ -179,6 +218,38 @@ export const normalizeFields = (fields, generateValueUsingLabel) => {
 					value,
 				},
 				index
+=======
+export const normalizeFieldReference = (currentIndex, fields) => {
+	const duplicateReference = fields
+		.filter((field, index) => index !== currentIndex)
+		.some(({reference}) => reference === fields[currentIndex].reference);
+
+	if (duplicateReference) {
+		fields[currentIndex].reference = getDefaultFieldName(true);
+	}
+
+	return fields;
+};
+
+export const normalizeFields = (
+	fields,
+	generateOptionValueUsingOptionLabel
+) => {
+	return fields.map((field) => {
+		return {
+			...field,
+			reference: normalizeValue(
+				fields,
+				field,
+				generateOptionValueUsingOptionLabel,
+				'reference'
+			),
+			value: normalizeValue(
+				fields,
+				field,
+				generateOptionValueUsingOptionLabel,
+				'value'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			),
 			value,
 		};

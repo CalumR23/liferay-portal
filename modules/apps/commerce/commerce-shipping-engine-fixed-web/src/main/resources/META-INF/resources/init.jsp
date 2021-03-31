@@ -26,6 +26,11 @@ taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <%@ page import="com.liferay.commerce.inventory.model.CommerceInventoryWarehouse" %><%@
+<<<<<<< HEAD
+=======
+page import="com.liferay.commerce.model.CommerceCountry" %><%@
+page import="com.liferay.commerce.model.CommerceRegion" %><%@
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 page import="com.liferay.commerce.product.constants.CPMeasurementUnitConstants" %><%@
 page import="com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOption" %><%@
 page import="com.liferay.commerce.shipping.engine.fixed.model.CommerceShippingFixedOptionRel" %><%@

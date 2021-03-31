@@ -189,6 +189,7 @@ export default withRouter(({history}) => {
 					</>
 				)}
 
+<<<<<<< HEAD
 				<NewTopicModal
 					currentSectionId={+context.rootTopicId}
 					onClose={() => setTopicModalVisibility(false)}
@@ -199,6 +200,22 @@ export default withRouter(({history}) => {
 					setError={setError}
 					visible={topicModalVisibility}
 				/>
+=======
+					<NewTopicModal
+						currentSectionId={+context.rootTopicId}
+						onClose={() => setTopicModalVisibility(false)}
+						onCreateNavigateTo={() => {
+							historyPushParser(`/tmp`);
+							history.goBack();
+						}}
+						setError={setError}
+						visible={topicModalVisibility}
+					/>
+				</div>
+				{loading && <ClayLoadingIndicator />}
+
+				<Alert info={error} />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			</div>
 			{loading && <ClayLoadingIndicator />}
 

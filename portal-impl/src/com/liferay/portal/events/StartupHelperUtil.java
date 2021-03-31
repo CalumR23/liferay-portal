@@ -51,6 +51,20 @@ public class StartupHelperUtil {
 
 	public static void initResourceActions() {
 		ResourceActionLocalServiceUtil.checkResourceActions();
+<<<<<<< HEAD
+=======
+
+		try (LoggingTimer loggingTimer = new LoggingTimer()) {
+			List<String> modelNames = ResourceActionsUtil.getModelNames();
+
+			for (String modelName : modelNames) {
+				List<String> actionIds =
+					ResourceActionsUtil.getModelResourceActions(modelName);
+
+				ResourceActionLocalServiceUtil.checkResourceActions(
+					modelName, actionIds, true);
+			}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try (LoggingTimer loggingTimer = new LoggingTimer()) {
 			ResourceActionsUtil.populateModelResources(

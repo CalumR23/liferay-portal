@@ -248,6 +248,7 @@ public class AssetCategoriesManagementToolbarDisplayContext
 	}
 
 	private String _getCategoriesSelectorURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, AssetCategory.class.getName(),
@@ -255,6 +256,16 @@ public class AssetCategoriesManagementToolbarDisplayContext
 		).setParameter(
 			"vocabularyIds", _assetCategoriesDisplayContext.getVocabularyId()
 		).setParameter(
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, AssetCategory.class.getName(),
+			PortletProvider.Action.BROWSE);
+
+		portletURL.setParameter(
+			"vocabularyIds",
+			String.valueOf(_assetCategoriesDisplayContext.getVocabularyId()));
+		portletURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"eventName",
 			liferayPortletResponse.getNamespace() + "selectCategory"
 		).setParameter(

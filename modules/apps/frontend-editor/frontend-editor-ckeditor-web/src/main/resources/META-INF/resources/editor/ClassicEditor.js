@@ -52,12 +52,24 @@ const ClassicEditor = React.forwardRef(
 			if (editor && editor.instanceReady) {
 				data = editor.getData();
 
+<<<<<<< HEAD
 				if (
 					CKEDITOR.env.gecko &&
 					CKEDITOR.tools.trim(data) === '<br />'
 				) {
 					data = '';
 				}
+=======
+			if (CKEDITOR.env.gecko && CKEDITOR.tools.trim(data) === '<br />') {
+				data = '';
+			}
+
+			data = data.replace(/(\u200B){7}/, '');
+		}
+
+		return data;
+	}, [contents]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				data = data.replace(/(\u200B){7}/, '');
 			}

@@ -106,6 +106,8 @@ const ItemSelectorPreview = ({
 				const newItemList = [...itemList];
 
 				newItemList[currentItemIndex] = {...currentItem, url, value};
+<<<<<<< HEAD
+=======
 
 				updateItemList(newItemList);
 			}
@@ -166,6 +168,128 @@ const ItemSelectorPreview = ({
 		close();
 
 		handleSelectedItem(currentItem);
+	};
+
+	const handleSaveEdit = (e) => {
+		const itemData = e.data.file;
+
+		const editedItemMetadata = {
+			groups: [
+				{
+					data: [
+						{
+							key: Liferay.Language.get('format'),
+							value: itemData.type,
+						},
+						{
+							key: Liferay.Language.get('name'),
+							value: itemData.title,
+						},
+					],
+					title: Liferay.Language.get('file-info'),
+				},
+			],
+		};
+
+		const editedItem = {
+			fileentryid: currentItem.fileentryid,
+			metadata: JSON.stringify(editedItemMetadata),
+			returntype: uploadItemReturnType,
+			title: itemData.title,
+			url: itemData.url,
+			value: itemData.resolvedValue,
+		};
+
+		const updatedItemList = [...itemList, editedItem];
+		updateItemList(updatedItemList);
+		setCurrentItemIndex(updatedItemList.length - 1);
+	};
+
+	const handleClickEdit = () => {
+		const itemTitle = currentItem.title;
+		const editDialogTitle = `${Liferay.Language.get(
+			'edit'
+		)} ${itemTitle} (${Liferay.Language.get('copy')})`;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
+		const editEntityBaseZIndex = Liferay.zIndex.WINDOW;
+
+<<<<<<< HEAD
+	useEffect(() => {
+		document.documentElement.addEventListener('keydown', handleOnKeyDown);
+
+		const updateCurrentItemHandler = Liferay.on(
+			'updateCurrentItem',
+			updateCurrentItem
+		);
+
+		Liferay.component('ItemSelectorPreview', ItemSelectorPreview);
+
+		return () => {
+			document.documentElement.removeEventListener(
+				'keydown',
+				handleOnKeyDown
+			);
+
+			Liferay.detach(updateCurrentItemHandler);
+			Liferay.component('ItemSelectorPreview', null);
+		};
+	}, [handleOnKeyDown, updateCurrentItem]);
+
+	useEffect(() => {
+		const sidenavToggle = infoButtonRef.current;
+
+		if (sidenavToggle) {
+			Liferay.SideNavigation.initialize(sidenavToggle, {
+				container: '.sidenav-container',
+				position: 'right',
+				typeMobile: 'fixed',
+				width: '320px',
+			});
+		}
+	}, [infoButtonRef]);
+
+	const handleClickBack = () => {
+		close();
+
+		if (reloadOnHide) {
+			const frame = window.frameElement;
+
+			if (frame) {
+				frame.contentWindow.location.reload();
+			}
+		}
+	};
+
+	const handleClickDone = () => {
+
+		// LPS-120692
+
+		close();
+
+		handleSelectedItem(currentItem);
+=======
+		Liferay.Util.editEntity(
+			{
+				dialog: {
+					destroyOnHide: true,
+					zIndex: editEntityBaseZIndex + 100,
+				},
+				id: 'Edit_' + itemTitle,
+				stack: false,
+				title: editDialogTitle,
+				uri: editItemURL,
+				urlParams: {
+					entityURL: currentItem.url,
+					saveFileEntryId: currentItem.fileentryid,
+					saveFileName: itemTitle,
+					saveParamName: 'imageSelectorFileName',
+					saveURL: uploadItemURL,
+				},
+			},
+			handleSaveEdit
+		);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	};
 
 	return (

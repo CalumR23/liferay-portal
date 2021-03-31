@@ -152,6 +152,20 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 		return currentSortingURL;
 	}
 
+	public PortletURL getCurrentSortingURL() throws PortletException {
+		PortletURL currentSortingURL = PortletURLUtil.clone(
+			_getPortletURL(), _liferayPortletResponse);
+
+		currentSortingURL.setParameter("orderByType", getOrderByType());
+		currentSortingURL.setParameter("orderByCol", _getOrderByCol());
+
+		if (_repositoryEntryBrowserDisplayContext.isSearchEverywhere()) {
+			currentSortingURL.setParameter("scope", "everywhere");
+		}
+
+		return currentSortingURL;
+	}
+
 	public List<DropdownItem> getFilterDropdownItems() {
 		return DropdownItemListBuilder.addGroup(
 			this::_isShowScopeFilter,
@@ -202,6 +216,7 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 
 		return LabelItemListBuilder.add(
 			labelItem -> {
+<<<<<<< HEAD
 				labelItem.putData(
 					"removeLabelURL",
 					PortletURLBuilder.create(
@@ -209,6 +224,13 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 					).setParameter(
 						"scope", (String)null
 					).buildString());
+=======
+				PortletURL removeLabelURL = getCurrentSortingURL();
+
+				removeLabelURL.setParameter("scope", (String)null);
+
+				labelItem.putData("removeLabelURL", removeLabelURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				labelItem.setCloseable(true);
 
@@ -243,9 +265,15 @@ public class ItemSelectorRepositoryEntryManagementToolbarDisplayContext {
 	}
 
 	public PortletURL getSortingURL() throws PortletException {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			getCurrentSortingURL()
 		).setParameter(
+=======
+		PortletURL sortingURL = getCurrentSortingURL();
+
+		sortingURL.setParameter(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			"orderByType",
 			Objects.equals(getOrderByType(), "asc") ? "desc" : "asc"
 		).build();

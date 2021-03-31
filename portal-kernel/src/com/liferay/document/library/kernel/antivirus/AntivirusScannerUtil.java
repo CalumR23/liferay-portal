@@ -24,6 +24,17 @@ import java.io.File;
  */
 public class AntivirusScannerUtil {
 
+<<<<<<< HEAD
+=======
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static AntivirusScanner getAntivirusScanner() {
+		return _antivirusScanner;
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static boolean isActive() {
 		return _antivirusScanner.isActive();
 	}
@@ -40,9 +51,21 @@ public class AntivirusScannerUtil {
 		}
 	}
 
+<<<<<<< HEAD
 	private static volatile AntivirusScanner _antivirusScanner =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			AntivirusScanner.class, AntivirusScannerUtil.class,
 			"_antivirusScanner", false);
+=======
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public void setAntivirusScanner(AntivirusScanner antivirusScanner) {
+		_antivirusScanner = antivirusScanner;
+	}
+
+	private static AntivirusScanner _antivirusScanner;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 }

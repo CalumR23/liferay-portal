@@ -142,6 +142,29 @@ public class EditRoleAssignmentsManagementToolbarDisplayContext {
 			dropdownItem -> {
 				dropdownItem.putData("action", "addSegmentEntry");
 
+<<<<<<< HEAD
+=======
+				PortletURL addSegmentEntryURL =
+					PortletProviderUtil.getPortletURL(
+						_renderRequest, SegmentsEntry.class.getName(),
+						PortletProvider.Action.EDIT);
+
+				addSegmentEntryURL.setParameter(
+					"redirect",
+					ParamUtil.getString(_httpServletRequest, "redirect"));
+				addSegmentEntryURL.setParameter(
+					"backURL",
+					ParamUtil.getString(_httpServletRequest, "backURL"));
+
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)_httpServletRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
+
+				addSegmentEntryURL.setParameter(
+					"groupId",
+					String.valueOf(themeDisplay.getCompanyGroupId()));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				dropdownItem.putData(
 					"addSegmentEntryURL",
 					PortletURLBuilder.create(

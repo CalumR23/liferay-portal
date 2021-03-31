@@ -79,7 +79,10 @@ public abstract class BaseProductResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-products/{discountProductId}/product'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "discountProductId")}
 	)
@@ -100,7 +103,10 @@ public abstract class BaseProductResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-entries/{priceEntryId}/product'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
 	)
@@ -108,8 +114,13 @@ public abstract class BaseProductResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Product")})
 	public Product getPriceEntryIdProduct(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId)
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new Product();
@@ -121,7 +132,10 @@ public abstract class BaseProductResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifier-products/{priceModifierProductId}/product'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "priceModifierProductId")
@@ -132,8 +146,12 @@ public abstract class BaseProductResourceImpl
 	@Tags(value = {@Tag(name = "Product")})
 	public Product getPriceModifierProductProduct(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("priceModifierProductId")
 				Long priceModifierProductId)
+=======
+			@PathParam("priceModifierProductId") Long priceModifierProductId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new Product();

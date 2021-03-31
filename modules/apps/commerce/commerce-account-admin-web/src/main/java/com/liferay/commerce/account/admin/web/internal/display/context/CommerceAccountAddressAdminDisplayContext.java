@@ -129,6 +129,7 @@ public class CommerceAccountAddressAdminDisplayContext
 	}
 
 	public String getDeleteCommerceAddressURL(long commerceAddressId) {
+<<<<<<< HEAD
 		return PortletURLBuilder.createActionURL(
 			commerceAccountAdminRequestHelper.getLiferayPortletResponse()
 		).setActionName(
@@ -140,11 +141,29 @@ public class CommerceAccountAddressAdminDisplayContext
 		).setParameter(
 			"commerceAddressId", commerceAddressId
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			commerceAccountAdminRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createActionURL();
+
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_account_admin/edit_commerce_address");
+		portletURL.setParameter(
+			"redirect", commerceAccountAdminRequestHelper.getCurrentURL());
+		portletURL.setParameter(
+			"commerceAddressId", String.valueOf(commerceAddressId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getEditCommerceAddressURL(long commerceAddressId)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			commerceAccountAdminRequestHelper.getLiferayPortletResponse()
 		).setMVCRenderCommandName(
@@ -156,6 +175,24 @@ public class CommerceAccountAddressAdminDisplayContext
 		).setParameter(
 			"commerceAddressId", commerceAddressId
 		).buildString();
+=======
+		LiferayPortletResponse liferayPortletResponse =
+			commerceAccountAdminRequestHelper.getLiferayPortletResponse();
+
+		PortletURL portletURL = liferayPortletResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_address");
+		portletURL.setParameter(
+			"redirect", commerceAccountAdminRequestHelper.getCurrentURL());
+		portletURL.setParameter(
+			"commerceAccountId", String.valueOf(getCommerceAccountId()));
+		portletURL.setParameter(
+			"commerceAddressId", String.valueOf(commerceAddressId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -170,6 +207,7 @@ public class CommerceAccountAddressAdminDisplayContext
 	public long getRegionId() throws PortalException {
 		long regionId = 0;
 
+<<<<<<< HEAD
 		CommerceAddress commerceAddress = getCommerceAddress();
 
 		if (commerceAddress != null) {
@@ -178,6 +216,11 @@ public class CommerceAccountAddressAdminDisplayContext
 
 		return regionId;
 	}
+=======
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_account");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	public List<Region> getRegions() throws PortalException {
 		return _regionService.getRegions(getCountryId(), true);

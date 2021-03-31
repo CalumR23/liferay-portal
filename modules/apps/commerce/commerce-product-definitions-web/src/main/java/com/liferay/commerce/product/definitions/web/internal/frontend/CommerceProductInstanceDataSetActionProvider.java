@@ -106,6 +106,7 @@ public class CommerceProductInstanceDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				_portal.getOriginalServletRequest(httpServletRequest),
@@ -119,12 +120,22 @@ public class CommerceProductInstanceDataSetActionProvider
 		).setParameter(
 			"cpInstanceId", cpInstanceId
 		).build();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME, "/cp_definitions/edit_cp_instance");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter("cpInstanceId", String.valueOf(cpInstanceId));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private PortletURL _getSkuEditURL(
 			CPInstance cpInstance, HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CPDefinition.class.getName(),
@@ -136,6 +147,18 @@ public class CommerceProductInstanceDataSetActionProvider
 		).setParameter(
 			"cpInstanceId", cpInstance.getCPInstanceId()
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CPDefinition.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/cp_definitions/edit_cp_instance");
+		portletURL.setParameter(
+			"cpDefinitionId", String.valueOf(cpInstance.getCPDefinitionId()));
+		portletURL.setParameter(
+			"cpInstanceId", String.valueOf(cpInstance.getCPInstanceId()));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

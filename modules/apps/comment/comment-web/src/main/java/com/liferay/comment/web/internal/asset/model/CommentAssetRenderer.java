@@ -153,6 +153,7 @@ public class CommentAssetRenderer
 			group = themeDisplay.getScopeGroup();
 		}
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortalUtil.getControlPanelPortletURL(
 				liferayPortletRequest, group, CommentPortletKeys.COMMENT, 0, 0,
@@ -162,6 +163,18 @@ public class CommentAssetRenderer
 		).setParameter(
 			"commentId", _workflowableComment.getCommentId()
 		).build();
+=======
+		PortletURL portletURL = PortalUtil.getControlPanelPortletURL(
+			liferayPortletRequest, group, CommentPortletKeys.COMMENT, 0, 0,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/comment/edit_discussion");
+		portletURL.setParameter(
+			"commentId", String.valueOf(_workflowableComment.getCommentId()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

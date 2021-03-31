@@ -11,9 +11,16 @@
 
 import ClayButton from '@clayui/button';
 import ClayList from '@clayui/list';
+<<<<<<< HEAD
 import {ALIGN_POSITIONS} from 'frontend-js-web';
 import PropTypes from 'prop-types';
 import React, {useContext, useMemo, useState} from 'react';
+=======
+import {ClayTooltipProvider} from '@clayui/tooltip';
+import {Align} from 'metal-position';
+import PropTypes from 'prop-types';
+import React, {useMemo, useState} from 'react';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import {
 	useChangeTimeSpanKey,
@@ -23,7 +30,10 @@ import {
 	useNextTimeSpan,
 	usePreviousTimeSpan,
 } from '../../context/ChartStateContext';
+<<<<<<< HEAD
 import {StoreStateContext} from '../../context/StoreContext';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {generateDateFormatters as dateFormat} from '../../utils/dateFormat';
 import {numberFormat} from '../../utils/numberFormat';
 import Hint from '../Hint';
@@ -34,13 +44,20 @@ const ITEMS_TO_SHOW = 5;
 
 export default function ReferralDetail({
 	currentPage,
+<<<<<<< HEAD
+=======
+	languageTag,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	showTimeSpanSelector = false,
 	timeSpanOptions,
 	trafficShareDataProvider,
 	trafficVolumeDataProvider,
 }) {
+<<<<<<< HEAD
 	const {languageTag} = useContext(StoreStateContext);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const [isReferringPagesExpanded, setIsReferringPagesExpanded] = useState(
 		false
 	);
@@ -106,7 +123,12 @@ export default function ReferralDetail({
 				className="c-mb-2"
 				dataProvider={trafficVolumeDataProvider}
 				label={Liferay.Util.sub(Liferay.Language.get('traffic-volume'))}
+<<<<<<< HEAD
 				popoverAlign={ALIGN_POSITIONS.Bottom}
+=======
+				languageTag={languageTag}
+				popoverAlign={Align.Bottom}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				popoverHeader={Liferay.Language.get('traffic-volume')}
 				popoverMessage={Liferay.Language.get(
 					'traffic-volume-is-the-number-of-page-views-coming-from-one-channel'
@@ -157,6 +179,7 @@ export default function ReferralDetail({
 							<ClayList.Item flex key={url}>
 								<ClayList.ItemField expand>
 									<ClayList.ItemText>
+<<<<<<< HEAD
 										<span
 											className="text-truncate-inline"
 											data-tooltip-align="top"
@@ -170,6 +193,23 @@ export default function ReferralDetail({
 												{url}
 											</a>
 										</span>
+=======
+										<ClayTooltipProvider>
+											<span
+												className="text-truncate-inline"
+												data-tooltip-align="top"
+												title={url}
+											>
+												<a
+													className="c-mr-2 text-primary text-truncate text-truncate-reverse"
+													href={url}
+													target="_blank"
+												>
+													{url}
+												</a>
+											</span>
+										</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									</ClayList.ItemText>
 								</ClayList.ItemField>
 								<ClayList.ItemField expand>
@@ -235,6 +275,7 @@ export default function ReferralDetail({
 							<ClayList.Item flex key={url}>
 								<ClayList.ItemField expand>
 									<ClayList.ItemText>
+<<<<<<< HEAD
 										<span
 											className="text-truncate-inline"
 											data-tooltip-align="top"
@@ -248,6 +289,23 @@ export default function ReferralDetail({
 												{url}
 											</a>
 										</span>
+=======
+										<ClayTooltipProvider>
+											<span
+												className="text-truncate-inline"
+												data-tooltip-align="top"
+												title={url}
+											>
+												<a
+													className="c-mr-2 text-primary text-truncate"
+													href={url}
+													target="_blank"
+												>
+													{url}
+												</a>
+											</span>
+										</ClayTooltipProvider>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									</ClayList.ItemText>
 								</ClayList.ItemField>
 								<ClayList.ItemField expand>
@@ -288,6 +346,10 @@ export default function ReferralDetail({
 
 ReferralDetail.propTypes = {
 	currentPage: PropTypes.object.isRequired,
+<<<<<<< HEAD
+=======
+	languageTag: PropTypes.string.isRequired,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	showTimeSpanSelector: PropTypes.bool,
 	timeSpanOptions: PropTypes.arrayOf(
 		PropTypes.shape({

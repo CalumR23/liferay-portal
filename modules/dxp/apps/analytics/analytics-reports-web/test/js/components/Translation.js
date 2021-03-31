@@ -75,7 +75,11 @@ describe('Translation', () => {
 			timeSpanKey: 'last-7-days',
 		};
 
+<<<<<<< HEAD
 		const {getByText} = render(
+=======
+		const {getAllByText, getByText} = render(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<ChartStateContextProvider
 				publishDate={testProps.pagePublishDate}
 				timeRange={testProps.timeRange}

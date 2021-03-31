@@ -263,7 +263,11 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		String[] sources = _processPortletProperties(classLoader);
 
+<<<<<<< HEAD
 		ResourceActionsUtil.populateModelResources(classLoader, sources);
+=======
+		String[] sources = _processPortletProperties(classLoader);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		for (Portlet portlet : portlets) {
 			ResourceActionsUtil.populatePortletResource(
@@ -553,7 +557,11 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
+<<<<<<< HEAD
 				_log.debug("Unable to read portlet.properties", exception);
+=======
+				_log.debug("Unable to read portlet.properties");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 
 			return new String[0];

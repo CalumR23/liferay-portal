@@ -157,14 +157,23 @@ public class S3Store implements Store {
 
 		_s3FileCache.cleanUpCacheFiles();
 
+<<<<<<< HEAD
 		try {
 			S3Object s3Object = getS3Object(
 				companyId, repositoryId, fileName, versionLabel);
+=======
+		try (S3Object s3Object = getS3Object(
+				companyId, repositoryId, fileName, versionLabel)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			ObjectMetadata objectMetadata = s3Object.getObjectMetadata();
 
 			return _s3FileCache.getCacheFileInputStream(
+<<<<<<< HEAD
 				s3Object, fileName, s3Object::getObjectContent,
+=======
+				fileName, s3Object::getObjectContent,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				objectMetadata.getLastModified());
 		}
 		catch (IOException ioException) {

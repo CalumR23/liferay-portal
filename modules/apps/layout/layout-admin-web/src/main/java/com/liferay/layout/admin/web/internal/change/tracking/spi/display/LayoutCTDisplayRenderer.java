@@ -65,6 +65,7 @@ public class LayoutCTDisplayRenderer extends BaseCTDisplayRenderer<Layout> {
 			return null;
 		}
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
@@ -72,6 +73,14 @@ public class LayoutCTDisplayRenderer extends BaseCTDisplayRenderer<Layout> {
 		).setMVCRenderCommandName(
 			"/layout_admin/edit_layout"
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/layout_admin/edit_layout");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String currentURL = _portal.getCurrentURL(httpServletRequest);
 

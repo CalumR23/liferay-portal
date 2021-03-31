@@ -34,10 +34,21 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.json.JSONObject;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+<<<<<<< HEAD
+=======
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.util.AggregateResourceBundle;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
@@ -397,6 +408,7 @@ public class JournalConverterImpl implements JournalConverter {
 	}
 
 	protected Serializable getFieldValue(
+<<<<<<< HEAD
 		DDMFormField ddmFormField, Element dynamicContentElement) {
 
 		if (Objects.equals(
@@ -415,6 +427,65 @@ public class JournalConverterImpl implements JournalConverter {
 
 		return FieldConstants.getSerializable(
 			ddmFormField.getDataType(), dynamicContentElement.getText());
+=======
+		String dataType, String type, Element dynamicContentElement,
+		Locale defaultLocale) {
+
+		if (Objects.equals(DDMFormFieldType.DOCUMENT_LIBRARY, type) ||
+			Objects.equals(DDMFormFieldType.IMAGE, type)) {
+
+			return _getFileEntryValue(defaultLocale, dynamicContentElement);
+		}
+
+		if (Objects.equals(DDMFormFieldType.JOURNAL_ARTICLE, type)) {
+			return _getJournalArticleValue(
+				defaultLocale, dynamicContentElement);
+		}
+
+		if (Objects.equals(DDMFormFieldType.LINK_TO_PAGE, type)) {
+			return _getLinkToLayoutValue(defaultLocale, dynamicContentElement);
+		}
+
+		if (Objects.equals(DDMFormFieldType.SELECT, type)) {
+			return _getSelectValue(dynamicContentElement);
+		}
+
+		return FieldConstants.getSerializable(
+			dataType, dynamicContentElement.getText());
+	}
+
+	protected void getJournalMetadataElement(Element metadataElement) {
+		removeAttribute(metadataElement, "locale");
+
+		Element dynamicElementElement = metadataElement.getParent();
+
+		// Required
+
+		boolean required = GetterUtil.getBoolean(
+			dynamicElementElement.attributeValue("required"));
+
+		addMetadataEntry(metadataElement, "required", String.valueOf(required));
+
+		// Tooltip
+
+		Element tipElement = fetchMetadataEntry(metadataElement, "name", "tip");
+
+		if (tipElement != null) {
+			tipElement.addAttribute("name", "instructions");
+
+			addMetadataEntry(metadataElement, "displayAsTooltip", "true");
+		}
+	}
+
+	protected void removeAttribute(Element element, String attributeName) {
+		Attribute attribute = element.attribute(attributeName);
+
+		if (attribute == null) {
+			return;
+		}
+
+		element.remove(attribute);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	protected String[] splitFieldsDisplayValue(Field fieldsDisplayField) {
@@ -450,6 +521,7 @@ public class JournalConverterImpl implements JournalConverter {
 	}
 
 	protected void updateDynamicContentValue(
+<<<<<<< HEAD
 		DDMFormField ddmFormField, Element dynamicContentElement,
 		String fieldName, String fieldType, String fieldValue,
 		boolean multiple) {
@@ -487,11 +559,23 @@ public class JournalConverterImpl implements JournalConverter {
 							fieldName,
 						portalException);
 				}
+=======
+		Element dynamicContentElement, String fieldType, boolean multiple,
+		String fieldValue) {
+
+		if (DDMFormFieldType.CHECKBOX.equals(fieldType)) {
+			if (fieldValue.equals(Boolean.FALSE.toString())) {
+				fieldValue = StringPool.BLANK;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 
 			dynamicContentElement.addCDATA(fieldValue);
 		}
+<<<<<<< HEAD
 		else if (Objects.equals(DDMFormFieldTypeConstants.SELECT, fieldType) &&
+=======
+		else if (DDMFormFieldType.SELECT.equals(fieldType) &&
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				 Validator.isNotNull(fieldValue)) {
 
 			JSONArray jsonArray = null;
@@ -677,10 +761,230 @@ public class JournalConverterImpl implements JournalConverter {
 			jsonArray.put(dynamicContentElement.getText());
 		}
 
+<<<<<<< HEAD
+		return jsonArray.toString();
+=======
+	private String _getFileEntryValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		JSONObject jsonObject = null;
+
+		try {
+			jsonObject = JSONFactoryUtil.createJSONObject(
+				dynamicContentElement.getText());
+		}
+		catch (JSONException jsonException) {
+			return StringPool.BLANK;
+		}
+
+		if (jsonObject == null) {
+			return StringPool.BLANK;
+		}
+
+		String uuid = jsonObject.getString("uuid");
+		long groupId = jsonObject.getLong("groupId");
+
+		if (Validator.isNull(uuid) || (groupId <= 0)) {
+			return StringPool.BLANK;
+		}
+
+		try {
+			if (!ExportImportThreadLocal.isImportInProcess()) {
+				FileEntry fileEntry =
+					_dlAppLocalService.getFileEntryByUuidAndGroupId(
+						uuid, groupId);
+
+				String title = fileEntry.getTitle();
+
+				if (fileEntry.isInTrash()) {
+					title = _trashHelper.getOriginalTitle(fileEntry.getTitle());
+
+					jsonObject.put(
+						"message",
+						LanguageUtil.get(
+							_getResourceBundle(defaultLocale),
+							"the-selected-document-was-moved-to-the-recycle-" +
+								"bin"));
+				}
+
+				jsonObject.put("title", title);
+			}
+		}
+		catch (Exception exception) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Unable to get file entry for UUID ", uuid,
+						" and group ID ", groupId));
+			}
+
+			jsonObject.put(
+				"message",
+				LanguageUtil.get(
+					_getResourceBundle(defaultLocale),
+					"the-selected-document-was-deleted"));
+		}
+
+		return jsonObject.toString();
+	}
+
+	private String _getJournalArticleValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		try {
+			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
+				dynamicContentElement.getText());
+
+			long classPK = jsonObject.getLong("classPK");
+
+			if (classPK <= 0) {
+				return jsonObject.toString();
+			}
+
+			JournalArticle article =
+				_journalArticleLocalService.fetchLatestArticle(classPK);
+
+			if (article != null) {
+				jsonObject.put("groupId", article.getGroupId());
+
+				String title = article.getTitle(defaultLocale);
+
+				if (article.isInTrash()) {
+					jsonObject.put(
+						"message",
+						LanguageUtil.get(
+							_getResourceBundle(defaultLocale),
+							"the-selected-web-content-was-moved-to-the-" +
+								"recycle-bin"));
+				}
+
+				jsonObject.put(
+					"title", title
+				).put(
+					"titleMap", article.getTitleMap()
+				).put(
+					"uuid", article.getUuid()
+				);
+			}
+			else {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to get article for  " + classPK);
+				}
+
+				jsonObject.put(
+					"message",
+					LanguageUtil.get(
+						_getResourceBundle(defaultLocale),
+						"the-selected-web-content-was-deleted"));
+			}
+
+			return jsonObject.toString();
+		}
+		catch (JSONException jsonException) {
+			return StringPool.BLANK;
+		}
+	}
+
+	private String _getLinkToLayoutValue(
+		Locale defaultLocale, Element dynamicContentElement) {
+
+		String value = dynamicContentElement.getText();
+
+		if (JSONUtil.isValid(value)) {
+			return value;
+		}
+
+		String[] values = StringUtil.split(
+			dynamicContentElement.getText(), CharPool.AT);
+
+		if (ArrayUtil.isEmpty(values)) {
+			return StringPool.BLANK;
+		}
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		long layoutId = GetterUtil.getLong(values[0]);
+		boolean privateLayout = !Objects.equals(values[1], "public");
+
+		if (values.length > 2) {
+			long groupId = GetterUtil.getLong(values[2]);
+
+			jsonObject.put("groupId", groupId);
+
+			Layout layout = _layoutLocalService.fetchLayout(
+				groupId, privateLayout, layoutId);
+
+			if (layout != null) {
+				jsonObject.put("name", layout.getName(defaultLocale));
+			}
+		}
+
+		jsonObject.put(
+			"layoutId", layoutId
+		).put(
+			"privateLayout", privateLayout
+		);
+
+		return jsonObject.toString();
+	}
+
+	private ResourceBundle _getResourceBundle(Locale locale) {
+		ResourceBundle classResourceBundle = ResourceBundleUtil.getBundle(
+			locale, "com.liferay.journal.lang");
+
+		return new AggregateResourceBundle(
+			classResourceBundle, _portal.getResourceBundle(locale));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+	}
+
+	private String _getSelectValue(Element dynamicContentElement) {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		List<Element> optionElements = dynamicContentElement.elements("option");
+
+		if (!optionElements.isEmpty()) {
+			for (Element optionElement : optionElements) {
+				jsonArray.put(optionElement.getText());
+			}
+		}
+		else {
+			jsonArray.put(dynamicContentElement.getText());
+		}
+
 		return jsonArray.toString();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalConverterImpl.class);
 
+<<<<<<< HEAD
+=======
+	private final Map<String, String> _ddmDataTypes;
+	private final Map<String, String> _ddmMetadataAttributes;
+	private final Map<String, String> _ddmTypesToJournalTypes;
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private FieldsToDDMFormValuesConverter _fieldsToDDMFormValuesConverter;
+
+	@Reference
+	private Http _http;
+
+	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	private final Map<String, String> _journalTypesToDDMTypes;
+
+	@Reference(unbind = "-")
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private Portal _portal;
+
+	@Reference
+	private TrashHelper _trashHelper;
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 }

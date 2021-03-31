@@ -159,7 +159,10 @@ public abstract class BasePriceEntryResourceImpl
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-entries/{priceEntryId}'  -u 'test@liferay.com:test'
 	 */
 	@DELETE
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
 	)
@@ -167,8 +170,13 @@ public abstract class BasePriceEntryResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "PriceEntry")})
 	public void deletePriceEntry(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId)
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 	}
 
@@ -187,8 +195,13 @@ public abstract class BasePriceEntryResourceImpl
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "PriceEntry")})
 	public Response deletePriceEntryBatch(
+<<<<<<< HEAD
 			@Parameter(hidden = true) @QueryParam("callbackURL")
 				String callbackURL,
+=======
+			@Parameter(hidden = true) @QueryParam("callbackURL") String
+				callbackURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Object object)
 		throws Exception {
 
@@ -214,7 +227,10 @@ public abstract class BasePriceEntryResourceImpl
 	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-entries/{priceEntryId}'  -u 'test@liferay.com:test'
 	 */
 	@GET
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
 	)
@@ -222,8 +238,13 @@ public abstract class BasePriceEntryResourceImpl
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "PriceEntry")})
 	public PriceEntry getPriceEntry(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId)
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		return new PriceEntry();
@@ -240,12 +261,23 @@ public abstract class BasePriceEntryResourceImpl
 		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
 	)
 	@PATCH
+<<<<<<< HEAD
+=======
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "priceEntryId")}
+	)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Path("/price-entries/{priceEntryId}")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "PriceEntry")})
 	public PriceEntry patchPriceEntry(
+<<<<<<< HEAD
 			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId")
 				Long priceEntryId,
+=======
+			@NotNull @Parameter(hidden = true) @PathParam("priceEntryId") Long
+				priceEntryId,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			PriceEntry priceEntry)
 		throws Exception {
 

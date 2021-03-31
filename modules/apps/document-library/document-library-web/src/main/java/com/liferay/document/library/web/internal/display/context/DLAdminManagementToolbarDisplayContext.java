@@ -39,7 +39,10 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.LabelItemListBuilder;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -213,6 +216,90 @@ public class DLAdminManagementToolbarDisplayContext
 		).build();
 	}
 
+<<<<<<< HEAD
+=======
+	public List<String> getAvailableActions(FileEntry fileEntry)
+		throws PortalException {
+
+		List<String> availableActions = new ArrayList<>();
+
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.DELETE)) {
+
+			availableActions.add("deleteEntries");
+		}
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.UPDATE)) {
+
+			availableActions.add("move");
+
+			if (fileEntry.isCheckedOut()) {
+				availableActions.add("checkin");
+			}
+			else {
+				availableActions.add("checkout");
+			}
+
+			if (!RepositoryUtil.isExternalRepository(
+					fileEntry.getRepositoryId()) &&
+				!_hasWorkflowDefinitionLink(fileEntry) &&
+				!_isCheckedOutByAnotherUser(fileEntry)) {
+
+				if (_hasValidAssetVocabularies(
+						_themeDisplay.getScopeGroupId())) {
+
+					availableActions.add("editCategories");
+				}
+
+				availableActions.add("editTags");
+			}
+		}
+
+		if (DLFileEntryPermission.contains(
+				permissionChecker, fileEntry, ActionKeys.VIEW)) {
+
+			availableActions.add("download");
+		}
+
+		return availableActions;
+	}
+
+	public List<String> getAvailableActions(Folder folder)
+		throws PortalException {
+
+		List<String> availableActions = new ArrayList<>();
+
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.DELETE)) {
+
+			availableActions.add("deleteEntries");
+		}
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.UPDATE) &&
+			!folder.isMountPoint()) {
+
+			availableActions.add("move");
+		}
+
+		if (DLFolderPermission.contains(
+				permissionChecker, folder, ActionKeys.VIEW) &&
+			!RepositoryUtil.isExternalRepository(folder.getRepositoryId())) {
+
+			availableActions.add("download");
+		}
+
+		return availableActions;
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	public String getClearResultsURL() {
 		return PortletURLBuilder.createRenderURL(
@@ -376,6 +463,16 @@ public class DLAdminManagementToolbarDisplayContext
 	public String getInfoPanelId() {
 		return "infoPanelId";
 	}
+<<<<<<< HEAD
+=======
+
+	@Override
+	public String getSearchActionURL() {
+		PortletURL searchURL = _liferayPortletResponse.createRenderURL();
+
+		searchURL.setParameter(
+			"mvcRenderCommandName", "/document_library/search");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Override
 	public String getSearchActionURL() {
@@ -434,8 +531,14 @@ public class DLAdminManagementToolbarDisplayContext
 			_getCurrentSortingURL()
 		).setParameter(
 			"orderByType",
+<<<<<<< HEAD
 			Objects.equals(_getOrderByType(), "asc") ? "desc" : "asc"
 		).buildString();
+=======
+			Objects.equals(_getOrderByType(), "asc") ? "desc" : "asc");
+
+		return sortingURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override

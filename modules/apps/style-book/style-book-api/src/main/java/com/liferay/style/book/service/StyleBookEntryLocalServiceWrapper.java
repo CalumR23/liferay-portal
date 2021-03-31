@@ -327,8 +327,13 @@ public class StyleBookEntryLocalServiceWrapper
 	}
 
 	@Override
+<<<<<<< HEAD
 	public StyleBookEntry fetchStyleBookEntryByUuidAndGroupId(
 		String uuid, long groupId) {
+=======
+	public com.liferay.style.book.model.StyleBookEntry
+		fetchStyleBookEntryByUuidAndGroupId(String uuid, long groupId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return _styleBookEntryLocalService.fetchStyleBookEntryByUuidAndGroupId(
 			uuid, groupId);
@@ -438,8 +443,13 @@ public class StyleBookEntryLocalServiceWrapper
 	}
 
 	@Override
+<<<<<<< HEAD
 	public java.util.List<StyleBookEntry> getStyleBookEntriesByUuidAndCompanyId(
 		String uuid, long companyId) {
+=======
+	public java.util.List<com.liferay.style.book.model.StyleBookEntry>
+		getStyleBookEntriesByUuidAndCompanyId(String uuid, long companyId) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return _styleBookEntryLocalService.
 			getStyleBookEntriesByUuidAndCompanyId(uuid, companyId);
@@ -562,7 +572,11 @@ public class StyleBookEntryLocalServiceWrapper
 	}
 
 	@Override
+<<<<<<< HEAD
 	public StyleBookEntry updateStyleBookEntry(
+=======
+	public com.liferay.style.book.model.StyleBookEntry updateStyleBookEntry(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			long userId, long styleBookEntryId, boolean defaultStylebookEntry,
 			String frontendTokensValues, String name, String styleBookEntryKey,
 			long previewFileEntryId)
@@ -574,7 +588,11 @@ public class StyleBookEntryLocalServiceWrapper
 	}
 
 	@Override
+<<<<<<< HEAD
 	public StyleBookEntry updateStyleBookEntry(
+=======
+	public com.liferay.style.book.model.StyleBookEntry updateStyleBookEntry(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			long styleBookEntryId, String frontendTokensValues, String name)
 		throws com.liferay.portal.kernel.exception.PortalException {
 

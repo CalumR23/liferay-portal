@@ -19,6 +19,7 @@
 <%
 String cmd = ParamUtil.getString(request, Constants.CMD);
 
+<<<<<<< HEAD
 PortletURL portletURL = PortletURLBuilder.createRenderURL(
 	renderResponse
 ).setMVCRenderCommandName(
@@ -26,6 +27,12 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 ).setParameter(
 	"configurationScreenKey", "2-synced-contact-data"
 ).build();
+=======
+PortletURL portletURL = renderResponse.createRenderURL();
+
+portletURL.setParameter("mvcRenderCommandName", "/configuration_admin/view_configuration_screen");
+portletURL.setParameter("configurationScreenKey", "2-synced-contact-data");
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 String redirect = ParamUtil.getString(request, "redirect", portletURL.toString());
 

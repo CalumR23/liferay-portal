@@ -76,6 +76,7 @@ public class CPDefinitionDisplayLayoutDisplayContext
 	}
 
 	public String getAddProductDisplayPageURL() throws Exception {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceChannel.class.getName(),
@@ -87,6 +88,21 @@ public class CPDefinitionDisplayLayoutDisplayContext
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceChannel.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_channels/edit_cp_display_layout");
+		portletURL.setParameter(
+			"commerceChannelId", String.valueOf(getCommerceChannelId()));
+
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public CommerceChannel getCommerceChannel() {

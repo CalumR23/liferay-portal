@@ -17,25 +17,34 @@ package com.liferay.portal.search.elasticsearch7.internal.query;
 import com.liferay.portal.search.elasticsearch7.internal.query.function.score.ElasticsearchScoreFunctionTranslator;
 import com.liferay.portal.search.query.function.score.FieldValueFactorScoreFunction;
 import com.liferay.portal.search.test.util.query.BaseScoreFunctionTranslatorTestCase;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilder;
 
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 /**
  * @author André de Oliveira
  */
 public class ElasticsearchScoreFunctionTranslatorTest
 	extends BaseScoreFunctionTranslatorTestCase {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	protected String translate(
 		FieldValueFactorScoreFunction fieldValueFactorScoreFunction) {

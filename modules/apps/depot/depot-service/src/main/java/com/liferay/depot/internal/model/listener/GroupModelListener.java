@@ -41,7 +41,11 @@ public class GroupModelListener extends BaseModelListener<Group> {
 	public void onAfterRemove(Group group) throws ModelListenerException {
 		super.onAfterRemove(group);
 
+<<<<<<< HEAD
 		if ((group != null) || group.isDepot()) {
+=======
+		if (group.isDepot()) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			TransactionCommitCallbackUtil.registerCallback(
 				() -> {
 					DepotEntry depotEntry =

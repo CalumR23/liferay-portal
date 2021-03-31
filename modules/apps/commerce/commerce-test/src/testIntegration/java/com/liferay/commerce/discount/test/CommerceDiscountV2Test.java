@@ -25,7 +25,10 @@ import com.liferay.commerce.currency.model.CommerceMoney;
 import com.liferay.commerce.currency.test.util.CommerceCurrencyTestUtil;
 import com.liferay.commerce.discount.CommerceDiscountValue;
 import com.liferay.commerce.discount.constants.CommerceDiscountConstants;
+<<<<<<< HEAD
 import com.liferay.commerce.discount.constants.CommerceDiscountRuleConstants;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.discount.exception.DuplicateCommerceDiscountException;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalService;

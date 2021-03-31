@@ -193,6 +193,44 @@ WikiNodesManagementToolbarDisplayContext wikiNodesManagementToolbarDisplayContex
 										</span>
 									</c:if>
 
+<<<<<<< HEAD
+=======
+					<%
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", StringUtil.merge(wikiNodesManagementToolbarDisplayContext.getAvailableActions(node))
+						).build());
+
+					PortletURL rowURL = renderResponse.createRenderURL();
+
+					rowURL.setParameter("mvcRenderCommandName", "/wiki/view_pages");
+					rowURL.setParameter("navigation", "all-pages");
+					rowURL.setParameter("redirect", currentURL);
+					rowURL.setParameter("nodeId", String.valueOf(node.getNodeId()));
+					%>
+
+					<c:choose>
+						<c:when test='<%= displayStyle.equals("descriptive") %>'>
+							<liferay-ui:search-container-column-icon
+								icon="wiki"
+								toggleRowChecker="<%= true %>"
+							/>
+
+							<liferay-ui:search-container-column-text
+								colspan="<%= 2 %>"
+							>
+								<p class="h5">
+									<aui:a href="<%= rowURL.toString() %>">
+										<%= HtmlUtil.escape(node.getName()) %>
+									</aui:a>
+								</p>
+
+								<%
+								Date lastPostDate = node.getLastPostDate();
+								%>
+
+								<c:if test="<%= lastPostDate != null %>">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									<span class="text-default">
 										<liferay-ui:message arguments="<%= String.valueOf(WikiPageServiceUtil.getPagesCount(scopeGroupId, node.getNodeId(), true)) %>" key="x-pages" />
 									</span>

@@ -34,7 +34,10 @@ public class StyleBookEntrySoap implements Serializable {
 		StyleBookEntrySoap soapModel = new StyleBookEntrySoap();
 
 		soapModel.setMvccVersion(model.getMvccVersion());
+<<<<<<< HEAD
 		soapModel.setCtCollectionId(model.getCtCollectionId());
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		soapModel.setUuid(model.getUuid());
 		soapModel.setHeadId(model.getHeadId());
 		soapModel.setStyleBookEntryId(model.getStyleBookEntryId());
@@ -115,6 +118,7 @@ public class StyleBookEntrySoap implements Serializable {
 		_mvccVersion = mvccVersion;
 	}
 
+<<<<<<< HEAD
 	public long getCtCollectionId() {
 		return _ctCollectionId;
 	}
@@ -123,6 +127,8 @@ public class StyleBookEntrySoap implements Serializable {
 		_ctCollectionId = ctCollectionId;
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public String getUuid() {
 		return _uuid;
 	}
@@ -240,7 +246,10 @@ public class StyleBookEntrySoap implements Serializable {
 	}
 
 	private long _mvccVersion;
+<<<<<<< HEAD
 	private long _ctCollectionId;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private String _uuid;
 	private long _headId;
 	private long _styleBookEntryId;

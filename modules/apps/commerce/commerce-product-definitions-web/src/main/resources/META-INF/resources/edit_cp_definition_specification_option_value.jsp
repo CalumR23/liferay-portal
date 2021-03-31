@@ -40,7 +40,13 @@ long cpOptionCategoryId = BeanParamUtil.getLong(cpDefinitionSpecificationOptionV
 			<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 			<aui:input name="cpDefinitionSpecificationOptionValueId" type="hidden" value="<%= String.valueOf(cpDefinitionSpecificationOptionValue.getCPDefinitionSpecificationOptionValueId()) %>" />
 
+<<<<<<< HEAD
 			<aui:input defaultLanguageId="<%= cpDefinitionSpecificationOptionValueDisplayContext.getCatalogDefaultLanguageId() %>" name="value" value="<%= cpDefinitionSpecificationOptionValue.getValue(cpDefinitionSpecificationOptionValueDisplayContext.getCatalogDefaultLanguageId()) %>" />
+=======
+			<aui:model-context bean="<%= cpDefinitionSpecificationOptionValue %>" model="<%= CPDefinitionSpecificationOptionValue.class %>" />
+
+			<aui:input defaultLanguageId="<%= cpDefinitionSpecificationOptionValueDisplayContext.getCatalogDefaultLanguageId() %>" name="value" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<aui:select label="group" name="CPOptionCategoryId" showEmptyOption="<%= true %>">
 
@@ -56,6 +62,7 @@ long cpOptionCategoryId = BeanParamUtil.getLong(cpDefinitionSpecificationOptionV
 
 			</aui:select>
 
+<<<<<<< HEAD
 			<%
 			NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
 
@@ -66,6 +73,9 @@ long cpOptionCategoryId = BeanParamUtil.getLong(cpDefinitionSpecificationOptionV
 				<aui:validator name="min">[0]</aui:validator>
 				<aui:validator name="number" />
 			</aui:input>
+=======
+			<aui:input label="position" name="priority" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			<c:if test="<%= cpDefinitionSpecificationOptionValueDisplayContext.hasCustomAttributesAvailable() %>">
 				<liferay-expando:custom-attribute-list

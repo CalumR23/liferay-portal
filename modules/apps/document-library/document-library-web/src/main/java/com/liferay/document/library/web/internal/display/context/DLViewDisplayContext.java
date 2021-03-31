@@ -23,7 +23,10 @@ import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.web.internal.display.context.logic.DLPortletInstanceSettingsHelper;
 import com.liferay.document.library.web.internal.display.context.util.DLRequestHelper;
 import com.liferay.document.library.web.internal.security.permission.resource.DLFolderPermission;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -175,6 +178,7 @@ public class DLViewDisplayContext {
 	public String getSelectCategoriesURL()
 		throws PortalException, WindowStateException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				_httpServletRequest, AssetCategory.class.getName(),
@@ -190,6 +194,20 @@ public class DLViewDisplayContext {
 		).setWindowState(
 			LiferayWindowState.POP_UP
 		).buildString();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			_httpServletRequest, AssetCategory.class.getName(),
+			PortletProvider.Action.BROWSE);
+
+		portletURL.setParameter(
+			"eventName", _renderResponse.getNamespace() + "selectCategories");
+		portletURL.setParameter("selectedCategories", "{selectedCategories}");
+		portletURL.setParameter("singleSelect", "{singleSelect}");
+		portletURL.setParameter("vocabularyIds", "{vocabularyIds}");
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getSelectFileEntryTypeURL() throws WindowStateException {
@@ -248,6 +266,7 @@ public class DLViewDisplayContext {
 	}
 
 	public String getViewFileEntryTypeURL() throws PortletException {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLUtil.clone(_getCurrentPortletURL(), _renderResponse)
 		).setParameter(
@@ -255,6 +274,15 @@ public class DLViewDisplayContext {
 		).setParameter(
 			"fileEntryTypeId", (String)null
 		).buildString();
+=======
+		PortletURL portletURL = PortletURLUtil.clone(
+			_getCurrentPortletURL(), _renderResponse);
+
+		portletURL.setParameter("browseBy", "file-entry-type");
+		portletURL.setParameter("fileEntryTypeId", (String)null);
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public String getViewFileEntryURL() {

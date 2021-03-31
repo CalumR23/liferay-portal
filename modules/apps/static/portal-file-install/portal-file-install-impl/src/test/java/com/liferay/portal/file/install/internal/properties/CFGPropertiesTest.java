@@ -19,7 +19,11 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+import com.liferay.portal.kernel.test.rule.NewEnvTestRule;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -43,7 +47,11 @@ public class CFGPropertiesTest {
 	@Rule
 	public static final AggregateTestRule aggregateTestRule =
 		new AggregateTestRule(
+<<<<<<< HEAD
 			CodeCoverageAssertor.INSTANCE, LiferayUnitTestRule.INSTANCE);
+=======
+			CodeCoverageAssertor.INSTANCE, NewEnvTestRule.INSTANCE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Test
 	public void testException() throws IOException {

@@ -42,8 +42,11 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+<<<<<<< HEAD
 
 import java.util.Properties;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -167,6 +170,7 @@ public class EditDispatchTalendJobArchiveMVCActionCommand
 
 		dispatchTaskSettingsUnicodeProperties.put("JAVA_OPTS", newJVMOptions);
 
+<<<<<<< HEAD
 		Properties contextProperties = talendArchive.getContextProperties();
 
 		for (String propertyName : contextProperties.stringPropertyNames()) {
@@ -182,6 +186,8 @@ public class EditDispatchTalendJobArchiveMVCActionCommand
 					" (Automatic Copy)");
 		}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		_dispatchTriggerLocalService.updateDispatchTrigger(
 			dispatchTriggerId, dispatchTaskSettingsUnicodeProperties,
 			dispatchTrigger.getName());

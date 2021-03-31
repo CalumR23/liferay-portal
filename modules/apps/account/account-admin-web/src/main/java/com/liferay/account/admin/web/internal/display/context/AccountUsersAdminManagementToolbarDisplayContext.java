@@ -88,6 +88,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 				dropdownItem.putData("action", "deactivateAccountUsers");
 
 				PortletURL deactivateAccountUsersURL =
+<<<<<<< HEAD
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
 					).setActionName(
@@ -104,6 +105,22 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 						ParamUtil.getString(
 							httpServletRequest, "accountEntryIds")
 					).build();
+=======
+					liferayPortletResponse.createActionURL();
+
+				deactivateAccountUsersURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/account_admin/edit_account_users");
+				deactivateAccountUsersURL.setParameter(
+					Constants.CMD, Constants.DEACTIVATE);
+				deactivateAccountUsersURL.setParameter(
+					"navigation", getNavigation());
+				deactivateAccountUsersURL.setParameter(
+					"accountEntriesNavigation", _getAccountEntriesNavigation());
+				deactivateAccountUsersURL.setParameter(
+					"accountEntryIds",
+					ParamUtil.getString(httpServletRequest, "accountEntryIds"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.putData(
 					"deactivateAccountUsersURL",
@@ -126,6 +143,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 				dropdownItem.putData("action", "activateAccountUsers");
 
 				PortletURL activateAccountUsersURL =
+<<<<<<< HEAD
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
 					).setActionName(
@@ -142,6 +160,22 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 						ParamUtil.getString(
 							httpServletRequest, "accountEntryIds")
 					).build();
+=======
+					liferayPortletResponse.createActionURL();
+
+				activateAccountUsersURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/account_admin/edit_account_users");
+				activateAccountUsersURL.setParameter(
+					Constants.CMD, Constants.RESTORE);
+				activateAccountUsersURL.setParameter(
+					"navigation", getNavigation());
+				activateAccountUsersURL.setParameter(
+					"accountEntriesNavigation", _getAccountEntriesNavigation());
+				activateAccountUsersURL.setParameter(
+					"accountEntryIds",
+					ParamUtil.getString(httpServletRequest, "accountEntryIds"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.putData(
 					"activateAccountUsersURL",
@@ -164,6 +198,7 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 				dropdownItem.putData("action", "deleteAccountUsers");
 
 				PortletURL deleteAccountUsersURL =
+<<<<<<< HEAD
 					PortletURLBuilder.createActionURL(
 						liferayPortletResponse
 					).setActionName(
@@ -180,6 +215,22 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 						ParamUtil.getString(
 							httpServletRequest, "accountEntryIds")
 					).build();
+=======
+					liferayPortletResponse.createActionURL();
+
+				deleteAccountUsersURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/account_admin/edit_account_users");
+				deleteAccountUsersURL.setParameter(
+					Constants.CMD, Constants.DELETE);
+				deleteAccountUsersURL.setParameter(
+					"navigation", getNavigation());
+				deleteAccountUsersURL.setParameter(
+					"accountEntriesNavigation", _getAccountEntriesNavigation());
+				deleteAccountUsersURL.setParameter(
+					"accountEntryIds",
+					ParamUtil.getString(httpServletRequest, "accountEntryIds"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.putData(
 					"deleteAccountUsersURL", deleteAccountUsersURL.toString());
@@ -199,6 +250,13 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 
 		List<String> availableActions = new ArrayList<>();
 
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (!UserPermissionUtil.contains(
 				_themeDisplay.getPermissionChecker(),
 				accountUserDisplay.getUserId(), ActionKeys.DELETE)) {
@@ -429,6 +487,13 @@ public class AccountUsersAdminManagementToolbarDisplayContext
 
 	@Override
 	public Boolean isShowCreationMenu() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return PortalPermissionUtil.contains(
 			_themeDisplay.getPermissionChecker(), ActionKeys.ADD_USER);
 	}

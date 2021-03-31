@@ -2677,6 +2677,7 @@ public interface StructuredContentResource {
 						"/o/headless-delivery/v1.0/structured-contents/{structuredContentId}/permissions");
 
 			httpInvoker.path("structuredContentId", structuredContentId);
+<<<<<<< HEAD
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);
@@ -2763,6 +2764,8 @@ public interface StructuredContentResource {
 
 			httpInvoker.path("structuredContentId", structuredContentId);
 			httpInvoker.path("displayPageKey", displayPageKey);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			httpInvoker.userNameAndPassword(
 				_builder._login + ":" + _builder._password);

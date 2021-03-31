@@ -382,6 +382,7 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 				String resolution = attributes.get(
 					Constants.RESOLUTION_DIRECTIVE);
+<<<<<<< HEAD
 
 				if (!Objects.equals(
 						Constants.RESOLUTION_OPTIONAL, resolution)) {
@@ -390,6 +391,16 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 				}
 			}
 
+=======
+
+				if (!Objects.equals(
+						Constants.RESOLUTION_OPTIONAL, resolution)) {
+
+					parameterIterator.remove();
+				}
+			}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			if (imports.isEmpty()) {
 				iterator.remove();
 			}
@@ -441,10 +452,17 @@ public class DirectoryWatcher extends Thread implements BundleListener {
 
 					if (Objects.equals(
 							importEntry.getKey(), exportEntry.getKey())) {
+<<<<<<< HEAD
 
 						Map<String, String> importAttributes =
 							importEntry.getValue();
 
+=======
+
+						Map<String, String> importAttributes =
+							importEntry.getValue();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						String importVersionString = importAttributes.get(
 							Constants.VERSION_ATTRIBUTE);
 

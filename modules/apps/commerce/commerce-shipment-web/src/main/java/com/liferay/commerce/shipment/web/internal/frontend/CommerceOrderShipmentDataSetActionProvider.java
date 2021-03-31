@@ -91,6 +91,7 @@ public class CommerceOrderShipmentDataSetActionProvider
 	private String _getShipmentDeleteURL(
 		long commerceShipmentId, HttpServletRequest httpServletRequest) {
 
+<<<<<<< HEAD
 		PortletURL portletURL = PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
@@ -102,6 +103,19 @@ public class CommerceOrderShipmentDataSetActionProvider
 		).setParameter(
 			"commerceShipmentId", commerceShipmentId
 		).build();
+=======
+		PortletURL portletURL = _portal.getControlPanelPortletURL(
+			httpServletRequest, CommercePortletKeys.COMMERCE_SHIPMENT,
+			ActionRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_shipment/delete_commerce_shipment");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceShipmentId", String.valueOf(commerceShipmentId));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			portletURL.setWindowState(LiferayWindowState.POP_UP);

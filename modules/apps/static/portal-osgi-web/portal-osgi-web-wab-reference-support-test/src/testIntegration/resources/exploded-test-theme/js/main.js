@@ -5,7 +5,12 @@ AUI().ready(
 	loaded.
 	*/
 
+<<<<<<< HEAD
 	function () {}
+=======
+	function() {
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 );
 
 Liferay.Portlet.ready(
@@ -17,7 +22,12 @@ Liferay.Portlet.ready(
 	node: the Alloy Node object of the current portlet
 	*/
 
+<<<<<<< HEAD
 	function (portletId, node) {}
+=======
+	function(portletId, node) {
+	}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 );
 
 Liferay.on(
@@ -28,5 +38,11 @@ Liferay.on(
 	the page.
 	*/
 
+<<<<<<< HEAD
 	function () {}
 );
+=======
+	function() {
+	}
+);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

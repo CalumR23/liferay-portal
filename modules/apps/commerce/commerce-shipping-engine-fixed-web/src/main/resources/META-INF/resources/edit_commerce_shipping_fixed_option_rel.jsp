@@ -21,8 +21,13 @@ CommerceShippingFixedOptionRelsDisplayContext commerceShippingFixedOptionRelsDis
 
 CommerceShippingFixedOptionRel commerceShippingFixedOptionRel = commerceShippingFixedOptionRelsDisplayContext.getCommerceShippingFixedOptionRel();
 
+<<<<<<< HEAD
 long countryId = commerceShippingFixedOptionRelsDisplayContext.getCountryId();
 long regionId = commerceShippingFixedOptionRelsDisplayContext.getRegionId();
+=======
+long commerceCountryId = commerceShippingFixedOptionRelsDisplayContext.getCommerceCountryId();
+long commerceRegionId = commerceShippingFixedOptionRelsDisplayContext.getCommerceRegionId();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 long commerceShippingMethodId = commerceShippingFixedOptionRelsDisplayContext.getCommerceShippingMethodId();
 
 long commerceShippingFixedOptionRelId = 0;
@@ -90,6 +95,7 @@ if (commerceShippingFixedOptionRel != null) {
 
 			<div class="row">
 				<div class="col-md-4">
+<<<<<<< HEAD
 					<aui:select bean="<%= commerceShippingFixedOptionRel %>" label="country" model="<%= CommerceShippingFixedOptionRel.class %>" name="countryId" showEmptyOption="<%= true %>">
 
 						<%
@@ -99,6 +105,17 @@ if (commerceShippingFixedOptionRel != null) {
 						%>
 
 							<aui:option label="<%= country.getTitle(languageId) %>" selected="<%= (commerceShippingFixedOptionRel != null) && (commerceShippingFixedOptionRel.getCountryId() == country.getCountryId()) %>" value="<%= country.getCountryId() %>" />
+=======
+					<aui:select bean="<%= commerceShippingFixedOptionRel %>" label="country" model="<%= CommerceShippingFixedOptionRel.class %>" name="commerceCountryId" showEmptyOption="<%= true %>">
+
+						<%
+						List<CommerceCountry> commerceCountries = commerceShippingFixedOptionRelsDisplayContext.getCommerceCountries();
+
+						for (CommerceCountry commerceCountry : commerceCountries) {
+						%>
+
+							<aui:option label="<%= commerceCountry.getName(languageId) %>" selected="<%= (commerceShippingFixedOptionRel != null) && (commerceShippingFixedOptionRel.getCommerceCountryId() == commerceCountry.getCommerceCountryId()) %>" value="<%= commerceCountry.getCommerceCountryId() %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						<%
 						}
@@ -108,6 +125,7 @@ if (commerceShippingFixedOptionRel != null) {
 				</div>
 
 				<div class="col-md-4">
+<<<<<<< HEAD
 					<aui:select bean="<%= commerceShippingFixedOptionRel %>" label="region" model="<%= CommerceShippingFixedOptionRel.class %>" name="regionId" showEmptyOption="<%= true %>">
 
 						<%
@@ -117,6 +135,17 @@ if (commerceShippingFixedOptionRel != null) {
 						%>
 
 							<aui:option label="<%= region.getName() %>" selected="<%= (commerceShippingFixedOptionRel != null) && (commerceShippingFixedOptionRel.getRegionId() == region.getRegionId()) %>" value="<%= region.getRegionId() %>" />
+=======
+					<aui:select bean="<%= commerceShippingFixedOptionRel %>" label="region" model="<%= CommerceShippingFixedOptionRel.class %>" name="commerceRegionId" showEmptyOption="<%= true %>">
+
+						<%
+						List<CommerceRegion> commerceRegions = commerceShippingFixedOptionRelsDisplayContext.getCommerceRegions();
+
+						for (CommerceRegion commerceRegion : commerceRegions) {
+						%>
+
+							<aui:option label="<%= commerceRegion.getName() %>" selected="<%= (commerceShippingFixedOptionRel != null) && (commerceShippingFixedOptionRel.getCommerceRegionId() == commerceRegion.getCommerceRegionId()) %>" value="<%= commerceRegion.getCommerceRegionId() %>" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 						<%
 						}
@@ -164,6 +193,7 @@ if (commerceShippingFixedOptionRel != null) {
 <aui:script use="aui-base,liferay-dynamic-select">
 	new Liferay.DynamicSelect([
 		{
+<<<<<<< HEAD
 			select: '<portlet:namespace />countryId',
 			selectData: function (callback) {
 				Liferay.Service(
@@ -171,11 +201,21 @@ if (commerceShippingFixedOptionRel != null) {
 					{
 						active: true,
 						companyId: <%= company.getCompanyId() %>,
+=======
+			select: '<portlet:namespace />commerceCountryId',
+			selectData: function (callback) {
+				Liferay.Service(
+					'/commerce.commercecountry/get-commerce-countries',
+					{
+						companyId: <%= company.getCompanyId() %>,
+						active: true,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					},
 					callback
 				);
 			},
 			selectDesc: 'nameCurrentValue',
+<<<<<<< HEAD
 			selectId: 'countryId',
 			selectSort: '<%= true %>',
 			selectVal: '<%= countryId %>',
@@ -188,13 +228,32 @@ if (commerceShippingFixedOptionRel != null) {
 					{
 						active: true,
 						countryId: Number(selectKey),
+=======
+			selectId: 'commerceCountryId',
+			selectSort: '<%= true %>',
+			selectVal: '<%= commerceCountryId %>',
+		},
+		{
+			select: '<portlet:namespace />commerceRegionId',
+			selectData: function (callback, selectKey) {
+				Liferay.Service(
+					'/commerce.commerceregion/get-commerce-regions',
+					{
+						commerceCountryId: Number(selectKey),
+						active: true,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					},
 					callback
 				);
 			},
 			selectDesc: 'name',
+<<<<<<< HEAD
 			selectId: 'regionId',
 			selectVal: '<%= regionId %>',
+=======
+			selectId: 'commerceRegionId',
+			selectVal: '<%= commerceRegionId %>',
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		},
 	]);
 </aui:script>

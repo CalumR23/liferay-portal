@@ -349,11 +349,17 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 			HttpServletRequest httpServletRequest, CommerceOrder commerceOrder)
 		throws PortalException {
 
+<<<<<<< HEAD
 		if (commerceOrder != null) {
 			commerceOrder = _commerceOrderLocalService.recalculatePrice(
 				commerceOrder.getCommerceOrderId(),
 				_getCommerceContext(httpServletRequest));
 		}
+=======
+		commerceOrder = _commerceOrderLocalService.recalculatePrice(
+			commerceOrder.getCommerceOrderId(),
+			_getCommerceContext(httpServletRequest));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
@@ -379,6 +385,7 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 			return;
 		}
 
+<<<<<<< HEAD
 		Cookie cookie = new Cookie(cookieName, commerceOrder.getUuid());
 
 		String domain = CookieKeys.getDomain(httpServletRequest);
@@ -390,12 +397,19 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 		cookie.setMaxAge(CookieKeys.MAX_AGE);
 		cookie.setPath(StringPool.SLASH);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
+<<<<<<< HEAD
 		CookieKeys.addCookie(
 			httpServletRequest, themeDisplay.getResponse(), cookie);
+=======
+		_setGuestCommerceOrder(
+			commerceOrder, httpServletRequest, themeDisplay.getResponse());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference(
@@ -467,6 +481,19 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 			httpServletRequest);
 
 		_commerceOrderThreadLocal.set(userCommerceOrder);
+<<<<<<< HEAD
+=======
+
+		try {
+			_commerceOrderLocalService.mergeGuestCommerceOrder(
+				commerceOrder.getCommerceOrderId(),
+				userCommerceOrder.getCommerceOrderId(),
+				_getCommerceContext(httpServletRequest), serviceContext);
+		}
+		finally {
+			_commerceOrderThreadLocal.remove();
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		try {
 			_commerceOrderLocalService.mergeGuestCommerceOrder(
@@ -496,8 +523,11 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 		throws PortalException {
 
 		CommerceOrder commerceOrder = _commerceOrderThreadLocal.get();
+<<<<<<< HEAD
 
 		CommerceAccount commerceAccount = commerceContext.getCommerceAccount();
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (commerceOrder != null) {
 			CommerceOrder persistenceCommerceOrder =
@@ -537,8 +567,12 @@ public class CommerceOrderHttpHelperImpl implements CommerceOrderHttpHelper {
 
 		HttpSession httpSession = originalHttpServletRequest.getSession();
 
+<<<<<<< HEAD
 		String cookieName = getCookieName(
 			commerceChannel.getCommerceChannelId());
+=======
+		String cookieName = getCookieName(commerceChannel.getGroupId());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String commerceOrderUuid = (String)httpSession.getAttribute(cookieName);
 

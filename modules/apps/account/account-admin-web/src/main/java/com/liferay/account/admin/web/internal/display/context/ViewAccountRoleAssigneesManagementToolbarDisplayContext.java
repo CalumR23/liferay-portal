@@ -70,11 +70,18 @@ public class ViewAccountRoleAssigneesManagementToolbarDisplayContext
 					currentURLObj.toString()
 				).setParameter(
 					"accountEntryId",
+<<<<<<< HEAD
 					ParamUtil.getString(httpServletRequest, "accountEntryId")
 				).setParameter(
 					"accountRoleId",
 					ParamUtil.getString(httpServletRequest, "accountRoleId")
 				).build();
+=======
+					ParamUtil.getString(httpServletRequest, "accountEntryId"));
+				removeUsersURL.setParameter(
+					"accountRoleId",
+					ParamUtil.getString(httpServletRequest, "accountRoleId"));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				dropdownItem.putData(
 					"removeUsersURL", removeUsersURL.toString());

@@ -30,7 +30,10 @@ public class Cart {
 		_products = products;
 		_summary = summary;
 		_valid = valid;
+<<<<<<< HEAD
 		_orderStatusInfo = orderStatusInfo;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_success = true;
 	}

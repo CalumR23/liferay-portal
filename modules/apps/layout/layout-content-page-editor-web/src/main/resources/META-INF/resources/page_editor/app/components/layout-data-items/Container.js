@@ -171,7 +171,10 @@ const Container = React.forwardRef(
 						empty: !item.children.length && !height,
 						[`bg-${backgroundColor}`]:
 							backgroundColor && !backgroundColor.startsWith('#'),
+<<<<<<< HEAD
 						[justify]: !!justify,
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						[`ml-${marginLeft || 0}`]:
 							widthType !== CONTAINER_WIDTH_TYPES.fixed &&
 							!withinTopper,

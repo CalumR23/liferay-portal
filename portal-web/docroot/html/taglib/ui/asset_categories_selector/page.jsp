@@ -43,7 +43,13 @@ List<AssetVocabulary> vocabularies = new ArrayList<>();
 vocabularies.addAll(AssetVocabularyServiceUtil.getGroupVocabularies(groupIds));
 
 vocabularies.sort(new AssetVocabularyGroupLocalizedTitleComparator(scopeGroupId, locale, true));
+<<<<<<< HEAD
 %>
+=======
+
+if (Validator.isNotNull(className)) {
+	vocabularies = AssetUtil.filterVocabularies(vocabularies, className, classTypePK);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 <c:choose>
 	<c:when test="<%= Validator.isNotNull(className) %>">

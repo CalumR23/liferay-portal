@@ -124,6 +124,7 @@ public class ChannelDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -131,6 +132,16 @@ public class ChannelDisplayContext {
 		).setParameter(
 			"configurationScreenKey", "1-synced-sites"
 		).build();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/configuration_admin/view_configuration_screen");
+		portletURL.setParameter("configurationScreenKey", "1-synced-sites");
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private long _getCompanyId() {

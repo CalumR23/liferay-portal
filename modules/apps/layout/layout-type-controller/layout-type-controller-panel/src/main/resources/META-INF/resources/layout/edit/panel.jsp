@@ -55,7 +55,11 @@ if (selLayout != null) {
 		formatJSONResults: function (json) {
 			var output = [];
 
+<<<<<<< HEAD
 			A.each(json.children.list, (item, index) => {
+=======
+			A.each(json.children.list, function (item, index) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				var childPortlets = [];
 				var total = 0;
 
@@ -159,7 +163,11 @@ if (selLayout != null) {
 		initPanelSelectPortlets();
 	</c:if>
 
+<<<<<<< HEAD
 	Liferay.on('<portlet:namespace />toggleLayoutTypeFields', (event) => {
+=======
+	Liferay.on('<portlet:namespace />toggleLayoutTypeFields', function (event) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (event.type == 'panel') {
 			initPanelSelectPortlets();
 		}

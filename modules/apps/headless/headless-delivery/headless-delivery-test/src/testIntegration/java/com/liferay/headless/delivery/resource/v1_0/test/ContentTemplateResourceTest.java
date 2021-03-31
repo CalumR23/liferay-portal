@@ -43,8 +43,11 @@ import java.io.InputStream;
 
 import java.util.Collections;
 
+<<<<<<< HEAD
 import org.junit.Ignore;
 import org.junit.Test;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.runner.RunWith;
 
 /**
@@ -54,6 +57,7 @@ import org.junit.runner.RunWith;
 public class ContentTemplateResourceTest
 	extends BaseContentTemplateResourceTestCase {
 
+<<<<<<< HEAD
 	@Ignore
 	@Override
 	@Test
@@ -66,6 +70,8 @@ public class ContentTemplateResourceTest
 	public void testGetSiteContentTemplatesPageWithFilterStringEquals() {
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	protected ContentTemplate
 			testGetAssetLibraryContentTemplatesPage_addContentTemplate(
@@ -117,8 +123,13 @@ public class ContentTemplateResourceTest
 		DDMStructure ddmStructure = ddmStructureTestHelper.addStructure(
 			PortalUtil.getClassNameId(JournalArticle.class),
 			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+<<<<<<< HEAD
 			_deserialize(_read("test-ddm-structure.json")),
 			StorageType.DEFAULT.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+=======
+			_deserialize(_read("test-structured-content-structure.json")),
+			StorageType.JSON.getValue(), DDMStructureConstants.TYPE_DEFAULT);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		DDMTemplate ddmTemplate = DDMTemplateLocalServiceUtil.addTemplate(
 			TestPropsValues.getUserId(), group.getGroupId(),

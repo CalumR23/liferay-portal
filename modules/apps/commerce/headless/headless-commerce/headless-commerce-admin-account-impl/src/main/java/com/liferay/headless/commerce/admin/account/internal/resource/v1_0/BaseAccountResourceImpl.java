@@ -86,7 +86,11 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accountGroups/by-externalReferenceCode/{externalReferenceCode}/accounts' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "defaultBillingAccountAddressId": ___, "defaultShippingAccountAddressId": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+=======
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accountGroups/by-externalReferenceCode/{externalReferenceCode}/accounts' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override
@@ -178,7 +182,11 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "defaultBillingAccountAddressId": ___, "defaultShippingAccountAddressId": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+=======
+	 * curl -X 'POST' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override
@@ -279,7 +287,11 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "defaultBillingAccountAddressId": ___, "defaultShippingAccountAddressId": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+=======
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts/by-externalReferenceCode/{externalReferenceCode}' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override
@@ -413,7 +425,11 @@ public abstract class BaseAccountResourceImpl
 	/**
 	 * Invoke this method with the command line:
 	 *
+<<<<<<< HEAD
 	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts/{id}' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "defaultBillingAccountAddressId": ___, "defaultShippingAccountAddressId": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+=======
+	 * curl -X 'PATCH' 'http://localhost:8080/o/headless-commerce-admin-account/v1.0/accounts/{id}' -d $'{"accountAddresses": ___, "accountMembers": ___, "accountOrganizations": ___, "customFields": ___, "emailAddresses": ___, "externalReferenceCode": ___, "id": ___, "logoId": ___, "logoURL": ___, "name": ___, "root": ___, "taxId": ___, "type": ___}' --header 'Content-Type: application/json' -u 'test@liferay.com:test'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 */
 	@Consumes({"application/json", "application/xml"})
 	@Override

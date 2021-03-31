@@ -77,12 +77,19 @@ public class StyleBookEntryCacheModel
 
 	@Override
 	public String toString() {
+<<<<<<< HEAD
 		StringBundler sb = new StringBundler(33);
 
 		sb.append("{mvccVersion=");
 		sb.append(mvccVersion);
 		sb.append(", ctCollectionId=");
 		sb.append(ctCollectionId);
+=======
+		StringBundler sb = new StringBundler(31);
+
+		sb.append("{mvccVersion=");
+		sb.append(mvccVersion);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		sb.append(", uuid=");
 		sb.append(uuid);
 		sb.append(", headId=");
@@ -121,7 +128,10 @@ public class StyleBookEntryCacheModel
 		StyleBookEntryImpl styleBookEntryImpl = new StyleBookEntryImpl();
 
 		styleBookEntryImpl.setMvccVersion(mvccVersion);
+<<<<<<< HEAD
 		styleBookEntryImpl.setCtCollectionId(ctCollectionId);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (uuid == null) {
 			styleBookEntryImpl.setUuid("");
@@ -193,6 +203,7 @@ public class StyleBookEntryCacheModel
 		throws ClassNotFoundException, IOException {
 
 		mvccVersion = objectInput.readLong();
+		uuid = objectInput.readUTF();
 
 		ctCollectionId = objectInput.readLong();
 		uuid = objectInput.readUTF();
@@ -224,8 +235,11 @@ public class StyleBookEntryCacheModel
 	public void writeExternal(ObjectOutput objectOutput) throws IOException {
 		objectOutput.writeLong(mvccVersion);
 
+<<<<<<< HEAD
 		objectOutput.writeLong(ctCollectionId);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (uuid == null) {
 			objectOutput.writeUTF("");
 		}
@@ -282,7 +296,10 @@ public class StyleBookEntryCacheModel
 	}
 
 	public long mvccVersion;
+<<<<<<< HEAD
 	public long ctCollectionId;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public String uuid;
 	public long headId;
 	public boolean head;

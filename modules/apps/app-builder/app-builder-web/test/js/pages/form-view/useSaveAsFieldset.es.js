@@ -19,6 +19,10 @@ import React from 'react';
 
 import FormViewContext from '../../../../src/main/resources/META-INF/resources/js/pages/form-view/FormViewContext.es';
 import useSaveAsFieldset from '../../../../src/main/resources/META-INF/resources/js/pages/form-view/useSaveAsFieldset.es';
+<<<<<<< HEAD
+=======
+import * as toast from '../../../../src/main/resources/META-INF/resources/js/utils/toast.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {FORM_VIEW, dataLayoutBuilderConfig} from '../../constants.es';
 
 const {FORM_VIEW_CONTEXT} = FORM_VIEW;

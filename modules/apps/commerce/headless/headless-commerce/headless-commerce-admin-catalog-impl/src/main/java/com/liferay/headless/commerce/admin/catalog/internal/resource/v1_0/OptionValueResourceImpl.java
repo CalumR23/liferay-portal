@@ -67,6 +67,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 )
 public class OptionValueResourceImpl
 	extends BaseOptionValueResourceImpl implements NestedFieldSupport {
+<<<<<<< HEAD
 
 	@Override
 	public Response deleteOptionValue(Long id) throws Exception {
@@ -99,6 +100,8 @@ public class OptionValueResourceImpl
 
 		return responseBuilder.build();
 	}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Override
 	public Page<OptionValue> getOptionByExternalReferenceCodeOptionValuesPage(

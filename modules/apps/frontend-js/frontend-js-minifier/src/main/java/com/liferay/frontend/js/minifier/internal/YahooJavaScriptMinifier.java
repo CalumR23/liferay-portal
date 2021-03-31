@@ -37,14 +37,20 @@ import org.osgi.service.component.annotations.Modified;
 
 /**
  * @author Carlos Sierra Andrés
+<<<<<<< HEAD
  * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
  */
 @Component(
 	configurationPid = "com.frontend.js.minifier.configuration.YahooJavaScriptMinifierConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	service = JavaScriptMinifier.class
 )
+<<<<<<< HEAD
 @Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 public class YahooJavaScriptMinifier implements JavaScriptMinifier {
 
 	@Override
@@ -66,7 +72,11 @@ public class YahooJavaScriptMinifier implements JavaScriptMinifier {
 				_yahooJavaScriptMinifierConfiguration.jsDisableOptimizations());
 		}
 		catch (Exception exception) {
+<<<<<<< HEAD
 			_log.error("Unable to minify JavaScript:\n" + content, exception);
+=======
+			_log.error("Unable to minify JavaScript:\n" + content);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			unsyncStringWriter.append(content);
 		}

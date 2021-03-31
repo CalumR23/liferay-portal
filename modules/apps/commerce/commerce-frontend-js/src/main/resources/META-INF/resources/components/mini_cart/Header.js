@@ -36,8 +36,13 @@ function Header() {
 					</h3>
 				</div>
 				{toggleable && (
+<<<<<<< HEAD
 					<button className="mini-cart-close" onClick={closeCart}>
 						<ClayIcon spritemap={spritemap} symbol="times" />
+=======
+					<button className={'mini-cart-close'} onClick={closeCart}>
+						<ClayIcon spritemap={spritemap} symbol={'times'} />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					</button>
 				)}
 			</div>

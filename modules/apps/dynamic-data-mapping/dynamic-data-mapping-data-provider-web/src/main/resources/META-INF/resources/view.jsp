@@ -20,12 +20,18 @@
 String backURL = ParamUtil.getString(request, "backURL");
 
 String displayStyle = ddmDataProviderDisplayContext.getDisplayStyle();
+<<<<<<< HEAD
 
 PortletURL portletURL = PortletURLBuilder.create(
 	ddmDataProviderDisplayContext.getPortletURL()
 ).setParameter(
 	"displayStyle", displayStyle
 ).build();
+=======
+PortletURL portletURL = ddmDataProviderDisplayContext.getPortletURL();
+
+portletURL.setParameter("displayStyle", displayStyle);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 portletDisplay.setShowBackIcon(ddmDataProviderDisplayContext.isShowBackIcon());
 portletDisplay.setURLBack(backURL);

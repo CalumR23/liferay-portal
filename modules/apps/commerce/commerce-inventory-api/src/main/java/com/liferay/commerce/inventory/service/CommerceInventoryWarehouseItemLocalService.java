@@ -277,6 +277,7 @@ public interface CommerceInventoryWarehouseItemLocalService
 		throws PortalException;
 
 	/**
+<<<<<<< HEAD
 	 * Returns the commerce inventory warehouse item with the matching external reference code and company.
 	 *
 	 * @param companyId the primary key of the company
@@ -291,6 +292,8 @@ public interface CommerceInventoryWarehouseItemLocalService
 		throws PortalException;
 
 	/**
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
 	 #getCommerceInventoryWarehouseItemByReferenceCode(String,
 	 long)}

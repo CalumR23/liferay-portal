@@ -24,7 +24,11 @@ import com.liferay.dynamic.data.mapping.form.item.selector.criterion.DDMUserPers
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.item.selector.ItemSelector;
+<<<<<<< HEAD
 import com.liferay.item.selector.ItemSelectorCriterion;
+=======
+import com.liferay.item.selector.ItemSelectorReturnType;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.item.selector.criteria.FileEntryItemSelectorReturnType;
 import com.liferay.item.selector.criteria.file.criterion.FileItemSelectorCriterion;
 import com.liferay.petra.string.StringBundler;
@@ -64,8 +68,13 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Calendar;
+=======
+import java.util.Calendar;
+import java.util.Collections;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -165,11 +174,14 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			"maximumSubmissionLimitReached",
 			GetterUtil.getBoolean(
 				ddmFormField.getProperty("maximumSubmissionLimitReached")));
+<<<<<<< HEAD
 		parameters.put(
 			"message",
 			_getMessage(
 				ddmFormFieldRenderingContext.getLocale(),
 				ddmFormFieldRenderingContext.getValue()));
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		String value = ddmFormFieldRenderingContext.getValue();
 
@@ -270,6 +282,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 		long groupId = GetterUtil.getLong(
 			ddmFormFieldRenderingContext.getProperty("groupId"));
+<<<<<<< HEAD
 
 		Group group = _groupLocalService.fetchGroup(groupId);
 
@@ -316,6 +329,35 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			group, groupId, portletNamespace + "selectDocumentLibrary",
 			itemSelectorCriteria.toArray(new ItemSelectorCriterion[0]));
 
+=======
+
+		Group group = _groupLocalService.fetchGroup(groupId);
+
+		if (group == null) {
+			ThemeDisplay themeDisplay = getThemeDisplay(httpServletRequest);
+
+			if (themeDisplay != null) {
+				group = themeDisplay.getScopeGroup();
+			}
+		}
+
+		FileItemSelectorCriterion fileItemSelectorCriterion =
+			new FileItemSelectorCriterion();
+
+		fileItemSelectorCriterion.setDesiredItemSelectorReturnTypes(
+			Collections.<ItemSelectorReturnType>singletonList(
+				new FileEntryItemSelectorReturnType()));
+
+		PortletURL itemSelectorURL = _itemSelector.getItemSelectorURL(
+			RequestBackedPortletURLFactoryUtil.create(httpServletRequest),
+			group, groupId,
+			ddmFormFieldRenderingContext.getPortletNamespace() +
+				"selectDocumentLibrary",
+			fileItemSelectorCriterion);
+
+		itemSelectorURL.setParameter("folderId", String.valueOf(folderId));
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return itemSelectorURL.toString();
 	}
 
@@ -527,6 +569,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		return DLFolderConstants.DEFAULT_PARENT_FOLDER_ID;
 	}
 
+<<<<<<< HEAD
 	private String _getMessage(Locale defaultLocale, String value) {
 		if (Validator.isNull(value)) {
 			return StringPool.BLANK;
@@ -555,6 +598,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		return StringPool.BLANK;
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private Folder _getPrivateUserFolder(
 		long repositoryId, long parentFolderId,
 		HttpServletRequest httpServletRequest, User user) {
@@ -618,9 +663,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 	private ItemSelector _itemSelector;
 
 	@Reference
+<<<<<<< HEAD
 	private Portal _portal;
 
 	@Reference
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private PortletFileRepository _portletFileRepository;
 
 	@Reference

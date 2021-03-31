@@ -143,6 +143,7 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 						<c:if test="<%= commerceCartContentDisplayContext.hasViewPricePermission() %>">
 
 							<%
+<<<<<<< HEAD
 							CommerceMoney unitPriceCommerceMoney = commerceCartContentDisplayContext.getUnitPriceCommerceMoney(commerceOrderItem);
 							CommerceMoney unitPromoPriceCommerceMoney = commerceCartContentDisplayContext.getUnitPromoPriceCommerceMoney(commerceOrderItem);
 							%>
@@ -168,6 +169,16 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 							%>
 
 							<%= HtmlUtil.escape(discountAmountCommerceMoney.format(locale)) %>
+=======
+							CommerceMoney unitPriceCommerceMoney = commerceOrderItem.getUnitPriceMoney();
+
+							if (commercePriceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+								unitPriceCommerceMoney = commerceOrderItem.getUnitPriceWithTaxAmountMoney();
+							}
+							%>
+
+							<%= HtmlUtil.escape(unitPriceCommerceMoney.format(locale)) %>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						</c:if>
 					</liferay-ui:search-container-column-text>
 
@@ -187,7 +198,15 @@ Map<Long, List<CommerceOrderValidatorResult>> commerceOrderValidatorResultMap = 
 						<c:if test="<%= commerceCartContentDisplayContext.hasViewPricePermission() %>">
 
 							<%
+<<<<<<< HEAD
 							CommerceMoney finalPriceCommerceMoney = commerceCartContentDisplayContext.getFinalPriceCommerceMoney(commerceOrderItem);
+=======
+							CommerceMoney finalPriceCommerceMoney = commerceOrderItem.getFinalPriceMoney();
+
+							if (commercePriceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
+								finalPriceCommerceMoney = commerceOrderItem.getFinalPriceWithTaxAmountMoney();
+							}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							%>
 
 							<%= HtmlUtil.escape(finalPriceCommerceMoney.format(locale)) %>

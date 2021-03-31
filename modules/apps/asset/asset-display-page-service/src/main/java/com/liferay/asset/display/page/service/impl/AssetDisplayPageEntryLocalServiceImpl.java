@@ -191,6 +191,7 @@ public class AssetDisplayPageEntryLocalServiceImpl
 	}
 
 	@Override
+<<<<<<< HEAD
 	public int getAssetDisplayPageEntriesCount(
 		long classNameId, long classTypeId, long layoutPageTemplateEntryId,
 		boolean defaultTemplate) {
@@ -214,6 +215,8 @@ public class AssetDisplayPageEntryLocalServiceImpl
 	}
 
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public int getAssetDisplayPageEntriesCountByLayoutPageTemplateEntryId(
 		long layoutPageTemplateEntryId) {
 

@@ -86,7 +86,10 @@ public abstract class BasePriceModifierCategoryResourceImpl
 	 * curl -X 'DELETE' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/price-modifier-categories/{priceModifierCategoryId}'  -u 'test@liferay.com:test'
 	 */
 	@DELETE
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Parameters(
 		value = {
 			@Parameter(in = ParameterIn.PATH, name = "priceModifierCategoryId")
@@ -97,8 +100,12 @@ public abstract class BasePriceModifierCategoryResourceImpl
 	@Tags(value = {@Tag(name = "PriceModifierCategory")})
 	public void deletePriceModifierCategory(
 			@NotNull @Parameter(hidden = true)
+<<<<<<< HEAD
 			@PathParam("priceModifierCategoryId")
 				Long priceModifierCategoryId)
+=======
+			@PathParam("priceModifierCategoryId") Long priceModifierCategoryId)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 	}
 
@@ -117,8 +124,13 @@ public abstract class BasePriceModifierCategoryResourceImpl
 	@Produces("application/json")
 	@Tags(value = {@Tag(name = "PriceModifierCategory")})
 	public Response deletePriceModifierCategoryBatch(
+<<<<<<< HEAD
 			@Parameter(hidden = true) @QueryParam("callbackURL")
 				String callbackURL,
+=======
+			@Parameter(hidden = true) @QueryParam("callbackURL") String
+				callbackURL,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			Object object)
 		throws Exception {
 

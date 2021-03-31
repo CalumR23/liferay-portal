@@ -62,7 +62,11 @@ const EditFormView = (props) => {
 
 	if (document.querySelector('.change-tracking-indicator')) {
 		WrapperComponent = ({children}) => (
+<<<<<<< HEAD
 			<div className="menu-indicator-enabled">{children}</div>
+=======
+			<div className="publications-enabled">{children}</div>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		);
 	}
 
@@ -77,7 +81,11 @@ const EditFormView = (props) => {
 
 					<FormViewUpperToolbar
 						newCustomObject={newCustomObject}
+<<<<<<< HEAD
 						popUpWindow={popUpWindow}
+=======
+						showTranslationManager={showTranslationManager}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					/>
 
 					{createPortal(

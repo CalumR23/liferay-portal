@@ -19,10 +19,21 @@ import MiniCartContext from './MiniCartContext';
 import {ITEMS_LIST} from './util/constants';
 
 function Wrapper() {
+<<<<<<< HEAD
 	const {CartViews, isOpen, spritemap} = useContext(MiniCartContext);
 
 	return (
 		<div className="mini-cart-wrapper">
+=======
+	const {CartViews, cartState, isOpen, spritemap} = useContext(
+		MiniCartContext
+	);
+
+	const {cartItems = []} = cartState;
+
+	return (
+		<div className={'mini-cart-wrapper'}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			<CartViews.Header />
 
 			<div className="mini-cart-wrapper-items">

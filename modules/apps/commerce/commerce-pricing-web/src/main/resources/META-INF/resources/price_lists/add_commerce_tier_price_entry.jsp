@@ -33,7 +33,11 @@ boolean neverExpire = true;
 <commerce-ui:modal-content
 	title='<%= LanguageUtil.get(request, "add-new-price-tier") %>'
 >
+<<<<<<< HEAD
 	<aui:form action="<%= editCommerceTierPriceEntryActionURL %>" method="post" name="fm">
+=======
+	<aui:form action="<%= editCommerceTierPriceEntryActionURL %>" cssClass="container-fluid-1280" method="post" name="fm">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		<aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.ADD %>" />
 		<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 		<aui:input name="commercePriceEntryId" type="hidden" value="<%= commercePriceEntryId %>" />

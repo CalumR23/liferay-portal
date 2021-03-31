@@ -127,11 +127,16 @@ public class ServiceConfigurationInitializer {
 
 	private void _readResourceActions() {
 		try {
+<<<<<<< HEAD
 			_resourceActions.populateModelResources(
+=======
+			_resourceActions.readAndCheck(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				_classLoader,
 				StringUtil.split(
 					_portletConfiguration.get(
 						PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
+<<<<<<< HEAD
 
 			if (!PropsValues.RESOURCE_ACTIONS_STRICT_MODE_ENABLED) {
 				_resourceActions.populatePortletResources(
@@ -140,6 +145,8 @@ public class ServiceConfigurationInitializer {
 						_portletConfiguration.get(
 							PropsKeys.RESOURCE_ACTIONS_CONFIGS)));
 			}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 		catch (Exception exception) {
 			_log.error(

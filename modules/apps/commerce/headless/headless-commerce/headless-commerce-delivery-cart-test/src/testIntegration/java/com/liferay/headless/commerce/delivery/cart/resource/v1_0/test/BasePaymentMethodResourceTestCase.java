@@ -206,7 +206,11 @@ public abstract class BasePaymentMethodResourceTestCase {
 		Long irrelevantCartId =
 			testGetCartPaymentMethodsPage_getIrrelevantCartId();
 
+<<<<<<< HEAD
 		if (irrelevantCartId != null) {
+=======
+		if ((irrelevantCartId != null)) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			PaymentMethod irrelevantPaymentMethod =
 				testGetCartPaymentMethodsPage_addPaymentMethod(
 					irrelevantCartId, randomIrrelevantPaymentMethod());
@@ -679,12 +683,21 @@ public abstract class BasePaymentMethodResourceTestCase {
 						_parameterMap.entrySet()) {
 
 					sb.append(entry.getKey());
+<<<<<<< HEAD
 					sb.append(": ");
 					sb.append(entry.getValue());
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(":");
+					sb.append(entry.getValue());
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append(")");
 			}
@@ -694,10 +707,17 @@ public abstract class BasePaymentMethodResourceTestCase {
 
 				for (GraphQLField graphQLField : _graphQLFields) {
 					sb.append(graphQLField.toString());
+<<<<<<< HEAD
 					sb.append(", ");
 				}
 
 				sb.setLength(sb.length() - 2);
+=======
+					sb.append(",");
+				}
+
+				sb.setLength(sb.length() - 1);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				sb.append("}");
 			}

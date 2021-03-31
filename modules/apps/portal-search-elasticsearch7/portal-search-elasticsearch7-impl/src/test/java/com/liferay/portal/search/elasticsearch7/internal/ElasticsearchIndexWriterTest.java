@@ -23,7 +23,10 @@ import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.search.test.util.indexing.BaseIndexingTestCase;
 import com.liferay.portal.search.test.util.indexing.DocumentFixture;
 import com.liferay.portal.search.test.util.indexing.IndexingFixture;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +36,11 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -42,6 +48,7 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexWriterTest extends BaseIndexingTestCase {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
@@ -49,6 +56,9 @@ public class ElasticsearchIndexWriterTest extends BaseIndexingTestCase {
 
 	@Before
 	@Override
+=======
+	@Before
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void setUp() throws Exception {
 		super.setUp();
 
@@ -56,7 +66,10 @@ public class ElasticsearchIndexWriterTest extends BaseIndexingTestCase {
 	}
 
 	@After
+<<<<<<< HEAD
 	@Override
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public void tearDown() throws SearchException {
 		Stream<Document> stream = _documents.stream();
 

@@ -29,6 +29,10 @@ import com.liferay.commerce.exception.CommerceOrderStatusException;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.model.CommerceRegion;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.model.CommerceShippingMethod;
 import com.liferay.commerce.order.CommerceOrderValidatorRegistry;
 import com.liferay.commerce.order.CommerceOrderValidatorResult;
@@ -42,6 +46,10 @@ import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.CommerceAddressService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderService;
+<<<<<<< HEAD
+=======
+import com.liferay.commerce.service.CommerceRegionLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.service.CommerceShippingMethodLocalService;
 import com.liferay.commerce.util.CommerceShippingHelper;
 import com.liferay.headless.commerce.core.util.ExpandoUtil;
@@ -68,6 +76,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+<<<<<<< HEAD
+=======
+
+import javax.validation.constraints.NotNull;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import javax.ws.rs.core.Response;
 
@@ -192,7 +205,11 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public Cart postCartCouponCode(Long cartId, CouponCode couponCode)
+=======
+	public Cart postCartCouponCode(@NotNull Long cartId, CouponCode couponCode)
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		throws Exception {
 
 		CommerceOrder commerceOrder = _commerceOrderService.getCommerceOrder(
@@ -271,7 +288,198 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 			commerceAccount.getCommerceAccountId(), commerceCurrencyId);
 	}
 
+<<<<<<< HEAD
 	private void _addOrUpdateBillingAddress(
+=======
+	private long _getCommerceRegionId(
+			CommerceAddress commerceAddress, CommerceCountry commerceCountry,
+			Address address)
+		throws Exception {
+
+		if (Validator.isNull(address.getRegionISOCode()) &&
+			(commerceAddress != null)) {
+
+			return commerceAddress.getCommerceRegionId();
+		}
+
+		if (Validator.isNull(address.getRegionISOCode()) ||
+			(commerceCountry == null)) {
+
+			return 0;
+		}
+
+		CommerceRegion commerceRegion =
+			_commerceRegionLocalService.getCommerceRegion(
+				commerceCountry.getCommerceCountryId(),
+				address.getRegionISOCode());
+
+		return commerceRegion.getCommerceRegionId();
+	}
+
+	private CartItem[] _getValidatedCommerceOrderItems(
+			CommerceOrder commerceOrder, Cart cart)
+		throws Exception {
+
+		List<CartItem> cartItems = new ArrayList<>();
+
+		Map<Long, List<CommerceOrderValidatorResult>>
+			commerceOrderValidatorResults =
+				_commerceOrderValidatorRegistry.
+					getCommerceOrderValidatorResults(null, commerceOrder);
+
+		List<CommerceOrderItem> commerceOrderItems =
+			commerceOrder.getCommerceOrderItems();
+
+		for (CommerceOrderItem commerceOrderItem : commerceOrderItems) {
+			CartItem cartItem = _cartItemDTOConverter.toDTO(
+				new DefaultDTOConverterContext(
+					commerceOrderItem.getCommerceOrderItemId(),
+					contextAcceptLanguage.getPreferredLocale()));
+
+			if (commerceOrderValidatorResults.containsKey(
+					commerceOrderItem.getCommerceOrderItemId())) {
+
+				List<CommerceOrderValidatorResult>
+					commerceOrderItemValidatorResults =
+						commerceOrderValidatorResults.get(
+							commerceOrderItem.getCommerceOrderItemId());
+
+				Stream<CommerceOrderValidatorResult>
+					commerceOrderValidatorResultStream =
+						commerceOrderItemValidatorResults.stream();
+
+				boolean cartItemValid = commerceOrderValidatorResultStream.map(
+					commerceOrderItemValidatorResult ->
+						commerceOrderItemValidatorResult.isValid()
+				).reduce(
+					true, Boolean::logicalAnd
+				);
+
+				cartItem.setValid(cartItemValid);
+
+				cart.setValid(cartItemValid);
+
+				commerceOrderValidatorResultStream =
+					commerceOrderItemValidatorResults.stream();
+
+				cartItem.setErrorMessages(
+					commerceOrderValidatorResultStream.map(
+						commerceOrderItemValidatorResult ->
+							commerceOrderItemValidatorResult.
+								getLocalizedMessage()
+					).toArray(
+						String[]::new
+					));
+			}
+
+			cartItems.add(cartItem);
+		}
+
+		return cartItems.toArray(new CartItem[0]);
+	}
+
+	private Cart _toCart(CommerceOrder commerceOrder) throws Exception {
+		return _cartDTOConverter.toDTO(
+			new DefaultDTOConverterContext(
+				commerceOrder.getCommerceOrderId(),
+				contextAcceptLanguage.getPreferredLocale()));
+	}
+
+	private List<Cart> _toCarts(List<CommerceOrder> commerceOrders)
+		throws Exception {
+
+		List<Cart> carts = new ArrayList<>();
+
+		for (CommerceOrder commerceOrder : commerceOrders) {
+			carts.add(_toCart(commerceOrder));
+		}
+
+		return carts;
+	}
+
+	private void _updateCommerceOrderAddress(
+			CommerceOrder commerceOrder, Address address, int type,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		CommerceAddress commerceAddress =
+			_commerceAddressService.getCommerceAddress(
+				commerceOrder.getShippingAddressId());
+
+		CommerceCountry commerceCountry = commerceAddress.getCommerceCountry();
+
+		_commerceAddressService.updateCommerceAddress(
+			commerceAddress.getCommerceAddressId(), address.getName(),
+			GetterUtil.get(
+				address.getDescription(), commerceAddress.getDescription()),
+			address.getStreet1(),
+			GetterUtil.get(address.getStreet2(), commerceAddress.getStreet2()),
+			GetterUtil.get(address.getStreet3(), commerceAddress.getStreet3()),
+			address.getCity(),
+			GetterUtil.get(address.getZip(), commerceAddress.getZip()),
+			_getCommerceRegionId(commerceAddress, commerceCountry, address),
+			commerceCountry.getCommerceCountryId(),
+			GetterUtil.get(
+				address.getPhoneNumber(), commerceAddress.getPhoneNumber()),
+			type, serviceContext);
+	}
+
+	private void _updateOrder(CommerceOrder commerceOrder, Cart cart)
+		throws Exception {
+
+		long commerceShippingMethodId =
+			commerceOrder.getCommerceShippingMethodId();
+
+		CommerceShippingMethod commerceShippingMethod =
+			_commerceShippingMethodLocalService.fetchCommerceShippingMethod(
+				commerceOrder.getGroupId(), cart.getShippingMethod());
+
+		if (commerceShippingMethod != null) {
+			commerceShippingMethodId =
+				commerceShippingMethod.getCommerceShippingMethodId();
+		}
+
+		CommerceContext commerceContext = _commerceContextFactory.create(
+			contextCompany.getCompanyId(), commerceOrder.getGroupId(),
+			contextUser.getUserId(), commerceOrder.getCommerceOrderId(),
+			commerceOrder.getCommerceAccountId());
+
+		commerceOrder = _commerceOrderService.updateCommerceOrder(
+			commerceOrder.getCommerceOrderId(),
+			GetterUtil.get(
+				cart.getBillingAddressId(),
+				commerceOrder.getBillingAddressId()),
+			GetterUtil.get(
+				cart.getShippingAddressId(),
+				commerceOrder.getShippingAddressId()),
+			GetterUtil.get(
+				cart.getPaymentMethod(),
+				commerceOrder.getCommercePaymentMethodKey()),
+			commerceShippingMethodId,
+			GetterUtil.get(
+				cart.getShippingOption(),
+				commerceOrder.getShippingOptionName()),
+			commerceOrder.getPurchaseOrderNumber(), commerceOrder.getSubtotal(),
+			commerceOrder.getShippingAmount(), commerceOrder.getTotal(),
+			commerceOrder.getAdvanceStatus(), commerceContext);
+
+		// Expando
+
+		Map<String, ?> customFields = cart.getCustomFields();
+
+		if ((customFields != null) && !customFields.isEmpty()) {
+			ExpandoUtil.updateExpando(
+				contextCompany.getCompanyId(), CommerceOrder.class,
+				commerceOrder.getPrimaryKey(), customFields);
+		}
+
+		// Update nested resources
+
+		_upsertNestedResources(cart, commerceOrder, commerceContext);
+	}
+
+	private void _upsertBillingAddress(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			CommerceOrder commerceOrder, Address address, int type,
 			CommerceContext commerceContext, ServiceContext serviceContext)
 		throws Exception {
@@ -419,6 +627,7 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 			commerceOrder.getAdvanceStatus(), commerceContext);
 	}
 
+<<<<<<< HEAD
 	private long _getRegionId(
 			CommerceAddress commerceAddress, Country country, Address address)
 		throws Exception {
@@ -601,6 +810,8 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 		_addOrUpdateNestedResources(cart, commerceOrder, commerceContext);
 	}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private Cart _validateOrder(CommerceOrder commerceOrder) throws Exception {
 		List<String> errorMessages = new ArrayList<>();
 
@@ -639,6 +850,12 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 
 	@Reference
 	private CommerceChannelService _commerceChannelService;
+<<<<<<< HEAD
+=======
+
+	@Reference
+	private CommerceContextFactory _commerceContextFactory;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private CommerceContextFactory _commerceContextFactory;
@@ -657,19 +874,33 @@ public class CartResourceImpl extends BaseCartResourceImpl {
 
 	@Reference
 	private CommerceOrderValidatorRegistry _commerceOrderValidatorRegistry;
+<<<<<<< HEAD
 
 	@Reference
 	private CommercePaymentEngine _commercePaymentEngine;
 
 	@Reference
+=======
+
+	@Reference
+	private CommercePaymentEngine _commercePaymentEngine;
+
+	@Reference
+	private CommerceRegionLocalService _commerceRegionLocalService;
+
+	@Reference
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private CommerceShippingHelper _commerceShippingHelper;
 
 	@Reference
 	private CommerceShippingMethodLocalService
 		_commerceShippingMethodLocalService;
+<<<<<<< HEAD
 
 	@Reference
 	private CountryService _countryService;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Reference
 	private CPInstanceLocalService _cpInstanceLocalService;

@@ -39,7 +39,10 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.util.Validator;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.servlet.filters.threadlocal.ThreadLocalFilterThreadLocal;
 
 import java.io.Serializable;
@@ -100,9 +103,30 @@ public class FinderCacheImpl
 
 	@Override
 	public void clearCache(Class<?> clazz) {
+<<<<<<< HEAD
 		clearByEntityCache(clazz.getName());
 	}
 
+	/**
+	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
+	 * 			#clearCache(Class)}
+	 */
+	@Deprecated
+	@Override
+	public void clearCache(String className) {
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+		clearLocalCache();
+
+		String className = clazz.getName();
+
+		_clearCache(className);
+		_clearCache(_getCacheNameWithPagination(className));
+		_clearCache(_getCacheNameWithoutPagination(className));
+	}
+
+<<<<<<< HEAD
+=======
 	/**
 	 * @deprecated As of Cavanaugh (7.4.x), replaced by {@link
 	 * 			#clearCache(Class)}
@@ -117,6 +141,7 @@ public class FinderCacheImpl
 		portalCache.removeAll();
 	}
 
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Override
 	public void clearLocalCache() {
 		if (_isLocalCacheEnabled()) {
@@ -183,6 +208,7 @@ public class FinderCacheImpl
 			return cacheValue;
 		}
 
+<<<<<<< HEAD
 		Map.Entry<String, Serializable> cacheResultEntry =
 			(Map.Entry<String, Serializable>)cacheValue;
 
@@ -196,6 +222,8 @@ public class FinderCacheImpl
 
 		cacheValue = cacheResultEntry.getValue();
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		if (cacheValue instanceof List<?>) {
 			List<Serializable> primaryKeys = (List<Serializable>)cacheValue;
 
@@ -217,6 +245,7 @@ public class FinderCacheImpl
 			return Collections.unmodifiableList(list);
 		}
 
+<<<<<<< HEAD
 		return basePersistence.fetchByPrimaryKey(cacheValue);
 	}
 
@@ -231,6 +260,9 @@ public class FinderCacheImpl
 		BasePersistenceImpl<? extends BaseModel<?>> basePersistenceImpl) {
 
 		return getResult(finderPath, args);
+=======
+		return basePersistenceImpl.fetchByPrimaryKey(cacheValue);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -289,16 +321,22 @@ public class FinderCacheImpl
 				return;
 			}
 			else if (finderPath.isBaseModelResult()) {
+<<<<<<< HEAD
 				String baseModelClassName = null;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				ArrayList<Serializable> primaryKeys = new ArrayList<>(
 					objects.size());
 
 				for (Object object : objects) {
 					BaseModel<?> baseModel = (BaseModel<?>)object;
+<<<<<<< HEAD
 
 					if (baseModelClassName == null) {
 						baseModelClassName = baseModel.getModelClassName();
 					}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 					primaryKeys.add(baseModel.getPrimaryKeyObj());
 				}
@@ -325,6 +363,7 @@ public class FinderCacheImpl
 		}
 
 		if (!finderPaths.containsKey(cacheKeyPrefix)) {
+<<<<<<< HEAD
 			FinderPath originalFinderPath = finderPaths.putIfAbsent(
 				cacheKeyPrefix, finderPath);
 
@@ -352,6 +391,9 @@ public class FinderCacheImpl
 					dslQueryCacheNames.add(cacheName);
 				}
 			}
+=======
+			finderPaths.putIfAbsent(cacheKeyPrefix, finderPath);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		Serializable cacheKey = _encodeCacheKey(finderPath, args);
@@ -383,11 +425,21 @@ public class FinderCacheImpl
 		putResult(finderPath, args, result);
 	}
 
+<<<<<<< HEAD
 	public void removeByEntityCache(String className, BaseModel<?> baseModel) {
 		clearLocalCache();
 
 		_clearCache(_getCacheNameWithPagination(className));
 		_clearCache(_getCacheNameWithoutPagination(className));
+=======
+	public void removeByEntityCache(Class<?> clazz, BaseModel<?> baseModel) {
+		clearLocalCache();
+
+		String cacheName = clazz.getName();
+
+		_clearCache(_getCacheNameWithPagination(cacheName));
+		_clearCache(_getCacheNameWithoutPagination(cacheName));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		_clearDSLQueryCache(className);
 
@@ -448,6 +500,7 @@ public class FinderCacheImpl
 
 		clearLocalCache();
 
+<<<<<<< HEAD
 		_clearCache(_getCacheNameWithPagination(className));
 
 		_clearDSLQueryCache(className);
@@ -456,6 +509,11 @@ public class FinderCacheImpl
 			className);
 
 		Set<FinderPath> finderPaths = new HashSet<>();
+=======
+		String cacheName = clazz.getName();
+
+		_clearCache(_getCacheNameWithPagination(cacheName));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		finderPaths.addAll(
 			_getFinderPaths(_getCacheNameWithoutPagination(className)));
@@ -512,11 +570,15 @@ public class FinderCacheImpl
 
 		portalCacheManager.registerPortalCacheManagerListener(this);
 
+<<<<<<< HEAD
 		_argumentsResolverServiceTracker = ServiceTrackerFactory.open(
 			bundleContext, ArgumentsResolver.class,
 			new ArgumentsResolverServiceTrackerCustomizer());
 
 		_basePersistenceServiceTrackerMap =
+=======
+		_argumentsResolverServiceTrackerMap =
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			ServiceTrackerMapFactory.openSingleValueMap(
 				bundleContext,
 				(Class<BasePersistence<?>>)(Class<?>)BasePersistence.class,
@@ -536,13 +598,49 @@ public class FinderCacheImpl
 
 	@Deactivate
 	protected void deactivate() {
+<<<<<<< HEAD
 		_argumentsResolverServiceTracker.close();
 
 		_basePersistenceServiceTrackerMap.close();
+=======
+		_argumentsResolverServiceTrackerMap.close();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private void _clearCache(String cacheName) {
 		PortalCache<?, ?> portalCache = _getPortalCache(cacheName);
+<<<<<<< HEAD
+=======
+
+		portalCache.removeAll();
+	}
+
+	private Serializable _encodeCacheKey(
+		FinderPath finderPath, Object[] arguments) {
+
+		CacheKeyGenerator cacheKeyGenerator = _getCacheKeyGenerator(
+			finderPath.isBaseModelResult());
+
+		String[] keys = new String[arguments.length * 2];
+
+		for (int i = 0; i < arguments.length; i++) {
+			int index = i * 2;
+
+			keys[index] = StringPool.PERIOD;
+			keys[index + 1] = StringUtil.toHexString(arguments[i]);
+		}
+
+		return cacheKeyGenerator.getCacheKey(
+			new String[] {
+				finderPath.getCacheKeyPrefix(),
+				StringUtil.toHexString(cacheKeyGenerator.getCacheKey(keys))
+			});
+	}
+
+	private Object[] _getArguments(
+		FinderPath finderPath, BaseModel<?> baseModel, boolean checkColumn,
+		boolean original) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		portalCache.removeAll();
 	}
@@ -577,6 +675,32 @@ public class FinderCacheImpl
 				finderPath.getCacheKeyPrefix(),
 				StringUtil.toHexString(cacheKeyGenerator.getCacheKey(keys))
 			});
+	}
+
+	private CacheKeyGenerator _getCacheKeyGenerator(boolean baseModel) {
+		if (baseModel) {
+			CacheKeyGenerator cacheKeyGenerator = _baseModelCacheKeyGenerator;
+
+			if (cacheKeyGenerator == null) {
+				cacheKeyGenerator = CacheKeyGeneratorUtil.getCacheKeyGenerator(
+					FinderCache.class.getName() + "#BaseModel");
+
+				_baseModelCacheKeyGenerator = cacheKeyGenerator;
+			}
+
+			return cacheKeyGenerator;
+		}
+
+		CacheKeyGenerator cacheKeyGenerator = _cacheKeyGenerator;
+
+		if (cacheKeyGenerator == null) {
+			cacheKeyGenerator = CacheKeyGeneratorUtil.getCacheKeyGenerator(
+				FinderCache.class.getName());
+
+			_cacheKeyGenerator = cacheKeyGenerator;
+		}
+
+		return cacheKeyGenerator;
 	}
 
 	private CacheKeyGenerator _getCacheKeyGenerator(boolean baseModel) {
@@ -680,6 +804,7 @@ public class FinderCacheImpl
 	private static final String _GROUP_KEY_PREFIX =
 		FinderCache.class.getName() + StringPool.PERIOD;
 
+<<<<<<< HEAD
 	private final Map<String, ArgumentsResolver> _argumentsResolvers =
 		new ConcurrentHashMap<>();
 	private ServiceTracker<ArgumentsResolver, ArgumentsResolver>
@@ -691,6 +816,12 @@ public class FinderCacheImpl
 	private volatile CacheKeyGenerator _cacheKeyGenerator;
 	private final Map<String, Set<String>> _dslQueryCacheNamesMap =
 		new ConcurrentHashMap<>();
+=======
+	private ServiceTrackerMap<String, ArgumentsResolver>
+		_argumentsResolverServiceTrackerMap;
+	private volatile CacheKeyGenerator _baseModelCacheKeyGenerator;
+	private volatile CacheKeyGenerator _cacheKeyGenerator;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final Map<String, Map<String, FinderPath>> _finderPathsMap =
 		new ConcurrentHashMap<>();
 	private ThreadLocal<LRUMap> _localCache;

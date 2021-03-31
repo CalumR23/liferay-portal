@@ -138,6 +138,7 @@ public class CommerceChannelClayTable
 				PermissionThreadLocal.getPermissionChecker(),
 				channel.getChannelId(), ActionKeys.DELETE),
 			dropdownItem -> {
+<<<<<<< HEAD
 				PortletURL deleteURL = PortletURLBuilder.create(
 					_portal.getControlPanelPortletURL(
 						httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
@@ -147,6 +148,16 @@ public class CommerceChannelClayTable
 				).setParameter(
 					Constants.CMD, Constants.DELETE
 				).build();
+=======
+				PortletURL deleteURL = _portal.getControlPanelPortletURL(
+					httpServletRequest, CPPortletKeys.COMMERCE_CHANNELS,
+					PortletRequest.ACTION_PHASE);
+
+				deleteURL.setParameter(
+					ActionRequest.ACTION_NAME,
+					"/commerce_channels/edit_commerce_channel");
+				deleteURL.setParameter(Constants.CMD, Constants.DELETE);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				String redirect = ParamUtil.getString(
 					httpServletRequest, "currentUrl",

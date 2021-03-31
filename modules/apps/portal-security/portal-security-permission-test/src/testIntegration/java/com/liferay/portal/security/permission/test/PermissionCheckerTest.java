@@ -81,12 +81,22 @@ public class PermissionCheckerTest {
 
 		String packageName = pkg.getName();
 
+<<<<<<< HEAD
 		_source =
+=======
+		_resourceActions.read(
+			PermissionCheckerTest.class.getClassLoader(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			StringUtil.replace(packageName, '.', '/') +
 				"/dependencies/resource-actions.xml";
 
+<<<<<<< HEAD
 		_resourceActions.populateModelResources(
 			PermissionCheckerTest.class.getClassLoader(), _source);
+=======
+		_resourceActions.check(_PORTLET_RESOURCE_NAME);
+		_resourceActions.check(_NONSITE_PORTLET_RESOURCE_NAME);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@AfterClass

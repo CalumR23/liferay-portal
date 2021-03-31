@@ -25,12 +25,16 @@ export const convertValueToJSON = (value) => {
 	return value;
 };
 
+<<<<<<< HEAD
 export const getEditingValue = ({
 	defaultLocale,
 	editingLocale,
 	fieldName,
 	value,
 }) => {
+=======
+export const getEditingValue = ({defaultLocale, editingLocale, value}) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const valueJSON = convertValueToJSON(value);
 
 	if (valueJSON) {

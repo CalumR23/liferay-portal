@@ -15,7 +15,10 @@
 package com.liferay.commerce.inventory.web.internal.frontend;
 
 import com.liferay.commerce.inventory.constants.CommerceInventoryActionKeys;
+<<<<<<< HEAD
 import com.liferay.commerce.inventory.model.CommerceInventoryWarehouse;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.commerce.inventory.web.internal.frontend.constants.CommerceInventoryDataSetConstants;
 import com.liferay.commerce.inventory.web.internal.model.InventoryItem;
 import com.liferay.commerce.product.constants.CPPortletKeys;
@@ -26,10 +29,15 @@ import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+=======
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.permission.PortalPermissionUtil;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Constants;
@@ -66,7 +74,13 @@ public class CommerceInventoryItemClayDataSetActionProvider
 		InventoryItem inventoryItem = (InventoryItem)model;
 
 		return DropdownItemListBuilder.add(
+<<<<<<< HEAD
 			() -> _hasPermission(),
+=======
+			() -> PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			dropdownItem -> {
 				ThemeDisplay themeDisplay =
 					(ThemeDisplay)httpServletRequest.getAttribute(
@@ -80,7 +94,13 @@ public class CommerceInventoryItemClayDataSetActionProvider
 					LanguageUtil.get(httpServletRequest, "edit"));
 			}
 		).add(
+<<<<<<< HEAD
 			() -> _hasPermission(),
+=======
+			() -> PortalPermissionUtil.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceInventoryActionKeys.MANAGE_INVENTORY),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			dropdownItem -> {
 				dropdownItem.setHref(
 					_getInventoryItemDeleteURL(
@@ -96,6 +116,7 @@ public class CommerceInventoryItemClayDataSetActionProvider
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletURLFactoryUtil.create(
 				themeDisplay.getRequest(), portletDisplay.getId(),
@@ -105,6 +126,18 @@ public class CommerceInventoryItemClayDataSetActionProvider
 		).setParameter(
 			"sku", sku
 		).buildString();
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			themeDisplay.getRequest(), portletDisplay.getId(),
+			themeDisplay.getPlid(), PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_inventory/edit_commerce_inventory_item");
+		portletURL.setParameter("sku", String.valueOf(sku));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getInventoryItemDeleteURL(
@@ -114,6 +147,7 @@ public class CommerceInventoryItemClayDataSetActionProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
 				_portal.getOriginalServletRequest(httpServletRequest),
@@ -133,6 +167,14 @@ public class CommerceInventoryItemClayDataSetActionProvider
 		PortletResourcePermission portletResourcePermission =
 			_commerceInventoryWarehouseModelResourcePermission.
 				getPortletResourcePermission();
+=======
+		portletURL.setParameter(
+			ActionRequest.ACTION_NAME,
+			"/commerce_inventory/edit_commerce_inventory_warehouse");
+		portletURL.setParameter(Constants.CMD, Constants.DELETE);
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter("sku", String.valueOf(sku));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return portletResourcePermission.contains(
 			PermissionThreadLocal.getPermissionChecker(), null,

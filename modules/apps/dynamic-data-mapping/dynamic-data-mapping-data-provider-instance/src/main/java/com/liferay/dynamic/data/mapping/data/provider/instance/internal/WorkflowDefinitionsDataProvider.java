@@ -18,6 +18,10 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProvider;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderException;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
+<<<<<<< HEAD
+=======
+import com.liferay.petra.string.StringPool;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.util.KeyValuePair;
@@ -77,7 +81,13 @@ public class WorkflowDefinitionsDataProvider implements DDMDataProvider {
 			String languageId = LocaleUtil.toLanguageId(locale);
 
 			for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
+<<<<<<< HEAD
 				String value = workflowDefinition.getName();
+=======
+				String value =
+					workflowDefinition.getName() + StringPool.AT +
+						workflowDefinition.getVersion();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 				keyValuePairs.add(
 					new KeyValuePair(

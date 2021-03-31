@@ -290,9 +290,12 @@ public class ProductHelperImpl implements ProductHelper {
 			commerceDiscountValue.getDiscountAmount();
 
 		priceModel.setDiscount(discountAmountCommerceMoney.format(locale));
+<<<<<<< HEAD
 
 		CommerceCurrency commerceCurrency =
 			discountAmountCommerceMoney.getCommerceCurrency();
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		priceModel.setDiscountPercentage(
 			_percentageFormatter.getLocalizedPercentage(

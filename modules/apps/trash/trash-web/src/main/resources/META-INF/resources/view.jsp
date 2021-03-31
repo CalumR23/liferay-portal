@@ -72,10 +72,17 @@ TrashManagementToolbarDisplayContext trashManagementToolbarDisplayContext = new 
 
 				<liferay-ui:error exception="<%= TrashEntryException.class %>" message="unable-to-move-this-item-to-the-recycle-bin" />
 
+<<<<<<< HEAD
 				<liferay-ui:error exception="<%= TrashPermissionException.class %>">
 
 					<%
 					TrashPermissionException tpe = (TrashPermissionException)errorException;
+=======
+					row.setData(
+						HashMapBuilder.<String, Object>put(
+							"actions", trashManagementToolbarDisplayContext.getAvailableActions(trashEntry)
+						).build());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					%>
 
 					<c:if test="<%= tpe.getType() == TrashPermissionException.DELETE %>">

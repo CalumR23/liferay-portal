@@ -116,6 +116,7 @@ public class CommerceSubscriptionEntryClayDataSetActionProvider
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, CommerceSubscriptionEntry.class.getName(),
@@ -127,6 +128,22 @@ public class CommerceSubscriptionEntryClayDataSetActionProvider
 		).setParameter(
 			"commerceSubscriptionEntryId", commerceSubscriptionEntryId
 		).build();
+=======
+		PortletURL portletURL = PortletProviderUtil.getPortletURL(
+			httpServletRequest, CommerceSubscriptionEntry.class.getName(),
+			PortletProvider.Action.MANAGE);
+
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_subscription_entry/edit_commerce_subscription_entry");
+		portletURL.setParameter(
+			"redirect", _portal.getCurrentURL(httpServletRequest));
+		portletURL.setParameter(
+			"commerceSubscriptionEntryId",
+			String.valueOf(commerceSubscriptionEntryId));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Reference

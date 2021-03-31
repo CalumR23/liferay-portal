@@ -18,7 +18,10 @@ import com.liferay.message.boards.constants.MBPortletKeys;
 import com.liferay.message.boards.model.MBCategory;
 import com.liferay.message.boards.web.internal.display.MBCategoryDisplay;
 import com.liferay.message.boards.web.internal.util.MBUtil;
+<<<<<<< HEAD
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -51,6 +54,7 @@ public class MBViewStatisticsDisplayContext {
 	}
 
 	public PortletURL getPortletURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.createRenderURL(
 			_renderResponse
 		).setMVCRenderCommandName(
@@ -58,6 +62,16 @@ public class MBViewStatisticsDisplayContext {
 		).setParameter(
 			"mbCategoryId", _getCategoryId()
 		).build();
+=======
+		PortletURL portletURL = _renderResponse.createRenderURL();
+
+		portletURL.setParameter(
+			"mvcRenderCommandName", "/message_boards/view_statistics");
+		portletURL.setParameter(
+			"mbCategoryId", String.valueOf(_getCategoryId()));
+
+		return portletURL;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	public boolean isMBAdmin() {

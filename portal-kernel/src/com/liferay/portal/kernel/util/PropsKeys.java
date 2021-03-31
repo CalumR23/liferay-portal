@@ -658,9 +658,12 @@ public interface PropsKeys {
 	public static final String CUSTOM_SQL_FUNCTION_ISNULL =
 		"custom.sql.function.isnull";
 
+<<<<<<< HEAD
 	public static final String DATA_LIMIT_DL_STORAGE_MAX_SIZE =
 		"data.limit.dl.storage.max.size";
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static final String DATA_LIMIT_MAIL_MESSAGE_MAX_COUNT =
 		"data.limit.mail.message.max.count";
 
@@ -671,6 +674,7 @@ public interface PropsKeys {
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+<<<<<<< HEAD
 	public static final String DATA_LIMIT_MAX_DL_STORAGE_SIZE =
 		"data.limit.max.dl.storage.size";
 
@@ -678,6 +682,8 @@ public interface PropsKeys {
 	 * @deprecated As of Cavanaugh (7.4.x), with no direct replacement
 	 */
 	@Deprecated
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static final String DATA_LIMIT_MAX_JOURNAL_ARTICLE_COUNT =
 		"data.limit.max.journal.article.count";
 
@@ -1139,6 +1145,16 @@ public interface PropsKeys {
 	public static final String DL_STORE_ANTIVIRUS_ENABLED =
 		"dl.store.antivirus.enabled";
 
+<<<<<<< HEAD
+=======
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
+	public static final String DL_STORE_ANTIVIRUS_IMPL =
+		"dl.store.antivirus.impl";
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	public static final String DL_STORE_FILE_IMPL_SAFE_FILE_NAME_2_AMPERSAND =
 		"dl.store.file.impl.safe.file.name.2.ampersand";
 

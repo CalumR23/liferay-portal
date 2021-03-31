@@ -99,7 +99,31 @@ function Table({dataLoading, items, itemsActions, schema, style}) {
 	const SelectionComponent =
 		selectionType === 'multiple' ? ClayCheckbox : ClayRadio;
 
+<<<<<<< HEAD
 	let viewContent;
+=======
+	return (
+		<div className={`table-style-${style}`}>
+			<ClayTable borderless hover={false} responsive>
+				<TableHeadRow
+					items={items}
+					schema={schema}
+					selectItems={selectItems}
+					selectable={selectable}
+					selectedItemsKey={selectedItemsKey}
+					selectedItemsValue={selectedItemsValue}
+					selectionType={selectionType}
+					sorting={sorting}
+					updateSorting={updateSorting}
+					visibleFields={visibleFields}
+				/>
+				<ClayTable.Body>
+					{items.map((item, i) => {
+						const itemId = item[selectedItemsKey] || i;
+						const nestedItems =
+							nestedItemsReferenceKey &&
+							item[nestedItemsReferenceKey];
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	if (dataLoading) {
 		viewContent = <ClayLoadingIndicator className="mt-7" />;

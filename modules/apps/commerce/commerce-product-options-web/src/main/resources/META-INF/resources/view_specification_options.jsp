@@ -134,6 +134,7 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 							iteratorURL="<%= portletURL %>"
 							searchContainer="<%= cpSpecificationOptionDisplayContext.getSearchContainer() %>"
 						>
+<<<<<<< HEAD
 							<liferay-ui:search-container-row
 								className="com.liferay.commerce.product.model.CPSpecificationOption"
 								keyProperty="CPSpecificationOptionId"
@@ -186,6 +187,45 @@ renderResponse.setTitle(LanguageUtil.get(request, "specifications"));
 							<liferay-ui:search-iterator
 								displayStyle="<%= displayStyle %>"
 								markupView="lexicon"
+=======
+
+							<%
+							PortletURL rowURL = renderResponse.createRenderURL();
+
+							rowURL.setParameter("mvcRenderCommandName", "/cp_specification_options/edit_cp_specification_option");
+							rowURL.setParameter("redirect", currentURL);
+							rowURL.setParameter("cpSpecificationOptionId", String.valueOf(cpSpecificationOption.getCPSpecificationOptionId()));
+							%>
+
+							<liferay-ui:search-container-column-text
+								cssClass="important table-cell-content"
+								href="<%= rowURL %>"
+								name="label"
+								value="<%= HtmlUtil.escape(cpSpecificationOption.getTitle(locale)) %>"
+							/>
+
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-content"
+								name="default-group"
+								value="<%= HtmlUtil.escape(cpSpecificationOptionDisplayContext.getCPOptionCategoryTitle(cpSpecificationOption)) %>"
+							/>
+
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-content"
+								name="use-in-faceted-navigation"
+								value='<%= LanguageUtil.get(request, cpSpecificationOption.isFacetable() ? "yes" : "no") %>'
+							/>
+
+							<liferay-ui:search-container-column-date
+								cssClass="table-cell-content"
+								name="modified-date"
+								property="modifiedDate"
+							/>
+
+							<liferay-ui:search-container-column-jsp
+								cssClass="entry-action-column"
+								path="/specification_option_action.jsp"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 							/>
 						</liferay-ui:search-container>
 					</div>

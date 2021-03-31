@@ -133,6 +133,7 @@ const SelectLayout = ({
 				id={`${namespace}selectLayoutFm`}
 			>
 				<fieldset className="panel-body">
+<<<<<<< HEAD
 					{empty ? (
 						<EmptyState />
 					) : (
@@ -150,6 +151,20 @@ const SelectLayout = ({
 							/>
 						</div>
 					)}
+=======
+					<div
+						className="layout-tree"
+						id={`${namespace}layoutContainer`}
+					>
+						<Treeview
+							NodeComponent={Treeview.Card}
+							filterQuery={filterQuery}
+							multiSelection={multiSelection}
+							nodes={nodes}
+							onSelectedNodesChange={handleSelectionChange}
+						/>
+					</div>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				</fieldset>
 			</ClayLayout.ContainerFluid>
 		</div>

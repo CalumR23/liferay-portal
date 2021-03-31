@@ -142,7 +142,11 @@ ViewTranslationDisplayContext viewTranslationDisplayContext = (ViewTranslationDi
 									<%= label %>
 								</label>
 
+<<<<<<< HEAD
 								<div class="translation-editor-preview" dir="<%= LanguageUtil.get(viewTranslationDisplayContext.getTargetLocale(), "lang.dir") %>">
+=======
+								<div class="translate-editor-preview" dir="<%= LanguageUtil.get(viewTranslationDisplayContext.getTargetLocale(), "lang.dir") %>">
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									<%= targetContent %>
 								</div>
 							</c:when>

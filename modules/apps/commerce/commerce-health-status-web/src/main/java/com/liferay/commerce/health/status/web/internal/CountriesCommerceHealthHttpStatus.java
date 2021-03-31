@@ -16,11 +16,23 @@ package com.liferay.commerce.health.status.web.internal;
 
 import com.liferay.commerce.constants.CommerceHealthStatusConstants;
 import com.liferay.commerce.health.status.CommerceHealthHttpStatus;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.service.CountryService;
+=======
+import com.liferay.commerce.model.CommerceCountry;
+import com.liferay.commerce.service.CommerceCountryLocalService;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.List;
@@ -49,6 +61,19 @@ public class CountriesCommerceHealthHttpStatus
 	@Override
 	public void fixIssue(HttpServletRequest httpServletRequest)
 		throws PortalException {
+<<<<<<< HEAD
+=======
+
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			httpServletRequest);
+
+		try {
+			_commerceCountryLocalService.importDefaultCountries(serviceContext);
+		}
+		catch (Exception exception) {
+			_log.error(exception, exception);
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -88,6 +113,7 @@ public class CountriesCommerceHealthHttpStatus
 	public boolean isFixed(long companyId, long commerceChannelId)
 		throws PortalException {
 
+<<<<<<< HEAD
 		List<Country> countries = _countryLocalService.getCompanyCountries(
 			companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
 
@@ -96,5 +122,19 @@ public class CountriesCommerceHealthHttpStatus
 
 	@Reference
 	private CountryService _countryLocalService;
+=======
+		List<CommerceCountry> commerceCountries =
+			_commerceCountryLocalService.getCommerceCountries(
+				companyId, QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+
+		return !commerceCountries.isEmpty();
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		CountriesCommerceHealthHttpStatus.class);
+
+	@Reference
+	private CommerceCountryLocalService _commerceCountryLocalService;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 }

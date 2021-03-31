@@ -114,6 +114,7 @@ public class TrashManagementToolbarDisplayContext
 
 	@Override
 	public String getClearResultsURL() {
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			getPortletURL()
 		).setParameter(
@@ -121,6 +122,32 @@ public class TrashManagementToolbarDisplayContext
 		).setParameter(
 			"keywords", StringPool.BLANK
 		).buildString();
+=======
+		PortletURL clearResultsURL = getPortletURL();
+
+		clearResultsURL.setParameter("navigation", StringPool.BLANK);
+		clearResultsURL.setParameter("keywords", StringPool.BLANK);
+
+		return clearResultsURL.toString();
+	}
+
+	public Map<String, Object> getComponentContext() {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		PortletURL restoreEntriesURL = liferayPortletResponse.createActionURL(
+			TrashPortletKeys.TRASH);
+
+		restoreEntriesURL.setParameter(
+			ActionRequest.ACTION_NAME, "restoreEntries");
+		restoreEntriesURL.setParameter(
+			"redirect", themeDisplay.getURLCurrent());
+
+		return HashMapBuilder.<String, Object>put(
+			"restoreEntriesURL", restoreEntriesURL.toString()
+		).build();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Override
@@ -130,6 +157,13 @@ public class TrashManagementToolbarDisplayContext
 
 	@Override
 	public List<LabelItem> getFilterLabelItems() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return LabelItemListBuilder.add(
 			() ->
 				Validator.isNotNull(getNavigation()) &&
@@ -182,6 +216,13 @@ public class TrashManagementToolbarDisplayContext
 
 	@Override
 	protected List<DropdownItem> getFilterNavigationDropdownItems() {
+<<<<<<< HEAD
+=======
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return new DropdownItemList() {
 			{
 				add(

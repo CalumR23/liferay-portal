@@ -58,14 +58,25 @@ export default function Detail({
 				currentPage.data.countryKeywords.length > 0 && (
 					<KeywordsDetail
 						currentPage={currentPage}
+<<<<<<< HEAD
+=======
+						languageTag={languageTag}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						trafficShareDataProvider={trafficShareDataProvider}
 						trafficVolumeDataProvider={trafficVolumeDataProvider}
 					/>
 				)}
+<<<<<<< HEAD
 
 			{currentPage.view === TRAFFIC_CHANNELS.REFERRAL && (
 				<ReferralDetail
 					currentPage={currentPage}
+=======
+
+			{currentPage.view === TRAFFIC_CHANNELS.REFERRAL && (
+				<ReferralDetail
+					currentPage={currentPage}
+					languageTag={languageTag}
 					timeSpanOptions={timeSpanOptions}
 					trafficShareDataProvider={trafficShareDataProvider}
 					trafficVolumeDataProvider={trafficVolumeDataProvider}
@@ -75,11 +86,25 @@ export default function Detail({
 			{currentPage.view === TRAFFIC_CHANNELS.SOCIAL && (
 				<SocialDetail
 					currentPage={currentPage}
+					languageTag={languageTag}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					timeSpanOptions={timeSpanOptions}
 					trafficShareDataProvider={trafficShareDataProvider}
 					trafficVolumeDataProvider={trafficVolumeDataProvider}
 				/>
 			)}
+<<<<<<< HEAD
+
+			{currentPage.view === TRAFFIC_CHANNELS.SOCIAL && (
+				<SocialDetail
+					currentPage={currentPage}
+					timeSpanOptions={timeSpanOptions}
+					trafficShareDataProvider={trafficShareDataProvider}
+					trafficVolumeDataProvider={trafficVolumeDataProvider}
+				/>
+			)}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</>
 	);
 }

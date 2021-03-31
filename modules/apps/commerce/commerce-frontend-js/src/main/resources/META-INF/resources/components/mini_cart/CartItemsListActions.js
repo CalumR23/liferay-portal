@@ -44,12 +44,22 @@ function CartItemsListActions({numberOfItems}) {
 		setIsUpdating(true);
 
 		CartResource.updateCartById(orderId, {cartItems: []})
+<<<<<<< HEAD
 			.then(() => updateCartModel({id: orderId}))
+=======
+			.then(() => updateCartModel({orderId}))
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			.then(() => {
 				setIsAsking(false);
 				setIsUpdating(false);
 
+<<<<<<< HEAD
 				Liferay.fire(PRODUCT_REMOVED_FROM_CART, {skuId: ALL});
+=======
+				Liferay.fire(PRODUCT_REMOVED, {
+					skuId: 'all',
+				});
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			});
 	};
 
@@ -69,7 +79,11 @@ function CartItemsListActions({numberOfItems}) {
 					)}
 				</div>
 
+<<<<<<< HEAD
 				<div className="mini-cart-header-actions">
+=======
+				<div className={'mini-cart-header-actions'}>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					<span className={classnames('actions', isAsking && 'hide')}>
 						<ClayButton
 							className="action"

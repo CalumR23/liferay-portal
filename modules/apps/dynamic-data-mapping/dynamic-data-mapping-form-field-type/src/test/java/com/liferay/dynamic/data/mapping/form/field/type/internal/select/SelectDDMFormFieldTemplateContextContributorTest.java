@@ -186,6 +186,7 @@ public class SelectDDMFormFieldTemplateContextContributorTest
 			ddmFormFieldOptions.addOptionReference(
 				"value " + i, "Reference " + i);
 		}
+<<<<<<< HEAD
 
 		List<Map<String, String>> actualOptions = _getActualOptions(
 			ddmFormField, ddmFormFieldOptions, LocaleUtil.US);
@@ -194,6 +195,16 @@ public class SelectDDMFormFieldTemplateContextContributorTest
 
 		ddmFormField.setProperty("alphabeticalOrder", "true");
 
+=======
+
+		List<Map<String, String>> actualOptions = _getActualOptions(
+			ddmFormField, ddmFormFieldOptions, LocaleUtil.US);
+
+		Assert.assertNotEquals(expectedOptions, actualOptions);
+
+		ddmFormField.setProperty("alphabeticalOrder", "true");
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		actualOptions = _getActualOptions(
 			ddmFormField, ddmFormFieldOptions, LocaleUtil.US);
 

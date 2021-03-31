@@ -49,7 +49,12 @@ ContentDashboardAdminDisplayContext contentDashboardAdminDisplayContext = (Conte
 									cssClass="component-action"
 									disabled="<%= !contentDashboardAdminDisplayContext.isSwapConfigurationEnabled() %>"
 									displayType="secondary"
+<<<<<<< HEAD
 									icon="change"
+=======
+									icon="cog"
+									onClick="<%= contentDashboardAdminDisplayContext.getOnClickConfiguration() %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 									small="<%= true %>"
 									type="submit"
 								/>

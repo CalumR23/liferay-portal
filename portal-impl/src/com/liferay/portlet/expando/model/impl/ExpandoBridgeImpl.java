@@ -433,9 +433,17 @@ public class ExpandoBridgeImpl implements ExpandoBridge {
 		boolean secure =
 			PropsValues.PERMISSIONS_CUSTOM_ATTRIBUTE_WRITE_CHECK_BY_DEFAULT;
 
+<<<<<<< HEAD
 		if (CopyLayoutThreadLocal.isCopyLayout() ||
 			ExportImportThreadLocal.isImportInProcess()) {
 
+=======
+		if (CopyLayoutThreadLocal.isCopyLayout()) {
+			secure = false;
+		}
+
+		if (ExportImportThreadLocal.isImportInProcess()) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			secure = false;
 		}
 

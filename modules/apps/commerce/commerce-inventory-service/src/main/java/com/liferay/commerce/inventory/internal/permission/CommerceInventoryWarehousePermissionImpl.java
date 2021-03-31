@@ -23,7 +23,11 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+=======
+import com.liferay.portal.kernel.service.permission.PortalPermission;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.ArrayUtil;
 
 import org.osgi.service.component.annotations.Component;
@@ -142,8 +146,13 @@ public class CommerceInventoryWarehousePermissionImpl
 			return true;
 		}
 
+<<<<<<< HEAD
 		if (_portletResourcePermission.contains(
 				PermissionThreadLocal.getPermissionChecker(), null,
+=======
+		if (_portalPermission.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				CommerceInventoryActionKeys.MANAGE_INVENTORY)) {
 
 			return true;

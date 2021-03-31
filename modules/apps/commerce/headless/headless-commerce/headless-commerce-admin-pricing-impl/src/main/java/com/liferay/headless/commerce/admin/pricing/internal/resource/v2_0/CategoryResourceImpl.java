@@ -26,6 +26,11 @@ import com.liferay.headless.commerce.admin.pricing.resource.v2_0.CategoryResourc
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.portal.vulcan.fields.NestedField;
 import com.liferay.portal.vulcan.fields.NestedFieldSupport;
+<<<<<<< HEAD
+=======
+
+import javax.validation.constraints.NotNull;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +50,15 @@ public class CategoryResourceImpl
 
 	@NestedField(parentClass = DiscountCategory.class, value = "category")
 	@Override
+<<<<<<< HEAD
 	public Category getDiscountCategoryCategory(Long id) throws Exception {
+		CommerceDiscountRel commerceDiscountRel =
+			_commerceDiscountRelService.getCommerceDiscountRel(id);
+=======
+	public Category getDiscountCategoryCategory(@NotNull Long id)
+		throws Exception {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
 		CommerceDiscountRel commerceDiscountRel =
 			_commerceDiscountRelService.getCommerceDiscountRel(id);
 
@@ -57,7 +70,15 @@ public class CategoryResourceImpl
 
 	@NestedField(parentClass = PriceModifierCategory.class, value = "category")
 	@Override
+<<<<<<< HEAD
 	public Category getPriceModifierCategoryCategory(Long id) throws Exception {
+		CommercePriceModifierRel commercePriceModifierRel =
+			_commercePriceModifierRelService.getCommercePriceModifierRel(id);
+=======
+	public Category getPriceModifierCategoryCategory(@NotNull Long id)
+		throws Exception {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
+
 		CommercePriceModifierRel commercePriceModifierRel =
 			_commercePriceModifierRelService.getCommercePriceModifierRel(id);
 

@@ -112,6 +112,7 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 									value="<%= String.valueOf(depotAdminDisplayContext.getDepotEntryConnectedGroupsCount(depotEntry)) %>"
 								/>
 
+<<<<<<< HEAD
 								<liferay-ui:search-container-column-text>
 									<clay:dropdown-actions
 										dropdownItems="<%= depotAdminDisplayContext.getActionDropdownItems(depotEntry) %>"
@@ -130,6 +131,46 @@ DepotAdminManagementToolbarDisplayContext depotAdminManagementToolbarDisplayCont
 				</liferay-ui:search-container>
 			</aui:form>
 		</clay:container-fluid>
+=======
+							<liferay-ui:search-container-column-text>
+								<clay:vertical-card
+									verticalCard="<%= depotAdminDisplayContext.getDepotEntryVerticalCard(depotEntry) %>"
+								/>
+							</liferay-ui:search-container-column-text>
+						</c:when>
+						<c:otherwise>
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-expand table-cell-minw-200 table-title"
+								name="name"
+								orderable="<%= true %>"
+							>
+								<aui:a href="<%= depotAdminDisplayContext.getViewDepotURL(depotEntry) %>" label="<%= HtmlUtil.escape(depotEntryGroup.getDescriptiveName(locale)) %>" localizeLabel="<%= false %>" />
+							</liferay-ui:search-container-column-text>
+
+							<liferay-ui:search-container-column-text
+								cssClass="table-cell-expand table-cell-minw-200"
+								name="num-of-connections"
+								value="<%= String.valueOf(depotAdminDisplayContext.getDepotEntryConnectedGroupsCount(depotEntry)) %>"
+							/>
+
+							<liferay-ui:search-container-column-text>
+								<clay:dropdown-actions
+									defaultEventHandler="<%= DepotAdminWebKeys.DEPOT_ENTRY_DROPDOWN_DEFAULT_EVENT_HANDLER %>"
+									dropdownItems="<%= depotAdminDisplayContext.getActionDropdownItems(depotEntry) %>"
+								/>
+							</liferay-ui:search-container-column-text>
+						</c:otherwise>
+					</c:choose>
+				</liferay-ui:search-container-row>
+
+				<liferay-ui:search-iterator
+					displayStyle="<%= depotAdminDisplayContext.getDisplayStyle() %>"
+					markupView="lexicon"
+					searchContainer="<%= searchContainer %>"
+				/>
+			</liferay-ui:search-container>
+		</aui:form>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	</div>
 </div>
 

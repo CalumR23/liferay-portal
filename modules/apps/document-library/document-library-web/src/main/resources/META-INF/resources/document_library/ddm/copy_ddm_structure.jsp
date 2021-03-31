@@ -30,6 +30,10 @@ renderResponse.setTitle(LanguageUtil.format(request, "copy-x", ddmStructure.getN
 %>
 
 <portlet:actionURL name="/document_library/copy_data_definition" var="copyDataDefinitionURL" />
+<<<<<<< HEAD
+=======
+<portlet:actionURL name="/document_library/copy_ddm_structure" var="copyDDMStructureURL" />
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 <liferay-frontend:edit-form
 	action="<%= copyDataDefinitionURL %>"

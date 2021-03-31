@@ -14,6 +14,10 @@
 
 import {
 	DEFAULT_ORDER_DETAILS_PORTLET_ID,
+<<<<<<< HEAD
+=======
+	DISCOUNT_LEVEL_PREFIX,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	ORDER_DETAILS_ENDPOINT,
 	ORDER_UUID_PARAMETER,
 } from './constants';
@@ -42,7 +46,11 @@ function generatedOrderDetailURL() {
 	baseURL.searchParams.append('p_p_lifecycle', '0');
 	baseURL.searchParams.append(
 		`_${DEFAULT_ORDER_DETAILS_PORTLET_ID}_mvcRenderCommandName`,
+<<<<<<< HEAD
 		'/commerce_open_order_content/edit_commerce_order'
+=======
+		'editCommerceOrder'
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	);
 	baseURL.searchParams.append(
 		`_${DEFAULT_ORDER_DETAILS_PORTLET_ID}_commerceOrderUuid`,
@@ -56,12 +64,21 @@ export function regenerateOrderDetailURL(orderDetailURL, orderUUID) {
 	const originalURL = orderDetailURL
 		? new URL(orderDetailURL)
 		: generatedOrderDetailURL();
+<<<<<<< HEAD
 
 	originalURL.searchParams.set(
 		`_${DEFAULT_ORDER_DETAILS_PORTLET_ID}_${ORDER_UUID_PARAMETER}`,
 		orderUUID
 	);
 
+=======
+
+	originalURL.searchParams.set(
+		`_${DEFAULT_ORDER_DETAILS_PORTLET_ID}_${ORDER_UUID_PARAMETER}`,
+		orderUUID
+	);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	return originalURL.toString();
 }
 

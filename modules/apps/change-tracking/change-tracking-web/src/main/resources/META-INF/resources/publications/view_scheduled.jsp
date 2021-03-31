@@ -31,7 +31,11 @@ Format format = FastDateFormatFactoryUtil.getDateTime(locale, timeZone);
 />
 
 <clay:management-toolbar
+<<<<<<< HEAD
 	managementToolbarDisplayContext="<%= viewScheduledManagementToolbarDisplayContext %>"
+=======
+	displayContext="<%= viewScheduledManagementToolbarDisplayContext %>"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 />
 
 <clay:container-fluid>

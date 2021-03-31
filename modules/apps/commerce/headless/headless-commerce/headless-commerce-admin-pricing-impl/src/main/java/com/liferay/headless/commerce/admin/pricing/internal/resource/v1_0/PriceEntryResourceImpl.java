@@ -344,6 +344,59 @@ public class PriceEntryResourceImpl extends BasePriceEntryResourceImpl {
 		return commercePriceEntry;
 	}
 
+<<<<<<< HEAD
+=======
+	private CommercePriceEntry _upsertCommercePriceEntry(
+			CommercePriceList commercePriceList, PriceEntry priceEntry)
+		throws Exception {
+
+		ServiceContext serviceContext = _serviceContextHelper.getServiceContext(
+			commercePriceList.getGroupId());
+
+		// Commerce price entry
+
+		long cProductId = 0;
+		String cpInstanceUuid = null;
+		CPInstance cpInstance = null;
+
+		long skuId = GetterUtil.getLong(priceEntry.getSkuId());
+		String skuExternalReferenceCode =
+			priceEntry.getSkuExternalReferenceCode();
+
+		if (skuId > 0) {
+			cpInstance = _cpInstanceService.fetchCPInstance(skuId);
+		}
+		else if (Validator.isNotNull(skuExternalReferenceCode)) {
+			cpInstance = _cpInstanceService.fetchByExternalReferenceCode(
+				serviceContext.getCompanyId(), skuExternalReferenceCode);
+		}
+
+		if (cpInstance != null) {
+			CPDefinition cpDefinition = cpInstance.getCPDefinition();
+
+			cProductId = cpDefinition.getCProductId();
+
+			cpInstanceUuid = cpInstance.getCPInstanceUuid();
+		}
+
+		CommercePriceEntry commercePriceEntry =
+			_commercePriceEntryService.upsertCommercePriceEntry(
+				priceEntry.getExternalReferenceCode(),
+				GetterUtil.getLong(priceEntry.getId()), cProductId,
+				cpInstanceUuid, commercePriceList.getCommercePriceListId(),
+				priceEntry.getPrice(),
+				(BigDecimal)GetterUtil.get(
+					priceEntry.getPromoPrice(), BigDecimal.ZERO),
+				priceEntry.getSkuExternalReferenceCode(), serviceContext);
+
+		// Update nested resources
+
+		_updateNestedResources(priceEntry, commercePriceEntry, serviceContext);
+
+		return commercePriceEntry;
+	}
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Reference
 	private CommercePriceEntryService _commercePriceEntryService;
 

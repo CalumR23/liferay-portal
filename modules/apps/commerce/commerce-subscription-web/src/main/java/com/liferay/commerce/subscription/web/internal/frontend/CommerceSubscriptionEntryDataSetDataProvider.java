@@ -156,6 +156,7 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, themeDisplay.getScopeGroup(),
@@ -167,6 +168,16 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 		).setParameter(
 			"commerceAccountId", commerceAccountId
 		).buildString();
+=======
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_account_admin/edit_commerce_account");
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceAccountId", String.valueOf(commerceAccountId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private String _getEditCommerceOrderURL(
@@ -182,6 +193,7 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 			httpServletRequest, "currentUrl",
 			_portal.getCurrentURL(httpServletRequest));
 
+<<<<<<< HEAD
 		return PortletURLBuilder.create(
 			PortletProviderUtil.getPortletURL(
 				httpServletRequest, themeDisplay.getScopeGroup(),
@@ -193,6 +205,16 @@ public class CommerceSubscriptionEntryDataSetDataProvider
 		).setParameter(
 			"commerceOrderId", commerceOrderId
 		).buildString();
+=======
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/commerce_open_order_content/edit_commerce_order");
+		portletURL.setParameter("redirect", redirect);
+		portletURL.setParameter(
+			"commerceOrderId", String.valueOf(commerceOrderId));
+
+		return portletURL.toString();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	private Label _getSubscriptionStatus(

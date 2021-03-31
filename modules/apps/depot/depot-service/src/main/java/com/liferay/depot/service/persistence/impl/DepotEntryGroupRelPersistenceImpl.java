@@ -38,7 +38,10 @@ import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -53,6 +56,10 @@ import java.lang.reflect.InvocationHandler;
 
 import java.util.Date;
 import java.util.HashMap;
+<<<<<<< HEAD
+=======
+import java.util.HashSet;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -199,7 +206,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DepotEntryGroupRel>)finderCache.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DepotEntryGroupRel depotEntryGroupRel : list) {
@@ -587,7 +598,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(2);
@@ -717,7 +732,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			result = finderCache.getResult(
+<<<<<<< HEAD
 				_finderPathFetchByUUID_G, finderArgs);
+=======
+				_finderPathFetchByUUID_G, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		}
 
 		if (result instanceof DepotEntryGroupRel) {
@@ -828,7 +847,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, groupId};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -994,7 +1017,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		if (useFinderCache) {
 			list = (List<DepotEntryGroupRel>)finderCache.getResult(
+<<<<<<< HEAD
 				finderPath, finderArgs);
+=======
+				finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 			if ((list != null) && !list.isEmpty()) {
 				for (DepotEntryGroupRel depotEntryGroupRel : list) {
@@ -1411,7 +1438,11 @@ public class DepotEntryGroupRelPersistenceImpl
 
 		Object[] finderArgs = new Object[] {uuid, companyId};
 
+<<<<<<< HEAD
 		Long count = (Long)finderCache.getResult(finderPath, finderArgs);
+=======
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		if (count == null) {
 			StringBundler sb = new StringBundler(3);
@@ -3914,9 +3945,16 @@ public class DepotEntryGroupRelPersistenceImpl
 			depotEntryGroupRelModelImpl.getGroupId()
 		};
 
+<<<<<<< HEAD
 		finderCache.putResult(_finderPathCountByUUID_G, args, Long.valueOf(1));
 		finderCache.putResult(
 			_finderPathFetchByUUID_G, args, depotEntryGroupRelModelImpl);
+=======
+		finderCache.putResult(
+			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByUUID_G, args, depotEntryGroupRelModelImpl, false);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		args = new Object[] {
 			depotEntryGroupRelModelImpl.getDepotEntryId(),
@@ -4412,7 +4450,11 @@ public class DepotEntryGroupRelPersistenceImpl
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll",
 			new String[0], new String[0], false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid",
 			new String[] {
 				String.class.getName(), Integer.class.getName(),
@@ -4420,27 +4462,47 @@ public class DepotEntryGroupRelPersistenceImpl
 			},
 			new String[] {"uuid_"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid = new FinderPath(
+=======
+		_finderPathCountByUuid = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid",
 			new String[] {String.class.getName()}, new String[] {"uuid_"},
 			false);
 
+<<<<<<< HEAD
 		_finderPathFetchByUUID_G = new FinderPath(
+=======
+		_finderPathFetchByUUID_G = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_ENTITY, "fetchByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUUID_G = new FinderPath(
+=======
+		_finderPathCountByUUID_G = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUUID_G",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "groupId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByUuid_C = new FinderPath(
+=======
+		_finderPathWithPaginationFindByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByUuid_C",
 			new String[] {
 				String.class.getName(), Long.class.getName(),
@@ -4449,17 +4511,29 @@ public class DepotEntryGroupRelPersistenceImpl
 			},
 			new String[] {"uuid_", "companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathWithoutPaginationFindByUuid_C = new FinderPath(
+=======
+		_finderPathWithoutPaginationFindByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, true);
 
+<<<<<<< HEAD
 		_finderPathCountByUuid_C = new FinderPath(
+=======
+		_finderPathCountByUuid_C = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByUuid_C",
 			new String[] {String.class.getName(), Long.class.getName()},
 			new String[] {"uuid_", "companyId"}, false);
 
+<<<<<<< HEAD
 		_finderPathWithPaginationFindByDepotEntryId = new FinderPath(
+=======
+		_finderPathWithPaginationFindByDepotEntryId = _createFinderPath(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByDepotEntryId",
 			new String[] {
 				Long.class.getName(), Integer.class.getName(),
@@ -4610,12 +4684,34 @@ public class DepotEntryGroupRelPersistenceImpl
 
 	private static final Set<String> _badColumnNames = SetUtil.fromArray(
 		new String[] {"uuid"});
+<<<<<<< HEAD
+=======
+
+	private FinderPath _createFinderPath(
+		String cacheName, String methodName, String[] params,
+		String[] columnNames, boolean baseModelResult) {
+
+		FinderPath finderPath = new FinderPath(
+			cacheName, methodName, params, columnNames, baseModelResult);
+
+		if (!cacheName.equals(FINDER_CLASS_NAME_LIST_WITH_PAGINATION)) {
+			_serviceRegistrations.add(
+				_bundleContext.registerService(
+					FinderPath.class, finderPath,
+					MapUtil.singletonDictionary("cache.name", cacheName)));
+		}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	@Override
 	protected FinderCache getFinderCache() {
 		return finderCache;
 	}
 
+<<<<<<< HEAD
+=======
+	private Set<ServiceRegistration<FinderPath>> _serviceRegistrations =
+		new HashSet<>();
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private ServiceRegistration<ArgumentsResolver>
 		_argumentsResolverServiceRegistration;
 

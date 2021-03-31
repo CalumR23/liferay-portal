@@ -138,6 +138,7 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 				else if (!commerceOrder.isOpen() &&
 						 (continueAsGuest || commerceOrder.isGuestOrder())) {
 
+<<<<<<< HEAD
 					CommerceChannel commerceChannel =
 						_commerceChannelLocalService.
 							getCommerceChannelByGroupId(
@@ -153,6 +154,22 @@ public class CommerceCheckoutPortlet extends MVCPortlet {
 						httpServletRequest, httpServletResponse,
 						CookieKeys.getDomain(httpServletRequest),
 						"continueAsGuest");
+=======
+					CookieKeys.deleteCookies(
+						httpServletRequest, httpServletResponse,
+						CookieKeys.getDomain(httpServletRequest),
+						"continueAsGuest");
+
+					String domain = CookieKeys.getDomain(httpServletRequest);
+
+					String commerceOrderUuidWebKey =
+						CommerceOrder.class.getName() + StringPool.POUND +
+							commerceOrder.getGroupId();
+
+					CookieKeys.deleteCookies(
+						httpServletRequest, httpServletResponse, domain,
+						commerceOrderUuidWebKey);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				}
 
 				renderRequest.setAttribute(

@@ -101,4 +101,15 @@ PortletURL portletURL = PortletURLBuilder.createRenderURL(
 			/>
 		</liferay-ui:search-container>
 	</aui:form>
+<<<<<<< HEAD
 </clay:container-fluid>
+=======
+</clay:container-fluid>
+
+<script>
+	Liferay.Util.selectEntityHandler(
+		'#<portlet:namespace />selectVersionFm',
+		'<%= HtmlUtil.escapeJS(eventName) %>'
+	);
+</script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469

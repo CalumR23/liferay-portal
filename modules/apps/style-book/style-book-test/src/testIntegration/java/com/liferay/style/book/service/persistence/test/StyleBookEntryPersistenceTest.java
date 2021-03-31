@@ -126,8 +126,11 @@ public class StyleBookEntryPersistenceTest {
 
 		newStyleBookEntry.setMvccVersion(RandomTestUtil.nextLong());
 
+<<<<<<< HEAD
 		newStyleBookEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		newStyleBookEntry.setUuid(RandomTestUtil.randomString());
 
 		newStyleBookEntry.setHeadId(RandomTestUtil.nextLong());
@@ -165,9 +168,12 @@ public class StyleBookEntryPersistenceTest {
 			existingStyleBookEntry.getMvccVersion(),
 			newStyleBookEntry.getMvccVersion());
 		Assert.assertEquals(
+<<<<<<< HEAD
 			existingStyleBookEntry.getCtCollectionId(),
 			newStyleBookEntry.getCtCollectionId());
 		Assert.assertEquals(
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			existingStyleBookEntry.getUuid(), newStyleBookEntry.getUuid());
 		Assert.assertEquals(
 			existingStyleBookEntry.getHeadId(), newStyleBookEntry.getHeadId());
@@ -375,12 +381,20 @@ public class StyleBookEntryPersistenceTest {
 
 	protected OrderByComparator<StyleBookEntry> getOrderByComparator() {
 		return OrderByComparatorFactoryUtil.create(
+<<<<<<< HEAD
 			"StyleBookEntry", "mvccVersion", true, "ctCollectionId", true,
 			"uuid", true, "headId", true, "styleBookEntryId", true, "groupId",
 			true, "companyId", true, "userId", true, "userName", true,
 			"createDate", true, "modifiedDate", true, "defaultStyleBookEntry",
 			true, "name", true, "previewFileEntryId", true, "styleBookEntryKey",
 			true);
+=======
+			"StyleBookEntry", "mvccVersion", true, "uuid", true, "headId", true,
+			"styleBookEntryId", true, "groupId", true, "companyId", true,
+			"userId", true, "userName", true, "createDate", true,
+			"modifiedDate", true, "defaultStyleBookEntry", true, "name", true,
+			"previewFileEntryId", true, "styleBookEntryKey", true);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	@Test
@@ -684,8 +698,11 @@ public class StyleBookEntryPersistenceTest {
 
 		styleBookEntry.setMvccVersion(RandomTestUtil.nextLong());
 
+<<<<<<< HEAD
 		styleBookEntry.setCtCollectionId(RandomTestUtil.nextLong());
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		styleBookEntry.setUuid(RandomTestUtil.randomString());
 
 		styleBookEntry.setHeadId(RandomTestUtil.nextLong());

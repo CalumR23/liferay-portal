@@ -17,6 +17,10 @@ import {toQueryString} from 'data-engine-js-components-web/js/hooks/useQuery.es'
 import React from 'react';
 import {Link} from 'react-router-dom';
 
+<<<<<<< HEAD
+=======
+import {toQueryString} from '../../hooks/useQuery.es';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {FieldValuePreview} from './FieldPreview.es';
 import {ENTRY_STATUS_LABEL} from './constants.es';
 

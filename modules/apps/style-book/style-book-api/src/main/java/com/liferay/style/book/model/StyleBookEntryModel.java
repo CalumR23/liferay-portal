@@ -20,7 +20,10 @@ import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.model.ShardedModel;
 import com.liferay.portal.kernel.model.StagedAuditedModel;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.model.change.tracking.CTModel;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.model.version.VersionedModel;
 
 import java.util.Date;
@@ -40,9 +43,14 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface StyleBookEntryModel
+<<<<<<< HEAD
 	extends BaseModel<StyleBookEntry>, CTModel<StyleBookEntry>, GroupedModel,
 			MVCCModel, ShardedModel, StagedAuditedModel,
 			VersionedModel<StyleBookEntryVersion> {
+=======
+	extends BaseModel<StyleBookEntry>, GroupedModel, MVCCModel, ShardedModel,
+			StagedAuditedModel, VersionedModel<StyleBookEntryVersion> {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	/*
 	 * NOTE FOR DEVELOPERS:
@@ -83,6 +91,7 @@ public interface StyleBookEntryModel
 	public void setMvccVersion(long mvccVersion);
 
 	/**
+<<<<<<< HEAD
 	 * Returns the ct collection ID of this style book entry.
 	 *
 	 * @return the ct collection ID of this style book entry
@@ -99,6 +108,8 @@ public interface StyleBookEntryModel
 	public void setCtCollectionId(long ctCollectionId);
 
 	/**
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	 * Returns the uuid of this style book entry.
 	 *
 	 * @return the uuid of this style book entry

@@ -16,14 +16,20 @@ package com.liferay.petra.url.pattern.mapper;
 
 import com.liferay.petra.url.pattern.mapper.internal.DynamicSizeTrieURLPatternMapper;
 import com.liferay.petra.url.pattern.mapper.internal.StaticSizeTrieURLPatternMapper;
+<<<<<<< HEAD
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
+<<<<<<< HEAD
 import org.junit.ClassRule;
 import org.junit.Rule;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import org.junit.Test;
 
 /**
@@ -31,11 +37,14 @@ import org.junit.Test;
  */
 public class URLPatternMapperFactoryTest {
 
+<<<<<<< HEAD
 	@ClassRule
 	@Rule
 	public static final LiferayUnitTestRule liferayUnitTestRule =
 		LiferayUnitTestRule.INSTANCE;
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	@Test
 	public void testCreate() {
 		Map<String, String> map = new HashMap<>();

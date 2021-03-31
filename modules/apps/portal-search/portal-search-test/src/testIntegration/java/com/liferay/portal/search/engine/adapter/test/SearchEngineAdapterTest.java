@@ -175,7 +175,18 @@ public class SearchEngineAdapterTest {
 
 			String message = runtimeException.getMessage();
 
+<<<<<<< HEAD
 			if (isSearchEngine("Elasticsearch7")) {
+=======
+			if (isSearchEngine("Solr")) {
+				Assert.assertTrue(
+					message,
+					message.contains(
+						"<p>Problem accessing /solr/" + index + "/update") ||
+					message.contains("Error 404 Not Found"));
+			}
+			else if (isSearchEngine("Elasticsearch7")) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				Assert.assertTrue(
 					message,
 					message.contains("reason=no such index [" + index + "]"));

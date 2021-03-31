@@ -32,15 +32,24 @@ import com.liferay.portal.search.query.BooleanQuery;
 import com.liferay.portal.search.query.FunctionScoreQuery;
 import com.liferay.portal.search.query.Queries;
 import com.liferay.portal.search.query.TermQuery;
+<<<<<<< HEAD
 import com.liferay.portal.search.query.function.CombineFunction;
 import com.liferay.portal.search.query.function.score.ScoreFunctions;
+=======
+import com.liferay.portal.search.query.function.score.ScoreFunctions;
+import com.liferay.portal.search.query.function.score.ScriptScoreFunction;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.search.script.Script;
 import com.liferay.portal.search.script.ScriptBuilder;
 import com.liferay.portal.search.script.ScriptType;
 import com.liferay.portal.search.script.Scripts;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.LinkedHashMap;
+=======
+import java.util.HashMap;
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +100,11 @@ public class FrequentPatternCommerceMLRecommendationManagerImpl
 
 		int start = 0;
 
+<<<<<<< HEAD
 		Map<String, Document> documentMap = new LinkedHashMap<>(
+=======
+		Map<String, Document> documentMap = new HashMap<>(
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			DEFAULT_RESULT_SIZE, 1.0F);
 
 		while (documentMap.size() < DEFAULT_RESULT_SIZE) {
@@ -106,10 +119,13 @@ public class FrequentPatternCommerceMLRecommendationManagerImpl
 				String recommendedEntryClassPK = doc.get(
 					CommerceMLRecommendationField.RECOMMENDED_ENTRY_CLASS_PK);
 
+<<<<<<< HEAD
 				if (documentMap.get(recommendedEntryClassPK) != null) {
 					continue;
 				}
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 				documentMap.put(recommendedEntryClassPK, doc);
 
 				if (documentMap.size() == DEFAULT_RESULT_SIZE) {
@@ -168,8 +184,12 @@ public class FrequentPatternCommerceMLRecommendationManagerImpl
 
 		frequentPatternCommerceMLRecommendation.setAntecedentIds(
 			GetterUtil.getLongValues(
+<<<<<<< HEAD
 				document.getValues(
 					CommerceMLRecommendationField.ANTECEDENT_IDS)));
+=======
+				document.get(CommerceMLRecommendationField.ANTECEDENT_IDS)));
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		frequentPatternCommerceMLRecommendation.setAntecedentIdsLength(
 			GetterUtil.getLong(
@@ -236,6 +256,7 @@ public class FrequentPatternCommerceMLRecommendationManagerImpl
 		searchSearchRequest.setIndexNames(
 			_commerceMLIndexer.getIndexName(companyId));
 
+<<<<<<< HEAD
 		FunctionScoreQuery functionScoreQuery = _queries.functionScore(
 			_getConstantScoreQuery(cpDefinitionIds));
 
@@ -250,6 +271,26 @@ public class FrequentPatternCommerceMLRecommendationManagerImpl
 
 		searchSearchRequest.setSize(DEFAULT_FETCH_SIZE);
 
+=======
+		searchSearchRequest.setSize(DEFAULT_FETCH_SIZE);
+
+		BooleanQuery excludeRecommendationsBooleanQuery =
+			_getExcludeRecommendations(cpDefinitionIds);
+
+		BooleanQuery booleanQuery = _getConstantScoreQuery(cpDefinitionIds);
+
+		ScriptScoreFunction scriptScoreFunction = _scoreFunctions.script(
+			_getScript(cpDefinitionIds));
+
+		FunctionScoreQuery functionScoreQuery = _queries.functionScore(
+			excludeRecommendationsBooleanQuery);
+
+		functionScoreQuery.addFilterQueryScoreFunctionHolder(
+			booleanQuery, scriptScoreFunction);
+
+		searchSearchRequest.setQuery(functionScoreQuery);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		return searchSearchRequest;
 	}
 

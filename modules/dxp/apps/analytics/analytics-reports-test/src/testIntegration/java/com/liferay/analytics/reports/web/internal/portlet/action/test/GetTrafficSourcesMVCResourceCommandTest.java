@@ -239,6 +239,7 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 					Assert.assertEquals("social", jsonObject2.get("name"));
 					Assert.assertEquals(385, jsonObject2.getInt("value"));
+<<<<<<< HEAD
 
 					JSONArray referringSocialMediaJSONArray =
 						jsonObject2.getJSONArray("referringSocialMedia");
@@ -254,6 +255,23 @@ public class GetTrafficSourcesMVCResourceCommandTest {
 
 					JSONObject jsonObject3 = jsonArray.getJSONObject(2);
 
+=======
+
+					JSONArray referringSocialMediaJSONArray =
+						jsonObject2.getJSONArray("referringSocialMedia");
+
+					JSONObject referringSocialMediaJSONObject =
+						referringSocialMediaJSONArray.getJSONObject(0);
+
+					Assert.assertEquals(
+						"facebook", referringSocialMediaJSONObject.get("name"));
+					Assert.assertEquals(
+						385,
+						referringSocialMediaJSONObject.get("trafficAmount"));
+
+					JSONObject jsonObject3 = jsonArray.getJSONObject(2);
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 					Assert.assertEquals("referral", jsonObject3.get("name"));
 					Assert.assertEquals(2L, jsonObject3.getInt("value"));
 

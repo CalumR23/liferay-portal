@@ -16,14 +16,35 @@ import {fetch} from 'frontend-js-web';
 
 import createOdataFilter from './odata';
 
+<<<<<<< HEAD
 export const fetchHeaders = new Headers({
 	Accept: 'application/json',
 	'Accept-Language': Liferay.ThemeDisplay.getBCP47LanguageId(),
+=======
+export function getAcceptLanguageHeaderParam() {
+	const browserLang = navigator.language || navigator.userLanguage;
+	const themeLang = Liferay.ThemeDisplay.getLanguageId().replace('_', '-');
+
+	if (browserLang === themeLang) {
+		return browserLang;
+	}
+
+	return `${browserLang}, ${themeLang};q=0.8`;
+}
+
+export const fetchHeaders = new Headers({
+	Accept: 'application/json',
+	'Accept-Language': getAcceptLanguageHeaderParam(),
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	'Content-Type': 'application/json',
 });
 
 export const fetchParams = {
+<<<<<<< HEAD
 	headers: fetchHeaders,
+=======
+	headers: Liferay.staticEnvHeaders || fetchHeaders,
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 };
 
 export function getData(apiUrl, query, page, pageSize) {

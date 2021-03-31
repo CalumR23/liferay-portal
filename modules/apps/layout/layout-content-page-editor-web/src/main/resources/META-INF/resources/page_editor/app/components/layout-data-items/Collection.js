@@ -16,8 +16,11 @@ import ClayLayout from '@clayui/layout';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {COLUMN_SIZE_MODULE_PER_ROW_SIZES} from '../../config/constants/columnSizes';
+<<<<<<< HEAD
 import selectLanguageId from '../../selectors/selectLanguageId';
 import selectSegmentsExperienceId from '../../selectors/selectSegmentsExperienceId';
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import CollectionService from '../../services/CollectionService';
 import {useDispatch, useSelector} from '../../store/index';
 import {CollectionItemContextProvider} from '../CollectionItemContext';

@@ -9,12 +9,20 @@
  * distribution rights of the Software.
  */
 
+<<<<<<< HEAD
 import {useStateSafe} from '@liferay/frontend-js-react-web';
+=======
+import {useStateSafe} from 'frontend-js-react-web';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import PropTypes from 'prop-types';
 import React, {useContext, useEffect} from 'react';
 
 import ConnectionContext from '../context/ConnectionContext';
+<<<<<<< HEAD
 import {StoreDispatchContext, StoreStateContext} from '../context/StoreContext';
+=======
+import {StoreContext, useWarning} from '../context/StoreContext';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {numberFormat} from '../utils/numberFormat';
 import Hint from './Hint';
 
@@ -31,8 +39,11 @@ function TotalCount({
 	const {validAnalyticsConnection} = useContext(ConnectionContext);
 
 	const [value, setValue] = useStateSafe('-');
+<<<<<<< HEAD
 
 	const dispatch = useContext(StoreDispatchContext);
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	const {languageTag, publishedToday} = useContext(StoreStateContext);
 
@@ -42,10 +53,17 @@ function TotalCount({
 				.then(setValue)
 				.catch(() => {
 					setValue('-');
+<<<<<<< HEAD
 					dispatch({type: 'ADD_WARNING'});
 				});
 		}
 	}, [dispatch, dataProvider, setValue, validAnalyticsConnection]);
+=======
+					addWarning();
+				});
+		}
+	}, [addWarning, dataProvider, setValue, validAnalyticsConnection]);
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 	let displayValue = '-';
 

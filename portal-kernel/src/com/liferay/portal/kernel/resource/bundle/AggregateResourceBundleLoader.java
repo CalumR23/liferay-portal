@@ -16,8 +16,11 @@ package com.liferay.portal.kernel.resource.bundle;
 
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+<<<<<<< HEAD
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.LocaleUtil;
 
@@ -61,9 +64,12 @@ public class AggregateResourceBundleLoader implements ResourceBundleLoader {
 				}
 			}
 			catch (Exception exception) {
+<<<<<<< HEAD
 				if (_log.isDebugEnabled()) {
 					_log.debug(exception, exception);
 				}
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 			}
 		}
 
@@ -85,9 +91,12 @@ public class AggregateResourceBundleLoader implements ResourceBundleLoader {
 			resourceBundles.toArray(new ResourceBundle[0]));
 	}
 
+<<<<<<< HEAD
 	private static final Log _log = LogFactoryUtil.getLog(
 		AggregateResourceBundleLoader.class);
 
+=======
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	private final ResourceBundleLoader[] _resourceBundleLoaders;
 
 }

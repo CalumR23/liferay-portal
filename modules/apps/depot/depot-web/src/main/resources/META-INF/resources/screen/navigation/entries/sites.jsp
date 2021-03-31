@@ -36,6 +36,7 @@ List<DepotEntryGroupRel> depotEntryGroupRels = depotAdminSitesDisplayContext.get
 		<c:if test="<%= !depotAdminSitesDisplayContext.isLiveDepotEntry() %>">
 			<clay:content-col>
 				<span class="heading-end">
+<<<<<<< HEAD
 
 					<%
 					PortletURL itemSelectorURL = depotAdminSitesDisplayContext.getItemSelectorURL();
@@ -55,6 +56,12 @@ List<DepotEntryGroupRel> depotEntryGroupRels = depotAdminSitesDisplayContext.get
 						id='<%= liferayPortletResponse.getNamespace() + "addConnectedSiteButton" %>'
 						label="add"
 						propsTransformer="js/AddConnectedSitesButtonPropsTransformer"
+=======
+					<clay:button
+						displayType="secondary"
+						id='<%= liferayPortletResponse.getNamespace() + "addConnectedSiteButton" %>'
+						label="add"
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 						small="<%= true %>"
 						title="connect-to-a-site"
 					/>
@@ -69,6 +76,7 @@ List<DepotEntryGroupRel> depotEntryGroupRels = depotAdminSitesDisplayContext.get
 
 	<liferay-ui:error exception="<%= DepotEntryGroupRelToGroupException.MustBeRemotelyStaged.class %>">
 		<liferay-ui:message key="a-remotely-staged-asset-library-cannot-be-connected-to-a-locally-staged-site" />
+<<<<<<< HEAD
 	</liferay-ui:error>
 
 	<liferay-ui:error exception="<%= DepotEntryGroupRelToGroupException.MustBeStaged.class %>">
@@ -79,6 +87,18 @@ List<DepotEntryGroupRel> depotEntryGroupRels = depotAdminSitesDisplayContext.get
 		<liferay-ui:message key="an-unstaged-asset-library-cannot-be-connected-to-a-staged-site" />
 	</liferay-ui:error>
 
+=======
+	</liferay-ui:error>
+
+	<liferay-ui:error exception="<%= DepotEntryGroupRelToGroupException.MustBeStaged.class %>">
+		<liferay-ui:message key="a-staged-asset-library-cannot-be-connected-to-an-unstaged-site" />
+	</liferay-ui:error>
+
+	<liferay-ui:error exception="<%= DepotEntryGroupRelToGroupException.MustNotBeStaged.class %>">
+		<liferay-ui:message key="an-unstaged-asset-library-cannot-be-connected-to-a-staged-site" />
+	</liferay-ui:error>
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	<c:if test="<%= depotAdminSitesDisplayContext.isLiveDepotEntry() %>">
 		<clay:alert
 			displayType="info"
@@ -148,4 +168,40 @@ List<DepotEntryGroupRel> depotEntryGroupRels = depotAdminSitesDisplayContext.get
 			markupView="lexicon"
 		/>
 	</liferay-ui:search-container>
+<<<<<<< HEAD
+=======
+
+	<aui:script require="metal-dom/src/all/dom as dom">
+		var addConnectedSiteButton = document.querySelector(
+			'#<portlet:namespace />addConnectedSiteButton'
+		);
+
+		if (addConnectedSiteButton) {
+			addConnectedSiteButton.addEventListener('click', function (event) {
+				Liferay.Util.openSelectionModal({
+					onSelect: function (event) {
+						var toGroupIdInput = document.querySelector(
+							'#<portlet:namespace />toGroupId'
+						);
+
+						toGroupIdInput.value = event.groupid;
+
+						var redirectInput = document.querySelector(
+							'#<portlet:namespace />redirect'
+						);
+
+						redirectInput.value = '<%= currentURL %>';
+
+						submitForm(toGroupIdInput.form);
+					},
+					selectEventName:
+						'<%= liferayPortletResponse.getNamespace() + "selectSite" %>',
+					title: '<liferay-ui:message key="select-site" />',
+					url:
+						'<%= String.valueOf(depotAdminSitesDisplayContext.getItemSelectorURL()) %>',
+				});
+			});
+		}
+	</aui:script>
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 </clay:sheet-section>

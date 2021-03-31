@@ -270,6 +270,7 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 			HttpServletResponse httpServletResponse, User user)
 		throws Exception {
 
+<<<<<<< HEAD
 		httpServletResponse.sendRedirect(
 			PortletURLBuilder.create(
 				PortletURLFactoryUtil.create(
@@ -294,6 +295,25 @@ public class FacebookConnectStrutsAction implements StrutsAction {
 			).setWindowState(
 				LiferayWindowState.POP_UP
 			).buildString());
+=======
+		PortletURL portletURL = PortletURLFactoryUtil.create(
+			httpServletRequest, PortletKeys.LOGIN, PortletRequest.RENDER_PHASE);
+
+		portletURL.setParameter("saveLastPath", Boolean.FALSE.toString());
+		portletURL.setParameter(
+			"mvcRenderCommandName",
+			"/login_authentication_facebook_connect/associate_facebook_user");
+		portletURL.setParameter(
+			"redirect", ParamUtil.getString(httpServletRequest, "redirect"));
+		portletURL.setParameter("userId", String.valueOf(user.getUserId()));
+		portletURL.setParameter("emailAddress", user.getEmailAddress());
+		portletURL.setParameter("firstName", user.getFirstName());
+		portletURL.setParameter("lastName", user.getLastName());
+		portletURL.setPortletMode(PortletMode.VIEW);
+		portletURL.setWindowState(LiferayWindowState.POP_UP);
+
+		httpServletResponse.sendRedirect(portletURL.toString());
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	}
 
 	protected void sendError(

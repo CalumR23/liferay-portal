@@ -116,7 +116,13 @@ const JournalArticleSelector = ({
 				)}
 			</ClayInput.Group>
 
+<<<<<<< HEAD
 			{message && <div className="form-feedback-item">{message}</div>}
+=======
+			{article.message && (
+				<div className="form-feedback-item">{article.message}</div>
+			)}
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 		</ClayForm.Group>
 	);
 };

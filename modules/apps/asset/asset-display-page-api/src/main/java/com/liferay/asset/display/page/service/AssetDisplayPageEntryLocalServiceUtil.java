@@ -308,10 +308,20 @@ public class AssetDisplayPageEntryLocalServiceUtil {
 				layoutPageTemplateEntryId);
 	}
 
+<<<<<<< HEAD
 	public static List<AssetDisplayPageEntry>
 		getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
 			long layoutPageTemplateEntryId, int start, int end,
 			OrderByComparator<AssetDisplayPageEntry> orderByComparator) {
+=======
+	public static java.util.List
+		<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
+			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(
+				long layoutPageTemplateEntryId, int start, int end,
+				com.liferay.portal.kernel.util.OrderByComparator
+					<com.liferay.asset.display.page.model.AssetDisplayPageEntry>
+						orderByComparator) {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 
 		return getService().
 			getAssetDisplayPageEntriesByLayoutPageTemplateEntryId(

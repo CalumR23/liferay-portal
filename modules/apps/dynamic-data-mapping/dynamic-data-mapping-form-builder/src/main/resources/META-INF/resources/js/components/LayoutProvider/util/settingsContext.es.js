@@ -199,12 +199,16 @@ export const updateFieldReference = (
 	return focusedField;
 };
 
+<<<<<<< HEAD
 export const updateFieldDataType = (
 	defaultLanguageId,
 	editingLanguageId,
 	focusedField,
 	value
 ) => {
+=======
+export const updateFieldDataType = (editingLanguageId, focusedField, value) => {
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	let {settingsContext} = focusedField;
 
 	settingsContext = {

@@ -36,7 +36,11 @@ import {
 	useSetLoading,
 } from '../context/ChartStateContext';
 import ConnectionContext from '../context/ConnectionContext';
+<<<<<<< HEAD
 import {StoreDispatchContext, StoreStateContext} from '../context/StoreContext';
+=======
+import {StoreContext, useHistoricalWarning} from '../context/StoreContext';
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 import {generateDateFormatters as dateFormat} from '../utils/dateFormat';
 import {numberFormat} from '../utils/numberFormat';
 import {ActiveDot as CustomActiveDot, Dot as CustomDot} from './CustomDots';
@@ -144,6 +148,7 @@ export default function Chart({
 
 	const dispatch = useContext(StoreDispatchContext);
 
+<<<<<<< HEAD
 	const {languageTag, publishedToday} = useContext(StoreStateContext);
 
 	const chartState = useChartState();
@@ -152,6 +157,16 @@ export default function Chart({
 
 	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
 
+=======
+	const chartState = useChartState();
+
+	const {firstDate, lastDate} = useDateTitle();
+
+	const isPreviousPeriodButtonDisabled = useIsPreviousPeriodButtonDisabled();
+
+	const [, addHistoricalWarning] = useHistoricalWarning();
+
+>>>>>>> 3cc350081830d5b3ed7848d769d3985a6bbf0469
 	const addDataSetItems = useAddDataSetItems();
 
 	const changeTimeSpanKey = useChangeTimeSpanKey();
