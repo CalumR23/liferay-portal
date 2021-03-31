@@ -529,6 +529,76 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I start the test-fixpack-builder-revert job with the following parameters ${table}"
+	macro startTestFixPackBuilderRevertJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var mirrorUser = PropsUtil.get("mirror.user");
+		var mirrorPassword = PropsUtil.get("mirror.password");
+		var portalUrl = PropsUtil.get("portal.url");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "bundle") {
+				var bundle = "${value}";
+			}
+			else if ("${field}" == "fixPack") {
+				var fixPack = "${value}";
+			}
+			else if ("${field}" == "hotfix") {
+				var hotfix = "${value}";
+			}
+			else if ("${field}" == "patchingTool") {
+				var patchingTool = "${value}";
+			}
+			else if ("${field}" == "patchingToolMajorVersion") {
+				var patchingToolMajorVersion = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for test-fixpack-builder-revert");
+			}
+		}
+
+		if (!(isSet(bundle))) {
+			var bundle = "";
+		}
+		if (!(isSet(fixPack))) {
+			var fixPack = "";
+		}
+		if (!(isSet(hotfix))) {
+			var hotfix = "";
+		}
+		if (!(isSet(patchingTool))) {
+			var patchingTool = "";
+		}
+
+		if (contains("${patchingTool}", "LATEST")) {
+			var curlLatestPatchingTool = '''
+				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
+				 -u ${mirrorUser}:${mirrorPassword}
+			''';
+
+			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
+
+			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
+
+			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${latestVersion}");
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/test-fixpack-builder-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d bundle=${bundle}
+			-d fixPack=${fixPack}
+			-d hotfix=${hotfix}
+			-d patchingTool=${patchingTool}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I start the test-fixpack-builder-main-smoke job with the following parameters ${table}"
 	macro startTestFixPackBuilderMainSmokeJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
@@ -647,6 +717,28 @@ definition {
 
 			if (!("${errorCount}" == "${acceptableErrorCount}")) {
 				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack install and either apply fixes to the builder or update the test case as needed.");
+			}
+		}
+
+		Jenkins.viewConsoleText(consoleOutputText = "Server startup in");
+	}
+
+	@prose = "the test-fixpack-builder-revert console log should not have any visible errors"
+	macro viewRevertConsoleText {
+		Jenkins.clickFullLogLink();
+
+		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
+		var errorCount = StringUtil.count("${consoleOutputText}", "ERROR");
+
+		echo("Number of errors: ${errorCount}");
+
+		if (!("${fileAddedCount}" == "0")) {
+			var acceptableErrorCount = StringUtil.count("${consoleOutputText}", "ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found");
+
+			echo("Number of acceptable errors: ${acceptableErrorCount}");
+
+			if (!("${errorCount}" == "${acceptableErrorCount}")) {
+				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack revert and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
 
