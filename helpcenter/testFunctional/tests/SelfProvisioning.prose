@@ -9,10 +9,13 @@ Teardown:
 	* I get the ID of the default user belonging to the organization "Sfpzen - ${staticProjectName}" from zendesk.liferay.com
 	* I tear down the users with the following email addresses from web.liferay.com
 	| sfp.customer1@lrcustomer.com.broken |
+	| sfp.employee1@liferay.com.broken    |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| sfp.customer1@lrcustomer.com.broken |
+	| sfp.employee1@liferay.com.broken    |
 	* I tear down the users with the following email addresses from koroneiki
 	| sfp.customer1@lrcustomer.com.broken |
+	| sfp.employee1@liferay.com.broken    |
 	* I tear down the product purchases on koroneiki made by the account "Sfpzen - ${staticProjectName}" for the following products
 	| DXP Production                   |
 	| Portal Production                |
@@ -20,6 +23,7 @@ Teardown:
 	| Platinum Subscription            |
  	* I tear down the contacts on koroneiki with the following email addresses
 	| sfp.customer1@lrcustomer.com.broken |
+	| sfp.employee1@liferay.com.broken    |
 	* I tear down the accounts on koroneiki with the following names
 	| Sfpzen - ${staticProjectName} |
 	* I tear down the accounts on koroneiki with the following "Code" values
@@ -32,6 +36,7 @@ Teardown:
 	| New Subscription(s) for Sfpzen - ${staticProjectName} |
 	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
 	| sfp.customer1@lrcustomer.com.broken |
+	| sfp.employee1@liferay.com.broken    |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com
 	| Sfpzen - ${staticProjectName} |
@@ -40,7 +45,7 @@ Teardown:
 
 Scenario: View dxp options
 	@ help.center.smoke = "true"
-	DXP search downloads should be visible according to the permissions that users have.
+	DXP activation key options should be visible according to the permissions that users have.
 
 	Given I wait for "5" seconds
 	And I create a user with the following parameters
@@ -94,7 +99,7 @@ Scenario: View dxp options
 	| Version | 7.0                           |
 
 Scenario: View portal options
-	Portal search downloads should be visible according to the permissions that users have.
+	Portal activation key options should be visible according to the permissions that users have.
 
 	Given I wait for "5" seconds
 	And I create a user with the following parameters
@@ -149,7 +154,7 @@ Scenario: View portal options
 	| Version | 5.1                           |
 
 Scenario: View commerce options
-	Commerce search downloads should be visible according to the permissions that users have.
+	Commerce activation key options should be visible according to the permissions that users have.
 
 	Given I wait for "5" seconds
 	And I create a user with the following parameters
@@ -210,3 +215,29 @@ Scenario: View commerce options
 	| Project | Sfpzen - ${staticProjectName} |
 	| Product | Commerce Subscription         |
 	| Version | 1                             |
+
+Scenario: View employee options
+	Appropriate activation key options should be visible according to the permissions that employees have.
+
+	Given I wait for "5" seconds
+	And I create a user with the following parameters
+	| Screen Name   | sfp.employee1                    |
+	| Email Address | sfp.employee1@liferay.com.broken |
+	| First Name    | SFP                              |
+	| Last Name     | Employee1                        |
+	And I assign the web user with the email address "sfp.employee1@liferay.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "sfp.employee1@liferay.com.broken" to the web role "Verified User"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	Then the support user with the email address "sfp.employee1@liferay.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "sfp.employee1@liferay.com.broken" to "osbadminqauser"
+	And I log out and log into the support homepage as "sfp.employee1@liferay.com.broken" with password "osbadminqauser"
+	And I go to the Self Provisioning page
+	Then I should be able to view the following options in the Self Provisioning portlet
+	| Project | Liferay, Inc.         |
+	| Product | Commerce Subscription |
+	| Product | Digital Enterprise    |
+	| Product | Portal                |

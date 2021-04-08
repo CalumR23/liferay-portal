@@ -1,0 +1,89 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.provisioning.employee.integration"
+
+Feature: Koroneiki to Provisioning Employee Integration
+	Testing employee sync updates in Provisioning caused by changes in Koroneiki.
+
+Teardown:
+	* I wait for "5" seconds
+	* I tear down the users with the following email addresses from web.liferay.com
+	| pro.employee1@liferay.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| pro.employee1@liferay.com.broken |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| pro.employee1@liferay.com.broken |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| pro.employee1@liferay.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+
+Scenario: View Liferay employee
+	New Liferay employees who are added to koroneiki via web should sync correctly to provisioning.
+
+	Given I wait for "5" seconds
+	And I create a user with the following parameters
+	| Screen Name   | pro.employee1                    |
+	| Email Address | pro.employee1@liferay.com.broken |
+	| First Name    | PRO                              |
+	| Last Name     | Employee1                        |
+	And I assign the web user with the email address "pro.employee1@liferay.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "pro.employee1@liferay.com.broken" to the web role "Verified User"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Liferay,"
+	And I click on the account with the name "Liferay, Inc." on the provisioning index
+	And I click on the "Contacts" tab
+	And I search and filter the accounts details page using the following parameters
+	| Keyword | pro.employee1@liferay.com.broken |
+	Then I should be able to view the contact with the email address "pro.employee1@liferay.com.broken" and the following values
+	| Name          | PRO Employee1                    |
+	| Email Address | pro.employee1@liferay.com.broken |
+	| Role          | Member                           |
+	When I go to the user index page
+	And I search the users page using the keyword "pro.employee1"
+	Then I should be able to view a user on the provisioning index with the name "PRO Employee1" and the following values
+	| Name               | PRO Employee1                                                                      |
+	| Email Address      | pro.employee1@liferay.com.broken                                                   |
+	| Entitlements       | Customer, Customer - Commerce, Customer - DXP, Customer - Portal, Liferay Employee |
+	| Number of Accounts | 1                                                                                  |
+
+Scenario: Remove Liferay employee
+	New Liferay employees who are removed from the Liferay Inc org on web should sync correctly to provisioning.
+
+	Given I wait for "5" seconds
+	And I create a user with the following parameters
+	| Screen Name   | pro.employee1                    |
+	| Email Address | pro.employee1@liferay.com.broken |
+	| First Name    | PRO                              |
+	| Last Name     | Employee1                        |
+	And I assign the web user with the email address "pro.employee1@liferay.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "pro.employee1@liferay.com.broken" to the web role "Verified User"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	When I remove the web user with the email address "pro.employee1@liferay.com.broken" from the web organization "Liferay, Inc."
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I search the accounts page using the keyword "Liferay,"
+	And I click on the account with the name "Liferay, Inc." on the provisioning index
+	And I click on the "Contacts" tab
+	And I search and filter the accounts details page using the following parameters
+	| Keyword | pro.employee1@liferay.com.broken |
+	Then I should not be able to view the contact with the email address "pro.employee1@liferay.com.broken"
+	When I go to the user index page
+	And I search the users page using the keyword "pro.employee1"
+	Then I should be able to view a user on the provisioning index with the name "PRO Employee1" and the following values
+	| Name               | PRO Employee1                    |
+	| Email Address      | pro.employee1@liferay.com.broken |
+	| Entitlements       |                                  |
+	| Number of Accounts | 0                                |

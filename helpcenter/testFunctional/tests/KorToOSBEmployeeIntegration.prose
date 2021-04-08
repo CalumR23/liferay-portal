@@ -1,0 +1,63 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.osb.employee.integration"
+
+Feature: Koroneiki to OSB Employee Integration
+	Testing employee sync updates in OSB caused by changes in Koroneiki.
+
+Teardown:
+	* I wait for "5" seconds
+	* I tear down the users with the following email addresses from web.liferay.com
+	| kor.employee1@liferay.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| kor.employee1@liferay.com.broken |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| kor.employee1@liferay.com.broken |
+	* I wait for "5" seconds
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| kor.employee1@liferay.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+
+Scenario: View Liferay employee
+	New Liferay employees who are added to koroneiki via web should sync correctly to OSB.
+
+	Given I wait for "5" seconds
+	And I create a user with the following parameters
+	| Screen Name   | kor.employee1                    |
+	| Email Address | kor.employee1@liferay.com.broken |
+	| First Name    | KOR                              |
+	| Last Name     | Employee1                        |
+	And I assign the web user with the email address "kor.employee1@liferay.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "kor.employee1@liferay.com.broken" to the web role "Verified User"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	Then the support user with the email address "kor.employee1@liferay.com.broken" should be synced to the support site
+	And the organization "Liferay, Inc." should have the user with the email address "kor.employee1@liferay.com.broken" as a member
+
+Scenario: Remove Liferay employee
+	New Liferay employees who are removed from the Liferay Inc org on web should sync correctly to OSB.
+
+	Given I wait for "5" seconds
+	And I create a user with the following parameters
+	| Screen Name   | kor.employee1                    |
+	| Email Address | kor.employee1@liferay.com.broken |
+	| First Name    | KOR                              |
+	| Last Name     | Employee1                        |
+	And I assign the web user with the email address "kor.employee1@liferay.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "kor.employee1@liferay.com.broken" to the web role "Verified User"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	Then the support user with the email address "kor.employee1@liferay.com.broken" should be synced to the support site
+	And the organization "Liferay, Inc." should have the user with the email address "kor.employee1@liferay.com.broken" as a member
+	When I remove the web user with the email address "kor.employee1@liferay.com.broken" from the web organization "Liferay, Inc."
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Customer - Commerce"
+	And I synchronize the contact entitlement definition with the name "Liferay Employee"
+	Then the organization "Liferay, Inc." should not have the user with the email address "kor.employee1@liferay.com.broken" as a member
