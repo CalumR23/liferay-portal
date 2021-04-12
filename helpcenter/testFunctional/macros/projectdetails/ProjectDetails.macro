@@ -232,6 +232,26 @@ definition {
 		Click(locator1 = "ProjectDetailsSourceCodeAccessForm#SUBMIT_BUTTON");
 	}
 
+	@prose = "I delete the attachment with the keyword ${fileKeyword}"
+	macro deleteAttachment {
+		var key_fileKeyword = "${fileKeyword}";
+
+		if (IsElementPresent(locator1 = "ProjectDetailsProject#ATTACHMENT_ACTIONS_LINK")) {
+			Click(locator1 = "ProjectDetailsProject#ATTACHMENT_ACTIONS_LINK");
+
+			var key_action = "Delete";
+
+			ClickNoError(locator1 = "ProjectDetailsProject#MENULIST_ACTION");
+		}
+		else {
+			ClickNoError(locator1 = "ProjectDetailsProject#ATTACHMENT_DELETE_LINK");
+		}
+
+		Confirm(value1 = "Are you sure you want to delete this?");
+
+		Message.success();
+	}
+
 	@prose = "I delete the environment configuration with the name ${environmentName}"
 	macro deleteEnvironmentConfiguration {
 		var key_environmentName = "${environmentName}";
@@ -256,6 +276,29 @@ definition {
 		ClickNoError(locator1 = "ProjectDetailsProject#SOURCE_CODE_ACCESS_USER_DETAILS_DELETE_BUTTON");
 
 		Confirm(value1 = "Are you sure you want to delete this?");
+	}
+
+	@prose = "I edit access for the file with the keyword ${fileKeyword} to be accessible from any support location"
+	macro editAttachmentToBeAccessibleFromAnywhere {
+		var key_fileKeyword = "${fileKeyword}";
+
+		var key_action = "Edit Access";
+
+		Click(locator1 = "ProjectDetailsProject#MENULIST_ACTION");
+
+		SelectFrame(locator1 = "ProjectDetailsEditAccessForm#EDIT_ACCESS_IFRAME");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ProjectDetailsEditAccessForm#INFO_MESSAGE",
+			value1 = "Note: This action cannot be undone.");
+
+		Check(locator1 = "ProjectDetailsEditAccessForm#NO_PERSONAL_DATA_CHECKBOX");
+
+		SelectFrameTop();
+
+		Button.save();
+
+		Message.success();
 	}
 
 	@prose = "I edit the environment configuration with the name ${environmentName} with the following values ${table}"
@@ -539,7 +582,7 @@ definition {
 					value1 = "${value}");
 			}
 			else if ("${field}" == "Does Not Contain Personal Data") {
-				AssertTextEquals.assertPartialText(
+				AssertTextEquals(
 					locator1 = "ProjectDetailsProject#ATTACHMENT_DOES_NOT_CONTAIN_PERSONAL_DATA",
 					value1 = "${value}");
 			}
