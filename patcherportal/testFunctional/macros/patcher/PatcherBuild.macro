@@ -9,6 +9,23 @@ definition {
 	var portalURL = PropsUtil.get("portal.url");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
+	macro assertTextAreaValue {
+		WaitForSPARefresh();
+
+		var javascript = '''
+			function getWebElement(locator) {
+				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+			}
+			return getWebElement("${xpath}")["value"];
+		''';
+
+		var propertyValue = selenium.getEval("${javascript}");
+
+		TestUtils.assertEquals(
+			actual="${propertyValue}",
+			expected="${expectedValue}");
+	}
+
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion using the ${jenkinsValue} Jenkins job"
 	macro checkForCompileCompletion {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -460,21 +477,6 @@ definition {
 			value1 = "Actions");
 	}
 
-	macro assertTextAreaValue {
-		WaitForSPARefresh();
-
-		var javascript = '''
-			function getWebElement(locator) {
-				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-			}
-			return getWebElement("${xpath}")["value"];
-		''';
-
-		var propertyValue = selenium.getEval("${javascript}");
-
-		TestUtils.assertEquals(actual="${propertyValue}", expected="${expectedValue}");
-	}
-
 	@prose = "I create a Patcher build for a new account with the following values ${table}"
 	macro createForNewAccount {
 		Patcher.gotoAccounts();
@@ -570,19 +572,27 @@ definition {
 		}
 
 		if (!("${ticketSuggestions}" == "")) {
+			var xpath = '''
+				//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]
+			''';
+
 			PatcherBuild.assertTextAreaValue(
-				xpath = "//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]",
+				expectedValue = "${ticketSuggestions}",
 				propertyName = "value",
-				expectedValue = "${ticketSuggestions}");
+				xpath = "${xpath}");
 
 			Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
 
 			Patcher.pause(timeInSeconds = "1");
 
+			var xpath = '''
+				//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]";
+			''';
+
 			PatcherBuild.assertTextAreaValue(
-				xpath = "//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]",
+				expectedValue = "${initialTicketsList},${ticketSuggestions}",
 				propertyName = "value",
-				expectedValue = "${initialTicketsList},${ticketSuggestions}");
+				xpath = "${xpath}");
 		}
 
 		AssertClick(
@@ -638,26 +648,34 @@ definition {
 			}
 		}
 
+		var xpath = '''
+			//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]
+		''';
+
 		PatcherBuild.assertTextAreaValue(
-			xpath = "//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]",
+			expectedValue = "${ticketSuggestions}",
 			propertyName = "value",
-			expectedValue = "${ticketSuggestions}");
+			xpath = "${xpath}");
 
 		Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
 
 		Patcher.pause(timeInSeconds = "1");
 
+		var xpath = '''
+			//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]";
+		''';
+
 		if (!("${initialTicketsList}" == "")) {
 			PatcherBuild.assertTextAreaValue(
-				xpath = "//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]",
+				expectedValue = "${initialTicketsList},${ticketSuggestions}",
 				propertyName = "value",
-				expectedValue = "${initialTicketsList},${ticketSuggestions}");
+				xpath = "${xpath}");
 		}
 		else {
 			PatcherBuild.assertTextAreaValue(
-				xpath = "//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]",
+				expectedValue = "${ticketSuggestions}",
 				propertyName = "value",
-				expectedValue = "${ticketSuggestions}");
+				xpath = "${xpath}");
 		}
 	}
 
