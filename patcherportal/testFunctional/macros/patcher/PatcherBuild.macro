@@ -9,14 +9,31 @@ definition {
 	var portalURL = PropsUtil.get("portal.url");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
-	macro assertTextAreaValue {
+	macro assertTroubleshootingSuggestionsValue {
 		WaitForSPARefresh();
 
 		var javascript = '''
 			function getWebElement(locator) {
 				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 			}
-			return getWebElement("${xpath}")["value"];
+			return getWebElement("//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]")["value"];
+		''';
+
+		var propertyValue = selenium.getEval("${javascript}");
+
+		TestUtils.assertEquals(
+			actual="${propertyValue}",
+			expected="${expectedValue}");
+	}
+
+	macro assertTicketListValue {
+		WaitForSPARefresh();
+
+		var javascript = '''
+			function getWebElement(locator) {
+				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+			}
+			return getWebElement("//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]")["value"];
 		''';
 
 		var propertyValue = selenium.getEval("${javascript}");
@@ -572,27 +589,13 @@ definition {
 		}
 
 		if (!("${ticketSuggestions}" == "")) {
-			var xpath = '''
-				//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]
-			''';
-
-			PatcherBuild.assertTextAreaValue(
-				expectedValue = "${ticketSuggestions}",
-				propertyName = "value",
-				xpath = "${xpath}");
+			PatcherBuild.assertTroubleshootingSuggestionsValue(expectedValue = "${ticketSuggestions}");
 
 			Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
 
 			Patcher.pause(timeInSeconds = "1");
 
-			var xpath = '''
-				//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]";
-			''';
-
-			PatcherBuild.assertTextAreaValue(
-				expectedValue = "${initialTicketsList},${ticketSuggestions}",
-				propertyName = "value",
-				xpath = "${xpath}");
+			PatcherBuild.assertTicketListValue(expectedValue = "${initialTicketsList},${ticketSuggestions}");
 		}
 
 		AssertClick(
@@ -648,34 +651,17 @@ definition {
 			}
 		}
 
-		var xpath = '''
-			//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]
-		''';
-
-		PatcherBuild.assertTextAreaValue(
-			expectedValue = "${ticketSuggestions}",
-			propertyName = "value",
-			xpath = "${xpath}");
+		PatcherBuild.assertTroubleshootingSuggestionsValue(expectedValue = "${ticketSuggestions}");
 
 		Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
 
 		Patcher.pause(timeInSeconds = "1");
 
-		var xpath = '''
-			//textarea[contains(@id,'osbpatcherportlet_patcherBuildName')]";
-		''';
-
 		if (!("${initialTicketsList}" == "")) {
-			PatcherBuild.assertTextAreaValue(
-				expectedValue = "${initialTicketsList},${ticketSuggestions}",
-				propertyName = "value",
-				xpath = "${xpath}");
+			PatcherBuild.assertTicketListValue(expectedValue = "${initialTicketsList},${ticketSuggestions}");
 		}
 		else {
-			PatcherBuild.assertTextAreaValue(
-				expectedValue = "${ticketSuggestions}",
-				propertyName = "value",
-				xpath = "${xpath}");
+			PatcherBuild.assertTicketListValue(expectedValue = "${ticketSuggestions}");
 		}
 	}
 
