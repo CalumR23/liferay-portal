@@ -6,9 +6,40 @@ definition {
 		Click(locator1 = "ProvisioningLicense#ACTIVATE_BUTTON");
 	}
 
+	@prose = "I click on the add fields button in position ${positionValue} on the license form"
+	macro clickAddFieldsButton {
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#ADD_FIELDS_BUTTON");
+	}
+
+	@prose = "I click on the choose button for the detached product purchase on the license form"
+	macro clickChooseDetachedProductPurchaseButton {
+		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHOOSE_DETACHED_PRODUCT_PURCHASE_BUTTON");
+	}
+
+	@prose = "I click on the choose button for the product purchase in position ${positionValue} on the license form"
+	macro clickChooseProductPurchaseButton {
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHOOSE_PRODUCT_PURCHASE_BUTTON");
+	}
+
 	@prose = "I click on the deactivate button on the license page"
 	macro clickDeactivateLicenseButton {
 		Click(locator1 = "ProvisioningLicense#DEACTIVATE_BUTTON");
+	}
+
+	@prose = "I click on the delete fields button in position ${positionValue} on the license form"
+	macro clickDeleteFieldsButton {
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#DELETE_FIELDS_BUTTON");
+	}
+
+	@prose = "I click on the generate button on the license form"
+	macro clickGenerateLicenseButton {
+		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#GENERATE_BUTTON");
 	}
 
 	@prose = "I click on the move button on the license page"
@@ -22,14 +53,30 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var option = "${row[1]}";
-			var type = "${row[2]}";
-			var value = "${row[3]}";
+			var type = "${row[1]}";
+			var value = "${row[2]}";
+			var positionValue = "${row[3]}";
 
 			var key_field = "${field}";
-			var key_option = "${option}";
 
-			if ("${type}" == "Select") {
+			if ("${positionValue}" == "") {
+				var key_positionValue = "1";
+			}
+			else {
+				var key_positionValue = "${positionValue}";
+			}
+
+			if ("${type}" == "Input") {
+				Type(
+					locator1 = "ProvisioningLicenseGenerateLicenseForm#INPUT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${type}" == "Textarea") {
+				Type(
+					locator1 = "ProvisioningLicenseGenerateLicenseForm#TEXTAREA_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${type}" == "Select") {
 				Select(
 					locator1 = "ProvisioningLicenseGenerateLicenseForm#SELECT_FIELD",
 					value1 = "${value}");
@@ -67,8 +114,16 @@ definition {
 					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#DONE_BUTTON");
 				}
 			}
+			else if ("${type}" == "Checkbox") {
+				if ("${value}" == "true") {
+					Check(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHECKBOX");
+				}
+				else {
+					Uncheck(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHECKBOX");
+				}
+			}
 			else {
-				fail("No such generate license field type ${type}. Please use Select or Select Entity");
+				fail("No such generate license field type ${type}. Please use Input, Textarea, Select, Select Entity, or Checkbox");
 			}
 		}
 	}
