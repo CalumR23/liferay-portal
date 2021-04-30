@@ -13,6 +13,14 @@ definition {
 		Click(locator1 = "Provisioning#ACCOUNT_NAME");		
 	}
 
+	@prose = "I click on the license with the name ${licenseName} and product ${productName} on the provisioning index"
+	macro clickAccountAndProductLicense {
+		var key_licenseName = "${licenseName}";
+		var key_productName = "${productName}";
+
+		Click(locator1 = "Provisioning#LICENSE_NAME_BY_NAME_AND_PRODUCT");		
+	}
+
 	@prose = "I click on the generate license button on the license index"
 	macro clickGenerateLicenseButton {
 		Click(locator1 = "Provisioning#GENERATE_LICENSE_BUTTON");
@@ -599,6 +607,14 @@ definition {
 			value1 = "Your request failed to complete.");
 	}
 
+	@prose = "I should not be able to view a license on the provisioning index with the name ${licenseName} and product ${productName}"
+	macro _viewNoAccountAndProductLicenseViaIndex {
+		var key_licenseName = "${licenseName}";
+		var key_productName = "${productName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#LICENSE_ROW_BY_NAME_AND_PRODUCT");
+	}
+
 	@prose = "I should not be able to view an account on the provisioning index with the name ${accountName}"
 	macro _viewNoAccountViaIndex {
 		var key_accountName = "${accountName}";
@@ -656,6 +672,58 @@ definition {
 		var key_userName = "${userName}";
 
 		AssertElementNotPresent(locator1 = "Provisioning#USER_ROW");
+	}
+
+	@prose = "I should be able to view a license on the provisioning index with the name ${licenseName} and product ${productName} and the following values ${table}"
+	macro _viewAccountAndProductLicenseViaIndex {
+		var key_licenseName = "${licenseName}";
+		var key_productName = "${productName}";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#LICENSE_NAME_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Description") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_DESCRIPTION_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Account") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_ACCOUNT_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Expiration Date") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_EXPIRATION_DATE_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_PRODUCT_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_TYPE_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Host Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_HOST_NAME_BY_NAME_AND_PRODUCT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such license field ${field}");
+			}
+		}
 	}
 
 	@prose = "I should be able to view an account on the provisioning index with the name ${accountName} and the following values ${table}"
