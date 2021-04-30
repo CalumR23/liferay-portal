@@ -546,6 +546,9 @@ Scenario: Generate new DXP and Portal license
 	| Product     | DXP Production                |
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey} |
+	| Label | Product: DXP Production          |
 	And I should not be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and product "Portal Production"
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
@@ -559,6 +562,9 @@ Scenario: Generate new DXP and Portal license
 	| Product     | DXP Production                |
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey} |
+	| Label | Product: DXP Production          |
 	And I should not be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and product "Portal Production"
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
@@ -575,6 +581,9 @@ Scenario: Generate new DXP and Portal license
 	| Product     | Portal Production             |
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey} |
+	| Label | Product: Portal Production       |
 	And I should not be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and product "DXP Production"
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
@@ -588,6 +597,9 @@ Scenario: Generate new DXP and Portal license
 	| Product     | Portal Production             |
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey} |
+	| Label | Product: Portal Production       |
 	And I should not be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and product "DXP Production"
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
@@ -601,6 +613,9 @@ Scenario: Generate new DXP and Portal license
 	| Product     | Portal Production             |
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey} |
+	| Label | Product: Portal Production       |
 	And I should not be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and product "DXP Production"
 
 Scenario: Deactivate new DXP license
@@ -883,8 +898,8 @@ Scenario: Generate new detached DXP license
 	| Current Provisioned | 1              |
 	| State               | -              |
 
-Scenario: Generate new commerce development license via account subscription
-	Testing the ability to generate a new license for a T4 commerce project from koroneiki via an account subscription
+Scenario: Generate new commerce development license
+	Testing the ability to generate a new license for a T4 commerce project from koroneiki on provisioning
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -923,23 +938,37 @@ Scenario: Generate new commerce development license via account subscription
 	| Start Date              | ${staticStartDate}       | |
 	| Status                  | Approved                 | |
 	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
-	And I search the accounts page using the keyword "Korlic"
-	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
-	And I click on the "Commerce Subscription Development" subscription link
-	And I click on generate license button on the subscription details page
-	And I generate a new license with the following values
-	| Product                | Commerce Subscription Development                     | |
-	| Choose Liferay Version | 1                                                     | |
-	| Type                   | Liferay Commerce Subscription Development (Developer) | |
-	| Choose Purchase        | ${staticProductPurchaseId}                            | |
-	| Maximum Connections    | 10                                                    | |
-	And I go to the License Management page
-	And I search the License Management page with the account key value "${staticAccountKey}"
-	Then I should be able to view the license with the name "Korlic - ${staticProjectName}" following values
-	| Project         | KORLIC                              |
-	| Name            | Korlic - ${staticProjectName}       |
-	| Product         | Commerce Subscription Development 1 |
-	| Type            | Developer                           |
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}                 | |
+	| Product | Select        | Commerce Subscription Development             | |
+	| Version | Select        | 1                                             | |
+	| Type    | Select        | Commerce Subscription Development (Developer) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Maximum Connections | Input | 10 | |
+	And I click on the generate button on the license form
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName}     |
+	| Description | Korlic - ${staticProjectName}     |
+	| Account     | Korlic - ${staticProjectName}     |
+	| Product     | Commerce Subscription Development |
+	| Type        | Developer                         |
+	| Host Name   | -                                 |
+	When I click on the license with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header              | Korlic - ${staticProjectName}     | |
+	| Product             | Commerce Subscription Development | |
+	| Version             | 1                                 | |
+	| Type                | Developer                         | |
+	| Owner               | Korlic - ${staticProjectName}     | |
+	| Description         | Korlic - ${staticProjectName}     | |
+	| Maximum Connections | 10                                | |
+	| Complimentary       | No                                | |
+	| Status              | ACTIVE                            | |
+	| Created By          | Test Test                         | |
 	And I generate static end dates
 	And I generate static start dates
 	And I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "Commerce Subscription Development" with the following values
@@ -953,31 +982,46 @@ Scenario: Generate new commerce development license via account subscription
 	| Current Provisioned | 1                                 |
 	| State               | ACTIVE                            |
 	When I click on the "Commerce Subscription Development" subscription provisioned link
-	Then I should be able to view the license with the name "Korlic - ${staticProjectName}" following values
-	| Project         | KORLIC                              |
-	| Name            | Korlic - ${staticProjectName}       |
-	| Product         | Commerce Subscription Development 1 |
-	| Type            | Developer                           |
+	Then I should be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName}     |
+	| Description | Korlic - ${staticProjectName}     |
+	| Account     | Korlic - ${staticProjectName}     |
+	| Product     | Commerce Subscription Development |
+	| Type        | Developer                         |
+	| Host Name   | -                                 |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey}           |
+	| Label | Product: Commerce Subscription Development |
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
 	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
 	And I click on the "Commerce Subscription Development" subscription link
 	And I click on subscription provisioned link
-	Then I should be able to view the license with the name "Korlic - ${staticProjectName}" following values
-	| Project         | KORLIC                              |
-	| Name            | Korlic - ${staticProjectName}       |
-	| Product         | Commerce Subscription Development 1 |
-	| Type            | Developer                           |
+	Then I should be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName}     |
+	| Description | Korlic - ${staticProjectName}     |
+	| Account     | Korlic - ${staticProjectName}     |
+	| Product     | Commerce Subscription Development |
+	| Type        | Developer                         |
+	| Host Name   | -                                 |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey}           |
+	| Label | Product: Commerce Subscription Development |
 	When I go to the account index page
 	And I search the accounts page using the keyword "Korlic"
 	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
 	And I click on the "Commerce Subscription Development" subscription link
 	And I click on provisioned link for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullEndDate}"
-	Then I should be able to view the license with the name "Korlic - ${staticProjectName}" following values
-	| Project         | KORLIC                              |
-	| Name            | Korlic - ${staticProjectName}       |
-	| Product         | Commerce Subscription Development 1 |
-	| Type            | Developer                           |
+	Then I should be able to view a license on the provisioning index with the name "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName}     |
+	| Description | Korlic - ${staticProjectName}     |
+	| Account     | Korlic - ${staticProjectName}     |
+	| Product     | Commerce Subscription Development |
+	| Type        | Developer                         |
+	| Host Name   | -                                 |
+	And I should be able to view the search info message with the following types and values
+	| Label | Account Key: ${staticAccountKey}           |
+	| Label | Product: Commerce Subscription Development |
 
 Scenario: Generate new commerce production license via account subscription
 	Testing the ability to generate a new production license for a T4 commerce project from koroneiki via an account subscription
