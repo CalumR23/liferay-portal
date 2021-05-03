@@ -27,6 +27,17 @@ definition {
 		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHOOSE_PRODUCT_PURCHASE_BUTTON");
 	}
 
+	@prose = "I click on the choose button for the product purchase in position ${positionValue} on the move license form"
+	macro clickChooseProductPurchaseButtonViaMoveLicenseForm {
+		SelectFrame(locator1 = "ProvisioningLicenseMoveLicense#MOVE_LICENSE_IFRAME");
+
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicenseMoveLicense#CHOOSE_PRODUCT_PURCHASE_BUTTON");
+
+		SelectFrameTop();
+	}
+
 	@prose = "I click on the deactivate button for the license in position ${positionValue} on the license page"
 	macro clickDeactivateLicenseButton {
 		var key_positionValue = "${positionValue}";
@@ -58,6 +69,11 @@ definition {
 		var key_positionValue = "${positionValue}";
 
 		Click(locator1 = "ProvisioningLicense#MOVE_BUTTON");
+	}
+
+	@prose = "I click on the renew button on the renew license form"
+	macro clickRenewButton {
+		Click(locator1 = "ProvisioningLicenseRenew#RENEW_BUTTON");
 	}
 
 	@prose = "I click on the renew button for the license in position ${positionValue} on the license page"
@@ -146,6 +162,123 @@ definition {
 				fail("No such generate license field type ${type}. Please use Input, Textarea, Select, Select Entity, or Checkbox");
 			}
 		}
+	}
+
+	@prose = "I populate the renew license form with the following values ${table}"
+	macro populateRenewLicenseForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Start Date") {
+				if (contains("${value}", ",")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+					var month = StringUtil.extractFirst("${value}", " ");
+
+					var fullMonth = KoroneikiProductPurchaseAPI._getFullMonthName(month = "${month}");
+
+					var year = StringUtil.extractLast("${value}", " ");
+
+					var day = StringUtil.replace("${value}", "${month} ", "");
+
+					var day = StringUtil.replace("${day}", ", ${year}", "");
+
+					var singleDigitDay = StringUtil.startsWith("${day}", "0");
+
+					if ("${singleDigitDay}" == "true") {
+						var day = StringUtil.replace("${day}", "0", "");
+					}
+
+					Select(
+						locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_MONTH_SELECT",
+						value1 = "${fullMonth}");
+
+					Select(
+						locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_YEAR_SELECT",
+						value1 = "${year}");
+
+					var key_day = "${day}";
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_DAY_BUTTON");
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+				}
+				else {
+					Click.pauseMakeVisibleClickAt(
+						locator1 = "ProvisioningLicenseRenew#START_DATE_FIELD",
+						value1 = "${value}");
+
+					Type(
+						locator1 = "ProvisioningLicenseRenew#START_DATE_FIELD",
+						value1 = "${value}");
+
+					KeyPress(
+						locator1 = "ProvisioningLicenseRenew#START_DATE_FIELD",
+						value1 = "\RETURN");
+				}
+			}
+			else if ("${field}" == "Expiration Date") {
+				if (contains("${value}", ",")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#EXPIRATION_DATE_PICKER_DROPDOWN_BUTTON");
+
+					var month = StringUtil.extractFirst("${value}", " ");
+
+					var fullMonth = KoroneikiProductPurchaseAPI._getFullMonthName(month = "${month}");
+
+					var year = StringUtil.extractLast("${value}", " ");
+
+					var day = StringUtil.replace("${value}", "${month} ", "");
+
+					var day = StringUtil.replace("${day}", ", ${year}", "");
+
+					var singleDigitDay = StringUtil.startsWith("${day}", "0");
+
+					if ("${singleDigitDay}" == "true") {
+						var day = StringUtil.replace("${day}", "0", "");
+					}
+
+					Select(
+						locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_MONTH_SELECT",
+						value1 = "${fullMonth}");
+
+					Select(
+						locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_YEAR_SELECT",
+						value1 = "${year}");
+
+					var key_day = "${day}";
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#CALENDAR_DATE_PICKER_DAY_BUTTON");
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseRenew#EXPIRATION_DATE_PICKER_DROPDOWN_BUTTON");
+
+				}
+				else {
+					Click.pauseMakeVisibleClickAt(
+						locator1 = "ProvisioningLicenseRenew#EXPIRATION_DATE_FIELD",
+						value1 = "${value}");
+
+					Type(
+						locator1 = "ProvisioningLicenseRenew#EXPIRATION_DATE_FIELD",
+						value1 = "${value}");
+
+					KeyPress(
+						locator1 = "ProvisioningLicenseRenew#EXPIRATION_DATE_FIELD",
+						value1 = "\RETURN");
+				}
+			}
+			else {
+				fail("No such renew license field ${field}.");
+			}
+		}
+	}
+
+	@prose = "the renew button should be disabled on the renew license form"
+	macro viewDisabledRenewButton {
+		AssertElementPresent(locator1 = "ProvisioningLicenseRenew#RENEW_BUTTON_DISABLED");
 	}
 
 	@prose = "I should be able to view the download button for the license in position ${positionValue} on the license page"
