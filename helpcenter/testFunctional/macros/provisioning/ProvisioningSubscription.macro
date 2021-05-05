@@ -635,11 +635,23 @@ definition {
 		AssertVisible(locator1 = "ProvisioningSubscriptionForm#DELETE_BUTTON_DISABLED");
 	}
 
+	@prose = "the save button on the subscription form should be disabled"
+	macro viewDisabledSubscriptionFormSaveButton {
+		AssertElementPresent(locator1 = "ProvisioningSubscriptionForm#SAVE_BUTTON_DISABLED");
+	}
+
 	@prose = "I should be able to view the subscription form error message with the text ${errorMessage}"
 	macro viewErrorMessage {
 		AssertTextEquals.assertPartialText(
 			locator1 = "ProvisioningSubscriptionForm#ERROR_MESSAGE",
 			value1 = "${errorMessage}");
+	}
+
+	@prose = "I should not be able to view the license with the name ${licenseName} on the subscription details page"
+	macro _viewNoSubscriptionLicense {
+		var key_licenseName = "${licenseName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningSubscription#LICENSE_ROW");
 	}
 
 	@prose = "I should be able to view the following subscription values in the subscription details page ${table}"
@@ -686,9 +698,52 @@ definition {
 		}
 	}
 
-	@prose = "the save button on the subscription form should be disabled"
-	macro viewDisabledSubscriptionFormSaveButton {
-		AssertElementPresent(locator1 = "ProvisioningSubscriptionForm#SAVE_BUTTON_DISABLED");
+	@prose = "I should be able to view the license with the name ${licenseName} and the following values ${table}"
+	macro _viewSubscriptionLicense {
+		var key_licenseName = "${licenseName}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#LICENSE_ROW");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Description") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_DESCRIPTION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Expiration Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_EXPIRATION_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_TYPE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Host Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningSubscription#LICENSE_HOST_NAME",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such subscription license field ${field}");
+			}
+		}
 	}
 
 	@prose = "I should be able to view the term with the start date to end date ${startDateEndDate} and the following values ${table}"
