@@ -1600,3 +1600,29 @@ Scenario: Add dxp environment details with solr 5x
 	| Search             | Solr 5.x                   |
 	| Portal EXT         | portal-ext.properties      |
 	| Patch Info         | patchinfo.txt              |
+
+Scenario: View project details as non support developer or non support watcher
+	Projects created in PJD should not be visible to a non support developer or non support watcher.
+
+	Given I assign the contact with the email address "pjd.customer1@lrcustomer.com.broken" on the account "Pjdzen - ${staticProjectName}" to the following roles
+	| LCS User |
+	| Member   |
+	And I assign the contact with the email address "pjd.customer2@lrcustomer.com.broken" on the account "Pjdzen - ${staticProjectName}" to the following roles
+	| LCS User |
+	| Member   |
+	And I remove the contact with the email address "pjd.customer1@lrcustomer.com.broken" on the account "Pjdzen - ${staticProjectName}" from the following roles
+	| Support Developer |
+	And I remove the contact with the email address "pjd.customer2@lrcustomer.com.broken" on the account "Pjdzen - ${staticProjectName}" from the following roles
+	| Support Watcher |
+	Then the support user with the email address "pjd.customer1@lrcustomer.com.broken" should be synced to the support site
+	And the support user with the email address "pjd.customer2@lrcustomer.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "pjd.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I update the support password for user with the email address "pjd.customer2@lrcustomer.com.broken" to "osbadminqauser"
+	And I assign the support user with the email address "pjd.customer1@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the support user with the email address "pjd.customer2@lrcustomer.com.broken" to the support group "Help Center"
+	And I log into the support homepage as "pjd.customer1@lrcustomer.com.broken" with password "osbadminqauser"
+	And I go to the Project Details page
+	Then I should be able to view a no permission error message
+	When I log out and log into the support homepage as "pjd.customer2@lrcustomer.com.broken" with password "osbadminqauser"
+	And I go to the Project Details page
+	Then I should be able to view a no permission error message
