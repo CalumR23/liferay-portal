@@ -174,33 +174,6 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I assign the provisioning user with the email address ${userEmailAddress} to the provisioning group ${groupName}"
-	macro assignUserToProvisioningGroup {
-		var groupId = JSONGroup.getProvisioningGroupId(groupName = "${groupName}");
-
-		var companyId = JSONCompany.getProvisioningCompanyId();
-
-		var curl = '''
-			${provisioningURL}/api/jsonws/user/get-user-by-email-address
-			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-			-d companyId=${companyId}
-			-d emailAddress=${userEmailAddress}
-			''';
-
-		var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-		echo("Provisioning User ID: ${provisioningUserId}");
-
-		var curl = '''
-			${provisioningURL}/api/jsonws/user/add-group-users
-			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-			-d groupId=${groupId}
-			-d userIds=${provisioningUserId}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I assign the support user with the email address ${userEmailAddress} to the support group ${groupName}"
 	macro assignUserToSupportGroup {
 		var groupId = JSONGroup.getSupportGroupId(groupName = "${groupName}");
@@ -617,6 +590,7 @@ definition {
 			-d autoPassword=false
 			-d password1=provisioningqauser
 			-d password2=provisioningqauser
+			-d passwordReset=false
 			-d autoScreenName=false
 			-d screenName=${userScreenName}
 			-d emailAddress=${userEmailAddress}
@@ -1241,8 +1215,6 @@ definition {
 
 	@prose = "I update the provisioning password for user with the email address ${userEmailAddress} to ${userPassword}"
 	macro updateProvisioningPassword {
-		var companyId = JSONCompany.getProvisioningCompanyId();
-
 		var curl = '''
 			${provisioningURL}/api/jsonws/user/get-user-by-email-address
 			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
@@ -1254,16 +1226,25 @@ definition {
 
 		echo("Provisioning User ID: ${provisioningUserId}");
 
-		var curl = '''
-			${provisioningURL}/api/jsonws/user/update-password
-			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-			-d userId=${provisioningUserId}
-			-d password1=${userPassword}
-			-d password2=${userPassword}
-			-d passwordReset=false
-			''';
+		OSBAdmin.logoutAndLoginToProvisioning(
+			userEmailAddress = "${provisioningAdminEmailAddress}",
+			userPassword = "${provisioningAdminPassword}");
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		Open(locator1 = "https://webserver-lrprovisioning-uat.lfr.cloud/group/control_panel/manage?p_p_id=com_liferay_users_admin_web_portlet_UsersAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_users_admin_web_portlet_UsersAdminPortlet_mvcRenderCommandName=%2Fusers_admin%2Fedit_user&_com_liferay_users_admin_web_portlet_UsersAdminPortlet_p_u_i_d=${provisioningUserId}&_com_liferay_users_admin_web_portlet_UsersAdminPortlet_screenNavigationCategoryKey=general&_com_liferay_users_admin_web_portlet_UsersAdminPortlet_screenNavigationEntryKey=password");
+
+		Type(
+			locator1 = "UserAccount#NEW_PASSWORD_FIELD",
+			value1 = "${userPassword}");
+
+		Type(
+			locator1 = "UserAccount#ENTER_AGAIN_FIELD",
+			value1 = "${userPassword}");
+
+		Button.save();
+
+		Message.success();
+
+		OSBAdmin.logoutOfProvisioning();
 	}
 
 	@prose = "I update the support password for user with the email address ${userEmailAddress} to ${userPassword}"
