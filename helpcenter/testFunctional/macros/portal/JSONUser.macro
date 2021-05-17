@@ -2,6 +2,9 @@ definition {
 	var koroneikiAdminEmailAddress = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var provisioningAdminEmailAddress = PropsUtil.get("provisioning.admin.email.address");
+	var provisioningAdminPassword = PropsUtil.get("provisioning.admin.password");
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
@@ -31,6 +34,33 @@ definition {
 			-u ${webAdminEmailAddress}:${webAdminPassword}
 			-d userId=${webUserId}
 			-d agreedToTermsOfUse=true
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the provisioning user with the email address ${userEmailAddress} to the provisioning role ${roleName}"
+	macro assignUserToProvisioningRole {
+		var roleId = JSONRole.getProvisioningRoleIdByName(roleName = "${roleName}");
+
+		var companyId = JSONCompany.getProvisioningCompanyId();
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/get-user-by-email-address
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Provisioning User ID: ${provisioningUserId}");
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/add-role-users
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d roleId=${roleId}
+			-d userIds=${provisioningUserId}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -139,6 +169,33 @@ definition {
 			-u ${webAdminEmailAddress}:${webAdminPassword}
 			-d roleId=${roleId}
 			-d userIds=${webUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the provisioning user with the email address ${userEmailAddress} to the provisioning group ${groupName}"
+	macro assignUserToProvisioningGroup {
+		var groupId = JSONGroup.getProvisioningGroupId(groupName = "${groupName}");
+
+		var companyId = JSONCompany.getProvisioningCompanyId();
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/get-user-by-email-address
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Provisioning User ID: ${provisioningUserId}");
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/add-group-users
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d groupId=${groupId}
+			-d userIds=${provisioningUserId}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -524,6 +581,81 @@ definition {
 		return "${staticKoroneikiUserIdList}";
 	}
 
+	@prose = "I create a provisioning user with the following parameters ${table}"
+	macro createViaProvisioning {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getProvisioningCompanyId();
+
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/add-user
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Provisioning User ID: ${provisioningUserId}");
+
+		if (contains("${staticProvisioningUserIdList}", "{staticProvisioningUserIdList}")) {
+			static var staticProvisioningUserIdList = "${provisioningUserId}";
+		}
+		else {
+			static var staticProvisioningUserIdList = "${staticProvisioningUserIdList},${provisioningUserId}";
+		}
+
+		echo("Provisioning User ID List: ${staticProvisioningUserIdList}");
+
+		return "${staticProvisioningUserIdList}";
+	}
+
 	@prose = "I create a support user with the following parameters ${table}"
 	macro createViaSupport {
 		var RawTable rawTable = new RawTable("${table}");
@@ -827,6 +959,51 @@ definition {
 		}
 	}
 
+	@prose = "I tear down the users with the following email addresses from provisioning ${table}"
+	macro tearDownUsersViaProvisioning {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompany.getProvisioningCompanyId();
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${provisioningURL}/api/jsonws/user/get-user-by-screen-name
+				-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var userObject = JSONCurlUtil.post("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+				echo("Provisioning User ID: ${provisioningUserId}");
+
+				var curl = '''
+					${provisioningURL}/api/jsonws/user/update-status
+					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+					-d userId=${provisioningUserId}
+	  				-d status=5
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+				var curl = '''
+					${provisioningURL}/api/jsonws/user/delete-user
+					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+					-d userId=${provisioningUserId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
 	@prose = "I tear down the users with the following email addresses from koroneiki ${table}"
 	macro tearDownUsersViaKoroneiki {
 		var RawTable rawTable = new RawTable("${table}");
@@ -1057,6 +1234,33 @@ definition {
 			-d roleIds=
 			-d userGroupRoles=
 			-d userGroupIds=
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I update the provisioning password for user with the email address ${userEmailAddress} to ${userPassword}"
+	macro updateProvisioningPassword {
+		var companyId = JSONCompany.getProvisioningCompanyId();
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/get-user-by-email-address
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Provisioning User ID: ${provisioningUserId}");
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/get-user-by-email-address
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d userId=${provisioningUserId}
+			-d password1=${userPassword}
+			-d password2=${userPassword}
+			-d passwordReset=false
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
