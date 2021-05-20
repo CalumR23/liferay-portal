@@ -1,0 +1,792 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.provisioning.permission"
+
+Feature:  Koroneiki to Provisioning Account Partner Worker Permissions
+	Testing to assure that provisioning partner account worker permissions works properly.
+
+Setup:
+	* I create a provisioning user with the following parameters
+	| Screen Name   | provisioning.worker                    |
+	| Email Address | provisioning.worker@liferay.com.broken |
+	| First Name    | Provisioning                           |
+	| Last Name     | Worker                                 |
+	* I assign the provisioning user with the email address "provisioning.worker@liferay.com.broken" to the provisioning role "Provisioning Worker"
+	* I create a user with the following parameters
+	| Screen Name   | prm.koroneiki1                       |
+	| Email Address | prm.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRM                                  |
+	| Last Name     | Koroneiki1                           |
+	* I create a user with the following parameters
+	| Screen Name   | prm.koroneiki2                       |
+	| Email Address | prm.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRM                                  |
+	| Last Name     | Koroneiki2                           |
+
+Teardown:
+	* I wait for "5" seconds
+	* I get the ID of the default user belonging to the organization "Permis - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Misper - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I get the ID of the default user belonging to the organization "Perpar - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the third default user ID variable
+	* I tear down the teams on koroneiki with the following names
+	| Permission Partner |
+	* I tear down the external links for the account "Permis - ${staticProjectName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey}   | salesforce |
+	| ${staticDossieraProjectKey}   | dossiera   |
+	| ${staticSalesforceProjectKey} | salesforce |
+	* I tear down the external links for the account "Misper - ${staticCompanyName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey} | salesforce |
+	| ${staticDossieraAccountKey} | dossiera   |
+	* I tear down the product purchases on koroneiki made by the account "Permis - ${staticProjectName}" for the following products
+	| DXP Production         |
+	| Platinum Subscription  |
+	* I tear down the product purchases on koroneiki made by the account "Perpar - ${staticProjectName}" for the following products
+	| Service Partnership |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the accounts on koroneiki with the following names
+	| Perpar - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| PERPARPERPAR |
+	* I tear down the accounts on koroneiki with the following names
+	| Permis - ${staticProjectName} |
+	| Misper - ${staticCompanyName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| MISPERPERMIS |
+	| MISPER       |
+	* I teardown the tickets with the following keywords from zendesk.liferay.com
+	| New Subscription(s) for Permis - ${staticProjectName} |
+	| New Subscription(s) for Misper - ${staticCompanyName} |
+	* I wait for "5" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes via groovy
+	| PERPARPERPAR |
+	| MISPERPERMIS |
+	| MISPER       |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Perpar - ${staticProjectName} |
+	| Permis - ${staticProjectName} |
+	| Misper - ${staticCompanyName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId3}" from zendesk.liferay.com
+	* I tear down the users with the following email addresses from provisioning
+	| provisioning.worker@liferay.com.broken |
+
+Scenario: Add partner
+	Testing the ability to create a T4 project in Dossiera and add the project partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "prm.koroneiki1@lrcustomer.com.broken" on the account "Permis - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | PERPARPERPAR                                   |
+	| Contact Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Perpar - ${staticProjectName}                  |
+	| Profile Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Perpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Perpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Perpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Permis - ${staticProjectName} |
+	| Code           | MISPERPERMIS                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Perpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | Perpar - ${staticProjectName} |	|
+	| First Line Support  | Perpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "Partner"
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "First Line Support"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the partner link in the account header
+	Then I should be able to view the following team values in the team details page
+	| Name | Perpar - ${staticProjectName} |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Perpar"
+	And I click on the account with the name "Perpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Perpar - ${staticProjectName}" and the following values
+	| Name                         | Perpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 1                             |
+	| First Line Support Accounts  | 1                             |
+	When I click on the "Perpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Permis - ${staticProjectName}" and the following values
+	| Account Name  | Permis - ${staticProjectName} |
+	| Code          | MISPERPERMIS                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I click on the "First Line Support Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Permis - ${staticProjectName}" and the following values
+	| Account Name  | Permis - ${staticProjectName} |
+	| Code          | MISPERPERMIS                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	Then I should be able to view an account on the provisioning index with the name "Permis - ${staticProjectName}" and the following values
+	| Name    | Permis - ${staticProjectName} |
+	| Code    | MISPERPERMIS                  |
+	| Partner | Perpar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+	When I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "1" with the field value "contactEmailAddress" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account                 |
+	| Update Field Name           | contactEmailAddress                  |
+	| Update Field Original Value | N/A                                  |
+	| Update Field New Value      | prm.koroneiki2@lrcustomer.com.broken |
+	And the history entry in position number "1" with the field value "internal" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | internal             |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | false                |
+	And the history entry in position number "1" with the field value "code" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | code                 |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | MISPERPERMIS         |
+	And the history entry in position number "1" with the field value "region" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | region               |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | United States        |
+	And I generate the account ID value for "Misper - ${staticCompanyName}"
+	And the history entry in position number "1" with the field value "parentAccountId" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | parentAccountId      |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | ${staticAccountId}   |
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	And the history entry in position number "1" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | accountId            |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | ${staticAccountId}   |
+	And the history entry in position number "1" with the field value "name" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account          |
+	| Update Field Name           | name                          |
+	| Update Field Original Value | N/A                           |
+	| Update Field New Value      | Permis - ${staticProjectName} |
+	And the history entry in position number "1" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | status               |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | Active               |
+	And the history entry in position number "1" with the field value "tier" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | tier                 |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | T4                   |
+	And the history entry in position number "15" with the field value "Team Role" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Assigned Team > Perpar - ${staticProjectName} |
+	| Update Field Name           | Team Role                                                           |
+	| Update Field Original Value | N/A                                                                 |
+	| Update Field New Value      | Partner                                                             |
+	And the history entry in position number "16" with the field value "Team Role" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Assigned Team > Perpar - ${staticProjectName} |
+	| Update Field Name           | Team Role                                                           |
+	| Update Field Original Value | N/A                                                                 |
+	| Update Field New Value      | First Line Support                                                  |
+
+Scenario: Update partner
+	Testing the ability to create a T4 project in Dossiera and updating the project partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "prm.koroneiki1@lrcustomer.com.broken" on the account "Permis - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create a team with the name "Permission Partner" for the account "Permis - ${staticProjectName}"
+	And I assign the team with the name "Permission Partner" on the account "Permis - ${staticProjectName}" to the following roles
+	| Partner |
+	And I create an account on koroneiki with the following values
+	| Code                  | PERPARPERPAR                                   |
+	| Contact Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Perpar - ${staticProjectName}                  |
+	| Profile Email Address | prm.koroneiki1@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Perpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Perpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Perpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Permis - ${staticProjectName} |
+	| Code           | MISPERPERMIS                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Perpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | Perpar - ${staticProjectName} |	|
+	| First Line Support  | Perpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "Partner"
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "First Line Support"
+	And the team with the name "Permission Partner" assigned the account "Permis - ${staticProjectName}" should not have the team role "Partner"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	Then I should be able to view an account on the provisioning index with the name "Permis - ${staticProjectName}" and the following values
+	| Name    | Permis - ${staticProjectName} |
+	| Code    | MISPERPERMIS                  |
+	| Partner | Perpar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+	When I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "1" with the field value "contactEmailAddress" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account                 |
+	| Update Field Name           | contactEmailAddress                  |
+	| Update Field Original Value | N/A                                  |
+	| Update Field New Value      | prm.koroneiki2@lrcustomer.com.broken |
+	And the history entry in position number "1" with the field value "internal" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | internal             |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | false                |
+	And the history entry in position number "1" with the field value "code" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | code                 |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | MISPERPERMIS         |
+	And the history entry in position number "1" with the field value "region" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | region               |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | United States        |
+	And I generate the account ID value for "Misper - ${staticCompanyName}"
+	And the history entry in position number "1" with the field value "parentAccountId" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | parentAccountId      |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | ${staticAccountId}   |
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	And the history entry in position number "1" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | accountId            |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | ${staticAccountId}   |
+	And the history entry in position number "1" with the field value "name" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account          |
+	| Update Field Name           | name                          |
+	| Update Field Original Value | N/A                           |
+	| Update Field New Value      | Permis - ${staticProjectName} |
+	And the history entry in position number "1" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | status               |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | Active               |
+	And the history entry in position number "1" with the field value "tier" should be visible on the account details page with the following values
+	| Update Description          | Auto > Added Account |
+	| Update Field Name           | tier                 |
+	| Update Field Original Value | N/A                  |
+	| Update Field New Value      | T4                   |
+	And the history entry in position number "17" with the field value "Team Role" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Unassigned Team > Permission Partner |
+	| Update Field Name           | Team Role                                                  |
+	| Update Field Original Value | Partner                                                    |
+	| Update Field New Value      | N/A                                                        |
+	And the history entry in position number "18" with the field value "Team Role" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Assigned Team > Perpar - ${staticProjectName} |
+	| Update Field Name           | Team Role                                                           |
+	| Update Field Original Value | N/A                                                                 |
+	| Update Field New Value      | Partner                                                             |
+	And the history entry in position number "19" with the field value "Team Role" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Assigned Team > Perpar - ${staticProjectName} |
+	| Update Field Name           | Team Role                                                           |
+	| Update Field Original Value | N/A                                                                 |
+	| Update Field New Value      | First Line Support                                                  |
+
+Scenario: Remove partner
+	Testing the ability to create a T4 project in Dossiera and add and remove a project partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "prm.koroneiki1@lrcustomer.com.broken" on the account "Permis - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | PERPARPERPAR                                   |
+	| Contact Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Perpar - ${staticProjectName}                  |
+	| Profile Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Perpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Perpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Perpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Permis - ${staticProjectName} |
+	| Code           | MISPERPERMIS                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Perpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | Perpar - ${staticProjectName} |	|
+	| First Line Support  | Perpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Delete Entity | | |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | -                             |	|
+	| First Line Support  | Perpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should not have the team role "Partner"
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "First Line Support"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the partner link in the account header
+	Then I should be able to view the following team values in the team details page
+	| Name | Perpar - ${staticProjectName} |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Perpar"
+	And I click on the account with the name "Perpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Perpar - ${staticProjectName}" and the following values
+	| Name                         | Perpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 0                             |
+	| First Line Support Accounts  | 1                             |
+	When I click on the "Perpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Permis - ${staticProjectName}"
+	When I click on the "First Line Support Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Permis - ${staticProjectName}" and the following values
+	| Account Name  | Permis - ${staticProjectName} |
+	| Code          | MISPERPERMIS                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	Then I should be able to view an account on the provisioning index with the name "Permis - ${staticProjectName}" and the following values
+	| Name    | Permis - ${staticProjectName} |
+	| Code    | MISPERPERMIS                  |
+	| Partner | -                             |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |
+
+Scenario: Remove fls partner
+	Testing the ability to create a T4 project in Dossiera and add and remove a project fls partner in the provisioning page account details 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "prm.koroneiki1@lrcustomer.com.broken" on the account "Permis - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I create an account on koroneiki with the following values
+	| Code                  | PERPARPERPAR                                   |
+	| Contact Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Description           | Test provisioning partner account on koroneiki |
+	| Fax Number            | 555-555-9012                                   |
+	| Name                  | Perpar - ${staticProjectName}                  |
+	| Profile Email Address | prm.koroneiki2@lrcustomer.com.broken           |
+	| Region                | United States                                  |
+	| Status                | Active                                         |
+	| Tier                  | T4                                             |
+	| Website               | www.koroneikipartner.com                       |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Perpar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| Perpetual   | true     | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Details" tab
+	And I edit the following account fields and types to the following values under the account details tab
+	| Partner/Reseller/SI | Select Entity | Perpar - ${staticProjectName} | |
+	| First Line Support  | Select Entity | Perpar - ${staticProjectName} | |
+	Then I should be able to view the following account values in the account details page
+	| Name           | Permis - ${staticProjectName} |
+	| Code           | MISPERPERMIS                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| Country        | United States                 |
+	| SLA            | Platinum                      |
+	| Developers     | 1 / 3 Filled                  |
+	| Tier           | T4                            |
+	| FLS Partner    | Perpar - ${staticProjectName} |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | Perpar - ${staticProjectName} |	|
+	| First Line Support  | Perpar - ${staticProjectName} |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	When I edit the following account fields and types to the following values under the account details tab
+	| First Line Support | Delete Entity | | |
+	Then I should be able to view the following account values under the account details tab
+	| Account Name        | Permis - ${staticProjectName} | |
+	| State               | ACTIVE                        | |
+	| Code                | MISPERPERMIS                  | |
+	| Tier                | T4                            | |
+	| Data Region         | United States                 | |
+	| Partner/Reseller/SI | Perpar - ${staticProjectName} |	|
+	| First Line Support  | -                             |	|
+	| Street 1            | 456 Fake Street               | |
+	| Country             | United States                 | |
+	| City                | Diamond Bar                   | |
+	| State/Province      | California                    | |
+	| Postal Code         | 91765                         | |
+	| Primary             | Yes                           | |
+	| Dossiera Project    | ${staticDossieraProjectKey}   | |
+	| Salesforce Project  | ${staticSalesforceProjectKey} | |
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should have the team role "Partner"
+	And the team with the name "Perpar - ${staticProjectName}" assigned the account "Permis - ${staticProjectName}" should not have the team role "First Line Support"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| FLS Partner | - |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Perpar"
+	And I click on the account with the name "Perpar - ${staticProjectName}" on the provisioning index
+	And I click on the "Teams" tab
+	Then I should be able to view the team with the name "Perpar - ${staticProjectName}" and the following values
+	| Name                         | Perpar - ${staticProjectName} |
+	| Partner/Reseller/SI Accounts | 1                             |
+	| First Line Support Accounts  | 0                             |
+	When I click on the "Perpar - ${staticProjectName}" team link
+	And I click on the "Partner/Reseller/SI Accounts" tab
+	Then I should be able to view an account on the team details page with the name "Permis - ${staticProjectName}" and the following values
+	| Account Name  | Permis - ${staticProjectName} |
+	| Code          | MISPERPERMIS                  |
+	| Region        | United States                 |
+	| SLA           | Platinum                      |
+	| Tier          | T4                            |
+	| Account State | ACTIVE                        |
+	When I click on the "First Line Support Accounts" tab
+	Then I should not be able to view an account on the team details page with the name "Permis - ${staticProjectName}"
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	Then I should be able to view an account on the provisioning index with the name "Permis - ${staticProjectName}" and the following values
+	| Name    | Permis - ${staticProjectName} |
+	| Code    | MISPERPERMIS                  |
+	| Partner | Perpar - ${staticProjectName} |
+	| Region  | United States                 |
+	| SLA     | Platinum                      |
+	| Tier    | T4                            |
+	| State   | ACTIVE                        |

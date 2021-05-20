@@ -1,0 +1,1037 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.provisioning.permission"
+
+Feature:  Koroneiki to Provisioning Subscription Worker Permissions
+	Testing to assure that provisioning subscription worker permissions works properly.
+
+Setup:
+	* I create a provisioning user with the following parameters
+	| Screen Name   | provisioning.worker                    |
+	| Email Address | provisioning.worker@liferay.com.broken |
+	| First Name    | Provisioning                           |
+	| Last Name     | Worker                                 |
+	* I assign the provisioning user with the email address "provisioning.worker@liferay.com.broken" to the provisioning role "Provisioning Worker"
+	* I create a user with the following parameters
+	| Screen Name   | prm.koroneiki1                       |
+	| Email Address | prm.koroneiki1@lrcustomer.com.broken |
+	| First Name    | PRM                                  |
+	| Last Name     | Koroneiki1                           |
+	* I create a user with the following parameters
+	| Screen Name   | prm.koroneiki2                       |
+	| Email Address | prm.koroneiki2@lrcustomer.com.broken |
+	| First Name    | PRM                                  |
+	| Last Name     | Koroneiki2                           |
+
+Teardown:
+	* I wait for "5" seconds
+	* I get the ID of the default user belonging to the organization "Permis - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Misper - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I tear down the external links for the account "Permis - ${staticProjectName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey}   | salesforce |
+	| ${staticDossieraProjectKey}   | dossiera   |
+	| ${staticSalesforceProjectKey} | salesforce |
+	* I tear down the external links for the account "Misper - ${staticCompanyName}" on koroneiki with the following entity id and domain values
+	| ${staticDossieraAccountKey} | salesforce |
+	| ${staticDossieraAccountKey} | dossiera   |
+	* I tear down the product consumptions on koroneiki made by the account "Permis - ${staticProjectName}" for the following products
+	| DXP Production        |
+	| Portal Production     |
+	| Platinum Subscription |
+	| Gold Subscription     |
+	* I tear down the product purchases on koroneiki made by the account "Permis - ${staticProjectName}" for the following products
+	| DXP Production        |
+	| Portal Production     |
+	| Platinum Subscription |
+	| Gold Subscription     |
+	* I tear down the users with the following email addresses from web.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+ 	* I tear down the contacts on koroneiki with the following email addresses
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I tear down the accounts on koroneiki with the following names
+	| Permis - ${staticProjectName} |
+	| Misper - ${staticCompanyName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| MISPERPERMIS |
+	| MISPER       |
+	* I teardown the tickets with the following keywords from zendesk.liferay.com
+	| New Subscription(s) for Permis - ${staticProjectName} |
+	| New Subscription(s) for Misper - ${staticCompanyName} |
+	* I wait for "5" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	* I tear down the projects with the following project codes via groovy
+	| MISPERPERMIS |
+	| MISPER       |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| prm.koroneiki1@lrcustomer.com.broken |
+	| prm.koroneiki2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com
+	| Permis - ${staticProjectName} |
+	| Misper - ${staticCompanyName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
+	* I tear down the users with the following email addresses from provisioning
+	| provisioning.worker@liferay.com.broken |
+
+Scenario: Add subscription
+	Testing the ability to add a subcription in provisioning and viewing the subscription in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Portal Production" on the subscription select window
+	Then the subscription row with the product "Portal Production" should have the delete button disabled
+	When I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "DXP Production" under the "Primary" section
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" under the "Regular" section
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name                | Portal Production |
+	| Current Provisioned | 0                 |
+	| Current Purchased   | 1                 |
+	| State               | ACTIVE            |
+	And I should be able to view the product with the name "Portal Production" under the "Primary" section
+	And the "Active" product tab should have the count value "3"
+	And the "Future" product tab should have the count value "0"
+	And the "Complimentary" product tab should have the count value "0"
+	And the "Expired" product tab should have the count value "0"
+	And the "Cancelled" product tab should have the count value "0"
+	And the "All" product tab should have the count value "3"
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production |
+	| Provisioned        | 1              |
+	| Approved Purchased | 1              |
+	| State              | ACTIVE         |
+	And I should be able to view the product with the name "DXP Production" under the "Primary" section
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" under the "Regular" section
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name               | Portal Production |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	And I should be able to view the product with the name "Portal Production" under the "Primary" section
+	When I click on the "DXP Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | DXP Production        |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Platinum Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Platinum Subscription |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Portal Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Portal Production |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+
+Scenario: Add subscriptions via bulk input
+	Testing the ability to add multiple subcriptions via bulk input in provisioning and viewing the subscription in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Portal Production" on the subscription select window
+	And I click on the select button on the subscription form
+	And I select the product with the name "Gold Subscription" on the subscription select window
+	And I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Gold Subscription | Salesforce Opportunity Key | k1l2m3n4o5p6q7r8s9t0             |
+	| Bulk Input        | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Bulk Input        | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name                | Portal Production |
+	| Current Provisioned | 0                 |
+	| Current Purchased   | 1                 |
+	| State               | ACTIVE            |
+	And I should be able to view the product with the name "Gold Subscription" and the following values on the account details page
+	| Name                | Gold Subscription |
+	| Current Provisioned | 0                 |
+	| Current Purchased   | 1                 |
+	| State               | ACTIVE            |
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	And the external link with the entity id "k1l2m3n4o5p6q7r8s9t0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | k1l2m3n4o5p6q7r8s9t0 |
+	| Entity Name | opportunity          |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production        |
+	| Provisioned        | 1                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name               | Portal Production |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	And I should be able to view the product with the name "Gold Subscription" and the following values on the account details page
+	| Name               | Gold Subscription |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	When I click on the "DXP Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | DXP Production        |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Platinum Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Platinum Subscription |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Portal Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Portal Production |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Gold Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Gold Subscription |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+	And the history entry in position number "16" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "16" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "16" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+
+Scenario: Delete subscription during add process
+	Testing the ability to delete a subscription during the add process in provisioning and viewing the subscription in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Portal Production" on the subscription select window
+	And I click on the select button on the subscription form
+	And I select the product with the name "Gold Subscription" on the subscription select window
+	And I populate the subscription form with the following values
+	| Gold Subscription | Salesforce Opportunity Key | k1l2m3n4o5p6q7r8s9t0 |
+	And I remove the subscription row with the product "Gold Subscription"
+	Then the subscription row with the product "Portal Production" should have the delete button disabled
+	When I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production        |
+	| Current Provisioned | 1                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name                | Portal Production |
+	| Current Provisioned | 0              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	And the "Active" product tab should have the count value "3"
+	And the "Future" product tab should have the count value "0"
+	And the "Complimentary" product tab should have the count value "0"
+	And the "Expired" product tab should have the count value "0"
+	And the "Cancelled" product tab should have the count value "0"
+	And the "All" product tab should have the count value "3"
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should not be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Gold Subscription"
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production        |
+	| Provisioned        | 1                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name               | Portal Production |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "DXP Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | DXP Production        |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Platinum Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Platinum Subscription |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Portal Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Portal Production |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+
+Scenario: Delete subscription after add process
+	Testing the ability to delete a subscription after the add process in provisioning and viewing the subscription in the provisioning account details page 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static yyyymmdd start and end dates
+	And I generate static full start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the add subscriptions button
+	And I select the product with the name "Portal Production" on the subscription select window
+	And I click on the select button on the subscription form
+	And I select the product with the name "Gold Subscription" on the subscription select window
+	And I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | a1b2c3d4e5f6g7h8i9j0             |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	| Gold Subscription | Salesforce Opportunity Key | k1l2m3n4o5p6q7r8s9t0             |
+	| Gold Subscription | Start Date                 | ${staticYyyyMmDdStartDate}       |
+	| Gold Subscription | End Date                   | ${staticYyyyMmDdOriginalEndDate} |
+	And I select the following products under the subscriptions tab
+	| Portal Production |
+	| Gold Subscription |
+	And I click the edit subscriptions button
+	And I populate the subscription term form using the following product and term values and proceed
+	| Portal Production | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Gold Subscription | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	And I remove the subscription row with the product "Gold Subscription"
+	Then the subscription row with the product "Portal Production" should have the delete button disabled
+	When I click on the save button on the subscription form
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production        |
+	| Current Provisioned | 1                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name                | Portal Production |
+	| Current Provisioned | 0                 |
+	| Current Purchased   | 1                 |
+	| State               | ACTIVE            |
+	And I should be able to view the product with the name "Gold Subscription" and the following values on the account details page
+	| Name                | Gold Subscription |
+	| Current Provisioned | 0                 |
+	| Current Purchased   | 1                 |
+	| State               | ACTIVE            |
+	And the "Active" product tab should have the count value "4"
+	And the "Future" product tab should have the count value "0"
+	And the "Complimentary" product tab should have the count value "0"
+	And the "Expired" product tab should have the count value "0"
+	And the "Cancelled" product tab should have the count value "0"
+	And the "All" product tab should have the count value "4"
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And I should be able to view a product purchase on koroneiki made by the account "Permis - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Perpetual   | false    | |
+	| Quantity    | 1        | |
+	| Status      | Approved | |
+	And the external link with the entity id "a1b2c3d4e5f6g7h8i9j0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Portal Production" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | a1b2c3d4e5f6g7h8i9j0 |
+	| Entity Name | opportunity          |
+	And the external link with the entity id "k1l2m3n4o5p6q7r8s9t0" should be present on the product purchase made by account "Permis - ${staticProjectName}" for the product "Gold Subscription" with the following values
+	| Domain      | salesforce           |
+	| Entity Id   | k1l2m3n4o5p6q7r8s9t0 |
+	| Entity Name | opportunity          |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	And I should not be able to view the product with the name "Portal Production" on the account details page
+	And I should not be able to view the product with the name "Gold Subscription" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name               | DXP Production        |
+	| Provisioned        | 1                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name               | Platinum Subscription |
+	| Provisioned        | 0                     |
+	| Approved Purchased | 1                     |
+	| State              | ACTIVE                |
+	And I should be able to view the product with the name "Portal Production" and the following values on the account details page
+	| Name               | Portal Production |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	And I should be able to view the product with the name "Gold Subscription" and the following values on the account details page
+	| Name               | Gold Subscription |
+	| Provisioned        | 0                 |
+	| Approved Purchased | 1                 |
+	| State              | ACTIVE            |
+	When I click on the "DXP Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | DXP Production        |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Platinum Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Platinum Subscription |
+	| State  | ACTIVE                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Portal Production" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Portal Production |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "Gold Subscription" subscription link
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name   | Gold Subscription |
+	| State  | ACTIVE            |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	When I click on the "History" tab
+	And I generate the account ID value for "Permis - ${staticProjectName}"
+	Then the history entry in position number "15" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "15" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "15" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Portal Production |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+	And the history entry in position number "16" with the field value "quantity" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | quantity                                                         |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 1                                                                |
+	And the history entry in position number "16" with the field value "accountId" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | accountId                                                        |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | ${staticAccountId}                                               |
+	And the history entry in position number "16" with the field value "status" should be visible on the account details page with the following values
+	| Update Description          | Provisioning Worker > Added Product Purchase > Gold Subscription |
+	| Update Field Name           | status                                                           |
+	| Update Field Original Value | N/A                                                              |
+	| Update Field New Value      | 0                                                                |
+
+Scenario: Update subscription
+	Testing the ability to update a subscription in provisioning that does not have a salesforce opportunity key
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I create a product purchase for an account with the name "Permis - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "Portal Production" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}"
+	And I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
+	| Portal Production | Grace Period End Date      | ${staticYyyyMmDdEndDate}          |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | Portal Production                                     |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 0                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 0                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| Status                     | APPROVED                                              |
+
+Scenario: Update subscription via bulk edit
+	Testing the ability to update a subscription via bulk input in provisioning that does not have a salesforce opportunity key
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | prm.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | PRM                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | prm.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | PRM                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Permis - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I create a product purchase for an account with the name "Permis - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "provisioning.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Permis"
+	And I click on the account with the name "Permis - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I select the following products under the subscriptions tab
+	| Portal Production |
+	And I click the edit subscriptions button
+	And I populate the subscription term form using the following product and term values and proceed
+	| Portal Production | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	And I populate and save the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
+	| Portal Production | Grace Period End Date      | ${staticYyyyMmDdEndDate}          |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | Portal Production                                     |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 0                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 0                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| Status                     | APPROVED                                              |
