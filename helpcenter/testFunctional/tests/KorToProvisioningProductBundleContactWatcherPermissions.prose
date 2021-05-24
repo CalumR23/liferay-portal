@@ -1,0 +1,54 @@
+@testray.main.component.name = "Support QA"
+@type = "koroneiki.provisioning.permission"
+
+Feature:  Koroneiki to Provisioning Product Bundle Contact Worker Permissions
+	Testing to assure that provisioning product bundle contact worker permissions works properly.
+
+Setup:
+	* I create a provisioning user with the following parameters
+	| Screen Name   | provisioning.contact.worker                    |
+	| Email Address | provisioning.contact.worker@liferay.com.broken |
+	| First Name    | Provisioning                                   |
+	| Last Name     | Contact Worker                                 |
+	* I assign the provisioning user with the email address "provisioning.contact.worker@liferay.com.broken" to the provisioning role "Provisioning Contact Worker"
+
+Teardown:
+	* I wait for "5" seconds
+	* I log out and log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	* I go to the product bundles index page
+	* I tear down the following product bundles
+	| Visible Products |
+	* I tear down the products on koroneiki with the following names
+	| A Visible Product        |
+	| A Visible Second Product |
+	* I tear down the users with the following email addresses from provisioning
+	| provisioning.contact.worker@liferay.com.broken |
+
+Scenario: View no new product bundle button
+	Testing the inability to create product bundles in the provisioning product index 
+
+	Given I log into the provisioning homepage as "provisioning.contact.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the product bundles index page
+	And the new product bundle button should not be present
+
+Scenario: View product bundle
+	Testing the ability to view product bundles in the provisioning product index that do not contain a link or delete button
+
+	Given I create a product with the following values
+	| Name | A Visible Product | |
+	And I create a product with the following values
+	| Name | A Visible Second Product | |
+	And I log out and log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the product bundles index page
+	And I click on the new product bundle button
+	And I populate and save the product bundle form with the following values
+	| Name        | Input | Visible Products         |
+	| Add Product |       | A Visible Product        |
+	| Add Product |       | A Visible Second Product |
+	And I log out and log into the provisioning homepage as "provisioning.contact.worker@liferay.com.broken" with password "provisioningqauser"
+	And I update my password upon login to "test"
+	And I go to the product bundles index page
+	Then I should be able to view a non linked product bundle on the provisioning index with the name "Visible Products" and the following values
+	| Name | Visible Products |
+	And the delete button for the product bundle "Visible Products" should not be present
