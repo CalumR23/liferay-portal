@@ -459,146 +459,6 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I start the test-fixpack-builder-install job with the following parameters ${table}"
-	macro startTestFixPackBuilderInstallJob {
-		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
-		var mirrorUser = PropsUtil.get("mirror.user");
-		var mirrorPassword = PropsUtil.get("mirror.password");
-		var portalUrl = PropsUtil.get("portal.url");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "bundle") {
-				var bundle = "${value}";
-			}
-			else if ("${field}" == "fixPack") {
-				var fixPack = "${value}";
-			}
-			else if ("${field}" == "hotfix") {
-				var hotfix = "${value}";
-			}
-			else if ("${field}" == "patchingTool") {
-				var patchingTool = "${value}";
-			}
-			else if ("${field}" == "patchingToolMajorVersion") {
-				var patchingToolMajorVersion = "${value}";
-			}
-			else {
-				fail("No such Jenkins job field ${field} for test-fixpack-builder-install");
-			}
-		}
-
-		if (!(isSet(bundle))) {
-			var bundle = "";
-		}
-		if (!(isSet(fixPack))) {
-			var fixPack = "";
-		}
-		if (!(isSet(hotfix))) {
-			var hotfix = "";
-		}
-		if (!(isSet(patchingTool))) {
-			var patchingTool = "";
-		}
-
-		if (contains("${patchingTool}", "LATEST")) {
-			var curlLatestPatchingTool = '''
-				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
-				 -u ${mirrorUser}:${mirrorPassword}
-			''';
-
-			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
-
-			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
-
-			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${latestVersion}");
-		}
-
-		var curl = '''
-			${portalUrl}/view/All/job/test-fixpack-builder-install\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
-			-d bundle=${bundle}
-			-d fixPack=${fixPack}
-			-d hotfix=${hotfix}
-			-d patchingTool=${patchingTool}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
-	@prose = "I start the test-fixpack-builder-revert job with the following parameters ${table}"
-	macro startTestFixPackBuilderRevertJob {
-		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
-		var mirrorUser = PropsUtil.get("mirror.user");
-		var mirrorPassword = PropsUtil.get("mirror.password");
-		var portalUrl = PropsUtil.get("portal.url");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "bundle") {
-				var bundle = "${value}";
-			}
-			else if ("${field}" == "fixPack") {
-				var fixPack = "${value}";
-			}
-			else if ("${field}" == "hotfix") {
-				var hotfix = "${value}";
-			}
-			else if ("${field}" == "patchingTool") {
-				var patchingTool = "${value}";
-			}
-			else if ("${field}" == "patchingToolMajorVersion") {
-				var patchingToolMajorVersion = "${value}";
-			}
-			else {
-				fail("No such Jenkins job field ${field} for test-fixpack-builder-revert");
-			}
-		}
-
-		if (!(isSet(bundle))) {
-			var bundle = "";
-		}
-		if (!(isSet(fixPack))) {
-			var fixPack = "";
-		}
-		if (!(isSet(hotfix))) {
-			var hotfix = "";
-		}
-		if (!(isSet(patchingTool))) {
-			var patchingTool = "";
-		}
-
-		if (contains("${patchingTool}", "LATEST")) {
-			var curlLatestPatchingTool = '''
-				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
-				 -u ${mirrorUser}:${mirrorPassword}
-			''';
-
-			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
-
-			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
-
-			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${latestVersion}");
-		}
-
-		var curl = '''
-			${portalUrl}/view/All/job/test-fixpack-builder-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
-			-d bundle=${bundle}
-			-d fixPack=${fixPack}
-			-d hotfix=${hotfix}
-			-d patchingTool=${patchingTool}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I start the test-fixpack-builder-main-smoke job with the following parameters ${table}"
 	macro startTestFixPackBuilderMainSmokeJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
@@ -803,5 +663,117 @@ definition {
 		Jenkins.viewNoConsoleText(
 			consoleOutputText = "+Liferay-Portal-Server-Info: Liferay Community Edition Portal"
 		);
+	}
+
+	macro testFixPackBuilderJenkinsJob {
+		Jenkins.pause(
+		    timeInSeconds = "10"
+		);
+		Jenkins.openJenkinsURL();
+		Jenkins.getCurrentJobBuildNumberForShortJob(
+			jobName = "${jenkinsJobName}"
+		);
+		Jenkins.checkForJobCompletion(
+			jobName = "${jenkinsJobName}",
+			jobBuildNumber = "${staticJobBuildNumber}"
+		);
+		Jenkins.openJenkinsURL();
+		Jenkins.gotoConsoleOutput(
+			jobName = "${jenkinsJobName}",
+			jobBuildNumber = "${staticJobBuildNumber}"
+		);
+		if ("${jenkinsJobName}" == "test-fixpack-builder-install(2x-uat)") {
+		    Jenkins.viewInstallConsoleText();
+		}
+		else if ("${jenkinsJobName}" == "test-fixpack-builder-revert(2x-uat)") {
+		    Jenkins.viewRevertConsoleText();
+		}
+		else {
+		    fail("No such Jenkins job ${jenkinsJobName}");
+		}
+	}
+
+	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
+	macro patchingToolInstallAndRevert {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var mirrorUser = PropsUtil.get("mirror.user");
+		var mirrorPassword = PropsUtil.get("mirror.password");
+		var portalUrl = PropsUtil.get("portal.url");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "bundle") {
+				var bundle = "${value}";
+			}
+			else if ("${field}" == "fixPack") {
+				var fixPack = "${value}";
+			}
+			else if ("${field}" == "hotfix") {
+				var hotfix = "${value}";
+			}
+			else if ("${field}" == "patchingTool") {
+				var patchingTool = "${value}";
+			}
+			else if ("${field}" == "patchingToolMajorVersion") {
+				var patchingToolMajorVersion = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for ${value}");
+			}
+		}
+
+		if (!(isSet(bundle))) {
+			var bundle = "";
+		}
+		if (!(isSet(fixPack))) {
+			var fixPack = "";
+		}
+		if (!(isSet(hotfix))) {
+			var hotfix = "";
+		}
+		if (!(isSet(patchingTool))) {
+			var patchingTool = "";
+		}
+
+		if (contains("${patchingTool}", "LATEST")) {
+			var curlLatestPatchingTool = '''
+				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
+				 -u ${mirrorUser}:${mirrorPassword}
+			''';
+
+			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
+
+			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
+
+			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${latestVersion}");
+		}
+
+		var curl = '''
+			 ${portalUrl}/view/All/job/test-fixpack-builder-install\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			 -d bundle=${bundle}
+			 -d fixPack=${fixPack}
+			 -d hotfix=${hotfix}
+			 -d patchingTool=${patchingTool}
+			 ''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-install(2x-uat)");
+
+		var curl = '''
+			 ${portalUrl}/view/All/job/test-fixpack-builder-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			 -d bundle=${bundle}
+			 -d fixPack=${fixPack}
+			 -d hotfix=${hotfix}
+			 -d patchingTool=${patchingTool}
+			 ''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-revert(2x-uat)");
 	}
 }
