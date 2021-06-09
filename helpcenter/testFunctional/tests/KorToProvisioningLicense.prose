@@ -354,6 +354,175 @@ Scenario: Generate new DXP license via account subscription
 	| Type        | Production                    |
 	| Host Name   | localhost                     |
 
+Scenario: Generate new DXP license for perpetual subscription
+	Testing the ability to generate a new license for a T4 DXP perpetual project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Perpetual               | true     |   |
+	| Product Field and Value | sizing   | 1 |
+	| Product Field and Value | licenses | 1 |
+	| Product Field and Value | version  | 7 |
+	| Quantity                | 1        |   |
+	| Status                  | Approved |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName} | |
+	| Product | Select        | DXP Production                | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP Production (Production)   | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Account     | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	When I click on the license with the keyword "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header        | Korlic - ${staticProjectName} | |
+	| Product       | DXP Production                | |
+	| Version       | 7.2                           | |
+	| Type          | Production                    | |
+	| Host Name     | localhost                     | |
+	| IP Addresses  | 123.45.67.89                  | |
+	| MAC Addresses | 0A-1B-2C-3D-4E-5F             | |
+	| Owner         | Korlic - ${staticProjectName} | |
+	| Description   | Korlic - ${staticProjectName} | |
+	| Complimentary | No                            | |
+	| Status        | ACTIVE                        | |
+	| Created By    | Test Test                     | |
+	When I generate static infinite end dates for perpetual subscription licenses
+	And I generate static start dates
+	And I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "DXP Production" with the following values
+	| End Date   | ${staticInfiniteEndDates} | |
+	| Start Date | ${staticStartDates}       | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| State               | ACTIVE         |
+	When I click on the "DXP Production" subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Production" subscription link
+	And I click on subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Production" subscription link
+	And I click on provisioned link for the subscription term with the start date to end date "Perpetual"
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the account details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	And the "Active" license tab should have the count value "1"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "1"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the account details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the account details page
+	When I click on the "All" license tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the account details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Production" subscription link
+	And I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+	And the "Active" license tab should have the count value "1"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "1"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the subscription details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the subscription details page
+	When I click on the "All" license tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Production                    |
+	| Host Name   | localhost                     |
+
 Scenario: Generate new expired DXP license
 	Testing the ability to generate a new expired license for a T4 DXP project from koroneiki on provisioning
 
@@ -906,7 +1075,7 @@ Scenario: Generate new DXP developer cluster license
 	| Host Name   | -                             |
 
 Scenario: Generate new DXP virtual cluster license
-	Testing the ability to generate a new cluster license for a T4 DXP developer project from koroneiki on provisioning
+	Testing the ability to generate a new virtual cluster license for a T4 DXP production project from koroneiki on provisioning
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1015,6 +1184,120 @@ Scenario: Generate new DXP virtual cluster license
 	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
 	And I click on the "DXP Production" subscription link
 	And I click on provisioned link for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullEndDate}"
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Virtual Cluster               |
+	| Host Name   | -                             |
+
+Scenario: Generate new DXP virtual cluster license for perpetual subscription
+	Testing the ability to generate a new virtual cluster license for a T4 DXP production project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Perpetual               | true     |   |
+	| Product Field and Value | sizing   | 1 |
+	| Product Field and Value | licenses | 1 |
+	| Product Field and Value | version  | 7 |
+	| Quantity                | 1        |   |
+	| Status                  | Approved |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}                      | |
+	| Product | Select        | DXP Production                                     | |
+	| Version | Select        | 7.2                                                | |
+	| Type    | Select        | DXP Production (Virtual Cluster) (Virtual-cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Maximum Cluster Nodes | Input | 5 | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Account     | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Virtual Cluster               |
+	| Host Name   | -                             |
+	When I click on the license with the keyword "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header                | Korlic - ${staticProjectName} | |
+	| Product               | DXP Production                | |
+	| Version               | 7.2                           | |
+	| Type                  | Virtual Cluster               | |
+	| Owner                 | Korlic - ${staticProjectName} | |
+	| Description           | Korlic - ${staticProjectName} | |
+	| Maximum Cluster Nodes | 5                             | |
+	| Complimentary         | No                            | |
+	| Status                | ACTIVE                        | |
+	| Created By            | Test Test                     | |
+	When I generate static end dates for perpetual subscription licenses
+	And I generate static start dates
+	And I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "DXP Production" with the following values
+	| End Date   | ${staticEndDates}   | |
+	| Start Date | ${staticStartDates} | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| State               | ACTIVE         |
+	When I click on the "DXP Production" subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Virtual Cluster               |
+	| Host Name   | -                             |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Production" subscription link
+	And I click on subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Production                |
+	| Type        | Virtual Cluster               |
+	| Host Name   | -                             |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Production" subscription link
+	And I click on provisioned link for the subscription term with the start date to end date "Perpetual"
 	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
 	| Name        | Korlic - ${staticProjectName} |
 	| Description | Korlic - ${staticProjectName} |
@@ -1136,6 +1419,117 @@ Scenario: Generate new DXP OEM license
 	| Type        | OEM                           |
 	| Host Name   | -                             |
 
+Scenario: Generate new DXP OEM license for perpetual subscription
+	Testing the ability to generate a new OEM license for a T4 DXP OEM perpetual project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP OEM" on koroneiki with the following values
+	| Perpetual               | true     |   |
+	| Product Field and Value | sizing   | 1 |
+	| Product Field and Value | licenses | 1 |
+	| Product Field and Value | version  | 7 |
+	| Quantity                | 1        |   |
+	| Status                  | Approved |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP OEM"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName} | |
+	| Product | Select        | DXP OEM                       | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP OEM (Oem)                 | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP OEM                       | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Account     | Korlic - ${staticProjectName} |
+	| Product     | DXP OEM                       |
+	| Type        | OEM                           |
+	| Host Name   | -                             |
+	When I click on the license with the keyword "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header              | Korlic - ${staticProjectName} | |
+	| Product             | DXP OEM                       | |
+	| Version             | 7.2                           | |
+	| Type                | OEM                           | |
+	| Owner               | Korlic - ${staticProjectName} | |
+	| Description         | Korlic - ${staticProjectName} | |
+	| Complimentary       | No                            | |
+	| Status              | ACTIVE                        | |
+	| Created By          | Test Test                     | |
+	When I generate static end dates for perpetual subscription licenses
+	And I generate static start dates
+	And I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "DXP OEM" with the following values
+	| End Date   | ${staticEndDates}   | |
+	| Start Date | ${staticStartDates} | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP OEM" and the following values on the account details page
+	| Name                | DXP OEM |
+	| Current Provisioned | 1       |
+	| State               | ACTIVE  |
+	When I click on the "DXP OEM" subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP OEM                       |
+	| Type        | OEM                           |
+	| Host Name   | -                             |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP OEM" subscription link
+	And I click on subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP OEM                       |
+	| Type        | OEM                           |
+	| Host Name   | -                             |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP OEM" subscription link
+	And I click on provisioned link for the subscription term with the start date to end date "Perpetual"
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP OEM                       |
+	| Type        | OEM                           |
+	| Host Name   | -                             |
+
 Scenario: Generate new DXP Limited license
 	Testing the ability to generate a new limited license for a T4 DXP Limited project from koroneiki on provisioning
 
@@ -1250,6 +1644,124 @@ Scenario: Generate new DXP Limited license
 	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
 	And I click on the "DXP Limited" subscription link
 	And I click on provisioned link for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullEndDate}"
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Limited                   |
+	| Type        | Limited                       |
+	| Host Name   | localhost                     |
+
+Scenario: Generate new DXP Limited license for perpetual subscription
+	Testing the ability to generate a new limited license for a T4 DXP Limited perpetual project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Limited" on koroneiki with the following values
+	| Perpetual               | true     |   |
+	| Product Field and Value | sizing   | 1 |
+	| Product Field and Value | licenses | 1 |
+	| Product Field and Value | version  | 7 |
+	| Quantity                | 1        |   |
+	| Status                  | Approved |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Limited"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName} | |
+	| Product | Select        | DXP Limited                   | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP Limited (Limited)         | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Limited                   | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Account     | Korlic - ${staticProjectName} |
+	| Product     | DXP Limited                   |
+	| Type        | Limited                       |
+	| Host Name   | localhost                     |
+	When I click on the license with the keyword "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header              | Korlic - ${staticProjectName} | |
+	| Product             | DXP Limited                   | |
+	| Version             | 7.2                           | |
+	| Type                | Limited                       | |
+	| Host Name           | localhost                     | |
+	| IP Addresses        | 123.45.67.89                  | |
+	| MAC Addresses       | 0A-1B-2C-3D-4E-5F             | |
+	| Owner               | Korlic - ${staticProjectName} | |
+	| Description         | Korlic - ${staticProjectName} | |
+	| Complimentary       | No                            | |
+	| Status              | ACTIVE                        | |
+	| Created By          | Test Test                     | |
+	When I generate static end dates for perpetual subscription licenses
+	And I generate static start dates
+	And I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "DXP Limited" with the following values
+	| End Date   | ${staticEndDates}   | |
+	| Start Date | ${staticStartDates} | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP Limited" and the following values on the account details page
+	| Name                | DXP Limited |
+	| Current Provisioned | 1           |
+	| State               | ACTIVE      |
+	When I click on the "DXP Limited" subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Limited                   |
+	| Type        | Limited                       |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Limited" subscription link
+	And I click on subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName} |
+	| Description | Korlic - ${staticProjectName} |
+	| Product     | DXP Limited                   |
+	| Type        | Limited                       |
+	| Host Name   | localhost                     |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "DXP Limited" subscription link
+	And I click on provisioned link for the subscription term with the start date to end date "Perpetual"
 	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
 	| Name        | Korlic - ${staticProjectName} |
 	| Description | Korlic - ${staticProjectName} |
@@ -7683,6 +8195,117 @@ Scenario: Generate new commerce enterprise wide license
 	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
 	And I click on the "Commerce Subscription Unlimited Enterprise-Wide" subscription link
 	And I click on provisioned link for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullEndDate}"
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName}                   |
+	| Description | Korlic - ${staticProjectName}                   |
+	| Product     | Commerce Subscription Unlimited Enterprise-Wide |
+	| Type        | Enterprise                                      |
+	| Host Name   | -                                               |
+
+Scenario: Generate new commerce enterprise wide license for perpetual subscription
+	Testing the ability to generate a new enterprise wide license for a T4 commerce perpetual project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Commerce Subscription Unlimited Enterprise-Wide" on koroneiki with the following values
+	| Perpetual               | true     |   |
+	| Product Field and Value | sizing   | 1 |
+	| Product Field and Value | licenses | 1 |
+	| Product Field and Value | version  | 0 |
+	| Quantity                | 1        |   |
+	| Status                  | Approved |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "Commerce Subscription Unlimited Enterprise-Wide"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}                                | |
+	| Product | Select        | Commerce Subscription Unlimited Enterprise-Wide              | |
+	| Version | Select        | 1                                                            | |
+	| Type    | Select        | Commerce Subscription Unlimited Enterprise-Wide (Enterprise) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName}                   | |
+	| Product | Commerce Subscription Unlimited Enterprise-Wide | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name        | Korlic - ${staticProjectName}                   |
+	| Description | Korlic - ${staticProjectName}                   |
+	| Account     | Korlic - ${staticProjectName}                   |
+	| Product     | Commerce Subscription Unlimited Enterprise-Wide |
+	| Type        | Enterprise                                      |
+	| Host Name   | -                                               |
+	When I click on the license with the keyword "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following license values on the license page
+	| Header              | Korlic - ${staticProjectName}                   | |
+	| Product             | Commerce Subscription Unlimited Enterprise-Wide | |
+	| Version             | 1                                               | |
+	| Type                | Enterprise                                      | |
+	| Owner               | Korlic - ${staticProjectName}                   | |
+	| Description         | Korlic - ${staticProjectName}                   | |
+	| Complimentary       | No                                              | |
+	| Status              | ACTIVE                                          | |
+	| Created By          | Test Test                                       | |
+	When I generate static end dates for perpetual subscription licenses
+	And I generate static start dates
+	Then I should be able to view a product consumption on koroneiki made by the account "Korlic - ${staticProjectName}" for the product "Commerce Subscription Unlimited Enterprise-Wide" with the following values
+	| End Date   | ${staticEndDates}   | |
+	| Start Date | ${staticStartDates} | |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "Commerce Subscription Unlimited Enterprise-Wide" and the following values on the account details page
+	| Name                | Commerce Subscription Unlimited Enterprise-Wide |
+	| Current Provisioned | 1                                               |
+	| State               | ACTIVE                                          |
+	When I click on the "Commerce Subscription Unlimited Enterprise-Wide" subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName}                   |
+	| Description | Korlic - ${staticProjectName}                   |
+	| Product     | Commerce Subscription Unlimited Enterprise-Wide |
+	| Type        | Enterprise                                      |
+	| Host Name   | -                                               |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Commerce Subscription Unlimited Enterprise-Wide" subscription link
+	And I click on subscription provisioned link
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
+	| Name        | Korlic - ${staticProjectName}                   |
+	| Description | Korlic - ${staticProjectName}                   |
+	| Product     | Commerce Subscription Unlimited Enterprise-Wide |
+	| Type        | Enterprise                                      |
+	| Host Name   | -                                               |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Commerce Subscription Unlimited Enterprise-Wide" subscription link
+	And I click on provisioned link for the subscription term with the start date to end date "Perpetual"
 	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the subscription details page
 	| Name        | Korlic - ${staticProjectName}                   |
 	| Description | Korlic - ${staticProjectName}                   |
