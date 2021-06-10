@@ -1035,6 +1035,25 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with the ticket ID ${ticketId} should be assigned to the user with the email address ${userEmailAddress}"
+	macro _viewTicketAssignee {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userIdFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.assignee_id");
+
+		echo("Expected User ID: ${userId}");
+		echo("Actual User ID: ${userIdFromAPI}");
+
+		if (!("${userIdFromAPI}" == "${userId}")) {
+			fail("Actual value ${userIdFromAPI} does not match expected value ${userId}");
+		}
+	}
+
 	@prose = "an email regarding an assignment to ticketId ${ticketId} for the support language ${supportLanguage} containing the following parameters should be sent out to the ticket assignee ${table}"
 	macro _viewTicketAssignmentEmailToAssignee {
 		var RawTable rawTable = new RawTable("${table}");
