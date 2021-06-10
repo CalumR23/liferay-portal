@@ -1314,6 +1314,29 @@ definition {
 		}
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the role ${roleName}"
+	macro _viewUserRoleByEmailAddress {
+		var roleName = StringUtil.replace("${roleName}", " ", "-");
+
+		var roleName = StringUtil.lowerCase("${roleName}");
+
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var roleNameFromAPI = JSONCurlUtil.get("${curl}", "$.user.role");
+
+		echo("Expected User Role: ${roleName}");
+		echo("Actual User Role: ${roleNameFromAPI}");
+
+		if (!("${roleNameFromAPI}" == "${roleName}")) {
+			fail("Actual value ${roleNameFromAPI} does not match expected value ${roleName}");
+		}
+	}
+
 	macro _viewUserSearchResultsByEmailAddress {
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
