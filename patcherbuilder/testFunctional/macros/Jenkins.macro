@@ -665,6 +665,22 @@ definition {
 		);
 	}
 
+	macro checkLinkToSlave {
+		Jenkins.openJenkinsURL();
+
+		Jenkins.clickJobLink(jobName = "${jobName}");
+
+		Click(locator1 = "//*[@id="buildHistory"]/tbody/tr[2]/td[2]/a");
+
+		var jenkinsSlave = selenium.getText("Jenkins#JENKINS_NODE");
+
+		var jenkinsSlaveNumber = StringUtil.replace("${jenkinsSlave}", "cloud-", "");
+
+		var jenkinsSlaveNumber = StringUtil.replace("${jenkinsSlaveNumber}", "-", ".");
+
+		return "${jenkinsSlaveNumber}";
+	}
+
 	macro testFixPackBuilderJenkinsJob {
 		Jenkins.pause(timeInSeconds = "10");
 
@@ -687,18 +703,19 @@ definition {
 		);
 
 		if ("${jenkinsJobName}" == "test-fixpack-builder-install(2x-uat)") {
-		    Jenkins.viewInstallConsoleText();
+			Jenkins.viewInstallConsoleText();
 		}
 		else if ("${jenkinsJobName}" == "test-fixpack-builder-revert(2x-uat)") {
-		    Jenkins.viewRevertConsoleText();
+			Jenkins.viewRevertConsoleText();
 		}
 		else {
-		    fail("No such Jenkins job ${jenkinsJobName}");
+			fail("No such Jenkins job ${jenkinsJobName}");
 		}
 	}
 
 	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
 	macro patchingToolInstallAndRevert {
+		var jenkinsSlaveNumber = Jenkins.checkLinkToSlave(jobName = "fixpack-builder-hotfix-7x(2x-uat)");
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var mirrorUser = PropsUtil.get("mirror.user");
 		var mirrorPassword = PropsUtil.get("mirror.password");
