@@ -1,8 +1,8 @@
 @testray.main.component.name = "Support QA"
 @type = "koroneiki.provisioning.license.integration"
 
-Feature:  Koroneiki To Provisioning License Integration
-	Testing to assure that provisioning license management works properly.
+Feature:  Koroneiki To Provisioning Aggregate License Integration
+	Testing to assure that provisioning aggregate license management works properly.
 
 Teardown:
 	* I wait for "5" seconds
@@ -2306,6 +2306,103 @@ Scenario: Delete DXP license from DXP aggregate license download page
 	| ${staticLicenseKeyId2} |
 	And I should not be able to view the download button for the following license key id values on the download license page
 	| ${staticLicenseKeyId2} |
+	| ${staticLicenseKeyId1} |
+
+Scenario: Delete DXP development license from DXP non aggregate license download page
+	Testing the ability to generate non aggregate licenses and then removing one license for a T4 DXP development project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Description           | Test osb account on koroneiki        |
+	| Fax Number            | 555-555-1234                         |
+	| Name                  | Korlic - ${staticProjectName}        |
+	| Phone Number          | 555-555-5678                         |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken |
+	| Region                | United States                        |
+	| Status                | Active                               |
+	| Tier                  | T4                                   |
+	| Website               | www.koroneikicorporation.com         |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Development" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 2 |
+	| Product Field and Value | licenses                 | 2 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 2                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Development"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName} | |
+	| Product | Select        | DXP Development               | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP Development (Developer)   | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                | Input | Korlic - ${staticProjectName} License1 Name        | |
+	| Description         | Input | Korlic - ${staticProjectName} License1 Description | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName}    | |
+	| Product | DXP Development                  | |
+	And I obtain the license key ID value from the license details page
+	And I rename the first license key ID variable
+	When I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName} | |
+	| Product | Select        | DXP Development               | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP Development (Developer)   | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                | Input | Korlic - ${staticProjectName} License2 Name        | |
+	| Description         | Input | Korlic - ${staticProjectName} License2 Description | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Development               | |
+	And I obtain the license key ID value from the license details page
+	And I rename the second license key ID variable
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	And I select the following licenses under the licenses tab
+	| Korlic - ${staticProjectName} License1 Name |
+	| Korlic - ${staticProjectName} License2 Name |
+	And I click on the "Download" button in the dropdown menu for all licenses under the license tab
+	And I click on the delete license button for the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the download license page
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the download license page
+	And I should be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" and the following values on the download license page
+	| Name        | Korlic - ${staticProjectName} License2 Name        |
+	| Description | Korlic - ${staticProjectName} License2 Description |
+	| Version     | 7.2                                                |
+	| Product     | DXP Development                                    |
+	| Type        | DXP Development (Developer)                        |
+	| Status      | ACTIVE                                             |
+	And the delete license button for the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the download license page should be disabled
+	And I should be able to view the download button for the following license key id values on the download license page
+	| ${staticLicenseKeyId2} |
+	And I should not be able to view the download button for the following license key id values on the download license page
 	| ${staticLicenseKeyId1} |
 
 Scenario: Delete Portal aggregate license from new DXP and Portal Production aggregate license download page
