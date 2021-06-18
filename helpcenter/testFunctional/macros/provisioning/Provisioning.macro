@@ -221,6 +221,154 @@ definition {
 		OSBAdmin.pause(timeInSeconds = "1");
 	}
 
+	@prose = "I populate the advanced search form with the following values ${table}"
+	macro populateAdvancedSearchForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var option = "${row[1]}";
+			var type = "${row[2]}";
+			var value = "${row[3]}";
+
+			var key_field = "${field}";
+			var key_option = "${option}";
+
+			if ("${type}" == "Input") {
+				if (("${field}" == "Created After") || ("${field}" == "Created Before") || ("${field}" == "Modified After") || ("${field}" == "Modified Before")) {
+					Type(
+						locator1 = "Provisioning#ADVANCED_SEARCH_DATE_INPUT_FIELD",
+						value1 = "${value}");
+				}
+				else if (("${field}" == "Created Between After") || ("${field}" == "Modified Between After") || ("${field}" == "Started Between After") || ("${field}" == "Expires Between After")) {
+					var key_fieldGroup = StringUtil.replace("${field}", " After", "");
+
+					var key_field = "After";
+
+					Type(
+						locator1 = "Provisioning#ADVANCED_SEARCH_GROUPED_DATE_INPUT_FIELD",
+						value1 = "${value}");
+				}
+				else if (("${field}" == "Created Between Before") || ("${field}" == "Modified Between Before") || ("${field}" == "Started Between Before") || ("${field}" == "Expires Between Before")) {
+					var key_fieldGroup = StringUtil.replace("${field}", " Before", "");
+
+					var key_field = "Before";
+
+					Type(
+						locator1 = "Provisioning#ADVANCED_SEARCH_GROUPED_DATE_INPUT_FIELD",
+						value1 = "${value}");
+				}
+				else if ("${field}" == "Account") {
+					Type(
+						locator1 = "Provisioning#ADVANCED_SEARCH_INPUT_FIELD_EXACT",
+						value1 = "${value}");
+				}
+				else {
+					Type(
+						locator1 = "Provisioning#ADVANCED_SEARCH_INPUT_FIELD",
+						value1 = "${value}");
+				}
+			}
+			else if ("${type}" == "Select") {
+				Select(
+					locator1 = "Provisioning#ADVANCED_SEARCH_SELECT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${type}" == "Checkbox") {
+				if (("${field}" == "License Type") || ("${field}" == "Product Version") || ("${field}" == "Product")) {
+					if (contains("${option}", "Portal")) {
+						if ("${value}" == "true") {
+							if (IsNotChecked(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX_EXACT")) {
+								Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX_EXACT");
+							}
+						}
+						else {
+							if (IsChecked(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX_EXACT")) {
+								Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX_EXACT");
+							}
+						}
+					}
+					else {
+						if ("${value}" == "true") {
+							if (IsNotChecked(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX")) {
+								Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX");
+							}
+						}
+						else {
+							if (IsChecked(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX")) {
+								Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_CHECKBOX");
+							}
+						}
+					}
+				}
+				else {
+					if ("${value}" == "true") {
+						if (IsNotChecked(locator1 = "Provisioning#ADVANCED_SEARCH_CHECKBOX")) {
+							Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_CHECKBOX");
+						}
+					}
+					else {
+						if (IsChecked(locator1 = "Provisioning#ADVANCED_SEARCH_CHECKBOX")) {
+							Click.pauseMakeVisibleClickAt(locator1 = "Provisioning#ADVANCED_SEARCH_CHECKBOX");
+						}
+					}
+				}
+			}
+			else if ("${type}" == "Radio Button") {
+				var key_value = "${value}";
+
+				Click(locator1 = "Provisioning#ADVANCED_SEARCH_RADIO_BUTTON");
+			}
+			else if ("${type}" == "Select Entity") {
+				Click(locator1 = "Provisioning#ADVANCED_SEARCH_SELECT_ENTITY_BUTTON");
+
+				SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+ 				var keyword = StringUtil.extractFirst("${value}", " ");
+
+				Type(
+					locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_FIELD",
+					value1 = "${keyword}");
+
+				Click(locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_BUTTON");
+
+				var key_entityName = "${value}";
+
+				Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+				SelectFrameTop();
+
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#DONE_BUTTON");
+
+				while (IsElementPresent(locator1 = "ProvisioningAccountSelect#DONE_BUTTON")) {
+					SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					Click(locator1 = "ProvisioningAccountSelect#ENTITY_ROW");
+
+					SelectFrameTop();
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccountSelect#DONE_BUTTON");
+				}
+			}
+			else if ("${type}" == "Panel") {
+				if ("${value}" == "Expand") {
+					Provisioning.expandAdvancedSearchPanel(panelLabel = "${field}");
+				}
+				else if ("${value}" == "Collapse") {
+					Provisioning.collapseAdvancedSearchPanel(panelLabel = "${field}");
+				}
+				else {
+					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");					
+				}
+			}
+			else {
+				fail("No such advanced search field type ${type}. Please use Input, Select, Panel, Checkbox, or Radio Button");
+			}
+		}
+	}
+
 	@prose = "I populate the advanced search form with the following values and search ${table}"
 	macro populateAdvancedSearchFormAndSearch {
 		var RawTable rawTable = new RawTable("${table}");
