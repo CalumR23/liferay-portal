@@ -359,6 +359,30 @@ definition {
 		return "${staticUserIdList}";
 	}
 
+	@prose = "I obtain the IDs of the following user names from zendesk.liferay.com ${table}"
+	macro _getMultipleUserIdsByName {
+		var userCount = "0";
+		var userIds = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userName = "${row[0]}";
+
+			var users = ZendeskUserAPI._viewUserSearchResultsByName(userName = "${userName}");
+
+			if (!("${users}" == "[]")) {
+				var userIds = ZendeskUserAPI._viewUserIdsByName(userName = "${userName}");
+			}
+		}
+
+		static var staticUserIdList = "${userIds}";
+
+		echo("User IDs: ${staticUserIdList}");
+
+		return "${staticUserIdList}";
+	}
+
 	macro _getUserNameById {
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
@@ -1141,6 +1165,47 @@ definition {
 		return "${userID}";
 	}
 
+	macro _viewUserIdByName {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userID = JSONCurlUtil.get("${curl}", "$.users[0].id");
+
+		return "${userID}";
+	}
+
+	macro _viewUserIdsByName {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var count = JSONCurlUtil.get("${curl}", "$.count");
+
+		var userNumber = "0";
+
+		var userIds = "";
+
+		while (!("${count}" == "${userNumber}")) {
+			echo("Count: ${count}");
+			echo("Current User Number: ${userNumber}");
+
+			var userId = JSONCurlUtil.get("${curl}", "$.users[${userNumber}].id");
+
+			if("${userIds}" == "") {
+				var userIds = "${userId}";
+			}
+			else {
+				var userIds = "${userIds},${userId}";
+			}
+			var userNumber = MathUtil.sum("${userNumber}", "1");
+		}
+
+		return "${userIds}";
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the name ${userName}"
 	macro _viewUserNameByEmailAddress {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -1351,6 +1416,17 @@ definition {
 	macro _viewUserSearchResultsByExternalId {
 		var curl = '''
 			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var users = JSONCurlUtil.get("${curl}", "$.users");
+
+		return "${users}";
+	} 
+
+	macro _viewUserSearchResultsByName {
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
