@@ -1300,6 +1300,112 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "the support user with the email address ${userEmailAddress} should not be part of the support organization with the name ${organizationName}"
+	macro viewNoSupportUserOrganizationSync{
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-user-organizations
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userId=${supportUserId}
+			''';
+
+		var userOrganizations = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMembers}", "${userEmailAddress}")))) {
+			var companyId = JSONCompany.getSupportCompanyId();
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-user-by-email-address
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d companyId=${companyId}
+				-d emailAddress=${userEmailAddress}
+				''';
+
+			var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Support User ID: ${supportUserId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/organization/get-user-organizations
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d userId=${supportUserId}
+				''';
+
+			var userOrganizations = JSONCurlUtil.post("${curl}");
+		}
+
+		if (contains("${userOrganizations}", "${organizationName}")) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to be in the support organization ${organizationName}");
+		}
+	}
+
+	@prose = "the support user with the email address ${userEmailAddress} should be part of the support organization with the name ${organizationName}"
+	macro viewSupportUserOrganizationSync {
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/organization/get-user-organizations
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userId=${supportUserId}
+			''';
+
+		var userOrganizations = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMembers}", "${userEmailAddress}")))) {
+			var companyId = JSONCompany.getSupportCompanyId();
+
+			var curl = '''
+				${supportURL}/api/jsonws/user/get-user-by-email-address
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d companyId=${companyId}
+				-d emailAddress=${userEmailAddress}
+				''';
+
+			var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+			echo("Support User ID: ${supportUserId}");
+
+			var curl = '''
+				${supportURL}/api/jsonws/organization/get-user-organizations
+				-u ${supportAdminEmailAddress}:${supportAdminPassword}
+				-d userId=${supportUserId}
+				''';
+
+			var userOrganizations = JSONCurlUtil.post("${curl}");
+		}
+
+		if (!(contains("${userOrganizations}", "${organizationName}"))) {
+			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to have not been added to the support organization ${organizationName}");
+		}
+	}
+
 	@prose = "the support user with the email address ${userEmailAddress} should be synced to the support site"
 	macro viewSupportUserSync {
 		var companyId = JSONCompany.getSupportCompanyId();
