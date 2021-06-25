@@ -206,6 +206,64 @@ definition {
 		return "${requesterId}";
 	}
 
+	@prose = "I teardown multiple tickets with the following keywords from zendesk.liferay.com ${table}"
+	macro _tearDownMultipleTicketsByKeywords {
+		var ticketIdList = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var keywords = "${row[0]}";
+
+			var ticketId = "";
+
+			var results = ZendeskTicketAPI._viewTicketSearchResultsByKeywords(keywords = "${keywords}");
+
+			if (contains("${results}", "${keywords}")) {
+				var ticketIds = ZendeskTicketAPI._viewTicketIdsByKeywords(keywords = "${keywords}");
+			}
+		}
+
+		if (!("${ticketIds}" == "")) {
+			var curl = '''
+				--tlsv1.2 ${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIds}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
+
+			var curl = '''
+				--tlsv1.2 ${statusUrl}
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+
+			if (!("${status}" == "completed")) {
+				if (("${status}" == "queued") || ("${status}" == "working")) {
+					while (("${status}" == "queued") || ("${status}" == "working")) {
+						ZendeskHomepage.pause(timeInSeconds = "2");
+
+						var curl = '''
+							--tlsv1.2 ${statusUrl}
+							-u ${zendeskAdminEmail}/token:${apiToken}
+							''';
+
+						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+					}
+					if (!("${status}" == "completed")) {
+						echo("Warning: The ticket tear down may have failed");
+						echo("Tear Down Job Status: ${status}");
+					}
+				}
+				else {
+					echo("Warning: The ticket tear down may have failed");
+					echo("Tear Down Job Status: ${status}");
+				}
+			}
+		}
+	}
+
 	@prose = "I teardown the tickets with the following keywords from zendesk.liferay.com ${table}"
 	macro _tearDownTicketsByKeywords {
 		var ticketIdList = "";
@@ -1758,6 +1816,42 @@ definition {
 		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
 
 		return "${ticketId}";
+	}
+
+	macro _viewTicketIdsByKeywords {
+		var keywords = StringUtil.replace("${keywords}", " ", "+");
+
+		var keywords = StringUtil.replace("${keywords}", ")", "");
+
+		var keywords = StringUtil.replace("${keywords}", "(", "");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/search.json?query=${keywords}
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var count = JSONCurlUtil.get("${curl}", "$.count");
+
+		var ticketNumber = "0";
+
+		var ticketIds = "";
+
+		while (!("${count}" == "${ticketNumber}")) {
+			echo("Count: ${count}");
+			echo("Current Ticket Number: ${ticketNumber}");
+
+			var ticketId = JSONCurlUtil.get("${curl}", "$.results[${ticketNumber}].id");
+
+			if("${ticketIds}" == "") {
+				var ticketIds = "${ticketId}";
+			}
+			else {
+				var ticketIds = "${ticketIds},${ticketId}";
+			}
+			var ticketNumber = MathUtil.sum("${ticketNumber}", "1");
+		}
+
+		return "${ticketIds}";
 	}
 
 	macro _viewTicketIdByTicketSubject {
