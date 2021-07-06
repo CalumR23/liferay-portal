@@ -48,6 +48,31 @@ definition {
 		return "${accountEntryObject}";
 	}
 
+	@prose = "the support organization with the code ${accountCode} should not be part of the support site"
+	macro viewNoSupportOrganizationSync {
+		var curl = '''
+			${supportURL}/api/jsonws/osb-portlet.accountentry/get-account-entry-by-code
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d code=${accountCode}
+			''';
+
+		var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${accountCode}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${accountEntryObject}", "${accountCode}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${accountCode}");
+		}
+
+		if (contains("${accountEntryObject}", "${accountCode}")) {
+			fail("After ${currentIteration} checks, the support organization with code ${accountCode} appears to be a part of the support site");
+		}
+	}
+
 	@prose = "the support organization with the code ${accountCode} should be part of the support site"
 	macro viewSupportOrganizationSync {
 		var curl = '''
