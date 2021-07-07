@@ -1,4 +1,6 @@
 definition {
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
 	@prose = "I activate the account with the name ${accountName} and code ${accountCode}"
@@ -325,6 +327,7 @@ definition {
 	@prose = "I click on the ${productName} subscription provisioned link"
 	macro clickSubscriptionProvisionedLink {
 		var key_productName = "${productName}";
+
 		if (IsElementPresent(locator1 = "ProvisioningAccount#PRODUCT_PROVISIONED")) {
 			Click(locator1 = "ProvisioningAccount#PRODUCT_PROVISIONED");
 		}
@@ -351,9 +354,47 @@ definition {
 
 	@prose = "I click on the Sync To Zendesk button on the account page"
 	macro clickSyncToZendeskButton {
+		var currentIteration = "0";
+
 		Click(locator1 = "ProvisioningAccount#ACCOUNT_SYNC_TO_ZENDESK_BUTTON");
 
-		Message.success();
+		OSBAdmin.pause(timeInSeconds = "3");
+
+		if (IsElementPresent(locator1 = "Message#SUCCESS_MESSAGE")) {
+			Message.success();
+
+			var zendeskSyncSuccess = "true";
+		}
+		else {
+			var zendeskSyncSuccess = "false";
+		}
+
+		echo("Zendesk Sync Success: ${zendeskSyncSuccess}");
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${zendeskSyncSuccess}" == "false")) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			Click(locator1 = "ProvisioningAccount#ACCOUNT_SYNC_TO_ZENDESK_BUTTON");
+
+			OSBAdmin.pause(timeInSeconds = "3");
+
+			if (IsElementPresent(locator1 = "Message#SUCCESS_MESSAGE")) {
+				Message.success();
+
+				var zendeskSyncSuccess = "true";
+			}
+			else {
+				var zendeskSyncSuccess = "false";
+			}
+
+			echo("Zendesk Sync Success: ${zendeskSyncSuccess}");
+		}
+
+		if ("${zendeskSyncSuccess}" == "false") {
+			fail("After ${currentIteration} checks, the provisioning Sync To Zendesk process may have failed.");
+		}
 	}
 
 	@prose = "I click on the ${teamName} team link"
