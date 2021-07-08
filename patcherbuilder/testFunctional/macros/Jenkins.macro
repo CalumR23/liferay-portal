@@ -577,30 +577,8 @@ definition {
 		);
 	}
 
-	@prose = "the test-fixpack-builder-install console log should not have any visible errors"
-	macro viewInstallConsoleText {
-		Jenkins.clickFullLogLink();
-
-		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
-		var errorCount = StringUtil.count("${consoleOutputText}", "ERROR");
-
-		echo("Number of errors: ${errorCount}");
-
-		if (!("${fileAddedCount}" == "0")) {
-			var acceptableErrorCount = StringUtil.count("${consoleOutputText}", "ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found");
-
-			echo("Number of acceptable errors: ${acceptableErrorCount}");
-
-			if (!("${errorCount}" == "${acceptableErrorCount}")) {
-				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack install and either apply fixes to the builder or update the test case as needed.");
-			}
-		}
-
-		Jenkins.viewConsoleText(consoleOutputText = "Starting catalina");
-	}
-
-	@prose = "the test-fixpack-builder-revert console log should not have any visible errors"
-	macro viewRevertConsoleText {
+	@prose = "the test-fixpack-builder-install-revert console log should not have any visible errors"
+	macro viewInstallRevertConsoleText {
 		Jenkins.clickFullLogLink();
 
 		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
@@ -702,15 +680,7 @@ definition {
 			jobBuildNumber = "${staticJobBuildNumber}"
 		);
 
-		if ("${jenkinsJobName}" == "test-fixpack-builder-install(2x-uat)") {
-			Jenkins.viewInstallConsoleText();
-		}
-		else if ("${jenkinsJobName}" == "test-fixpack-builder-revert(2x-uat)") {
-			Jenkins.viewRevertConsoleText();
-		}
-		else {
-			fail("No such Jenkins job ${jenkinsJobName}");
-		}
+		Jenkins.viewInstallRevertConsoleText();
 	}
 
 	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
@@ -774,7 +744,7 @@ definition {
 		}
 
 		var curl = '''
-			 ${portalUrl}/view/All/job/test-fixpack-builder-install\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			 ${portalUrl}/view/All/job/test-fixpack-builder-install-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
 			 -d bundle=${bundle}
 			 -d fixPack=${fixPack}
 			 -d hotfix=${hotfix}
@@ -783,18 +753,6 @@ definition {
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 
-		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-install(2x-uat)");
-
-		var curl = '''
-			 ${portalUrl}/view/All/job/test-fixpack-builder-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
-			 -d bundle=${bundle}
-			 -d fixPack=${fixPack}
-			 -d hotfix=${hotfix}
-			 -d patchingTool=${patchingTool}
-			 ''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-
-		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-revert(2x-uat)");
+		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-install-revert(2x-uat)");
 	}
 }
