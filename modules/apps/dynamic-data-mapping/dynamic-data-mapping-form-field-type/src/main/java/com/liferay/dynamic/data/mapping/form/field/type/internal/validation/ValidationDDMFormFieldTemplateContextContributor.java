@@ -52,16 +52,13 @@ public class ValidationDDMFormFieldTemplateContextContributor
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
 		return HashMapBuilder.<String, Object>put(
-			"dataType", _getDataType(ddmFormField, ddmFormFieldRenderingContext)
+			"dataType", getDataType(ddmFormField, ddmFormFieldRenderingContext)
 		).put(
 			"value", _getValue(ddmFormFieldRenderingContext)
 		).build();
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private String _getDataType(
+	protected String getDataType(
 		DDMFormField ddmFormField,
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
 
@@ -73,13 +70,16 @@ public class ValidationDDMFormFieldTemplateContextContributor
 			String validationDataType = (String)changedProperties.get(
 				"validationDataType");
 
-			if (validationDataType != null) {
+			if (Validator.isNotNull(validationDataType)) {
 				return validationDataType;
 			}
 		}
 
 		return ddmFormField.getDataType();
 	}
+
+	@Reference
+	protected JSONFactory jsonFactory;
 
 	private Map<String, Object> _getValue(
 		DDMFormFieldRenderingContext ddmFormFieldRenderingContext) {
