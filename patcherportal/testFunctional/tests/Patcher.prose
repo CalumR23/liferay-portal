@@ -5043,3 +5043,352 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
+
+  Scenario: Create a 73 fix pack dxp 2 build
+    @priority = "5"
+    @test.group = "8"
+    As a TSE, I should be able to create a 73 fix pack dxp 2 build
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content for the first fix
+    And I generate random fix content for the second fix
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-2-7310                                      |
+      | Content         | ${staticFixContent1}                                     |
+      | Branch Name     | LPSQA-134777-dxp-2-7310                                  |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-2-7310                                      |
+      | Content         | ${staticFixContent2}                                     |
+      | Branch Name     | LPS-94011                                                |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+      | Workaround      | true                                                     |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-2-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Patch                |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-2-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Workaround           |
+    When I check the Patcher fix containing the content "${staticFixContent1}" and type "Patch" for add completion
+    And I check the Patcher fix containing the content "${staticFixContent2}" and type "Workaround" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Git Hash        | d666e66427                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Patch                      |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Git Hash        | 6a060a5d07                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Workaround                 |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+      | Product         | DXP 7.3                                   |
+      | Project Version | fix-pack-dxp-2-7310                       |
+      | Tickets List    | ${staticFixContent1},${staticFixContent2} |
+      | Account Code    | HITACHIGP                                 |
+      | Support Ticket  | ${staticTicketNumber}                     |
+    And I set the account code "HITACHIGP" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Type            | Official                |
+      | Support Ticket  | ${staticTicketNumber}   |
+      | Version         | 1.0                     |
+      | Project Version | fix-pack-dxp-2-7310     |
+      | Content         | 0 Fix Packs + 2 Tickets |
+      | Patcher Status  | Merging                 |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Name     | ${staticFixContent1} |
+      | Version  | 1.0                  |
+      | Git Hash | d666e66427           |
+      | Status   | Complete             |
+      | Type     | Patch                |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Name     | ${staticFixContent2} |
+      | Version  | 1.0                  |
+      | Git Hash | 6a060a5d07           |
+      | Status   | Complete             |
+      | Type     | Workaround           |
+    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for merge completion
+    And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticTicketNumber}          |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-2-7310            |
+      | Content         | 0 Fix Packs + 2 Tickets        |
+      | Patcher Status  | Complete                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
+
+  Scenario: Create 73 fix pack dxp 2 fixes and merge on fix pack dxp 2 project version
+    @priority = "5"
+    @test.group = "9"
+    As a TSE, I should be able to create 73 fix pack dxp 2 fixes and merge on fix pack dxp 2 project version
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content for the first fix
+    And I generate random fix content for the second fix
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-2-7310                                      |
+      | Content         | ${staticFixContent1}                                     |
+      | Branch Name     | LPSQA-134777-dxp-2-7310                                  |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-2-7310                                      |
+      | Content         | ${staticFixContent2}                                     |
+      | Branch Name     | LPS-94011                                                |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+      | Workaround      | true                                                     |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-2-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Patch                |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-2-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Workaround           |
+    When I check the Patcher fix containing the content "${staticFixContent1}" and type "Patch" for add completion
+    And I check the Patcher fix containing the content "${staticFixContent2}" and type "Workaround" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Patch" with the following values
+      | Content         | ${staticFixContent1}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Git Hash        | d666e66427                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Patch                      |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Git Hash        | 6a060a5d07                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Workaround                 |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+      | Product         | DXP 7.3                                   |
+      | Project Version | fix-pack-dxp-2-7310                       |
+      | Tickets List    | ${staticFixContent1},${staticFixContent2} |
+      | Account Code    | STVINTRA                                  |
+      | Support Ticket  | ${staticTicketNumber}                     |
+      | Merge Only      | true                                      |
+    And I set the account code "STVINTRA" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                |
+      | Support Ticket  | ${staticTicketNumber}   |
+      | Version         | 1.0                     |
+      | Project Version | fix-pack-dxp-2-7310     |
+      | Content         | 0 Fix Packs + 2 Tickets |
+      | Patcher Status  | Merging Only            |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Name     | ${staticFixContent1} |
+      | Version  | 1.0                  |
+      | Git Hash | d666e66427           |
+      | Status   | Complete             |
+      | Type     | Patch                |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Name     | ${staticFixContent2} |
+      | Version  | 1.0                  |
+      | Git Hash | 6a060a5d07           |
+      | Status   | Complete             |
+      | Type     | Workaround           |
+    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for merge completion
+    And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for compile completion using the "fixpack-builder-agent(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                   |
+      | Support Ticket  | ${staticTicketNumber}      |
+      | Version         | 1.0                        |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Content         | 0 Fix Packs + 2 Tickets    |
+      | Patcher Status  | Complete Merging Only      |
+      | Jenkins         | fixpack-builder-agent(uat) |
+
+  Scenario: Create 73 fix pack dxp 1 and dxp 2 fixes and merge on fix pack dxp 2 project version
+    @priority = "5"
+    @test.group = "10"
+    As a TSE, I should be able to create 73 fix pack dxp 1 and dxp 2 fixes and merge on fix pack dxp 2 project version
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content for the first fix
+    And I generate random fix content for the second fix
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-1-7310                                      |
+      | Content         | ${staticFixContent1}                                     |
+      | Branch Name     | 7310fp01_LPS-94011                                       |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+      | Workaround      | true                                                     |
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3                                                  |
+      | Project Version | fix-pack-dxp-2-7310                                      |
+      | Content         | ${staticFixContent2}                                     |
+      | Branch Name     | LPS-94011                                                |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+      | Workaround      | true                                                     |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent1} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-1-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Workaround           |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2} |
+      | Version         | 1.0                  |
+      | Product         | DXP 7.3              |
+      | Project Version | fix-pack-dxp-2-7310  |
+      | Patcher Status  | Adding               |
+      | Type            | Workaround           |
+    When I check the Patcher fix containing the content "${staticFixContent1}" and type "Workaround" for add completion
+    And I check the Patcher fix containing the content "${staticFixContent2}" and type "Workaround" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent1}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent1}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-1-7310        |
+      | Git Hash        | 439fdf4bb4                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Workaround                 |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    And I should be able to view a Patcher fix containing the content "${staticFixContent2}" and type "Workaround" with the following values
+      | Content         | ${staticFixContent2}       |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.3                    |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Git Hash        | 6a060a5d07                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Workaround                 |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+      | Product         | DXP 7.3                                   |
+      | Project Version | fix-pack-dxp-2-7310                       |
+      | Tickets List    | ${staticFixContent1},${staticFixContent2} |
+      | Account Code    | STVINTRA                                  |
+      | Support Ticket  | ${staticTicketNumber}                     |
+      | Merge Only      | true                                      |
+    And I set the account code "STVINTRA" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                |
+      | Support Ticket  | ${staticTicketNumber}   |
+      | Version         | 1.0                     |
+      | Project Version | fix-pack-dxp-2-7310     |
+      | Content         | 0 Fix Packs + 2 Tickets |
+      | Patcher Status  | Rebasing Merging Only   |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent1}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Name     | ${staticFixContent1} |
+      | Version  | 1.0                  |
+      | Status   | Rebasing             |
+      | Type     | Rebase               |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Name     | ${staticFixContent2} |
+      | Version  | 1.0                  |
+      | Git Hash | 6a060a5d07           |
+      | Status   | Complete             |
+      | Type     | Workaround           |
+    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for rebase completion
+    And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for merge completion
+    And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for compile completion using the "fixpack-builder-agent(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                   |
+      | Support Ticket  | ${staticTicketNumber}      |
+      | Version         | 1.0                        |
+      | Project Version | fix-pack-dxp-2-7310        |
+      | Content         | 0 Fix Packs + 2 Tickets    |
+      | Patcher Status  | Merging Only               |
+      | Jenkins         | fixpack-builder-agent(uat) |
+
+  Scenario: Create a 73 Liferay SOAP Connector for SharePoint build
+    @priority = "5"
+    @test.group = "11"
+    As a TSE, I should be able to create a 73 Liferay SOAP Connector for SharePoint build
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.3 Liferay SOAP Connector for SharePoint            |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310                   |
+      | Content         | ${staticFixContent}                                      |
+      | Branch Name     | LPS-135055                                               |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+      | Content         | ${staticFixContent}                           |
+      | Version         | 1.0                                           |
+      | Product         | DXP 7.3 Liferay SOAP Connector for SharePoint |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310        |
+      | Patcher Status  | Adding                                        |
+      | Type            | Patch                                         |
+    When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+      | Content         | ${staticFixContent}                           |
+      | Version         | 1.0                                           |
+      | Product         | DXP 7.3 Liferay SOAP Connector for SharePoint |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310        |
+      | Git Hash        | 4b6cb18c33                                    |
+      | Patcher Status  | Complete                                      |
+      | Type            | Patch                                         |
+      | Jenkins         | fixpack-builder-agent(uat)                    |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+      | Product         | DXP 7.3 Liferay SOAP Connector for SharePoint |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310        |
+      | Tickets List    | ${staticFixContent}                           |
+      | Account Code    | LIFERAYSECURITY                               |
+      | Support Ticket  | ${staticTicketNumber}                         |
+    And I set the account code "LIFERAYSECURITY" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LIFERAYSECURITY" with the following values
+      | Type            | Official                               |
+      | Support Ticket  | ${staticTicketNumber}                  |
+      | Version         | 1.0                                    |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310 |
+      | Content         | 0 Fix Packs + 1 Tickets                |
+      | Patcher Status  | Compiling                              |
+    And I should be able to view a Patcher build fix with the name "${staticFixContent}" for the ticket "${staticTicketNumber}" on the account "LIFERAYSECURITY" with the following values
+      | Name     | ${staticFixContent} |
+      | Version  | 1.0                 |
+      | Git Hash | 4b6cb18c33          |
+      | Status   | Complete            |
+      | Type     | Patch               |
+    And I check the Patcher build for the ticket "${staticTicketNumber}" on the account "LIFERAYSECURITY" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "LIFERAYSECURITY" with the following values
+      | Type            | Official                               |
+      | Support Ticket  | ${staticTicketNumber}                  |
+      | Version         | 1.0                                    |
+      | Project Version | marketplace-sharepoint-soap-6.0.0-7310 |
+      | Content         | 0 Fix Packs + 1 Tickets                |
+      | Patcher Status  | Complete                               |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat)         |
+      | Jenkins         | fixpack-builder-agent(uat)             |
