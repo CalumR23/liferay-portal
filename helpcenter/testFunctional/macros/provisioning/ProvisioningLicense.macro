@@ -139,12 +139,22 @@ definition {
 	macro clickReplaceButton {
 		Click(locator1 = "ProvisioningLicenseReplace#REPLACE_BUTTON");
 	}
+	@prose = "I click on the extend button on the extend license form"
+	macro clickExtendButton {
+		Click(locator1 = "ProvisioningLicenseExtend#EXTEND_BUTTON");
+	}
 
 	@prose = "I click on the replace button for the license in position ${positionValue} on the license page"
 	macro clickReplaceLicenseButton {
 		var key_positionValue = "${positionValue}";
 
 		Click(locator1 = "ProvisioningLicense#REPLACE_BUTTON");
+	}
+	@prose = "I click on the extend button for the license in position ${positionValue} on the license page"
+	macro clickExtendLicenseButton {
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicense#EXTEND_BUTTON");
 	}
 
 	@prose = "I obtain the license key ID value from the license details page"
@@ -457,6 +467,117 @@ definition {
 			}
 		}
 	}
+	@prose = "I populate the extend license form with the following values ${table}"
+	macro populateExtendLicenseForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Start Date") {
+				if (contains("${value}", ",")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+					var month = StringUtil.extractFirst("${value}", " ");
+
+					var fullMonth = KoroneikiProductPurchaseAPI._getFullMonthName(month = "${month}");
+
+					var year = StringUtil.extractLast("${value}", " ");
+
+					var day = StringUtil.replace("${value}", "${month} ", "");
+
+					var day = StringUtil.replace("${day}", ", ${year}", "");
+
+					var singleDigitDay = StringUtil.startsWith("${day}", "0");
+
+					if ("${singleDigitDay}" == "true") {
+						var day = StringUtil.replace("${day}", "0", "");
+					}
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_MONTH_SELECT",
+						value1 = "${fullMonth}");
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_YEAR_SELECT",
+						value1 = "${year}");
+
+					var key_day = "${day}";
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_DAY_BUTTON");
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+				}
+				else {
+					Click.pauseMakeVisibleClickAt(
+						locator1 = "ProvisioningLicenseExtend#START_DATE_FIELD",
+						value1 = "${value}");
+
+					Type(
+						locator1 = "ProvisioningLicenseExtend#START_DATE_FIELD",
+						value1 = "${value}");
+
+					KeyPress(
+						locator1 = "ProvisioningLicenseExtend#START_DATE_FIELD",
+						value1 = "\RETURN");
+				}
+			}
+			else if ("${field}" == "Expiration Date") {
+				if (contains("${value}", ",")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#EXPIRATION_DATE_PICKER_DROPDOWN_BUTTON");
+
+					var month = StringUtil.extractFirst("${value}", " ");
+
+					var fullMonth = KoroneikiProductPurchaseAPI._getFullMonthName(month = "${month}");
+
+					var year = StringUtil.extractLast("${value}", " ");
+
+					var day = StringUtil.replace("${value}", "${month} ", "");
+
+					var day = StringUtil.replace("${day}", ", ${year}", "");
+
+					var singleDigitDay = StringUtil.startsWith("${day}", "0");
+
+					if ("${singleDigitDay}" == "true") {
+						var day = StringUtil.replace("${day}", "0", "");
+					}
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_MONTH_SELECT",
+						value1 = "${fullMonth}");
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_YEAR_SELECT",
+						value1 = "${year}");
+
+					var key_day = "${day}";
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_DAY_BUTTON");
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#EXPIRATION_DATE_PICKER_DROPDOWN_BUTTON");
+
+				}
+				else {
+					Click.pauseMakeVisibleClickAt(
+						locator1 = "ProvisioningLicenseExtend#EXPIRATION_DATE_FIELD",
+						value1 = "${value}");
+
+					Type(
+						locator1 = "ProvisioningLicenseExtend#EXPIRATION_DATE_FIELD",
+						value1 = "${value}");
+
+					KeyPress(
+						locator1 = "ProvisioningLicenseExtend#EXPIRATION_DATE_FIELD",
+						value1 = "\RETURN");
+				}
+			}
+			else {
+				fail("No such replace license field ${field}.");
+			}
+		}
+	}
 
 	@prose = "I rename the first license key ID variable"
 	macro _renameFirstLicenseKeyIdVariable {
@@ -491,6 +612,12 @@ definition {
 		var key_positionValue = "${positionValue}";
 
 		AssertElementPresent(locator1 = "ProvisioningLicenseGenerateLicenseForm#CHOOSE_PRODUCT_PURCHASE_BUTTON_DISABLED");
+	}
+	@prose = "the choose button for the extend license in position ${positionValue} should be disabled"
+	macro viewDisabledChooseExtendLicenseButton {
+		var key_positionValue = "${positionValue}";
+
+		AssertElementPresent(locator1 = "ProvisioningLicenseExtend#EXTEND_BUTTON");
 	}
 
 	@prose = "the delete license button for the license with the keyword ${licenseKeyword} on the download license page should be disabled"
@@ -754,6 +881,12 @@ definition {
 		var key_positionValue = "${positionValue}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningLicense#REPLACE_BUTTON");
+	}
+	@prose = "I should not be able to view the extend button for the license in position ${positionValue} on the license page"
+	macro viewNoExtendLicenseButton {
+		var key_positionValue = "${positionValue}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningLicense#EXTEND_BUTTON");
 	}
 
 	@prose = "I should not be able to view the license with the keyword ${licenseKeyword} on the download license page"
