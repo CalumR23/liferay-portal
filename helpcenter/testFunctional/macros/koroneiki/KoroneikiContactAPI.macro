@@ -1419,52 +1419,6 @@ definition {
 		}
 	}
 
-	@prose = "I tear down the external links for the contact role ${contactRoleName} on koroneiki with the following entity id values ${table}"
-	macro _tearDownAccountExternalLinks {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var entityId = "${row[0]}";
-
-			if (contains("${contactRoleName}", " ")) {
-				var keyword = StringUtil.extractFirst("${contactRoleName}", " ");
-			}
-			else {
-				var keyword = "${contactRoleName}";
-			}
-
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?search=${keyword}\&pageSize=100
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				''';
-
-			var allAccounts = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${allAccounts}", "${accountName}")) {
-				var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-				var curl = '''
-					--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${contactRoleKey}/external-links
-					--header "API_Token: ${apiToken}"
-					-H "accept: application/json"
-					-H "Content-Type: application/json"
-					''';
-
-				var allAccountExternalLinks = JSONCurlUtil.get("${curl}", "$");
-
-				if (contains("${allAccountExternalLinks}", "${entityId}")) {
-					KoroneikiAccountAPI._deleteContactExternalLink(
-						entityId = "${entityId}",
-						domain = "${domain}");
-
-					echo("Entity ID of external link for ${contactRoleName} deleted: ${entityId}");
-				}
-			}
-		}
-	}
-
 	@prose = "I tear down the permissions for a koroneiki contact with the email address ${contactEmailAddress} set for a non permissioned user"
 	macro _tearDownContactPermissions {
 		var curl = '''

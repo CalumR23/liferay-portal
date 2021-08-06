@@ -646,80 +646,6 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I create an external link for the contact role ${contactRoleName} with the following values ${table}"
-	macro _createContactRoleExternalLink {
-		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Agent Name") {
-				var value = StringUtil.replace("${value}", " ", "%20");
-
-				var agentName = "${value}";
-			}
-			else if ("${field}" == "Domain") {
-				var domain = "${value}";
-			}
-			else if ("${field}" == "Entity Id") {
-				var entityId = "${value}";
-			}
-			else if ("${field}" == "Entity Name") {
-				var entityName = "${value}";
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-		}
-
-		if (!(isSet(agentName))) {
-			var agentName = "";
-		}
-		if (!(isSet(domain))) {
-			var domain = "";
-		}
-		if (!(isSet(entityId))) {
-			var entityId = "";
-		}
-		if (!(isSet(entityName))) {
-			var entityName = "";
-		}
-
-		if ("${agentName}" == "") {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/external-links
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"domain": "${domain}",
-					"entityId": "${entityId}",
-					"entityName": "${entityName}"
-				}
-				''';
-		}
-		else {
-			var curl = '''
-				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/external-links?agentName=${agentName}\&agentUID=a1b2c3d4-e5f6-g7h8-i9j1-0k11l12m13n1
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"domain": "${domain}",
-					"entityId": "${entityId}",
-					"entityName": "${entityName}"
-				}
-				''';
-		}
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I create a nested field for the account entitlement coming from the entitlement definition ${entitlementDefinitionName}"
 	macro _createAccountEntitlementNestedField {
 		var entitlementDefinitionKey = KoroneikiAccountAPI._getAccountEntitlementDefinitionKey(entitlementDefinitionName = "${entitlementDefinitionName}");
@@ -1680,22 +1606,6 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I delete an external link with the entity id ${entityId} on the contact role ${contactRoleName}"
-	macro _deleteContactExternalLink {
-		var externalLinkKey = KoroneikiAccountAPI._getContactRoleExternalLinkKey(
-			contactRoleName = "${contactRoleName}",
-			entityId = "${entityId}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/external-links/${externalLinkKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-	}
-
 	@prose = "I delete an external link with the entity id ${entityId} on the account ${accountName} executed by ${agentName}"
 	macro _deleteAccountExternalLinkExecutedByAgent {
 		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKey(
@@ -1896,31 +1806,6 @@ definition {
 		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
 
 		echo("External link key value for ${entityId} on account ${accountName}: ${externalLinkKey}");
-
-		return "${externalLinkKey}";
-	}
-
-	macro _getContactRoleExternalLinkKey {
-		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.domain=='${domain}')].key");
-
-		var externalLinkKey = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].key");
-
-		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "[", "");
-
-		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
-
-		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
-
-		echo("External link key value for ${entityId} on contact role ${contactRoleName}");
 
 		return "${externalLinkKey}";
 	}
@@ -5159,74 +5044,6 @@ definition {
 		}
 	}
 
-	@prose = "the external link with the entity id ${entityId} and domain ${domain} should be present on the contact role ${contactRoleName} with the following values ${table}"
-	macro _viewContactRoleOnExternalLinkViaIdAndDomain {
-		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Domain") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].domain");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Id") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].entityId");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "Entity Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].entityName");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "URL") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}' && @.domain=='${domain}')].url");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\/", "/");
-			}
-			else {
-				fail("No such external link field ${field}");
-			}
-
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
-
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
-			}
-		}
-	}
-
 	@prose = "the team with the name ${teamName} should be part of the account ${accountName}"
 	macro _viewAccountTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -5950,24 +5767,6 @@ definition {
 
 		if (contains("${allAccountExternalLinks}", "${entityId}")) {
 			fail("The external link with the entity id ${entityId} is on the account with the name ${accountName}");
-		}
-	}
-
-	@prose = "the external link with the entity id ${entityId} should not be present on the contact role ${contactRoleName}"
-	macro _viewNoAccountExternalLinkOnContactRole {
-		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${contactRoleKey}/external-links
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allAccountExternalLinks = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allAccountExternalLinks}", "${entityId}")) {
-			fail("The external link with the entity id ${entityId} is on the contact role with the name ${contactRoleName}");
 		}
 	}
 
