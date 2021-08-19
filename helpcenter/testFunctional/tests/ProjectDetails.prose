@@ -1876,3 +1876,89 @@ Scenario: View project with detached licenses
 	| Instance Size    | -                                |
 	| Quantity         | 0                                |
 	| Provisioned      | 1                                |
+
+Scenario: View partner account 
+	@ help.center.smoke = "true"
+	Projects created in PJD should have certain elements visible to partners in the project details page.
+
+	Given I log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
+	And I go to the Project Details page
+	And I search for the project with the name "Zenpar - ${staticCompanyName}"
+	And I go to the project with the name "Zenpar - ${staticCompanyName}"
+	Then the project details with the following values should be visible
+	| Project Code    | ZENPARZENPAR                  |
+	| State           | ACTIVE                        |
+	| Level           | Not Applicable                |
+	| Support Region  | -                             |
+	When I go to the Team Members tab
+	Then the team member with the name "PJD Partner1" should be visible with the following values
+	| Name  | PJD Partner1                        |
+	| Role  | Partner Manager                     |
+	| Email | pjd.partner1@lrpartner.com.broken   |
+	When I go to the Offerings tab
+	Then the offering with the product name "Service Partnership" should be visible with the following values
+	| Product          | Service Partnership   |
+	| Start Date       | Today                 |
+#	| Support End Date | 1 year from now       |
+	| Instance Size    | -                     |
+	| Quantity         | 1                     |
+	| Provisioned      | 0                     |
+	| State            | ACTIVE                |
+
+Scenario: View partner account as a partner
+	Projects created in PJD should be visible to a partner in the project details page.
+
+	Given I create a product purchase for an account with the name "Zenpar - ${staticCompanyName}" and the product "Service Partnership" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Service Partnership"
+	And I wait for "1" minutes
+	Then the support organization with the code "ZENPARZENPAR" should be part of the support site
+	And the support user with the email address "pjd.partner1@lrpartner.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "pjd.partner1@lrpartner.com.broken" to "osbadminqauser"
+	And I assign the support user with the email address "pjd.partner1@lrpartner.com.broken" to the support group "Help Center"
+	And I log out and log into the support homepage as "pjd.partner1@lrpartner.com.broken" with password "osbadminqauser"
+	And I go to the Project Details page
+	And I go to the project with the name "Zenpar - ${staticCompanyName}"
+	And I go to the Team Members tab
+	Then the team member with the name "PJD Partner1" should be visible with the following values
+	| Name  | PJD Partner1                        |
+	| Role  | Partner Manager                     |
+	| Email | pjd.partner1@lrpartner.com.broken   |
+	When I go to the Offerings tab
+	Then the offering with the product name "Service Partnership" should be visible with the following values
+	| Product          | Service Partnership   |
+	| Start Date       | Today                 |
+#	| Support End Date | 1 year from now       |
+	| Instance Size    | -                     |
+	| Quantity         | 2                     |
+	| Provisioned      | 0                     |
+	| State            | ACTIVE                |
+
+Scenario: View a partner user access the Self Provisioning portlet
+	Partner user should be able to access the Self Provisioning portlet.
+
+	Given I create a product purchase for an account with the name "Zenpar - ${staticCompanyName}" and the product "Commerce Subscription Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Partner - Commerce"
+	And I wait for "1" minutes
+	Then the support organization with the code "ZENPARZENPAR" should be part of the support site
+	And I assign the web user with the email address "pjd.partner1@lrpartner.com.broken" to the web organization "Liferay, Inc."
+	And I assign the web user with the email address "pjd.partner1@lrpartner.com.broken" to the web role "Verified User"
+	Then the support user with the email address "pjd.partner1@lrpartner.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "pjd.partner1@lrpartner.com.broken" to "osbadminqauser"
+	And I log out and log into the support homepage as "pjd.partner1@lrpartner.com.broken" with password "osbadminqauser"
+	And I go to the Self Provisioning page
+	Then I should be able to view the following options in the Self Provisioning portlet
+	| Project | Liferay, Inc.          |
+	| Product | Commerce Subscription  |
+	| Version | 1                      |
