@@ -7633,7 +7633,7 @@ Scenario: Update subscription with no salesforce opportunity key
 	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
 	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
 	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
-	| Portal Production | Grace Period End Date      | ${staticYyyyMmDdEndDate}          |
+	| Portal Production | Grace Period               | 30                                |
 	Then I should be able to view the following subscription values in the subscription details page
 	| Name         | Portal Production                                     |
 	| State        | ACTIVE                                                |
@@ -7733,11 +7733,11 @@ Scenario: Update subscriptions with no salesforce opportunity keys
 	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
 	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
 	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
-	| Portal Production | Grace Period End Date      | ${staticYyyyMmDdEndDate}          |
+	| Portal Production | Grace Period               | 30                                |
 	| Gold Subscription | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
 	| Gold Subscription | Start Date                 | ${staticYyyyMmDdStartDate}        |
 	| Gold Subscription | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
-	| Gold Subscription | Grace Period End Date      | ${staticYyyyMmDdEndDate}          |
+	| Gold Subscription | Grace Period               | 30                                |
 	And I click on the "Portal Production" subscription link
 	Then I should be able to view the following subscription values in the subscription details page
 	| Name         | Portal Production                                     |
@@ -7759,6 +7759,110 @@ Scenario: Update subscriptions with no salesforce opportunity keys
 	And I click on the "Gold Subscription" subscription link
 	Then I should be able to view the following subscription values in the subscription details page
 	| Name         | Gold Subscription                                     |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 0                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 0                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| State                      | ACTIVE                                                |
+
+Scenario: View grace period field validation on subscription form 
+	Testing the validation of a grace period field on subscription form 
+
+	Given I generate several static variables for Provisioning
+	And I generate a provisioning company name
+	And I generate a provisioning project name
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Subkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sub.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SUB                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sub.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SUB                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korsub - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static yyyymmdd start and end dates
+	And I create a product consumption for an account with the name "Korsub - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I create a product purchase for an account with the name "Korsub - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "Portal Production" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}"
+	And I populate the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
+	| Portal Production | Grace Period               | -1                                |
+	Then I should be able to view the subscription form error message with the text "Invalid Date"
+	And I should be able to view the subscription form error message with the text "Please make sure the start date is before the end date and the grace period is a positive number"
+	And the save button on the subscription form should be disabled
+	And I populate the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
+	| Portal Production | Grace Period               | 100000000                         |
+	Then I should be able to view the subscription form error message with the text "Invalid Date"
+	And I should be able to view the subscription form error message with the text "Please make sure the start date is before the end date and the grace period is a positive number"
+	And the save button on the subscription form should be disabled
+	And I populate the subscription form with the following values
+	| Portal Production | Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
+	| Portal Production | Start Date                 | ${staticYyyyMmDdStartDate}        |
+	| Portal Production | End Date                   | ${staticYyyyMmDdOriginalEndDate}  |
+	| Portal Production | Grace Period               | 30                                |
+	And I click on the save button on the subscription form
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | Portal Production                                     |
 	| State        | ACTIVE                                                |
 	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
 	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
