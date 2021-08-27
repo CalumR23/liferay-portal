@@ -43,6 +43,50 @@ definition {
 			expected="${expectedValue}");
 	}
 
+	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} and ${jenkinsValue} Jenkins job"
+	macro checkForJenkinsLink {
+        PatcherAccount.gotoAccount(accountCode = "${accountCode}");
+        var key_supportTicket = "${supportTicket}";
+        var key_jenkinsValue = "${jenkinsValue}";
+
+        while (IsElementNotPresent(locator1 = "Patcher#BUILD_ID")) {
+            Refresh();
+
+            PatcherSearch.searchAdvanced(
+                accountCodeKeyword = "${accountCode}",
+                supportTicketKeyword = "${supportTicket}");
+        }
+
+        var jenkinsLinkUrl = selenium.getAttribute("//tr[contains(.,'${key_supportTicket}')]/td[9]/a[contains(.,'${key_jenkinsValue}')]@href");
+
+        var jenkinsJobStatus = "Not Found";
+        while (("${jenkinsJobStatus}" == "In Progress") || ("${jenkinsJobStatus}" == "Not Found")) {
+            Open(locator1 = "${jenkinsLinkUrl}");
+
+            if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_FAILED")) {
+                var jenkinsJobStatus = "Failed";
+            }
+            else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_SUCCESS")) {
+                var jenkinsJobStatus = "Success";
+            }
+            else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_IN_PROGRESS")) {
+                var jenkinsJobStatus = "In Progress";
+            }
+            else if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_STATUS_ABORTED")) {
+                var jenkinsJobStatus = "Aborted";
+            }
+            else {
+                var jenkinsJobStatus = "Not Found";
+            }
+        }
+
+		TestUtils.assertEquals(
+			actual="${jenkinsJobStatus}",
+			expected="Success");
+
+		Patcher.openURL();
+	}
+
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion using the ${jenkinsValue} Jenkins job"
 	macro checkForCompileCompletion {
 		PatcherAccount.gotoAccount(accountCode = "${accountCode}");
@@ -394,7 +438,7 @@ definition {
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Merging") && (maxIterations = "30")) {
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && (("${buildPatcherStatus}" == "Merging") || ("${buildPatcherStatus}" == "Merging Only")) && (maxIterations = "30")) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			Patcher.pause(timeInSeconds = "${buildMergeCompletionPollIntervalInSeconds}");
@@ -445,7 +489,7 @@ definition {
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && ("${buildPatcherStatus}" == "Rebasing") && (maxIterations = "30")) {
+		while ((!("${currentIteration}" == "${buildCompletionPollMaximumIterations}")) && (("${buildPatcherStatus}" == "Rebasing") || ("${buildPatcherStatus}" == "Rebasing Merging Only")) && (maxIterations = "30")) {
 			var currentIteration = MathUtil.sum("${currentIteration}", "1");
 
 			Patcher.pause(timeInSeconds = "${buildRebaseCompletionPollIntervalInSeconds}");
