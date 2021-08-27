@@ -1,4 +1,5 @@
 definition {
+
 	var buildCompileCompletionPollIntervalInMinutes = PropsUtil.get("build.compile.completion.poll.interval.in.minutes");
 	var buildMergeCompletionPollIntervalInSeconds = PropsUtil.get("build.merge.completion.poll.interval.in.seconds");
 	var buildRebaseCompletionPollIntervalInSeconds = PropsUtil.get("build.rebase.completion.poll.interval.in.seconds");
@@ -8,23 +9,6 @@ definition {
 	var patcherAdminPassword = PropsUtil.get("patcher.admin.password");
 	var portalURL = PropsUtil.get("portal.url");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
-
-	macro assertTroubleshootingSuggestionsValue {
-		WaitForSPARefresh();
-
-		var javascript = '''
-			function getWebElement(locator) {
-				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-			}
-			return getWebElement("//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]")["value"];
-		''';
-
-		var propertyValue = selenium.getEval("${javascript}");
-
-		TestUtils.assertEquals(
-			actual="${propertyValue}",
-			expected="${expectedValue}");
-	}
 
 	macro assertTicketListValue {
 		WaitForSPARefresh();
@@ -39,8 +23,25 @@ definition {
 		var propertyValue = selenium.getEval("${javascript}");
 
 		TestUtils.assertEquals(
-			actual="${propertyValue}",
-			expected="${expectedValue}");
+			actual = "${propertyValue}",
+			expected = "${expectedValue}");
+	}
+
+	macro assertTroubleshootingSuggestionsValue {
+		WaitForSPARefresh();
+
+		var javascript = '''
+			function getWebElement(locator) {
+				return document.evaluate(locator, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+			}
+			return getWebElement("//textarea[contains(@id,'osbpatcherportlet_troubleshootingTicketList')]")["value"];
+		''';
+
+		var propertyValue = selenium.getEval("${javascript}");
+
+		TestUtils.assertEquals(
+			actual = "${propertyValue}",
+			expected = "${expectedValue}");
 	}
 
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} and ${jenkinsValue} Jenkins job"
@@ -80,11 +81,66 @@ definition {
             }
         }
 
-		TestUtils.assertEquals(
-			actual="${jenkinsJobStatus}",
-			expected="Success");
+	@prose = "I check build for new account with Troubleshooting tickets with the following values ${table}"
+	macro checkBuildForNewAccountWithTroubleshootingTickets {
+		Patcher.gotoAccounts();
 
-		Patcher.openURL();
+		AssertClick(
+			locator1 = "Patcher#CREATE_BUTTON",
+			value1 = "Create Build for New Account");
+
+		Patcher.pause(timeInSeconds = "1");
+
+		var RawTable rawTable = new RawTable("${table}");
+		var initialTicketsList = "";
+		var ticketSuggestions = "";
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Product") {
+				Select(
+					locator1 = "PatcherBuildAdd#PRODUCT_VERSION_SELECT",
+					value1 = "${value}");
+
+				Patcher.pause(timeInSeconds = "5");
+			}
+			else if ("${field}" == "Project Version") {
+				Select(
+					locator1 = "PatcherBuildAdd#PROJECT_VERSION_SELECT",
+					value1 = "${value}");
+
+				Patcher.pause(timeInSeconds = "5");
+			}
+			else if ("${field}" == "Tickets List") {
+				Type(
+					locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
+					value1 = "${value}");
+
+				var initialTicketsList = "${value}";
+
+				Patcher.pause(timeInSeconds = "1");
+			}
+			else if ("${field}" == "Troubleshooting Ticket Suggestions") {
+				var ticketSuggestions = "${value}";
+			}
+		}
+
+		Patcher.pause(timeInSeconds = "5");
+
+		PatcherBuild.assertTroubleshootingSuggestionsValue(expectedValue = "${ticketSuggestions}");
+
+		Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
+
+		Patcher.pause(timeInSeconds = "1");
+
+		if (!("${initialTicketsList}" == "")) {
+			PatcherBuild.assertTicketListValue(expectedValue = "${initialTicketsList},${ticketSuggestions}");
+		}
+		else {
+			PatcherBuild.assertTicketListValue(expectedValue = "${ticketSuggestions}");
+		}
 	}
 
 	@prose = "I check the Patcher build for the ticket ${supportTicket} on the account ${accountCode} for compile completion using the ${jenkinsValue} Jenkins job"
@@ -610,7 +666,7 @@ definition {
 					Patcher.pause(timeInSeconds = "1");
 				}
 				else {
-					Uncheck(locator1 = "PatcherBuildAdd#MERGE_ONLY_CHECKBOX");			
+					Uncheck(locator1 = "PatcherBuildAdd#MERGE_ONLY_CHECKBOX");
 
 					Patcher.pause(timeInSeconds = "1");
 				}
@@ -622,7 +678,7 @@ definition {
 					Patcher.pause(timeInSeconds = "1");
 				}
 				else {
-					Uncheck(locator1 = "PatcherBuildAdd#SMOKE_TEST_CHECKBOX");			
+					Uncheck(locator1 = "PatcherBuildAdd#SMOKE_TEST_CHECKBOX");
 
 					Patcher.pause(timeInSeconds = "1");
 				}
@@ -649,68 +705,6 @@ definition {
 			value1 = "Add");
 
 		Message.success();
-	}
-
-	@prose = "I check build for new account with Troubleshooting tickets with the following values ${table}"
-	macro checkBuildForNewAccountWithTroubleshootingTickets {
-		Patcher.gotoAccounts();
-
-		AssertClick(
-			locator1 = "Patcher#CREATE_BUTTON",
-			value1 = "Create Build for New Account");
-
-		Patcher.pause(timeInSeconds = "1");
-
-		var RawTable rawTable = new RawTable("${table}");
-		var initialTicketsList = "";
-		var ticketSuggestions = "";
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Product") {
-				Select(
-					locator1 = "PatcherBuildAdd#PRODUCT_VERSION_SELECT",
-					value1 = "${value}");
-
-				Patcher.pause(timeInSeconds = "5");
-			}
-			else if ("${field}" == "Project Version") {
-				Select(
-					locator1 = "PatcherBuildAdd#PROJECT_VERSION_SELECT",
-					value1 = "${value}");
-
-				Patcher.pause(timeInSeconds = "5");
-			}
-			else if ("${field}" == "Tickets List") {
-				Type(
-					locator1 = "PatcherBuildAdd#TICKETS_LIST_FIELD",
-					value1 = "${value}");
-
-				var initialTicketsList = "${value}";
-
-				Patcher.pause(timeInSeconds = "1");
-			}
-			else if ("${field}" == "Troubleshooting Ticket Suggestions") {
-				var ticketSuggestions = "${value}";
-			}
-		}
-
-		Patcher.pause(timeInSeconds = "5");
-
-		PatcherBuild.assertTroubleshootingSuggestionsValue(expectedValue = "${ticketSuggestions}");
-
-		Click(locator1 = "PatcherBuildAdd#ADD_TROUBLESHOOTING_TICKET_SUGGESTIONS");
-
-		Patcher.pause(timeInSeconds = "1");
-
-		if (!("${initialTicketsList}" == "")) {
-			PatcherBuild.assertTicketListValue(expectedValue = "${initialTicketsList},${ticketSuggestions}");
-		}
-		else {
-			PatcherBuild.assertTicketListValue(expectedValue = "${ticketSuggestions}");
-		}
 	}
 
 	macro editFix {
@@ -1114,7 +1108,7 @@ definition {
 					AssertElementPresent(locator1 = "Patcher#BUILD_OBSOLETE_ICON");
 				}
 				else {
-					AssertElementNotPresent(locator1 = "Patcher#BUILD_OBSOLETE_ICON");			
+					AssertElementNotPresent(locator1 = "Patcher#BUILD_OBSOLETE_ICON");
 				}
 			}
 			else if ("${field}" == "Build ID") {
@@ -1388,4 +1382,5 @@ definition {
 
 		Navigator.closeIframe();
 	}
+
 }
