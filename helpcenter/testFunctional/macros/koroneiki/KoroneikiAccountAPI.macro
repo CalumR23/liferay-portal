@@ -5,6 +5,16 @@ definition {
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
+	@prose = "the account date modified value ${accountDateModifiedValue1} should be different from the ${accountDateModifiedValue2}"
+	macro _assertDifferentAccountDateModifiedValuesFirst {
+		echo("First Account Date Modified Value: ${accountDateModifiedValue1}");
+		echo("Second Account Date Modified Value: ${accountDateModifiedValue2}");
+
+		if ("${accountDateModifiedValue1}" == "${accountDateModifiedValue2}") {
+			fail("The two account modified date values ${accountDateModifiedValue1} and ${accountDateModifiedValue2} are the same.");
+		}
+	}
+
 	@prose = "I assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles ${table}"
 	macro _assignContactRolesToContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -1745,6 +1755,22 @@ definition {
 		return "${auditEntryKey}";
 	}
 
+	@prose = "I obtain the date modified value for the account ${accountName}"
+	macro _getAccountDateModifiedValue {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		static var staticAccountDateModifiedValue = JSONCurlUtil.get("${curl}", "$.dateModified");
+
+		return "${staticAccountDateModifiedValue}";
+	}
+
 	macro _getAccountEntitlementDefinitionExternalLinkKey {
 		var curl = '''
 			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions
@@ -1808,61 +1834,6 @@ definition {
 		echo("External link key value for ${entityId} on account ${accountName}: ${externalLinkKey}");
 
 		return "${externalLinkKey}";
-	}
-
-@prose = "I obtain the date modified value for the account ${accountName}"
-	macro _getAccountDateModifiedValue {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		static var staticAccountDateModifiedValue = JSONCurlUtil.get("${curl}", "$.dateModified");
-
-		return "${staticAccountDateModifiedValue}";
-	}
-
-	@prose = "I rename the first account date modified value"
-	macro _renameFirstAccountDateModifiedValue {
-        static var staticAccountDateModifiedValue1 = "${staticAccountDateModifiedValue}";
-
-		return "${staticAccountDateModified1Value1}";
-    }
-
-
-	@prose = "I rename the second account date modified value"
-	macro _renameSecondAccountDateModifiedValue {
-		static var staticAccountDateModifiedValue2 = "${staticAccountDateModifiedValue}";
-
-		return "${staticAccountDateModifiedValue2}";
-	}
-
-	@prose = "I rename the third account date modified value"
-	macro _renameThirdAccountDateModifiedValue {
-		static var staticAccountDateModifiedValue3 = "${staticAccountDateModifiedValue}";
-
-		return "${staticAccountDateModifiedValue3}";
-	}
-
-	@prose = "I rename the fourth account date modified value"
-	macro _renameFourthAccountDateModifiedValue {
-		static var staticAccountDateModifiedValue4 = "${staticAccountDateModifiedValue}";
-
-		return "${staticAccountDateModifiedValue4}";
-	}
-
-	@prose = "the account date modified value ${accountDateModifiedValue1} should be different from the ${accountDateModifiedValue2}"
-	macro _assertDifferentAccountDateModifiedValuesFirst {
-		echo("First Account Date Modified Value: ${accountDateModifiedValue1}");
-		echo("Second Account Date Modified Value: ${accountDateModifiedValue2}");
-
-		if ("${accountDateModifiedValue1}" == "${accountDateModifiedValue2}") {
-			fail("The two account modified date values ${accountDateModifiedValue1} and ${accountDateModifiedValue2} are the same.");
-		}
 	}
 
 	macro _getAccountExternalLinkKeyViaIdAndDomain {
@@ -2418,6 +2389,13 @@ definition {
 		}
 	}
 
+	@prose = "I rename the first account date modified value"
+	macro _renameFirstAccountDateModifiedValue {
+        static var staticAccountDateModifiedValue1 = "${staticAccountDateModifiedValue}";
+
+		return "${staticAccountDateModified1Value1}";
+    }
+
 	@prose = "I rename the first account external link nested field variable"
 	macro _renameFirstAccountExternalLinkNestedFieldVariable {
 		static var staticAccountExternalLinksNestedField1 = "${staticAccountExternalLinksNestedField}";
@@ -2458,6 +2436,13 @@ definition {
 		static var staticProductPurchasesNestedField1 = "${staticProductPurchasesNestedField}";
 
 		return "${staticProductPurchasesNestedField1}";
+	}
+
+	@prose = "I rename the second account date modified value"
+	macro _renameSecondAccountDateModifiedValue {
+		static var staticAccountDateModifiedValue2 = "${staticAccountDateModifiedValue}";
+
+		return "${staticAccountDateModifiedValue2}";
 	}
 
 	@prose = "I rename the second account external link nested field variable"
@@ -2502,6 +2487,13 @@ definition {
 		return "${staticProductPurchasesNestedField2}";
 	}
 
+	@prose = "I rename the third account date modified value"
+	macro _renameThirdAccountDateModifiedValue {
+		static var staticAccountDateModifiedValue3 = "${staticAccountDateModifiedValue}";
+
+		return "${staticAccountDateModifiedValue3}";
+	}
+
 	@prose = "I rename the third account external link nested field variable"
 	macro _renameThirdAccountExternalLinkNestedFieldVariable {
 		static var staticAccountExternalLinksNestedField3 = "${staticAccountExternalLinksNestedField}";
@@ -2543,6 +2535,14 @@ definition {
 
 		return "${staticProductPurchasesNestedField3}";
 	}
+
+	@prose = "I rename the fourth account date modified value"
+	macro _renameFourthAccountDateModifiedValue {
+		static var staticAccountDateModifiedValue4 = "${staticAccountDateModifiedValue}";
+
+		return "${staticAccountDateModifiedValue4}";
+	}
+
 
 	@prose = "I rename the fourth product purchase nested field variable"
 	macro _renameFourthProductPurchaseNestedFieldVariable {
