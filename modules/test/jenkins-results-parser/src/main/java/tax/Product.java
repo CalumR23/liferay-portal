@@ -14,41 +14,68 @@
 
 package tax;
 
+import com.liferay.poshi.core.util.GetterUtil;
+
 /**
  * @author Calum Ragan
  */
 public class Product {
-    int quantity;
-    boolean exempt = false;
-    boolean imported = false;
-    double amount;
 
-    public void parseProducts(String input){
-      String[] parsedArray = input.split("/n");
-      for (String product : parsedArray){
-          createProduct(product);
-      }
-    };
+	public Product(String input) {
+		parseInput(input);
+	}
 
-    public void createProduct(String product){
-        String[] productArray = product.split(" ");
-        quantity = Integer.parseInt(productArray[0]);
-        amount = Double.parseDouble(
-                productArray[productArray.length - 1]);
+	public double getAmount() {
+		return _amount;
+	}
 
-        for (String word : productArray) {
-            if (word.equals("book") || word.equals("chocolate") ||
-                    word.equals("pills")) {
+	public boolean getExported() {
+		return _exempt;
+	}
 
-                exempt = true;
-            };
+	public boolean getImported() {
+		return _imported;
+	}
 
-            if (word.equals("imported")) {
-                imported = true;
-            };
-        };
+	public String getName() {
+		return _name;
+	}
 
+	public double getTaxedAmount() {
+		return _taxedAmount;
+	}
 
+	public void parseInput(String product) {
+		String[] productArray = product.split(" ");
 
-    }
-};
+		_quantity = GetterUtil.getInteger(productArray[0]);
+
+		_amount = GetterUtil.getDouble(productArray[productArray.length - 1]);
+
+		_name = product;
+
+		for (String word : productArray) {
+			if (word.equals("book") || word.contains("chocolate") ||
+				word.equals("pills")) {
+
+				_exempt = true;
+			}
+
+			if (word.equals("imported")) {
+				_imported = true;
+			}
+		}
+	}
+
+	public void setTaxedAmount(double newAmount) {
+		_taxedAmount = newAmount;
+	}
+
+	private double _amount;
+	private boolean _exempt;
+	private boolean _imported;
+	private String _name;
+	private int _quantity;
+	private double _taxedAmount;
+
+}
