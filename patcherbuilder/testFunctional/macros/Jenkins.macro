@@ -1,4 +1,5 @@
 definition {
+
 	var jobCompletionPollIntervalInMinutes = PropsUtil.get("job.completion.poll.interval.in.minutes");
 	var jobCompletionPollMaximumIterations = PropsUtil.get("job.completion.poll.maximum.iterations");
 
@@ -56,7 +57,9 @@ definition {
 	}
 
 	macro clickConsoleOutputLink {
-		AssertClick(locator1 = "Jenkins#CONSOLE_OUTPUT_LINK", value1 = "Console Output");
+		AssertClick(
+			locator1 = "Jenkins#CONSOLE_OUTPUT_LINK",
+			value1 = "Console Output");
 	}
 
 	macro clickFullLogLink {
@@ -132,6 +135,84 @@ definition {
 		Open(locator1 = "/view/All");
 	}
 
+	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
+	macro patchingToolInstallAndRevert {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var jenkinsSlaveNumber = Jenkins.checkLinkToSlave(jobName = "fixpack-builder-hotfix-7x(2x-uat)");
+		var mirrorUser = PropsUtil.get("mirror.user");
+		var mirrorPassword = PropsUtil.get("mirror.password");
+		var portalUrl = PropsUtil.get("portal.url");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "bundle") {
+				var bundle = "${value}";
+			}
+			else if ("${field}" == "fixPack") {
+				var fixPack = "${value}";
+			}
+			else if ("${field}" == "hotfix") {
+				var hotfix = "${value}";
+			}
+			else if ("${field}" == "patchingTool") {
+				var patchingTool = "${value}";
+			}
+			else if ("${field}" == "patchingToolMajorVersion") {
+				var patchingToolMajorVersion = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for ${value}");
+			}
+		}
+
+		if (!(isSet(bundle))) {
+			var bundle = "";
+		}
+
+		if (!(isSet(fixPack))) {
+			var fixPack = "";
+		}
+
+		if (!(isSet(hotfix))) {
+			var hotfix = "";
+		}
+
+		if (!(isSet(patchingTool))) {
+			var patchingTool = "";
+		}
+
+		if (contains("${patchingTool}", "LATEST")) {
+			var curlLatestPatchingTool = '''
+				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
+				 -u ${mirrorUser}:${mirrorPassword}
+			''';
+
+			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
+
+			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
+
+			var trimmedLatestVersion = StringUtil.trim("${latestVersion}");
+
+			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${trimmedLatestVersion}");
+		}
+
+		var curl = '''
+			 ${portalUrl}/view/All/job/test-fixpack-builder-install-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			 -d bundle=${bundle}
+			 -d fixPack=${fixPack}
+			 -d hotfix=${hotfix}
+			 -d patchingTool=${patchingTool}
+			 ''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-install-revert(2x-uat)");
+	}
+
 	@prose = "I wait for ${timeInSeconds} seconds"
 	macro pause {
 		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
@@ -146,65 +227,6 @@ definition {
 		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
 
 		Pause(locator1 = "${timeInMilliseconds}");
-	}
-
-	@prose = "I start the fixpack-builder-fixpack-7x uat job with the following parameters ${table}"
-	macro startFixpackBuilderFixpack7xJob {
-		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
-		var portalUrl = PropsUtil.get("portal.url");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "fix.pack.fixed.issues") {
-				var fixPackFixedIssues = "${value}";
-			}
-			else if ("${field}" == "fix.pack.id") {
-				var fixPackId = "${value}";
-			}
-			else if ("${field}" == "git.revision") {
-				var gitRevision = "${value}";
-			}
-			else if ("${field}" == "runBuilderUpToPublishAppsOnly") {
-				var runBuilderUpToPublishAppsOnly = "${value}";
-			}
-			else if ("${field}" == "checkStaleArtifactsSkip") {
-				var checkStaleArtifactsSkip = "${value}";
-			}
-			else {
-				fail("No such Jenkins job field ${field} for fixpack-builder-fixpack-7x(uat)");
-			}
-		}
-
-		if (!(isSet(fixPackFixedIssues))) {
-			var fixPackFixedIssues = "";
-		}
-		if (!(isSet(fixPackId))) {
-			var fixPackId = "";
-		}
-		if (!(isSet(gitRevision))) {
-			var gitRevision = "";
-		}
-		if (!(isSet(runBuilderUpToPublishAppsOnly))) {
-			var runBuilderUpToPublishAppsOnly = "false";
-		}
-		if (!(isSet(checkStaleArtifactsSkip))) {
-			var checkStaleArtifactsSkip = "false";
-		}
-
-		var curl = '''
-			${portalUrl}/view/All/job/fixpack-builder-fixpack-7x\(uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
-			-d fix.pack.fixed.issues=${fixPackFixedIssues}
-			-d fix.pack.id=${fixPackId}
-			-d git.revision=${gitRevision}
-			-d runBuilderUpToPublishAppsOnly=${runBuilderUpToPublishAppsOnly}
-			-d checkStaleArtifactsSkip=${checkStaleArtifactsSkip}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
 	@prose = "I start the fixpack-builder-agent job with the following parameters ${table}"
@@ -262,36 +284,47 @@ definition {
 		if (!(isSet(osbPatcherBaseCommittish))) {
 			var osbPatcherBaseCommittish = "";
 		}
+
 		if (!(isSet(osbPatcherCommittish))) {
 			var osbPatcherCommittish = "";
 		}
+
 		if (!(isSet(osbPatcherFixIds))) {
 			var osbPatcherFixIds = "";
 		}
+
 		if (!(isSet(osbPatcherGitRemoteUrl))) {
 			var osbPatcherGitRemoteUrl = "";
 		}
+
 		if (!(isSet(osbPatcherPatcherFixId))) {
 			var osbPatcherPatcherFixId = "";
 		}
+
 		if (!(isSet(osbPatcherProductVersion))) {
 			var osbPatcherProductVersion = "";
 		}
+
 		if (!(isSet(osbPatcherRebase))) {
 			var osbPatcherRebase = "";
 		}
+
 		if (!(isSet(osbPatcherRepository))) {
 			var osbPatcherRepository = "";
 		}
+
 		if (!(isSet(osbPatcherType))) {
 			var osbPatcherType = "";
 		}
+
 		if (!(isSet(patcherFixDeliveryMethod))) {
 			var patcherFixDeliveryMethod = "";
 		}
+
 		if (!(isSet(patcherRequestKey))) {
 			var patcherRequestKey = "";
 		}
+
 		if (!(isSet(patcherUserId))) {
 			var patcherUserId = "";
 		}
@@ -310,6 +343,69 @@ definition {
 			-d patcher.fix.delivery.method=${patcherFixDeliveryMethod}
 			-d patcher.request.key=${patcherRequestKey}
 			-d patcher.user.id=${patcherUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I start the fixpack-builder-fixpack-7x uat job with the following parameters ${table}"
+	macro startFixpackBuilderFixpack7xJob {
+		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+		var portalUrl = PropsUtil.get("portal.url");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "fix.pack.fixed.issues") {
+				var fixPackFixedIssues = "${value}";
+			}
+			else if ("${field}" == "fix.pack.id") {
+				var fixPackId = "${value}";
+			}
+			else if ("${field}" == "git.revision") {
+				var gitRevision = "${value}";
+			}
+			else if ("${field}" == "runBuilderUpToPublishAppsOnly") {
+				var runBuilderUpToPublishAppsOnly = "${value}";
+			}
+			else if ("${field}" == "checkStaleArtifactsSkip") {
+				var checkStaleArtifactsSkip = "${value}";
+			}
+			else {
+				fail("No such Jenkins job field ${field} for fixpack-builder-fixpack-7x-uat");
+			}
+		}
+
+		if (!(isSet(fixPackFixedIssues))) {
+			var fixPackFixedIssues = "";
+		}
+
+		if (!(isSet(fixPackId))) {
+			var fixPackId = "";
+		}
+
+		if (!(isSet(gitRevision))) {
+			var gitRevision = "";
+		}
+
+		if (!(isSet(runBuilderUpToPublishAppsOnly))) {
+			var runBuilderUpToPublishAppsOnly = "false";
+		}
+
+		if (!(isSet(checkStaleArtifactsSkip))) {
+			var checkStaleArtifactsSkip = "false";
+		}
+
+		var curl = '''
+			${portalUrl}/view/All/job/fixpack-builder-fixpack-7x\(uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
+			-d fix.pack.fixed.issues=${fixPackFixedIssues}
+			-d fix.pack.id=${fixPackId}
+			-d git.revision=${gitRevision}
+			-d runBuilderUpToPublishAppsOnly=${runBuilderUpToPublishAppsOnly}
+			-d checkStaleArtifactsSkip=${checkStaleArtifactsSkip}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -376,42 +472,55 @@ definition {
 		if (!(isSet(fixPackCustomerTicket))) {
 			var fixPackCustomerTicket = "";
 		}
+
 		if (!(isSet(fixPackBuiltFor))) {
 			var fixPackBuiltFor = "";
 		}
+
 		if (!(isSet(fixPackFixedIssues))) {
 			var fixPackFixedIssues = "";
 		}
+
 		if (!(isSet(fixPackHotfixedIssues))) {
 			var fixPackHotfixedIssues = "";
 		}
+
 		if (!(isSet(fixPackId))) {
 			var fixPackId = "";
 		}
+
 		if (!(isSet(gitRevision))) {
 			var gitRevision = "";
 		}
+
 		if (!(isSet(patcherBuildId))) {
 			var patcherBuildId = "";
 		}
+
 		if (!(isSet(patcherUserId))) {
 			var patcherUserId = "";
 		}
+
 		if (!(isSet(patcherFixDeliveryMethod))) {
 			var patcherFixDeliveryMethod = "";
 		}
+
 		if (!(isSet(releaseToolGitRemoteUserName))) {
 			var releaseToolGitRemoteUserName = "";
 		}
+
 		if (!(isSet(releaseToolGitBranch))) {
 			var releaseToolGitBranch = "";
 		}
+
 		if (!(isSet(fixPackBaseCommittish))) {
 			var fixPackBaseCommittish = "";
 		}
+
 		if (!(isSet(patcherCombinedBranch))) {
 			var patcherCombinedBranch = "false";
 		}
+
 		if (!(isSet(patcherSecurityPatch))) {
 			var patcherSecurityPatch = "false";
 		}
@@ -421,7 +530,7 @@ definition {
 			-d fix.pack.customer.ticket=${fixPackCustomerTicket}
 			-d fix.pack.built.for=${fixPackBuiltFor}
 			-d fix.pack.fixed.issues=${fixPackFixedIssues}
- 			-d fix.pack.hotfixed.issues=${fixPackHotfixedIssues}
+			-d fix.pack.hotfixed.issues=${fixPackHotfixedIssues}
 			-d fix.pack.id=${fixPackId}
 			-d git.revision=${gitRevision}
 			-d patcher.build.id=${patcherBuildId}
@@ -462,6 +571,7 @@ definition {
 		if (!(isSet(destinationFilePath))) {
 			var destinationFilePath = "";
 		}
+
 		if (!(isSet(originFilePath))) {
 			var originFilePath = "";
 		}
@@ -500,6 +610,7 @@ definition {
 		if (!(isSet(githubUsername))) {
 			var githubUsername = "";
 		}
+
 		if (!(isSet(gitBranch))) {
 			var gitBranch = "";
 		}
@@ -538,6 +649,7 @@ definition {
 		if (!(isSet(alphaPath))) {
 			var alphaPath = "";
 		}
+
 		if (!(isSet(betaPath))) {
 			var betaPath = "";
 		}
@@ -570,11 +682,30 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	macro testFixPackBuilderJenkinsJob {
+		Jenkins.pause(timeInSeconds = "10");
+
+		Jenkins.openJenkinsURL();
+
+		Jenkins.getCurrentJobBuildNumberForShortJob(jobName = "${jenkinsJobName}");
+
+		Jenkins.checkForJobCompletion(
+			jobBuildNumber = "${staticJobBuildNumber}",
+			jobName = "${jenkinsJobName}");
+
+		Jenkins.openJenkinsURL();
+
+		Jenkins.gotoConsoleOutput(
+			jobBuildNumber = "${staticJobBuildNumber}",
+			jobName = "${jenkinsJobName}");
+
+		Jenkins.viewInstallRevertConsoleText();
+	}
+
 	macro viewConsoleText {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Jenkins#CONSOLE_OUTPUT_TEXT",
-			value1 = "${consoleOutputText}"
-		);
+			value1 = "${consoleOutputText}");
 	}
 
 	@prose = "the test-fixpack-builder-install-revert console log should not have any visible errors"
@@ -611,8 +742,7 @@ definition {
 	macro viewNoConsoleText {
 		AssertTextNotEquals.assertNotPartialText(
 			locator1 = "Jenkins#CONSOLE_OUTPUT_TEXT",
-			value1 = "${consoleOutputText}"
-		);
+			value1 = "${consoleOutputText}");
 	}
 
 	@prose = "the test-fixpack-builder-patch-difference console log should not have any visible errors"
@@ -650,111 +780,9 @@ definition {
 
 		Jenkins.viewConsoleText(consoleOutputText = "Modified 79");
 
-		Jenkins.viewNoConsoleText(
-			consoleOutputText = "-Liferay-Portal-Server-Info: Liferay DXP Digital Enterprise"
-		);
+		Jenkins.viewNoConsoleText(consoleOutputText = "-Liferay-Portal-Server-Info: Liferay DXP Digital Enterprise");
 
-		Jenkins.viewNoConsoleText(
-			consoleOutputText = "+Liferay-Portal-Server-Info: Liferay Community Edition Portal"
-		);
+		Jenkins.viewNoConsoleText(consoleOutputText = "+Liferay-Portal-Server-Info: Liferay Community Edition Portal");
 	}
 
-	macro testFixPackBuilderJenkinsJob {
-		Jenkins.pause(timeInSeconds = "10");
-
-		Jenkins.openJenkinsURL();
-
-		Jenkins.getCurrentJobBuildNumberForShortJob(
-			jobName = "${jenkinsJobName}"
-		);
-
-		Jenkins.checkForJobCompletion(
-			jobName = "${jenkinsJobName}",
-			jobBuildNumber = "${staticJobBuildNumber}"
-		);
-
-		Jenkins.openJenkinsURL();
-
-		Jenkins.gotoConsoleOutput(
-			jobName = "${jenkinsJobName}",
-			jobBuildNumber = "${staticJobBuildNumber}"
-		);
-
-		Jenkins.viewInstallRevertConsoleText();
-	}
-
-	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
-	macro patchingToolInstallAndRevert {
-		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
-		var jenkinsSlaveNumber = Jenkins.checkLinkToSlave(jobName = "fixpack-builder-hotfix-7x(2x-uat)");
-		var mirrorUser = PropsUtil.get("mirror.user");
-		var mirrorPassword = PropsUtil.get("mirror.password");
-		var portalUrl = PropsUtil.get("portal.url");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "bundle") {
-				var bundle = "${value}";
-			}
-			else if ("${field}" == "fixPack") {
-				var fixPack = "${value}";
-			}
-			else if ("${field}" == "hotfix") {
-				var hotfix = "${value}";
-			}
-			else if ("${field}" == "patchingTool") {
-				var patchingTool = "${value}";
-			}
-			else if ("${field}" == "patchingToolMajorVersion") {
-				var patchingToolMajorVersion = "${value}";
-			}
-			else {
-				fail("No such Jenkins job field ${field} for ${value}");
-			}
-		}
-
-		if (!(isSet(bundle))) {
-			var bundle = "";
-		}
-		if (!(isSet(fixPack))) {
-			var fixPack = "";
-		}
-		if (!(isSet(hotfix))) {
-			var hotfix = "";
-		}
-		if (!(isSet(patchingTool))) {
-			var patchingTool = "";
-		}
-
-		if (contains("${patchingTool}", "LATEST")) {
-			var curlLatestPatchingTool = '''
-				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
-				 -u ${mirrorUser}:${mirrorPassword}
-			''';
-
-			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
-
-			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
-
-			var trimmedLatestVersion = StringUtil.trim("${latestVersion}");
-
-			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${trimmedLatestVersion}");
-		}
-
-		var curl = '''
-			 ${portalUrl}/view/All/job/test-fixpack-builder-install-revert\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
-			 -d bundle=${bundle}
-			 -d fixPack=${fixPack}
-			 -d hotfix=${hotfix}
-			 -d patchingTool=${patchingTool}
-			 ''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-
-		Jenkins.testFixPackBuilderJenkinsJob(jenkinsJobName = "test-fixpack-builder-install-revert(2x-uat)");
-	}
 }
