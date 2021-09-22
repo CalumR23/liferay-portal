@@ -5526,8 +5526,12 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
+			if ("${field}" == "Account Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
+			}
 			if ("${field}" == "Code") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
 			}
@@ -5574,11 +5578,21 @@ definition {
 				fail("No such account field ${field}");
 			}
 
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
+			if ("${field}" == "Account Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
 
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
 			}
 		}
 	}
