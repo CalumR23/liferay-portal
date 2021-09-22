@@ -2062,6 +2062,27 @@ definition {
 		return "${accountKey}";
 	}
 
+	macro _getAccountKeyViaAccountNameAndProperty {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?filter=property_${propertyName}+eq+%27${propertyValue}%27
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var accountKey = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${accountName}')].key");
+
+		var accountKey = StringUtil.replace("${accountKey}", "[", "");
+
+		var accountKey = StringUtil.replace("${accountKey}", "]", "");
+
+		var accountKey = StringUtil.replace("${accountKey}", "&quot;", "");
+
+		echo("Account Key value for ${accountName} with property ${propertyName} value ${propertyValue}: ${accountKey}");
+
+		return "${accountKey}";
+	}
+
 	macro _getAccountNoteKeyViaAccountNameAndContent {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
@@ -5532,7 +5553,96 @@ definition {
 			if ("${field}" == "Account Field and Value") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
 			}
-			if ("${field}" == "Code") {
+			else if ("${field}" == "Code") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
+			}
+			else if ("${field}" == "Contact Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
+			}
+			else if ("${field}" == "Data Region") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.dataRegion");
+			}
+			else if ("${field}" == "Description") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.description");
+			}
+			else if ("${field}" == "Fax Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.faxNumber");
+			}
+			else if ("${field}" == "Internal") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.internal");
+			}
+			else if ("${field}" == "Language") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.language");
+			}
+			else if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.name");
+			}
+			else if ("${field}" == "Phone Number") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.phoneNumber");
+			}
+			else if ("${field}" == "Profile Email Address") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
+			}
+			else if ("${field}" == "Region") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.region");
+			}
+			else if ("${field}" == "Status") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.status");
+			}
+			else if ("${field}" == "Tier") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.tier");
+			}
+			else if ("${field}" == "Website") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.website");
+			}
+			else {
+				fail("No such account field ${field}");
+			}
+
+			if ("${field}" == "Account Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
+
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
+			}
+		}
+	}
+
+	@prose = "I should be able to view a koroneiki account with the name ${accountName} with the property ${propertyName} value ${propertyValue} and the following values ${table}"
+	macro _viewAccountViaAccountNameAndProperty {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountNameAndProperty(
+			accountName = "${accountName}",
+			propertyName = "${propertyName}",
+			propertyValue = "${propertyValue}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Account Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
+			}
+			else if ("${field}" == "Code") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -6248,6 +6358,22 @@ definition {
 
 		if (contains("${allAccountTeams}", "${teamName}")) {
 			fail("The team with the name ${teamName} is on the account with the name ${accountName}");
+		}
+	}
+
+	@prose = "I should not be able to view a koroneiki account with the name ${accountName} with the property ${propertyName} value ${propertyValue}"
+	macro _viewNoAccountViaNameAndProperty {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?filter=property_${propertyName}+eq+%27${propertyValue}%27
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccounts}", "${accountName}")) {
+			fail("The account with the name ${accountName} with the property ${propertyName} value ${propertyValue} is still present in Koroneiki");
 		}
 	}
 
