@@ -359,53 +359,64 @@ definition {
 
 	@prose = "I attempt to create an account on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountAttempt {
+		var properties = "";
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
-			if ("${field}" == "Code") {
-				var code = "${value}";
+			if ("${field}" == "Account Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Code") {
+				var code = "${value1}";
 			}
 			else if ("${field}" == "Contact Email Address") {
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Data Region") {
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else if ("${field}" == "Description") {
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else if ("${field}" == "Fax Number") {
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else if ("${field}" == "Internal") {
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else if ("${field}" == "Language") {
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else if ("${field}" == "Name") {
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else if ("${field}" == "Phone Number") {
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else if ("${field}" == "Profile Email Address") {
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Region") {
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else if ("${field}" == "Status") {
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else if ("${field}" == "Tier") {
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else if ("${field}" == "Website") {
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				fail("No such account field ${field}");
@@ -455,29 +466,59 @@ definition {
 			var website = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"dataRegion": "${dataRegion}",
-				"description": "${description}",
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"language": "${language}",
-				"name": "${name}",
-				"phoneNumber": "${phoneNumber}",
-				"profileEmailAddress": "${profileEmailAddress}",
-				"region": "${region}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"properties": {
+						${properties}
+					},
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -941,53 +982,64 @@ definition {
 	macro _createChildAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
+		var properties = "";
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[1]}";
 
-			if ("${field}" == "Code") {
-				var code = "${value}";
+			if ("${field}" == "Account Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Code") {
+				var code = "${value1}";
 			}
 			else if ("${field}" == "Contact Email Address") {
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Data Region") {
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else if ("${field}" == "Description") {
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else if ("${field}" == "Fax Number") {
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else if ("${field}" == "Internal") {
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else if ("${field}" == "Language") {
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else if ("${field}" == "Name") {
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else if ("${field}" == "Phone Number") {
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else if ("${field}" == "Profile Email Address") {
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Region") {
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else if ("${field}" == "Status") {
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else if ("${field}" == "Tier") {
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else if ("${field}" == "Website") {
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				fail("No such account field ${field}");
@@ -1037,30 +1089,62 @@ definition {
 			var website = "";
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"dataRegion": "${dataRegion}",
-				"description": "${description}",
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"language": "${language}",
-				"name": "${name}",
-				"parentAccountKey": "${accountKey}",
-				"phoneNumber": "${phoneNumber}",
-				"profileEmailAddress": "${profileEmailAddress}",
-				"region": "${region}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"parentAccountKey": "${accountKey}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"parentAccountKey": "${accountKey}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"properties": {
+						${properties}
+					},
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
@@ -1711,53 +1795,64 @@ definition {
 	macro _updateAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
+		var properties = "";
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
-			if ("${field}" == "Code") {
-				var code = "${value}";
+			if ("${field}" == "Account Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Code") {
+				var code = "${value1}";
 			}
 			else if ("${field}" == "Contact Email Address") {
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Data Region") {
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else if ("${field}" == "Description") {
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else if ("${field}" == "Fax Number") {
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else if ("${field}" == "Internal") {
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else if ("${field}" == "Language") {
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else if ("${field}" == "Name") {
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else if ("${field}" == "Phone Number") {
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else if ("${field}" == "Profile Email Address") {
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Region") {
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else if ("${field}" == "Status") {
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else if ("${field}" == "Tier") {
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else if ("${field}" == "Website") {
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				fail("No such account field ${field}");
@@ -1775,9 +1870,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "code=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.code");
+				var value1 = JSONCurlUtil.get("${curl}", "$.code");
 
-				var code = "${value}";
+				var code = "${value1}";
 			}
 			else {
 				var code = "";
@@ -1787,9 +1882,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "contactEmailAddress=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
+				var value1 = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
 
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else {
 				var contactEmailAddress = "";
@@ -1799,9 +1894,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "dataRegion=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.dataRegion");
+				var value1 = JSONCurlUtil.get("${curl}", "$.dataRegion");
 
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else {
 				var dataRegion = "";
@@ -1811,9 +1906,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "description=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.description");
+				var value1 = JSONCurlUtil.get("${curl}", "$.description");
 
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else {
 				var description = "";
@@ -1823,9 +1918,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "faxNumber=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.faxNumber");
+				var value1 = JSONCurlUtil.get("${curl}", "$.faxNumber");
 
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else {
 				var faxNumber = "";
@@ -1835,9 +1930,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "internal=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.internal");
+				var value1 = JSONCurlUtil.get("${curl}", "$.internal");
 
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else {
 				var internal = "false";
@@ -1847,9 +1942,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "language=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.language");
+				var value1 = JSONCurlUtil.get("${curl}", "$.language");
 
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else {
 				var language = "";
@@ -1859,9 +1954,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "name=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.name");
+				var value1 = JSONCurlUtil.get("${curl}", "$.name");
 
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else {
 				var name = "";
@@ -1871,9 +1966,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "phoneNumber=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.phoneNumber");
+				var value1 = JSONCurlUtil.get("${curl}", "$.phoneNumber");
 
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else {
 				var phoneNumber = "";
@@ -1883,21 +1978,33 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "profileEmailAddress=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
+				var value1 = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
 
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else {
 				var profileEmailAddress = "";
+			}
+		}
+		if (!(isSet(properties))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "properties=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value1}";
+			}
+			else {
+				var properties = "";
 			}
 		}
 		if (!(isSet(region))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "region=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.region");
+				var value1 = JSONCurlUtil.get("${curl}", "$.region");
 
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else {
 				var region = "";
@@ -1907,9 +2014,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "status=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.status");
+				var value1 = JSONCurlUtil.get("${curl}", "$.status");
 
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else {
 				var status = "";
@@ -1919,9 +2026,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "tier=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.tier");
+				var value1 = JSONCurlUtil.get("${curl}", "$.tier");
 
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else {
 				var tier = "";
@@ -1931,38 +2038,68 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "website=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.website");
+				var value1 = JSONCurlUtil.get("${curl}", "$.website");
 
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				var website = "";
 			}
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"dataRegion": "${dataRegion}",
-				"description": "${description}",
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"language": "${language}",
-				"name": "${name}",
-				"phoneNumber": "${phoneNumber}",
-				"profileEmailAddress": "${profileEmailAddress}",
-				"region": "${region}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"properties": {
+						${properties}
+					},
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -1971,53 +2108,64 @@ definition {
 	macro _updateAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
+		var properties = "";
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
-			if ("${field}" == "Code") {
-				var code = "${value}";
+			if ("${field}" == "Account Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Code") {
+				var code = "${value1}";
 			}
 			else if ("${field}" == "Contact Email Address") {
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Data Region") {
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else if ("${field}" == "Description") {
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else if ("${field}" == "Fax Number") {
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else if ("${field}" == "Internal") {
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else if ("${field}" == "Language") {
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else if ("${field}" == "Name") {
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else if ("${field}" == "Phone Number") {
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else if ("${field}" == "Profile Email Address") {
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else if ("${field}" == "Region") {
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else if ("${field}" == "Status") {
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else if ("${field}" == "Tier") {
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else if ("${field}" == "Website") {
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				fail("No such account field ${field}");
@@ -2035,9 +2183,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "code=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.code");
+				var value1 = JSONCurlUtil.get("${curl}", "$.code");
 
-				var code = "${value}";
+				var code = "${value1}";
 			}
 			else {
 				var code = "";
@@ -2047,9 +2195,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "contactEmailAddress=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
+				var value1 = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
 
-				var contactEmailAddress = "${value}";
+				var contactEmailAddress = "${value1}";
 			}
 			else {
 				var contactEmailAddress = "";
@@ -2059,9 +2207,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "dataRegion=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.dataRegion");
+				var value1 = JSONCurlUtil.get("${curl}", "$.dataRegion");
 
-				var dataRegion = "${value}";
+				var dataRegion = "${value1}";
 			}
 			else {
 				var dataRegion = "";
@@ -2071,9 +2219,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "description=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.description");
+				var value1 = JSONCurlUtil.get("${curl}", "$.description");
 
-				var description = "${value}";
+				var description = "${value1}";
 			}
 			else {
 				var description = "";
@@ -2083,9 +2231,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "faxNumber=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.faxNumber");
+				var value1 = JSONCurlUtil.get("${curl}", "$.faxNumber");
 
-				var faxNumber = "${value}";
+				var faxNumber = "${value1}";
 			}
 			else {
 				var faxNumber = "";
@@ -2095,9 +2243,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "internal=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.internal");
+				var value1 = JSONCurlUtil.get("${curl}", "$.internal");
 
-				var internal = "${value}";
+				var internal = "${value1}";
 			}
 			else {
 				var internal = "false";
@@ -2107,9 +2255,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "language=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.language");
+				var value1 = JSONCurlUtil.get("${curl}", "$.language");
 
-				var language = "${value}";
+				var language = "${value1}";
 			}
 			else {
 				var language = "";
@@ -2119,9 +2267,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "name=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.name");
+				var value1 = JSONCurlUtil.get("${curl}", "$.name");
 
-				var name = "${value}";
+				var name = "${value1}";
 			}
 			else {
 				var name = "";
@@ -2131,9 +2279,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "phoneNumber=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.phoneNumber");
+				var value1 = JSONCurlUtil.get("${curl}", "$.phoneNumber");
 
-				var phoneNumber = "${value}";
+				var phoneNumber = "${value1}";
 			}
 			else {
 				var phoneNumber = "";
@@ -2143,21 +2291,33 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "profileEmailAddress=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
+				var value1 = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
 
-				var profileEmailAddress = "${value}";
+				var profileEmailAddress = "${value1}";
 			}
 			else {
 				var profileEmailAddress = "";
+			}
+		}
+		if (!(isSet(properties))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "properties=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value1}";
+			}
+			else {
+				var properties = "";
 			}
 		}
 		if (!(isSet(region))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "region=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.region");
+				var value1 = JSONCurlUtil.get("${curl}", "$.region");
 
-				var region = "${value}";
+				var region = "${value1}";
 			}
 			else {
 				var region = "";
@@ -2167,9 +2327,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "status=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.status");
+				var value1 = JSONCurlUtil.get("${curl}", "$.status");
 
-				var status = "${value}";
+				var status = "${value1}";
 			}
 			else {
 				var status = "";
@@ -2179,9 +2339,9 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "tier=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.tier");
+				var value1 = JSONCurlUtil.get("${curl}", "$.tier");
 
-				var tier = "${value}";
+				var tier = "${value1}";
 			}
 			else {
 				var tier = "";
@@ -2191,38 +2351,68 @@ definition {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${accountObject}", "website=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.website");
+				var value1 = JSONCurlUtil.get("${curl}", "$.website");
 
-				var website = "${value}";
+				var website = "${value1}";
 			}
 			else {
 				var website = "";
 			}
 		}
 
-		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"code": "${code}",
-				"contactEmailAddress": "${contactEmailAddress}",
-				"dataRegion": "${dataRegion}",
-				"description": "${description}",
-				"faxNumber": "${faxNumber}",
-				"internal": ${internal},
-				"language": "${language}",
-				"name": "${name}",
-				"phoneNumber": "${phoneNumber}",
-				"profileEmailAddress": "${profileEmailAddress}",
-				"region": "${region}",
-				"status": "${status}",
-				"tier": "${tier}",
-				"website": "${website}"
-			}
-			''';
+		if ("${properties}" == "") {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"properties": {
+						${properties}
+					},
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';			
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -2414,9 +2604,13 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
 
-			if ("${field}" == "Code") {
+			if ("${field}" == "Account Field and Value") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
+			}
+			else if ("${field}" == "Code") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.code");
 			}
 			else if ("${field}" == "Contact Email Address") {
@@ -2462,11 +2656,21 @@ definition {
 				fail("No such account field ${field}");
 			}
 
-			echo("Expected ${field} Value: ${value}");
-			echo("Actual ${field} Value: ${valueFromAPI}");
+			if ("${field}" == "Account Field and Value") {
+				echo("Expected property field ${value1} value: ${value2}");
+				echo("Actual property field ${value1} value: ${valueFromAPI}");
 
-			if (!(contains("${value}", "${valueFromAPI}"))) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+				if (!(contains("${value2}", "${valueFromAPI}"))) {
+					fail("Actual property field ${value1} value ${valueFromAPI} does not match expected property field ${value1} value ${value2}");
+				}
+			}
+			else {
+				echo("Expected ${field} Value: ${value1}");
+				echo("Actual ${field} Value: ${valueFromAPI}");
+
+				if (!(contains("${value1}", "${valueFromAPI}"))) {
+					fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value1}");
+				}
 			}
 		}
 	}
