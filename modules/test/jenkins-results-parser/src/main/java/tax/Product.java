@@ -46,22 +46,22 @@ public class Product {
 	}
 
 	public void parseInput(String product) {
-		String[] productArray = product.split(" ");
+		String[] productNames = product.split(" ");
 
-		_quantity = GetterUtil.getInteger(productArray[0]);
+		_quantity = GetterUtil.getInteger(productNames[0]);
 
-		_amount = GetterUtil.getDouble(productArray[productArray.length - 1]);
+		_amount = GetterUtil.getDouble(productNames[productNames.length - 1]);
 
 		_name = product;
 
-		for (String word : productArray) {
-			if (word.equals("book") || word.contains("chocolate") ||
-				word.equals("pills")) {
+		for (String productName : productNames) {
+			if (productName.equals("book") || productName.contains("chocolate") ||
+				productName.equals("pills")) {
 
 				_exempt = true;
 			}
 
-			if (word.equals("imported")) {
+			if (productName.equals("imported")) {
 				_imported = true;
 			}
 		}

@@ -28,8 +28,9 @@ public class Basket {
 		_products.add(item);
 	}
 
-	public void checkout() {
+	public String checkout() {
 		double totalTax = 0;
+		String output = "";
 		double totalAmount = 0;
 
 		for (Product item : _products) {
@@ -55,15 +56,17 @@ public class Basket {
 
 			int index = itemName.indexOf(" at ");
 
-			String output =
-				itemName.substring(0, index) + " : " +
+			String itemOutput =
+				itemName.substring(0, index) + ": " +
 					_decimalFormat.format(item.getTaxedAmount());
 
-			System.out.println(output);
+			output += itemOutput + "\n";
 		}
 
-		System.out.println("Sales Tax : " + _decimalFormat.format(totalTax));
-		System.out.println("Total : " + _decimalFormat.format(totalAmount));
+		output += "Sales Taxes: " + _decimalFormat.format(totalTax) + "\n";
+		output += "Total: " + _decimalFormat.format(totalAmount);
+
+		return output;
 	}
 
 	private static final DecimalFormat _decimalFormat = new DecimalFormat("0.00");
