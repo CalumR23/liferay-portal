@@ -1,0 +1,216 @@
+definition {
+	var provisioningAdminEmail = PropsUtil.get("provisioning.admin.email.address");
+	var provisioningAdminPassword = PropsUtil.get("provisioning.admin.password");
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+	var roleName = PropsUtil.get("provisioning.non.permission.role.name");
+
+
+    macro _getLicenseKeyViaLicenseName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+			var curl = '''
+				--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100
+				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+		var licenseKeyId = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].id");
+
+		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "[", "");
+
+		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "]", "");
+
+		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "&quot;", "");
+
+		echo("License Key ID value for ${licenseName}: ${licenseKeyId}");
+
+		return "${licenseKeyId}";
+	}
+
+	@prose = "I activate the license on provisioning with the name ${licenseName} on the account ${accountName}"
+	macro _activateLicenseWithKeyIdValue {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/activate?licenseKeyIds=${licenseKeyId}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I deactivate the license on provisioning with the name ${licenseName} on the account ${accountName}"
+	macro _deactivateLicenseWithKeyIdValue {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/deactivate?licenseKeyIds=${licenseKeyId}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I download the license on provisioning with the name ${licenseName} on the account ${accountName}"
+	macro _downloadLicenseWithKeyIdValue {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?licenseKeyIds=${licenseKeyId}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
+	@prose = "I extend the license on provisioning with the name ${licenseName} on the account ${accountName} and the product ${productName} with the values ${table}"
+	macro _extendLicenseWithKeyIdValue {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "licenseKeyId") {
+				var id = "${value}";
+			}
+			else if ("${field}" == "Product Purchase") {
+				var productPurchaseKey = "${value}";
+			}
+			else if ("${field}" == "Start Date") {
+				var startDate = "${value}";
+			}
+			else if ("${field}" == "Expiration Date") {
+				var expirationDate = "${value}";
+			}
+			else {
+				fail("No such license field ${field}");
+			}
+		}
+
+		if (!(isSet(id))) {
+			var id = "";
+		}
+		else if (!(isSet(expirationDate))) {
+			var expirationDate = "";
+		}
+		else if (!(isSet(startDate))) {
+			var startDate = "";
+		}
+		else if (!(isSet(productPurchaseKey))) {
+			var productPurchaseKey = "";
+		}
+		else {
+				fail("No such license field ${field}");
+			}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/extend
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H 'Content-Type: application/json'
+			-d
+			[{
+				"id": ${licenseKeyId},
+				"expirationDate": "${expirationDate}",
+				"productPurchaseKey": "${productPurchaseKey}",
+				"startDate": "${startDate}"
+			}]
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I should be able to view the license generate option on the account ${accountName} with the product group ${productGroupName} and values ${table}"
+	macro _licenseGenerateOptions{ 
+	var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+	var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Label") {
+				var label = "${value}";
+			}
+			else if ("${field}" == "License Entry Name") {
+				var licenseEntryName = "${value}";
+			}
+			else {
+				fail("No such license field ${field}");
+			}
+		}
+		echo("Actual label value: ${label}");
+		echo("Actual label value: ${licenseEntryName}");
+
+		if (!(isSet(label))) {
+			var label = "";
+		}
+		if (!(isSet(licenseEntryName))) {
+			var licenseEntryName = "";
+		}
+
+	var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		var labelProductKeyVersion = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${label}')].label");
+
+		var licenseName = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${label}')].types[?(@.licenseEntryName=='${licenseEntryName}')].licenseEntryName");
+
+		var labelProductKeyVersionAPI = StringUtil.replace("${labelProductKeyVersion}", "[", "");
+
+		var labelProductKeyVersionAPI = StringUtil.replace("${labelProductKeyVersionAPI}", "]", "");
+
+		var labelProductKeyVersionAPI = StringUtil.replace("${labelProductKeyVersionAPI}", "&quot;", "");
+
+		var licenseNameAPI = StringUtil.replace("${licenseName}", "[", "");
+
+		var licenseNameAPI = StringUtil.replace("${licenseNameAPI}", "]", "");
+
+		var licenseNameAPI = StringUtil.replace("${licenseNameAPI}", "&quot;", "");
+
+		echo("Expected label value: ${label}");
+
+		echo("Actual label value: ${labelProductKeyVersionAPI}");
+
+		echo("Expected label value: ${licenseEntryName}");
+
+		echo("Actual label value: ${licenseNameAPI}");
+
+		if (!("${labelProductKeyVersionAPI}" == "${label}")) {
+			fail("Actual label value ${labelProductKeyVersionAPI} does not match expected label value ${label}");
+		}
+
+		if (!("${licenseNameAPI}" == "${licenseEntryName}")) {
+			fail("Actual label value ${licenseNameAPI} does not match expected label value ${licenseEntryName}");
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+
+	}
+}
