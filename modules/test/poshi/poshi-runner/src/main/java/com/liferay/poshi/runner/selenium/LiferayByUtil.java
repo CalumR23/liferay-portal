@@ -57,22 +57,22 @@ public class LiferayByUtil {
 
 				JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
 
-				String[] subSelectors = _cssSelector.split(">>>");
+				String[] partialCssSelectors = _cssSelector.split(">>>");
 
-				WebElement result = null;
+				WebElement webElement = null;
 
-				for (String subSelector : subSelectors) {
+				for (String partialCssSelector : partialCssSelectors) {
 					By.ByCssSelector byCssSelector = new By.ByCssSelector(
-						subSelector);
+						partialCssSelector);
 
-					result = byCssSelector.findElement(searchContext);
+					webElement = byCssSelector.findElement(searchContext);
 
 					searchContext =
 						(WebElement)javascriptExecutor.executeScript(
-							"return arguments[0].shadowRoot", result);
+							"return arguments[0].shadowRoot", webElement);
 				}
 
-				return result;
+				return webElement;
 			}
 
 			throw new WebDriverException(
