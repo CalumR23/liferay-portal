@@ -58,16 +58,16 @@ public class LiferayByUtil {
 				JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
 
 				String[] subSelectors = _cssSelector.split(">>>");
-				SearchContext currentContext = searchContext;
+
 				WebElement result = null;
 
 				for (String subSelector : subSelectors) {
 					By.ByCssSelector byCssSelector = new By.ByCssSelector(
 						subSelector);
 
-					result = byCssSelector.findElement(currentContext);
+					result = byCssSelector.findElement(searchContext);
 
-					currentContext =
+					searchContext =
 						(WebElement)javascriptExecutor.executeScript(
 							"return arguments[0].shadowRoot", result);
 				}
