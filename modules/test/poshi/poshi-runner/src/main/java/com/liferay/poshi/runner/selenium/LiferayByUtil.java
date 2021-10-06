@@ -80,44 +80,38 @@ public class LiferayByUtil {
 		}
 
 		@Override
-		public List<WebElement> findElements(SearchContext context) {
-			if (context instanceof ChromeDriver) {
-				JavascriptExecutor jsExecutor;
+		public List<WebElement> findElements(SearchContext searchContext) {
+			if (searchContext instanceof WebDriver) {
+				WrapsDriver wrapsDriver = (WrapsDriver)searchContext;
 
-				if (context instanceof JavascriptExecutor) {
-					jsExecutor = (JavascriptExecutor)context;
-				}
-				else {
-					WrapsDriver wrapsDriver = (WrapsDriver)context;
+				WebDriver webDriver = wrapsDriver.getWrappedDriver();
 
-					WebDriver webDriver = wrapsDriver.getWrappedDriver();
+				JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
 
-					jsExecutor = (JavascriptExecutor)webDriver;
-				}
+				String[] partialCssSelectors = _cssSelector.split(">>>");
 
-				String[] subSelectors = _cssSelector.split(">>>");
-				SearchContext currentContext = context;
+				WebElement webElement = null;
 
-				for (int i = 0; i < (subSelectors.length - 1); i++) {
+				for (int i = 0; i < (partialCssSelectors.length - 1); i++) {
 					By.ByCssSelector byCssSelector = new By.ByCssSelector(
-						subSelectors[i]);
+					partialCssSelectors[i]);
 
-					WebElement nextRoot = byCssSelector.findElement(
-						currentContext);
+					webElement = byCssSelector.findElement(
+					searchContext);
 
-					currentContext = (WebElement)jsExecutor.executeScript(
-						"return arguments[0].shadowRoot", nextRoot);
+					searchContext = (WebElement)javascriptExecutor.executeScript(
+						"return arguments[0].shadowRoot", webElement);
 				}
 
 				By.ByCssSelector byCssSelector = new By.ByCssSelector(
-					subSelectors[subSelectors.length - 1]);
+				partialCssSelectors[partialCssSelectors.length - 1]);
 
-				return byCssSelector.findElements(currentContext);
+				return byCssSelector.findElements(searchContext);
 			}
 
 			throw new WebDriverException(
-				"Driver does not support finding elements by selector: " +
-					_cssSelector);
+				"Unable to find element(s) using CSS selector: " +
+				_cssSelector);
 		}
 
 		@Override
