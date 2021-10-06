@@ -42,7 +42,7 @@ public class LiferayByUtil {
 		public ByCssSelectorWithShadowRoot(String cssSelector) {
 			if (cssSelector == null) {
 				throw new IllegalArgumentException(
-					"Cannot find elements when the selector is null");
+					"Unable to find elements when the selector is null");
 			}
 
 			_cssSelector = cssSelector;
