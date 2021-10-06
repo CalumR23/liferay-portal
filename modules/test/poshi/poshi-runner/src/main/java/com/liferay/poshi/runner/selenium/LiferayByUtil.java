@@ -51,17 +51,17 @@ public class LiferayByUtil {
 		@Override
 		public WebElement findElement(SearchContext context) {
 			if (context instanceof ChromeDriver) {
-				JavascriptExecutor jsExecutor;
+				JavascriptExecutor javascriptExecutor;
 
 				if (context instanceof JavascriptExecutor) {
-					jsExecutor = (JavascriptExecutor)context;
+					javascriptExecutor = (JavascriptExecutor)context;
 				}
 				else {
 					WrapsDriver wrapsDriver = (WrapsDriver)context;
 
 					WebDriver webDriver = wrapsDriver.getWrappedDriver();
 
-					jsExecutor = (JavascriptExecutor)webDriver;
+					javascriptExecutor = (JavascriptExecutor)webDriver;
 				}
 
 				String[] subSelectors = _cssSelector.split(">>>");
@@ -74,8 +74,9 @@ public class LiferayByUtil {
 
 					result = byCssSelector.findElement(currentContext);
 
-					currentContext = (WebElement)jsExecutor.executeScript(
-						"return arguments[0].shadowRoot", result);
+					currentContext =
+						(WebElement)javascriptExecutor.executeScript(
+							"return arguments[0].shadowRoot", result);
 				}
 
 				return result;
