@@ -76,8 +76,7 @@ public class LiferayByUtil {
 			}
 
 			throw new WebDriverException(
-				"Driver does not support finding an element by selector: " +
-					_cssSelector);
+				"Unable to find element using CSS selector: " + _cssSelector);
 		}
 
 		@Override
