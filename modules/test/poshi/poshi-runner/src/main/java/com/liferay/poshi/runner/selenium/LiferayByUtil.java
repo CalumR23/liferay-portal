@@ -32,13 +32,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
  */
 public class LiferayByUtil {
 
-	public static By shadowDom(String selector) {
-		return new ByShadowCss(selector);
+	public static By cssSelectorWithShadowRoot(String selector) {
+		return new ByCssSelectorWithShadowRoot(selector);
 	}
 
-	public static class ByShadowCss extends By implements Serializable {
+	public static class ByCssSelectorWithShadowRoot
+		extends By implements Serializable {
 
-		public ByShadowCss(String cssSelector) {
+		public ByCssSelectorWithShadowRoot(String cssSelector) {
 			if (cssSelector == null) {
 				throw new IllegalArgumentException(
 					"Cannot find elements when the selector is null");
