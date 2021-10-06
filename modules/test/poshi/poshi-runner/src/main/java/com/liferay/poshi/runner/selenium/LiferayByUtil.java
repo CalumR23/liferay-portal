@@ -50,7 +50,7 @@ public class LiferayByUtil {
 
 		@Override
 		public WebElement findElement(SearchContext context) {
-			if (context instanceof ChromeDriver) {
+			if (context instanceof WebDriver) {
 				WrapsDriver wrapsDriver = (WrapsDriver)context;
 
 				WebDriver webDriver = wrapsDriver.getWrappedDriver();
