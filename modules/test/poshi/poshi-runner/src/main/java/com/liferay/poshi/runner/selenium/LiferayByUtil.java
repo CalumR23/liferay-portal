@@ -120,8 +120,6 @@ public class LiferayByUtil {
 			return "By.cssSelector: " + _cssSelector;
 		}
 
-		private static final long serialVersionUID = -1230258723099459239L;
-
 		private final String _cssSelector;
 
 	}
