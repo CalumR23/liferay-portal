@@ -25,7 +25,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WrapsDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
 /**
  * @author Calum Ragan
@@ -55,7 +54,8 @@ public class LiferayByUtil {
 
 				WebDriver webDriver = wrapsDriver.getWrappedDriver();
 
-				JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
+				JavascriptExecutor javascriptExecutor =
+					(JavascriptExecutor)webDriver;
 
 				String[] partialCssSelectors = _cssSelector.split(">>>");
 
@@ -86,7 +86,8 @@ public class LiferayByUtil {
 
 				WebDriver webDriver = wrapsDriver.getWrappedDriver();
 
-				JavascriptExecutor javascriptExecutor = (JavascriptExecutor)webDriver;
+				JavascriptExecutor javascriptExecutor =
+					(JavascriptExecutor)webDriver;
 
 				String[] partialCssSelectors = _cssSelector.split(">>>");
 
@@ -94,24 +95,24 @@ public class LiferayByUtil {
 
 				for (int i = 0; i < (partialCssSelectors.length - 1); i++) {
 					By.ByCssSelector byCssSelector = new By.ByCssSelector(
-					partialCssSelectors[i]);
+						partialCssSelectors[i]);
 
-					webElement = byCssSelector.findElement(
-					searchContext);
+					webElement = byCssSelector.findElement(searchContext);
 
-					searchContext = (WebElement)javascriptExecutor.executeScript(
-						"return arguments[0].shadowRoot", webElement);
+					searchContext =
+						(WebElement)javascriptExecutor.executeScript(
+							"return arguments[0].shadowRoot", webElement);
 				}
 
 				By.ByCssSelector byCssSelector = new By.ByCssSelector(
-				partialCssSelectors[partialCssSelectors.length - 1]);
+					partialCssSelectors[partialCssSelectors.length - 1]);
 
 				return byCssSelector.findElements(searchContext);
 			}
 
 			throw new WebDriverException(
 				"Unable to find element(s) using CSS selector: " +
-				_cssSelector);
+					_cssSelector);
 		}
 
 		@Override
