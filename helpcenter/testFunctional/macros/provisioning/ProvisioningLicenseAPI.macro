@@ -97,6 +97,7 @@ definition {
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
+
 	macro _getLicenseKeyIdViaLicenseName {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
@@ -120,98 +121,6 @@ definition {
 		echo("License Key ID value for ${licenseName}: ${licenseKeyId}");
 
 		return "${licenseKeyId}";
-	}
-
-	@prose = "I search for the licenses keys on the account ${accountName} with the name ${licenseName} using okta authentication"
-	macro _getLicenseKeyIdViaLicenseNameUsingOktaAuth {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100
-			-H "Okta-Session-ID: ${staticSessionIdOkta}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var licenseKeyId = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].id");
-
-		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "[", "");
-
-		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "]", "");
-
-		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "&quot;", "");
-
-		echo("License Key ID value for ${licenseName}: ${licenseKeyId}");
-
-		return "${licenseKeyId}";
-	}
-
-	@prose = "I attempt to search for the licenses keys on the account ${accountName} with the name ${licenseName} using a non permissioned user with okta authentication"
-	macro _getLicenseKeyIdViaLicenseNameAttemptUsingOktaAuth {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100
-			-H "Okta-Session-ID: ${staticSessionIdOkta}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var errorMsgApi = JSONCurlUtil.get("${curl}", "$.status");
-
-		if ("${errorMsgApi}" == "NOT_FOUND") {
-
-			echo("The Status of the API Call is ${errorMsgApi}");
-
-			echo("The user with a non permissioned okta authentication was not able to access the licenses");
-		}
-		else {
-			fail("User was able to search for the license without the right okta authentication.");
-		}
-	}
-
-	@prose = "I log into the dev domain as ${userEmailAddress} with password ${userPassword}"
-	macro _loginToDevDomain {
-		Open(locator1 = "https://login-dev.liferay.com/signin/refresh-auth-state/00y4KuEUb2CNOzjwqN8K2asnRECKaHIfTCfmfzFxFR");
-
-		Type(
-			locator1 = "OSBLogin#EMAIL_ADDRESS_FIELD",
-			value1 = "${userEmailAddress}");
-
-		Type(
-			locator1 = "OSBLogin#PASSWORD_FIELD",
-			value1 = "${userPassword}");
-
-		Click(locator1 = "OSBLogin#SIGN_IN_BUTTON");
-
-		AssertElementNotPresent(locator1 = "OSBLogin#SIGN_IN_BUTTON");
-	}
-
-	@prose = "I obtain the okta session ID value from the dev domain page"
-	macro _getOktaSessionIdDevPage {
-		Open(locator1 = "https://login-dev.liferay.com/api/v1/sessions/me");
-
-		var sessionIdOkta = selenium.getText("//body/pre");
-
-		var sessionIdOkta = StringUtil.extractFirst("${sessionIdOkta}", ",");
-
-		var sessionIdOkta = StringUtil.replace("${sessionIdOkta}", "{", "");
-
-		var sessionIdOkta = StringUtil.replace("${sessionIdOkta}", "&quot;", "");
-
-		var sessionIdOkta = StringUtil.replace("${sessionIdOkta}", "id", "");
-
-		var sessionIdOkta = StringUtil.replace("${sessionIdOkta}", ":", "");
-
-		static var staticSessionIdOkta = "${sessionIdOkta}";
-
-		echo("Session ID Value: ${staticSessionIdOkta}");
-
-		return "${staticSessionIdOkta}";
 	}
 
 	@prose = "I should be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} ${table}"
@@ -256,4 +165,96 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} using the okta session id value ${oktaSessionId} ${table}"
+	macro _viewGenerateLicenseFormOptionsUsingOktaAuth { 
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
+			-H "Okta-Session-ID: ${oktaSessionId}"
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Label") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value}')].label");
+			}
+			else if ("${field}" == "License Entry Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value}')].types[?(@.licenseEntryName=='${licenseEntryName}')].licenseEntryName");
+			}
+			else {
+				fail("License field ${field} not testable via automation at the current time.");
+			}
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			echo("Expected ${field} value: ${value}");
+			echo("Actual ${field} value: ${valueFromAPI}");
+
+			if (!("${value}" == "${valueFromAPI}")) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} using the okta session id value ${oktaSessionId}"
+	macro _viewLicenseKeyIdViaLicenseNameUsingOktaAuth {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100
+			-H "Okta-Session-ID: ${oktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var licenseNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "[", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "]", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "&quot;", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "+", " ");
+
+		echo("Expected license key name value: ${licenseName}");
+		echo("Actual license key name value: ${licenseNameFromAPI}");
+
+		if (!("${licenseNameFromAPI}" == "${licenseName}")) {
+			fail("Actual license name ${licenseNameFromAPI} does not match expected license name value ${licenseName}");
+		}
+	}
+
+	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName} using the okta session id value ${oktaSessionId}"
+	macro _viewNoLicenseKeyIdViaLicenseNameAttemptUsingOktaAuth {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100
+			-H "Okta-Session-ID: ${oktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "${keyword}")) {
+			fail("The license with the name ${licenseName} is visible to a non permissioned user");
+		}
+	}
 }
