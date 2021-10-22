@@ -245,3 +245,79 @@ Scenario: View employee options
 	| Product | Commerce Subscription |
 	| Product | DXP                   |
 	| Product | Portal                |
+
+Scenario: Download dxp options
+	DXP activation key should be downloaded according to the permissions that users have.
+
+	Given I wait for "5" seconds
+	And I generate a provisioning project name
+	And I create a user with the following parameters
+	| Screen Name   | sfp.customer1                       |
+	| Email Address | sfp.customer1@lrcustomer.com.broken |
+	| First Name    | SFP                                 |
+	| Last Name     | Customer1                           |
+	And I assign the web user with the email address "sfp.customer1@lrcustomer.com.broken" to the web role "Verified User"
+	And I create an account on koroneiki with the following values
+	| Code   | SFPZENSFPZEN                  | |
+	| Name   | Sfpzen - ${staticProjectName} | |
+	| Region | United States                 | |
+	| Status | Active                        | |
+	| Tier   | T1                            | |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Sfpzen - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I create a product purchase for an account with the name "Sfpzen - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I assign the contact with the email address "sfp.customer1@lrcustomer.com.broken" on the account "Sfpzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - DXP"
+	Then the support user with the email address "sfp.customer1@lrcustomer.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "sfp.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I assign the support user with the email address "sfp.customer1@lrcustomer.com.broken" to the support group "Help Center"
+	And I assign the web user with the email address "sfp.customer1@lrcustomer.com.broken" to the web role "Verified User"
+	And I assign the support user with the email address "sfp.customer1@lrcustomer.com.broken" to the support role "Customer - DXP"
+	And I assign the support user with the email address "sfp.customer1@lrcustomer.com.broken" to the support user group "customer"
+	And I log out and log into the support homepage as "sfp.customer1@lrcustomer.com.broken" with password "osbadminqauser"
+	And I go to the Self Provisioning page
+	Then I should be able to download the following options in the Self Provisioning portlet
+	| Project | Sfpzen - ${staticProjectName} |
+	| Product | DXP                           |
+	| Version | 7.4                           |
+	| Version | 7.3                           |
+	| Version | 7.2                           |
+	| Version | 7.1                           |
+	| Version | 7.0                           |
+	And I should be able to see the downloaded file of type "xml" the with the params
+	| License Type | activation-key            |
+	| Product      | DXP Development           |
+	| Version      | 7.4                       |
+	| License Name | Developer Activation Keys |
+	And I should be able to see the downloaded file of type "xml" the with the params
+	| License Type | activation-key            |
+	| Product      | DXP Development           |
+	| Version      | 7.3                       |
+	| License Name | Developer Activation Keys |
+	And I should be able to see the downloaded file of type "xml" the with the params
+	| License Type | activation-key            |
+	| Product      | DXP Development           |
+	| Version      | 7.1                       |
+	| License Name | Developer Activation Keys |
+	And I should be able to see the downloaded file of type "xml" the with the params
+	| License Type | activation-key            |
+	| Product      | DXP Development           |
+	| Version      | 7.0                       |
+	| License Name | Developer Activation Keys |
