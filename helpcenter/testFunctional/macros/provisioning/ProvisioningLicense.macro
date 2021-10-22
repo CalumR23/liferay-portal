@@ -1,6 +1,68 @@
 definition {
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
+	@prose = "I should be able to see the downloaded file of type ${fileType} the with the params ${table}"
+	macro assertDownloadFileName {
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		var licenseType = "";
+		var product = "";
+		var version = "";
+		var licenseName = "";
+		var copy = "";
+
+		for (var role : table "${rawTable}") {
+			var field = "${role[0]}";	
+			var type = "${role[1]}";
+
+			if ("${field}" == "License Type") {
+				var licenseType = "${type}-";
+			}
+			else if ("${field}" == "Product"){
+				var product = "${type}-";
+			}
+			else if ("${field}" == "Version") {
+				var version = "${type}-";
+			}
+			else if ("${field}" == "License Name") {
+				if ("${licenseName}" == "") {
+					var licenseName = "${type}";
+				}
+				else {
+					var licenseName = "${licenseName}-${type}";
+				}
+			}
+			else if ("${field}" == "Copy") {
+				var copy = " (${type})";
+			}
+			else {
+				fail("No such field ${field} required!");
+			}
+		}
+
+
+		var downloadedFileName = "${licenseType}${product}${version}${licenseName}";
+
+		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
+		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
+
+		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
+
+		var tempFileDirectory = selenium.getOutputDirName();
+
+		var downloadedFilePath = "${tempFileDirectory}/${downloadedFileName}";
+
+		var fileExists = FileUtil.exists("${downloadedFilePath}");
+
+		if ("${fileExists}" == "true") {
+			echo("File named ${downloadedFileName} was downloaded.");
+		}
+		else {
+			fail("File named ${downloadedFileName} NOT FOUND in folder ${tempFileDirectory}!");
+		}
+	}
+
 	@prose = "I click on the activate button for the license in position ${positionValue} on the license page"
 	macro clickActivateLicenseButton {
 		var key_positionValue = "${positionValue}";
@@ -102,6 +164,30 @@ definition {
 		Click(locator1 = "ProvisioningLicenseDownloadLicense#LICENSE_DELETE_BUTTON");
 	}
 
+	@prose = "I click the download button for the following license key id values on the download license page ${table}"
+	macro clickDownloadLicenseButtonViaDownloadLicensePage {
+		var licenseKeyIdList = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIdList}" == "") {
+				var licenseKeyIdList = "${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIdList = "${licenseKeyIdList},${licenseKeyId}";
+			}
+		}
+
+		var key_licenseKeyIdList = "${licenseKeyIdList}";
+
+		Click(locator1 = "ProvisioningLicenseDownloadLicense#DOWNLOAD_BUTTON");
+
+		DownloadTempFile();
+	}
+
 	@prose = "I click on the generate button on the license form"
 	macro clickGenerateLicenseButton {
 		Click(locator1 = "ProvisioningLicenseGenerateLicenseForm#GENERATE_BUTTON");
@@ -162,6 +248,15 @@ definition {
 		Click(locator1 = "ProvisioningLicense#EXTEND_BUTTON");
 	}
 
+	@prose = "I click download the licence by click the button in the position ${positionValue}"
+	macro downloadLicense {
+		var key_positionValue = "${positionValue}";
+
+		Click(locator1 = "ProvisioningLicense#DOWNLOAD_BUTTON");
+
+		DownloadTempFile();
+	}
+
 	@prose = "I obtain the license key ID value from the license details page"
 	macro getLicenseKeyIdViaLicenseDetails {
 		WaitForSPARefresh();
@@ -171,6 +266,68 @@ definition {
 		echo("License Key ID Value: ${staticLicenseKeyId}");
 
 		return "${staticLicenseKeyId}";
+	}
+
+	@prose = "I open the downloaded file with the type ${fileType} with the params ${table}"
+	macro openDownloadedFile {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var role : table "${rawTable}") {
+			var field = "${role[0]}";
+			var type = "${role[1]}";
+
+			if ("${field}" == "License Type") {
+				var licenseType = "${type}-";
+			}
+			else if ("${field}" == "Product"){
+				var product = "${type}-";
+			}
+			else if ("${field}" == "Version") {
+				var version = "${type}-";
+			}
+			else if ("${field}" == "Account") {
+				var account = "${type}";
+			}
+			else if ("${field}" == "Copy") {
+				var copy = " (${type})";
+			}
+			else {
+				fail("No such field ${field} required!");
+			}
+		}
+
+		if (!(isSet(licenseType))) {
+			var licenseType = "";
+		}
+
+		if (!(isSet(product))) {
+			var product = "";
+		}
+
+		if (!(isSet(version))) {
+			var version = "";
+		}
+
+		if (!(isSet(account))) {
+			var account = "";
+		}
+
+		if (!(isSet(copy))) {
+			var copy = "";
+		}
+
+		var downloadedFileName = "${licenseType}${product}${version}${account}";
+
+		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
+		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
+
+		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
+
+		var tempFileDirectory = selenium.getOutputDirName();
+
+		var downloadedFileName = "${tempFileDirectory}/${downloadedFileName}";
+
+		Open(locator1 = "file://${downloadedFilePath}");
 	}
 
 	@prose = "I populate the generate license form with the following values ${table}"
@@ -735,163 +892,6 @@ definition {
 
 		return "${staticLicenseKeyId4}";
 	}
-
-	@prose = "I click download the licence by click the button in the position ${positionValue}"
-	macro downloadLicense {
-		var key_positionValue = "${positionValue}";
-
-		Click(locator1 = "ProvisioningLicense#DOWNLOAD_BUTTON");
-
-		DownloadTempFile();
-	}
-
-	@prose = "I should be able to see the downloaded file of type ${fileType} the with the params ${table}"
-	macro assertDownloadFileName {
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseType = "";
-		var product = "";
-		var version = "";
-		var licenseName = "";
-		var copy = "";
-
-		for (var role : table "${rawTable}") {
-			var field = "${role[0]}";	
-			var type = "${role[1]}";
-
-			if ("${field}" == "License Type") {
-				var licenseType = "${type}-";
-			}
-			else if ("${field}" == "Product"){
-				var product = "${type}-";
-			}
-			else if ("${field}" == "Version") {
-				var version = "${type}-";
-			}
-			else if ("${field}" == "License Name") {
-				if ("${licenseName}" == "") {
-					var licenseName = "${type}";
-				}
-				else {
-					var licenseName = "${licenseName}-${type}";
-				}
-			}
-			else if ("${field}" == "Copy") {
-				var copy = " (${type})";
-			}
-			else {
-				fail("No such field ${field} required!");
-			}
-		}
-
-
-		var downloadedFileName = "${licenseType}${product}${version}${licenseName}";
-
-		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
-		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
-
-		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
-
-		var tempFileDirectory = selenium.getOutputDirName();
-
-		var downloadedFilePath = "${tempFileDirectory}/${downloadedFileName}";
-
-		var fileExists = FileUtil.exists("${downloadedFilePath}");
-
-		if ("${fileExists}" == "true") {
-			echo("File named ${downloadedFileName} was downloaded.");
-		}
-		else {
-			fail("File named ${downloadedFileName} NOT FOUND in folder ${tempFileDirectory}!");
-		}
-	}
-
-	@prose = "I open the downloaded file with the type ${fileType} with the params ${table}"
-	macro openDownloadedFile {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var role : table "${rawTable}") {
-			var field = "${role[0]}";
-			var type = "${role[1]}";
-
-			if ("${field}" == "License Type") {
-				var licenseType = "${type}-";
-			}
-			else if ("${field}" == "Product"){
-				var product = "${type}-";
-			}
-			else if ("${field}" == "Version") {
-				var version = "${type}-";
-			}
-			else if ("${field}" == "Account") {
-				var account = "${type}";
-			}
-			else if ("${field}" == "Copy") {
-				var copy = " (${type})";
-			}
-			else {
-				fail("No such field ${field} required!");
-			}
-		}
-
-		if (!(isSet(licenseType))) {
-			var licenseType = "";
-		}
-
-		if (!(isSet(product))) {
-			var product = "";
-		}
-
-		if (!(isSet(version))) {
-			var version = "";
-		}
-
-		if (!(isSet(account))) {
-			var account = "";
-		}
-
-		if (!(isSet(copy))) {
-			var copy = "";
-		}
-
-		var downloadedFileName = "${licenseType}${product}${version}${account}";
-
-		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
-		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
-
-		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
-
-		var tempFileDirectory = selenium.getOutputDirName();
-
-		var downloadedFileName = "${tempFileDirectory}/${downloadedFileName}";
-
-		Open(locator1 = "file://${downloadedFilePath}");
-	}
-
-	@prose = "I click the download button for the following license key id values on the download license page ${table}"
-	macro clickDownloadLicenseButtonViaDownloadLicensePage {
-		var licenseKeyIdList = "";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIdList}" == "") {
-				var licenseKeyIdList = "${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIdList = "${licenseKeyIdList},${licenseKeyId}";
-			}
-		}
-
-		var key_licenseKeyIdList = "${licenseKeyIdList}";
-
-		Click(locator1 = "ProvisioningLicenseDownloadLicense#DOWNLOAD_BUTTON");
-
-		DownloadTempFile();
-	}	
 
 	@prose = "the choose button for the product purchase in position ${positionValue} should be disabled"
 	macro viewDisabledChooseProductPurchaseButton {
