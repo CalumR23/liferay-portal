@@ -2018,6 +2018,32 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with the ID ${ticketId} should have the heat score ${heatScore}"
+	macro _viewTicketHeatScore{
+
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Heat Score");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/tickets/${ticketId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var heatScoreFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "[", "");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "]", "");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "&quot;", "");
+
+		echo("Expected Heat Score Value: ${heatScore}");
+		echo("Actual Heat Score Value: ${heatScoreFromAPI}");
+
+		if (!("${heatScoreFromAPI}" == "${heatScore}")) {
+			fail("Actual value ${heatScoreFromAPI} does not match expected value ${heatScore}");
+		}
+	}
+
 	@prose = "the ticket with keywords ${keywords} should have the product ${product}"
 	macro _viewTicketProduct {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
