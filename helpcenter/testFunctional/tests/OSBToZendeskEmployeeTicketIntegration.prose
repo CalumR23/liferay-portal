@@ -135,3 +135,66 @@ Scenario: View ticket after employee deactivation
 	| Please downgrade Liferay Employee1 liferay.employee1@liferay.com.broken on Zendesk. They have the following non-closed tickets assigned to them. |
 	And I should be able to view the email message containing the following text
 	| ${staticRequestIdList} |
+
+Scenario: View closed ticket after employee deactivation
+	Employees should be deactivated even with zendesk closed tickets assigned to them 
+
+	Given I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I wait for "1" minutes
+	Then the support organization with the code "OSBZENOSBZEN" should be part of the support site
+	And the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Osbzen - ${staticProjectName}                    |
+	And I assign the ticket with the ID "${staticRequestIdList}" to a user with the email address "liferay.employee1@liferay.com.broken"
+	And I wait for "60" seconds
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Portal Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |	
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And I deactivate the user with the email address "liferay.employee1@liferay.com.broken" from web.liferay.com
+	Then the user with the email address "liferay.employee1@liferay.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "liferay.employee1@liferay.com.broken" should not be in the organization "Liferay, Inc."
+	And the user with the email address "liferay.employee1@liferay.com.broken" should not have the "osb_lr_employee" tag
+	And the user with the email address "liferay.employee1@liferay.com.broken" on zendesk.liferay.com should have the name "Liferay Employee1"
+	And the user with the email address "liferay.employee1@liferay.com.broken" on zendesk.liferay.com should have the role "Agent"
+	And the ticket with ticketId "${staticRequestIdList}" should have the default user from the organization with the name "Osbzen - ${staticProjectName}" as the requester
