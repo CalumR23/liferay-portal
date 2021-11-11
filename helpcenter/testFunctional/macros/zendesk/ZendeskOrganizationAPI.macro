@@ -218,8 +218,8 @@ definition {
 		return "${staticOrganizationID}";
 	}
 
-	@prose = "I obtain the external IDs of the following organizations from zendesk.liferay.com ${table}"
-	macro _getMultipleOrganizationExternalIdsByOrganizationName {
+	@prose = "I obtain the external IDs of the following organizations from zendesk.liferay.com if still present ${table}"
+	macro _getMultipleOrganizationExternalIdsByOrganizationNameIfStillPresent {
 		var organizationCount = "0";
 		var organizationExternalIds = "";
 
@@ -229,6 +229,14 @@ definition {
 			var organizationName = "${row[0]}";
 
 			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+
+			var currentIteration = "0";
+
+			while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${organizations}" == "[]"))) {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+			}
 
 			if (!("${organizations}" == "[]")) {
 				var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
