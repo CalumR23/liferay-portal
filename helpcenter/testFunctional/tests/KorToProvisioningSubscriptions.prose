@@ -20,6 +20,7 @@ Setup:
 	| Last Name     | Koroneiki2                           |
 
 Teardown:
+	* I wait for "5" seconds
 	* I get the ID of the default user belonging to the organization "Korsub - ${staticProjectName}" from zendesk.liferay.com
 	* I rename the first default user ID variable
 	* I get the ID of the default user belonging to the organization "Subkor - ${staticCompanyName}" from zendesk.liferay.com
@@ -64,6 +65,8 @@ Teardown:
 	* I teardown the tickets with the following keywords from zendesk.liferay.com
 	| New Subscription(s) for Korsub - ${staticProjectName} |
 	| New Subscription(s) for Subkor - ${staticCompanyName} |
+	* I wait for "5" seconds
+	* I log out and log into the support homepage as "amos.fong@liferay.com.broken" with password "test"
 	* I tear down the projects with the following project codes via groovy
 	| SUBKORKORSUB |
 	| SUBKOR       |
@@ -9589,3 +9592,356 @@ Scenario: Add future subscription to existing cancelled perpetual subscription
 	| Purchased                  | 1                                 |
 	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey} |
 	| State                      | CANCELLED                         |
+
+Scenario: Extend subscriptions with similar dates via extend all active subscriptions button
+	Testing the ability to extend product purchases via extend all active subscriptions button in provisioning and viewing the subscriptions in the provisioning account details page   
+
+	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Subkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sub.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SUB                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sub.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SUB                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korsub - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I generate past static start and end dates
+	And I generate past static full start and end dates
+	And I generate static yyyymmdd start and end dates
+	And I update a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I create a product consumption for an account with the name "Korsub - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Purchase        | true            |                |
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "DXP Production" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullFutureStartDate} - ${staticFullFutureOriginalEndDate}"
+	And I populate and save the subscription form with the following values
+	| DXP Production | Start Date   | ${staticYyyyMmDdStartDate}       |
+	| DXP Production | End Date     | ${staticYyyyMmDdOriginalEndDate} |
+	| DXP Production | Grace Period | 30                               |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | DXP Production                                        |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 1                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 1                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| State                      | ACTIVE                                                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "Platinum Subscription" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullFutureStartDate} - ${staticFullFutureOriginalEndDate}"
+	And I populate and save the subscription form with the following values
+	| Platinum Subscription | Start Date   | ${staticYyyyMmDdStartDate}       |
+	| Platinum Subscription | End Date     | ${staticYyyyMmDdOriginalEndDate} |
+	| Platinum Subscription | Grace Period | 30                               |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | Platinum Subscription                                 |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 0                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 0                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| State                      | ACTIVE                                                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I select the following products under the subscriptions tab
+	| DXP Production        |
+	| Platinum Subscription |
+	And I click on the extend all active subscriptions button
+	And I populate the extend all active subscriptions form with the following values
+	| Grace Period End Date | ${staticYyyyMmDdFutureEndDate} |
+	And I click on the extend button on the extend all active subscriptions form
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	Then I should be able to view an account on the provisioning index with the name "Korsub - ${staticProjectName}" and the following values
+	| Name  | Korsub - ${staticProjectName} |
+	| Code  | SUBKORKORSUB                  |
+	| State | ACTIVE                        |
+	When I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name  | Korsub - ${staticProjectName} |
+	| Code  | SUBKORKORSUB                  |
+	| State | ACTIVE                        |
+	And I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                  | DXP Production                                        |
+	| Support Life          | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period End Date | ${staticFullFutureEndDate}                            |
+	| Provisioned           | 1                                                     |
+	| Approved Purchased    | 1                                                     |
+	| State                 | ACTIVE                                                |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                  | Platinum Subscription                                 |
+	| Support Life          | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period End Date | ${staticFullFutureEndDate}                            |
+	| Provisioned           | 0                                                     |
+	| Approved Purchased    | 1                                                     |
+	| State                 | ACTIVE                                                |
+
+Scenario: Extend subscriptions with different dates via extend all active subscriptions button
+	Testing the ability to extend product purchases via extend all active subscriptions button in provisioning and viewing the subscriptions in the provisioning account details page   
+
+	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Subkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | sub.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | SUB                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | sub.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | SUB                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korsub - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I generate past static start and end dates
+	And I generate past static full start and end dates
+	And I generate past static yyyymmdd start and end dates
+	And I generate static yyyymmdd start and end dates
+	And I update a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Korsub - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I create a product consumption for an account with the name "Korsub - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| Product Purchase        | true            |                |
+	| Product Field and Value | additionalProp1 | propertyValue1 |
+	| Product Field and Value | additionalProp2 | propertyValue2 |
+	| Product Field and Value | additionalProp3 | propertyValue3 |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "DXP Production" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullFutureStartDate} - ${staticFullFutureOriginalEndDate}"
+	And I populate and save the subscription form with the following values
+	| DXP Production | Start Date   | ${staticYyyyMmDdPastStartDate}   |
+	| DXP Production | End Date     | ${staticYyyyMmDdOriginalEndDate} |
+	| DXP Production | Grace Period | 30                               |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | DXP Production                                            |
+	| State        | ACTIVE                                                    |
+	| Support Life | ${staticFullPastStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}       |
+	| Provisioned  | 1                                                         |
+	And I should be able to view the term with the start date to end date "${staticFullPastStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullPastStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}       |
+	| Provisioned                | 1                                                         |
+	| Purchased                  | 1                                                         |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                         |
+	| State                      | ACTIVE                                                    |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I click on the "Platinum Subscription" subscription link
+	And I click on the "Edit" button in the dropdown menu for the subscription term with the start date to end date "${staticFullFutureStartDate} - ${staticFullFutureOriginalEndDate}"
+	And I populate and save the subscription form with the following values
+	| Platinum Subscription | Start Date   | ${staticYyyyMmDdStartDate}       |
+	| Platinum Subscription | End Date     | ${staticYyyyMmDdOriginalEndDate} |
+	| Platinum Subscription | Grace Period | 30                               |
+	Then I should be able to view the following subscription values in the subscription details page
+	| Name         | Platinum Subscription                                 |
+	| State        | ACTIVE                                                |
+	| Support Life | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned  | 0                                                     |
+	And I should be able to view the term with the start date to end date "${staticFullStartDate} - ${staticFullOriginalEndDate}" and the following values
+	| Start - End Date           | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period               | ${staticFullOriginalEndDate} - ${staticFullEndDate}   |
+	| Provisioned                | 0                                                     |
+	| Purchased                  | 1                                                     |
+	| Salesforce Opportunity Key | ${staticSalesforceOpportunityKey}                     |
+	| State                      | ACTIVE                                                |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	And I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	And I click on the "All" product tab
+	And I select the following products under the subscriptions tab
+	| DXP Production        |
+	| Platinum Subscription |
+	And I click on the extend all active subscriptions button
+	And I populate the extend all active subscriptions form with the following values
+	| Grace Period End Date | ${staticYyyyMmDdFutureEndDate} |
+	And I click on the extend button on the extend all active subscriptions form
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korsub"
+	Then I should be able to view an account on the provisioning index with the name "Korsub - ${staticProjectName}" and the following values
+	| Name  | Korsub - ${staticProjectName} |
+	| Code  | SUBKORKORSUB                  |
+	| State | ACTIVE                        |
+	When I click on the account with the name "Korsub - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name  | Korsub - ${staticProjectName} |
+	| Code  | SUBKORKORSUB                  |
+	| State | ACTIVE                        |
+	And I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 1              |
+	| Current Purchased   | 1              |
+	| State               | ACTIVE         |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                | Platinum Subscription |
+	| Current Provisioned | 0                     |
+	| Current Purchased   | 1                     |
+	| State               | ACTIVE                |
+	When I click on the "Future" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Complimentary" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Expired" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "Cancelled" product tab
+	Then I should not be able to view the product with the name "DXP Production" on the account details page
+	And I should not be able to view the product with the name "Platinum Subscription" on the account details page
+	When I click on the "All" product tab
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                  | DXP Production                                            |
+	| Support Life          | ${staticFullPastStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period End Date | ${staticFullFutureEndDate}                                |
+	| Provisioned           | 1                                                         |
+	| Approved Purchased    | 1                                                         |
+	| State                 | ACTIVE                                                    |
+	And I should be able to view the product with the name "Platinum Subscription" and the following values on the account details page
+	| Name                  | Platinum Subscription                                 |
+	| Support Life          | ${staticFullStartDate} - ${staticFullOriginalEndDate} |
+	| Grace Period End Date | ${staticFullFutureEndDate}                            |
+	| Provisioned           | 0                                                     |
+	| Approved Purchased    | 1                                                     |
+	| State                 | ACTIVE                                                |

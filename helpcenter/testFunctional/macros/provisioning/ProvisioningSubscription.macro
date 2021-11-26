@@ -877,4 +877,68 @@ definition {
 			}
 		}
 	}
+
+	@prose = "I populate the extend all active subscriptions form with the following values ${table}"
+	macro populateExtendAllActiveSubscriptionsForm {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Grace Period End Date") {
+
+				if (contains("${value}", ",")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+					var month = StringUtil.extractFirst("${value}", " ");
+
+					var fullMonth = KoroneikiProductPurchaseAPI._getFullMonthName(month = "${month}");
+
+					var year = StringUtil.extractLast("${value}", " ");
+
+					var day = StringUtil.replace("${value}", "${month} ", "");
+
+					var day = StringUtil.replace("${day}", ", ${year}", "");
+
+					var singleDigitDay = StringUtil.startsWith("${day}", "0");
+
+					if ("${singleDigitDay}" == "true") {
+						var day = StringUtil.replace("${day}", "0", "");
+					}
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_MONTH_SELECT",
+						value1 = "${fullMonth}");
+
+					Select(
+						locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_YEAR_SELECT",
+						value1 = "${year}");
+
+					var key_day = "${day}";
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#CALENDAR_DATE_PICKER_DAY_BUTTON");
+
+					Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningLicenseExtend#START_DATE_PICKER_DROPDOWN_BUTTON");
+
+				}
+				else {
+						Click.pauseMakeVisibleClickAt(
+							locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+							value1 = "${value}");
+
+						Type(
+							locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+							value1 = "${value}");
+
+						KeyPress(
+							locator1 = "ProvisioningSubscriptionForm#GRACE_PERIOD_END_DATE_FIELD",
+							value1 = "\RETURN");
+					}	
+				}
+				else {
+				fail("No such extend license field ${field}.");
+			}
+		}
+	}
 }
