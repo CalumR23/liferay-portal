@@ -8,7 +8,7 @@ definition {
 		var currentIteration = "0";
 		var jobInProgress = "true";
 
-		while ((!("${currentIteration}" == "${jobCompletionPollMaximumIterations}")) && ("${jobInProgress}" == "true")) {
+		while (("${currentIteration}" != "${jobCompletionPollMaximumIterations}") && ("${jobInProgress}" == "true")) {
 			Jenkins.openJenkinsURL();
 
 			var key_jobBuildNumber = "${jobBuildNumber}";
@@ -16,8 +16,7 @@ definition {
 			Jenkins.clickJobLink(jobName = "${jobName}");
 
 			if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_BUILD_STATUS_IN_PROGRESS")) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
+				var currentIteration = ${currentIteration} + 1;
 				var jobInProgress = "true";
 
 				Jenkins.pauseInMinutes(timeInMinutes = "${jobCompletionPollIntervalInMinutes}");
@@ -48,9 +47,7 @@ definition {
 		Click(locator1 = "Jenkins#JENKINS_JOB_BUILD_LINK");
 
 		var jenkinsSlave = selenium.getText("Jenkins#JENKINS_NODE");
-
 		var jenkinsSlaveNumber = StringUtil.replace("${jenkinsSlave}", "cloud-", "");
-
 		var jenkinsSlaveNumber = StringUtil.replace("${jenkinsSlaveNumber}", "-", ".");
 
 		return "${jenkinsSlaveNumber}";
@@ -138,11 +135,12 @@ definition {
 	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
 	macro patchingToolInstallAndRevert {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
+
 		var jenkinsSlaveNumber = Jenkins.checkLinkToSlave(jobName = "fixpack-builder-hotfix-7x(2x-uat)");
+
 		var mirrorUser = PropsUtil.get("mirror.user");
 		var mirrorPassword = PropsUtil.get("mirror.password");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -190,13 +188,9 @@ definition {
 				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
 				 -u ${mirrorUser}:${mirrorPassword}
 			''';
-
 			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
-
 			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
-
 			var trimmedLatestVersion = StringUtil.trim("${latestVersion}");
-
 			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${trimmedLatestVersion}");
 		}
 
@@ -215,16 +209,15 @@ definition {
 
 	@prose = "I wait for ${timeInSeconds} seconds"
 	macro pause {
-		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+		var timeInMilliseconds = ${timeInSeconds} * 1000;
 
 		Pause(locator1 = "${timeInMilliseconds}");
 	}
 
 	@prose = "I wait for ${timeInMinutes} minutes"
 	macro pauseInMinutes {
-		var timeInSeconds = MathUtil.product("${timeInMinutes}", "60");
-
-		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+		var timeInSeconds = ${timeInMinutes} * 60;
+		var timeInMilliseconds = ${timeInSeconds} * 1000;
 
 		Pause(locator1 = "${timeInMilliseconds}");
 	}
@@ -233,7 +226,6 @@ definition {
 	macro startFixPackBuilderAgentJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -352,7 +344,6 @@ definition {
 	macro startFixpackBuilderFixpack7xJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -415,7 +406,6 @@ definition {
 	macro startFixPackBuilderHotfix7xJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -463,6 +453,9 @@ definition {
 			}
 			else if ("${field}" == "patcher.security.patch") {
 				var patcherSecurityPatch = "${value}";
+			}
+			else if ("${field}" == "patcher.request.key") {
+				var patcherRequestKey = "${value}";
 			}
 			else {
 				fail("No such Jenkins job field ${field} for fixpack-builder-hotfix-7x");
@@ -525,6 +518,10 @@ definition {
 			var patcherSecurityPatch = "false";
 		}
 
+		if (!(isSet(patcherRequestKey))) {
+			var patcherRequestKey = "";
+		}
+
 		var curl = '''
 			${portalUrl}/view/All/job/fixpack-builder-hotfix-7x\(2x-uat\)/buildWithParameters?token=${jenkinsAuthenticationToken}
 			-d fix.pack.customer.ticket=${fixPackCustomerTicket}
@@ -541,6 +538,7 @@ definition {
 			-d fix.pack.baseCommittish=${fixPackBaseCommittish}
 			-d patcher.combined.branch=${patcherCombinedBranch}
 			-d patcher.security.patch=${patcherSecurityPatch}
+			-d patcher.request.key=${patcherRequestKey}
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -550,7 +548,6 @@ definition {
 	macro startTestFixPackBuilderHotfixCopyJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -589,7 +586,6 @@ definition {
 	macro startTestFixPackBuilderMainSmokeJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -628,7 +624,6 @@ definition {
 	macro startTestFixPackBuilderPatchDifferenceJob {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -669,9 +664,7 @@ definition {
 		var jenkinsAdminUserToken = PropsUtil.get("jenkins.admin.user.token");
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
-
 		var jobName = StringUtil.replace("${jobName}", "(", "\(");
-
 		var jobName = StringUtil.replace("${jobName}", ")", "\)");
 
 		var curl = '''
@@ -717,12 +710,12 @@ definition {
 
 		echo("Number of errors: ${errorCount}");
 
-		if (!("${fileAddedCount}" == "0")) {
+		if ("${fileAddedCount}" != "0") {
 			var acceptableErrorCount = StringUtil.count("${consoleOutputText}", "ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found");
 
 			echo("Number of acceptable errors: ${acceptableErrorCount}");
 
-			if (!("${errorCount}" == "${acceptableErrorCount}")) {
+			if ("${errorCount}" != "${acceptableErrorCount}") {
 				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack revert and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
@@ -754,12 +747,12 @@ definition {
 
 		echo("Number of files added: ${fileAddedCount}");
 
-		if (!("${fileAddedCount}" == "0")) {
+		if ("${fileAddedCount}" != "0") {
 			var acceptableFileAddedCount = StringUtil.count("${consoleOutputText}", "Added: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
 
 			echo("Number of acceptable files added: ${acceptableFileAddedCount}");
 
-			if (!("${fileAddedCount}" == "${acceptableFileAddedCount}")) {
+			if ("${fileAddedCount}" != "${acceptableFileAddedCount}") {
 				fail("Unexpected files may have been added.  The test counted ${fileAddedCount} added files but ${acceptableFileAddedCount} acceptable added files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
@@ -768,12 +761,12 @@ definition {
 
 		echo("Number of files removed: ${fileRemovedCount}");
 
-		if (!("${fileRemovedCount}" == "0")) {
+		if ("${fileRemovedCount}" != "0") {
 			var acceptableFileRemovedCount = StringUtil.count("${consoleOutputText}", "Removed: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
 
 			echo("Number of acceptable files removed: ${acceptableFileRemovedCount}");
 
-			if (!("${fileRemovedCount}" == "${acceptableFileRemovedCount}")) {
+			if ("${fileRemovedCount}" != "${acceptableFileRemovedCount}") {
 				fail("Unexpected files may have been removed.  The test counted ${fileRemovedCount} removed files but ${acceptableFileRemovedCount} acceptable removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
