@@ -5679,7 +5679,7 @@ definition {
 			productName = "${productName}");
 
 		var curl = '''
-			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/product-purchases/${productPurchaseKey}?nestedFields=productConsumptions
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -5728,6 +5728,53 @@ definition {
 			}
 			else if ("${field}" == "Perpetual") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.perpetual");
+			}
+			else if ("${field}" == "Product Consumption Nested Field") {
+				var productConsumptionsObjects = JSONCurlUtil.get("${curl}", "$.productConsumptions");
+
+				var productConsumptionsObjectsEdit = JSONCurlUtil.get("${curl}", "$.productConsumptions");
+
+				echo("1. ${productConsumptionsObjectsEdit}");
+
+				var numberOfProductConsumptions = StringUtil.count("${productConsumptionsObjects}", "productKey");
+
+				var productConsumptionObjectNumber = "0";
+
+				while (!("${productConsumptionObjectNumber}" == "${numberOfProductConsumptions}")) {
+					var productConsumptionsObject = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}]");
+
+					var accountKey = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}].accountKey");
+
+					var productConsumptionsObjectsEdit = StringUtil.replace("${productConsumptionsObjectsEdit}", "&quot;accountKey&quot;:&quot;${accountKey}&quot;,", "");
+
+					var dateCreated = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}].dateCreated");
+
+					var productConsumptionsObjectsEdit = StringUtil.replace("${productConsumptionsObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
+
+					var externalLinks = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}].externalLinks");
+
+					var productConsumptionsObjectsEdit = StringUtil.replace("${productConsumptionsObjectsEdit}", "&quot;externalLinks&quot;:${externalLinks},", "");
+
+					var key = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}].key");
+
+					var productConsumptionsObjectsEdit = StringUtil.replace("${productConsumptionsObjectsEdit}", "&quot;key&quot;:&quot;${key}&quot;,", "");
+
+					var productPurchaseKey = JSONCurlUtil.get("${curl}", "$.productConsumptions[${productConsumptionObjectNumber}].productPurchaseKey");
+
+					var productConsumptionsObjectsEdit = StringUtil.replace("${productConsumptionsObjectsEdit}", "&quot;productPurchaseKey&quot;:&quot;${productPurchaseKey}&quot;,", "");
+
+					var productConsumptionObjectNumber = MathUtil.sum("${productConsumptionObjectNumber}", "1");
+				}
+
+				var productConsumptionsObjectsEdit = StringUtil.replaceFirst("${productConsumptionsObjectsEdit}", "[", "");
+
+				var productConsumptionsObjectsEdit = StringUtil.reverse("${productConsumptionsObjectsEdit}");
+
+				var productConsumptionsObjectsEdit = StringUtil.replaceFirst("${productConsumptionsObjectsEdit}", "]", "");
+
+				var productConsumptionsObjectsEdit = StringUtil.reverse("${productConsumptionsObjectsEdit}");
+
+				var valueFromAPI = "${productConsumptionsObjectsEdit}";
 			}
 			else if ("${field}" == "Product Field and Value") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.properties.${value1}");
