@@ -2,6 +2,7 @@ definition {
 	var dxpCloudApiToken = PropsUtil.get("dxp.cloud.api.token");
 	var dxpCloudApiUrl = PropsUtil.get("dxp.cloud.api.url");
 	var dxpCloudPageId = PropsUtil.get("dxp.cloud.page.id");
+	var supportURL = PropsUtil.get("support.liferay.url");
 
 	@prose = "the user with the email address ${userEmailAddress} should not be subscribed on DXP cloud"
 	macro viewNoSubscribedUser {
@@ -28,6 +29,178 @@ definition {
 
 		if (!(contains("${dxpCloudSubscribers}", "${userEmailAddress}"))) {
 			fail("The user with the email address ${userEmailAddress} was not subscribed to DXP Cloud");
+		}
+	}
+
+	@prose = "I manually add the user with the email address ${userEmailAddress} to the DXP Cloud subscription list"
+	macro addDXPCloudSubscriptionUserManually {
+		var script = '''
+			import com.liferay.registry.RegistryUtil;
+
+			try {
+				def registry = RegistryUtil.getRegistry()
+
+				def bundleContext = registry._bundleContext
+
+				serviceReference = bundleContext.getServiceReference("com.liferay.osb.customer.service.DXPCloudStatusPageWebService");
+
+				dxpcloudStatusPageWebService = bundleContext.getService(serviceReference);
+
+				String emailAddress = "${userEmailAddress}";
+
+				dxpcloudStatusPageWebService.postSubscriber(emailAddress);
+			}
+			catch (Exception e) {
+				out.println("""<div class="portlet-msg-error">${e}</div>""");
+				e.printStackTrace(out);
+			}
+			''';
+
+		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+		OSBAdmin.pause(timeInSeconds = "3");
+
+		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			Click(locator1 = "ProductMenu#TOGGLE");
+		}
+
+		Select(
+			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+			value1 = "Groovy");
+
+		Type(
+			locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+			value1 = "${script}");
+
+		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
+
+		Message.success();
+	}
+
+	@prose = "I manually remove the user with the email address ${userEmailAddress} to the DXP Cloud subscription list"
+	macro removeDXPCloudSubscriptionUserManually {
+		var script = '''
+			import com.liferay.portal.kernel.json.JSONArray;
+			import com.liferay.portal.kernel.json.JSONObject;
+			import com.liferay.portal.kernel.util.Validator;
+			import com.liferay.registry.RegistryUtil;
+
+			import java.util.List;
+
+			try {
+				def registry = RegistryUtil.getRegistry()
+
+				def bundleContext = registry._bundleContext
+
+				serviceReference = bundleContext.getServiceReference("com.liferay.osb.customer.service.DXPCloudStatusPageWebService");
+
+				dxpcloudStatusPageWebService = bundleContext.getService(serviceReference);
+
+				serviceReference = bundleContext.getServiceReference("com.liferay.osb.customer.subscription.util.DXPCloudStatusPageSubscriptionUtil");
+
+				dxpCloudStatusPageSubscriptionUtil = bundleContext.getService(serviceReference);
+
+				String emailAddress = "${userEmailAddress}";
+
+				Map<String, String> subscribers = dxpCloudStatusPageSubscriptionUtil.getSubscribers();
+
+				String subscriberId = subscribers.get(emailAddress);
+
+				if (Validator.isNotNull(subscriberId)) {
+					dxpcloudStatusPageWebService.deleteSubscriber(subscriberId);
+				}
+			}
+			catch (Exception e) {
+				out.println("""<div class="portlet-msg-error">${e}</div>""");
+				e.printStackTrace(out);
+			}
+			''';
+
+		Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+		OSBAdmin.pause(timeInSeconds = "3");
+
+		if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+			Click(locator1 = "ProductMenu#TOGGLE");
+		}
+
+		Select(
+			locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+			value1 = "Groovy");
+
+		Type(
+			locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+			value1 = "${script}");
+
+		Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
+
+		Message.success();
+	}
+
+	@prose = "I tear down the user email addresses from DXP Cloud subscription list ${table}"
+	macro removeDXPCloudSubscriptionUserManuallyTearDown {
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var script = '''
+				import com.liferay.portal.kernel.json.JSONArray;
+				import com.liferay.portal.kernel.json.JSONObject;
+				import com.liferay.portal.kernel.util.Validator;
+				import com.liferay.registry.RegistryUtil;
+
+				import java.util.List;
+
+				try {
+					def registry = RegistryUtil.getRegistry()
+
+					def bundleContext = registry._bundleContext
+
+					serviceReference = bundleContext.getServiceReference("com.liferay.osb.customer.service.DXPCloudStatusPageWebService");
+
+					dxpcloudStatusPageWebService = bundleContext.getService(serviceReference);
+
+					serviceReference = bundleContext.getServiceReference("com.liferay.osb.customer.subscription.util.DXPCloudStatusPageSubscriptionUtil");
+
+					dxpCloudStatusPageSubscriptionUtil = bundleContext.getService(serviceReference);
+
+					String emailAddress = "${userEmailAddress}";
+
+					Map<String, String> subscribers = dxpCloudStatusPageSubscriptionUtil.getSubscribers();
+
+					String subscriberId = subscribers.get(emailAddress);
+
+					if (Validator.isNotNull(subscriberId)) {
+						dxpcloudStatusPageWebService.deleteSubscriber(subscriberId);
+					}
+				}
+				catch (Exception e) {
+					out.println("""<div class="portlet-msg-error">${e}</div>""");
+					e.printStackTrace(out);
+				}
+				''';
+
+			Open(locator1 = "${supportURL}/group/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_mvcRenderCommandName=%2Fserver_admin%2Fview&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs1=script&_com_liferay_server_admin_web_portlet_ServerAdminPortlet_tabs2=");
+
+			OSBAdmin.pause(timeInSeconds = "3");
+
+			if (IsElementPresent(locator1 = "ProductMenu#PRODUCT_MENU_OPENED")) {
+				Click(locator1 = "ProductMenu#TOGGLE");
+			}
+
+			Select(
+				locator1 = "ServerAdministrationScript#LANGUAGE_SELECT",
+				value1 = "Groovy");
+
+			Type(
+				locator1 = "ServerAdministrationScript#SCRIPT_FIELD",
+				value1 = "${script}");
+
+			Click(locator1 = "ServerAdministrationScript#EXECUTE_BUTTON");
+
+			Message.success();
 		}
 	}
 }
