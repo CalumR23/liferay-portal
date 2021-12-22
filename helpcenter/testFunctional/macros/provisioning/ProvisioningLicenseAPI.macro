@@ -144,13 +144,27 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+			var value3 = "${row[3]}";
+			var valueComparation = "";
 
 			if ("${field}" == "Label") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value}')].label");
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value1}')].label");
+				var valueComparation = "${value1}";
 			}
 			else if ("${field}" == "License Entry Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value}')].types[?(@.licenseEntryName=='${licenseEntryName}')].licenseEntryName");
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value1}')].types[?(@.licenseEntryName=='${value2}')].licenseEntryName");
+				var valueComparation = "${value2}";
+			}
+			else if ("${field}" == "License Entry Type") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value1}')].types[?(@.licenseEntryType=='${value3}' && @.licenseEntryName=='${value2}')].licenseEntryType");
+				var valueComparation = "${value3}";
+			}
+			else if ("${field}" == "Product Key") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value2}");
+				var valueComparation = "${productKey}";
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[0].versions[?(@.label=='${value1}')].types[?(@.productKey=='${productKey}' && @.licenseEntryName=='${value2}')].productKey");
 			}
 			else {
 				fail("License field ${field} not testable via automation at the current time.");
@@ -162,11 +176,11 @@ definition {
 
 			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 
-			echo("Expected ${field} value: ${value}");
+			echo("Expected ${field} value: ${valueComparation}");
 			echo("Actual ${field} value: ${valueFromAPI}");
 
-			if (!("${value}" == "${valueFromAPI}")) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			if (!("${valueComparation}" == "${valueFromAPI}")) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${valueComparation} ");
 			}
 		}
 	}
