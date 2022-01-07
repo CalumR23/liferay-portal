@@ -63,7 +63,7 @@ definition {
             Click(locator1 = "ZendeskKCApp#DXPC_FAST_TRACK_ARTICLE_TEMPLATE_LINK");
         }
         else if ("${articleTemplate}" == "Fast Track Article") {
-		    Click(locator1 = "ZendeskKCApp#FAST_TRACK_ARTICLE_TEMPLATE_LINK");
+			Click(locator1 = "ZendeskKCApp#FAST_TRACK_ARTICLE_TEMPLATE_LINK");
         }
 
 		WaitForSPARefresh();
@@ -71,10 +71,10 @@ definition {
 		SelectFrameTop();
 
         if ("${articleTemplate}" == "DXPC Fast Track Article") {
-		    SelectWindow(locator1 = "New DXP Cloud Article");
+			SelectWindow(locator1 = "New DXP Cloud Article");
         }
         else if ("${articleTemplate}" == "Fast Track Article") {
-		    SelectWindow(locator1 = "Fast Track Article");
+			SelectWindow(locator1 = "Fast Track Article");
         }
 
 		AssertElementPresent(locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_FIELD");
@@ -124,7 +124,7 @@ definition {
 		Click(locator1 = "ZendeskKBArticleCreate#SAVE_ARTICLE_BUTTON");
 
 		if ("${reviewStatus}" == "Published") {
-		    Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_OPTION_DROPDOWN_BUTTON");
+			Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_OPTION_DROPDOWN_BUTTON");
 
 			Click(locator1 = "ZendeskKBArticleCreate#PUBLISH_ARTICLE_OPTION_LINK");
         }
@@ -222,6 +222,29 @@ definition {
 		SelectFrameTop();
 	}
 
+	@prose = "I should not be able to view an article with the name ${articleName} in the article list"
+	macro viewNoArticleList {
+		Open(locator1 = "${zendeskURL}/knowledge/lists/");
+
+		ZendeskHomepage.pause(timeInSeconds = "5");
+
+		if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
+			Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
+		}
+
+		Type(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "${articleName}");
+
+		KeyPress(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "\ENTER");
+
+		AssertElementNotPresent(
+			locator1 = "ZendeskKCApp#ARTICLE",
+			key_articleName = "${articleName}");
+	}
+
 	@prose = "I tear down the articles with the following names from zendesk.liferay.com ${table}"
 	macro _tearDownArticlesByName {
 		var RawTable rawTable = new RawTable("${table}");
@@ -259,5 +282,106 @@ definition {
 
 		}
 	}
-	
+
+	@prose = "I edit an article with the following values ${table}"
+	macro editArticle {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Article Name") {
+				var articleName = "${value}";
+			}
+			else if ("${field}" == "Article Name Update") {
+				var articleNameUpdate = "${value}";
+			}
+			else if ("${field}" == "Article Description Update") {
+				var articleDescriptionUpdate = "${value}";
+			}
+			else if ("${field}" == "Review Status") {
+				var reviewStatus = "${value}";
+			}
+			else if ("${field}" == "Review Status Update") {
+				var reviewStatusUpdate = "${value}";
+			}
+			else {
+				fail("No such field ${field}");
+			}
+		}
+
+		Open(locator1 = "${zendeskURL}/knowledge/lists/");
+
+		ZendeskHomepage.pause(timeInSeconds = "5");
+
+		if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
+			Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
+		}
+
+		Type(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "${articleName}");
+
+		KeyPress(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "\ENTER");
+
+		Click(
+			locator1 = "ZendeskKCApp#ARTICLE_STATUS",
+			key_articleName = "${articleName}",
+			key_reviewStatus = "${reviewStatus}");
+
+		Click(locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_FIELD");
+
+		KeyPress.keyDown(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_INPUT",
+			value1 = "\CONTROL");
+
+		KeyPress(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_INPUT",
+			value1 = "a");
+
+		Type.sendKeys(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_INPUT",
+			value1 = "${articleNameUpdate}");
+
+		KeyPress.keyUp(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_INPUT",
+			value1 = "\CONTROL");
+
+		SelectFrame(locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_IFRAME");
+
+		Click(locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_BODY");
+
+		KeyPress.keyDown(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_BODY",
+			value1 = "\CONTROL");
+
+		KeyPress(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_BODY",
+			value1 = "a");
+
+		Type.sendKeys(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_BODY",
+			value1 = "${articleDescriptionUpdate}");
+
+		KeyPress.keyUp(
+			locator1 = "ZendeskKBArticleCreate#ARTICLE_DESCRIPTION_BODY",
+			value1 = "\CONTROL");
+
+		SelectFrameTop();
+
+		SelectWindow(locator1 = "${articleNameUpdate}");
+
+		Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_BUTTON");
+
+		if ("${reviewStatusUpdate}" == "Published") {
+			ZendeskHomepage.pause(timeInSeconds = "10");
+
+			Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_OPTION_DROPDOWN_BUTTON");
+
+			Click(locator1 = "ZendeskKBArticleCreate#PUBLISH_ARTICLE_OPTION_LINK");
+        }
+	}
 }
