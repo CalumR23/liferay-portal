@@ -330,65 +330,48 @@ definition {
 
 		ZendeskHomepage.pause(timeInSeconds = "10");
 
-		ZendeskRequest.fulfillLargeFileUploaderFields(table = "${table}");
-	}
+		var RawTable rawTable = new RawTable("${table}");
 
-	@prose = "I fulfill the large file uploader fields ${table}"
-	macro  fulfillLargeFileUploaderFields {
-		var toFulfill = "true";
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
 
-		while("${toFulfill}" == "true") {
-			var RawTable rawTable = new RawTable("${table}");
+			if ("${field}" == "Attachment") {
+				MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
 
-			for (var row : table "${rawTable}") {
-				var field = "${row[0]}";
-				var value = "${row[1]}";
+				UploadCommonFile(
+					locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
+					value1 = "${value}");
 
-				if ("${field}" == "Attachment") {
-					MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
-
-					UploadCommonFile(
-						locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
-						value1 = "${value}");
-
-					ZendeskHomepage.pause(timeInSeconds = "10");
-				}
-				else if ("${field}" == "Comment") {
-					Type(
-						locator1 = "LargeFileUploader#COMMENT_FIELD",
-						value1 = "${value}");
-				}
-				else if ("${field}" == "Data Region") {
-					AssertTextEquals.assertPartialText(
-						locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
-						value1 = "Your file will be uploaded to a file server in the ${value}.");
-				}
-				else if ("${field}" == "No Personal Data") {
-					if ("${value}" == "true") {
-						Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
-					}
-					else {
-						Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
-					}
+				ZendeskHomepage.pause(timeInSeconds = "10");
+			}
+			else if ("${field}" == "Comment") {
+				Type(
+					locator1 = "LargeFileUploader#COMMENT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Data Region") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
+					value1 = "Your file will be uploaded to a file server in the ${value}.");
+			}
+			else if ("${field}" == "No Personal Data") {
+				if ("${value}" == "true") {
+					Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
 				}
 				else {
-					fail("No such large file uploader field ${field}");
+					Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
 				}
 			}
-			AssertTextEquals.assertPartialText(
-				locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
-				value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
-
-			Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
-
-			if (IsElementPresent(locator1 = "LargeFileUploader#ATTACHMENT_FIELD_ERROR_MESSAGE")) {
-				Refresh();
-			}
 			else {
-				var toFulfill = "false";
+				fail("No such large file uploader field ${field}");
 			}
 		}
+		AssertTextEquals.assertPartialText(
+			locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
+			value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
 
+		Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
 	}
 
 	@prose = "I should be able to view a request with the following details ${table}"
