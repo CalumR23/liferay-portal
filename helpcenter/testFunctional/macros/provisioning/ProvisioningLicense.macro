@@ -903,8 +903,8 @@ definition {
 		AssertVisible(locator1 = "ProvisioningLicenseDownloadLicense#DOWNLOAD_BUTTON");
 	}
 
-	@prose = "I should be able to view the downloaded ${fileType} license file the with the following parameters ${table}"
-	macro viewDownloadedLicense {
+	@prose = "I format the expected license file name of type ${fileType} with the values ${table}"
+	macro formatLicenseFileName {
 		var RawTable rawTable = new RawTable("${table}");
 
 		var licenseType = "";
@@ -915,27 +915,27 @@ definition {
 
 		for (var role : table "${rawTable}") {
 			var field = "${role[0]}";	
-			var type = "${role[1]}";
+			var value = "${role[1]}";
 
 			if ("${field}" == "License Type") {
-				var licenseType = "${type}-";
+				var licenseType = "${value}-";
 			}
 			else if ("${field}" == "Product"){
-				var product = "${type}-";
+				var product = "${value}-";
 			}
 			else if ("${field}" == "Version") {
-				var version = "${type}-";
+				var version = "${value}-";
 			}
 			else if ("${field}" == "License Name") {
 				if ("${licenseName}" == "") {
-					var licenseName = "${type}";
+					var licenseName = "${value}";
 				}
 				else {
-					var licenseName = "${licenseName}-${type}";
+					var licenseName = "${licenseName}-${value}";
 				}
 			}
 			else if ("${field}" == "Copy") {
-				var copy = " (${type})";
+				var copy = " (${value})";
 			}
 			else {
 				fail("No such field ${field} required!");
@@ -949,6 +949,13 @@ definition {
 		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
 
 		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
+
+		return "${downloadedFileName}";
+	}
+
+	@prose = "I should be able to view the downloaded ${fileType} license file the with the following parameters ${table}"
+	macro assertDownloadedLicensePresent {
+		var downloadedFileName = ProvisioningLicense.formatLicenseFileName(table = "${table}", fileType = "${fileType}");
 
 		echo("Expected file name: ${downloadedFileName}");
 
