@@ -13640,6 +13640,126 @@ Scenario: View extend license form date field validation for detached license
 	| Expiration Date | Input | 2021-04-30 | |
 	Then the choose button for the extend license in position "1" should be disabled
 
+Scenario: View bulk extend license form date field validation
+	Testing that the bulk extend license form date field validation works correctly
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static full non abbreviated start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I generate future static full non abbreviated start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License1 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License1 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License2 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License2 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	And I select the following licenses under the licenses tab
+	| Korlic - ${staticProjectName} License1 Name |
+	| Korlic - ${staticProjectName} License2 Name |
+	And I click on the "Extend" button in the dropdown menu for all licenses under the license tab
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | 2020-05-32 |
+	| Bulk Input | Expiration Date | 2021-04-32 | 
+	Then the extend button should be disabled on the extend license form
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | 2020-05-31 |
+	| Bulk Input | Expiration Date | 2021-04-32 | 
+	Then the extend button should be disabled on the extend license form
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | 2020-05-32 |
+	| Bulk Input | Expiration Date | 2021-04-30 | 
+	Then the extend button should be disabled on the extend license form
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | 2021-04-30 |
+	| Bulk Input | Expiration Date | 2021-04-30 | 
+	Then the extend button should be disabled on the extend license form
+
 Scenario: View no extend button for DXP production license
 	Testing the inability to extend a new DXP license for a T4 DXP production project from koroneiki on provisioning
 
@@ -14097,3 +14217,387 @@ Scenario: Generate DXP Production virtual cluster license after selecting DXP Pr
 	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the subscription details page
 	When I click on the "Deactivated" license tab
 	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName}" on the subscription details page
+
+Scenario: Bulk extend DXP licenses via bulk extend
+	Testing the ability to bulk extend virtual cluster DXP licenses via bulk extend for a T4 DXP project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static full non abbreviated start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I generate future static full non abbreviated start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License1 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License1 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License2 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License2 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	And I select the following licenses under the licenses tab
+	| Korlic - ${staticProjectName} License1 Name |
+	| Korlic - ${staticProjectName} License2 Name |
+	And I click on the "Extend" button in the dropdown menu for all licenses under the license tab
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | ${staticYyyyMmDdFutureStartDate}       |
+	| Bulk Input | Expiration Date | ${staticYyyyMmDdFutureOriginalEndDate} |
+	And I click on the extend button for the "DXP Production" license in position "1" on the extend license form
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 20             |
+	| State               | ACTIVE         |
+	When I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And the "Active" license tab should have the count value "4"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "4"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the account details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the account details page
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" and the following values on the subscription details page
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I should be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" and the following values on the subscription details page
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And the "Active" license tab should have the count value "4"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "4"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the subscription details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the subscription details page
+
+Scenario: Bulk extend different DXP licenses via bulk extend
+	Testing the ability to bulk extend DXP Production and DXP Limited licenses via bulk extend for a T4 DXP project from koroneiki on provisioning
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate static full non abbreviated start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I generate future static full non abbreviated start and end dates
+	And I generate future static yyyymmdd start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "test@liferay.com" with password "kwSgiajslgb7ecsD"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License1 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License1 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | DXP Production                   | |
+	| Version | Select        | 7.2                              | |
+	| Type    | Select        | DXP Production (Virtual Cluster) | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name                  | Input    | Korlic - ${staticProjectName} License2 Name        | |
+	| Description           | Input    | Korlic - ${staticProjectName} License2 Description | |
+	| Maximum Cluster Nodes | Input    | 5                                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account        | Select Entity | Korlic - ${staticProjectName} | |
+	| Product        | Select        | DXP Limited                   | |
+	| Version        | Select        | 7.2                           | |
+	| Type           | Select        | DXP Limited                   | |
+	| Instance Size  | Select        | 1                             | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name          | Input    | Korlic - ${staticProjectName} License3 Name        | |
+	| Description   | Input    | Korlic - ${staticProjectName} License3 Description | |
+	| Host Name     | Input    | localhost                                          | |
+	| IP Addresses  | Textarea | 123.45.67.89                                       | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | DXP Limited                   | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName} License3 Name        |
+	| Description   | Korlic - ${staticProjectName} License3 Description |
+	| Product       | DXP Limited                                        |
+	| Type          | Limited                                            |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	And I select the following licenses under the licenses tab
+	| Korlic - ${staticProjectName} License1 Name |
+	| Korlic - ${staticProjectName} License2 Name |
+	| Korlic - ${staticProjectName} License3 Name |
+	And I click on the "Extend" button in the dropdown menu for all licenses under the license tab
+	And I populate the extend license form fields in position "1" and the following values
+	| Bulk Input | Start Date      | ${staticYyyyMmDdFutureStartDate}       |
+	| Bulk Input | Expiration Date | ${staticYyyyMmDdFutureOriginalEndDate} |
+	And I click on the extend button for the "DXP Production" license in position "1" on the extend license form
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the product with the name "DXP Production" and the following values on the account details page
+	| Name                | DXP Production |
+	| Current Provisioned | 20             |
+	| State               | ACTIVE         |
+	When I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And the "Active" license tab should have the count value "5"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "5"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License3 Name" on the account details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the account details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License3 Name" on the account details page
+	When I go to the account index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	And I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" and the following values on the subscription details page
+	| Name          | Korlic - ${staticProjectName} License1 Name        |
+	| Description   | Korlic - ${staticProjectName} License1 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I should be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" and the following values on the subscription details page
+	| Name          | Korlic - ${staticProjectName} License2 Name        |
+	| Description   | Korlic - ${staticProjectName} License2 Description |
+	| Product       | DXP Production                                     |
+	| Type          | Virtual Cluster                                    |
+	| Details       | Maximum Cluster Nodes: 5                           |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And I should be able to view the license with the keyword "Korlic - ${staticProjectName} License3 Name" and the following values on the subscription details page
+	| Name          | Korlic - ${staticProjectName} License3 Name        |
+	| Description   | Korlic - ${staticProjectName} License3 Description |
+	| Product       | DXP Limited                                        |
+	| Type          | Limited                                            |
+	| Status        | ACTIVE                                             |
+	| Complimentary | false                                              |
+	And the "Active" license tab should have the count value "5"
+	And the "Expired" license tab should have the count value "0"
+	And the "Deactivated" license tab should have the count value "0"
+	And the "All" license tab should have the count value "5"
+	When I click on the "Expired" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License3 Name" on the account details page
+	When I click on the "Deactivated" license tab
+	Then I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License2 Name" on the subscription details page
+	And I should not be able to view the license with the keyword "Korlic - ${staticProjectName} License3 Name" on the account details page
