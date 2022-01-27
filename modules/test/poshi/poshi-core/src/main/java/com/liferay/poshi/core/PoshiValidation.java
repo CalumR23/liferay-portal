@@ -1442,11 +1442,11 @@ public class PoshiValidation {
 		int seleniumParameterCount = PoshiContext.getSeleniumParameterCount(
 			seleniumMethodName);
 
-		List<String> methodParameters =
-			PoshiScriptParserUtil.getMethodParameters(
+		List<String> methodParameterValues =
+			PoshiScriptParserUtil.getMethodParameterValues(
 				seleniumGetterMethodMatcher.group("methodParameters"));
 
-		if (methodParameters.size() != seleniumParameterCount) {
+		if (methodParameterValues.size() != seleniumParameterCount) {
 			_exceptions.add(
 				new ValidationException(
 					element, "Expected ", seleniumParameterCount,
@@ -1454,7 +1454,7 @@ public class PoshiValidation {
 					"\" but found ", seleniumParameterCount, "\n", filePath));
 		}
 
-		for (String methodParameter : methodParameters) {
+		for (String methodParameter : methodParameterValues) {
 			Matcher invalidMethodParameterMatcher =
 				_invalidMethodParameterPattern.matcher(methodParameter);
 

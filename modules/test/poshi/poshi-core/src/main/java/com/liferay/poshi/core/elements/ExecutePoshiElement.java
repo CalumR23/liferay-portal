@@ -78,7 +78,7 @@ public class ExecutePoshiElement extends PoshiElement {
 			addAttribute("selenium", getCommandName(poshiScript));
 
 			List<String> methodParameters =
-				PoshiScriptParserUtil.getMethodParameters(
+				PoshiScriptParserUtil.getMethodParameterValues(
 					poshiScriptParentheticalContent);
 
 			for (int i = 0; i < methodParameters.size(); i++) {
@@ -143,7 +143,7 @@ public class ExecutePoshiElement extends PoshiElement {
 			addAttribute("method", getCommandName(poshiScript));
 
 			for (String methodParameter :
-					PoshiScriptParserUtil.getMethodParameters(
+					PoshiScriptParserUtil.getMethodParameterValues(
 						poshiScriptParentheticalContent)) {
 
 				add(PoshiNodeFactory.newPoshiNode(this, methodParameter));
@@ -153,7 +153,7 @@ public class ExecutePoshiElement extends PoshiElement {
 		}
 
 		for (String methodParameter :
-				PoshiScriptParserUtil.getMethodParameters(
+				PoshiScriptParserUtil.getMethodParameterValues(
 					poshiScriptParentheticalContent,
 					_executeParameterPattern)) {
 
