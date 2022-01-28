@@ -1,0 +1,58 @@
+definition {
+	var provisioningAdminEmail = PropsUtil.get("provisioning.admin.email.address");
+	var provisioningAdminPassword = PropsUtil.get("provisioning.admin.password");
+	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+	var roleName = PropsUtil.get("provisioning.non.permission.role.name");
+
+    @prose = "I assign the following roles to the user with the email adress ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _assignContactRolesToContact { 
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+
+        var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+            var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
+    @prose = "I unassign the following roles to the user with the email adress ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _unassignContactRolesToContact { 
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+
+        var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+            var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+}

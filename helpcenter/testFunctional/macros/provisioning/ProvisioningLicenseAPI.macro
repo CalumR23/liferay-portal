@@ -58,6 +58,27 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
 	}
 
+	@prose = "I should be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} via api"
+	macro _downloadDeveloperLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroup}/product-version/${productVersion}/development-license-key
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}");
+
+		if (!(contains("${licenseFile}","${productGroup}"))) {
+			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded ");
+		}
+		if (!(contains("${licenseFile}","${productVersion}"))) {
+			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded ");
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
 	@prose = "I extend the license on provisioning with the name ${licenseName} on the account ${accountName} and the product purchase key ${productPurchaseKey} with the following values ${table}"
 	macro _extendLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
