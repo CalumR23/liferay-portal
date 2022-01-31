@@ -123,6 +123,199 @@ Scenario: View ticket after project offering expiration
 #	And I go to My activities
 #	Then I should not see a request with the subject "Request Subject" in the index
 
+Scenario: View ticket after project offering expiration with closed watcher
+	@ help.center.acceptance = "true"
+	Zendesk tickets should be moved to closed status when its respective project is expired with a closed watcher
+
+	Given I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I wait for "1" minutes
+	Then the support organization with the code "OSBZENOSBZEN" should be part of the support site
+	And the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Osbzen - ${staticProjectName}                    |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Portal Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And the ticket with ticketId "${staticRequestIdList}" should have the default user from the organization with the name "Osbzen - ${staticProjectName}" as the requester
+#	When I update the user with the email address "osb.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+#	And I log into zendesk as "osb.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+#	And I go to My activities
+#	Then I should not see a request with the subject "Request Subject" in the index
+
+
+Scenario: View ticket after project offering deactivation
+	@ help.center.acceptance = "true"
+	Zendesk tickets should be moved to closed status when its respective project is expired and deactivated
+
+	Given I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I wait for "1" minutes
+	Then the support organization with the code "OSBZENOSBZEN" should be part of the support site
+	And the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Osbzen - ${staticProjectName}                    |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I generate future static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Portal Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And the ticket with ticketId "${staticRequestIdList}" should have the default user from the organization with the name "Osbzen - ${staticProjectName}" as the requester
+#	When I update the user with the email address "osb.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+#	And I log into zendesk as "osb.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+#	And I go to My activities
+#	Then I should not see a request with the subject "Request Subject" in the index
+
+Scenario: View ticket after project offering deactivation with closed watcher
+	@ help.center.acceptance = "true"
+	Zendesk tickets should be moved to closed status when its respective project is expired and deactivated with closer watcher 
+
+	Given I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I wait for "1" minutes
+	Then the support organization with the code "OSBZENOSBZEN" should be part of the support site
+	And the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	When I wait for "60" seconds
+	And I create a request as a user with the email address "osb.customer1@lrcustomer.com.broken" with the following values
+	| Product           | prd_liferay_portal_6_2                           |
+	| Component         | activation_key_project_administration            |
+	| System Status     | production_functioning_with_limited_capabilities |
+	| Subject           | Request Subject                                  |
+	| Description       | Request Description                              |
+	| Organization Name | Osbzen - ${staticProjectName}                    |
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "new"
+	And the ticket with ticketId "${staticRequestIdList}" should have the requester with the email address "osb.customer1@lrcustomer.com.broken"
+	When I wait for "60" seconds
+	And I generate future static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Portal Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the ticket with ticketId "${staticRequestIdList}" should have the status "closed"
+	And the ticket with ticketId "${staticRequestIdList}" should have the default user from the organization with the name "Osbzen - ${staticProjectName}" as the requester
+#	When I update the user with the email address "osb.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+#	And I log into zendesk as "osb.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+#	And I go to My activities
+#	Then I should not see a request with the subject "Request Subject" in the index
+
 Scenario: View ticket after requester removal on organization with multiple customers
 	@ help.center.acceptance = "true"
 	Zendesk users should not be removed from an OSB org if they have open tickets and are the last remaining customer on the OSB org.
