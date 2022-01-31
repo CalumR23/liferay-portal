@@ -224,6 +224,24 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I sould be able to view a error when delete a assigned contact role on koroneiki with the name ${contactRoleName}"
+	macro viewErrorDeleteAssignedContactRole {
+		var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contact-roles/${contactRoleKey}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var errorMessage = JSONCurlUtil.delete("${curl}");
+
+		if (!(contains("${errorMessage}","Please remove any contacts assigned to the contact role before attempting to delete"))) {
+			fail("There was no error upon deletion attempt of the contact role");
+		}
+	}
+
 	@prose = "I delete an external link with the entity id ${entityId} on the contact role ${contactRoleName}"
 	macro _deleteContactRoleExternalLink {
 		var externalLinkKey = KoroneikiContactRoleAPI._getContactRoleExternalLinkKey(
