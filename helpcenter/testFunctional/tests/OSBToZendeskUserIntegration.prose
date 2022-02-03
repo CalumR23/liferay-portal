@@ -16,6 +16,11 @@ Setup:
 	| Email Address | osb.customer2@lrcustomer.com.broken |
 	| First Name    | OSB                                 |
 	| Last Name     | Customer2                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer3                       |
+	| Email Address | osb.customer3@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer3                           |
 	* I assign the web user with the email address "osb.customer1@lrcustomer.com.broken" to the web role "Verified User"
 	* I assign the web user with the email address "osb.customer2@lrcustomer.com.broken" to the web role "Verified User"
 	* I create an account on koroneiki with the following values
@@ -59,15 +64,19 @@ Teardown:
 	* I tear down the users with the following email addresses from web.liferay.com
 	| osb.customer1@lrcustomer.com.broken |
 	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| osb.customer1@lrcustomer.com.broken |
 	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
 	* I tear down the users with the following email addresses from koroneiki
 	| osb.customer1@lrcustomer.com.broken |
 	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
  	* I tear down the contacts on koroneiki with the following email addresses
 	| osb.customer1@lrcustomer.com.broken |
 	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
 	* I tear down the accounts on koroneiki with the following names
 	| Osbzen - ${staticProjectName} |
 	* I tear down the accounts on koroneiki with the following "Code" values
@@ -80,6 +89,7 @@ Teardown:
 	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
 	| osb.customer1@lrcustomer.com.broken |
 	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
 	| Osbzen - ${staticProjectName} |
@@ -268,6 +278,136 @@ Scenario: View resynced deleted users via provisioning
 	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
 	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
 
+Scenario: View closed watcher and other resynced users via provisioning of an expired project
+	Users of an expired project who are resynced to Zendesk via Provisioning should be in their appropriate organization with their appropriate tags on an expired project.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"	
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	Then I remove a user with the email address "osb.customer3@lrcustomer.com.broken" from an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove all tags from the user with the email address "osb.customer3@lrcustomer.com.broken"
+	And I wait for "10" seconds
+	And I log into the provisioning homepage as "test@liferay.com" with password "nHZMPLWyzvRKujPLqfHK"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Osbzen"
+	And I click on the account with the name "Osbzen - ${staticProjectName}" on the provisioning index
+	And I click on the Sync To Zendesk button on the account page
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer3@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	
+Scenario: View closed watcher and other resynced users via provisioning of an unactivated project
+	Users of an unactivated who are resynced to Zendesk via Provisioning should be in their appropriate organization with their appropriate tags.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"	
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	Then I remove a user with the email address "osb.customer3@lrcustomer.com.broken" from an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove all tags from the user with the email address "osb.customer3@lrcustomer.com.broken"
+	And I wait for "10" seconds
+	And I log into the provisioning homepage as "test@liferay.com" with password "nHZMPLWyzvRKujPLqfHK"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Osbzen"
+	And I click on the account with the name "Osbzen - ${staticProjectName}" on the provisioning index
+	And I click on the Sync To Zendesk button on the account page
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer3@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+
 Scenario: View customer role updates
 	Existing users who are changed from Developer to Watcher and vice versa on OSB should have their respective Zendesk tags updated.
 
@@ -315,6 +455,100 @@ Scenario: View expired project user updates
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View unactivated project user updates
+	If a project's order becomes inactive in OSB, existing users on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View expired project closed watcher user updates
+	If a project's order becomes inactive in OSB, existing users on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View unactivated project closed watcher user updates
+	If a project's order becomes inactive in OSB, existing users on that project should have their tags removed and also be removed from their organization in Zendesk.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 
 Scenario: View renewed project user updates
 	If a project's order becomes active from inactive in OSB, existing users on that project should have their tags added back and also be add back to their organization in Zendesk.
@@ -378,6 +612,38 @@ Scenario: View customer removal updates
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 
+Scenario: View customer re-assign updates
+	Removed customer users who are re-assigned to Zendesk should be in their appropriate organization with their appropriate tags.
+	
+	Given I remove customer contacts with the following email addresses from the account "Osbzen - ${staticProjectName}"
+	| osb.customer1@lrcustomer.com.broken |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	When I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
 Scenario: View watcher removal updates
 	If a watcher is removed from a project in OSB, the watcher's tags should be removed and the watcher should also be removed from the organization in Zendesk.
 
@@ -395,6 +661,38 @@ Scenario: View watcher removal updates
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View watcher re-assign updates
+	Removed watcher users who are re-assigned to Zendesk should be in their appropriate organization with their appropriate tags.
+
+	Given I remove customer contacts with the following email addresses from the account "Osbzen - ${staticProjectName}"
+	| osb.customer2@lrcustomer.com.broken |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	When I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 
 Scenario: View closed watcher user updates
 	If a project's order becomes inactive in OSB, existing users on that project marked as closed watchers should have watcher tags retained and also be part of the organization in Zendesk.
@@ -427,6 +725,170 @@ Scenario: View closed watcher user updates
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View closed watcher user updates of an unactivated project
+	If a project's order becomes inactive in OSB, existing users on that project marked as closed watchers should have watcher tags retained and also be part of the organization in Zendesk.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View expired project closed watcher and others users updates
+	If a project's order becomes inactive in OSB, existing users on that project marked as closed watchers should have watcher tags retained and also be part of the organization in Zendesk.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View unactivated project closed watcher and others users updates
+	If a project's order becomes inactive in OSB, existing users on that project marked as closed watchers should have watcher tags retained and also be part of the organization in Zendesk.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View resynced closed watcher users via provisioning 
+	Users who are resynced to Zendesk via Provisioning should be in their appropriate organization with their appropriate tags.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	Then I remove a user with the email address "osb.customer1@lrcustomer.com.broken" from an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove a user with the email address "osb.customer2@lrcustomer.com.broken" from an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove all tags from the user with the email address "osb.customer1@lrcustomer.com.broken"
+	And I remove all tags from the user with the email address "osb.customer2@lrcustomer.com.broken"
+	And I wait for "10" seconds
+	And I log into the provisioning homepage as "test@liferay.com" with password "nHZMPLWyzvRKujPLqfHK"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Osbzen"
+	And I click on the account with the name "Osbzen - ${staticProjectName}" on the provisioning index
+	And I click on the Sync To Zendesk button on the account page
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
 
 Scenario: View closed watcher user removal
 	If a project's order becomes inactive in OSB, existing users on that project unmarked as closed watchers should have watcher tags removed and also be removed from the organization in Zendesk.
@@ -465,6 +927,96 @@ Scenario: View closed watcher user removal
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
 	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View closed watcher user removal of an unactivated project
+	If a project's order becomes inactive in OSB, existing users on that project unmarked as closed watchers should have watcher tags removed and also be removed from the organization in Zendesk.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" from the following roles	
+	| Support Closed Watcher |
+	And I remove the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" from the following roles	
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+
+Scenario: View closed watcher re-assign updates
+	Removed closed watcher users who are re-assigned to Zendesk should be in their appropriate organization with their appropriate tags.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And I remove the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" from the following roles	
+	| Support Closed Watcher |
+	And I remove the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" from the following roles	
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	When I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
 
 Scenario: View closed watcher and project reopening user updates
 	Projects that are reopened with closed watchers should restore previous statuses for their respective users and remove all closed watcher tags.
@@ -515,3 +1067,183 @@ Scenario: View closed watcher and project reopening user updates
 	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
 	And the contact with the email address "osb.customer1@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
 	And the contact with the email address "osb.customer2@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+
+Scenario: View closed watcher and project reopening user updates of an unactivated project
+	Projects that are reopened with closed watchers should restore previous statuses for their respective users and remove all closed watcher tags.
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I wait for "10" seconds
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the contact with the email address "osb.customer1@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+	And the contact with the email address "osb.customer2@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+
+Scenario: View closed watcher and others users updates of an expired project reopening
+	Projects that are reopened with closed watchers should restore previous statuses for their respective users and remove all closed watcher tags.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I wait for "10" seconds
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"	
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer3@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the contact with the email address "osb.customer1@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+	And the contact with the email address "osb.customer2@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+	And the contact with the email address "osb.customer3@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+
+Scenario: View closed watcher and others users updates on the unactivated project reopening
+	Projects that are reopened with closed watchers should restore previous statuses for their respective users and remove all closed watcher tags.
+
+	Given I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Watcher |
+	And I assign the contact with the email address "osb.customer3@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Closed Watcher |
+	And I wait for "10" seconds
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I update a product purchase on koroneiki made by the account "Osbzen - ${staticProjectName}" for the product "Gold Subscription" to have the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	Then the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be in the organization "Osbzen - ${staticProjectName}"	
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer3@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the web user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the web user with the email address "osb.customer3@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the contact with the email address "osb.customer1@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+	And the contact with the email address "osb.customer2@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
+	And the contact with the email address "osb.customer3@lrcustomer.com.broken" assigned the account "Osbzen - ${staticProjectName}" should not have the contact role "Support Closed Watcher"
