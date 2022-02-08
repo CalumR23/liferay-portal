@@ -1432,3 +1432,143 @@ Scenario: Download customer large files on project details as employee
 	Then I should see the downloaded file "Document_1.txt"
 	And the attachment with the keyword "Document_2.txt" should not be clickable
 	Then I should not see the downloaded file "Document_2.txt"
+
+Scenario: Download large files on project details as partner
+	Partner users should be able to download large attached files that they own on product details if thay are flaged as No Personal Content
+
+	Given I generate a provisioning project name
+	And I create a user with the following parameters
+	| Screen Name   | lfa.partner1                      |
+	| Email Address | lfa.partner1@lrpartner.com.broken |
+	| First Name    | LFA                               |
+	| Last Name     | Partner1                          |
+	And I create a user with the following parameters
+	| Screen Name   | lfa.partner2                      |
+	| Email Address | lfa.partner2@lrpartner.com.broken |
+	| First Name    | LFA                               |
+	| Last Name     | Partner2                          |
+	And I assign the web user with the email address "lfa.partner1@lrpartner.com.broken" to the web role "Verified User"
+	And I assign the web user with the email address "lfa.partner2@lrpartner.com.broken" to the web role "Verified User"
+	And I generate static start and end dates
+	And I create an account on koroneiki with the following values
+	| Name   | Lfapar - ${staticProjectName} | |
+	| Code   | LFAPARLFAPAR                  | |
+	| Status | Active                        | |
+	And I create a product purchase for an account with the name "Lfapar - ${staticProjectName}" and the product "Service Partnership" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I assign the contact with the email address "lfa.partner1@lrpartner.com.broken" on the account "Lfapar - ${staticProjectName}" to the following roles
+	| Partner Member |
+	And I assign the contact with the email address "lfa.partner2@lrpartner.com.broken" on the account "Lfapar - ${staticProjectName}" to the following roles
+	| Partner Manager |
+	And I create an assigned team nested field for a team with the name "Lfapar - ${staticProjectName}" assigned to the account "Lfazen - ${staticProjectName}"
+	And I create a user with the following parameters
+	| Screen Name   | lfa.customer1                       |
+	| Email Address | lfa.customer1@lrcustomer.com.broken |
+	| First Name    | LFA                                 |
+	| Last Name     | Customer1                           |
+	And I assign the web user with the email address "lfa.customer1@lrcustomer.com.broken" to the web role "Verified User"
+	And I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} | |
+	| Code                       | LFAZENLFAZEN                     | |
+	| Data Region                | United States                    | |
+	| Language                   | English                          | |
+	| Name                       | Lfazen - ${staticProjectName}    | |
+	| Region                     | United States                    | |
+	| Status                     | Active                           | |
+	| Tier                       | T1                               | |
+	And I assign the team with the name "Lfapar - ${staticProjectName}" on the account "Lfazen - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Lfapar - ${staticProjectName}" on the account "Lfazen - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I assign the contact with the email address "lfa.customer1@lrcustomer.com.broken" on the account "Lfazen - ${staticProjectName}" to the following roles
+	| Support Developer |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Lfazen - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Lfazen - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Gold Subscription"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I synchronize the contact entitlement definition with the name "Customer - Portal"
+	And I synchronize the contact entitlement definition with the name "Partner"
+	And I wait for "1" minutes
+	Then the support organization with the code "LFAZENLFAZEN" should be part of the support site
+	And the organization "Lfazen - ${staticProjectName}" should be present on zendesk.liferay.com
+	And the support user with the email address "lfa.customer1@lrcustomer.com.broken" should be synced to the support site
+	And the support user with the email address "lfa.partner1@lrpartner.com.broken" should be synced to the support site
+	And the support user with the email address "lfa.partner2@lrpartner.com.broken" should be synced to the support site
+	When I update the support password for user with the email address "lfa.customer1@lrcustomer.com.broken" to "osbadminqauser"
+	And I update the support password for user with the email address "lfa.partner1@lrpartner.com.broken" to "osbadminqauser"
+	And I update the support password for user with the email address "lfa.partner2@lrpartner.com.broken" to "osbadminqauser"
+	And I update the user with the email address "lfa.customer1@lrcustomer.com.broken" to use the password "zendeskqauser"
+	And I update the user with the email address "lfa.partner1@lrpartner.com.broken" to use the password "zendeskqauser"
+	And I update the user with the email address "lfa.partner2@lrpartner.com.broken" to use the password "zendeskqauser"
+	And I log out and log into the support homepage as "lfa.customer1@lrcustomer.com.broken" with password "osbadminqauser"
+	And I log into zendesk as "lfa.customer1@lrcustomer.com.broken" with password "zendeskqauser"
+	And I create a request with the following values
+	| Product       | Liferay Portal                          | 6.2                                   |
+	| Component     | Activation Key & Project Administration |                                       |
+	| System Status | Production                              | Functioning with limited capabilities |
+	| Subject       | Request Subject                         |                                       |
+	| Description   | Request Description                     |                                       |
+	And I log out and log into the support homepage as "lfa.partner1@lrpartner.com.broken" with password "osbadminqauser"
+	And I log into zendesk as "lfa.partner1@lrpartner.com.broken" with password "zendeskqauser"
+	And I go to the request with the ID "${staticRequestId}"
+	And I accept all cookies
+	And I upload a file using the large file uploader with the following parameters
+	| Attachment       | Document_1.txt     |
+	| Comment          | Large File Comment |
+	| Data Region      | United States      |
+	| No Personal Data | true               |
+	When I upload a file using the large file uploader with the following parameters
+	| Attachment       | Document_2.txt     |
+	| Comment          | Large File Comment |
+	| Data Region      | United States      |
+	| No Personal Data | false              |
+	When I go to the Project Details page
+	And I go to the project with the name "Lfazen - ${staticProjectName}"
+	And I go to the Attachments tab
+	And I download the attachment with the keyword "Document_1.txt" by actions link
+	Then I should see the downloaded file "Document_1.txt"
+	And the attachment with the keyword "Document_2.txt" should not be clickable
+	Then I should not see the downloaded file "Document_2.txt"
+	When I log out and log into the support homepage as "lfa.partner2@lrpartner.com.broken" with password "osbadminqauser"
+	And I log into zendesk as "lfa.partner2@lrpartner.com.broken" with password "zendeskqauser"
+	And I go to the request with the ID "${staticRequestId}"
+	And I accept all cookies
+	And I upload a file using the large file uploader with the following parameters
+	| Attachment       | Document_3.txt      |
+	| Comment          | Large File Comment  |
+	| Data Region      | United States       |
+	| No Personal Data | true                |
+	When I upload a file using the large file uploader with the following parameters
+	| Attachment       | Document_4.txt      |
+	| Comment          | Large File Comment  |
+	| Data Region      | United States       |
+	| No Personal Data | false               |
+	When I go to the Project Details page
+	And I go to the project with the name "Lfazen - ${staticProjectName}"
+	And I go to the Attachments tab
+	And I download the attachment with the keyword "Document_3.txt" by actions link
+	Then I should see the downloaded file "Document_3.txt"
+	And the attachment with the keyword "Document_4.txt" should not be clickable
+	Then I should not see the downloaded file "Document_4.txt"
