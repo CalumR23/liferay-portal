@@ -36,6 +36,154 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I should be able to view the active licenses on the account ${accountName} with the following values ${table}"
+	macro _viewActiveLicenseAndType{
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "License Name") {
+				var licenseEntryName = "${value}";
+			}
+			else if ("${field}" == "License Type") {
+				var licenseEntryType = "${value}";
+			}
+			else {
+				fail("No such license extension field ${field}");
+			}
+		}
+
+		if (!(isSet(licenseEntryName))) {
+			var licenseEntryName = "";
+		}
+		if (!(isSet(licenseEntryType))) {
+			var licenseEntryType = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		if (!("${licenseEntryName}" == "")){
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseEntryName}')].name");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			echo("Expected Action Value: ${licenseEntryName}");
+			echo("Actual Action Value: ${valueFromAPI}");
+
+			if (!("${licenseEntryName}" == "${valueFromAPI}")) {
+				fail("This license field either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
+			}
+		}
+
+		if (!("${licenseEntryType}" == "")){
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.licenseEntryType=='${licenseEntryType}' && @.name=='${licenseEntryName}')].licenseEntryType ");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			var valueFromAPI = StringUtil.lowerCaseFirstLetter("${valueFromAPI}");
+
+			echo("Expected Action Value: ${licenseEntryType}");
+			echo("Actual Action Value: ${valueFromAPI}");
+
+			if (!("${licenseEntryType}" == "${valueFromAPI}")) {
+				fail("This license field either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
+			}
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
+	@prose = "I should be able to view the deactivated licenses on the account ${accountName} with the following values ${table}"
+	macro _viewDeactiveLicenseAndType{
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "License Name") {
+				var licenseEntryName = "${value}";
+			}
+			else if ("${field}" == "License Type") {
+				var licenseEntryType = "${value}";
+			}
+			else {
+				fail("No such license extension field ${field}");
+			}
+		}
+
+		if (!(isSet(licenseEntryName))) {
+			var licenseEntryName = "";
+		}
+		if (!(isSet(licenseEntryType))) {
+			var licenseEntryType = "";
+		}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		if (!("${licenseEntryName}" == "")){
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseEntryName}')].name");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			echo("Expected Action Value: ${licenseEntryName}");
+			echo("Actual Action Value: ${valueFromAPI}");
+
+			if ("${licenseEntryName}" == "${valueFromAPI}"){
+				fail("The account with the name ${childAccountName} is still present in as a child account in ${parentAccountName}");
+			}
+		}
+
+		if (!("${licenseEntryType}" == "")){
+			var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.licenseEntryType=='${licenseEntryType}' && @.name=='${licenseEntryName}')].licenseEntryType ");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+			var valueFromAPI = StringUtil.lowerCaseFirstLetter("${valueFromAPI}");
+
+			echo("Expected Action Value: ${licenseEntryType}");
+			echo("Actual Action Value: ${valueFromAPI}");
+
+			if ("${licenseEntryType}" == "${valueFromAPI}"){
+				fail("The account with the name ${childAccountName} is still present in as a child account in ${parentAccountName}");
+			}
+		}
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
 	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api"
 	macro _downloadLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
