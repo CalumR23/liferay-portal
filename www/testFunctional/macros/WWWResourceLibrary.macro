@@ -3,46 +3,64 @@ definition {
 	var wwwAdminPassword = PropsUtil.get("www.admin.password");
 	var wwwURL = PropsUtil.get("www.liferay.url");
 
+	@prose = "I clear all resource filters"
+	macro clearAllResourceFilters {
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#FILTER_BUTTON");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#FILTER_BUTTON");
+
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#CLEAR_ALL_BUTTON");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#CLEAR_ALL_BUTTON");
+
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#APPLY_BUTTON");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#APPLY_BUTTON");
+	}
+
 	@prose = "I filter the resources in the Resource Library using the following filters and values ${table}"
 	macro filterResources {
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#FILTER_BUTTON");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#FILTER_BUTTON");
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var filter = "${row[0]}";
 			var value = "${row[1]}";
 
-			if ("${filter}" == "Solution") {
-				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#SOLUTION_SELECT");
+			var key_value = "${value}";
 
-				Select(
-					locator1 = "WWWResourceLibrary#SOLUTION_SELECT",
-					value1 = "${value}");
+			if ("${filter}" == "Solutions") {
+				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#SOLUTIONS_FILTER_LABEL");
+
+				if (IsNotChecked(locator1 = "WWWResourceLibrary#SOLUTIONS_FILTER_CHECKBOX")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#SOLUTIONS_FILTER_CHECKBOX");					
+				}
 			}
-			else if ("${filter}" == "Industry") {
-				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#INDUSTRY_SELECT");
+			else if ("${filter}" == "Industries") {
+				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#INDUSTRIES_FILTER_LABEL");
 
-				Select(
-					locator1 = "WWWResourceLibrary#INDUSTRY_SELECT",
-					value1 = "${value}");
+				if (IsNotChecked(locator1 = "WWWResourceLibrary#INDUSTRIES_FILTER_CHECKBOX")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#INDUSTRIES_FILTER_CHECKBOX");
+				}
 			}
-			else if ("${filter}" == "Topic") {
-				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#TOPIC_SELECT");
+			else if ("${filter}" == "Resource Types") {
+				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESOURCE_TYPES_FILTER_LABEL");
 
-				Select(
-					locator1 = "WWWResourceLibrary#TOPIC_SELECT",
-					value1 = "${value}");
-			}
-			else if ("${filter}" == "Resource Type") {
-				ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESOURCE_TYPE_SELECT");
-
-				Select(
-					locator1 = "WWWResourceLibrary#RESOURCE_TYPE_SELECT",
-					value1 = "${value}");
+				if (IsNotChecked(locator1 = "WWWResourceLibrary#RESOURCE_TYPES_FILTER_CHECKBOX")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESOURCE_TYPES_FILTER_CHECKBOX");
+				}
 			}
 			else {
-				fail("No such resource filter ${filter}. Please use one of the following filters or update the test if changes are necessary: Solution, Industry, Topic, Resource Type");
+				fail("No such resource filter ${filter}. Please use one of the following filters or update the test if changes are necessary: Solutions, Industries, or Resource Types");
 			}
 		}
+
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#APPLY_BUTTON");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#APPLY_BUTTON");	
 	}
 
 	@prose = "I reset the search bar"
@@ -62,30 +80,51 @@ definition {
 
 		Type(
 			locator1 = "WWWResourceLibrary#SEARCH_FIELD",
-			value1 = "${keyword}");
+			value1 = "&quot;${keyword}&quot;");
 
 		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#SEARCH_BUTTON");	
 	}
 
-	@prose = "I sort the resources in the Resource Library by ${sortCriteria}"
-	macro sortResources {
-		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#SORT_BY_SELECT");
+	@prose = "I toggle the results per page value to ${resultsPerPage} results"
+	macro toggleResultsPerPage {
+		AssertElementPresent(locator1 = "WWWResourceLibrary#RESULTS_ITEMS_PER_PAGE_BUTTON");
 
-		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#SORT_BY_SELECT");
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_ITEMS_PER_PAGE_BUTTON");
 
-		Select(
-			locator1 = "WWWResourceLibrary#SORT_BY_SELECT",
-			value1 = "${sortCriteria}");
+		var key_resultsPerPage = "${resultsPerPage}";
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_ITEMS_PER_PAGE_BUTTON");
+
+		ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_ITEMS_PER_PAGE_OPTION");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_ITEMS_PER_PAGE_OPTION");
 	}
 
 	@prose = "I should not be able to view the resource with the title ${resourceTitle}"
 	macro viewNoResource {
 		var key_resourceTitle = "${resourceTitle}";
-		
+
+		if ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE_ACTIVE")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+		}
+
 		AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_TITLE");
 		AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_TYPE");
 		AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_TITLE");
 		AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_IMAGE");
+
+		while ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE_DISABLED")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+
+			AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_TITLE");
+			AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_TYPE");
+			AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_TITLE");
+			AssertElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_IMAGE");
+		}
 	}
 
 	@prose = "I should not be able to view a resource with the type ${resourceType}"
@@ -98,17 +137,41 @@ definition {
 	@prose = "I should be able to view the resource with the title ${resourceTitle}"
 	macro viewResource {
 		var key_resourceTitle = "${resourceTitle}";
+
+		if ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE_ACTIVE")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+		}
+
+		while ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_TITLE")) && (IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE_DISABLED")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+		}
 		
 		AssertVisible(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_TITLE");
 		AssertVisible(locator1 = "WWWResourceLibrary#RESOURCE_TYPE");
 		AssertVisible(locator1 = "WWWResourceLibrary#RESOURCE_TITLE");
-		AssertVisible(locator1 = "WWWResourceLibrary#RESOURCE_IMAGE");
+		AssertElementPresent(locator1 = "WWWResourceLibrary#RESOURCE_IMAGE");
 	}
 
 	@prose = "I should be able to view a resource in the position value ${positionValue} with the title ${resourceTitle}"
 	macro viewResourceByPosition {
 		var key_positionValue = "${positionValue}";
-		
+
+		if ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE_ACTIVE")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_PAGE_ONE");
+		}
+
+		while ((IsElementNotPresent(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_POSITION")) && (IsElementNotPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE_DISABLED")) && (IsElementPresent(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE"))) {
+			ScrollWebElementIntoView(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WWWResourceLibrary#RESULTS_NEXT_PAGE");
+		}
+
 		AssertTextEquals.assertPartialText(
 			locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_POSITION",
 			value1 = "${resourceTitle}");
@@ -117,7 +180,7 @@ definition {
 	@prose = "I should be able to view a resource with the type ${resourceType}"
 	macro viewResourceType {
 		var key_resourceType = "${resourceType}";
-		
+
 		AssertVisible(locator1 = "WWWResourceLibrary#RESOURCE_LINK_VIA_TYPE");
 	}
 }

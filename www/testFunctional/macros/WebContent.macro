@@ -1,7 +1,7 @@
 definition {
 	@prose = "I click the publish button"
 	macro clickPublish {
-		Click(locator1 = "WebContentCreate#PUBLISH_BUTTON");
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#PUBLISH_BUTTON");
 
 		WaitForSPARefresh();
 	}
@@ -13,7 +13,9 @@ definition {
 		var key_sidePanelCategory = StringUtil.lowerCaseFirstLetter("${sidePanelCategory}");
 
 		if (IsElementPresent(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED")) {
-			Click(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
+			ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
 		}
 	}
 
@@ -173,6 +175,14 @@ definition {
 
 		echo("Future calculated date: ${futureDate}");
 
+		var key_field = "Never Expire";
+
+		var key_positionValue = "1";
+
+		ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_CHECKBOX_APPROXIMATE");
+
+		var key_field = "Display Date";
+
 		var key_positionValue = "1";
 
 		Type.clickAtType(
@@ -305,7 +315,7 @@ definition {
 					locator1 = "WebContentCreate#TITLE_FIELD",
 					value1 = "${value}");
 			}
-			else if (contains("${fieldName}", "Quote")) {
+			else if ((contains("${fieldName}", "Quote")) || (contains("${fieldName}", "Topic"))) {
 				if ("${fieldType}" == "Input") {
 					WebContent.typeViaExactInputField(			
 						field = "${fieldName}",
@@ -313,6 +323,11 @@ definition {
 				}
 				else if ("${fieldType}" == "Textarea") {
 					WebContent.typeViaExactTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Rich Text Editor") {
+					WebContent.typeViaExactRichTextEditorField(
 						field = "${fieldName}",
 						value = "${value}");
 				}
@@ -327,7 +342,7 @@ definition {
 						value = "${value}");
 				}
 				else {
-					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, or Category Select");
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, Rich Text Editor, or Category Select");
 				}
 			}
 			else {
@@ -338,6 +353,11 @@ definition {
 				}
 				else if ("${fieldType}" == "Textarea") {
 					WebContent.typeViaApproximateTextareaField(
+						field = "${fieldName}",
+						value = "${value}");
+				}
+				else if ("${fieldType}" == "Rich Text Editor") {
+					WebContent.typeViaApproximateRichTextEditorField(
 						field = "${fieldName}",
 						value = "${value}");
 				}
@@ -352,7 +372,7 @@ definition {
 						value = "${value}");
 				}
 				else {
-					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, or Category Select");
+					fail("Invalid field type ${fieldType}. Please set second column value to Input, Textarea, File Upload, Rich Text Editor, or Category Select");
 				}
 			}
 		}
@@ -365,7 +385,9 @@ definition {
 		var key_sidePanelCategory = StringUtil.lowerCaseFirstLetter("${sidePanelCategory}");
 
 		if (IsElementPresent(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_COLLAPSED")) {
-			Click(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_COLLAPSED");
+			ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_COLLAPSED");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_COLLAPSED");
 		}
 	}
 
@@ -398,13 +420,21 @@ definition {
 		var key_field = "${field}";
 		var key_positionValue = "1";
 
-		Click(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+		ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+
+		while (IsElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+		}
 
 		SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
 
 		if (contains("${value}", ",")) {
 			for (var individualValue : list "${value}") {
 				var key_entryTitle = "${individualValue}";
+
+				AssertElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
 				ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
@@ -416,6 +446,8 @@ definition {
 		else {
 			var key_entryTitle = "${value}";
 
+			AssertElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
 			ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
@@ -425,9 +457,9 @@ definition {
 
 		SelectFrameTop();
 
-		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 
-		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON")) {
 			SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
 
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
@@ -440,10 +472,10 @@ definition {
 
 			SelectFrameTop();
 
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 		}
 
-		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 
 		while (IsElementPresent(locator1 = "WebContentCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_APPROXIMATE")) {
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_APPROXIMATE");
@@ -454,13 +486,21 @@ definition {
 		var key_field = "${field}";
 		var key_positionValue = "1";
 
-		Click(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+		ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+
+		while (IsElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+		}
 
 		SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
 
 		if (contains("${value}", ",")) {
 			for (var individualValue : list "${value}") {
 				var key_entryTitle = "${individualValue}";
+
+				AssertElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
 				ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
@@ -472,6 +512,8 @@ definition {
 		else {
 			var key_entryTitle = "${value}";
 
+			AssertElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
+
 			ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
 
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
@@ -481,9 +523,9 @@ definition {
 
 		SelectFrameTop();
 
-		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 
-		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON")) {
+		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON")) {
 			SelectFrame(locator1 = "WebContentCreate#SELECT_CATEGORY_IFRAME");
 
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ENTRY");
@@ -496,13 +538,58 @@ definition {
 
 			SelectFrameTop();
 
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 		}
 
-		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_ADD_BUTTON");
+		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_CATEGORY_DONE_BUTTON");
 
 		while (IsElementPresent(locator1 = "WebContentCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_EXACT")) {
 			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#CATEGORY_ITEM_OTHER_CLOSE_BUTTON_EXACT");
+		}
+	}
+
+	@prose = "I tear down the following web content entries ${table}"
+	macro tearDownCP {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "Web Content");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entryTitle = "${row[0]}";
+
+			Type(
+				locator1 = "WebContent#SEARCH_FIELD",
+				value1 = "${entryTitle}");
+
+			KeyPress(
+				locator1 = "WebContent#SEARCH_FIELD",
+				value1 = "\RETURN");
+
+			var key_entryTitle = "${entryTitle}";
+
+			if (IsElementPresent.pauseIsElementPresent(locator1 = "WebContent#ENTRY_LIST_CHECKBOX")) {
+				Check(locator1 = "WebContent#ENTRY_LIST_CHECKBOX");
+
+				ClickNoError(locator1 = "WebContent#MOVE_TO_RECYCLE_BIN_BUTTON");
+
+				Confirm(value1 = "Are you sure you want to move the selected entry to the Recycle Bin?");
+
+				AssertElementPresent(locator1 = "Message#SUCCESS");
+			}
+		}
+
+		ProductMenu.gotoPortlet(
+			category = "Recycle Bin",
+			panel = "Site Administration",
+			portlet = "Recycle Bin");
+
+		for (var row : table "${rawTable}") {
+			var entryTitle = "${row[0]}";
+
+			RecycleBin.tearDownCP(entryTitle = "${entryTitle}");
 		}
 	}
 
@@ -524,6 +611,27 @@ definition {
 
 		Type(
 			locator1 = "WebContentCreate#INPUT_FIELD_APPROXIMATE",
+			value1 = "${value}");
+	}
+
+	macro typeViaApproximateRichTextEditorField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_APPROXIMATE", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_APPROXIMATE")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type.typeCKEditorWaitForCKEditor(
+			locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_APPROXIMATE",
 			value1 = "${value}");
 	}
 
@@ -569,6 +677,27 @@ definition {
 			value1 = "${value}");
 	}
 
+	macro typeViaExactRichTextEditorField {
+		var key_field = "${field}";
+		var key_positionValue = "1";
+
+		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_EXACT", value1 = "")) {
+			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+
+			if (IsElementNotPresent(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_EXACT")) {
+				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+
+				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
+
+				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			}
+		}
+
+		Type.typeCKEditorWaitForCKEditor(
+			locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_EXACT",
+			value1 = "${value}");
+	}
+
 	macro typeViaExactTextareaField {
 		var key_field = "${field}";
 		var key_positionValue = "1";
@@ -606,13 +735,21 @@ definition {
 			}
 		}
 
-		Click(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+		ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+
+		while (IsElementNotPresent(locator1 = "WebContentCreate#SELECT_FILE_IFRAME")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_APPROXIMATE");
+		}
 
 		SelectFrame(locator1 = "WebContentCreate#SELECT_FILE_IFRAME");
 
 		if (contains("${value}", ",")) {
 			for (var individualValue : list "${value}") {
 				var key_entryTitle = "${individualValue}";
+
+				AssertElementPresent(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
 
 				ScrollWebElementIntoView(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
 
@@ -628,21 +765,6 @@ definition {
 		}
 
 		SelectFrameTop();
-
-		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
-
-		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON")) {
-			SelectFrame(locator1 = "WebContentCreate#SELECT_FILE_IFRAME");
-
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_PREVIEW_FOOTER_RIGHT_BUTTON");
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_PREVIEW_FOOTER_LEFT_BUTTON");
-
-			SelectFrameTop();
-
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
-		}
-
-		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
 	}
 
 	macro uploadFileViaExactField {
@@ -661,13 +783,21 @@ definition {
 			}
 		}
 
-		Click(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+		ScrollWebElementIntoView(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+
+		while (IsElementNotPresent(locator1 = "WebContentCreate#SELECT_FILE_IFRAME")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_BUTTON_EXACT");
+		}
 
 		SelectFrame(locator1 = "WebContentCreate#SELECT_FILE_IFRAME");
 
 		if (contains("${value}", ",")) {
 			for (var individualValue : list "${value}") {
 				var key_entryTitle = "${individualValue}";
+
+				AssertElementPresent(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
 
 				ScrollWebElementIntoView(locator1 = "WebContent#ENTRY_CARDS_THUMBNAIL");
 
@@ -683,20 +813,5 @@ definition {
 		}
 
 		SelectFrameTop();
-
-		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
-
-		while (IsElementPresent(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON")) {
-			SelectFrame(locator1 = "WebContentCreate#SELECT_FILE_IFRAME");
-
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_PREVIEW_FOOTER_RIGHT_BUTTON");
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_PREVIEW_FOOTER_LEFT_BUTTON");
-
-			SelectFrameTop();
-
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
-		}
-
-		AssertElementNotPresent(locator1 = "WebContentCreate#SELECT_FILE_ADD_BUTTON");
 	}
 }

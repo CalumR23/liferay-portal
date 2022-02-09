@@ -15,6 +15,8 @@ definition {
 	@prose = "I click on the add public page button"
 	macro clickAddPublicPageButton {
 		Click(locator1 = "Page#ADD_PUBLIC_PAGE");
+
+		Click(locator1 = "Page#MENUITEM_PUBLIC_PAGE");
 	}
 
 	@prose = "I click on the ${pageTemplate} page template"
@@ -34,31 +36,49 @@ definition {
 		var key_panelGroup = "${panelGroup}";
 
 		while (IsElementPresent(locator1 = "PageEdit#PANEL_GROUP_EXPANDED")) {
-			Click(locator1 = "PageEdit#PANEL_GROUP");
+			Click.pauseMakeVisibleClickAt(locator1 = "PageEdit#PANEL_GROUP");
 		}
 	}
 
-	@prose = "I drag and drop the card labeled ${card} above the section in position ${positionValue}"
+	@prose = "I drag and drop the card labeled ${card} within the ${sidebarCategory} sidebar category under the ${panelGroup} panel group above the section in position ${positionValue}"
 	macro dragAndDropCardAboveSection {
 		var key_card = "${card}";
 		var key_positionValue = "${positionValue}";
 
+		ProductMenuHelper.closeProductMenu();
+
+		AssertElementPresent(locator1 = "PageEdit#SECTION");
+
 		ScrollWebElementIntoView(locator1 = "PageEdit#SECTION");
 
-		Click(locator1 = "PageEdit#SECTION");
+		Click.pauseMakeVisibleClickAt(locator1 = "PageEdit#SECTION");
 
-		DragAndDrop.pauseDragAndDropCardToSection(
-			locator1 = "PageEdit#CARD",
-			locator2 = "PageEdit#SECTION_NAV",
-			value1 = "${card}");		
+		Page.gotoEditorSidebarCategory(sidebarCategory = "${sidebarCategory}");
+
+		Page.expandPanelGroup(panelGroup = "${panelGroup}");	
+
+		if (IsVisible(locator1 = "PageEdit#SECTION_NAV")) {
+			DragAndDrop.pauseDragAndDropCardToSection(
+				locator1 = "PageEdit#CARD",
+				locator2 = "PageEdit#SECTION_NAV",
+				value1 = "${card}");
+		}
+		else {
+			DragAndDrop.pauseDragAndDropCardToSection(
+				locator1 = "PageEdit#CARD",
+				locator2 = "PageEdit#SECTION_NAV_ALT",
+				value1 = "${card}");
+		}
+
+		WWWHomepage.pause(timeInSeconds = "3");
 	}
 
 	@prose = "I expand the ${panelGroup} panel group"
 	macro expandPanelGroup {
 		var key_panelGroup = "${panelGroup}";
 
-		while (IsElementPresent(locator1 = "PageEdit#PANEL_GROUP_COLLAPSED")) {
-			Click(locator1 = "PageEdit#PANEL_GROUP");
+		if (IsElementPresent(locator1 = "PageEdit#PANEL_GROUP_COLLAPSED")) {
+			Click.pauseMakeVisibleClickAt(locator1 = "PageEdit#PANEL_GROUP");
 		}
 	}
 
@@ -66,8 +86,20 @@ definition {
 	macro gotoEditorSidebarCategory {
 		var key_sidebarCategory = "${sidebarCategory}";
 
-		while (IsElementNotPresent(locator1 = "PageEdit#EDITOR_SIDEBAR_HEADER")) {
-			Click(locator1 = "PageEdit#EDITOR_SIDEBAR_BUTTON");
+		if (IsElementNotPresent(locator1 = "PageEdit#EDITOR_SIDEBAR_HEADER")) {
+
+			if ("${sidebarCategory}" == "Selection") {
+				var key_sidebarCategory = "page-structure";
+			}
+			else {
+				var key_sidebarCategory = StringUtil.lowerCase("${key_sidebarCategory}");
+
+				var key_sidebarCategory = StringUtil.replace("${key_sidebarCategory}", "and ", "");
+
+				var key_sidebarCategory = StringUtil.replace("${key_sidebarCategory}", " ", "-");
+			}
+
+			Click.pauseMakeVisibleClickAt(locator1 = "PageEdit#EDITOR_SIDEBAR_BUTTON");
 		}
 	}
 
@@ -76,13 +108,47 @@ definition {
 		var key_card = "${card}";
 		var key_positionValue = "${positionValue}";
 
-		ScrollWebElementIntoView(locator1 = "PageEdit#SECTION");
+		ScrollWebElementIntoView(locator1 = "PageEdit#SECTION_CARD");
 
-		Click(locator1 = "PageEdit#SECTION");
+		MouseOver(locator1 = "PageEdit#SECTION_CARD");
 
-		Click.pauseMakeVisibleClickAt(locator1 = "PageEdit#SECTION_REMOVE");
+		Click(locator1 = "PageEdit#SECTION_CARD_REMOVE_BUTTON");
 
 		WWWHomepage.pause(timeInSeconds = "3");
+	}
+
+	@prose = "I tear down the following pages ${table}"
+	macro tearDownCP {
+		ProductMenu.gotoPortlet(
+			category = "Site Builder",
+			panel = "Site Administration",
+			portlet = "Pages");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var entryTitle = "${row[0]}";
+
+			Type(
+				locator1 = "Page#SEARCH_FIELD",
+				value1 = "&quot;${entryTitle}&quot;");
+
+			KeyPress(
+				locator1 = "Page#SEARCH_FIELD",
+				value1 = "\RETURN");
+
+			var key_entryTitle = "${entryTitle}";
+
+			if (IsElementPresent.pauseIsElementPresent(locator1 = "Page#ENTRY_LIST_CHECKBOX")) {
+				Check(locator1 = "Page#ENTRY_LIST_CHECKBOX");
+
+				ClickNoError(locator1 = "Page#DELETE_BUTTON");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				AssertElementPresent(locator1 = "Message#SUCCESS");
+			}
+		}
 	}
 
 	@prose = "I should be able to view the public page ${pageName}"

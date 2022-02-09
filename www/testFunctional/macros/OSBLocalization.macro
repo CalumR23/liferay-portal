@@ -12,6 +12,65 @@ definition {
 		Click(locator1 = "OSBLocalization#ADD_LOCALIZATION_BUTTON");
 	}
 
+	@prose = "I tear down the localizations with the folowing keys and values ${table}"
+	macro tearDownCP {
+		ProductMenu.gotoPortlet(
+			category = "Content &amp; Data",
+			panel = "Site Administration",
+			portlet = "OSB Localization");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var key = "${row[0]}";
+			var value = "${row[1]}";
+
+			Click(locator1 = "OSBShortLinks#ITEMS_PER_PAGE_LINK");
+
+			var key_value = "60";
+
+			Click(locator1 = "OSBShortLinks#VALUE_LINK");
+
+			var key_key = "${key}";
+			var key_value = "${value}";
+			var notFound = "true";
+
+			if (IsElementPresent.pauseIsElementPresent(locator1 = "OSBLocalization#LOCALIZATION_ACTIONS")) {
+				Click(locator1 = "OSBLocalization#LOCALIZATION_ACTIONS");
+
+				ClickNoError(locator1 = "OSBLocalization#DELETE_LINK");
+
+				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+				AssertElementPresent(locator1 = "Message#SUCCESS");
+			}
+			else {
+				while ((IsElementNotPresent(locator1 = "OSBLocalization#NEXT_LINK_DISABLED")) && ("${notFound}" == "true")) {
+					Click.pauseMakeVisibleClickAt(locator1 = "OSBLocalization#NEXT_LINK");
+
+					if (IsElementPresent.pauseIsElementPresent(locator1 = "OSBLocalization#LOCALIZATION_ACTIONS")) {
+						Click(locator1 = "OSBLocalization#LOCALIZATION_ACTIONS");
+
+						ClickNoError(locator1 = "OSBLocalization#DELETE_LINK");
+
+						Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
+
+						AssertElementPresent(locator1 = "Message#SUCCESS");
+
+						var notFound = "false";
+					}
+					else {
+						var notFound = "true";
+					}
+				}
+			}
+
+			if (IsElementNotPresent(locator1 = "OSBLocalization#FIRST_LINK_DISABLED")) {
+				Click(locator1 = "OSBLocalization#FIRST_LINK");
+			}
+		}
+	}
+
 	@prose = "I should be able to view a localization with the key ${key} and value ${value}"
 	macro viewLocalization {
 		var key_key = "${key}";
