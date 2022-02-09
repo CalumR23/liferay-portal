@@ -1,6 +1,26 @@
 definition {
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 
+	@prose = "I should be able to view the downloaded ${fileType} license file the with the following parameters ${table}"
+	macro assertDownloadedLicensePresent {
+		var downloadedFileName = ProvisioningLicense.formatLicenseFileName(table = "${table}", fileType = "${fileType}");
+
+		echo("Expected file name: ${downloadedFileName}");
+
+		var tempDir = PropsUtil.get("output.dir.name");
+
+		var downloadedFilePath = "${tempDir}/${downloadedFileName}";
+
+		var fileExists = FileUtil.exists("${downloadedFilePath}");
+
+		if ("${fileExists}" == "true") {
+			echo("File named ${downloadedFileName} was downloaded.");
+		}
+		else {
+			fail("File named ${downloadedFileName} NOT FOUND in folder ${tempDir}!");
+		}
+	}
+
 	@prose = "I click on the activate button for the license in position ${positionValue} on the license page"
 	macro clickActivateLicenseButton {
 		var key_positionValue = "${positionValue}";
@@ -226,6 +246,56 @@ definition {
 		var downloadedFileName = "${tempDir}/${fileName}";
 
 		Open(locator1 = "file://${downloadedFilePath}");
+	}
+
+	@prose = "I format the expected license file name of type ${fileType} with the values ${table}"
+	macro formatLicenseFileName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		var licenseType = "";
+		var product = "";
+		var version = "";
+		var licenseName = "";
+		var copy = "";
+
+		for (var role : table "${rawTable}") {
+			var field = "${role[0]}";	
+			var value = "${role[1]}";
+
+			if ("${field}" == "License Type") {
+				var licenseType = "${value}-";
+			}
+			else if ("${field}" == "Product"){
+				var product = "${value}-";
+			}
+			else if ("${field}" == "Version") {
+				var version = "${value}-";
+			}
+			else if ("${field}" == "License Name") {
+				if ("${licenseName}" == "") {
+					var licenseName = "${value}";
+				}
+				else {
+					var licenseName = "${licenseName}-${value}";
+				}
+			}
+			else if ("${field}" == "Copy") {
+				var copy = " (${value})";
+			}
+			else {
+				fail("No such field ${field} required!");
+			}
+		}
+
+		var downloadedFileName = "${licenseType}${product}${version}${licenseName}";
+
+		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
+
+		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
+
+		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
+
+		return "${downloadedFileName}";
 	}
 
 	@prose = "I populate the generate license form with the following values ${table}"
@@ -763,11 +833,6 @@ definition {
 			}
 		}
 	}
-	
-	@prose = "I should not be able to view the bulk input form"
-	macro viewNoBulkInputForm {
-		AssertElementNotPresent(locator1 = "ProvisioningSubscriptionForm#EXTEND_BULK_INPUT_LINE");
-	}
 
 	@prose = "I rename the first license key ID variable"
 	macro _renameFirstLicenseKeyIdVariable {
@@ -868,76 +933,6 @@ definition {
 		var key_licenseKeyIdList = "${licenseKeyIdList}";
 
 		AssertVisible(locator1 = "ProvisioningLicenseDownloadLicense#DOWNLOAD_BUTTON");
-	}
-
-	@prose = "I format the expected license file name of type ${fileType} with the values ${table}"
-	macro formatLicenseFileName {
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseType = "";
-		var product = "";
-		var version = "";
-		var licenseName = "";
-		var copy = "";
-
-		for (var role : table "${rawTable}") {
-			var field = "${role[0]}";	
-			var value = "${role[1]}";
-
-			if ("${field}" == "License Type") {
-				var licenseType = "${value}-";
-			}
-			else if ("${field}" == "Product"){
-				var product = "${value}-";
-			}
-			else if ("${field}" == "Version") {
-				var version = "${value}-";
-			}
-			else if ("${field}" == "License Name") {
-				if ("${licenseName}" == "") {
-					var licenseName = "${value}";
-				}
-				else {
-					var licenseName = "${licenseName}-${value}";
-				}
-			}
-			else if ("${field}" == "Copy") {
-				var copy = " (${value})";
-			}
-			else {
-				fail("No such field ${field} required!");
-			}
-		}
-
-		var downloadedFileName = "${licenseType}${product}${version}${licenseName}";
-
-		var downloadedFileName = StringUtil.toLowerCase("${downloadedFileName}");
-
-		var downloadedFileName = StringUtil.replace("${downloadedFileName}", " ", "");
-
-		var downloadedFileName = "${downloadedFileName}${copy}.${fileType}";
-
-		return "${downloadedFileName}";
-	}
-
-	@prose = "I should be able to view the downloaded ${fileType} license file the with the following parameters ${table}"
-	macro assertDownloadedLicensePresent {
-		var downloadedFileName = ProvisioningLicense.formatLicenseFileName(table = "${table}", fileType = "${fileType}");
-
-		echo("Expected file name: ${downloadedFileName}");
-
-		var tempDir = PropsUtil.get("output.dir.name");
-
-		var downloadedFilePath = "${tempDir}/${downloadedFileName}";
-
-		var fileExists = FileUtil.exists("${downloadedFilePath}");
-
-		if ("${fileExists}" == "true") {
-			echo("File named ${downloadedFileName} was downloaded.");
-		}
-		else {
-			fail("File named ${downloadedFileName} NOT FOUND in folder ${tempDir}!");
-		}
 	}
 
 	@prose = "I should be able to view the following license values on the license page ${table}"
@@ -1049,6 +1044,11 @@ definition {
 		var key_positionValue = "${positionValue}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningLicense#ACTIVATE_BUTTON");
+	}
+	
+	@prose = "I should not be able to view the bulk input row"
+	macro viewNoBulkInputRow {
+		AssertElementNotPresent(locator1 = "ProvisioningLicenseExtend#BULK_INPUT_ROW");
 	}
 
 	@prose = "I should not be able to view the deactivate button for the license in position ${positionValue} on the license page"
