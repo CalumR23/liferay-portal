@@ -36,6 +36,28 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I should be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} via api"
+	macro _downloadDeveloperLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroup}/product-version/${productVersion}/development-license-key
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}");
+
+		if (!(contains("${licenseFile}","${productGroup}"))) {
+			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
+		}
+
+		if (!(contains("${licenseFile}","${productVersion}"))) {
+			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
+		}
+	}
+
 	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api"
 	macro _downloadLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
@@ -56,28 +78,6 @@ definition {
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
-	}
-
-	@prose = "I should be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} via api"
-	macro _downloadDeveloperLicense {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroup}/product-version/${productVersion}/development-license-key
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var licenseFile = JSONCurlUtil.get("${curl}");
-
-		if (!(contains("${licenseFile}","${productGroup}"))) {
-			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded ");
-		}
-
-		if (!(contains("${licenseFile}","${productVersion}"))) {
-			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded ");
-		}
 	}
 
 	@prose = "I should not be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} via api"
