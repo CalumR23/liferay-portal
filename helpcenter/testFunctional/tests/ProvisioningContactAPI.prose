@@ -23,9 +23,15 @@ Setup:
 	| Email Address | usr.koroneiki3@lrcustomer.com.broken |
 	| First Name    | USR                                  |
 	| Last Name     | Koroneiki3                           |
+	* I create a user with the following parameters
+	| Screen Name   | invalid.koroneiki4                |
+	| Email Address | invalid.koroneiki4@126.com.broken |
+	| First Name    | Invalid                           |
+	| Last Name     | Koroneiki3                        |
 	* I assign the web user with the email address "usr.koroneiki1@lrcustomer.com.broken" to the web role "Verified User"
 	* I assign the web user with the email address "usr.koroneiki2@lrcustomer.com.broken" to the web role "Verified User"
 	* I assign the web user with the email address "usr.koroneiki2@lrcustomer.com.broken" to the web role "Verified User"
+	* I assign the web user with the email address "invalid.koroneiki4@126.com.broken" to the web role "Verified User"
 
 Teardown:
 	* I get the ID of the default user belonging to the organization "Korusr - ${staticProjectName}" from zendesk.liferay.com
@@ -37,18 +43,22 @@ Teardown:
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the users with the following email addresses from koroneiki
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| invalid.koroneiki4@126.com.broken    |
  	* I tear down the contacts on koroneiki with the following email addresses
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the contact roles on koroneiki with the following names
 	| Liferay User Customer Role |
 	| Second User Customer Role  |
@@ -68,14 +78,13 @@ Teardown:
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| invalid.koroneiki4@126.com.broken    |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
 	| Korusr - ${staticProjectName} |
 	| Usrkor - ${staticCompanyName} |
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
-	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
-	* I teardown the user with userId "${staticDefaultUserId3}" from zendesk.liferay.com
 
 Scenario: Assign contact role to account user
 	Testing the ability to create a contact in Dossiera and koroneiki and attempting to assign roles to the contact via API
@@ -326,7 +335,7 @@ Scenario: Unassign multiple contact roles to account user
 	And I assign the contact with the email address "usr.koroneiki1@lrcustomer.com.broken" on the account "Korusr - ${staticProjectName}" to the following roles
 	| Support Developer |
     And I unassign the following roles from the user with the email adress "usr.koroneiki1@lrcustomer.com.broken" on the account with the name "Korusr - ${staticProjectName}" 
-	| Partner Manager |
+	| Partner Manager   |
 	| Support Developer |
 	And I log into the provisioning homepage as "test@liferay.com" with password "nHZMPLWyzvRKujPLqfHK"
 	And I go to the account index page
@@ -339,8 +348,7 @@ Scenario: Unassign multiple contact roles to account user
 	| Role          | Support Watcher                      |
 	| User Status   | VERIFIED                             |
 
-
-Scenario: View maximum number of developer contacts for purchase
+Scenario: Assign developer contacts above maximum attempt
 	Testing the ability to create a contact in Dossiera and koroneiki checking the maximum number of developer contacts of a subscription via API
 
 	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
@@ -397,7 +405,7 @@ Scenario: View maximum number of developer contacts for purchase
     | Support Developer |
 	And I assign the following roles to the user with the email adress "usr.koroneiki2@lrcustomer.com.broken" on the account with the name "Korusr - ${staticProjectName}"
     | Support Developer |
-	And I should not be able to assign the following roles to the user with the email adress "usr.koroneiki3@lrcustomer.com.broken" on the account with the name "Korusr - ${staticProjectName}"
+	And I attempt to assign the following roles to the user with the email adress "usr.koroneiki3@lrcustomer.com.broken" on the account with the name "Korusr - ${staticProjectName}" that has exceeded its max developer contacts
     | Support Developer |
 	And I log into the provisioning homepage as "test@liferay.com" with password "nHZMPLWyzvRKujPLqfHK"
 	And I go to the account index page
@@ -415,8 +423,9 @@ Scenario: View maximum number of developer contacts for purchase
 	| Email Address | usr.koroneiki2@lrcustomer.com.broken |
 	| Role          | Support Developer                    |
 	| User Status   | VERIFIED                             |
+	And the contact with the email address "usr.koroneiki3@lrcustomer.com.broken" should not be assigned the account "Korusr - ${staticProjectName}"
 
-Scenario: View generic email domain validation for contact roles 
+Scenario: Assign contact with invalid email attempt
 	Testing the ability to validate a generic contact email in Dossiera and koroneiki via API
 
 	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
@@ -463,5 +472,6 @@ Scenario: View generic email domain validation for contact roles
 	And I create a team with the name "User Site Partner" for the account "Korusr - ${staticProjectName}"
 	And I assign the team with the name "User Site Partner" on the account "Korusr - ${staticProjectName}" to the following roles
 	| Partner |
-	And I should not be able to assign the following roles to the user with a invalid email adress domain "126.com" on the account with the name "Korusr - ${staticProjectName}"
+	And I attempt to assign the following roles to the user with a invalid email address "invalid.koroneiki4@126.com" on the account with the name "Korusr - ${staticProjectName}"
     | Support Developer |
+   	Then the contact with the email address "invalid.koroneiki4@126.com" should not be assigned the account "Korusr - ${staticProjectName}"

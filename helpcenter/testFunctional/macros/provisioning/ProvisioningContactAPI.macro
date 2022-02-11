@@ -30,8 +30,8 @@ definition {
 		}
 	}
 
-	@prose = "I should not be able to assign the following roles to the user with the email adress ${userEmailAddress} on the account with the name ${accountName} ${table}"
-	macro _assignNoContactRolesToContact { 
+	@prose = "I attempt to assign the following roles to the user with the email adress ${userEmailAddress} on the account with the name ${accountName} that has exceeded its max developer contacts ${table}"
+	macro _assignContactRolesToContactOnAccountWithMaxDeveloperContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
         var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
@@ -55,14 +55,16 @@ definition {
 			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
 
 			if (!(contains("${responseOfContactApi}", "Account has reached the maximum allowed ticket requestors"))) {
-				fail("The contact was added to the account instead of failing due to the maximum contact number ");
+				fail("The contact may have been added to the account instead of failing due to the maximum contact number");
 			}
 		}
 	}
 
-	@prose = "I should not be able to assign the following roles to the user with a invalid email adress domain ${userEmailAddress} on the account with the name ${accountName} ${table}"
-	macro _assignNoContactRolesToInvalidContact { 
+	@prose = "I attempt to assign the following roles to the user with a invalid email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _assignContactRolesToContactWithInvalidEmailAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+        var userEmailDomain = StringUtil.extractLast("${userEmailAddress}", "@");
 
         var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
@@ -84,8 +86,8 @@ definition {
 
 			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
 
-			if (!(contains("${responseOfContactApi}", "Domain ${userEmailAddress} is not allowed"))) {
-				fail("The email adress is invalid or blocked");
+			if (!(contains("${responseOfContactApi}", "Domain ${userEmailDomain} is not allowed"))) {
+				fail("The contact may have been added to the account instead of failing due to an invalid email");
 			}
 		}
 	}
