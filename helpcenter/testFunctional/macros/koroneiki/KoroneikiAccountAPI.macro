@@ -1741,6 +1741,27 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "the account with the name ${accountName} should have ${count} external links"
+	macro _viewAccountExternalLinkViaAccountName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/external-links
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var totalCount = JSONCurlUtil.get("${curl}", "$.totalCount");
+
+		if ("${totalCount}" == "${count}") {
+			echo("The total count of external links for the account ${accountName} is ${totalCount} and the expected is ${count}");
+		}
+		else {
+			fail("The total count of external links for the account ${accountName} is ${totalCount} and the expected is ${count}");
+		}
+	}
+
 	@prose = "I delete an external link with the entity id ${entityId} on the account ${accountName} executed by ${agentName}"
 	macro _deleteAccountExternalLinkExecutedByAgent {
 		var externalLinkKey = KoroneikiAccountAPI._getAccountExternalLinkKey(
