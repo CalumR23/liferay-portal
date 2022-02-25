@@ -5,10 +5,6 @@ definition {
 	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
 	var supportWebId = PropsUtil.get("support.liferay.web.id");
-	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
-	var webAdminPassword = PropsUtil.get("web.admin.password");
-	var webWebId = PropsUtil.get("web.liferay.web.id");
-	var webURL = PropsUtil.get("web.liferay.url");
 
 	@prose = "I create a support organization with the name ${organizationName}"
 	macro createViaSupport {
@@ -28,42 +24,6 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
-	@prose = "I delete the organization ${organizationName} from customer.liferay.com"
-	macro deleteSupportOrganization {
-		var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
-
-		echo("Support Organization ID: ${organizationId}");
-
-		var curl = '''
-			${supportURL}/api/jsonws/organization/delete-organization
-			-u ${supportAdminEmailAddress}:${supportAdminPassword}
-			-d organizationId=${organizationId}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
-	macro getWebOrganizationId {
-		var companyId = JSONCompany.getWebCompanyId();
-
-		var curl = '''
-			${webURL}/api/secure/jsonws/organization/get-organization-id
-			-u ${webAdminEmailAddress}:${webAdminPassword}
-			-d companyId=${companyId}
-			-d name=${organizationName}
-			''';
-
-		var organizationId = JSONCurlUtil.post("${curl}");
-
-		var organizationId = StringUtil.replace("${organizationId}", "&quot;", "");
-
-		var organizationId = StringUtil.replace("${organizationId}", "Finished executing commands.", "");
-
-		echo("Organization ID: ${organizationId}");
-
-		return "${organizationId}";
 	}
 
 	macro getSupportOrganizationId {

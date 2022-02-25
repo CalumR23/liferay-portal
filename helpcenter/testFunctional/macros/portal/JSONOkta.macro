@@ -1,0 +1,401 @@
+definition {
+    var oktaURL = PropsUtil.get("okta.liferay.sandbox.url");
+	var oktaApiToken = PropsUtil.get("okta.api.token");
+
+    @prose = "I assign the okta user with the email address ${userEmailAddress} to the okta group ${groupName}"
+	macro assignUserToOktaGroup {
+		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/groups/${groupId}/users/${userId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the okta user with the email address ${userEmailAddress} to the okta role ${roleName}"
+	macro assignUserToOktaRole {
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d 
+			{
+			"credentials":
+				{
+					"emails":
+					{[
+						"status": "${roleName}"
+					]}
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I assign the okta user with the email address ${userEmailAddress} to a different okta role ${roleName}"
+	macro assignUserToDifferentOktaRole {
+		var roleId = JSONOkta.getOktaRoleIdByName(roleName = "${roleName}");
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}/roles/${roleId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+    @prose = "I remove the okta user with the email address ${userEmailAddress} from the okta group ${groupName}"
+	macro removeUserToOktaGroup {
+		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/groups/${groupId}/users/${userId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+    @prose = "I deactivate the user with the email address ${userEmailAddress} from okta"
+	macro deactivateOktaUser {
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}/lifecycle/deactivate
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+    @prose = "I delete the user with the email address ${userEmailAddress} from okta"
+	macro deleteOktaUser {
+		JSONOkta.deactivateOktaUser(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userEmailAddress}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+    @prose = "I create a user with the following parameters ${table}"
+	macro createOktaUser {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else if ("${field}" == "Active") {
+				var userActiveStatus = "${value}";
+			}
+			else if ("${field}" == "Role") {
+				var userRole = "${value}";
+			}
+			else if ("${field}" == "Password") {
+				var userPassword = "${value}";
+			}
+			else if ("${field}" == "Group") {
+				var groupName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		if (!(isSet(userActiveStatus))) {
+			var userActiveStatus = "false";
+		}
+		if (!(isSet(userRole))) {
+			var userRole = "UNVERIFIED";
+		}
+		if (!(isSet(groupName))) {
+
+			var curl = '''
+			${oktaURL}/api/v1/users?activate=${userActiveStatus}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d 
+			{
+			"profile":
+				{
+					"email": "${userEmailAddress}",
+					"login": "${userEmailAddress}",
+					"firstName": "${userFirstName}",
+					"lastName": "${userLastName}"
+				},
+			"credentials":
+				{
+					"emails":
+						[{
+							"status": "${userRole}"
+						}],
+					"password":
+						{
+							"value": "nHZMPLWyzvRKujPLqfHK"
+						}
+				}
+			}
+			''';
+		}
+		else {
+			var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+
+			var curl = '''
+			${oktaURL}/api/v1/users?activate=${userActiveStatus}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d 
+			{
+			"profile":
+				{
+					"email": "${userEmailAddress}",
+					"login": "${userEmailAddress}",
+					"firstName": "${userFirstName}",
+					"lastName": "${userLastName}"
+				},
+			"credentials":
+				{
+					
+					"emails":
+						[{
+							"status": "${userRole}"
+						}],
+					"password" :
+						{
+							"value": "nHZMPLWyzvRKujPLqfHK"
+						},
+					groupIds": 
+						[
+							"${groupId}"
+						]
+				}
+			}
+			''';
+		}
+		
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+    @prose = "I tear down the users with the following email addresses from okta ${table}"
+	macro tearDownUsers {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${oktaURL}/api/v1/users/${userEmailAddress}
+				-H "Authorization: SSWS ${oktaApiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var userObject = JSONCurlUtil.get("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				JSONOkta.deactivateOktaUser(userEmailAddress = "${userEmailAddress}");
+				JSONOkta.deleteOktaUser(userEmailAddress = "${userEmailAddress}");
+			}
+		}
+	}
+
+	@prose = "I update the okta password for user with the email address ${userEmailAddress} to ${userPassword}"
+	macro updateOktaPassword {
+
+		var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d 
+			{
+			"credentials":
+				{
+					"password":
+					{
+						"value": "${userPassword}"
+					} 
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+    @prose = "I tear down the users with the following screen names from okta ${table}"
+	macro tearDownUsersByScreenName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userScreenName = "${row[0]}";
+
+			var curl = '''
+				${oktaURL}/api/v1/users/${userScreenName}
+				-H "Authorization: SSWS ${oktaApiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var userObject = JSONCurlUtil.get("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				JSONOkta.deactivateOktaUser(userEmailAddress = "${userEmailAddress}");
+				JSONOkta.deleteOktaUser(userEmailAddress = "${userEmailAddress}");
+			}
+		}
+	}
+
+    @prose = "I update a user with the email address ${userEmailAddress} using following parameters ${table}"
+	macro updateOktaUser {
+		var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else if ("${field}" == "Verified") {
+				var userVerifiedStatus = "${value}";
+			}
+			else if ("${field}" == "Password") {
+				var userPassword = "${value}";
+			}
+		}
+
+		if (!(isSet(userVerifiedStatus))) {
+			var userVerifiedStatus = "false";
+		}
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d 
+			{
+			"profile":
+				{
+					"email": "${userEmailAddress}",
+					"login": "${userEmailAddress}",
+					"firstName": "${userFirstName}",
+					"lastName": "${userLastName}"
+				},
+			"credentials":
+				{
+					"emails":
+					{[
+						"status": "${userVerifiedStatus}"
+					]},
+					"password" :
+					{
+						"value": "${nHZMPLWyzvRKujPLqfHK}"
+					} 
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+    macro getOktaUserId {
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userEmailAddress}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var userId = JSONCurlUtil.get("${curl}", "$.id");
+
+		echo("Okta User ID: ${userId}");
+
+		return "${userId}";
+	}
+
+    macro getOktaGroupId {
+		var curl = '''
+			${oktaURL}/api/v1/groups?q=${groupName}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var groupId = JSONCurlUtil.get("${curl}", "$.[?(@.profile.name =='${groupName}')].id");
+
+		var groupId = StringUtil.replace("${groupId}", "[", "");
+
+		var groupId = StringUtil.replace("${groupId}", "]", "");
+
+		echo("Group ID: ${groupId}");
+
+		return "${groupId}";
+	}
+
+    macro getOktaRoleIdByName {
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}/roles
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var roleId = JSONCurlUtil.get("${curl}", "$.id");
+
+		return "${roleId}";
+	}
+}
