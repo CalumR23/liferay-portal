@@ -82,9 +82,6 @@ definition {
 			else if ("${field}" == "Email Status") {
 				var userEmailStatus = "${value}";
 			}
-			else if ("${field}" == "Password") {
-				var userPassword = "${value}";
-			}
 			else if ("${field}" == "Group") {
 				if ("${groupNames}" == "") {
 					var groupNames = "${value}";
@@ -347,8 +344,6 @@ definition {
 
     @prose = "I update a user with the email address ${userEmailAddress} using following parameters ${table}"
 	macro updateOktaUser {
-		// We may need to update this macro later on to be similar to other update API calls. One example that we may be able to model is KoroneikiAccountAPI#updateAccount
-
 		var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
 
 		var RawTable rawTable = new RawTable("${table}");
@@ -372,43 +367,176 @@ definition {
 			else if ("${field}" == "Email Status") {
 				var userEmailStatus = "${value}";
 			}
-			else if ("${field}" == "Password") {
-				var userPassword = "${value}";
+			else if ("${field}" == "Group") {
+				if ("${groupNames}" == "") {
+					var groupNames = "${value}";
+				}
+				else {
+					var groupNames = "${groupNames},${value}";
+				}
 			}
-		}
-
-		if (!(isSet(userEmailStatus))) {
-			var userEmailStatus = "VERIFIED";
+			else {
+				fail("No such user field ${field}");
+			}
 		}
 
 		var curl = '''
-			${oktaURL}/api/v1/users/${userId}
+			${oktaURL}/api/v1/users/${userEmailAddress}
 			-H "Authorization: SSWS ${oktaApiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
-			-d 
-			{
-			"profile":
+			''';
+
+		if (!(isSet(userScreenName))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "screenName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.profile.screenName");
+
+				var userScreenName = "${value}";
+			}
+			else {
+				var userScreenName = "";
+			}
+		}
+		if (!(isSet(userEmailAddress))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "email=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.profile.email");
+
+				var userEmailAddress = "${value}";
+			}
+			else {
+				var userEmailAddress = "";
+			}
+		}
+		if (!(isSet(userFirstName))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.profile.firstName");
+
+				var userFirstName = "${value}";
+			}
+			else {
+				var userFirstName = "";
+			}
+		}
+		if (!(isSet(userLastName))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "firstName=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.profile.lastName");
+
+				var userLastName = "${value}";
+			}
+			else {
+				var userLastName = "";
+			}
+		}
+		if (!(isSet(userEmailStatus))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "status=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.credentials.emails[0].status");
+
+				var userEmailStatus = "${value}";
+			}
+			else {
+				var userEmailStatus = "";
+			}
+		}
+		if (!(isSet(groupNames))) {
+			var userObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${userObject}", "groupIds=")) {
+				var value = JSONCurlUtil.get("${curl}", "$.credentials.groupIds[0]");
+
+				var groupIds = "${value}";
+			}
+			else {
+				var groupIds = "";
+			}
+		}
+
+		if ((!(isSet(groupNames))) && ("${groupIds}" == "")) {
+			var curl = '''
+				${oktaURL}/api/v1/users?activate=${userActiveStatus}
+				-H "Authorization: SSWS ${oktaApiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d 
 				{
-					"email": "${userEmailAddress}",
-					"login": "${userEmailAddress}",
-					"firstName": "${userFirstName}",
-					"lastName": "${userLastName}",
-					"screenName": "${userScreenName}"
-				},
-			"credentials":
-				{
-					"emails":
-					{[
-						"status": "${userEmailStatus}"
-					]},
-					"password" :
+				"profile":
 					{
-						"value": "nHZMPLWyzvRKujPLqfHK"
-					} 
+						"email": "${userEmailAddress}",
+						"login": "${userEmailAddress}",
+						"firstName": "${userFirstName}",
+						"lastName": "${userLastName}",
+						"screenName": "${userScreenName}"
+					},
+				"credentials":
+					{
+						"emails":
+							[{
+								"status": "${userEmailStatus}"
+							}],
+						"password":
+							{
+								"value": "nHZMPLWyzvRKujPLqfHK"
+							}
+					}
+				}
+				''';
+		}
+		else {
+			if (isSet(groupNames)) {
+				for (var groupName : list "${groupNames}") {
+					var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+
+					if ("${groupIds}" == "") {
+						var groupIds = "${groupId}";
+					}
+					else {
+						var groupIds = "${groupIds},${groupId}";
+					}			
 				}
 			}
-			''';
+
+			var curl = '''
+				${oktaURL}/api/v1/users?activate=${userActiveStatus}
+				-H "Authorization: SSWS ${oktaApiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d 
+				{
+				"profile":
+					{
+						"email": "${userEmailAddress}",
+						"login": "${userEmailAddress}",
+						"firstName": "${userFirstName}",
+						"lastName": "${userLastName}",
+						"screenName": "${userScreenName}"
+					},
+				"credentials":
+					{
+						"emails":
+							[{
+								"status": "${userEmailStatus}"
+							}],
+						"password" :
+							{
+								"value": "nHZMPLWyzvRKujPLqfHK"
+							},
+						groupIds": 
+							[
+								"${groupIds}"
+							]
+					}
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
