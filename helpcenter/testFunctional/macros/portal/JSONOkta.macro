@@ -101,6 +101,15 @@ definition {
 		if (!(isSet(userEmailStatus))) {
 			var userEmailStatus = "VERIFIED";
 		}
+
+		var partialUuid1 = StringUtil.randomString("8");
+		var partialUuid2 = StringUtil.randomString("4");
+		var partialUuid3 = StringUtil.randomString("4");
+		var partialUuid4 = StringUtil.randomString("4");
+		var partialUuid5 = StringUtil.randomString("12");
+
+		var userUuid = "${partialUuid1}-${partialUuid2}-${partialUuid3}-${partialUuid4}-${partialUuid5}";
+
 		if (!(isSet(groupNames))) {
 			var curl = '''
 				${oktaURL}/api/v1/users?activate=${userActiveStatus}
@@ -115,7 +124,8 @@ definition {
 						"login": "${userEmailAddress}",
 						"firstName": "${userFirstName}",
 						"lastName": "${userLastName}",
-						"screenName": "${userScreenName}"
+						"screenName": "${userScreenName}",
+						"uuid": "${userUuid}"
 					},
 				"credentials":
 					{
@@ -156,7 +166,8 @@ definition {
 						"login": "${userEmailAddress}",
 						"firstName": "${userFirstName}",
 						"lastName": "${userLastName}",
-						"screenName": "${userScreenName}"
+						"screenName": "${userScreenName}",
+						"uuid": "${userUuid}"
 					},
 				"credentials":
 					{
@@ -255,6 +266,21 @@ definition {
 		return "${userId}";
 	}
 
+    macro getOktaUserUuid {
+		var curl = '''
+			${oktaURL}/api/v1/users/${userEmailAddress}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var userUuid = JSONCurlUtil.get("${curl}", "$.profile.uuid");
+
+		echo("Okta User Uuid: ${userUuid}");
+
+		return "${userUuid}";
+	}
+
     @prose = "I remove the okta user with the email address ${userEmailAddress} from the okta group ${groupName}"
 	macro removeUserFromOktaGroup {
 		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
@@ -311,7 +337,7 @@ definition {
 
 			var userObject = JSONCurlUtil.get("${curl}");
 
-			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "Resource not found")))) {
 				JSONOkta.deactivateOktaUser(userEmailAddress = "${userEmailAddress}");
 				JSONOkta.deleteOktaUser(userEmailAddress = "${userEmailAddress}");
 			}
@@ -460,6 +486,8 @@ definition {
 			}
 		}
 
+		var userUuid = JSONCurlUtil.get("${curl}", "$.profile.uuid");
+
 		if ((!(isSet(groupNames))) && ("${groupIds}" == "")) {
 			var curl = '''
 				${oktaURL}/api/v1/users?activate=${userActiveStatus}
@@ -474,7 +502,8 @@ definition {
 						"login": "${userEmailAddress}",
 						"firstName": "${userFirstName}",
 						"lastName": "${userLastName}",
-						"screenName": "${userScreenName}"
+						"screenName": "${userScreenName}",
+						"uuid": "${userUuid}"
 					},
 				"credentials":
 					{
@@ -517,7 +546,8 @@ definition {
 						"login": "${userEmailAddress}",
 						"firstName": "${userFirstName}",
 						"lastName": "${userLastName}",
-						"screenName": "${userScreenName}"
+						"screenName": "${userScreenName}",
+						"uuid": "${userUuid}"
 					},
 				"credentials":
 					{
