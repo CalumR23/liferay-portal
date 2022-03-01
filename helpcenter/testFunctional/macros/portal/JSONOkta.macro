@@ -86,7 +86,12 @@ definition {
 				var userPassword = "${value}";
 			}
 			else if ("${field}" == "Group") {
-				var groupName = "${value}";
+				if ("${groupNames}" == "") {
+					var groupNames = "${value}";
+				}
+				else {
+					var groupNames = "${groupNames},${value}";
+				}
 			}
 			else {
 				fail("No such user field ${field}");
@@ -99,7 +104,7 @@ definition {
 		if (!(isSet(userEmailStatus))) {
 			var userEmailStatus = "VERIFIED";
 		}
-		if (!(isSet(groupName))) {
+		if (!(isSet(groupNames))) {
 			var curl = '''
 				${oktaURL}/api/v1/users?activate=${userActiveStatus}
 				-H "Authorization: SSWS ${oktaApiToken}"
@@ -130,7 +135,16 @@ definition {
 				''';
 		}
 		else {
-			var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+			for (var groupName : list "${groupNames}") {
+				var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+
+				if ("${groupIds}" == "") {
+					var groupIds = "${groupId}";
+				}
+				else {
+					var groupIds = "${groupIds},${groupId}";
+				}				
+			}
 
 			var curl = '''
 				${oktaURL}/api/v1/users?activate=${userActiveStatus}
@@ -159,7 +173,7 @@ definition {
 							},
 						groupIds": 
 							[
-								"${groupId}"
+								"${groupIds}"
 							]
 					}
 				}
