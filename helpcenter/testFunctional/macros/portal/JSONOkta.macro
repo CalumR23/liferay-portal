@@ -58,6 +58,8 @@ definition {
 
     @prose = "I create a user with the following parameters ${table}"
 	macro createOktaUser {
+		var groupNames = "";
+
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -143,6 +145,8 @@ definition {
 		}
 		else {
 			for (var groupName : list "${groupNames}") {
+				var groupIds = "";
+
 				var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
 
 				if ("${groupIds}" == "") {
@@ -150,7 +154,7 @@ definition {
 				}
 				else {
 					var groupIds = "${groupIds},${groupId}";
-				}				
+				}
 			}
 
 			var curl = '''
@@ -370,6 +374,8 @@ definition {
 
     @prose = "I update a user with the email address ${userEmailAddress} using following parameters ${table}"
 	macro updateOktaUser {
+		var groupNames = "";
+
 		var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
 
 		var RawTable rawTable = new RawTable("${table}");
@@ -473,7 +479,7 @@ definition {
 				var userEmailStatus = "";
 			}
 		}
-		if (!(isSet(groupNames))) {
+		if ("${groupNames}" == "") {
 			var userObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${userObject}", "groupIds=")) {
@@ -488,7 +494,7 @@ definition {
 
 		var userUuid = JSONCurlUtil.get("${curl}", "$.profile.uuid");
 
-		if ((!(isSet(groupNames))) && ("${groupIds}" == "")) {
+		if (("${groupNames}" == "") && ("${groupIds}" == "")) {
 			var curl = '''
 				${oktaURL}/api/v1/users?activate=${userActiveStatus}
 				-H "Authorization: SSWS ${oktaApiToken}"
@@ -520,7 +526,7 @@ definition {
 				''';
 		}
 		else {
-			if (isSet(groupNames)) {
+			if (!("${groupNames}" == "")) {
 				for (var groupName : list "${groupNames}") {
 					var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
 
@@ -529,7 +535,7 @@ definition {
 					}
 					else {
 						var groupIds = "${groupIds},${groupId}";
-					}			
+					}
 				}
 			}
 
