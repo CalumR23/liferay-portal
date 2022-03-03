@@ -97,6 +97,18 @@ definition {
 			}
 		}
 
+		if (!(isSet(userScreenName))) {
+			var userScreenName = "";
+		}
+		if (!(isSet(userEmailAddress))) {
+			var userEmailAddress = "";
+		}
+		if (!(isSet(userFirstName))) {
+			var userFirstName = "";
+		}
+		if (!(isSet(userLastName))) {
+			var userLastName = "";
+		}
 		if (!(isSet(userActiveStatus))) {
 			var userActiveStatus = "true";
 		}
@@ -396,6 +408,9 @@ definition {
 			else if ("${field}" == "Last Name") {
 				var userLastName = "${value}";
 			}
+			else if ("${field}" == "Active") {
+				var userActiveStatus = "${value}";
+			}
 			else if ("${field}" == "Email Status") {
 				var userEmailStatus = "${value}";
 			}
@@ -467,23 +482,30 @@ definition {
 				var userLastName = "";
 			}
 		}
-		if (!(isSet(userEmailStatus))) {
-			var userObject = JSONCurlUtil.get("${curl}", "$");
+		if (!(isSet(userActiveStatus))) {
+			var value = JSONCurlUtil.get("${curl}", "$.profile.status");
 
-			if (contains("${userObject}", "status=")) {
-				var value = JSONCurlUtil.get("${curl}", "$.credentials.emails[0].status");
-
-				var userEmailStatus = "${value}";
+			if ("${value}" == "ACTIVE") {
+				var userActiveStatus = "true";
 			}
 			else {
-				var userEmailStatus = "";
+				var userActiveStatus = "false";
 			}
+		}
+		if (!(isSet(userEmailStatus))) {
+			var value = JSONCurlUtil.get("${curl}", "$.credentials.emails[0].status");
+
+			var userEmailStatus = "${value}";
 		}
 		if ("${groupNames}" == "") {
 			var userObject = JSONCurlUtil.get("${curl}", "$");
 
 			if (contains("${userObject}", "groupIds=")) {
 				var value = JSONCurlUtil.get("${curl}", "$.credentials.groupIds[0]");
+
+				var value = StringUtil.replace("${value}", "[", "");
+
+				var value = StringUtil.replace("${value}", "]", "");
 
 				var groupIds = "${value}";
 			}
