@@ -221,6 +221,140 @@ definition {
 		}
 	}
 
+@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} and the following filters ${table}"
+	macro _viewFilteredLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var filters = "";
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var field = "name";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+%27${value}%27";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+%27${value}%27";
+				}
+			}
+			else if ("${field}" == "Description") {
+				var field = "description";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+%27${value}%27";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+%27${value}%27";
+				}
+			}
+			else if ("${field}" == "Host Name") {
+				var field = "hostName";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+%27${value}%27";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+%27${value}%27";
+				}
+			}
+			else if ("${field}" == "IP Addresses") {
+				var field = "ipAddresses";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}/any%28s:s+eq+%27${value}%27%29";
+				}
+				else {
+					var filters = "${filters}+and+${field}/any%28s:s+eq+%27${value}%27%29";
+				}
+			}
+			else if ("${field}" == "MAC Addresses") {
+				var field = "macAddresses";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}/any%28s:s+eq+%27${value}%27%29";
+				}
+				else {
+					var filters = "${filters}+and+${field}/any%28s:s+eq+%27${value}%27%29";
+				}
+			}
+			else if ("${field}" == "Instance Size") {
+				var field = "sizing";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+%27${value}%27";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+%27${value}%27";
+				}
+			}
+			else if ("${field}" == "Maximum Cluster Nodes") {
+				var field = "maxClusterNodes";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+${value}";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+${value}";
+				}
+			}
+			else if ("${field}" == "Product Name") {
+				var field = "productName";
+
+				if (contains("${value}", " ")) {
+					var value = StringUtil.replace("${value}", " ", "+");
+				}
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+%27${value}%27";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+%27${value}%27";
+				}
+			}
+			else if ("${field}" == "Complimentary") {
+				var field = "complimentary";
+
+				if ("${filters}" == "") {
+					var filters = "license-keys?filter=${field}+eq+${value}";
+				}
+				else {
+					var filters = "${filters}+and+${field}+eq+${value}";
+				}
+			}
+			else {
+				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing.");
+			}
+		}
+		
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/${filters}
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
+
+		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+
+		echo("License Expected: ${licenseName}");
+		echo("License Actual: ${valueFromAPI}");
+
+		if (!("${licenseName}" == "${valueFromAPI}")) {
+			fail("License filter did not return any results");
+		}
+	}
+
 	@prose = "I should be able to view the deactivated license on the account ${accountName} with the name ${licenseName} and the following values ${table}"
 	macro _viewDeactivatedLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
