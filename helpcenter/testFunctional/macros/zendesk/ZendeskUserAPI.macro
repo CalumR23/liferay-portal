@@ -11,7 +11,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/group_memberships.json
+			${zendeskURL}/api/v2/group_memberships.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -34,7 +34,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/organization_memberships.json
+			${zendeskURL}/api/v2/organization_memberships.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -57,7 +57,7 @@ definition {
 		var tag = "osb_${organizationId}_watcher";
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -65,7 +65,7 @@ definition {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -187,7 +187,7 @@ definition {
 		}
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/create_or_update.json
+			${zendeskURL}/api/v2/users/create_or_update.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -221,7 +221,7 @@ definition {
 		return "${staticUserID}";
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${staticUserID}/password.json
+			${zendeskURL}/api/v2/users/${staticUserID}/password.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -387,7 +387,7 @@ definition {
 
 	macro _getUserNameById {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -419,7 +419,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_memberships.json
+			${zendeskURL}/api/v2/users/${userId}/organization_memberships.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -432,7 +432,7 @@ definition {
 		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "&quot;", "");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_memberships/${organizationMembershipId}.json
+			${zendeskURL}/api/v2/users/${userId}/organization_memberships/${organizationMembershipId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -444,7 +444,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -505,14 +505,14 @@ definition {
 	macro _tearDownUserById {
 		if ((!(contains("${userId}", "{userId}"))) && (!("${userId}" == ""))) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/destroy_many.json?ids=${userId}
+				${zendeskURL}/api/v2/users/destroy_many.json?ids=${userId} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
 			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
 
 			var curl = '''
-				--tlsv1.2 ${statusUrl}
+				${statusUrl} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -524,11 +524,11 @@ definition {
 						ZendeskHomepage.pause(timeInSeconds = "2");
 
 						var curl = '''
-							--tlsv1.2 ${statusUrl}
+							${statusUrl} --tlsv1.2
 							-u ${zendeskAdminEmail}/token:${apiToken}
 							''';
 
-						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");				
+						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
 					if (!("${status}" == "completed")) {
 						echo("Warning: The user tear down may have failed");
@@ -542,7 +542,7 @@ definition {
 			}
 
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userId}
+				${zendeskURL}/api/v2/deleted_users/${userId} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -553,7 +553,7 @@ definition {
 	@prose = "I teardown tickets requested by the user with the following email address ${userEmailAddress} from zendesk.liferay.com"
 	macro _tearDownUserRequestedTicketsByUserEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -563,7 +563,7 @@ definition {
 			var userID = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/${userID}/tickets/requested.json
+				${zendeskURL}/api/v2/users/${userID}/tickets/requested.json --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -593,7 +593,7 @@ definition {
 	@prose = "I teardown tickets requested by the user with the following userExternalId ${userExternalId} from zendesk.liferay.com"
 	macro _tearDownUserRequestedTicketsByUserExternalId {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -603,7 +603,7 @@ definition {
 			var userID = ZendeskUserAPI._viewUserIdByExternalId(userExternalId = "${userExternalId}");
 
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/${userID}/tickets/requested.json
+				${zendeskURL}/api/v2/users/${userID}/tickets/requested.json --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -629,7 +629,7 @@ definition {
 			}
 		}
 	}
-	
+
 	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
 	macro _tearDownUsersByExternalIdList {
 		if ((!(contains("${userExternalIds}", "{userExternalIds}"))) && (!("${userExternalIds}" == ""))) {
@@ -637,7 +637,7 @@ definition {
 
 			for (var userExternalId : list "${userExternalIds}") {
 				var curl = '''
-					--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+					${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 					-u ${zendeskAdminEmail}/token:${apiToken}
 					''';
 
@@ -656,14 +656,14 @@ definition {
 			}
 
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds}
+				${zendeskURL}/api/v2/users/destroy_many.json?external_ids=${userExternalIds} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
 			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
 
 			var curl = '''
-				--tlsv1.2 ${statusUrl}
+				${statusUrl} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -675,7 +675,7 @@ definition {
 						ZendeskHomepage.pause(timeInSeconds = "2");
 
 						var curl = '''
-							--tlsv1.2 ${statusUrl}
+							${statusUrl} --tlsv1.2
 							-u ${zendeskAdminEmail}/token:${apiToken}
 							''';
 
@@ -694,7 +694,7 @@ definition {
 
 			for (var userID : list "${userIDs}") {
 				var curl = '''
-					--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userID}
+					${zendeskURL}/api/v2/deleted_users/${userID} --tlsv1.2
 					-u ${zendeskAdminEmail}/token:${apiToken}
 					''';
 
@@ -730,14 +730,14 @@ definition {
 	macro _tearDownUsersByIdList {
 		if ((!(contains("${userIds}", "{userIds}"))) && (!("${userIds}" == ""))) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/destroy_many.json?ids=${userIds}
+				${zendeskURL}/api/v2/users/destroy_many.json?ids=${userIds} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
 			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
 
 			var curl = '''
-				--tlsv1.2 ${statusUrl}
+				${statusUrl} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -749,7 +749,7 @@ definition {
 						ZendeskHomepage.pause(timeInSeconds = "2");
 
 						var curl = '''
-							--tlsv1.2 ${statusUrl}
+							${statusUrl} --tlsv1.2
 							-u ${zendeskAdminEmail}/token:${apiToken}
 							''';
 
@@ -768,7 +768,7 @@ definition {
 
 			for (var userId : list "${userIds}") {
 				var curl = '''
-					--tlsv1.2 ${zendeskURL}/api/v2/deleted_users/${userId}
+					${zendeskURL}/api/v2/deleted_users/${userId} --tlsv1.2
 					-u ${zendeskAdminEmail}/token:${apiToken}
 					''';
 
@@ -806,7 +806,7 @@ definition {
 		var customRoleId = ZendeskCustomRoleAPI._getCustomRoleIdByName(customRoleName = "${customRoleName}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -826,7 +826,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -846,7 +846,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/password.json
+			${zendeskURL}/api/v2/users/${userId}/password.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -863,7 +863,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -883,7 +883,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -903,7 +903,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			-H "Content-Type: application/json"
 			-d
@@ -968,7 +968,7 @@ definition {
 
 		if (!("${users}" == "[]")) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -1045,7 +1045,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1108,7 +1108,7 @@ definition {
 
 	macro _viewUserExistingTagsByEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1125,7 +1125,7 @@ definition {
 
 	macro _viewUserExistingTagsByExternalId {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1136,7 +1136,7 @@ definition {
 
 	macro _viewUserExternalIdByEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1147,7 +1147,7 @@ definition {
 
 	macro _viewUserIdByEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1158,7 +1158,7 @@ definition {
 
 	macro _viewUserIdByExternalId {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1169,7 +1169,7 @@ definition {
 
 	macro _viewUserIdByName {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
+			${zendeskURL}/api/v2/users/search.json?query=${userName} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1180,7 +1180,7 @@ definition {
 
 	macro _viewUserIdsByName {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
+			${zendeskURL}/api/v2/users/search.json?query=${userName} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1213,7 +1213,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1230,7 +1230,7 @@ definition {
 	@prose = "the user with userExternalId ${userExternalId} on zendesk.liferay.com should have the name ${userName}"
 	macro _viewUserNameByExternalId {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1263,7 +1263,7 @@ definition {
 
 		if (!("${users}" == "[]")) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -1277,7 +1277,7 @@ definition {
 
 	macro _viewUserOrganizationIdByEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1342,7 +1342,7 @@ definition {
 
 	macro _viewUserOrganizationMembershipsById {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_memberships.json
+			${zendeskURL}/api/v2/users/${userId}/organization_memberships.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1353,7 +1353,7 @@ definition {
 
 	macro _viewUserOrganizationSubscriptionsById {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}/organization_subscriptions.json
+			${zendeskURL}/api/v2/users/${userId}/organization_subscriptions.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1367,7 +1367,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1390,7 +1390,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1406,36 +1406,36 @@ definition {
 
 	macro _viewUserSearchResultsByEmailAddress {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+			${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
 		var users = JSONCurlUtil.get("${curl}", "$.users");
 
 		return "${users}";
-	} 
+	}
 
 	macro _viewUserSearchResultsByExternalId {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
 		var users = JSONCurlUtil.get("${curl}", "$.users");
 
 		return "${users}";
-	} 
+	}
 
 	macro _viewUserSearchResultsByName {
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userName}
+			${zendeskURL}/api/v2/users/search.json?query=${userName} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
 		var users = JSONCurlUtil.get("${curl}", "$.users");
 
 		return "${users}";
-	} 
+	}
 
 	@prose = "the user with the email address ${userEmailAddress} should be present on zendesk.liferay.com"
 	macro _viewUserSyncFromOsb {
@@ -1453,7 +1453,7 @@ definition {
 
 		if (!("${users}" == "[]")) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress}
+				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
@@ -1489,7 +1489,7 @@ definition {
 
 		if (!("${users}" == "[]")) {
 			var curl = '''
-				--tlsv1.2 ${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId}
+				${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
 
