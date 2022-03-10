@@ -343,9 +343,6 @@ public class PoshiValidation {
 			}
 
 			if (primaryAttributeName.equals("function")) {
-				validateRequiredAttributeNames(
-					poshiElement, Arrays.asList("locator1"), filePath);
-
 				List<String> possibleAttributeNames = Arrays.asList(
 					"function", "line-number", "locator1", "value1");
 
@@ -1409,6 +1406,8 @@ public class PoshiValidation {
 			}
 
 			if (element.attributeValue(requiredAttributeName) == null) {
+				System.out.println(requiredAttributeName);
+				System.out.println(element);
 				_addException(
 					element, "Missing " + requiredAttributeName + " attribute",
 					filePath);
