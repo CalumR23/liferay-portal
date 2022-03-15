@@ -221,6 +221,56 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the deactivated license on the account ${accountName} with the name ${licenseName} and the following values ${table}"
+	macro _viewDeactivatedLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else if ("${field}" == "License Entry Type") {
+				var value = StringUtil.lowerCaseFirstLetter("${value}");
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
+
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			}
+			else {
+				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
+			}
+		}
+
+		echo("Expected ${field} Value: ${value}");
+		echo("Actual ${field} Value: ${valueFromAPI}");
+
+		if (!("${value}" == "${valueFromAPI}")) {
+			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+		}
+	}
+
 @prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} and the following filters ${table}"
 	macro _viewFilteredLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -347,61 +397,11 @@ definition {
 
 		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 
-		echo("License Expected: ${licenseName}");
-		echo("License Actual: ${valueFromAPI}");
+		echo("Expected License Name Value: ${licenseName}");
+		echo("Actual License Name Value: ${valueFromAPI}");
 
 		if (!("${licenseName}" == "${valueFromAPI}")) {
-			fail("License filter did not return any results");
-		}
-	}
-
-	@prose = "I should be able to view the deactivated license on the account ${accountName} with the name ${licenseName} and the following values ${table}"
-	macro _viewDeactivatedLicense {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else if ("${field}" == "License Entry Type") {
-				var value = StringUtil.lowerCaseFirstLetter("${value}");
-
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
-
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
-			}
-			else {
-				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
-			}
-		}
-
-		echo("Expected ${field} Value: ${value}");
-		echo("Actual ${field} Value: ${valueFromAPI}");
-
-		if (!("${value}" == "${valueFromAPI}")) {
-			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			fail("The license search filters did not return the expected license with the name ${licenseName}");
 		}
 	}
 
