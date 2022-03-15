@@ -28,9 +28,7 @@ apply plugin: "com.liferay.source.formatter"
 apply plugin: "net.saliman.properties"
 
 task cleanWebDriver(type: Delete)
-task downloadChromeDriver(type: Download)
 task downloadInternetExplorerDriver(type: Download)
-task unzipChromeDriver(type: Copy)
 task unzipInternetExplorerDriver(type: Copy)
 
 if (!hasProperty("operatingSystem")) {
@@ -75,12 +73,6 @@ cleanWebDriver {
 	delete webDriverRootDir
 }
 
-downloadChromeDriver {
-	dest new File(webDriverRootDir, "chromedriver/${chromeDriverVersion}/${operatingSystem}/chromedriver.zip")
-	overwrite false
-	src "https://chromedriver.storage.googleapis.com/${chromeDriverVersion}/chromedriver_${operatingSystem}.zip"
-}
-
 downloadInternetExplorerDriver {
 	String ieDriverServerOs
 
@@ -94,12 +86,6 @@ downloadInternetExplorerDriver {
 	dest new File(webDriverRootDir, "iedriver/${internetExplorerDriverVersion}/${operatingSystem}/IEDriverServer_${ieDriverServerOs}_${internetExplorerDriverVersion}.zip")
 	overwrite false
 	src "http://selenium-release.storage.googleapis.com/${_parseMajorVersion(seleniumVersion)}/IEDriverServer_${ieDriverServerOs}_${internetExplorerDriverVersion}.zip"
-}
-
-unzipChromeDriver {
-	dependsOn downloadChromeDriver
-	from zipTree(downloadChromeDriver.dest)
-	into new File(webDriverRootDir, "chromedriver/${chromeDriverVersion}/${operatingSystem}")
 }
 
 unzipInternetExplorerDriver {
@@ -142,11 +128,7 @@ subprojects {
 
 		browser = poshiProperties.get("browser.type")
 
-		if (browser == "chrome") {
-			poshiProperties.put "selenium.executable.dir.name", "${unzipChromeDriver.destinationDir}${File.separator}"
-			poshiProperties.put "selenium.chrome.driver.executable", "chromedriver"
-		}
-		else if (browser == "internet.explorer") {
+		if (browser == "internet.explorer") {
 			poshiProperties.put "selenium.executable.dir.name", "${unzipInternetExplorerDriver.destinationDir}${File.separator}"
 			poshiProperties.put "selenium.ie.driver.executable", "IEDriverServer.exe"
 		}
@@ -162,10 +144,7 @@ subprojects {
 	}
 
 	runPoshi {
-		if (browser == "chrome") {
-			dependsOn unzipChromeDriver
-		}
-		else if (browser == "internet.explorer") {
+		if (browser == "internet.explorer") {
 			dependsOn unzipInternetExplorerDriver
 		}
 	}
