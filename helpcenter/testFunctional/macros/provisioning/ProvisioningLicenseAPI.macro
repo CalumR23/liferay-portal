@@ -542,6 +542,29 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view a license search error when searching for a license with the name ${licenseName} on the account ${accountName} using the okta session id value ${oktaSessionId}"
+	macro _viewLicenseKeySearchResultError {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "Access denied to")) {
+			echo("The user is not authorized to use this API");
+		}
+		else {
+			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
+		}
+	}
+
 	@prose = "I should not be able to view the active license on the account ${accountName} with the name ${licenseName}"
 	macro _viewNoActiveLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -595,32 +618,6 @@ definition {
 
 		if (contains("${jsonObject}", "${keyword}")) {
 			fail("The license with the name ${licenseName} is visible to a non permissioned user");
-		}
-		if (contains("${jsonObject}", "Access denied to")) {
-			echo("The user is not authorized to use this API");
-		}
-	}
-
-	@prose = "the okta user with the okta session id value ${oktaSessionId} that is not on the account ${accountName} with the license ${licenseName} should not be able to send any okta Api requests"
-	macro _viewNoLicenseKeyIdViaLicenseNameAttemptUsingOktaAuth {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "Access denied to")) {
-			echo("The user is not authorized to use this API");
-		}
-		else {
-			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
 		}
 	}
 }
