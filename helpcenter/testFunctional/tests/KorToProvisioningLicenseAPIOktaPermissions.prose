@@ -24,22 +24,33 @@ Teardown:
 	* I get the ID of the default user belonging to the organization "Permis - ${staticProjectName}" from zendesk.liferay.com
 	* I rename the first default user ID variable
 	* I get the ID of the default user belonging to the organization "Misper - ${staticCompanyName}" from zendesk.liferay.com
-	* I rename the fourth default user ID variable
+	* I rename the second default user ID variable
+	* I get the ID of the default user belonging to the organization "Propar - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
 	* I tear down the product consumption list on koroneiki made by the account "Permis - ${staticProjectName}" for the following products
 	| DXP Production     |
 	| DXP Non-Production |
 	* I tear down the product consumptions on koroneiki made by the account "Permis - ${staticProjectName}" for the following products
 	| DXP Production     |
 	| DXP Non-Production |
+	* I tear down the product consumption list on koroneiki made by the account "Propar - ${staticCompanyName}" for the following products
+	| DXP Production     |
+	| DXP Non-Production |
+	* I tear down the product consumptions on koroneiki made by the account "Propar - ${staticCompanyName}" for the following products
+	| DXP Production     |
+	| DXP Non-Production |
 	* I tear down the accounts on koroneiki with the following names
 	| Permis - ${staticProjectName} |
 	| Misper - ${staticCompanyName} |
+	| Propar - ${staticCompanyName} |
 	* I tear down the accounts on koroneiki with the following "Code" values
 	| MISPERPERMIS |
 	| MISPER       |
+	| PROPAR       |
 	* I tear down the projects with the following project codes via groovy
 	| MISPERPERMIS |
 	| MISPER       |
+	| PROPAR       |
 	* I tear down the users with the following email addresses from okta
 	| pro.okta1@lrcustomer.com.broken |
 	| pro.okta2@lrcustomer.com.broken |
@@ -55,6 +66,7 @@ Teardown:
 	* I teardown the tickets with the following keywords from zendesk.liferay.com
 	| New Subscription(s) for Permis - ${staticProjectName} |
 	| New Subscription(s) for Misper - ${staticCompanyName} |
+	| New Subscription(s) for Propar - ${staticCompanyName} |
 	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
 	| pro.okta1@lrcustomer.com.broken |
 	| pro.okta2@lrcustomer.com.broken |
@@ -62,13 +74,14 @@ Teardown:
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
 	| Permis - ${staticProjectName} |
 	| Misper - ${staticCompanyName} |
+	| Propar - ${staticCompanyName} |
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
 
 Scenario: View license with okta authentication using a valid user
 	@ help.center.acceptance = "true"
-	Testing the ability to view licenses  a license form options with the okta ID Session
+	Testing the ability to view licenses a license form options with the okta ID Session
 
 	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
 	| Account Name                           | Misper - ${staticCompanyName}              |
@@ -129,6 +142,120 @@ Scenario: View license with okta authentication using a valid user
 	| Header  | Permis - ${staticProjectName} | |
 	| Product | DXP Production                | |
 	When I log into the dev domain as "pro.okta1@lrcustomer.com.broken" with password "${staticOktaUserPassword}"
+	And I obtain the okta session ID value from the dev domain page
+	Then I should be able to view the license on the account "Permis - ${staticProjectName}" with the name "Permis - ${staticProjectName}" using the okta session id value "${staticOktaSessionId}"
+	And I should be able to view the following generate license form options for the account "Permis - ${staticProjectName}" with the product group "DXP" using the okta session id value "${staticOktaSessionId}"
+	| Label | 7.0 |
+	| Label | 7.1 |
+	| Label | 7.2 |
+	| Label | 7.3 |
+	| Label | 7.4 |
+
+Scenario: View FLS partner license with okta authentication using a valid user
+	Testing the ability to view FLS partner license form options with the okta ID Session
+
+	And I log into the support homepage as "${staticSupportAdminEmailAdress}" with password "${staticSupportAdminPassword}"
+	And I publish a partner account RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Propar - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Dossiera Account Key                   | abcdefgh1234567890                         |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Professional Services (Technical/Web/IT)   |
+	| Owner Email Address                    | pro.okta2@lrcustomer.com.broken            |
+	| Owner First Name                       | PRO2                                       |
+	| Owner Last Name                        | Okta2                                      |
+	| Partner First Line Support             | false                                      |
+	| Product Name                           | Service Partnership                        |
+	| Product Type                           | New                                        |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | 000000a1b2c3d4e5f6e7f                      |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I publish a project RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Misper - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | pro.okta1@lrcustomer.com.broken            |
+	| Contact First Name                     | PRO                                        |
+	| Contact Last Name                      | Okta1                                      |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | pro.okta1@lrcustomer.com.broken            |
+	| Owner First Name                       | PRO                                        |
+	| Owner Last Name                        | Okta1                                      |
+	| Partner First Line Support             | false                                      |
+	| Partner Dossiera Key                   | abcdefgh1234567890                         |
+	| Partner Name                           | Propar - ${staticCompanyName}              |
+	| Partner Support Level                  | Platinum                                   |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Permis - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "pro.okta2@lrcustomer.com.broken" on the account "Propar - ${staticCompanyName}" to the following roles
+	| Partner Member |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I create an assigned team nested field for a team with the name "Propar - ${staticCompanyName}" assigned to the account "Permis - ${staticProjectName}"
+	And I assign the team with the name "Propar - ${staticCompanyName}" on the account "Permis - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Propar - ${staticCompanyName}" on the account "Permis - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Permis - ${staticProjectName} | |
+	| Product | Select        | DXP Production                | |
+	| Version | Select        | 7.2                           | |
+	| Type    | Select        | DXP Production                | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Permis - ${staticProjectName} | |
+	| Product | DXP Production                | |
+	When I log into the dev domain as "pro.okta2@lrcustomer.com.broken" with password "${staticOktaUserPassword}"
 	And I obtain the okta session ID value from the dev domain page
 	Then I should be able to view the license on the account "Permis - ${staticProjectName}" with the name "Permis - ${staticProjectName}" using the okta session id value "${staticOktaSessionId}"
 	And I should be able to view the following generate license form options for the account "Permis - ${staticProjectName}" with the product group "DXP" using the okta session id value "${staticOktaSessionId}"
