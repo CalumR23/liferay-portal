@@ -2,6 +2,9 @@ definition {
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
+	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
+	var supportAdminPassword = PropsUtil.get("support.admin.password");
+	var supportURL = PropsUtil.get("support.liferay.url");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
@@ -348,6 +351,16 @@ definition {
 	@prose = "I teardown organizations with the following organizationExternalIds ${organizationExternalIds} from zendesk.liferay.com"
 	macro _tearDownOrganizationsByExternalIdList {
 		if ((!(contains("${organizationExternalIds}", "{organizationExternalIds}"))) && (!("${organizationExternalIds}" == ""))) {
+			for (var organizationExternalId : list "${organizationExternalIds}") {
+				var curl = '''
+					${supportURL}/api/jsonws/osb.accountentry/delete-account-entry
+					-u ${supportAdminEmailAddress}:${supportAdminPassword}
+					-d accountEntryId=${organizationExternalId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+
 			var curl = '''
 				--tlsv1.2 ${zendeskURL}/api/v2/organizations/destroy_many.json?external_ids=${organizationExternalIds}
 				-u ${zendeskAdminEmail}/token:${apiToken}
