@@ -144,3 +144,23 @@ Scenario: View subscription after removal from one account
 	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
 	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud
 
+Scenario: View no subscription after offering expiration
+	Users on accounts with expired DXP cloud subscriptions should not be subscribed to DXP cloud
+
+	Given I generate past static start and end dates
+	And I update a product purchase on koroneiki made by the account "Lxczen - ${staticProjectName}" for the product "LXC SM Subscription - HA Production" to have the following values
+	| End Date          | ${staticPastEndDate}         | |
+	| Original End Date | ${staticPastOriginalEndDate} | |
+	| Perpetual         | false                        | |
+	| Start Date        | ${staticPastStartDate}       | |
+	| Status            | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Lxczen - ${staticProjectName}" for the product "Limited Subscription" to have the following values
+	| End Date          | ${staticPastEndDate}         | |
+	| Original End Date | ${staticPastOriginalEndDate} | |
+	| Perpetual         | false                        | |
+	| Start Date        | ${staticPastStartDate}       | |
+	| Status            | Approved                     | |
+	And I synchronize the account entitlement definition with the name "Limited Subscription"
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should not be subscribed on DXP cloud
