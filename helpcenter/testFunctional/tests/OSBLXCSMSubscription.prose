@@ -1,0 +1,104 @@
+@testray.main.component.name = "Support QA"
+@type = "osb.integration"
+
+Feature: OSB LXC SM Subscription
+	Testing automatic subscriptions to LXC SM for customers on OSB accounts with DXP cloud subscriptions.
+
+Setup:
+	* I get all test passwords and admin emails
+	* I generate a provisioning project name
+	* I create a user with the following parameters
+	| Screen Name   | lxcsm.customer1                       |
+	| Email Address | lxcsm.customer1@lrcustomer.com.broken |
+	| First Name    | LXCSM                                 |
+	| Last Name     | Customer1                                |
+	* I create a user with the following parameters
+	| Screen Name   | lxcsm.customer2                       |
+	| Email Address | lxcsm.customer2@lrcustomer.com.broken |
+	| First Name    | LXCSM                                 |
+	| Last Name     | Customer2                                |
+	* I create a support user with the following parameters
+	| Screen Name   | lxcsm.user1                       |
+	| Email Address | lxcsm.user1@lrcustomer.com.broken |
+	| First Name    | LXCSM                             |
+	| Last Name     | User1                                |
+	* I create an account on koroneiki with the following values
+	| Code   | LXCZENLXCZEN                  | |
+	| Name   | Lxczen - ${staticProjectName} | |
+	| Region | United States                 | |
+	| Status | Active                        | |
+	| Tier   | T1                            | |
+	* I create an account on koroneiki with the following values
+	| Code   | LXCDUOLXCDUP                  | |
+	| Name   | Lxcdup - ${staticProjectName} | |
+	| Region | United States                 | |
+	| Status | Active                        | |
+	| Tier   | T1                            | |
+	* I assign the contact with the email address "lxcsm.customer1@lrcustomer.com.broken" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Support Requester |
+	* I assign the contact with the email address "lxcsm.customer2@lrcustomer.com.broken" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Support User |
+	* I generate static start and end dates
+	* I create a product purchase for an account with the name "Lxczen - ${staticProjectName}" and the product "LXC SM Subscription - HA Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I create a product purchase for an account with the name "Lxczen - ${staticProjectName}" and the product "Limited Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I synchronize the account entitlement definition with the name "Limited Subscription"
+	* I wait for "1" minutes
+	* the support organization with the code "LXCZENLXCZEN" should be part of the support site
+
+Teardown:
+	* I wait for "10" seconds
+	* I get the ID of the default user belonging to the organization "Lxczen - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Lxcdup - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I tear down the accounts on koroneiki with the following names
+	| Lxczen - ${staticProjectName} |
+	| Lxcdup - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| LXCZENLXCZEN |
+	| LXCDUOLXCDUP |
+	* I synchronize the account entitlement definition with the name "Limited Subscription"
+	* I tear down the projects with the following project codes via groovy
+	| LXCZENLXCZEN |
+	| LXCDUOLXCDUP |
+	* I tear down the users with the following email addresses from okta
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	| lxcsm.user1@lrcustomer.com.broken     |
+	* I tear down the users with the following email addresses from koroneiki
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	* I tear down the contacts on koroneiki with the following email addresses
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
+	| Lxczen - ${staticProjectName} |
+	| Lxcdup - ${staticProjectName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
+	* I log out and log into the support homepage as "${staticSupportAdminEmailAdress}" with password "${staticSupportAdminPassword}"
+	* I tear down the following user email addresses from the DXP Cloud subscription list
+	| lxcsm.customer1@lrcustomer.com.broken |
+	| lxcsm.customer2@lrcustomer.com.broken |
+	| lxcsm.user1@lrcustomer.com.broken     |
