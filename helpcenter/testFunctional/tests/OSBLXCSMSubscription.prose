@@ -111,3 +111,36 @@ Scenario: View subscription
 	Given the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
 	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud
 
+Scenario: View subscription after removal from one account
+	Users removed from one account with DXP cloud subscriptions while remaining on another should be subscribed to DXP cloud
+
+	Given I assign the contact with the email address "lxcsm.customer1@lrcustomer.com.broken" on the account "Lxcdup - ${staticProjectName}" to the following roles
+	| Support Requester |
+	And I assign the contact with the email address "lxcsm.customer2@lrcustomer.com.broken" on the account "Lxcdup - ${staticProjectName}" to the following roles
+	| Support User |
+	And I create a product purchase for an account with the name "Lxcdup - ${staticProjectName}" and the product "LXC SM Subscription - HA Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Lxcdup - ${staticProjectName}" and the product "Limited Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Limited Subscription"
+	And I wait for "1" minutes
+	Then the support organization with the code "LXCDUOLXCDUP" should be part of the support site
+	When I remove customer contacts with the following email addresses from the account "Lxczen - ${staticProjectName}"
+	| lxcsm.customer1@lrcustomer.com.broken |
+	And I remove customer contacts with the following email addresses from the account "Lxczen - ${staticProjectName}"
+	| lxcsm.customer2@lrcustomer.com.broken |
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud
+
