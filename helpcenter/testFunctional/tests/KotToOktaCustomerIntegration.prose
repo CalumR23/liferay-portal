@@ -1,0 +1,75 @@
+@testray.main.component.name = "Support QA"
+@type = "okta.integration"
+
+Feature:  Koroneiki To Okta Customer Group Integration
+	Testing to assure koroneiki customer and group integration to okta works properly.
+
+Setup:
+	* I get all test passwords and admin emails
+    * I create a user with the following parameters
+	| Screen Name   | okt.koroneiki1                       |
+	| Email Address | okt.koroneiki1@lrcustomer.com.broken |
+	| First Name    | OKT                                  |
+	| Last Name     | Koroneiki1                           |
+
+Teardown:
+	* I get the ID of the default user belonging to the organization "Korone - ${staticProjectName}" from zendesk.liferay.com
+	* I tear down the accounts on koroneiki with the following names
+	| Korone - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| KORONEKORONE |
+	* I synchronize the account entitlement definition with the name "Platinum Subscription"
+	* I tear down the projects with the following project codes via groovy
+	| KORONEKORONE |
+	* I tear down the users with the following email addresses from okta
+	| okt.koroneiki1@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| okt.koroneiki1@lrcustomer.com.broken |
+	* I tear down the contacts on koroneiki with the following email addresses
+	| okt.koroneiki1@lrcustomer.com.broken |
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
+	| Korone - ${staticProjectName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
+
+
+Scenario: Sync customer and group via Koroneiki to okta
+	Koroneiki customer contacts with the proper group synced via Koroneiki should be properly synced to okta.
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORONEKORONE                         | |
+	| Contact Email Address | okt.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test okt account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korone - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | okt.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Korone - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | true                     | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I create a product purchase for an account with the name "Korone - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | true                     | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I assign customer contacts with the following email addresses to the account "Korone - ${staticProjectName}"
+	| okt.koroneiki1@lrcustomer.com.broken |
+	And I assign the contact with the email address "okt.koroneiki1@lrcustomer.com.broken" on the account "Korone - ${staticProjectName}" to the following roles	
+	| Support User |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I synchronize the contact entitlement definition with the name "Customer"
+	And I wait for "1" minutes
+	Then the support organization with the code "KORONEKORONE" should be part of the support site
+	And the okta group "Customers" should have the user with the email address "okt.koroneiki1@lrcustomer.com.broken" as a member
