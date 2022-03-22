@@ -1,0 +1,123 @@
+@testray.main.component.name = "Support QA"
+@type = "osb.integration"
+
+Feature: OSB LXC SM Partner Subscription
+	Testing automatic subscriptions to LXC SM Partners for customers on OSB accounts with LXC SM subscriptions.
+
+Setup:
+	* I get all test passwords and admin emails
+	* I generate a provisioning project name
+	* I generate a provisioning company name
+	* I create a user with the following parameters
+	| Screen Name   | lxcosb.customer1                       |
+	| Email Address | lxcosb.customer1@lrcustomer.com.broken |
+	| First Name    | LXCOSB                                 |
+	| Last Name     | Customer1                              |
+	* I create a user with the following parameters
+	| Screen Name   | lxcosb.partner1                      |
+	| Email Address | lxcosb.partner1@lrpartner.com.broken |
+	| First Name    | LXCOSB                               |
+	| Last Name     | Partner1                             |
+	* I create an account on koroneiki with the following values
+	| Name   | Lxcpar - ${staticCompanyName} | |
+	| Code   | LXCPARLXCPAR                 | |
+	| Status | Active                       | |
+	* I assign the contact with the email address "lxcosb.partner1@lrpartner.com.broken" on the account "Lxcpar - ${staticCompanyName}" to the following roles
+	| Partner Manager |
+	* I set the project details non abbreviated date method to true
+	* I generate static start and end dates
+	* I generate past static start and end dates
+	* I generate static full non abbreviated start and end dates
+	* I generate future static full non abbreviated start and end dates
+	* I generate past static full non abbreviated start and end dates
+	* I create a product purchase for an account with the name "Lxcpar - ${staticCompanyName}" and the product "Service Partnership" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I create an assigned team nested field for a team with the name "Lxcpar - ${staticCompanyName}" assigned to the account "Lxczen - ${staticProjectName}"
+	* I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} | |
+	| Code                       | LXCZENLXCZEN                     | |
+	| Name                       | Lxczen - ${staticProjectName}    | |
+	| Region                     | United States                    | |
+	| Status                     | Active                           | |
+	| Tier                       | T1                               | |
+	* I assign the team with the name "Lxcpar - ${staticCompanyName}" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Partner |
+	* I assign the team with the name "Lxcpar - ${staticCompanyName}" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| First Line Support |
+	* I assign the contact with the email address "lxcosb.customer1@lrcustomer.com.broken" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Support Requester |
+	* I create a product purchase for an account with the name "Lxczen - ${staticProjectName}" and the product "LXC SM Subscription - HA Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I create a product purchase for an account with the name "Lxczen - ${staticProjectName}" and the product "Limited Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I synchronize the account entitlement definition with the name "Limited Subscription"
+	* I synchronize the account entitlement definition with the name "Partner"
+	* I synchronize the contact entitlement definition with the name "Partner"
+	* I wait for "1" minutes
+	* the support organization with the code "LXCZENLXCZEN" should be part of the support site
+
+Teardown:
+	* I get the ID of the default user belonging to the organization "Lxcpar - ${staticCompanyName}" from zendesk.liferay.com
+	* I rename the first default user ID variable
+	* I get the ID of the default user belonging to the organization "Lxczen - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I tear down the accounts on koroneiki with the following names
+	| Lxcpar - ${staticCompanyName} |
+	| Lxczen - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| LXCZENLXCZEN |
+	| LXCPARLXCPAR |
+	* I synchronize the account entitlement definition with the name "Platinum Subscription"
+	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I synchronize the account entitlement definition with the name "Limited Subscription"
+	* I tear down the projects with the following project codes via groovy
+	| LXCZENLXCZEN |
+	| LXCPARLXCPAR |
+	* I tear down the users with the following email addresses from okta
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+	* I tear down the users with the following email addresses from koroneiki
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+	* I tear down the product consumptions on koroneiki made by the account "Lxczen - ${staticCompanyName}" for the following products
+	| DXP Production                      |
+	| Limited Subscription                |
+	| LXC SM Subscription - HA Production |
+	* I tear down the contacts on koroneiki with the following email addresses
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
+	| Lxcpar - ${staticCompanyName} |
+	| Lxczen - ${staticProjectName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId1}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId2}" from zendesk.liferay.com
+	* I log out and log into the support homepage as "${staticSupportAdminEmailAdress}" with password "${staticSupportAdminPassword}"
+	* I tear down the following user email addresses from the DXP Cloud subscription list
+	| lxcosb.customer1@lrcustomer.com.broken |
+	| lxcosb.partner1@lrpartner.com.broken   |
+
