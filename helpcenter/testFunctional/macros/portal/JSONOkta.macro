@@ -319,28 +319,6 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "the okta group ${groupName} should have the user with the email address ${userEmailAddress} as a member"
-	macro viewOktaGroupMemberSync {
-		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
-        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
-
-		var curl = '''
-			${oktaURL}/api/v1/users/${userId}/groups
-			-H "Authorization: SSWS ${oktaApiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var groups = JSONCurlUtil.get("${curl}");
-
-		if (!(contains("${groups}", "${groupId}"))) {
-			fail("The user with the email address ${userEmailAddress} appears to have not been added to the okta group ${groupName}");
-		}else {
-			echo("The user with the email address ${userEmailAddress} is added to the okta group ${groupName}");
-		}
-	}
-
-
     @prose = "I tear down the users with the following email addresses from okta ${table}"
 	macro tearDownUsers {
 		var RawTable rawTable = new RawTable("${table}");
@@ -628,5 +606,26 @@ definition {
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} should be a member of the okta group ${groupName}"
+	macro viewOktaUserGroupMembership {
+		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+        var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			${oktaURL}/api/v1/users/${userId}/groups
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var groups = JSONCurlUtil.get("${curl}");
+
+		if (!(contains("${groups}", "${groupId}"))) {
+			fail("The user with the email address ${userEmailAddress} appears to have not been added as member to the okta group ${groupName}");
+		}else {
+			echo("The user with the email address ${userEmailAddress} is a member of the okta group ${groupName}");
+		}
 	}
 }
