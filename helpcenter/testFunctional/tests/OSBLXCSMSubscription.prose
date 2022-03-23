@@ -389,3 +389,26 @@ Scenario: Download self provisioning license
 	| License Name | Developer Activation Keys |
 	| Copy         | 1                         |
 
+Scenario: View subscription after removal and reassignment to account
+	Users that are removed from and reassigned to a LXC SM account should be subscribed to LXC SM
+
+	Given I remove customer contacts with the following email addresses from the account "Lxczen - ${staticProjectName}"
+	| lxcsm.customer1@lrcustomer.com.broken |
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud 
+	When I remove customer contacts with the following email addresses from the account "Lxczen - ${staticProjectName}"
+	| lxcsm.customer2@lrcustomer.com.broken |
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	When I assign the contact with the email address "lxcsm.customer1@lrcustomer.com.broken" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Support Requester |
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should not be subscribed on DXP cloud
+	When I assign the contact with the email address "lxcsm.customer2@lrcustomer.com.broken" on the account "Lxczen - ${staticProjectName}" to the following roles
+	| Support User |
+	And I wait for "1" minutes
+	Then the user with the email address "lxcsm.customer2@lrcustomer.com.broken" should be subscribed on DXP cloud
+	And the user with the email address "lxcsm.customer1@lrcustomer.com.broken" should be subscribed on DXP cloud
