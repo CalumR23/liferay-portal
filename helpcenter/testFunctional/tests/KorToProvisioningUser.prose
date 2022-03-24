@@ -68,24 +68,32 @@ Teardown:
 	| usr.koroneiki3@lrcustomer.com.broken |
 	| usr.koroneiki4@lrcustomer.com.broken |
 	| usr.koroneiki5@lrcustomer.com.broken |
+	| usr.okta1@lrcustomer.com.broken      |
+	| usr.okta2@lrcustomer.com.broken      |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
 	| usr.koroneiki4@lrcustomer.com.broken |
 	| usr.koroneiki5@lrcustomer.com.broken |
+	| usr.okta1@lrcustomer.com.broken      |
+	| usr.okta2@lrcustomer.com.broken      |
 	* I tear down the users with the following email addresses from koroneiki
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
 	| usr.koroneiki4@lrcustomer.com.broken |
 	| usr.koroneiki5@lrcustomer.com.broken |
+	| usr.okta1@lrcustomer.com.broken      |
+	| usr.okta2@lrcustomer.com.broken      |
 	* I tear down the contacts on koroneiki with the following email addresses
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
 	| usr.koroneiki4@lrcustomer.com.broken |
 	| usr.koroneiki5@lrcustomer.com.broken |
+	| usr.okta1@lrcustomer.com.broken      |
+	| usr.okta2@lrcustomer.com.broken      |
 	* I tear down the contact roles on koroneiki with the following names
 	| Liferay User Customer Role |
 	| Second User Customer Role  |
@@ -99,6 +107,8 @@ Teardown:
 	| usr.koroneiki3@lrcustomer.com.broken |
 	| usr.koroneiki4@lrcustomer.com.broken |
 	| usr.koroneiki5@lrcustomer.com.broken |
+	| usr.okta1@lrcustomer.com.broken      |
+	| usr.okta2@lrcustomer.com.broken      |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
 	| Korusr - ${staticProjectName} |
@@ -2643,3 +2653,310 @@ Scenario: View user account and team links
 	And I click on the contact team name link for the team "User Site Partner" on the account "Korusr - ${staticProjectName}"
 	Then I should be able to view the following team values in the team details page
 	| Name | User Site Partner |
+
+Scenario: View okta user creation form on active account
+	Testing the ability to create a customer contact on Koroneiki and view form for okta user creation on active account in provisioning.
+
+	Given I create an account on koroneiki with the following values
+	| Code                  | ONEUSRONEUSR                    | |
+	| Contact Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Description           | Test create okta user           | |
+	| Fax Number            | 555-555-4321                    | |
+	| Name                  | Oneusr - ${staticProjectName}   | |
+	| Phone Number          | 555-555-8765                    | |
+	| Profile Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Region                | United States                   | |
+	| Status                | Active                          | |
+	| Tier                  | T1                              | |
+	| Website               | www.koroneikicorporation.com    | |
+	And I generate static start and end dates
+	And I create a product purchase for an account with the name "Oneusr - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I create a product purchase for an account with the name "Oneusr - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Oneusr"
+	And I click on the account with the name "Oneusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Assign Role   | Support User                    |
+	Then I should be able to view an error message stating that the contact could not be found
+	And I populate and save the assign contact okta form with the following values
+	| First Name | USR                             |
+	| Last Name  | Okta1                           |
+	| Email      | usr.okta1@lrcustomer.com.broken |
+	| Roles      | Support User                    |
+	And I go to the account index page
+	And I search the accounts page using the keyword "Oneusr"
+	And I click on the account with the name "Oneusr - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Oneusr - ${staticProjectName} |
+	| Code           | ONEUSRONEUSR                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Tier           | T1                            |
+	And I click on the "Contacts" tab
+	Then I should be able to view the contact with the email address "usr.okta1@lrcustomer.com.broken" and the following values
+	| Name          | USR Okta1                       |
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Role          | Support User                    |
+	| User Status   | UNVERIFIED                      |
+	And the user with the email address "usr.okta1@lrcustomer.com.broken" should be present on okta
+
+Scenario: View okta user error message on expired account
+	Testing the ability to create partner contact on Koroneiki and view okta user error message on expired account in provisioning.
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | ONEUSRONEUSR                    | |
+	| Contact Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Description           | Test create okta user           | |
+	| Fax Number            | 555-555-4321                    | |
+	| Name                  | Oneusr - ${staticProjectName}   | |
+	| Phone Number          | 555-555-8765                    | |
+	| Profile Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Region                | United States                   | |
+	| Status                | Active                          | |
+	| Tier                  | T1                              | |
+	| Website               | www.koroneikicorporation.com    | |
+	And I generate past static start and end dates
+	And I generate past static full start and end dates
+	And I create a product purchase for an account with the name "Oneusr - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Quantity                | 1                            | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I create a product purchase for an account with the name "Oneusr - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Quantity                | 1                            | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I assign the contact with the email address "usr.okta1@lrcustomer.com.broken" on the account "Oneusr - ${staticProjectName}" to the following roles
+	| Support User |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Oneusr"
+	And I click on the account with the name "Oneusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Assign Role   | Support User                    |
+	Then I should be able to view an error message stating that the user must be created his own okta account
+	And I go to the account index page
+	And I search the accounts page using the keyword "Oneusr"
+	And I click on the account with the name "Oneusr - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Oneusr - ${staticProjectName} |
+	| Code           | ONEUSRONEUSR                  |
+	| State          | EXPIRED                       |
+	| Support Region | United States                 |
+	| Tier           | T1                            |
+	And the user with the email address "usr.okta1@lrcustomer.com.broken" should not be present on okta
+
+Scenario: View okta user creation form on active account for a partner
+	Testing the ability to create a partner on Koroneiki and view form for okta user creation on active account in provisioning.
+	
+	Given I create an account on koroneiki with the following values
+	| Code                  | ONEUSRONEUSR                    | |
+	| Contact Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Description           | Test okta partner user          | |
+	| Fax Number            | 555-555-4321                    | |
+	| Name                  | Korusr - ${staticProjectName}   | |
+	| Profile Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Region                | United States                   | |
+	| Status                | Active                          | |
+	| Tier                  | T4                              | |
+	| Website               | www.koroneikipartner.com        | |
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | USR                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | usr.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korusr - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "usr.okta1@lrcustomer.com.broken" on the account "Korusr - ${staticProjectName}" to the following roles
+	| Partner Member |
+	And I synchronize the contact entitlement definition with the name "Partner"
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Assign Role   | Partner Member                  |
+	Then I should be able to view an error message stating that the contact could not be found
+	And I populate and save the assign contact okta form with the following values
+	| First Name | USR                             |
+	| Last Name  | Okta1                           |
+	| Email      | usr.okta1@lrcustomer.com.broken |
+	| Roles      | Partner Member                  |
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korusr - ${staticProjectName} |
+	| Code           | USRKORKORUSR                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Tier           | T4                            |
+	And I click on the "Contacts" tab
+	Then I should be able to view the contact with the email address "usr.okta1@lrcustomer.com.broken" and the following values
+	| Name          | USR Okta1                       |
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Role          | Partner Member                  |
+	| User Status   | UNVERIFIED                      |
+	And the user with the email address "usr.okta1@lrcustomer.com.broken" should be present on okta
+
+Scenario: View okta user error message on expired account for a partner
+	Testing the ability to create a partner on Koroneiki and view okta user error message on expired account in provisioning.
+	
+	Given I create an account on koroneiki with the following values
+	| Code                  | ONEUSRONEUSR                    | |
+	| Contact Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Description           | Test okta partner user          | |
+	| Fax Number            | 555-555-4321                    | |
+	| Name                  | Korusr - ${staticProjectName}   | |
+	| Profile Email Address | usr.okta1@lrcustomer.com.broken | |
+	| Region                | United States                   | |
+	| Status                | Active                          | |
+	| Tier                  | T4                              | |
+	| Website               | www.koroneikipartner.com        | |
+	And I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | USR                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | usr.koroneiki1@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki1                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korusr - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I assign the contact with the email address "usr.okta1@lrcustomer.com.broken" on the account "Korusr - ${staticProjectName}" to the following roles
+	| Partner Member |
+	And I synchronize the contact entitlement definition with the name "Partner"
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I generate past static start and end dates
+	And I generate past static full start and end dates
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
+	| End Date                | ${staticPastEndDate}         | |
+	| Original End Date       | ${staticPastOriginalEndDate} | |
+	| Perpetual               | false                        | |
+	| Start Date              | ${staticPastStartDate}       | |
+	| Status                  | Approved                     | |
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.okta1@lrcustomer.com.broken |
+	| Assign Role   | Partner Member                  |
+	Then I should be able to view an error message stating that the user must be created his own okta account
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korusr - ${staticProjectName} |
+	| Code           | USRKORKORUSR                  |
+	| State          | EXPIRED                       |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Tier           | T4                            |
+	And the user with the email address "usr.okta1@lrcustomer.com.broken" should not be present on okta

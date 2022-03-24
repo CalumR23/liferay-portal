@@ -2369,6 +2369,28 @@ definition {
 			value1 = "An account can only have one Dossiera key.");
 	}
 
+	@prose = "I should be able to view an error message stating that the user must be created his own okta account"
+	macro viewErrorMessageForNonCreatedUserOnOkta  {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "The contact could not be found. The user must create his own Okta account.");
+	}
+
+	@prose = "I should be able to view an error message stating that the contact could not be found"
+	macro viewErrorMessageForNonCreatedUserOnOktaInActiveAccount  {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "The contact could not be found. Enter the contact's first and last name to create one.");
+	}
+
 	@prose = "I should be able to view an error message stating that the parent account ${accountName} cannot be assigned as a parent to itself"
 	macro viewErrorMessageForParentAccountAssignmentToItself {
 		var accountId = KoroneikiAccountAPI._getAccountId(accountName = "${accountName}");
@@ -2785,7 +2807,7 @@ definition {
 			else if ("${type}" == "Delete Entity") {
 				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_DELETE_BUTTON");
 			}
- 			else {
+			else {
 				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, Toggle Switch, File Upload, Select Entity, or Delete Entity.");
 			}
 
@@ -2814,5 +2836,49 @@ definition {
 		AssertTextEquals(
 			locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TAB_COUNTER",
 			value1 = "${countValue}");
+	}
+
+	@prose = "I populate and save the assign contact okta form with the following values ${table}"
+	macro populateAssignContactOktaFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "First Name") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#FIRST_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Last Name") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#LAST_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#EMAIL_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Roles") {
+				var key_role = "${value}";
+
+				if (IsElementNotPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+
+				Click(locator1 = "ProvisioningAccountAssignContact#ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+			}
+			else {
+				fail("No such contact field ${field}. Please set the field value to First Name, Last Name, Email or Role.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON");
 	}
 }
