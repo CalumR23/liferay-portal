@@ -6,69 +6,193 @@ Feature:  Oktkoriki To Okta Partner Group Integration
 
 Setup:
 	* I get all test passwords and admin emails
+	* I generate several static variables for Provisioning
+	* I generate static start and end dates
+	* I generate a provisioning company name
+	* I generate a provisioning project name
     * I create a user with the following parameters
-	| Screen Name   | okt.koroneiki1                       |
-	| Email Address | okt.koroneiki1@lrcustomer.com.broken |
+	| Screen Name   | okt.partner1                         |
+	| Email Address | okt.partner1@lrpartner.com.broken    |
 	| First Name    | OKT                                  |
 	| Last Name     | Oktkoriki1                           |
+    * I create a user with the following parameters
+	| Screen Name   | okt.partner1                         |
+	| Email Address | okt.partner2@lrpartner.com.broken    |
+	| First Name    | OKT                                  |
+	| Last Name     | Oktkoriki2                           |
+    * I create a user with the following parameters
+	| Screen Name   | pro.okta3                            |
+	| Email Address | pro.okta3@lrpartner.com.broken       |
+	| First Name    | PRO                                  |
+	| Last Name     | Okta3                                |
 
 Teardown:
+	
 	* I get the ID of the default user belonging to the organization "Oktkor - ${staticProjectName}" from zendesk.liferay.com
+	* I rename the second default user ID variable
+	* I get the ID of the default user belonging to the organization "Oktpar - ${staticCompanyName}" from zendesk.liferay.com
 	* I tear down the accounts on koroneiki with the following names
 	| Oktkor - ${staticProjectName} |
+	| Oktpar - ${staticCompanyName} |
 	* I tear down the accounts on koroneiki with the following "Code" values
 	| OKTKOROKTKOR |
-	* I synchronize the account entitlement definition with the name "Platinum Subscription"
+	| OKTPAROKTPAR |
 	* I tear down the projects with the following project codes via groovy
 	| OKTKOROKTKOR |
+	| OKTPAROKTPAR |
+	* I synchronize the account entitlement definition with the name "Platinum Subscription"
 	* I tear down the users with the following email addresses from okta
-	| okt.koroneiki1@lrcustomer.com.broken |
+	| okt.partner1@lrpartner.com.broken    |
+	| okt.partner2@lrpartner.com.broken    |
 	* I tear down the users with the following email addresses from koroneiki
-	| okt.koroneiki1@lrcustomer.com.broken |
+	| okt.partner1@lrpartner.com.broken    |
+	| okt.partner2@lrpartner.com.broken    |
 	* I tear down the contacts on koroneiki with the following email addresses
-	| okt.koroneiki1@lrcustomer.com.broken |
+	| okt.partner1@lrpartner.com.broken    |
+	| okt.partner2@lrpartner.com.broken    |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| okt.partner1@lrpartner.com.broken    |
+	| okt.partner2@lrpartner.com.broken    |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
 	| Oktkor - ${staticProjectName} |
+	| Oktpar - ${staticCompanyName} |
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
 
-Scenario: Sync partner and group via Oktkoriki to okta
-	Oktkoriki partner contacts with the proper group synced via Oktkoriki should be properly synced to okta.
+Scenario: Sync partner and group via koroneiki to okta
+	Koroneiki partner contacts with the proper group synced via Koroneiki should be properly synced to okta.
 
-	Given I generate a provisioning project name
-	And I create an account on koroneiki with the following values
-	| Code                  | OKTKOROKTKOR                         | |
-	| Contact Email Address | okt.koroneiki1@lrcustomer.com.broken | |
-	| Description           | Test okt account on koroneiki        | |
-	| Fax Number            | 555-555-1234                         | |
-	| Name                  | Oktkor - ${staticProjectName}        | |
-	| Phone Number          | 555-555-5678                         | |
-	| Profile Email Address | okt.koroneiki1@lrcustomer.com.broken | |
-	| Region                | United States                        | |
-	| Status                | Active                               | |
-	| Tier                  | T4                                   | |
-	| Website               | www.koroneikicorporation.com         | |
-	And I generate static start and end dates
-	And I create a product purchase for an account with the name "Oktkor - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	Given I create an account on koroneiki with the following values
+	| Name   | Oktpar - ${staticCompanyName} | |
+	| Code   | OKTPAROKTPAR                  | |
+	| Status | Active                        | |
+	And I create a product purchase for an account with the name "Oktpar - ${staticCompanyName}" and the product "Service Partnership" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         | |
 	| Original End Date       | ${staticOriginalEndDate} | |
-	| Perpetual               | true                     | |
+	| Perpetual               | false                    | |
 	| Quantity                | 1                        | |
 	| Start Date              | ${staticStartDate}       | |
 	| Status                  | Approved                 | |
+	And I assign the contact with the email address "okt.partner1@lrpartner.com.broken" on the account "Oktpar - ${staticCompanyName}" to the following roles
+	| Partner Member |
+	And I assign the contact with the email address "okt.partner2@lrpartner.com.broken" on the account "Oktpar - ${staticCompanyName}" to the following roles
+	| Partner Manager |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I create an assigned team nested field for a team with the name "Oktpar - ${staticCompanyName}" assigned to the account "Oktkor - ${staticProjectName}"
+	Then I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} | |
+	| Code                       | OKTKOROKTKOR                     | |
+	| Language                   | English                          | |
+	| Name                       | Oktkor - ${staticProjectName}    | |
+	| Region                     | United States                    | |
+	| Status                     | Active                           | |
+	| Tier                       | T1                               | |
+	And I assign the team with the name "Oktpar - ${staticCompanyName}" on the account "Oktkor - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Oktpar - ${staticCompanyName}" on the account "Oktkor - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I create a postal address for an account with the name "Oktkor - ${staticProjectName}" on koroneiki with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Type                  | Business        |
+	| Mailing               | True            |
+	| Postal Code           | 91765           |
+	| Primary               | True            |
+	| Street Address Line 1 | 123 Main Street |
+	And I create a product purchase for an account with the name "Oktkor - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
 	And I create a product purchase for an account with the name "Oktkor - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         | |
 	| Original End Date       | ${staticOriginalEndDate} | |
-	| Perpetual               | true                     | |
+	| Perpetual               | false                    | |
 	| Quantity                | 1                        | |
 	| Start Date              | ${staticStartDate}       | |
 	| Status                  | Approved                 | |
-	And I assign customer contacts with the following email addresses to the account "Oktkor - ${staticProjectName}"
-	| okt.koroneiki1@lrcustomer.com.broken |
-	And I assign the contact with the email address "okt.koroneiki1@lrcustomer.com.broken" on the account "Oktkor - ${staticProjectName}" to the following roles	
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I synchronize the contact entitlement definition with the name "Partner"
+	And I wait for "1" minutes
+	Then the support organization with the code "OKTPAROKTPAR" should be part of the support site
+	And the user with the email address "okt.partner2@lrpartner.com.broken" should be a member of the okta group "Partners"
+
+Scenario: Sync remove partner and group via koroneiki to okta
+	Koroneiki partner contacts with the proper group synced via Koroneiki should be properly synced to okta.
+
+	Given I create an account on koroneiki with the following values
+	| Name   | Oktpar - ${staticCompanyName} | |
+	| Code   | OKTPAROKTPAR                  | |
+	| Status | Active                        | |
+	And I create a product purchase for an account with the name "Oktpar - ${staticCompanyName}" and the product "Service Partnership" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I assign the contact with the email address "okt.partner1@lrpartner.com.broken" on the account "Oktpar - ${staticCompanyName}" to the following roles
+	| Partner Member |
+	And I assign the contact with the email address "okt.partner2@lrpartner.com.broken" on the account "Oktpar - ${staticCompanyName}" to the following roles
+	| Partner Manager |
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I create an assigned team nested field for a team with the name "Oktpar - ${staticCompanyName}" assigned to the account "Oktkor - ${staticProjectName}"
+	Then I create an account on koroneiki with the following values
+	| Assigned Team Nested Field | ${staticAssignedTeamNestedField} | |
+	| Code                       | OKTKOROKTKOR                     | |
+	| Language                   | English                          | |
+	| Name                       | Oktkor - ${staticProjectName}    | |
+	| Region                     | United States                    | |
+	| Status                     | Active                           | |
+	| Tier                       | T1                               | |
+	And I assign the team with the name "Oktpar - ${staticCompanyName}" on the account "Oktkor - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign the team with the name "Oktpar - ${staticCompanyName}" on the account "Oktkor - ${staticProjectName}" to the following roles
+	| First Line Support |
+	And I create a postal address for an account with the name "Oktkor - ${staticProjectName}" on koroneiki with the following values
+	| Country               | United States   |
+	| Locality              | Diamond Bar     |
+	| Region                | California      |
+	| Type                  | Business        |
+	| Mailing               | True            |
+	| Postal Code           | 91765           |
+	| Primary               | True            |
+	| Street Address Line 1 | 123 Main Street |
+	And I create a product purchase for an account with the name "Oktkor - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Oktkor - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I synchronize the contact entitlement definition with the name "Partner"
+	And I wait for "1" minutes
+	Then the support organization with the code "OKTPAROKTPAR" should be part of the support site
+	And the user with the email address "okt.partner2@lrpartner.com.broken" should be a member of the okta group "Partners"
+	And I unassign the following roles from the user with the email adress "okt.partner2@lrpartner.com.broken" on the account with the name "Oktpar - ${staticCompanyName}" 
 	| Partner Member |
 	And I synchronize the account entitlement definition with the name "Platinum Subscription"
-	And I synchronize the contact entitlement definition with the name "Partner Member"
+	And I synchronize the account entitlement definition with the name "Partner"
+	And I synchronize the contact entitlement definition with the name "Partner"
 	And I wait for "1" minutes
-	Then the support organization with the code "OKTKOROKTKOR" should be part of the support site
-	And the user with the email address "okt.koroneiki1@lrcustomer.com.broken" should be a member of the okta group "Partner Member"
+	And the user with the email address "okt.partner2@lrpartner.com.broken" should not be a member of the okta group "Partners"
