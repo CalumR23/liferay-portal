@@ -608,6 +608,25 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should not be present on okta"
+	macro viewNoOktaUser {
+		var curl = '''
+			${oktaURL}/api/v1/users/${userEmailAddress}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var oktaErrorMessage = JSONCurlUtil.get("${curl}");
+
+		if (contains("${oktaErrorMessage}", "Not found: Resource not found:")) {
+			echo("Actual email value ${userEmailAddress} is not present on okta");
+		}
+		else {
+			fail("Actual email value ${userEmailAddress} may be present on okta or the error message may have changed.");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} should not be a member of the okta group ${groupName}"
 	macro viewNoOktaUserGroupMembership {
 		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
@@ -653,8 +672,7 @@ definition {
 	}
 	
 	@prose = "the user with the email address ${userEmailAddress} should be present on okta"
-		macro viewCreatedUserOnOkta {
-
+	macro viewOktaUser {
 		var curl = '''
 			${oktaURL}/api/v1/users/${userEmailAddress}
 			-H "Authorization: SSWS ${oktaApiToken}"
@@ -675,26 +693,6 @@ definition {
 
 		if (!("${userEmailAddress}" == "${oktaUserEmail}")) {
 			fail("Actual okta email value ${userEmailAddress} does not match expected okta email value ${oktaUserEmail}");
-		}
-	}
-
-	@prose = "the user with the email address ${userEmailAddress} should not be present on okta"
-	macro viewNonCreatedUserOnOkta {
-
-		var curl = '''
-			${oktaURL}/api/v1/users/${userEmailAddress}
-			-H "Authorization: SSWS ${oktaApiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var oktaErrorMessage = JSONCurlUtil.get("${curl}");
-
-		if (contains("${oktaErrorMessage}", "Not found: Resource not found:")) {
-			echo("Actual email value ${userEmailAddress} is not present on okta");
-		}
-		else {
-			fail("Actual email value ${userEmailAddress} is present on okta");
 		}
 	}
 }
