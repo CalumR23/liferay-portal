@@ -14,7 +14,6 @@
 
 package com.liferay.poshi.core;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -1965,8 +1964,6 @@ public class PoshiContext {
 		Collections.synchronizedList(new ArrayList<>());
 	private static final List<String> _testCaseNamespacedClassNames =
 		Collections.synchronizedList(new ArrayList<>());
-	private static final Map<String, SeleniumMethod> _seleniumMethods =
-		new HashMap<>();
 
 	private static class PoshiFileCallable implements Callable<URL> {
 
