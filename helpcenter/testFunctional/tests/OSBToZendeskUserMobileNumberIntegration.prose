@@ -1,0 +1,184 @@
+#@testray.main.component.name = "Support QA"
+#@type = "zendesk.integration"
+
+Feature: OSB to Zendesk User Mobile Number Integration
+	Testing user mobile phone number sync updates in Zendesk caused by changes in OSB and web.
+
+Setup:
+	* I generate a provisioning project name
+	* I create a user with the following parameters
+	| Screen Name   | zen.phonenumber1                       |
+	| Email Address | zen.phonenumber1@lrcustomer.com.broken |
+	| First Name    | ZEN                                    |
+	| Last Name     | Phonenumber1                           |
+	* I generate static start and end dates
+	* I create an account on koroneiki with the following values
+	| Code   | PHONEZPHONEZ                  | |
+	| Name   | Phonez - ${staticProjectName} | |
+	| Region | United States                 | |
+	| Status | Active                        | |
+	| Tier   | T1                            | |
+	* I assign the contact with the email address "zen.phonenumber1@lrcustomer.com.broken" on the account "Phonez - ${staticProjectName}" to the following roles
+	| Support Requester |
+	* I create a product purchase for an account with the name "Phonez - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 6 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I create a product purchase for an account with the name "Phonez - ${staticProjectName}" and the product "Gold Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I wait for "30" seconds
+	* the support organization with the code "PHONEZPHONEZ" should be part of the support site
+	* the organization "Phonez - ${staticProjectName}" should be present on zendesk.liferay.com
+	* the user with the email address "zen.phonenumber1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	* the user with the email address "zen.phonenumber1@lrcustomer.com.broken" should be present via the external id search api on zendesk.liferay.com
+
+Teardown:
+	* I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Primary Number | |
+	| Mobile Number  | |
+	* I wait for "30" seconds
+	* I get the ID of the default user belonging to the organization "Phonez - ${staticProjectName}" from zendesk.liferay.com
+	* I tear down the accounts on koroneiki with the following names
+	| Phonez - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| PHONEZPHONEZ |
+	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I tear down the projects with the following project codes via groovy
+	| PHONEZPHONEZ |
+	* I tear down the users with the following screen names from okta
+	| zen.phonenumber1 |
+	* I tear down the users with the following email addresses from okta
+	| zen.phonenumber1@lrcustomer.com.broken |
+	* I tear down the users with the following screen names from customer.liferay.com
+	| zen.phonenumber1 |
+	* I tear down the users with the following email addresses from koroneiki
+	| zen.phonenumber1@lrcustomer.com.broken |
+	* I tear down the users with the following screen names from koroneiki
+	| zen.phonenumber1 |
+	* I tear down the contacts on koroneiki with the following email addresses
+	| zen.phonenumber1@lrcustomer.com.broken |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| zen.phonenumber1@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
+	| Phonez - ${staticProjectName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
+
+Scenario: View user phone number update
+	@ help.center.acceptance = "true"
+	OSB user phone number updates to details on web should sync properly to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	Then I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5559873461 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	Then I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15554394671 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
+
+Scenario: View user phone number delete
+	OSB user phone number deletions to details on web should sync properly to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "+15558402834"
+
+Scenario: View user phone number with no country code update
+	OSB user phone numbers with no country code updates to details on web should not sync to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+
+Scenario: View user phone number from no country code to country code update
+	OSB user phone numbers that go from no country code to country code on web should sync to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15554394671 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
+	And the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+
+Scenario: View user phone number from no country code to deletion to country code update
+	OSB user phone numbers that go from no country code to deletion to country code on web should sync to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15554394671 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
+
+Scenario: View user phone number from country code to deletion to no country code update
+	OSB user phone numbers that go from country code to deletion to no country code on web should not sync to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15554394671 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "+15554394671"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+
+Scenario: View user phone number with two non country code updates
+	OSB user phone numbers with two non country code updates to details on web should not sync to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | 5557496334 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should not have the phone number "5557496334"
+
+Scenario: View user phone number with two country code updates
+	OSB user phone numbers with two country code updates to details on web should sync properly to Zendesk.
+
+	Given I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15558402834 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15558402834"
+	When I update a user with the email address "zen.phonenumber1@lrcustomer.com.broken" using following parameters
+	| Mobile Number | +15554394671 |
+	And I wait for "30" seconds
+	Then the user with the email address "zen.phonenumber1@lrcustomer.com.broken" on zendesk.liferay.com should have the phone number "+15554394671"
