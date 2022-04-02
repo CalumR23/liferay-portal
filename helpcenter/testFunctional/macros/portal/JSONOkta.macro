@@ -15,12 +15,12 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
     @prose = "I assign the okta user with the email address ${userEmailAddress} to the okta group ${groupName}"
 	macro assignUserToOktaGroup {
-		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+		var groupId = JSONOkta.getOktaGroupIdWithNoQuotes(groupName = "${groupName}");
         var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
@@ -30,7 +30,7 @@ definition {
 			-H "Content-Type: application/json"
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "I assign the okta user with the email address ${userEmailAddress} to the okta role ${roleName}"
@@ -54,7 +54,7 @@ definition {
 			}
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
     @prose = "I create a user with the following parameters ${table}"
@@ -259,8 +259,10 @@ definition {
 	}
 
     macro getOktaGroupId {
+		var groupNameNoSpaces = StringUtil.replace("${groupName}", " ", "+");
+
 		var curl = '''
-			${oktaURL}/api/v1/groups?q=${groupName}
+			${oktaURL}/api/v1/groups?q=${groupNameNoSpaces}
 			-H "Authorization: SSWS ${oktaApiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
@@ -271,6 +273,29 @@ definition {
 		var groupId = StringUtil.replace("${groupId}", "[", "");
 
 		var groupId = StringUtil.replace("${groupId}", "]", "");
+
+		echo("Group ID: ${groupId}");
+
+		return "${groupId}";
+	}
+
+    macro getOktaGroupIdWithNoQuotes {
+		var groupNameNoSpaces = StringUtil.replace("${groupName}", " ", "+");
+
+		var curl = '''
+			${oktaURL}/api/v1/groups?q=${groupNameNoSpaces}
+			-H "Authorization: SSWS ${oktaApiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var groupId = JSONCurlUtil.get("${curl}", "$.[?(@.profile.name =='${groupName}')].id");
+
+		var groupId = StringUtil.replace("${groupId}", "[", "");
+
+		var groupId = StringUtil.replace("${groupId}", "]", "");
+
+		var groupId = StringUtil.replace("${groupId}", "&quot;", "");
 
 		echo("Group ID: ${groupId}");
 
@@ -322,7 +347,7 @@ definition {
 
     @prose = "I remove the okta user with the email address ${userEmailAddress} from the okta group ${groupName}"
 	macro removeUserFromOktaGroup {
-		var groupId = JSONOkta.getOktaGroupId(groupName = "${groupName}");
+		var groupId = JSONOkta.getOktaGroupIdWithNoQuotes(groupName = "${groupName}");
         var userId = JSONOkta.getOktaUserId(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
@@ -404,7 +429,7 @@ definition {
 			}
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
     @prose = "I update a user with the email address ${userEmailAddress} using following parameters ${table}"
@@ -655,7 +680,7 @@ definition {
 				''';
 		}
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
 	@prose = "the user with the email address ${userEmailAddress} should not be present on okta"

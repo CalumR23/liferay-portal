@@ -3,6 +3,8 @@ definition {
 	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
 	@prose = "I create a contact on koroneiki with the following values ${table}"
@@ -1944,6 +1946,37 @@ definition {
 		}
 	}
 
+	@prose = "the account with the name ${accountName} should be assigned the contact with the email address ${contactEmailAddress} via automatic sync"
+	macro _viewAccountSyncViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		var currentIteration = "0";
+
+		while ((!(contains("${allAccounts}", "${accountName}"))) && (!("${currentIteration}" == "${pollMaximumIterations}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
+		}
+	}
+
 	@prose = "the account with the name ${accountName} should be assigned the contact with the email address ${contactEmailAddress}"
 	macro _viewAccountViaUuid {
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
@@ -3032,6 +3065,35 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view a koroneiki contact with the email address ${contactEmailAddress} added via automatic sync"
+	macro _viewContactSyncViaEmailAddress {
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?search=${contactEmailAddress}
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allContacts = JSONCurlUtil.get("${curl}", "$");
+
+		var currentIteration = "0";
+
+		while ((!(contains("${allContacts}", "${contactEmailAddress}"))) && (!("${currentIteration}" == "${pollMaximumIterations}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?search=${contactEmailAddress}
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allContacts = JSONCurlUtil.get("${curl}", "$");
+		}
+	}		
+
 	@prose = "I should be able to view a koroneiki contact with the email address ${contactEmailAddress} and the following values ${table}"
 	macro _viewContactViaEmailAddress {
 		var curl = '''
@@ -3239,6 +3301,37 @@ definition {
 
 		if (contains("${allContactRoles}", "${contactRoleName}")) {
 			fail("The contact with the email address ${contactEmailAddress} still has the contact role ${contactRoleName}");
+		}
+	}
+
+	@prose = "the account with the name ${accountName} should not be assigned the contact with the email address ${contactEmailAddress} via automatic sync"
+	macro _viewNoAccountSyncViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/accounts
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		var currentIteration = "0";
+
+		while ((contains("${allAccounts}", "${accountName}")) && (!("${currentIteration}" == "${pollMaximumIterations}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var curl = '''
+				--tlsv1.2 ${koroneikiURL}/o/koroneiki-rest/v1.0/contacts/by-uuid/${contactUuid}/accounts
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var allAccounts = JSONCurlUtil.get("${curl}", "$");
 		}
 	}
 
