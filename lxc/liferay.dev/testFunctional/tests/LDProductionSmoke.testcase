@@ -1,0 +1,129 @@
+definition {
+
+	property test.env = "production";
+	property testray.main.component.name = "Liferay Dev";
+
+	setUp {
+		LDUtils.launchLDProd();
+
+		LDUtils.acceptCookies();
+	}
+
+	@description = "Make sure can log in with a valid account"
+	@priority = "4"
+	test CanLoginWithValidAccount {
+		task ("Clik on Login option") {
+			LDHome.clickLogin();
+		}
+
+		task ("Fill email, password and click to Sign In") {
+			var userEmailAddress = PropsUtil.get("test.this.liferaydev.test.account.uat.user.login");
+			var userPassword = PropsUtil.get("test.this.liferaydev.test.account.uat.user.password");
+
+			Default.Type(
+				locator1 = "OktaLogin#EMAIL_ADDRESS_FIELD",
+				value1 = "${userEmailAddress}");
+
+			Default.Type(
+				locator1 = "OktaLogin#PASSWORD_FIELD",
+				value1 = "${userPassword}");
+
+			Default.Click(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+		}
+
+		task ("Assert user was able to Sign In, no error messages are present and the user avatar is shown") {
+			Default.AssertElementNotPresent(
+				errorMessage = "We found some errors. Please review the form and make corrections.",
+				key_field = "infobox-error",
+				locator1 = "//div[contains(@class,'infobox-error')]//p[contains(text(),'${errorMessage}')]");
+
+			Default.AssertElementNotPresent(
+				errorMessage = "This field is required.",
+				key_field = "username",
+				locator1 = "//span[contains(@class,'${key_field}')]//following-sibling::p[contains(@id,'input-container-error') and contains(text(),'${errorMessage}')]");
+
+			Default.AssertElementNotPresent(
+				errorMessage = "This field is required.",
+				key_field = "password",
+				locator1 = "//span[contains(@class,'${key_field}')]//following-sibling::p[contains(@id,'input-container-error') and contains(text(),'${errorMessage}')]");
+
+			Default.AssertElementPresent(locator1 = "UserMenu#USER_AVATAR_BUTTON");
+
+			UserMenu.gotoUserPersonalMenu();
+
+			Default.AssertElementPresent(
+				locator1 = "UserMenu#USER_NAME",
+				userName = "Liferay Dev UAT User");
+		}
+	}
+
+	@description = "Make sure can't log in with an invalid account"
+	@priority = "4"
+	test CantLoginWithInvalidAccount {
+		task ("Clik on Login option") {
+			LDHome.clickLogin();
+		}
+
+		task ("Clik on the Sign In button without filling the email and passwords fields to trigger the error messages") {
+			Default.Click(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+		}
+
+		task ("Assert user was able to Sign In, no error messages are present and the user avatar is shown") {
+			Default.AssertElementPresent(
+				errorMessage = "We found some errors. Please review the form and make corrections.",
+				key_field = "infobox-error",
+				locator1 = "OktaLogin#INFO_BOX_ERROR_MESSAGE");
+
+			Default.AssertElementPresent(
+				errorMessage = "This field is required.",
+				key_field = "username",
+				locator1 = "OktaLogin#FIELD_ERROR_MESSAGE");
+
+			Default.AssertElementPresent(
+				errorMessage = "This field is required",
+				key_field = "password",
+				locator1 = "OktaLogin#FIELD_ERROR_MESSAGE");
+
+			Default.AssertElementNotPresent(locator1 = "UserMenu#USER_AVATAR_BUTTON");
+		}
+
+		task ("Assert user was unable to Sign In using invalid credentials ") {
+			var userEmailAddress = "liferaydev-invalid-user@liferay.com";
+			var userPassword = "invalid-password";
+
+			Default.Type(
+				locator1 = "OktaLogin#EMAIL_ADDRESS_FIELD",
+				value1 = "${userEmailAddress}");
+
+			Default.Type(
+				locator1 = "OktaLogin#PASSWORD_FIELD",
+				value1 = "${userPassword}");
+
+			Default.Click(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+
+			Default.AssertElementPresent(
+				errorMessage = "Unable to sign in",
+				key_field = "infobox-error",
+				locator1 = "OktaLogin#INFO_BOX_ERROR_MESSAGE");
+
+			Default.AssertElementNotPresent(locator1 = "UserMenu#USER_AVATAR_BUTTON");
+		}
+	}
+
+	@description = "Make sure the login option is available"
+	@priority = "4"
+	test LoginIsPresent {
+		task ("Clik on Login option") {
+			LDHome.clickLogin();
+		}
+
+		task ("Assert the Okta Login fields are present") {
+			Default.AssertElementPresent(locator1 = "OktaLogin#EMAIL_ADDRESS_FIELD");
+
+			Default.AssertElementPresent(locator1 = "OktaLogin#PASSWORD_FIELD");
+
+			Default.AssertElementPresent(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+		}
+	}
+
+}
