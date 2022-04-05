@@ -1,5 +1,7 @@
 definition {
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
+	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 
 	@prose = "I should be able to see the downloaded file ${file}"
 	macro assertDownloadedFile {
@@ -322,56 +324,76 @@ definition {
 			value1 = "\RETURN");
 	}
 
-	@prose = "I upload a file using the large file uploader with the following parameters ${table}"
+	@prose = "I upload a file using the large file uploader on ticket ${requestId} with the following parameters ${table}"
 	macro uploadFileViaLargeFileUploader {
-		ScrollWebElementIntoView(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
+		var uploadComplete = "false";
 
-		Click(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
+		var currentIteration = "0";
 
-		ZendeskHomepage.pause(timeInSeconds = "10");
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${uploadComplete}" == "true"))) {
+			ScrollWebElementIntoView(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
 
-		var RawTable rawTable = new RawTable("${table}");
+			Click(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
 
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
+			ZendeskHomepage.pause(timeInSeconds = "10");
 
-			if ("${field}" == "Attachment") {
-				MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
+			var RawTable rawTable = new RawTable("${table}");
 
-				UploadCommonFile(
-					locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
-					value1 = "${value}");
+			for (var row : table "${rawTable}") {
+				var field = "${row[0]}";
+				var value = "${row[1]}";
 
-				ZendeskHomepage.pause(timeInSeconds = "10");
-			}
-			else if ("${field}" == "Comment") {
-				Type(
-					locator1 = "LargeFileUploader#COMMENT_FIELD",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Data Region") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
-					value1 = "Your file will be uploaded to a file server in the ${value}.");
-			}
-			else if ("${field}" == "No Personal Data") {
-				if ("${value}" == "true") {
-					Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
+				if ("${field}" == "Attachment") {
+					MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
+
+					UploadCommonFile(
+						locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
+						value1 = "${value}");
+
+					ZendeskHomepage.pause(timeInSeconds = "10");
+				}
+				else if ("${field}" == "Comment") {
+					Type(
+						locator1 = "LargeFileUploader#COMMENT_FIELD",
+						value1 = "${value}");
+				}
+				else if ("${field}" == "Data Region") {
+					AssertTextEquals.assertPartialText(
+						locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
+						value1 = "Your file will be uploaded to a file server in the ${value}.");
+				}
+				else if ("${field}" == "No Personal Data") {
+					if ("${value}" == "true") {
+						Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
+					}
+					else {
+						Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
+					}
 				}
 				else {
-					Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
+					fail("No such large file uploader field ${field}");
 				}
 			}
-			else {
-				fail("No such large file uploader field ${field}");
+			AssertTextEquals.assertPartialText(
+				locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
+				value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
+
+			Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
+
+			if(IsElementNotPresent(locator1 = "LargeFileUploader#ATTACHMENT_FIELD_ERROR_MESSAGE")) {
+				var uploadComplete = "true";
+			} else {
+				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+				ZendeskRequest.gotoViaId(requestId = "${requestId}");
 			}
 		}
-		AssertTextEquals.assertPartialText(
-			locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
-			value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
 
-		Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
+		if("${currentIteration}" == "${pollMaximumIterations}") {
+			fail("After ${currentIteration} checks, the file couldn't be uploaded.");
+		}
 	}
 
 	@prose = "I should be able to view a request with the following details ${table}"
