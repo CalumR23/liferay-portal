@@ -714,6 +714,33 @@ definition {
 		}
 	}
 
+	@prose = "I unset the support user with the email address ${userEmailAddress} from the support organization ${organizationName}"
+	macro unsetUserFromSupportOrganization {
+		var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
+
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/unset-organization-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d userIds=${supportUserId}
+			-d organizationId=${organizationId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I update the provisioning password for user with the email address ${userEmailAddress} to ${userPassword}"
 	macro updateProvisioningPassword {
 		var curl = '''
