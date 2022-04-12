@@ -52,21 +52,25 @@ Teardown:
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| usr.koroneiki5@lrcustomer.com.broken |
 	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the users with the following email addresses from customer.liferay.com
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| usr.koroneiki5@lrcustomer.com.broken |
 	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the users with the following email addresses from koroneiki
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| usr.koroneiki5@lrcustomer.com.broken |
 	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the contacts on koroneiki with the following email addresses
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| usr.koroneiki5@lrcustomer.com.broken |
 	| invalid.koroneiki4@126.com.broken    |
 	* I tear down the contact roles on koroneiki with the following names
 	| Liferay User Customer Role |
@@ -75,6 +79,7 @@ Teardown:
 	| usr.koroneiki1@lrcustomer.com.broken |
 	| usr.koroneiki2@lrcustomer.com.broken |
 	| usr.koroneiki3@lrcustomer.com.broken |
+	| usr.koroneiki5@lrcustomer.com.broken |
 	| invalid.koroneiki4@126.com.broken    |
 	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
 	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
@@ -612,4 +617,68 @@ Scenario: Assign contact with invalid email attempt
 	| Partner |
 	And I attempt to assign the following roles to the user with a invalid email address "invalid.koroneiki4@126.com" on the account with the name "Korusr - ${staticProjectName}"
     | Support Requester |
-   	Then the contact with the email address "invalid.koroneiki4@126.com" should not be assigned the account "Korusr - ${staticProjectName}"
+	Then the contact with the email address "invalid.koroneiki4@126.com" should not be assigned the account "Korusr - ${staticProjectName}"
+
+Scenario: Assign a nonexisting contact to account
+	Testing the ability to assign roles to a nonexistent contact and create it via OKTA API
+
+	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | USR                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | usr.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korusr - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "User Site Partner" for the account "Korusr - ${staticProjectName}"
+	And I assign the team with the name "User Site Partner" on the account "Korusr - ${staticProjectName}" to the following roles
+	| Partner |
+	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should not be present on okta
+	And I assign contacts with the following email addresses to the team "User Site Partner"
+	| usr.koroneiki5@lrcustomer.com.broken |
+    And I assign the following roles to the user with the email adress "usr.koroneiki5@lrcustomer.com.broken" on the account with the name "Korusr - ${staticProjectName}"
+    | Partner Manager |
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I should be able to view the contact with the email address "usr.koroneiki5@lrcustomer.com.broken" and the following values
+	| Name          | usr.koroneiki5@lrcustomer.com.broken |
+	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
+	| Role          | Partner Manager                      |
+	| User Status   | VERIFIED                             |
+	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
