@@ -1,0 +1,58 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		LCPUtils.launchLCP();
+
+		LCPAuthentication.login();
+	}
+
+	tearDown {
+		LCPUtils.tearDownProjects();
+		
+		LCPAuthentication.logout();
+	}
+
+	@description = "Project is created when location and alphanumeric characters are provided for projectId and deleted in the Settings Page."
+	@priority = "5"
+	test CanCreateNewProject {
+		var projectName = "poshitest";
+
+		task ("Create a new project") {
+			LCPProjectsPage.createNewProject(projectName = "${projectName}");
+
+			LCPUtils.goToPage(page = "projects");
+
+			Default.AssertElementPresent(
+				key_environment = "${projectName}",
+				locator1 = "LCPProjects#PROJECT_NAME");
+		}
+	}
+
+	@description = "Project is created when location and alphanumeric characters are provided for projectId and deleted in the Settings Page."
+	@priority = "5"
+	test CanDeleteProject {
+		var projectName = "poshitest";
+
+		task ("Create a new project") {
+			LCPProjectsPage.createNewProject(projectName = "${projectName}");
+		}
+
+		task ("Delete the new project") {
+			LCPUtils.goToPage(page = "projects");
+
+			LCPProjectsPage.openEnvironment(environmentName = "${projectName}");
+
+			LCPSettingsPage.deleteEnvironment();
+
+			Default.AssertElementPresent(locator1 = "LCPSettings#ALERT_PROJECT_DELETED");
+
+			Default.AssertElementNotPresent(
+				key_environment = "${projectName}",
+				locator1 = "LCPProjects#PROJECT_NAME");
+		}
+	}
+
+}
