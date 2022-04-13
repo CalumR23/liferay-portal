@@ -94,4 +94,50 @@ definition {
 		}
 	}
 
+	@description = "New post is able to complete workflow and enters approved state"
+	@priority = "4"
+	test NewPostIsApproved {
+		task ("Ask a new question") {
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.askQuestion(
+				questionBody = "Test Question Body",
+				questionTitle = "Test Question Title");
+
+			Default.Pause(locator1 = "2000");
+		}
+
+		task ("Switch to admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve post") {
+			UserMenu.gotoUserPersonalMenu();
+
+			UserMenu.gotoUserPersonalOption(key_dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "Test Question Title");
+		}
+
+		task ("Assert new post is approved") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			Default.AssertElementPresent(
+				key_questionTitle = "Test Question Title",
+				locator1 = "LDAsk#QUESTION_TITLE");
+
+			Default.AssertElementNotPresent(
+				key_questionTitle = "Test Question Title",
+				locator1 = "LDAsk#QUESTION_PENDING_LABEL");
+		}
+	}
+
 }
