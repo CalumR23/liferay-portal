@@ -1,0 +1,94 @@
+definition {
+	@prose = "I click on the add button in the redirection page"
+	macro clickAddButton {
+		
+		Click(locator1 = "WWWRedirects#ADD_BUTTON");
+	}
+
+	@prose = "I create a source link with the following values ${table}"
+	macro createSourceLink {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var value = "${row[2]}";
+
+			var key_field = "${field}";
+
+			if ("${type}" == "Input") {
+				if ("${field}" == "Source URL") {
+					Type(
+						locator1 = "WWWRedirects#SOURCE_URL_FIELD",
+						value1 = "${value}");
+				}
+				if ("${field}" == "Destination URL") {
+					Type(
+						locator1 = "WWWRedirects#DESTINATION_URL_FIELD",
+						value1 = "${value}");
+				}
+				if ("${field}" == "Expiration Date") {
+					Type(
+						locator1 = "WWWRedirects#EXPIRATION_DATE_FIELD",
+						value1 = "${value}");
+				}		
+			}
+			else if ("${type}" == "Select") {
+				if ("${field}" == "Type") {
+					Select(
+						locator1 = "WWWRedirects#TYPE_FIELD",
+						value1 = "${value}");
+				}			
+			}
+		}
+
+		Click(locator1 = "WWWRedirects#CREATE_URL_BUTTON");
+
+		AssertElementPresent(locator1 = "Message#SUCCESS");	
+	}
+
+	@prose = "I tear down the links with the folowing source url and destination url values ${table}"
+	macro tearDownCP {
+		ProductMenu.gotoPortlet(
+			category = "Configuration",
+			panel = "Site Administration",
+			portlet = "Redirection");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var sourceUrl = "${row[0]}";
+			var destinationUrl = "${row[1]}";
+
+			var key_sourceUrl = "${sourceUrl}";
+			var key_destinationUrl = "${destinationUrl}";
+
+			if (IsElementPresent(locator1 = "WWWRedirects#SOURCE_LINK_ACTIONS")) {
+				ScrollWebElementIntoView(locator1 = "WWWRedirects#SOURCE_LINK_ACTIONS");
+
+				Click(locator1 = "WWWRedirects#SOURCE_LINK_ACTIONS");
+
+				ClickNoError(locator1 = "WWWRedirects#DELETE_LINK");
+
+				AssertElementPresent(locator1 = "Message#SUCCESS");
+			}
+			else {
+				fail("No such link with source url ${sourceUrl} and destination url ${destinationUrl} values");
+			}	
+		}
+	}
+
+	@prose = "I should be able to view a link with the source url ${sourceUrl} and destination url ${destinationUrl}"
+	macro viewShortLink {
+		var key_sourceUrl = "${sourceUrl}";
+		var key_destinationUrl = "${destinationUrl}";
+
+		AssertTextEquals(
+			locator1 = "WWWRedirects#SOURCE_LINK_SOURCE_URL",
+			value1 = "${sourceUrl}");
+
+		AssertTextEquals(
+			locator1 = "WWWRedirects#SOURCE_LINK_DESTINATION_URL",
+			value1 = "${destinationUrl}");
+	}
+}
