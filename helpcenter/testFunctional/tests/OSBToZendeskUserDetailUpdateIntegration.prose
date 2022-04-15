@@ -1,5 +1,5 @@
-#@testray.main.component.name = "Support QA"
-#@type = "zendesk.integration"
+@testray.main.component.name = "Support QA"
+@type = "zendesk.integration"
 
 Feature: OSB to Zendesk User Detail Update Integration
 	Testing user detail sync updates in Zendesk caused by changes in OSB.
@@ -17,8 +17,6 @@ Setup:
 	| Email Address | osb.customer2@lrcustomer.com.broken |
 	| First Name    | OSB                                 |
 	| Last Name     | Customer2                           |
-	* I update the okta password for the user with the email address "osb.customer1@lrcustomer.com.broken" to "te$tingte$tu$eronwebu@t"
-	* I update the okta password for the user with the email address "osb.customer2@lrcustomer.com.broken" to "te$tingte$tu$eronwebu@t"
 	* I create an account on koroneiki with the following values
 	| Code     | OSBZENOSBZEN                  | |
 	| Language | English                       | |
@@ -49,6 +47,8 @@ Setup:
 	| Start Date              | ${staticStartDate}       | |
 	| Status                  | Approved                 | |
 	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I synchronize the contact entitlement definition with the name "Customer"
+	* I synchronize the contact entitlement definition with the name "Customer - Portal"
 	* I wait for "1" minutes
 	* the support organization with the code "OSBZENOSBZEN" should be part of the support site
 	* the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
@@ -56,7 +56,6 @@ Setup:
 	* the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
 	* the user with the email address "osb.customer1@lrcustomer.com.broken" should be present via the external id search api on zendesk.liferay.com
 	* the user with the email address "osb.customer2@lrcustomer.com.broken" should be present via the external id search api on zendesk.liferay.com
-	* I wait for "2" minutes
 
 Teardown:
 	* I get the ID of the default user belonging to the organization "Osbzen - ${staticProjectName}" from zendesk.liferay.com
@@ -67,15 +66,21 @@ Teardown:
 	* I synchronize the account entitlement definition with the name "Gold Subscription"
 	* I tear down the projects with the following project codes via groovy
 	| OSBZENOSBZEN |
-	* I tear down the users with the following screen names from okta
-	| osb.customer1 |
-	| osb.customer2 |
-	* I tear down the users with the following screen names from customer.liferay.com
-	| osb.customer1 |
-	| osb.customer2 |
-	* I tear down the users with the following screen names from koroneiki
-	| osb.customer1 |
-	| osb.customer2 |
+	* I tear down the users with the following email addresses from okta
+	| edit.user1@lrcustomer.com.broken    |
+	| edit.user2@lrcustomer.com.broken    |
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| edit.user1@lrcustomer.com.broken    |
+	| edit.user2@lrcustomer.com.broken    |
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| edit.user1@lrcustomer.com.broken    |
+	| edit.user2@lrcustomer.com.broken    |
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
 	* I tear down the contacts on koroneiki with the following email addresses
 	| edit.user1@lrcustomer.com.broken    |
 	| edit.user2@lrcustomer.com.broken    |
@@ -95,21 +100,16 @@ Teardown:
 Scenario: View user updates
 	OSB user updates to details on okta should sync properly to Zendesk.
 
-	Given I log into the web homepage as "osb.customer1@lrcustomer.com.broken" with password "te$tingte$tu$eronwebu@t"
-#	And I update my details as "osb.customer1" to the following values
-#	| Email Address | edit.user1@lrcustomer.com.broken |
-#	| First Name    | Edit                             |
-#	| Last Name     | User1                            |
-	And I wait for "2" minutes
-	And I log out and log into the web homepage as "osb.customer2@lrcustomer.com.broken" with password "te$tingte$tu$eronwebu@t"
-#	And I update my details as "osb.customer2" to the following values
-#	| Email Address | edit.user2@lrcustomer.com.broken |
-#	| First Name    | Edit                             |
-#	| Last Name     | User2                            |
-	And I log out of the web homepage
-	When I wait for "2" minutes
-	And I update the user with the email address "edit.user1@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
-	And I update the user with the email address "edit.user2@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
+	Given I update a user with the email address "osb.customer1@lrcustomer.com.broken" to have the following parameters
+	| Screen Name   | edit.user1                       |
+	| Email Address | edit.user1@lrcustomer.com.broken |
+	| First Name    | Edit                             |
+	| Last Name     | User1                            |
+	And I update a user with the email address "osb.customer2@lrcustomer.com.broken" to have the following parameters
+	| Screen Name   | edit.user2                       |
+	| Email Address | edit.user2@lrcustomer.com.broken |
+	| First Name    | Edit                             |
+	| Last Name     | User2                            |
 	Then the user with the email address "edit.user1@lrcustomer.com.broken" should be present on zendesk.liferay.com
 	And the user with the email address "edit.user2@lrcustomer.com.broken" should be present on zendesk.liferay.com
 	And the user with the email address "edit.user1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
@@ -127,25 +127,24 @@ Scenario: View user updates
 	And the user with the email address "edit.user1@lrcustomer.com.broken" on zendesk.liferay.com should have the name "Edit User1"
 	And the user with the email address "edit.user2@lrcustomer.com.broken" on zendesk.liferay.com should have the name "Edit User2"
 
-#Scenario: View updated user login
-#	OSB user updates to details on web should not affect Zendesk login.
-#
-#	Given I log into the web homepage as "osb.customer1@lrcustomer.com.broken" with password "te$tingte$tu$eronwebu@t"
-#	And I update my details as "osb.customer1" to the following values
-#	| Email Address | edit.user1@lrcustomer.com.broken |
-#	| First Name    | Edit                             |
-#	| Last Name     | User1                            |
-#	And I wait for "2" minutes
-#	And I log out and log into the web homepage as "osb.customer2@lrcustomer.com.broken" with password "te$tingte$tu$eronwebu@t"
-#	And I update my details as "osb.customer2" to the following values
-#	| Email Address | edit.user2@lrcustomer.com.broken |
-#	| First Name    | Edit                             |
-#	| Last Name     | User2                            |
-#	And I log out of the web homepage
-#	When I wait for "2" minutes
-#	And I update the user with the email address "edit.user1@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
-#	And I update the user with the email address "edit.user2@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
-#	And I log into zendesk as "edit.user1@lrcustomer.com.broken" with password "zendeskqauser"
-#	Then I should see the homepage as a kb user
-#	When I log out and log into zendesk as "edit.user2@lrcustomer.com.broken" with password "zendeskqauser"
-#	Then I should see the homepage as a kb user
+Scenario: View updated user login
+	OSB user updates to details on web should not affect Zendesk login.
+
+	Given I update a user with the email address "osb.customer1@lrcustomer.com.broken" to have the following parameters
+	| Screen Name   | edit.user1                       |
+	| Email Address | edit.user1@lrcustomer.com.broken |
+	| First Name    | Edit                             |
+	| Last Name     | User1                            |
+	And I update a user with the email address "osb.customer2@lrcustomer.com.broken" to have the following parameters
+	| Screen Name   | edit.user2                       |
+	| Email Address | edit.user2@lrcustomer.com.broken |
+	| First Name    | Edit                             |
+	| Last Name     | User2                            |
+	Then the user with the email address "edit.user1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	And the user with the email address "edit.user2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	When I update the user with the email address "edit.user1@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
+	And I update the user with the email address "edit.user2@lrcustomer.com.broken" to use the password "${staticZendeskAdminPassword}"
+	And I log into zendesk as "edit.user1@lrcustomer.com.broken" with password "zendeskqauser"
+	Then I should see the homepage as a kb user
+	When I log out and log into zendesk as "edit.user2@lrcustomer.com.broken" with password "zendeskqauser"
+	Then I should see the homepage as a kb user
