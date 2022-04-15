@@ -87,7 +87,39 @@ definition {
 			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
 
 			if (!(contains("${responseOfContactApi}", "Domain ${userEmailDomain} is not allowed"))) {
-				fail("The contact may have been added to the account instead of failing due to an invalid email");
+				fail("The contact may have been added to the account instead of failing due to an invalid email or the error message may have changed. Please investigate.");
+			}
+		}
+	}
+
+	@prose = "I attempt to assign the following roles to the user with a non okta email address ${userEmailAddress} on an inactive account with the name ${accountName} ${table}"
+	macro _assignContactRolesToContactWithNonOktaEmailOnInactiveAccountAttempt {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+        var userEmailDomain = StringUtil.extractLast("${userEmailAddress}", "@");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+        var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+
+        var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+            var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+			var curl = '''
+				--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName}
+				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+				-H "accept: application/json"
+				-H 'Content-Type: application/json'
+				''';
+
+			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
+
+			if (!(contains("${responseOfContactApi}", "NOT_FOUND"))) {
+				fail("The contact may have been added to the inactive account instead of failing due to a non okta email or the error message may have changed. Please investigate.");
 			}
 		}
 	}
