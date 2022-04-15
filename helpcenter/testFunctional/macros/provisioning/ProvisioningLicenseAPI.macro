@@ -78,6 +78,47 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to download a license zip file on provisioning via api for the following license keys ${table}"
+	macro _downloadLicenseZip { 
+		var RawTable rawTable = new RawTable("${table}");
+
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var tempDir = PropsUtil.get("output.dir.name");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download-zip?"${licenseKeyIds}"
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			--output ${tempDir}/licenseZipFile.zip
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+
+		ZendeskHomepage.pause(timeInSeconds = "5");
+
+		var fileExists = FileUtil.exists("${tempDir}/licenseZipFile.zip");
+
+		if ("${fileExists}" == "true") {
+			echo("File named licenseZipFile.zip was downloaded.");
+		}
+		else {
+			fail("Files named licenseZipFile.zip NOT FOUND in folder ${tempDir}!");
+		}
+	}
+
 	@prose = "I should not be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} via api"
 	macro _downloadNoDeveloperLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
