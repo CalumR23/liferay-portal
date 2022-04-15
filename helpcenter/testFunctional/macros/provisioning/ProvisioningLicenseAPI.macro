@@ -670,6 +670,37 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to download a license aggregate file on provisioning via api for the following license keys ${table}"
+	macro _viewNoDownloadLicenseAggregate {
+		var RawTable rawTable = new RawTable("${table}");
+
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}"
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var error = JSONCurlUtil.get("${curl}", "$");
+
+		if (!(contains("${error}","The specified activation keys cannot be aggregated together"))) {
+			fail("The error message may have changed or a non expected license aggregate may have been downloaded. Please investigate");
+		}
+	}
+
 	@prose = "I should not be able to view the deactivated license on the account ${accountName} with the name ${licenseName}"
 	macro _viewNoDeactivatedLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
