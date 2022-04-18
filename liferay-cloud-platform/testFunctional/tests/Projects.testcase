@@ -93,4 +93,70 @@ definition {
 		}
 	}
 
+	@description = "Can check the environment information on the project page"
+	@priority = "5"
+	test CanVerifyEnvironmentInformationOnProjectPage {
+		task ("Assert environment type") {
+			for (var type : list "DEV,INFRA,PRD") {
+				Default.AssertElementPresent(
+					key_environmentType = "${type}",
+					key_projectName = "projtest",
+					locator1 = "Projects#ENVIRONMENT_TYPE");
+			}
+		}
+
+		task ("Assert environments status") {
+			Default.AssertTextEquals(
+				key_environment = "projtest-dev",
+				locator1 = "Projects#ENVIRONMENT_STATUS",
+				value1 = "Ready");
+
+			Default.AssertTextEquals(
+				key_environment = "projtest-infra",
+				locator1 = "Projects#ENVIRONMENT_STATUS",
+				value1 = "Ready");
+
+			Default.AssertTextEquals(
+				key_environment = "projtest-prd",
+				locator1 = "Projects#ENVIRONMENT_STATUS",
+				value1 = "None");
+		}
+
+		task ("Assert environment services") {
+			for (var serviceName : list "backup,database,liferay,search,webserver") {
+				Default.AssertElementPresent(
+					key_environment = "projtest-dev",
+					key_serviceName = "${serviceName}",
+					locator1 = "Projects#ENVIRONMENT_SERVICE");
+			}
+
+			Default.AssertElementPresent(
+				key_environment = "projtest-infra",
+				key_serviceName = "ci",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+
+			Default.AssertElementPresent(
+				key_environment = "projtest-prd",
+				locator1 = "Projects#ENVIRONMENT_NO_SERVICES");
+		}
+
+		task ("Assert team member") {
+			for (var environment : list "projtest-dev,projtest-infra,projtest-prd") {
+				Default.AssertElementPresent(
+					key_environment = "${environment}",
+					key_memberName = "Poshi Tester",
+					locator1 = "Projects#ENVIRONMENT_MEMBER");
+			}
+		}
+
+		task ("Assert project location") {
+			for (var environment : list "projtest-dev,projtest-infra,projtest-prd") {
+				Default.AssertElementPresent(
+					key_environment = "${environment}",
+					key_location = "Oregon, USA",
+					locator1 = "Projects#ENVIRONMENT_LOCATION");
+			}
+		}
+	}
+
 }
