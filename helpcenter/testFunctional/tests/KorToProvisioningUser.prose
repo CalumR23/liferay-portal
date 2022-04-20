@@ -2337,6 +2337,7 @@ Scenario: View okta user creation form on active account
 	| Role          | Support User                         |
 	| User Status   | UNVERIFIED                           |
 	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
+	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
 
 Scenario: View okta user error message on expired account
 	Testing the inability to create a customer contact via the view form for okta user creation on an inactive account in provisioning.
@@ -2497,6 +2498,7 @@ Scenario: View okta user creation form on active partner account
 	| Role          | Partner Member                       |
 	| User Status   | UNVERIFIED                           |
 	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
+	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
 
 Scenario: View okta user error message on expired partner account
 	Testing the inability to create a partner contact via the view form for okta user creation on an inactive partner account in provisioning.
@@ -2890,3 +2892,94 @@ Scenario: View okta updated user
 	When I go to the user index page
 	And I search the users page using the keyword "usr.koroneiki1"
 	Then I should not be able to view a user on the provisioning index with the name "USR Koroneiki1"
+
+Scenario: View okta updated user uuid
+	Testing the ability to create a contact in Dossiera and later updating the user uuid value via okta and viewing the respective user in the provisioning user details page
+
+	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | USR                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | usr.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korusr - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I create a team with the name "User Site Partner" for the account "Korusr - ${staticProjectName}"
+	And I assign the team with the name "User Site Partner" on the account "Korusr - ${staticProjectName}" to the following roles
+	| Partner |
+	And I assign contacts with the following email addresses to the team "User Site Partner"
+	| usr.koroneiki1@lrcustomer.com.broken |
+	And I create a contact role on koroneiki with the following values
+	| Description | This is the default user customer role for accounts |
+	| Name        | Liferay User Customer Role                          |
+	| Type        | Account Customer                                    |
+	And I assign the contact with the email address "usr.koroneiki1@lrcustomer.com.broken" on the account "Korusr - ${staticProjectName}" to the following roles
+	| Liferay User Customer Role |
+	And I update a user with the email address "usr.koroneiki1@lrcustomer.com.broken" to have the following parameters
+	| UUID | abcd1234-ef56-gh78-ij90-klmnop123456 |
+	And I log into the provisioning homepage as "${staticKoroneikiAdminEmailAddress}" with password "${staticKoroneikiAdminPassword}"
+	And I go to the user index page
+	And I search the users page using the keyword "usr.koroneiki1"
+	Then I should be able to view a user on the provisioning index with the name "USR Koroneiki1" and the following values
+	| Name               | USR Koroneiki1                       |
+	| Email Address      | usr.koroneiki1@lrcustomer.com.broken |
+	| Number of Accounts | 1                                    |
+	| Status             | VERIFIED                             |
+	When I click on the user with the name "USR Koroneiki1" on the provisioning index
+	And I click on the sync with okta button in the user details page
+	Then I should be able to view the following user values in the user details page
+	| Name               | USR Koroneiki1                       |
+	| Email Address      | usr.koroneiki1@lrcustomer.com.broken |
+	| Number of Accounts | 1                                    |
+	| Status             | VERIFIED                             |
+	And I should be able to view the contact account with the name "Korusr - ${staticProjectName}" and the following values
+	| Name          | Korusr - ${staticProjectName} |
+	| Code          | USRKORKORUSR                  |
+	| Region        | United States                 |
+	| Roles         | Support User                  |
+	| Roles         | Liferay User Customer Role    |
+	| Teams         | Korusr - ${staticProjectName} |
+	| Teams         | User Site Partner             |
+	| Account State | ACTIVE                        |
+	And I should not be able to view the Liferay Worker account with the name "Korusr - ${staticProjectName}"
+	And the koroneiki contact and the okta user with the email address "usr.koroneiki1@lrcustomer.com.broken" should have matching uuid values
+	When I click on the "General" tab
+	Then I should be able to view the user form with the following values
+	| Key from email address  | Read Only Input | usr.koroneiki1@lrcustomer.com.broken |
+	| Email Address           | Read Only Input | usr.koroneiki1@lrcustomer.com.broken |
+	| UUID from email address | Read Only Input | usr.koroneiki1@lrcustomer.com.broken |
+	| First Name              | Read Only Input | USR                                  |
+	| Last Name               | Read Only Input | Koroneiki1                           |
