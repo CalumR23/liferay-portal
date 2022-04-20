@@ -576,13 +576,55 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var field = "${row[0]}";
-			var value = "${row[1]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+			var value3 = "${row[3]}";
 
-			if ("${field}" == "Label") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value}')].label");
+			if ("${field}" == "Allow Permanent Licenses") {
+				var expectedValue = "${value1}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
+			}
+			else if ("${field}" == "End Date") {
+				var expectedValue = "${value2}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].endDate");
+			}
+			else if ("${field}" == "Label") {
+				var expectedValue = "${value1}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].label");
 			}
 			else if ("${field}" == "License Entry Name") {
-				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value}')].types[?(@.licenseEntryName=='${licenseEntryName}')].licenseEntryName");
+				var expectedValue = "${value2}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryName=='${value2}')].licenseEntryName");
+			}
+			else if ("${field}" == "License Entry Type") {
+				var expectedValue = "${value3}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryType=='${value3}' && @.licenseEntryName=='${value2}')].licenseEntryType");
+			}
+			else if ("${field}" == "Required Details") {
+				var expectedValue = "${value3}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.requiredDetails=='${value3}' && @.licenseEntryName=='${value2}')].requiredDetails");
+			}
+			else if ("${field}" == "Product Key") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value2}");
+				var expectedValue = "${productKey}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.productKey=='${productKey}' && @.licenseEntryName=='${value2}')].productKey");
+			}
+			else if ("${field}" == "Product Purchase Key") {
+				var expectedValue = "${value1}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].productPurchaseKey");
+			}
+			else if ("${field}" == "Start Date") {
+				var expectedValue = "${value2}";
+
+				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].startDate");
 			}
 			else {
 				fail("License field ${field} not testable via automation at the current time.");
@@ -594,11 +636,11 @@ definition {
 
 			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
 
-			echo("Expected ${field} value: ${value}");
+			echo("Expected ${field} value: ${expectedValue}");
 			echo("Actual ${field} value: ${valueFromAPI}");
 
-			if (!("${value}" == "${valueFromAPI}")) {
-				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
+			if (!("${expectedValue}" == "${valueFromAPI}")) {
+				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${expectedValue}");
 			}
 		}
 	}
