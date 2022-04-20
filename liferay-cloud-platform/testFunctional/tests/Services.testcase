@@ -1,0 +1,61 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Can assert environment location on overview page"
+	@priority = "5"
+	test AssertEnvironmentLocation {
+		var location = "Iowa, USA";
+
+		task ("Create a new project") {
+			ProjectsPage.createNewProject(
+				location = "${location}",
+				projectName = "poshitest");
+		}
+
+		task ("Assert location on location card") {
+			Default.AssertElementPresent(
+				key_location = "${location}",
+				locator1 = "Overview#SERVICE_LOCATION_NAME");
+		}
+	}
+
+	@description = "Can assert services names on overview page"
+	@priority = "5"
+	test AssertServicesNames {
+		ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+
+		for (var serviceName : list "backup,database,liferay,search,webserver") {
+			Default.AssertElementPresent(
+				key_serviceName = "${serviceName}",
+				locator1 = "Overview#SERVICE_NAME");
+		}
+	}
+
+	@description = "Can assert services status on overview page"
+	@priority = "5"
+	test AssertServicesStatus {
+		ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+
+		for (var serviceName : list "backup,database,liferay,search,webserver") {
+			Default.AssertElementPresent(
+				key_serviceName = "${serviceName}",
+				key_serviceStatus = "Ready",
+				locator1 = "Overview#SERVICE_STATUS");
+		}
+	}
+
+}
