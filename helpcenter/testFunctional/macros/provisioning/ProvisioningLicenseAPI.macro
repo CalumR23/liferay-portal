@@ -766,6 +766,73 @@ definition {
 		}
 	}
 
+	@prose = "I should not be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} ${table}"
+	macro _viewNoGenerateLicenseFormOptions { 
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Allow Permanent Licenses") {
+				var nonExpectedValue = "${value1}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
+			}
+			else if ("${field}" == "End Date") {
+				var nonExpectedValue = "${value2}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else if ("${field}" == "Label") {
+				var nonExpectedValue = "${value1}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "License Entry Name") {
+				var nonExpectedValue = "${value1}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Key") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
+				var nonExpectedValue = "${productKey}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Purchase Key") {
+				var nonExpectedValue = "${value1}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms");
+			}
+			else if ("${field}" == "Start Date") {
+				var nonExpectedValue = "${value2}";
+
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else {
+				fail("Negative assertions for this license field ${field} not testable via automation at the current time.");
+			}
+
+			echo("Non expected ${field} value: ${nonExpectedValue}");
+			echo("Actual API object value: ${objectFromAPI}");
+
+			if (contains("${objectFromAPI}", "${nonExpectedValue}")) {
+				fail("The non expected ${field} value ${nonExpectedValue} is present in the generate form");
+			}
+		}
+	}
+
 	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName} using the okta session id value ${oktaSessionId}"
 	macro _viewNoLicenseKeyIdViaLicenseName {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
