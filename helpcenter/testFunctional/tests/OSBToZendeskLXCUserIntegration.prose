@@ -1,0 +1,112 @@
+@testray.main.component.name = "Support QA"
+@type = "zendesk.integration"
+
+Feature: OSB to Zendesk LXC User Integration
+	Testing lxc user sync updates in Zendesk caused by changes in OSB.
+
+Setup:
+	* I get all test passwords and admin emails
+	* I generate a provisioning project name
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer1                       |
+	| Email Address | osb.customer1@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer1                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer2                       |
+	| Email Address | osb.customer2@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer2                           |
+	* I create a user with the following parameters
+	| Screen Name   | osb.customer3                       |
+	| Email Address | osb.customer3@lrcustomer.com.broken |
+	| First Name    | OSB                                 |
+	| Last Name     | Customer3                           |
+	* I create an account on koroneiki with the following values
+	| Code     | OSBZENOSBZEN                  | |
+	| Language | English                       | |
+	| Name     | Osbzen - ${staticProjectName} | |
+	| Region   | United States                 | |
+	| Status   | Active                        | |
+	| Tier     | T1                            | |
+	* I assign the contact with the email address "osb.customer1@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support Requester |
+	* I assign the contact with the email address "osb.customer2@lrcustomer.com.broken" on the account "Osbzen - ${staticProjectName}" to the following roles
+	| Support User |
+	* I generate static start and end dates
+	* I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "LXC SM Subscription HA Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	* I create a product purchase for an account with the name "Osbzen - ${staticProjectName}" and the product "Premium Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I wait for "1" minutes
+	* the support organization with the code "OSBZENOSBZEN" should be part of the support site
+	* the organization "Osbzen - ${staticProjectName}" should be present on zendesk.liferay.com
+	* the user with the email address "osb.customer1@lrcustomer.com.broken" should be present on zendesk.liferay.com
+	* the user with the email address "osb.customer2@lrcustomer.com.broken" should be present on zendesk.liferay.com
+
+Teardown:
+	* I get the ID of the default user belonging to the organization "Osbzen - ${staticProjectName}" from zendesk.liferay.com
+	* I tear down the accounts on koroneiki with the following names
+	| Osbzen - ${staticProjectName} |
+	* I tear down the accounts on koroneiki with the following "Code" values
+	| OSBZENOSBZEN |
+	* I synchronize the account entitlement definition with the name "Gold Subscription"
+	* I tear down the projects with the following project codes via groovy
+	| OSBZENOSBZEN |
+	* I tear down the users with the following email addresses from okta
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from customer.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
+	* I tear down the users with the following email addresses from koroneiki
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
+	* I tear down the contacts on koroneiki with the following email addresses
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
+	* I obtain the IDs of the following user email addresses from zendesk.liferay.com
+	| osb.customer1@lrcustomer.com.broken |
+	| osb.customer2@lrcustomer.com.broken |
+	| osb.customer3@lrcustomer.com.broken |
+	* I teardown users with the following userIds "${staticUserIdList}" from zendesk.liferay.com
+	* I obtain the external IDs of the following organizations from zendesk.liferay.com if still present
+	| Osbzen - ${staticProjectName} |
+	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
+	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
+
+Scenario: View new users
+	New lxc users who are added to Zendesk via OSB sync should be in their appropriate organization with their appropriate tags.
+
+	Given the user with the email address "osb.customer1@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be in the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" on zendesk.liferay.com should have the name "OSB Customer1"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" on zendesk.liferay.com should have the name "OSB Customer2"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be subscribed to the organization "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should have the "osb_kb" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should have the "osb_customer" tag
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should not have the "osb_customer" tag
+	And the user with the email address "osb.customer1@lrcustomer.com.broken" should not be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the user with the email address "osb.customer2@lrcustomer.com.broken" should be a watcher on an organization with the name "Osbzen - ${staticProjectName}"
+	And the uuid of the okta user with the email address "osb.customer1@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
+	And the uuid of the okta user with the email address "osb.customer2@lrcustomer.com.broken" should match the user external ID on zendesk.liferay.com
