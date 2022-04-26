@@ -317,9 +317,9 @@ public class PoshiValidation {
 		String elementName = poshiElement.getName();
 
 		if (elementName.equals("contains")) {
-			validateContainsElement(
+			validateEscapedString(
 				poshiElement, poshiElement.attributeValue("string"));
-			validateContainsElement(
+			validateEscapedString(
 				poshiElement, poshiElement.attributeValue("substring"));
 		}
 
@@ -408,25 +408,6 @@ public class PoshiValidation {
 				poshiElement.toPoshiElements(poshiElement.elements());
 
 			validateConditionElement(childPoshiElements.get(0));
-		}
-	}
-
-	protected static void validateContainsElement(
-		PoshiElement poshiElement, String attributeValue) {
-
-		if (attributeValue.contains("\"")) {
-			int escapedQuoteCount = StringUtils.countMatches(
-				attributeValue, "\\\"");
-			int quoteCount = StringUtils.countMatches(attributeValue, "\"");
-
-			if ((escapedQuoteCount != quoteCount) ||
-				!((escapedQuoteCount % 2) == 0)) {
-
-				_exceptions.add(
-					new PoshiElementException(
-						poshiElement,
-						"Unescaped quotes in contains parameter string"));
-			}
 		}
 	}
 
@@ -529,6 +510,25 @@ public class PoshiValidation {
 		validateHasNoAttributes(thenElement);
 
 		parseElements(thenElement);
+	}
+
+	protected static void validateEscapedString(
+		PoshiElement poshiElement, String attributeValue) {
+
+		if (attributeValue.contains("\"")) {
+			int escapedQuoteCount = StringUtils.countMatches(
+				attributeValue, "\\\"");
+			int quoteCount = StringUtils.countMatches(attributeValue, "\"");
+
+			if ((escapedQuoteCount != quoteCount) ||
+				!((escapedQuoteCount % 2) == 0)) {
+
+				_exceptions.add(
+					new PoshiElementException(
+						poshiElement,
+						"Unescaped quotes in contains parameter string"));
+			}
+		}
 	}
 
 	protected static void validateExecuteElement(PoshiElement poshiElement) {
