@@ -15,6 +15,42 @@ definition {
 		Authentication.logout();
 	}
 
+	@description = "Environment can be added to a project"
+	@priority = "5"
+	test CanAddEnvironmentToProject {
+		var projectName = "poshitest";
+
+		task ("Create a new project") {
+			ProjectsPage.createNewProject(projectName = "${projectName}");
+		}
+
+		task ("Add environment to project") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "DEV",
+				location = "Oregon, USA");
+
+			Utils.goToPage(page = "projects");
+
+			Default.AssertElementPresent(
+				key_environment = "${projectName}-dev",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("Delete the project") {
+			ProjectsPage.openEnvironment(environmentName = "${projectName}");
+
+			SettingsPage.deleteEnvironment();
+
+			Default.AssertElementPresent(
+				key_message = "Environments deleted",
+				locator1 = "Utils#GENERIC_TOAST_NOTIFICATION");
+
+			Default.AssertElementNotPresent(
+				key_environment = "${projectName}",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+	}
+
 	@description = "Project is created when location and alphanumeric characters are provided for projectId and deleted in the Settings Page."
 	@priority = "5"
 	test CanCreateNewProject {
