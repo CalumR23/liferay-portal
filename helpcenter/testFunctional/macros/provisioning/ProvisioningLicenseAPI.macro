@@ -255,6 +255,36 @@ definition {
         }
     }
 
+	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api using okta session id and should contains the following values ${table}"
+    macro _downloadAndCheckLicenseSessionId {
+        var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
+            accountName = "${accountName}",
+            licenseName = "${licenseName}");
+
+        var curl = '''
+            --tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download
+            -u ${provisioningAdminEmail}:${provisioningAdminPassword}
+            -H "accept: application/*"
+            -H 'Content-Type: application/*'
+            ''';
+
+        var licenseFile = JSONCurlUtil.get("${curl}", "$");
+
+        var RawTable rawTable = new RawTable("${table}");
+
+        for (var row : table "${rawTable}") {
+            var field = "${row[0]}";
+            var value = "${row[1]}";
+
+            var field = StringUtil.lowerCase("${field}");
+            var field = StringUtil.replace("${field}", " ", "-");
+			
+            if (!(contains("${licenseFile}","<${field}>${value}</${field}>"))) {
+                fail("The value is not present in the license file");
+            }
+        }
+    }
+
 	@prose = "I should not be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
 	macro _downloadNoLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
