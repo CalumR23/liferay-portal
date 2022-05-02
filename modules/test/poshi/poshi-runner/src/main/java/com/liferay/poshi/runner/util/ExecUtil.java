@@ -17,11 +17,18 @@ package com.liferay.poshi.runner.util;
 import com.liferay.poshi.core.util.OSDetector;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 /**
  * @author Michael Hashimoto
@@ -138,10 +145,45 @@ public class ExecUtil {
 			true, new File("."), _BASH_COMMAND_TIMEOUT_DEFAULT, commands);
 	}
 
+	public static Process executeCommand(String command)
+			throws IOException, TimeoutException {
+
+		if(!command.startsWith("git") || !command.startsWith("grep") || !command.startsWith("sed")){
+			throw new RuntimeException("Unable to utilize command. Please use git, grep, or sed");
+		}
+
+		return executeCommands(
+				true, new File("."), _BASH_COMMAND_TIMEOUT_DEFAULT, command);
+	}
+
 	public static String readInputStream(InputStream inputStream)
 		throws IOException {
 
 		return readInputStream(inputStream, false);
+	}
+
+	public Process executeScript(String filePath) {
+		Path executePath = Paths.get(filePath);
+
+		StringBuilder contentBuilder = new StringBuilder();
+
+		try (Stream<String> stream
+					 = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8))
+		{
+			stream.forEach(s -> contentBuilder.append(s).append("\n"));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+		String fileContent = contentBuilder.toString();
+
+		try {
+			return executeCommand(fileContent);
+		} catch(IOException | TimeoutException exception){
+			throw new RuntimeException(exception);
+		}
 	}
 
 	public static String readInputStream(
