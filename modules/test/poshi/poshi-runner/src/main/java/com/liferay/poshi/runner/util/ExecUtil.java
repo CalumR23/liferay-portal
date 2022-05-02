@@ -185,6 +185,12 @@ public class ExecUtil {
 		return sb.toString();
 	}
 
+	public static String readInputStream(InputStream inputStream)
+		throws IOException {
+
+		return readInputStream(inputStream, false);
+	}
+
 	public static String readInputStream(
 			InputStream inputStream, boolean resetAfterReading)
 		throws IOException {
