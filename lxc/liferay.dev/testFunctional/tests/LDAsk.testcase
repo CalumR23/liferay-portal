@@ -30,9 +30,49 @@ definition {
 	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteQuestion {
+		task ("Ask a new question") {
+			LDAsk.openCard(cardTitle = "Commerce");
 
-		// TODO LRQA-74602 CanDeleteQuestion pending implementation
+			LDAsk.askQuestion(
+				questionBody = "Test Question Body",
+				questionTitle = "Test Question Title");
+		}
 
+		task ("Switch to admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve post") {
+			Portal.UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Delete published question") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.deleteQuestion(questionTitle = "Test Question Title");
+		}
+
+		task ("Assert question is deleted") {
+			Default.AssertElementNotPresent(
+				key_questionTitle = "Test Question Title",
+				locator1 = "LDAsk#QUESTION_TITLE");
+		}
 	}
 
 	@description = "Automation ID: LRQA-74605 | Test Summary: Verify user is able to Edit a question"
