@@ -75,12 +75,81 @@ definition {
 	}
 
 	@description = "Automation ID: LRQA-74605 | Test Summary: Verify user is able to Edit a question"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanEditQuestion {
+		task ("Ask a new question") {
+			LDAsk.openCard(cardTitle = "Commerce");
 
-		// TODO LRQA-74605 CanEditQuestion pending implementation
+			LDAsk.askQuestion(
+				questionBody = "Test Question Body",
+				questionTitle = "Test Question Title");
+		}
 
+		task ("Switch to admin user") {
+			Default.Refresh();
+
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve post") {
+			Portal.UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Edit published question") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.editQuestion(
+				newQuestionTitle = "Edited Test Question Title",
+				questionTitle = "Test Question Title");
+		}
+
+		task ("Switch to admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve changes") {
+			Portal.UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "Edited Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "Edited Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Assert question is edited") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			Default.AssertElementPresent(
+				key_questionTitle = "Edited Test Question Title",
+				locator1 = "LDAsk#QUESTION_TITLE");
+		}
 	}
 
 	@description = "New Post correctly enters pending state with DB partition enabled"
