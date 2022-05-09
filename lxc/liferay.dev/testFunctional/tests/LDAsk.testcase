@@ -18,12 +18,83 @@ definition {
 	}
 
 	@description = "Automation ID: LRQA-74606 | Test Summary: Verify user is able to Answer a question"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanAnswerQuestion {
+		task ("Ask a new question") {
+			LDAsk.openCard(cardTitle = "Commerce");
 
-		// TODO LRQA-74606 CanAnswerQuestion pending implementation
+			LDAsk.askQuestion(
+				questionBody = "Test Question Body",
+				questionTitle = "Test Question Title");
+		}
 
+		task ("Switch to admin user") {
+			Default.Refresh();
+
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve post") {
+			Portal.UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Answer published question") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.answerQuestion(
+				questionAnswer = "Test Question Answer",
+				questionTitle = "Test Question Title");
+		}
+
+		task ("Switch to admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve changes") {
+			Portal.UserBar.gotoDropdownItem(dropdownItem = "My Workflow Tasks");
+
+			SystemWorkflow.assignToMe(itemTitle = "RE: Test Question Title");
+
+			Default.Refresh();
+
+			SystemWorkflow.approveWorkflowAsset(itemTitle = "RE: Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Assert question is edited") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.openQuestion(questionTitle = "Test Question Title");
+
+			Default.AssertElementPresent(
+				key_answerText = "Test Question Answer",
+				locator1 = "LDAsk#ANSWER");
+		}
 	}
 
 	@description = "Automation ID: LRQA-74602 | Test Summary: Verify user is able to Delete a question"
