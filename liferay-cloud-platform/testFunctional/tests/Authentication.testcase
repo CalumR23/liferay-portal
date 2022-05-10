@@ -72,12 +72,12 @@ definition {
 		}
 	}
 
-	@description = "Display invalid credentials message if password is incorrect"
+	@description = "Display invalid credentials message if the account does not exist or if password is incorrect"
 	@priority = "4"
-	test DisplayMessageForIncorrectPassword {
+	test DisplayInvalidCredentialsMessage {
 		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 
-		task ("Given: I input a wrong password") {
+		task ("Given: I input a wrong password for a valid email") {
 			Default.Type(
 				key_inputId = "email",
 				locator1 = "Utils#GENERIC_INPUT_FIELD",
@@ -87,6 +87,28 @@ definition {
 				key_inputId = "password",
 				locator1 = "Utils#GENERIC_INPUT_FIELD",
 				value1 = "wrong-password");
+		}
+
+		task ("When: I click the login button") {
+			Default.Click(locator1 = "Utils#SUBMIT_BUTTON");
+		}
+
+		task ("Then: The invalid credentials error message is displayed") {
+			Default.AssertElementPresent(
+				key_message = "The provided credentials are invalid.",
+				locator1 = "Authentication#TOAST_INCORRECT_INFORMATION");
+		}
+
+		task ("Given: I input an invalid email") {
+			Default.Type(
+				key_inputId = "email",
+				locator1 = "Utils#GENERIC_INPUT_FIELD",
+				value1 = "nonexistent@liferay.com");
+
+			Default.Type(
+				key_inputId = "password",
+				locator1 = "Utils#GENERIC_INPUT_FIELD",
+				value1 = "P4ssW0rd..");
 		}
 
 		task ("When: I click the login button") {
