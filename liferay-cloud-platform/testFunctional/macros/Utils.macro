@@ -3,50 +3,55 @@ definition {
 	var portalURL = PropsUtil.get("portal.url");
 
 	macro checkServiceReadyStatus {
-        var tries = "0";
-        var maxTries = "120";
-        var user = PropsUtil.get("test.this.lcp.test.account.user.email");
+		var tries = "0";
+		var maxTries = "120";
+		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
-        var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
-        var productID = "${productID}";
-        var serviceID = "${serviceID}";
+		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
+		var productID = "${productID}";
+		var serviceID = "${serviceID}";
 
-        while ("${tries}" != "${maxTries}" && "${readyStatus}" != "true") {
-	    	var curl = '''
+		while (("${tries}" != "${maxTries}") && ("${readyStatus}" != "true")) {
+			var curl = '''
     			https://${baseURL}/projects/${productID}/services/${serviceID} \
 	    		-u ${user}:${password} \
     		''';
-            var readyStatus = JSONCurlUtil.get("${curl}", "$['ready']");
+			var readyStatus = JSONCurlUtil.get("${curl}", "$['ready']");
 
-            if ("${readyStatus}" != "true") {
-                echo("Status for service is ${readyStatus}. Try attempt #${tries}");
-                var tries = ${tries} + 1;
-                Default.Pause(locator1 = "5000");
-            }
-            else {
-                return "${readyStatus}";
-                echo("Status for service is ${readyStatus}");
-            }
-            if ("${tries}" == "${maxTries}") {
-                fail("Timed out with waiting for ${serviceID} service to be ready.");
-            }
-        }
-    }
+			if ("${readyStatus}" != "true") {
+				echo("Status for service is ${readyStatus}. Try attempt #${tries}");
 
-    macro checkServiceStatus {
-        var user = PropsUtil.get("test.this.lcp.test.account.user.email");
+				var tries = ${tries} + 1;
+
+				Default.Pause(locator1 = "5000");
+			}
+			else {
+				return "${readyStatus}";
+
+				echo("Status for service is ${readyStatus}");
+			}
+
+			if ("${tries}" == "${maxTries}") {
+				fail("Timed out with waiting for ${serviceID} service to be ready.");
+			}
+		}
+	}
+
+	macro checkServiceStatus {
+		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
-        var baseURL = PropsUtil.get("test.this.lcp.test.base.url.backup");
+		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.backup");
 
 		var curl = '''
 			https://${baseURL} \
 			-u ${user}:${password} \
 		''';
-        var serviceStatus = JSONCurlUtil.get("${curl}", "$['status']");
+		var serviceStatus = JSONCurlUtil.get("${curl}", "$['status']");
 
 		return "${serviceStatus}";
-   		echo("The service status is: ${serviceStatus}");
-    }
+
+		echo("The service status is: ${serviceStatus}");
+	}
 
 	macro goToPage {
 		var keyPage = "${page}";
