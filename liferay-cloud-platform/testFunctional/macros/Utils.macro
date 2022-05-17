@@ -4,18 +4,19 @@ definition {
 
 	macro checkServiceReadyStatus {
 		var tries = "0";
-		var maxTries = "120";
+		var maxTries = "${maxTries}";
 		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
 		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
-		var productID = "${productID}";
+		var projectID = "${projectID}";
 		var serviceID = "${serviceID}";
 
 		while (("${tries}" != "${maxTries}") && ("${readyStatus}" != "true")) {
 			var curl = '''
-    			https://${baseURL}/projects/${productID}/services/${serviceID} \
+    			https://${baseURL}/projects/${projectID}/services/${serviceID} \
 	    		-u ${user}:${password} \
     		''';
+
 			var readyStatus = JSONCurlUtil.get("${curl}", "$['ready']");
 
 			if ("${readyStatus}" != "true") {
@@ -37,15 +38,18 @@ definition {
 		}
 	}
 
-	macro checkServiceStatus {
+	macro fetchServiceStatus {
 		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
-		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.backup");
+		var serviceID = "${serviceID}";
+		var projectID = "${projectID}";
+		var serviceDomain = "${serviceDomain}";
 
 		var curl = '''
-			https://${baseURL} \
+			https://${serviceID}-${projectID}.${serviceDomain} \
 			-u ${user}:${password} \
 		''';
+
 		var serviceStatus = JSONCurlUtil.get("${curl}", "$['status']");
 
 		return "${serviceStatus}";
