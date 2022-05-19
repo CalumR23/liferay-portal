@@ -1,0 +1,59 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Project is created when location and alphanumeric characters are provided for projectId"
+	@priority = "5"
+	test CanCreateProject {
+		task ("Given: The user can view 'New Project' page") {
+			Utils.goToPage(page = "projects/new-project");
+
+			Default.AssertElementPresent(
+				key_headerTitle = "New Project",
+				locator1 = "Utils#HEADER_TITLE");
+		}
+
+		task ("When: I input alphanumeric characters in projectId and select location") {
+			Default.Type(
+				key_inputId = "projectId",
+				locator1 = "Utils#GENERIC_INPUT_FIELD",
+				value1 = "poshitest");
+
+			Utils.selectMenuOption(menuOption = "Oregon, USA");
+		}
+
+		task ("And: I click the 'Create new project' button") {
+			Default.Click(locator1 = "Utils#SUBMIT_BUTTON");
+		}
+
+		task ("Then: The project is created") {
+			Default.AssertElementPresent(
+				key_message = "Project was created successfully.",
+				locator1 = "Utils#GENERIC_TOAST_NOTIFICATION");
+		}
+
+		task ("When: I access the Project page") {
+			Utils.goToPage(page = "projects");
+		}
+
+		task ("Then: The project is shown on the page") {
+			Default.AssertElementPresent(
+				key_environment = "poshitest",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+	}
+
+}
