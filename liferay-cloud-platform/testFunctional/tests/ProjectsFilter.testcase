@@ -1,0 +1,92 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Project filtering with 'Newest' filter displays newest project family first"
+	@priority = "4"
+	test CanSortProjectsByNewest {
+		task ("Given: I create projects") {
+			ProjectsPage.createNewProject(projectName = "alpha");
+
+			ProjectsPage.createNewProject(projectName = "beta");
+		}
+
+		task ("When: I open the Projects page and sort filter to 'Newest'") {
+			Utils.goToPage(page = "projects");
+
+			Default.Click(locator1 = "Projects#PROJECT_DROPDOWN_MENU");
+
+			Default.Click(
+				key_menuOption = "Newest",
+				locator1 = "Projects#PROJECT_DROPDOWN_MENU_OPTION");
+
+			Default.AssertElementPresent(
+				key_menuOption = "Newest",
+				locator1 = "Projects#PROJECT_DROPDOWN_MENU_OPTION_SELECTED");
+		}
+
+		task ("Then: Projects are shown in newest order") {
+			Default.AssertElementPresent(
+				key_environment = "alpha",
+				key_index = "2",
+				locator1 = "Projects#ENVIRONMENT_FAMILY_POSITION");
+
+			Default.AssertElementPresent(
+				key_environment = "beta",
+				key_index = "1",
+				locator1 = "Projects#ENVIRONMENT_FAMILY_POSITION");
+		}
+	}
+
+	@description = "Different project families are separately grouped"
+	@priority = "3"
+	test DifferentProjectsAreNotGrouped {
+		task ("When: I create project families") {
+			ProjectsPage.createNewProject(projectName = "alpha");
+
+			ProjectsPage.addNewEnvironment(
+				environmentType = "DEV",
+				location = "Oregon, USA");
+
+			ProjectsPage.createNewProject(projectName = "beta");
+
+			ProjectsPage.addNewEnvironment(
+				environmentType = "INFRA",
+				location = "Oregon, USA");
+		}
+
+		task ("And: Go to Projects page") {
+			Utils.goToPage(page = "projects");
+		}
+
+		task ("Then: Different project families are separately grouped") {
+			for (var environment : list "alpha,alpha-dev") {
+				Default.AssertElementPresent(
+					key_environment = "${environment}",
+					key_index = "1",
+					locator1 = "Projects#ENVIRONMENT_FAMILY_POSITION");
+			}
+
+			for (var environment : list "beta,beta-infra") {
+				Default.AssertElementPresent(
+					key_environment = "${environment}",
+					key_index = "2",
+					locator1 = "Projects#ENVIRONMENT_FAMILY_POSITION");
+			}
+		}
+	}
+
+}
