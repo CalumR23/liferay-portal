@@ -499,6 +499,46 @@ definition {
 		}
 	}
 
+	@description = "Verify user is able to Filter by Latest Created"
+	@priority = "4"
+	test CanFilterByLatestCreated {
+		task ("Ask a new question") {
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.askQuestion(
+				questionBody = "Test Question Body",
+				questionTitle = "Test Question Title");
+		}
+
+		task ("Switch to admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithAdminUser();
+		}
+
+		task ("Approve post") {
+			LDMyWorkflowTasks.approveWorkflowAsset(itemTitle = "Test Question Title");
+		}
+
+		task ("Switch to non-admin user") {
+			LDLogin.signOut();
+
+			LDLogin.signInWithNonAdminUser();
+		}
+
+		task ("Assert the new question is shown when filtered by Latest Created") {
+			LDNavigation.goToAsk();
+
+			LDAsk.openCard(cardTitle = "Commerce");
+
+			LDAsk.setQuestionsFilter(filterOption = "Latest Created");
+
+			Default.AssertElementPresent(
+				key_questionTitle = "Test Question Title",
+				locator1 = "LDAsk#QUESTION_TITLE");
+		}
+	}
+
 	@description = "New Post correctly enters pending state with DB partition enabled"
 	@priority = "5"
 	test CanNonAdminAddNewPostInPedingState {
