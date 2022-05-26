@@ -630,4 +630,40 @@ definition {
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
+
+	macro _getAllRequestTicketsFromUser {
+		var userID = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userID}/tickets/requested.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var allRequestedTickets = JSONCurlUtil.get("${curl}");
+
+		var amountOfTicketsId = StringUtil.count("${allRequestedTickets}", "url");
+
+		var count = "0";
+
+		while (!("${count}" == "${amountOfTicketsId}")) {
+			var requestId = JSONCurlUtil.get("${curl}", "$.tickets[${count}].id");
+
+			if (!(isSet(staticRequestIdList))) {
+				static var staticRequestIdList = "${requestId}";
+			}
+			else {
+				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+			}
+
+			var count = MathUtil.sum("${count}", "1");
+		}
+
+		if (!(isSet(staticRequestIdList))) {
+			fail("No ticket found for user email ${userEmailAddress}");
+		}
+
+		echo("${staticRequestIdList}");
+
+		return "${staticRequestIdList}";
+	}
 }
