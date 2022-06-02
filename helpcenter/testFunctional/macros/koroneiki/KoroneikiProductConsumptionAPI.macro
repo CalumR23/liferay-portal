@@ -1,4 +1,5 @@
 definition {
+
 	var apiToken = PropsUtil.get("koroneiki.api.token");
 	var koroneikiAdminEmail = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
@@ -10,7 +11,6 @@ definition {
 		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
 			accountName = "${accountName}",
 			productName = "${productName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -34,9 +34,11 @@ definition {
 		if (!(isSet(domain))) {
 			var domain = "";
 		}
+
 		if (!(isSet(entityId))) {
 			var entityId = "";
 		}
+
 		if (!(isSet(entityName))) {
 			var entityName = "";
 		}
@@ -85,12 +87,15 @@ definition {
 		if (!(isSet(domain))) {
 			var domain = "";
 		}
+
 		if (!(isSet(entityId))) {
 			var entityId = "";
 		}
+
 		if (!(isSet(entityName))) {
 			var entityName = "";
 		}
+
 		if (!(isSet(url))) {
 			var url = "";
 		}
@@ -103,9 +108,7 @@ definition {
 	@prose = "I create a nested field for the product consumption for the product ${productName} with the following values ${table}"
 	macro _createProductConsumptionNestedField {
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -147,30 +150,11 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I delete a product consumption list on koroneiki made by the account ${accountName} for the product ${productName}"
-	macro _deleteProductConsumptionList {
-		var productConsumptionKeyList = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
-			accountName = "${accountName}",
-			productName = "${productName}");
-
-		for (var productConsumptionKey : list "${productConsumptionKeyList}") {
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey} --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-		}
-	}
-
 	@prose = "I delete a product consumption on koroneiki made by the account ${accountName} for the product ${productName} executed by ${agentName}"
 	macro _deleteProductConsumptionExecutedByAgent {
 		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
 			accountName = "${accountName}",
 			productName = "${productName}");
-
 		var agentName = StringUtil.replace("${agentName}", " ", "%20");
 
 		var curl = '''
@@ -200,6 +184,24 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
+	@prose = "I delete a product consumption list on koroneiki made by the account ${accountName} for the product ${productName}"
+	macro _deleteProductConsumptionList {
+		var productConsumptionKeyList = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+
+		for (var productConsumptionKey : list "${productConsumptionKeyList}") {
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey} --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
 	macro _getProductConsumptionExternalLinkKey {
 		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
 			accountName = "${accountName}",
@@ -218,7 +220,7 @@ definition {
 
 		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "]", "");
 
-		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "&quot;", "");
+		var externalLinkKey = StringUtil.replace("${externalLinkKey}", "\"", "");
 
 		echo("External link key value for ${entityId} on product consumption on ${accountName} for ${productName}: ${externalLinkKey}");
 
@@ -230,7 +232,6 @@ definition {
 		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
 			accountName = "${accountName}",
 			productName = "${productName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -265,12 +266,15 @@ definition {
 		if (!(isSet(delete))) {
 			var delete = "false";
 		}
+
 		if (!(isSet(permissions))) {
 			var permissions = "false";
 		}
+
 		if (!(isSet(update))) {
 			var update = "false";
 		}
+
 		if (!(isSet(view))) {
 			var view = "false";
 		}
@@ -293,76 +297,6 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "I unset the following permissions for the product consumption made by the account ${accountName} for the product ${productName} for a permissioned user ${table}"
-	macro _unsetProductConsumptionPermissions {
-		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
-			accountName = "${accountName}",
-			productName = "${productName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Delete") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var delete = "${value}";
-			}
-			else if ("${field}" == "Permissions") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var permissions = "${value}";
-			}
-			else if ("${field}" == "Update") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var update = "${value}";
-			}
-			else if ("${field}" == "View") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var view = "${value}";
-			}
-			else {
-				fail("No such permission field ${field}");
-			}
-		}
-
-		if (!(isSet(delete))) {
-			var delete = "false";
-		}
-		if (!(isSet(permissions))) {
-			var permissions = "false";
-		}
-		if (!(isSet(update))) {
-			var update = "false";
-		}
-		if (!(isSet(view))) {
-			var view = "false";
-		}
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}/product-consumption-permissions --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"delete": "${delete}",
-				"permissions": "${permissions}",
-				"roleNames": [
-					"${roleName}"
-				],
-				"update": "${update}",
-				"view": "${view}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I tear down the external links for the product consumption made by account ${accountName} for the product ${productName} with the following entity id values ${table}"
@@ -427,6 +361,70 @@ definition {
 		}
 	}
 
+	@prose = "I tear down the product consumption list on koroneiki made by the account ${accountName} for the following products ${table}"
+	macro _tearDownProductConsumptionList {
+		if (contains("${accountName}", " ")) {
+			var keyword = StringUtil.replace("${accountName}", " ", "+");
+		}
+		else {
+			var keyword = "${accountName}";
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?filter="name%20eq%20'${keyword}'" --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var allAccounts = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allAccounts}", "${accountName}")) {
+			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+			var RawTable rawTable = new RawTable("${table}");
+
+			for (var row : table "${rawTable}") {
+				var productName = "${row[0]}";
+
+				if (contains("${productName}", " ")) {
+					var keyword = StringUtil.replace("${productName}", " ", "+");
+				}
+				else {
+					var keyword = "${productName}";
+				}
+
+				var curl = '''
+					${koroneikiURL}/o/koroneiki-rest/v1.0/products?filter="name%20eq%20'${keyword}'" --tlsv1.2
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					''';
+
+				var allProducts = JSONCurlUtil.get("${curl}", "$");
+
+				if (contains("${allProducts}", "${productName}")) {
+					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+					var curl = '''
+						${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions --tlsv1.2
+						--header "API_Token: ${apiToken}"
+						-H "accept: application/json"
+						-H "Content-Type: application/json"
+						''';
+
+					var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
+
+					if (contains("${allAccountProductConsumptions}", "${productKey}")) {
+						KoroneikiProductConsumptionAPI._deleteProductConsumptionList(
+							accountName = "${accountName}",
+							productName = "${productName}");
+
+						echo("Product Consumptions deleted: ${productName} made by ${accountName}");
+					}
+				}
+			}
+		}
+	}
+
 	@prose = "I tear down the permissions for the product consumption made by the account ${accountName} for the product ${productName} for a non permissioned user"
 	macro _tearDownProductConsumptionPermissions {
 		if (contains("${accountName}", " ")) {
@@ -484,72 +482,6 @@ definition {
 		}
 	}
 
-	@prose = "I tear down the product consumption list on koroneiki made by the account ${accountName} for the following products ${table}"
-	macro _tearDownProductConsumptionList {
-		if (contains("${accountName}", " ")) {
-			var keyword = StringUtil.replace("${accountName}", " ", "+");
-		}
-		else {
-			var keyword = "${accountName}";
-		}
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts?filter="name%20eq%20'${keyword}'" --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var allAccounts = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allAccounts}", "${accountName}")) {
-			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-			var RawTable rawTable = new RawTable("${table}");
-
-			for (var row : table "${rawTable}") {
-				var productName = "${row[0]}";
-
-				if (contains("${productName}", " ")) {
-					var keyword = StringUtil.replace("${productName}", " ", "+");
-				}
-				else {
-					var keyword = "${productName}";
-				}
-
-				var curl = '''
-					${koroneikiURL}/o/koroneiki-rest/v1.0/products?filter="name%20eq%20'${keyword}'" --tlsv1.2
-					--header "API_Token: ${apiToken}"
-					-H "accept: application/json"
-					-H "Content-Type: application/json"
-					''';
-
-				var allProducts = JSONCurlUtil.get("${curl}", "$");
-
-				if (contains("${allProducts}", "${productName}")) {
-					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
-					var curl = '''
-						${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions --tlsv1.2
-						--header "API_Token: ${apiToken}"
-						-H "accept: application/json"
-						-H "Content-Type: application/json"
-						''';
-
-					var allAccountProductConsumptions = JSONCurlUtil.get("${curl}", "$");
-
-					if (contains("${allAccountProductConsumptions}", "${productKey}")) {
-						KoroneikiProductConsumptionAPI._deleteProductConsumptionList(
-							accountName = "${accountName}",
-							productName = "${productName}");
-
-						echo("Product Consumptions deleted: ${productName} made by ${accountName}");
-					}
-				}
-			}
-		}
-	}
-
 	@prose = "I tear down the product consumptions on koroneiki made by the account ${accountName} for the following products ${table}"
 	macro _tearDownProductConsumptions {
 		if (contains("${accountName}", " ")) {
@@ -570,7 +502,6 @@ definition {
 
 		if (contains("${allAccounts}", "${accountName}")) {
 			var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 			var RawTable rawTable = new RawTable("${table}");
 
 			for (var row : table "${rawTable}") {
@@ -594,7 +525,6 @@ definition {
 
 				if (contains("${allProducts}", "${productName}")) {
 					var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 					var curl = '''
 						${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions --tlsv1.2
 						--header "API_Token: ${apiToken}"
@@ -616,12 +546,82 @@ definition {
 		}
 	}
 
+	@prose = "I unset the following permissions for the product consumption made by the account ${accountName} for the product ${productName} for a permissioned user ${table}"
+	macro _unsetProductConsumptionPermissions {
+		var productConsumptionKey = KoroneikiAccountAPI._getAccountProductConsumptionKeyViaAccountAndProductName(
+			accountName = "${accountName}",
+			productName = "${productName}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/${productConsumptionKey}/product-consumption-permissions --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
 	@prose = "I should not be able to view a product consumption on koroneiki made by the account ${accountName} for the product ${productName}"
 	macro _viewNoProductConsumption {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var curl = '''
 			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/product-consumptions --tlsv1.2
 			--header "API_Token: ${apiToken}"
@@ -668,7 +668,6 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -681,26 +680,21 @@ definition {
 			}
 			else if ("${field}" == "External Link Nested Field") {
 				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
 				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
-
 				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-
 				var externalLinkObjectNumber = "0";
 
-				while (!("${externalLinkObjectNumber}" == "${numberOfExternalLinks}")) {
+				while ("${externalLinkObjectNumber}" != "${numberOfExternalLinks}") {
 					var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
-
 					var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
 
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "&quot;dateCreated&quot;:&quot;${dateCreated}&quot;,", "");
-
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "\"dateCreated\":\"${dateCreated}\",", "");
 					var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
 
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",&quot;key&quot;:&quot;${key}&quot;", "");
-
-					var externalLinkObjectNumber = MathUtil.sum("${externalLinkObjectNumber}", "1");
+					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",\"key\":\"${key}\"", "");
+					var externalLinkObjectNumber = ${externalLinkObjectNumber} + 1;
 				}
+
 				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
 
 				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
@@ -724,6 +718,7 @@ definition {
 
 			if ("${field}" == "Product Field and Value") {
 				echo("Expected property field ${value1} value: ${value2}");
+
 				echo("Actual property field ${value1} value: ${valueFromAPI}");
 
 				if (!(contains("${value2}", "${valueFromAPI}"))) {
@@ -737,6 +732,7 @@ definition {
 						productName = "${productName}");
 
 					echo("Expected ${field} Value: ${productPurchaseKey}");
+
 					echo("Actual ${field} Value: ${valueFromAPI}");
 
 					if (!(contains("${productPurchaseKey}", "${valueFromAPI}"))) {
@@ -746,6 +742,7 @@ definition {
 			}
 			else {
 				echo("Expected ${field} Value: ${value1}");
+
 				echo("Actual ${field} Value: ${valueFromAPI}");
 
 				if (!(contains("${value1}", "${valueFromAPI}"))) {
@@ -767,7 +764,6 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -781,7 +777,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "Entity Id") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityId");
@@ -790,7 +786,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "Entity Name") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].entityName");
@@ -799,7 +795,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "URL") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.entityId=='${entityId}')].url");
@@ -808,7 +804,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\/", "/");
 			}
@@ -817,6 +813,7 @@ definition {
 			}
 
 			echo("Expected ${field} Value: ${value}");
+
 			echo("Actual ${field} Value: ${valueFromAPI}");
 
 			if (!(contains("${value}", "${valueFromAPI}"))) {
@@ -838,7 +835,6 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -862,6 +858,7 @@ definition {
 			}
 
 			echo("Expected ${field} Value: ${value}");
+
 			echo("Actual ${field} Value: ${valueFromAPI}");
 
 			if (!(contains("${value}", "${valueFromAPI}"))) {
@@ -873,16 +870,13 @@ definition {
 	@prose = "I should be able to view a product consumption on koroneiki made by the account ${accountName} for the product ${productName} with the following values using the external link domain ${domain} and entity name ${entityName} and entity id ${entityId} ${table}"
 	macro _viewProductConsumptionViaExternalLink {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var curl = '''
 			${koroneikiURL}/o/koroneiki-rest/v1.0/product-consumptions/by-external-link/${domain}/${entityName}/${entityId} --tlsv1.2
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -897,7 +891,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "Product Field and Value") {
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.accountKey=='${accountKey}' && @.productKey=='${productKey}')].properties.${value1}");
@@ -906,7 +900,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "Product Purchase") {
 				if ("${value1}" == "true") {
@@ -916,7 +910,7 @@ definition {
 
 					var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-					var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+					var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 				}
 			}
 			else if ("${field}" == "Start Date") {
@@ -926,7 +920,7 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else {
 				fail("No such product consumption field ${field}");
@@ -934,6 +928,7 @@ definition {
 
 			if ("${field}" == "Product Field and Value") {
 				echo("Expected property field ${value1} value: ${value2}");
+
 				echo("Actual property field ${value1} value: ${valueFromAPI}");
 
 				if (!(contains("${value2}", "${valueFromAPI}"))) {
@@ -947,6 +942,7 @@ definition {
 						productName = "${productName}");
 
 					echo("Expected ${field} Value: ${productPurchaseKey}");
+
 					echo("Actual ${field} Value: ${valueFromAPI}");
 
 					if (!(contains("${productPurchaseKey}", "${valueFromAPI}"))) {
@@ -956,6 +952,7 @@ definition {
 			}
 			else {
 				echo("Expected ${field} Value: ${value1}");
+
 				echo("Actual ${field} Value: ${valueFromAPI}");
 
 				if (!(contains("${value1}", "${valueFromAPI}"))) {
@@ -964,4 +961,5 @@ definition {
 			}
 		}
 	}
+
 }

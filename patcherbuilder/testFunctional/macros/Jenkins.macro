@@ -8,7 +8,7 @@ definition {
 		var currentIteration = "0";
 		var jobInProgress = "true";
 
-		while ((!("${currentIteration}" == "${jobCompletionPollMaximumIterations}")) && ("${jobInProgress}" == "true") && (maxIterations = "30")) {
+		while (("${currentIteration}" != "${jobCompletionPollMaximumIterations}") && ("${jobInProgress}" == "true") && (maxIterations = "30")) {
 			Jenkins.openJenkinsURL();
 
 			var key_jobBuildNumber = "${jobBuildNumber}";
@@ -16,7 +16,7 @@ definition {
 			Jenkins.clickJobLink(jobName = "${jobName}");
 
 			if (IsElementPresent(locator1 = "Jenkins#JENKINS_JOB_BUILD_STATUS_IN_PROGRESS")) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+				var currentIteration = ${currentIteration} + 1;
 				var jobInProgress = "true";
 
 				Jenkins.pauseInMinutes(timeInMinutes = "${jobCompletionPollIntervalInMinutes}");
@@ -107,6 +107,7 @@ definition {
 		var key_jobBuildNumber = "${jobBuildNumber}";
 
 		Jenkins.clickJobLink(jobName = "${jobName}");
+
 		Click(locator1 = "Jenkins#JENKINS_JOB_BUILD_LINK");
 
 		Jenkins.clickConsoleOutputLink();
@@ -120,7 +121,6 @@ definition {
 	@prose = "I test the patching tool install and revert features with the following parameters ${table}"
 	macro patchingToolInstallAndRevert {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
-
 		var mirrorUser = PropsUtil.get("mirror.user");
 		var mirrorPassword = PropsUtil.get("mirror.password");
 		var portalUrl = PropsUtil.get("portal.url");
@@ -171,9 +171,13 @@ definition {
 				 http://mirrors.lax.liferay.com/files.liferay.com/private/ee/fix-packs/patching-tool/LATEST-${patchingToolMajorVersion}.0.txt
 				 -u ${mirrorUser}:${mirrorPassword}
 			''';
+
 			var jsonResponse = JSONCurlUtil.get("${curlLatestPatchingTool}", "$");
+
 			var latestVersion = StringUtil.extractFirst("${jsonResponse}", "F");
+
 			var trimmedLatestVersion = StringUtil.trim("${latestVersion}");
+
 			var patchingTool = StringUtil.replace("${patchingTool}", "LATEST", "${trimmedLatestVersion}");
 		}
 
@@ -192,15 +196,16 @@ definition {
 
 	@prose = "I wait for ${timeInSeconds} seconds"
 	macro pause {
-		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+		var timeInMilliseconds = ${timeInSeconds} * 1000;
 
 		Pause(locator1 = "${timeInMilliseconds}");
 	}
 
 	@prose = "I wait for ${timeInMinutes} minutes"
 	macro pauseInMinutes {
-		var timeInSeconds = MathUtil.product("${timeInMinutes}", "60");
-		var timeInMilliseconds = MathUtil.product("${timeInSeconds}", "1000");
+		var timeInSeconds = ${timeInMinutes} * 60;
+
+		var timeInMilliseconds = ${timeInSeconds} * 1000;
 
 		Pause(locator1 = "${timeInMilliseconds}");
 	}
@@ -648,6 +653,7 @@ definition {
 		var jenkinsAuthenticationToken = PropsUtil.get("jenkins.authentication.token");
 		var portalUrl = PropsUtil.get("portal.url");
 		var jobName = StringUtil.replace("${jobName}", "(", "\(");
+
 		var jobName = StringUtil.replace("${jobName}", ")", "\)");
 
 		var curl = '''
@@ -689,22 +695,25 @@ definition {
 		Jenkins.clickFullLogLink();
 
 		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
+
 		var errorCount = StringUtil.count("${consoleOutputText}", "ERROR");
 
 		echo("Number of errors: ${errorCount}");
 
-		if (!("${fileAddedCount}" == "0")) {
+		if ("${fileAddedCount}" != "0") {
 			var acceptableErrorCount = StringUtil.count("${consoleOutputText}", "ERROR [localhost-startStop-1][LicenseManager:?] No binary licenses found");
 
 			echo("Number of acceptable errors: ${acceptableErrorCount}");
 
-			if (!("${errorCount}" == "${acceptableErrorCount}")) {
+			if ("${errorCount}" != "${acceptableErrorCount}") {
 				fail("Unexpected errors may be present.  The test counted ${errorCount} errors but ${acceptableErrorCount} acceptable errors.  Please check the most recent fix pack revert and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
 
 		Jenkins.viewConsoleText(consoleOutputText = "BUILD SUCCESSFUL");
+
 		Jenkins.viewConsoleText(consoleOutputText = "Starting catalina");
+
 		Jenkins.viewConsoleText(consoleOutputText = "BUILD SUCCESSFUL");
 	}
 
@@ -728,16 +737,17 @@ definition {
 		Jenkins.clickFullLogLink();
 
 		var consoleOutputText = selenium.getText("Jenkins#CONSOLE_OUTPUT_TEXT");
+
 		var fileAddedCount = StringUtil.count("${consoleOutputText}", "Added:");
 
 		echo("Number of files added: ${fileAddedCount}");
 
-		if (!("${fileAddedCount}" == "0")) {
+		if ("${fileAddedCount}" != "0") {
 			var acceptableFileAddedCount = StringUtil.count("${consoleOutputText}", "Added: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
 
 			echo("Number of acceptable files added: ${acceptableFileAddedCount}");
 
-			if (!("${fileAddedCount}" == "${acceptableFileAddedCount}")) {
+			if ("${fileAddedCount}" != "${acceptableFileAddedCount}") {
 				fail("Unexpected files may have been added.  The test counted ${fileAddedCount} added files but ${acceptableFileAddedCount} acceptable added files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
 			}
 		}
@@ -746,12 +756,12 @@ definition {
 
 		echo("Number of files removed: ${fileRemovedCount}");
 
-		if (!("${fileRemovedCount}" == "0")) {
+		if ("${fileRemovedCount}" != "0") {
 			var acceptableFileRemovedCount = StringUtil.count("${consoleOutputText}", "Removed: binaries/MODULES_BASE_PATH/target-platform/target-platform-indexes");
 
 			echo("Number of acceptable files removed: ${acceptableFileRemovedCount}");
 
-			if (!("${fileRemovedCount}" == "${acceptableFileRemovedCount}")) {
+			if ("${fileRemovedCount}" != "${acceptableFileRemovedCount}") {
 				fail("Unexpected files may have been removed.  The test counted ${fileRemovedCount} removed files but ${acceptableFileRemovedCount} acceptable removed files.  Please check the most recent fix pack comparison and either apply fixes to the builder or update the test case as needed.");
 			}
 		}

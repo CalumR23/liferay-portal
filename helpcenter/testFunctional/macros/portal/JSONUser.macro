@@ -1,4 +1,5 @@
 definition {
+
 	var koroneikiAdminEmailAddress = PropsUtil.get("koroneiki.admin.email.address");
 	var koroneikiAdminPassword = PropsUtil.get("koroneiki.admin.password");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
@@ -14,7 +15,6 @@ definition {
 	@prose = "I assign the provisioning user with the email address ${userEmailAddress} to the provisioning role ${roleName}"
 	macro assignUserToProvisioningRole {
 		var roleId = JSONRole.getProvisioningRoleIdByName(roleName = "${roleName}");
-
 		var companyId = JSONCompany.getProvisioningCompanyId();
 
 		var curl = '''
@@ -38,10 +38,35 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I assign the support user with the email address ${userEmailAddress} to the support group ${groupName}"
+	macro assignUserToSupportGroup {
+		var groupId = JSONGroup.getSupportGroupId(groupName = "${groupName}");
+		var companyId = JSONCompany.getSupportCompanyId();
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/get-user-by-email-address
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d emailAddress=${userEmailAddress}
+			''';
+
+		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-group-users
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d groupId=${groupId}
+			-d userIds=${supportUserId}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I assign the support user with the email address ${userEmailAddress} to the support organization ${organizationName}"
 	macro assignUserToSupportOrganization {
 		var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
-
 		var companyId = JSONCompany.getSupportCompanyId();
 
 		var curl = '''
@@ -68,7 +93,6 @@ definition {
 	@prose = "I assign the support user with the email address ${userEmailAddress} to the support role ${roleName}"
 	macro assignUserToSupportRole {
 		var roleId = JSONRole.getSupportRoleIdByName(roleName = "${roleName}");
-
 		var companyId = JSONCompany.getSupportCompanyId();
 
 		var curl = '''
@@ -92,37 +116,9 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I assign the support user with the email address ${userEmailAddress} to the support group ${groupName}"
-	macro assignUserToSupportGroup {
-		var groupId = JSONGroup.getSupportGroupId(groupName = "${groupName}");
-
-		var companyId = JSONCompany.getSupportCompanyId();
-
-		var curl = '''
-			${supportURL}/api/jsonws/user/get-user-by-email-address
-			-u ${supportAdminEmailAddress}:${supportAdminPassword}
-			-d companyId=${companyId}
-			-d emailAddress=${userEmailAddress}
-			''';
-
-		var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-		echo("Support User ID: ${supportUserId}");
-
-		var curl = '''
-			${supportURL}/api/jsonws/user/add-group-users
-			-u ${supportAdminEmailAddress}:${supportAdminPassword}
-			-d groupId=${groupId}
-			-d userIds=${supportUserId}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I assign the support user with the email address ${userEmailAddress} to the support user group ${userGroupName}"
 	macro assignUserToSupportUserGroup {
 		var userGroupId = JSONUserGroup.getSupportUserGroupId(userGroupName = "${userGroupName}");
-
 		var companyId = JSONCompany.getSupportCompanyId();
 
 		var curl = '''
@@ -144,6 +140,228 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "I create a koroneiki user with the following parameters ${table}"
+	macro createViaKoroneiki {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getKoroneikiCompanyId();
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${koroneikiURL}/api/jsonws/user/add-user
+			-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Koroneiki User ID: ${koroneikiUserId}");
+
+		if (!(isSet(staticKoroneikiUserIdList))) {
+			static var staticKoroneikiUserIdList = "${koroneikiUserId}";
+		}
+		else {
+			static var staticKoroneikiUserIdList = "${staticKoroneikiUserIdList},${koroneikiUserId}";
+		}
+
+		echo("Koroneiki User ID List: ${staticKoroneikiUserIdList}");
+
+		return "${staticKoroneikiUserIdList}";
+	}
+
+	@prose = "I create a provisioning user with the following parameters ${table}"
+	macro createViaProvisioning {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getProvisioningCompanyId();
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${provisioningURL}/api/jsonws/user/add-user
+			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=provisioningqauser
+			-d password2=provisioningqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Provisioning User ID: ${provisioningUserId}");
+
+		if (!(isSet(staticProvisioningUserIdList))) {
+			static var staticProvisioningUserIdList = "${provisioningUserId}";
+		}
+		else {
+			static var staticProvisioningUserIdList = "${staticProvisioningUserIdList},${provisioningUserId}";
+		}
+
+		echo("Provisioning User ID List: ${staticProvisioningUserIdList}");
+
+		return "${staticProvisioningUserIdList}";
+	}
+
+	@prose = "I create a support user with the following parameters ${table}"
+	macro createViaSupport {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Screen Name") {
+				var userScreenName = "${value}";
+			}
+			else if ("${field}" == "Email Address") {
+				var userEmailAddress = "${value}";
+			}
+			else if ("${field}" == "First Name") {
+				var userFirstName = "${value}";
+			}
+			else if ("${field}" == "Last Name") {
+				var userLastName = "${value}";
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+
+		var companyId = JSONCompany.getSupportCompanyId();
+		var openId = StringUtil.randomString("5");
+
+		var curl = '''
+			${supportURL}/api/jsonws/user/add-user
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d companyId=${companyId}
+			-d autoPassword=false
+			-d password1=osbadminqauser
+			-d password2=osbadminqauser
+			-d autoScreenName=false
+			-d screenName=${userScreenName}
+			-d emailAddress=${userEmailAddress}
+			-d facebookId=0
+			-d openId=${openId}
+			-d locale=
+			-d firstName=${userFirstName}
+			-d middleName=
+			-d lastName=${userLastName}
+			-d prefixId=0
+			-d suffixId=0
+			-d male=true
+			-d birthdayMonth=4
+			-d birthdayDay=31
+			-d birthdayYear=1986
+			-d jobTitle=
+			-d groupIds=
+			-d organizationIds=
+			-d roleIds=
+			-d userGroupIds=
+			-d sendEmail=true
+			''';
+
+		static var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+		echo("Support User ID: ${supportUserId}");
+
+		if (!(isSet(staticSupportUserIdList))) {
+			static var staticSupportUserIdList = "${supportUserId}";
+		}
+		else {
+			static var staticSupportUserIdList = "${staticSupportUserIdList},${supportUserId}";
+		}
+
+		echo("Support User ID List: ${staticSupportUserIdList}");
+
+		return "${staticSupportUserIdList}";
 	}
 
 	@prose = "I delete the user with the email address ${userEmailAddress} from customer.liferay.com"
@@ -213,238 +431,12 @@ definition {
 		return "${supportUserUuId}";
 	}
 
-	@prose = "I create a koroneiki user with the following parameters ${table}"
-	macro createViaKoroneiki {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Screen Name") {
-				var userScreenName = "${value}";
-			}
-			else if ("${field}" == "Email Address") {
-				var userEmailAddress = "${value}";
-			}
-			else if ("${field}" == "First Name") {
-				var userFirstName = "${value}";
-			}
-			else if ("${field}" == "Last Name") {
-				var userLastName = "${value}";
-			}
-			else {
-				fail("No such user field ${field}");
-			}
-		}
-
-		var companyId = JSONCompany.getKoroneikiCompanyId();
-
-		var openId = StringUtil.randomString("5");
-
-		var curl = '''
-			${koroneikiURL}/api/jsonws/user/add-user
-			-u ${koroneikiAdminEmailAddress}:${koroneikiAdminPassword}
-			-d companyId=${companyId}
-			-d autoPassword=false
-			-d password1=osbadminqauser
-			-d password2=osbadminqauser
-			-d autoScreenName=false
-			-d screenName=${userScreenName}
-			-d emailAddress=${userEmailAddress}
-			-d facebookId=0
-			-d openId=${openId}
-			-d locale=
-			-d firstName=${userFirstName}
-			-d middleName=
-			-d lastName=${userLastName}
-			-d prefixId=0
-			-d suffixId=0
-			-d male=true
-			-d birthdayMonth=4
-			-d birthdayDay=31
-			-d birthdayYear=1986
-			-d jobTitle=
-			-d groupIds=
-			-d organizationIds=
-			-d roleIds=
-			-d userGroupIds=
-			-d sendEmail=true
-			''';
-
-		static var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-		echo("Koroneiki User ID: ${koroneikiUserId}");
-
-		if (contains("${staticKoroneikiUserIdList}", "{staticKoroneikiUserIdList}")) {
-			static var staticKoroneikiUserIdList = "${koroneikiUserId}";
-		}
-		else {
-			static var staticKoroneikiUserIdList = "${staticKoroneikiUserIdList},${koroneikiUserId}";
-		}
-
-		echo("Koroneiki User ID List: ${staticKoroneikiUserIdList}");
-
-		return "${staticKoroneikiUserIdList}";
-	}
-
-	@prose = "I create a provisioning user with the following parameters ${table}"
-	macro createViaProvisioning {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Screen Name") {
-				var userScreenName = "${value}";
-			}
-			else if ("${field}" == "Email Address") {
-				var userEmailAddress = "${value}";
-			}
-			else if ("${field}" == "First Name") {
-				var userFirstName = "${value}";
-			}
-			else if ("${field}" == "Last Name") {
-				var userLastName = "${value}";
-			}
-			else {
-				fail("No such user field ${field}");
-			}
-		}
-
-		var companyId = JSONCompany.getProvisioningCompanyId();
-
-		var openId = StringUtil.randomString("5");
-
-		var curl = '''
-			${provisioningURL}/api/jsonws/user/add-user
-			-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-			-d companyId=${companyId}
-			-d autoPassword=false
-			-d password1=provisioningqauser
-			-d password2=provisioningqauser
-			-d autoScreenName=false
-			-d screenName=${userScreenName}
-			-d emailAddress=${userEmailAddress}
-			-d facebookId=0
-			-d openId=${openId}
-			-d locale=
-			-d firstName=${userFirstName}
-			-d middleName=
-			-d lastName=${userLastName}
-			-d prefixId=0
-			-d suffixId=0
-			-d male=true
-			-d birthdayMonth=4
-			-d birthdayDay=31
-			-d birthdayYear=1986
-			-d jobTitle=
-			-d groupIds=
-			-d organizationIds=
-			-d roleIds=
-			-d userGroupIds=
-			-d sendEmail=true
-			''';
-
-		static var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-		echo("Provisioning User ID: ${provisioningUserId}");
-
-		if (contains("${staticProvisioningUserIdList}", "{staticProvisioningUserIdList}")) {
-			static var staticProvisioningUserIdList = "${provisioningUserId}";
-		}
-		else {
-			static var staticProvisioningUserIdList = "${staticProvisioningUserIdList},${provisioningUserId}";
-		}
-
-		echo("Provisioning User ID List: ${staticProvisioningUserIdList}");
-
-		return "${staticProvisioningUserIdList}";
-	}
-
-	@prose = "I create a support user with the following parameters ${table}"
-	macro createViaSupport {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Screen Name") {
-				var userScreenName = "${value}";
-			}
-			else if ("${field}" == "Email Address") {
-				var userEmailAddress = "${value}";
-			}
-			else if ("${field}" == "First Name") {
-				var userFirstName = "${value}";
-			}
-			else if ("${field}" == "Last Name") {
-				var userLastName = "${value}";
-			}
-			else {
-				fail("No such user field ${field}");
-			}
-		}
-
-		var companyId = JSONCompany.getSupportCompanyId();
-
-		var openId = StringUtil.randomString("5");
-
-		var curl = '''
-			${supportURL}/api/jsonws/user/add-user
-			-u ${supportAdminEmailAddress}:${supportAdminPassword}
-			-d companyId=${companyId}
-			-d autoPassword=false
-			-d password1=osbadminqauser
-			-d password2=osbadminqauser
-			-d autoScreenName=false
-			-d screenName=${userScreenName}
-			-d emailAddress=${userEmailAddress}
-			-d facebookId=0
-			-d openId=${openId}
-			-d locale=
-			-d firstName=${userFirstName}
-			-d middleName=
-			-d lastName=${userLastName}
-			-d prefixId=0
-			-d suffixId=0
-			-d male=true
-			-d birthdayMonth=4
-			-d birthdayDay=31
-			-d birthdayYear=1986
-			-d jobTitle=
-			-d groupIds=
-			-d organizationIds=
-			-d roleIds=
-			-d userGroupIds=
-			-d sendEmail=true
-			''';
-
-		static var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-		echo("Support User ID: ${supportUserId}");
-
-		if (contains("${staticSupportUserIdList}", "{staticSupportUserIdList}")) {
-			static var staticSupportUserIdList = "${supportUserId}";
-		}
-		else {
-			static var staticSupportUserIdList = "${staticSupportUserIdList},${supportUserId}";
-		}
-
-		echo("Support User ID List: ${staticSupportUserIdList}");
-
-		return "${staticSupportUserIdList}";
-	}
-
 	@prose = "I tear down the users with the following screen names from koroneiki ${table}"
 	macro tearDownUsersByScreenNameViaKoroneiki {
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var userScreenName = "${row[0]}";
-
 			var companyId = JSONCompany.getKoroneikiCompanyId();
 
 			var curl = '''
@@ -456,7 +448,7 @@ definition {
 
 			var userObject = JSONCurlUtil.post("${curl}");
 
-			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+			if (contains("${userObject}", "${userScreenName}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
 				echo("Koroneiki User ID: ${koroneikiUserId}");
@@ -487,7 +479,6 @@ definition {
 
 		for (var row : table "${rawTable}") {
 			var userScreenName = "${row[0]}";
-
 			var companyId = JSONCompany.getSupportCompanyId();
 
 			var curl = '''
@@ -499,7 +490,7 @@ definition {
 
 			var userObject = JSONCurlUtil.post("${curl}");
 
-			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+			if (contains("${userObject}", "${userScreenName}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
 				echo("Support User ID: ${supportUserId}");
@@ -524,60 +515,13 @@ definition {
 		}
 	}
 
-	@prose = "I tear down the users with the following email addresses from provisioning ${table}"
-	macro tearDownUsersViaProvisioning {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var userEmailAddress = "${row[0]}";
-
-			var companyId = JSONCompany.getProvisioningCompanyId();
-
-			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
-
-			var curl = '''
-				${provisioningURL}/api/jsonws/user/get-user-by-screen-name
-				-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-				-d companyId=${companyId}
-				-d screenName=${userScreenName}
-				''';
-
-			var userObject = JSONCurlUtil.post("${curl}");
-
-			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
-				var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-				echo("Provisioning User ID: ${provisioningUserId}");
-
-				var curl = '''
-					${provisioningURL}/api/jsonws/user/update-status
-					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-					-d userId=${provisioningUserId}
-					-d status=5
-					''';
-
-				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-
-				var curl = '''
-					${provisioningURL}/api/jsonws/user/delete-user
-					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
-					-d userId=${provisioningUserId}
-					''';
-
-				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-			}
-		}
-	}
-
 	@prose = "I tear down the users with the following email addresses from koroneiki ${table}"
 	macro tearDownUsersViaKoroneiki {
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var userEmailAddress = "${row[0]}";
-
 			var companyId = JSONCompany.getKoroneikiCompanyId();
-
 			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
 
 			var curl = '''
@@ -589,7 +533,7 @@ definition {
 
 			var userObject = JSONCurlUtil.post("${curl}");
 
-			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+			if (contains("${userObject}", "${userScreenName}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var koroneikiUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
 				echo("Koroneiki User ID: ${koroneikiUserId}");
@@ -614,13 +558,55 @@ definition {
 		}
 	}
 
+	@prose = "I tear down the users with the following email addresses from provisioning ${table}"
+	macro tearDownUsersViaProvisioning {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+			var companyId = JSONCompany.getProvisioningCompanyId();
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${provisioningURL}/api/jsonws/user/get-user-by-screen-name
+				-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var userObject = JSONCurlUtil.post("${curl}");
+
+			if (contains("${userObject}", "${userScreenName}") && !(contains("${userObject}", "NoSuchUserException"))) {
+				var provisioningUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+				echo("Provisioning User ID: ${provisioningUserId}");
+
+				var curl = '''
+					${provisioningURL}/api/jsonws/user/update-status
+					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+					-d userId=${provisioningUserId}
+					-d status=5
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+				var curl = '''
+					${provisioningURL}/api/jsonws/user/delete-user
+					-u ${provisioningAdminEmailAddress}:${provisioningAdminPassword}
+					-d userId=${provisioningUserId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
 	@prose = "I tear down the users with the following email addresses from customer.liferay.com ${table}"
 	macro tearDownUsersViaSupport {
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var userEmailAddress = "${row[0]}";
-
 			var companyId = JSONCompany.getSupportCompanyId();
 
 			var curl = '''
@@ -631,16 +617,14 @@ definition {
 				''';
 
 			var userObject = JSONCurlUtil.post("${curl}");
-
 			var currentIteration = "0";
 
-			while ((contains("${userObject}", "${userEmailAddress}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
+			while (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
+				var currentIteration = ${currentIteration} + 1;
 				var userObject = JSONCurlUtil.post("${curl}");
 			}
 
-			if ((contains("${userObject}", "${userEmailAddress}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+			if (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
 				echo("Support User ID: ${supportUserId}");
@@ -674,7 +658,6 @@ definition {
 
 			for (var row : table "${rawTable}") {
 				var userEmailAddress = "${row[0]}";
-
 				var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
 
 				echo("Support Organization ID: ${organizationId}");
@@ -725,7 +708,6 @@ definition {
 	@prose = "I unset the support user with the email address ${userEmailAddress} from the support organization ${organizationName}"
 	macro unsetUserFromSupportOrganization {
 		var organizationId = JSONOrganization.getSupportOrganizationId(organizationName = "${organizationName}");
-
 		var companyId = JSONCompany.getSupportCompanyId();
 
 		var curl = '''
@@ -811,7 +793,7 @@ definition {
 	}
 
 	@prose = "the support user with the email address ${userEmailAddress} should not be part of the support organization with the name ${organizationName}"
-	macro viewNoSupportUserOrganizationSync{
+	macro viewNoSupportUserOrganizationSync {
 		var companyId = JSONCompany.getSupportCompanyId();
 
 		var curl = '''
@@ -832,14 +814,13 @@ definition {
 			''';
 
 		var userOrganizations = JSONCurlUtil.post("${curl}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${userOrganizations}", "${organizationName}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${userOrganizations}", "${organizationName}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-			
+
 			var companyId = JSONCompany.getSupportCompanyId();
 
 			var curl = '''
@@ -889,14 +870,13 @@ definition {
 			''';
 
 		var userOrganizations = JSONCurlUtil.post("${curl}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${userOrganizations}", "${organizationName}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${userOrganizations}", "${organizationName}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-			
+
 			var companyId = JSONCompany.getSupportCompanyId();
 
 			var curl = '''
@@ -936,11 +916,10 @@ definition {
 			''';
 
 		var userObject = JSONCurlUtil.post("${curl}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${userObject}", "NoSuchUserException"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${userObject}", "NoSuchUserException")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -951,4 +930,5 @@ definition {
 			fail("After ${currentIteration} checks, the support user appears to have not been added to the support site");
 		}
 	}
+
 }

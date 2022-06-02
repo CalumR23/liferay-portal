@@ -1,16 +1,322 @@
 definition {
+
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+
+	@prose = "I should be able to view an account on the provisioning index with the name ${accountName} and the following values ${table}"
+	macro _viewAccountViaIndex {
+		var key_accountName = "${accountName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#ACCOUNT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Code") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_CODE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support End Date") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_SUPPORT_END_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Partner") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_PARTNER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Region") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_REGION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "SLA") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#ACCOUNT_SLA",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Tier") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_TIER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				AssertTextEquals(
+					locator1 = "Provisioning#ACCOUNT_STATE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a license on the provisioning index with the keyword ${licenseKeyword} and the following values ${table}"
+	macro _viewLicenseViaIndex {
+		var key_licenseKeyword = "${licenseKeyword}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#LICENSE_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Description") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_DESCRIPTION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Account") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_ACCOUNT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Expiration Date") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_EXPIRATION_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#LICENSE_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_TYPE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Details") {
+				var key_label = StringUtil.extractFirst("${value}", ":");
+
+				var key_label = StringUtil.trim("${key_label}");
+				var value = StringUtil.extractLast("${value}", ":");
+
+				var value = StringUtil.trim("${value}");
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#LICENSE_DETAILS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "Provisioning#LICENSE_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Complimentary") {
+				if ("${value}" == "true") {
+					AssertElementPresent(
+						locator1 = "Provisioning#LICENSE_COMPLIMENTARY_CHECKED",
+						value1 = "${value}");
+				}
+				else {
+					AssertElementPresent(
+						locator1 = "Provisioning#LICENSE_COMPLIMENTARY_NOT_CHECKED",
+						value1 = "${value}");
+				}
+			}
+			else {
+				fail("No such license field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view an account on the provisioning index with the name ${accountName}"
+	macro _viewNoAccountViaIndex {
+		var key_accountName = "${accountName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#ACCOUNT_ROW");
+	}
+
+	@prose = "I should not be able to view a license on the provisioning index with the keyword ${licenseKeyword}"
+	macro _viewNoLicenseViaIndex {
+		var key_licenseKeyword = "${licenseKeyword}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#LICENSE_ROW");
+	}
+
+	@prose = "I should not be able to view a product bundle on the provisioning index with the name ${productBundleName}"
+	macro _viewNoProductBundleViaIndex {
+		var key_productBundleName = "${productBundleName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_BUNDLE_ROW");
+	}
+
+	@prose = "I should not be able to view a product on the provisioning index with the name ${productName}"
+	macro _viewNoProductViaIndex {
+		var key_productName = "${productName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_ROW");
+	}
+
+	@prose = "I should not be able to view a user on the provisioning index with the name ${userName}"
+	macro _viewNoUserViaIndex {
+		var key_userName = "${userName}";
+
+		AssertElementNotPresent(locator1 = "Provisioning#USER_ROW");
+	}
+
+	@prose = "I should be able to view a non linked product bundle on the provisioning index with the name ${productBundleName} and the following values ${table}"
+	macro _viewProductBundleNonLinkViaIndex {
+		var key_productBundleName = "${productBundleName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_BUNDLE_NAME_NON_LINK",
+					value1 = "${value}");
+
+				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_BUNDLE_NAME");
+			}
+			else {
+				fail("No such product bundle field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product bundle on the provisioning index with the name ${productBundleName} and the following values ${table}"
+	macro _viewProductBundleViaIndex {
+		var key_productBundleName = "${productBundleName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_BUNDLE_NAME",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product bundle field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a non linked product on the provisioning index with the name ${productName} and the following values ${table}"
+	macro _viewProductNonLinkViaIndex {
+		var key_productName = "${productName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_NAME_NON_LINK",
+					value1 = "${value}");
+
+				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_NAME");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_TYPE_NON_LINK",
+					value1 = "${value}");
+
+				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_NAME");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a product on the provisioning index with the name ${productName} and the following values ${table}"
+	macro _viewProductViaIndex {
+		var key_productName = "${productName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals(
+					locator1 = "Provisioning#PRODUCT_TYPE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such product field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view a user on the provisioning index with the name ${userName} and the following values ${table}"
+	macro _viewUserViaIndex {
+		var key_userName = "${userName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "Provisioning#USER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Entitlements") {
+				if ("${value}" == "") {
+					AssertNotVisible(locator1 = "Provisioning#USER_ENTITLEMENTS");
+				}
+				else {
+					AssertTextEquals.assertPartialText(
+						locator1 = "Provisioning#USER_ENTITLEMENTS",
+						value1 = "${value}");
+				}
+			}
+			else if ("${field}" == "Number of Accounts") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_NUMBER_OF_ACCOUNTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "Provisioning#USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+	}
 
 	@prose = "I should not see an alert"
 	macro assertNoAlert {
-		AssertAlertNotPresent();		
+		AssertAlertNotPresent();
 	}
 
 	@prose = "I click on the account with the name ${accountName} on the provisioning index"
 	macro clickAccount {
 		var key_accountName = "${accountName}";
 
-		Click(locator1 = "Provisioning#ACCOUNT_NAME");		
+		Click(locator1 = "Provisioning#ACCOUNT_NAME");
 	}
 
 	@prose = "I click on the generate license button on the license index"
@@ -56,14 +362,14 @@ definition {
 	macro clickProduct {
 		var key_productName = "${productName}";
 
-		Click(locator1 = "Provisioning#PRODUCT_NAME");	
+		Click(locator1 = "Provisioning#PRODUCT_NAME");
 	}
 
 	@prose = "I click on the product bundle with the name ${productBundleName} on the provisioning index"
 	macro clickProductBundle {
 		var key_productBundleName = "${productBundleName}";
 
-		Click(locator1 = "Provisioning#PRODUCT_BUNDLE_NAME");	
+		Click(locator1 = "Provisioning#PRODUCT_BUNDLE_NAME");
 	}
 
 	@prose = "I click on the delete button for the product bundle ${productBundleName}"
@@ -86,24 +392,24 @@ definition {
 
 	@prose = "I click on search accounts button"
 	macro clickSearchAccountsButton {
-		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_BUTTON");		
-	}
-
-	@prose = "I click on search licenses button"
-	macro clickSearchLicensesButton {
-		Click(locator1 = "Provisioning#SEARCH_LICENSES_BUTTON");		
+		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_BUTTON");
 	}
 
 	@prose = "I click on search dropdown result ${result}"
 	macro clickSearchDropdownResult {
 		var key_result = "${result}";
 
-		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_RESULT");		
+		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_RESULT");
+	}
+
+	@prose = "I click on search licenses button"
+	macro clickSearchLicensesButton {
+		Click(locator1 = "Provisioning#SEARCH_LICENSES_BUTTON");
 	}
 
 	@prose = "I click on the see all results link"
 	macro clickSeeAllResults {
-		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_SEE_ALL_RESULTS");		
+		Click(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_SEE_ALL_RESULTS");
 	}
 
 	@prose = "I click on the ${tabName} tab"
@@ -121,7 +427,7 @@ definition {
 	macro clickUser {
 		var key_userName = "${userName}";
 
-		Click(locator1 = "Provisioning#USER_NAME");	
+		Click(locator1 = "Provisioning#USER_NAME");
 	}
 
 	@prose = "I collapse the account advanced search form"
@@ -133,7 +439,7 @@ definition {
 		AssertVisible(locator1 = "Provisioning#SEARCH_ACCOUNTS_FIELD");
 
 		if (IsElementPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_EXPANDED")) {
-			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_BUTTON");	
+			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_BUTTON");
 		}
 	}
 
@@ -142,7 +448,7 @@ definition {
 		var key_panelLabel = "${panelLabel}";
 
 		if (IsElementPresent(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_EXPANDED")) {
-			Click(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL");	
+			Click(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL");
 		}
 	}
 
@@ -151,7 +457,7 @@ definition {
 		AssertVisible(locator1 = "Provisioning#SEARCH_LICENSES_FIELD");
 
 		if (IsElementPresent(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_EXPANDED")) {
-			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_BUTTON");	
+			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_BUTTON");
 		}
 	}
 
@@ -164,7 +470,7 @@ definition {
 		AssertVisible(locator1 = "Provisioning#SEARCH_ACCOUNTS_FIELD");
 
 		if (IsElementPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_COLLAPSED")) {
-			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_BUTTON");	
+			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_ACCOUNTS_ADVANCED_SEARCH_BUTTON");
 		}
 	}
 
@@ -173,7 +479,7 @@ definition {
 		var key_panelLabel = "${panelLabel}";
 
 		if (IsElementPresent(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL_COLLAPSED")) {
-			Click(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL");	
+			Click(locator1 = "Provisioning#ADVANCED_SEARCH_PANEL");
 		}
 	}
 
@@ -182,7 +488,7 @@ definition {
 		AssertVisible(locator1 = "Provisioning#SEARCH_LICENSES_FIELD");
 
 		if (IsElementPresent(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_COLLAPSED")) {
-			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_BUTTON");	
+			Click.pauseClickAt(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_BUTTON");
 		}
 	}
 
@@ -265,7 +571,6 @@ definition {
 			var option = "${row[1]}";
 			var type = "${row[2]}";
 			var value = "${row[3]}";
-
 			var key_field = "${field}";
 			var key_option = "${option}";
 
@@ -277,7 +582,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between After") || ("${field}" == "Modified Between After") || ("${field}" == "Started Between After") || ("${field}" == "Expires Between After")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " After", "");
-
 					var key_field = "After";
 
 					Type(
@@ -286,7 +590,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between Before") || ("${field}" == "Modified Between Before") || ("${field}" == "Started Between Before") || ("${field}" == "Expires Between Before")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " Before", "");
-
 					var key_field = "Before";
 
 					Type(
@@ -395,7 +698,7 @@ definition {
 					Provisioning.collapseAdvancedSearchPanel(panelLabel = "${field}");
 				}
 				else {
-					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");					
+					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");
 				}
 			}
 			else {
@@ -413,7 +716,6 @@ definition {
 			var option = "${row[1]}";
 			var type = "${row[2]}";
 			var value = "${row[3]}";
-
 			var key_field = "${field}";
 			var key_option = "${option}";
 
@@ -425,7 +727,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between After") || ("${field}" == "Modified Between After") || ("${field}" == "Started Between After") || ("${field}" == "Expires Between After")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " After", "");
-
 					var key_field = "After";
 
 					Type(
@@ -434,7 +735,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between Before") || ("${field}" == "Modified Between Before") || ("${field}" == "Started Between Before") || ("${field}" == "Expires Between Before")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " Before", "");
-
 					var key_field = "Before";
 
 					Type(
@@ -543,7 +843,7 @@ definition {
 					Provisioning.collapseAdvancedSearchPanel(panelLabel = "${field}");
 				}
 				else {
-					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");					
+					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");
 				}
 			}
 			else {
@@ -563,7 +863,6 @@ definition {
 			var option = "${row[1]}";
 			var type = "${row[2]}";
 			var value = "${row[3]}";
-
 			var key_field = "${field}";
 			var key_option = "${option}";
 
@@ -575,7 +874,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between After") || ("${field}" == "Modified Between After") || ("${field}" == "Started Between After") || ("${field}" == "Expires Between After")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " After", "");
-
 					var key_field = "After";
 
 					Type(
@@ -584,7 +882,6 @@ definition {
 				}
 				else if (("${field}" == "Created Between Before") || ("${field}" == "Modified Between Before") || ("${field}" == "Started Between Before") || ("${field}" == "Expires Between Before")) {
 					var key_fieldGroup = StringUtil.replace("${field}", " Before", "");
-
 					var key_field = "Before";
 
 					Type(
@@ -693,14 +990,14 @@ definition {
 					Provisioning.collapseAdvancedSearchPanel(panelLabel = "${field}");
 				}
 				else {
-					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");					
+					echo("Please set a value of Expand or Collapse. No action will be taken on the panel.");
 				}
 			}
 			else {
 				fail("No such advanced search field type ${type}. Please use Input, Select, Panel, Checkbox, or Radio Button");
 			}
 		}
-		
+
 		if (IsElementPresent(locator1 = "Provisioning#SEARCH_LICENSES_ADVANCED_SEARCH_EXPANDED")) {
 			Provisioning.expandAdvancedSearchPanel(panelLabel = "General Details");
 
@@ -729,14 +1026,14 @@ definition {
 	macro pressEnterViaSearchAccountsField {
 		KeyPress(
 			locator1 = "Provisioning#SEARCH_ACCOUNTS_FIELD",
-			value1 = "\RETURN");		
+			value1 = "\RETURN");
 	}
 
 	@prose = "I press enter on the search licenses field"
 	macro pressEnterViaSearchLicensesField {
 		KeyPress(
 			locator1 = "Provisioning#SEARCH_LICENSES_FIELD",
-			value1 = "\RETURN");		
+			value1 = "\RETURN");
 	}
 
 	@prose = "I remove the advanced search label with the content ${labelContent}"
@@ -927,13 +1224,6 @@ definition {
 			value1 = "Cannot remove the last team member with this role. Assign this role to another team member, then try again.");
 	}
 
-	@prose = "I should not be able to view an account on the provisioning index with the name ${accountName}"
-	macro _viewNoAccountViaIndex {
-		var key_accountName = "${accountName}";
-
-		AssertElementNotPresent(locator1 = "Provisioning#ACCOUNT_ROW");
-	}
-
 	@prose = "the search accounts button should not be disabled"
 	macro viewNoDisabledSearchAccountsButton {
 		AssertElementNotPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_BUTTON_DISABLED");
@@ -947,13 +1237,6 @@ definition {
 	@prose = "the generate license button on the license index should not be present"
 	macro viewNoGenerateLicenseButton {
 		AssertElementNotPresent(locator1 = "Provisioning#GENERATE_LICENSE_BUTTON");
-	}
-
-	@prose = "I should not be able to view a license on the provisioning index with the keyword ${licenseKeyword}"
-	macro _viewNoLicenseViaIndex {
-		var key_licenseKeyword = "${licenseKeyword}";
-
-		AssertElementNotPresent(locator1 = "Provisioning#LICENSE_ROW");
 	}
 
 	@prose = "the new product bundle button should not be present"
@@ -980,32 +1263,18 @@ definition {
 		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_DELETE");
 	}
 
-	@prose = "I should not be able to view a product bundle on the provisioning index with the name ${productBundleName}"
-	macro _viewNoProductBundleViaIndex {
-		var key_productBundleName = "${productBundleName}";
-
-		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_BUNDLE_ROW");
-	}
-
-	@prose = "I should not be able to view a product on the provisioning index with the name ${productName}"
-	macro _viewNoProductViaIndex {
-		var key_productName = "${productName}";
-
-		AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_ROW");
-	}
-
 	@prose = "I should not be able to view the search result ${result}"
 	macro viewNoSearchDropdownResult {
 		var key_result = "${result}";
 
-		AssertElementNotPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_RESULT");		
+		AssertElementNotPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_RESULT");
 	}
 
 	@prose = "I should not be able to view any search dropdown results"
 	macro viewNoSearchDropdownResults {
 		AssertTextEquals(
 			locator1 = "Provisioning#SEARCH_ACCOUNTS_DROPDOWN_NO_RESULTS",
-			value1 = "No results were found.");		
+			value1 = "No results were found.");
 	}
 
 	@prose = "the ${tabName} tab should not be present"
@@ -1017,187 +1286,6 @@ definition {
 		var key_tabName = StringUtil.replace("${key_tabName}", "/", "-");
 
 		AssertElementNotPresent(locator1 = "Provisioning#TAB");
-	}
-
-	@prose = "I should not be able to view a user on the provisioning index with the name ${userName}"
-	macro _viewNoUserViaIndex {
-		var key_userName = "${userName}";
-
-		AssertElementNotPresent(locator1 = "Provisioning#USER_ROW");
-	}
-
-	@prose = "I should be able to view an account on the provisioning index with the name ${accountName} and the following values ${table}"
-	macro _viewAccountViaIndex {
-		var key_accountName = "${accountName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#ACCOUNT_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Code") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_CODE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Support End Date") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_SUPPORT_END_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Partner") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_PARTNER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Region") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_REGION",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "SLA") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#ACCOUNT_SLA",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Tier") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_TIER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "State") {
-				AssertTextEquals(
-					locator1 = "Provisioning#ACCOUNT_STATE",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view a license on the provisioning index with the keyword ${licenseKeyword} and the following values ${table}"
-	macro _viewLicenseViaIndex {
-		var key_licenseKeyword = "${licenseKeyword}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#LICENSE_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Description") {
-				AssertTextEquals(
-					locator1 = "Provisioning#LICENSE_DESCRIPTION",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Account") {
-				AssertTextEquals(
-					locator1 = "Provisioning#LICENSE_ACCOUNT",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Expiration Date") {
-				AssertTextEquals(
-					locator1 = "Provisioning#LICENSE_EXPIRATION_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Product") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#LICENSE_PRODUCT",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Type") {
-				AssertTextEquals(
-					locator1 = "Provisioning#LICENSE_TYPE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Details") {
-				var key_label = StringUtil.extractFirst("${value}", ":");
-				var key_label = StringUtil.trim("${key_label}");
-
-				var value = StringUtil.extractLast("${value}", ":");
-				var value = StringUtil.trim("${value}");
-
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#LICENSE_DETAILS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Status") {
-				AssertTextEquals(
-					locator1 = "Provisioning#LICENSE_STATUS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Complimentary") {
-				if ("${value}" == "true") {
-					AssertElementPresent(
-						locator1 = "Provisioning#LICENSE_COMPLIMENTARY_CHECKED",
-						value1 = "${value}");
-				}
-				else {
-					AssertElementPresent(
-						locator1 = "Provisioning#LICENSE_COMPLIMENTARY_NOT_CHECKED",
-						value1 = "${value}");
-				}
-			}
-			else {
-				fail("No such license field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view a non linked product bundle on the provisioning index with the name ${productBundleName} and the following values ${table}"
-	macro _viewProductBundleNonLinkViaIndex {
-		var key_productBundleName = "${productBundleName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_BUNDLE_NAME_NON_LINK",
-					value1 = "${value}");
-
-				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_BUNDLE_NAME");
-			}
-			else {
-				fail("No such product bundle field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view a product bundle on the provisioning index with the name ${productBundleName} and the following values ${table}"
-	macro _viewProductBundleViaIndex {
-		var key_productBundleName = "${productBundleName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_BUNDLE_NAME",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such product bundle field ${field}");
-			}
-		}
 	}
 
 	@prose = "I should be able to view the product bundle error message on the product index resulting from an attempted deletion of the product"
@@ -1233,62 +1321,6 @@ definition {
 			value1 = "Product ${productId} cannot be deleted because it is referenced by one or more product purchases");
 	}
 
-	@prose = "I should be able to view a non linked product on the provisioning index with the name ${productName} and the following values ${table}"
-	macro _viewProductNonLinkViaIndex {
-		var key_productName = "${productName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_NAME_NON_LINK",
-					value1 = "${value}");
-
-				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_NAME");
-			}
-			else if ("${field}" == "Type") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_TYPE_NON_LINK",
-					value1 = "${value}");
-
-				AssertElementNotPresent(locator1 = "Provisioning#PRODUCT_NAME");
-			}
-			else {
-				fail("No such product field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view a product on the provisioning index with the name ${productName} and the following values ${table}"
-	macro _viewProductViaIndex {
-		var key_productName = "${productName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Type") {
-				AssertTextEquals(
-					locator1 = "Provisioning#PRODUCT_TYPE",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such product field ${field}");
-			}
-		}
-	}
-
 	@prose = "I should be able to view the Search Accounts field"
 	macro viewSearchAccountsField {
 		while (IsElementNotPresent(locator1 = "Provisioning#SEARCH_ACCOUNTS_FIELD")) {
@@ -1301,7 +1333,6 @@ definition {
 	@prose = "I should be able to view the search result ${result} with the following values ${table}"
 	macro viewSearchDropdownResult {
 		var key_result = "${result}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1321,13 +1352,12 @@ definition {
 			else {
 				fail("No such search result dropdown field ${field}");
 			}
-		}	
+		}
 	}
 
 	@prose = "I should be able to view the search info message with the following types and values ${table}"
 	macro viewSearchInfoMessage {
 		var key_result = "${result}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1349,52 +1379,7 @@ definition {
 			else {
 				fail("No such search info message type ${type}. Please use Text or Label as the type value.");
 			}
-		}	
-	}
-
-	@prose = "I should be able to view a user on the provisioning index with the name ${userName} and the following values ${table}"
-	macro _viewUserViaIndex {
-		var key_userName = "${userName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Provisioning#USER_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Email Address") {
-				AssertTextEquals(
-					locator1 = "Provisioning#USER_EMAIL_ADDRESS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Entitlements") {
-				if ("${value}" == "") {
-					AssertNotVisible(locator1 = "Provisioning#USER_ENTITLEMENTS");
-				}
-				else {
-					AssertTextEquals.assertPartialText(
-						locator1 = "Provisioning#USER_ENTITLEMENTS",
-						value1 = "${value}");
-				}
-			}
-			else if ("${field}" == "Number of Accounts") {
-				AssertTextEquals(
-					locator1 = "Provisioning#USER_NUMBER_OF_ACCOUNTS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Status") {
-				AssertTextEquals(
-					locator1 = "Provisioning#USER_STATUS",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such user field ${field}");
-			}
 		}
 	}
+
 }

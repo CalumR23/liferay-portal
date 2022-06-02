@@ -1,16 +1,78 @@
 definition {
+
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 
-    @prose = "I click on the apps button"
+	@prose = "I tear down the articles with the following names from zendesk.liferay.com ${table}"
+	macro _tearDownArticlesByName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var articleName = "${row[0]}";
+
+			Open(locator1 = "${zendeskURL}/knowledge/lists/");
+
+			ZendeskHomepage.pause(timeInSeconds = "5");
+
+			if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
+				Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
+			}
+
+			Type(
+				locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+				value1 = "${articleName}");
+
+			KeyPress(
+				locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+				value1 = "\ENTER");
+
+			if (IsElementPresent(key_articleName = "${articleName}", locator1 = "ZendeskKCApp#ARTICLE")) {
+				Click(
+					key_articleName = "${articleName}",
+					locator1 = "ZendeskKCApp#SELECT_ARTICLE");
+
+				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS");
+
+				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS_DELETE_OPTION");
+
+				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS_DELETE_BUTTON");
+			}
+		}
+	}
+
+	@prose = "I go to the articles list and I check that the article with the name ${articleName} has the review status ${reviewStatus}"
+	macro checkArticleReviewStatus {
+		Open(locator1 = "${zendeskURL}/knowledge/lists/");
+
+		ZendeskHomepage.pause(timeInSeconds = "5");
+
+		if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
+			Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
+		}
+
+		Type(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "${articleName}");
+
+		KeyPress(
+			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
+			value1 = "\ENTER");
+
+		AssertElementPresent(
+			key_articleName = "${articleName}",
+			key_reviewStatus = "${reviewStatus}",
+			locator1 = "ZendeskKCApp#ARTICLE_STATUS");
+	}
+
+	@prose = "I click on the apps button"
 	macro clickAppsbutton {
 		ZendeskHomepage.pause(timeInSeconds = "5");
 
 		if (IsElementNotPresent(locator1 = "ZendeskTicketView#HIDE_APPS_BUTTON")) {
 			Click(locator1 = "ZendeskTicketView#APPS_BUTTON");
 		}
-    }
+	}
 
-    @prose = "I create an article with the following values ${table}"
+	@prose = "I create an article with the following values ${table}"
 	macro createFastTrackArticle {
 		var RawTable rawTable = new RawTable("${table}");
 
@@ -21,7 +83,7 @@ definition {
 			if ("${field}" == "Ticket ID") {
 				var ticketId = "${value}";
 			}
-            else if ("${field}" == "Template") {
+			else if ("${field}" == "Template") {
 				var articleTemplate = "${value}";
 
 				if (("${articleTemplate}" == "DXPC Fast Track Article") || ("${articleTemplate}" == "Fast Track Article")) {
@@ -59,23 +121,23 @@ definition {
 
 		SelectFrame(locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_IFRAME");
 
-        if ("${articleTemplate}" == "DXPC Fast Track Article") {
-            Click(locator1 = "ZendeskKCApp#DXPC_FAST_TRACK_ARTICLE_TEMPLATE_LINK");
-        }
-        else if ("${articleTemplate}" == "Fast Track Article") {
+		if ("${articleTemplate}" == "DXPC Fast Track Article") {
+			Click(locator1 = "ZendeskKCApp#DXPC_FAST_TRACK_ARTICLE_TEMPLATE_LINK");
+		}
+		else if ("${articleTemplate}" == "Fast Track Article") {
 			Click(locator1 = "ZendeskKCApp#FAST_TRACK_ARTICLE_TEMPLATE_LINK");
-        }
+		}
 
 		WaitForSPARefresh();
 
 		SelectFrameTop();
 
-        if ("${articleTemplate}" == "DXPC Fast Track Article") {
+		if ("${articleTemplate}" == "DXPC Fast Track Article") {
 			SelectWindow(locator1 = "New DXP Cloud Article");
-        }
-        else if ("${articleTemplate}" == "Fast Track Article") {
+		}
+		else if ("${articleTemplate}" == "Fast Track Article") {
 			SelectWindow(locator1 = "Fast Track Article");
-        }
+		}
 
 		AssertElementPresent(locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_FIELD");
 
@@ -127,31 +189,7 @@ definition {
 			Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_OPTION_DROPDOWN_BUTTON");
 
 			Click(locator1 = "ZendeskKBArticleCreate#PUBLISH_ARTICLE_OPTION_LINK");
-        }
-	}
-
-	@prose = "I go to the articles list and I check that the article with the name ${articleName} has the review status ${reviewStatus}"
-	macro checkArticleReviewStatus {
-		Open(locator1 = "${zendeskURL}/knowledge/lists/");
-
-		ZendeskHomepage.pause(timeInSeconds = "5");
-
-		if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
-			Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
 		}
-
-		Type(
-			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
-			value1 = "${articleName}");
-
-		KeyPress(
-			locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
-			value1 = "\ENTER");
-
-		AssertElementPresent(
-			locator1 = "ZendeskKCApp#ARTICLE_STATUS",
-			key_articleName = "${articleName}",
-			key_reviewStatus = "${reviewStatus}");
 	}
 
 	@prose = "I edit an article with the following values ${table}"
@@ -199,9 +237,9 @@ definition {
 			value1 = "\ENTER");
 
 		Click(
-			locator1 = "ZendeskKCApp#ARTICLE_STATUS",
 			key_articleName = "${articleName}",
-			key_reviewStatus = "${reviewStatus}");
+			key_reviewStatus = "${reviewStatus}",
+			locator1 = "ZendeskKCApp#ARTICLE_STATUS");
 
 		Click(locator1 = "ZendeskKBArticleCreate#ARTICLE_NAME_FIELD");
 
@@ -253,7 +291,7 @@ definition {
 			Click(locator1 = "ZendeskKBArticleCreate#UPDATE_ARTICLE_OPTION_DROPDOWN_BUTTON");
 
 			Click(locator1 = "ZendeskKBArticleCreate#PUBLISH_ARTICLE_OPTION_LINK");
-        }
+		}
 	}
 
 	@prose = "I should be able to view an article with the name ${articleName} and description ${articleDescription}"
@@ -277,20 +315,20 @@ definition {
 			value1 = "\ENTER");
 
 		Click(
-			locator1 = "ZendeskKCApp#ARTICLE_NAME",
-			key_articleName = "${articleName}");
+			key_articleName = "${articleName}",
+			locator1 = "ZendeskKCApp#ARTICLE_NAME");
 
 		SelectFrameTop();
 
 		SelectFrame(locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_POPUP_IFRAME");
 
 		AssertElementPresent(
-			locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_POPUP_ARTICLE_NAME",
-			key_articleName = "${articleName}");
+			key_articleName = "${articleName}",
+			locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_POPUP_ARTICLE_NAME");
 
 		AssertElementPresent(
-			locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_POPUP_ARTICLE_DESCRIPTION",
-			key_articleDescription = "${articleDescription}");
+			key_articleDescription = "${articleDescription}",
+			locator1 = "ZendeskKCApp#KNOWLEDGE_CAPTURE_POPUP_ARTICLE_DESCRIPTION");
 
 		SelectFrameTop();
 
@@ -318,8 +356,8 @@ definition {
 			value1 = "\ENTER");
 
 		AssertElementNotPresent(
-			locator1 = "ZendeskKCApp#ARTICLE_NAME",
-			key_articleName = "${articleName}");
+			key_articleName = "${articleName}",
+			locator1 = "ZendeskKCApp#ARTICLE_NAME");
 
 		SelectFrameTop();
 	}
@@ -343,45 +381,8 @@ definition {
 			value1 = "\ENTER");
 
 		AssertElementNotPresent(
-			locator1 = "ZendeskKCApp#ARTICLE",
-			key_articleName = "${articleName}");
+			key_articleName = "${articleName}",
+			locator1 = "ZendeskKCApp#ARTICLE");
 	}
 
-	@prose = "I tear down the articles with the following names from zendesk.liferay.com ${table}"
-	macro _tearDownArticlesByName {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var articleName = "${row[0]}";
-
-			Open(locator1 = "${zendeskURL}/knowledge/lists/");
-
-			ZendeskHomepage.pause(timeInSeconds = "5");
-
-			if (IsElementPresent(locator1 = "ZendeskKCApp#GOT_IT_BUTTON")) {
-				Click(locator1 = "ZendeskKCApp#GOT_IT_BUTTON");
-			}
-
-			Type(
-				locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
-				value1 = "${articleName}");
-
-			KeyPress(
-				locator1 = "ZendeskKCApp#SEARCH_ARTICLE_FIELD",
-				value1 = "\ENTER");
-
-			if (IsElementPresent(locator1 = "ZendeskKCApp#ARTICLE", key_articleName = "${articleName}")) {
-				Click(
-					locator1 = "ZendeskKCApp#SELECT_ARTICLE",
-					key_articleName = "${articleName}");
-
-				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS");
-
-				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS_DELETE_OPTION");
-
-				Click(locator1 = "ZendeskKCApp#ARTICLE_SETTINGS_DELETE_BUTTON");
-			}
-
-		}
-	}
 }

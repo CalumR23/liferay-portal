@@ -1,4 +1,5 @@
 definition {
+
 	var oktaURL = PropsUtil.get("okta.liferay.login.dev.url");
 	var oktaApiToken = PropsUtil.get("okta.api.token");
 	var oktaUserPassword = PropsUtil.get("okta.user.password");
@@ -38,7 +39,6 @@ definition {
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
-
 
 	@prose = "I should not be able to activate the license on provisioning with the name ${licenseName} on the account ${accountName}"
 	macro _activateNoLicense {
@@ -86,16 +86,6 @@ definition {
 		}
 	}
 
-	@prose = "the API response should have the exception message ${apiResponseMessage}"
-	macro assertApiResponse {
-		if (contains("${staticApiResponse}", "${apiResponseMessage}")) {
-			echo("The Exception has the message ${apiResponseMessage}");
-		}
-		else {
-			fail("The API response ${staticApiResponse} did not have the text ${apiResponseMessage}");
-		}
-	}
-
 	@prose = "I deactivate the license on provisioning with the name ${licenseName} on the account ${accountName}"
 	macro _deactivateLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
@@ -128,7 +118,7 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-@prose = "I should not be able to deactivate the license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
+	@prose = "I should not be able to deactivate the license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
 	macro _deactivateNoLicense {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
 			accountName = "${accountName}",
@@ -151,6 +141,64 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api containing the following values ${table}"
+	macro _downloadAndCheckLicenseValues {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+            ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
+            -u ${provisioningAdminEmail}:${provisioningAdminPassword}
+            -H "accept: application/*"
+            -H 'Content-Type: application/*'
+            ''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}", "$");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+			var field = StringUtil.lowerCase("${field}");
+
+			var field = StringUtil.replace("${field}", " ", "-");
+
+			if (!(contains("${licenseFile}", "<${field}>${value}</${field}>"))) {
+				fail("The value is not present in the license file");
+			}
+		}
+	}
+
+	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api containing the following values using okta session id ${table}"
+	macro _downloadAndCheckLicenseValuesSessionId {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+            ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
+            -u ${provisioningAdminEmail}:${provisioningAdminPassword}
+            -H "accept: application/*"
+            -H 'Content-Type: application/*'
+            ''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}", "$");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+			var field = StringUtil.lowerCase("${field}");
+
+			var field = StringUtil.replace("${field}", " ", "-");
+
+			if (!(contains("${licenseFile}", "<${field}>${value}</${field}>"))) {
+				fail("The value is not present in the license file");
+			}
+		}
+	}
+
 	@prose = "I should be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName}"
 	macro _downloadDeveloperLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -164,14 +212,15 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}");
 
-		if (!(contains("${licenseFile}","${productGroup}"))) {
+		if (!(contains("${licenseFile}", "${productGroup}"))) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
 		}
 
-		if (!(contains("${licenseFile}","${productVersion}"))) {
+		if (!(contains("${licenseFile}", "${productVersion}"))) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
 		}
 	}
+
 	@prose = "I should be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName} using okta session id"
 	macro _downloadDeveloperLicenseSessionId {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -185,15 +234,14 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}");
 
-		if (!(contains("${licenseFile}","${productGroup}"))) {
+		if (!(contains("${licenseFile}", "${productGroup}"))) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
 		}
 
-		if (!(contains("${licenseFile}","${productVersion}"))) {
+		if (!(contains("${licenseFile}", "${productVersion}"))) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was not downloaded");
 		}
 	}
-
 
 	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName}"
 	macro _downloadLicense {
@@ -210,7 +258,67 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}", "$");
 
-		if (!(contains("${licenseFile}","${accountName}"))) {
+		if (!(contains("${licenseFile}", "${accountName}"))) {
+			fail("The value ${accountName} is not present in the license file");
+		}
+	}
+
+	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} for the following license keys ${table}"
+	macro _downloadLicenseAggregate {
+		var RawTable rawTable = new RawTable("${table}");
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}", "$");
+
+		if (!(contains("${licenseFile}", "${accountName}"))) {
+			fail("The value ${accountName} is not present in the license file");
+		}
+	}
+
+	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} using okta session id for the following license keys ${table}"
+	macro _downloadLicenseAggregateSessionId {
+		var RawTable rawTable = new RawTable("${table}");
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var licenseFile = JSONCurlUtil.get("${curl}", "$");
+
+		if (!(contains("${licenseFile}", "${accountName}"))) {
 			fail("The value ${accountName} is not present in the license file");
 		}
 	}
@@ -230,152 +338,7 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}", "$");
 
-		if (!(contains("${licenseFile}","${accountName}"))) {
-			fail("The value ${accountName} is not present in the license file");
-		}
-	}
-
-	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api containing the following values ${table}"
-    macro _downloadAndCheckLicenseValues {
-        var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
-            accountName = "${accountName}",
-            licenseName = "${licenseName}");
-
-        var curl = '''
-            ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
-            -u ${provisioningAdminEmail}:${provisioningAdminPassword}
-            -H "accept: application/*"
-            -H 'Content-Type: application/*'
-            ''';
-
-        var licenseFile = JSONCurlUtil.get("${curl}", "$");
-
-        var RawTable rawTable = new RawTable("${table}");
-
-        for (var row : table "${rawTable}") {
-            var field = "${row[0]}";
-            var value = "${row[1]}";
-
-            var field = StringUtil.lowerCase("${field}");
-            var field = StringUtil.replace("${field}", " ", "-");
-
-            if (!(contains("${licenseFile}","<${field}>${value}</${field}>"))) {
-                fail("The value is not present in the license file");
-            }
-        }
-    }
-
-	@prose = "I should be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} via api containing the following values using okta session id ${table}"
-    macro _downloadAndCheckLicenseValuesSessionId {
-        var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
-            accountName = "${accountName}",
-            licenseName = "${licenseName}");
-
-        var curl = '''
-            ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
-            -u ${provisioningAdminEmail}:${provisioningAdminPassword}
-            -H "accept: application/*"
-            -H 'Content-Type: application/*'
-            ''';
-
-        var licenseFile = JSONCurlUtil.get("${curl}", "$");
-
-        var RawTable rawTable = new RawTable("${table}");
-
-        for (var row : table "${rawTable}") {
-            var field = "${row[0]}";
-            var value = "${row[1]}";
-
-            var field = StringUtil.lowerCase("${field}");
-            var field = StringUtil.replace("${field}", " ", "-");
-
-            if (!(contains("${licenseFile}","<${field}>${value}</${field}>"))) {
-                fail("The value is not present in the license file");
-            }
-        }
-    }
-
-	@prose = "I should not be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
-	macro _downloadNoLicense {
-		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
-			accountName = "${accountName}",
-			licenseName = "${licenseName}");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "Access denied to")) {
-			echo("The user is not authorized to use this API");
-		}
-		else {
-			fail("The user was able to extend a license with an invalid Session ID.");
-		}
-	}
-
-	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} for the following license keys ${table}"
-	macro _downloadLicenseAggregate {
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseKeyIds = "";
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIds}" == "") {
-				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
-			}
-		}
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var licenseFile = JSONCurlUtil.get("${curl}", "$");
-
-		if (!(contains("${licenseFile}","${accountName}"))) {
-			fail("The value ${accountName} is not present in the license file");
-		}
-	}
-
-	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} using okta session id for the following license keys ${table}"
-	macro _downloadLicenseAggregateSessionId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseKeyIds = "";
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIds}" == "") {
-				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
-			}
-		}
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var licenseFile = JSONCurlUtil.get("${curl}", "$");
-
-		if (!(contains("${licenseFile}","${accountName}"))) {
+		if (!(contains("${licenseFile}", "${accountName}"))) {
 			fail("The value ${accountName} is not present in the license file");
 		}
 	}
@@ -383,7 +346,6 @@ definition {
 	@prose = "I should be able to download a license zip file on provisioning for the following license keys ${table}"
 	macro _downloadLicenseZip {
 		var RawTable rawTable = new RawTable("${table}");
-
 		var licenseKeyIds = "";
 
 		for (var row : table "${rawTable}") {
@@ -393,7 +355,7 @@ definition {
 				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
 			}
 			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
 			}
 		}
 
@@ -424,7 +386,6 @@ definition {
 	@prose = "I should be able to download a license zip file on provisioning using okta session id for the following license keys ${table}"
 	macro _downloadLicenseZipSessionId {
 		var RawTable rawTable = new RawTable("${table}");
-
 		var licenseKeyIds = "";
 
 		for (var row : table "${rawTable}") {
@@ -434,7 +395,7 @@ definition {
 				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
 			}
 			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
 			}
 		}
 
@@ -462,7 +423,7 @@ definition {
 		}
 	}
 
-@prose = "I should not be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName}"
+	@prose = "I should not be able to download a ${productGroup} developer license with version ${productVersion} on the account ${accountName}"
 	macro _downloadNoDeveloperLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
@@ -475,11 +436,11 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}");
 
-		if (contains("${licenseFile}","${productGroup}")) {
+		if (contains("${licenseFile}", "${productGroup}")) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was downloaded ");
 		}
 
-		if (contains("${licenseFile}","${productVersion}")) {
+		if (contains("${licenseFile}", "${productVersion}")) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was downloaded ");
 		}
 	}
@@ -497,12 +458,35 @@ definition {
 
 		var licenseFile = JSONCurlUtil.get("${curl}");
 
-		if (contains("${licenseFile}","${productGroup}")) {
+		if (contains("${licenseFile}", "${productGroup}")) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was downloaded ");
 		}
 
-		if (contains("${licenseFile}","${productVersion}")) {
+		if (contains("${licenseFile}", "${productVersion}")) {
 			fail("The development license of the group ${productGroup} and version ${productVersion} was downloaded ");
+		}
+	}
+
+	@prose = "I should not be able to download a single license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
+	macro _downloadNoLicense {
+		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
+			accountName = "${accountName}",
+			licenseName = "${licenseName}");
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/${licenseKeyId}/download --tlsv1.2
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "Access denied to")) {
+			echo("The user is not authorized to use this API");
+		}
+		else {
+			fail("The user was able to extend a license with an invalid Session ID.");
 		}
 	}
 
@@ -511,7 +495,6 @@ definition {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
 			accountName = "${accountName}",
 			licenseName = "${licenseName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -532,6 +515,7 @@ definition {
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
@@ -557,7 +541,6 @@ definition {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
 			accountName = "${accountName}",
 			licenseName = "${licenseName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -578,6 +561,7 @@ definition {
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
@@ -603,7 +587,6 @@ definition {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
 			accountName = "${accountName}",
 			licenseName = "${licenseName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -624,6 +607,7 @@ definition {
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
@@ -653,7 +637,6 @@ definition {
 
 	macro _getLicenseKeyIdViaLicenseName {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var keyword = StringUtil.replace("${licenseName}", " ", "+");
 
 		var curl = '''
@@ -669,7 +652,7 @@ definition {
 
 		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "]", "");
 
-		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "&quot;", "");
+		var licenseKeyId = StringUtil.replace("${licenseKeyId}", "\"", "");
 
 		echo("License Key ID value for ${licenseName}: ${licenseKeyId}");
 
@@ -686,7 +669,6 @@ definition {
 			-H "accept: application/*"
 			-H 'Content-Type: application/*'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -700,18 +682,17 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var value = StringUtil.lowerCaseFirstLetter("${value}");
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else {
 				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
@@ -719,9 +700,10 @@ definition {
 		}
 
 		echo("Expected ${field} Value: ${value}");
+
 		echo("Actual ${field} Value: ${valueFromAPI}");
 
-		if (!("${value}" == "${valueFromAPI}")) {
+		if ("${value}" != "${valueFromAPI}") {
 			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 		}
 	}
@@ -736,7 +718,6 @@ definition {
 			-H "accept: application/*"
 			-H 'Content-Type: application/*'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -750,18 +731,17 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var value = StringUtil.lowerCaseFirstLetter("${value}");
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else {
 				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
@@ -769,9 +749,10 @@ definition {
 		}
 
 		echo("Expected ${field} Value: ${value}");
+
 		echo("Actual ${field} Value: ${valueFromAPI}");
 
-		if (!("${value}" == "${valueFromAPI}")) {
+		if ("${value}" != "${valueFromAPI}") {
 			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 		}
 	}
@@ -786,7 +767,6 @@ definition {
 			-H "accept: application/*"
 			-H 'Content-Type: application/*'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -800,18 +780,17 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var value = StringUtil.lowerCaseFirstLetter("${value}");
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else {
 				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
@@ -829,7 +808,6 @@ definition {
 			-H "accept: application/*"
 			-H 'Content-Type: application/*'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -843,18 +821,17 @@ definition {
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var value = StringUtil.lowerCaseFirstLetter("${value}");
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].licenseEntryType");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "[", "");
 
 				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+				var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 			}
 			else {
 				fail("This license field ${field} either does not exist or has not been added to the macro yet for testing. Please update test or macro accordingly.");
@@ -862,9 +839,10 @@ definition {
 		}
 
 		echo("Expected ${field} Value: ${value}");
+
 		echo("Actual ${field} Value: ${valueFromAPI}");
 
-		if (!("${value}" == "${valueFromAPI}")) {
+		if ("${value}" != "${valueFromAPI}") {
 			fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${value}");
 		}
 	}
@@ -872,9 +850,7 @@ definition {
 	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} and the following filters ${table}"
 	macro _viewFilteredLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var filters = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -993,12 +969,13 @@ definition {
 
 		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 
 		echo("Expected License Name Value: ${licenseName}");
+
 		echo("Actual License Name Value: ${valueFromAPI}");
 
-		if (!("${licenseName}" == "${valueFromAPI}")) {
+		if ("${licenseName}" != "${valueFromAPI}") {
 			fail("The license search filters did not return the expected license with the name ${licenseName}");
 		}
 	}
@@ -1006,9 +983,7 @@ definition {
 	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} using okta session id and the following filters ${table}"
 	macro _viewFilteredLicenseSessionId {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var filters = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1127,12 +1102,13 @@ definition {
 
 		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+		var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 
 		echo("Expected License Name Value: ${licenseName}");
+
 		echo("Actual License Name Value: ${valueFromAPI}");
 
-		if (!("${licenseName}" == "${valueFromAPI}")) {
+		if ("${licenseName}" != "${valueFromAPI}") {
 			fail("The license search filters did not return the expected license with the name ${licenseName}");
 		}
 	}
@@ -1147,7 +1123,6 @@ definition {
 			-H "accept: application/json"
 			-H 'Content-Type: application/json'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1158,48 +1133,40 @@ definition {
 
 			if ("${field}" == "Allow Permanent Licenses") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
 			}
 			else if ("${field}" == "End Date") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].endDate");
 			}
 			else if ("${field}" == "Label") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].label");
 			}
 			else if ("${field}" == "License Entry Name") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryName=='${value2}')].licenseEntryName");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var expectedValue = "${value3}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryType=='${value3}' && @.licenseEntryName=='${value2}')].licenseEntryType");
 			}
 			else if ("${field}" == "Required Details") {
 				var expectedValue = "${value3}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.requiredDetails=='${value3}' && @.licenseEntryName=='${value2}')].requiredDetails");
 			}
 			else if ("${field}" == "Product Key") {
 				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value2}");
-				var expectedValue = "${productKey}";
 
+				var expectedValue = "${productKey}";
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.productKey=='${productKey}' && @.licenseEntryName=='${value2}')].productKey");
 			}
 			else if ("${field}" == "Product Purchase Key") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].productPurchaseKey");
 			}
 			else if ("${field}" == "Start Date") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].startDate");
 			}
 			else {
@@ -1210,12 +1177,13 @@ definition {
 
 			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 
 			echo("Expected ${field} value: ${expectedValue}");
+
 			echo("Actual ${field} value: ${valueFromAPI}");
 
-			if (!("${expectedValue}" == "${valueFromAPI}")) {
+			if ("${expectedValue}" != "${valueFromAPI}") {
 				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${expectedValue}");
 			}
 		}
@@ -1231,7 +1199,6 @@ definition {
 			-H "accept: application/json"
 			-H 'Content-Type: application/json'
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1242,48 +1209,40 @@ definition {
 
 			if ("${field}" == "Allow Permanent Licenses") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
 			}
 			else if ("${field}" == "End Date") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].endDate");
 			}
 			else if ("${field}" == "Label") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].label");
 			}
 			else if ("${field}" == "License Entry Name") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryName=='${value2}')].licenseEntryName");
 			}
 			else if ("${field}" == "License Entry Type") {
 				var expectedValue = "${value3}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.licenseEntryType=='${value3}' && @.licenseEntryName=='${value2}')].licenseEntryType");
 			}
 			else if ("${field}" == "Required Details") {
 				var expectedValue = "${value3}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.requiredDetails=='${value3}' && @.licenseEntryName=='${value2}')].requiredDetails");
 			}
 			else if ("${field}" == "Product Key") {
 				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value2}");
-				var expectedValue = "${productKey}";
 
+				var expectedValue = "${productKey}";
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.versions[?(@.label=='${value1}')].types[?(@.productKey=='${productKey}' && @.licenseEntryName=='${value2}')].productKey");
 			}
 			else if ("${field}" == "Product Purchase Key") {
 				var expectedValue = "${value1}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].productPurchaseKey");
 			}
 			else if ("${field}" == "Start Date") {
 				var expectedValue = "${value2}";
-
 				var valueFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')].startDate");
 			}
 			else {
@@ -1294,28 +1253,433 @@ definition {
 
 			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "]", "");
 
-			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "&quot;", "");
+			var valueFromAPI = StringUtil.replace("${valueFromAPI}", "\"", "");
 
 			echo("Expected ${field} value: ${expectedValue}");
+
 			echo("Actual ${field} value: ${valueFromAPI}");
 
-			if (!("${expectedValue}" == "${valueFromAPI}")) {
+			if ("${expectedValue}" != "${valueFromAPI}") {
 				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${expectedValue}");
 			}
 		}
 	}
 
-	@prose = "I create a license with the following parameters on the account ${accountName} and product purchase ${productName} using okta session id with the following values ${table}"
-	macro createLicense {
+	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName}"
+	macro _viewLicenseKeyIdViaLicenseName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
 
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100 --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var licenseNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "[", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "]", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "\"", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "+", " ");
+
+		echo("Expected license key name value: ${licenseName}");
+
+		echo("Actual license key name value: ${licenseNameFromAPI}");
+
+		if ("${licenseNameFromAPI}" != "${licenseName}") {
+			fail("Actual license name ${licenseNameFromAPI} does not match expected license name value ${licenseName}");
+		}
+	}
+
+	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} using okta session id"
+	macro _viewLicenseKeyIdViaLicenseNameSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100 --tlsv1.2
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var licenseNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "[", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "]", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "\"", "");
+
+		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "+", " ");
+
+		echo("Expected license key name value: ${licenseName}");
+
+		echo("Actual license key name value: ${licenseNameFromAPI}");
+
+		if ("${licenseNameFromAPI}" != "${licenseName}") {
+			fail("Actual license name ${licenseNameFromAPI} does not match expected license name value ${licenseName}");
+		}
+	}
+
+	@prose = "I should be able to view a license search error when searching for a license with the name ${licenseName} on the account ${accountName}"
+	macro _viewLicenseKeySearchResultError {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "Access denied to")) {
+			echo("The user is not authorized to use this API");
+		}
+		else {
+			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
+		}
+	}
+
+	@prose = "I should be able to view a license search error when searching for a license with the name ${licenseName} on the account ${accountName} using okta session id"
+	macro _viewLicenseKeySearchResultErrorSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "Access denied to")) {
+			echo("The user is not authorized to use this API");
+		}
+		else {
+			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
+		}
+	}
+
+	@prose = "I should not be able to view the active license on the account ${accountName} with the name ${licenseName}"
+	macro _viewNoActiveLicense {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
-		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
 
+		var allActiveLicenses = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allActiveLicenses}", "${licenseName}")) {
+			fail("The license with the name ${licenseName} is returning as active unexpectedly on ${accountName}");
+		}
+	}
+
+	@prose = "I should not be able to view the active license on the account ${accountName} with the name ${licenseName} using okta session id"
+	macro _viewNoActiveLicenseSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var allActiveLicenses = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allActiveLicenses}", "${licenseName}")) {
+			fail("The license with the name ${licenseName} is returning as active unexpectedly on ${accountName}");
+		}
+	}
+
+	@prose = "I should not be able to view the deactivated license on the account ${accountName} with the name ${licenseName}"
+	macro _viewNoDeactivatedLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var allDeactivatedLicenses = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allDeactivatedLicenses}", "${licenseName}")) {
+			fail("The license with the name ${licenseName} is returning as deactivated unexpectedly on ${accountName}");
+		}
+	}
+
+	@prose = "I should not be able to view the deactivated license on the account ${accountName} with the name ${licenseName} using okta session id"
+	macro _viewNoDeactivatedLicenseSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var allDeactivatedLicenses = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${allDeactivatedLicenses}", "${licenseName}")) {
+			fail("The license with the name ${licenseName} is returning as deactivated unexpectedly on ${accountName}");
+		}
+	}
+
+	@prose = "I should not be able to download a license aggregate file on provisioning for the following license keys ${table}"
+	macro _viewNoDownloadLicenseAggregate {
+		var RawTable rawTable = new RawTable("${table}");
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}"
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var error = JSONCurlUtil.get("${curl}", "$");
+
+		if (!(contains("${error}", "The specified activation keys cannot be aggregated together"))) {
+			fail("The error message may have changed or a non expected license aggregate may have been downloaded. Please investigate");
+		}
+	}
+
+	@prose = "I should not be able to download a license aggregate file on provisioning using okta session id for the following license keys ${table}"
+	macro _viewNoDownloadLicenseAggregateSessionId {
+		var RawTable rawTable = new RawTable("${table}");
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}"
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var error = JSONCurlUtil.get("${curl}", "$");
+
+		if (!(contains("${error}", "The specified activation keys cannot be aggregated together"))) {
+			fail("The error message may have changed or a non expected license aggregate may have been downloaded. Please investigate");
+		}
+	}
+
+	@prose = "I should not be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} ${table}"
+	macro _viewNoGenerateLicenseFormOptions {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Allow Permanent Licenses") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
+			}
+			else if ("${field}" == "End Date") {
+				var nonExpectedValue = "${value2}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else if ("${field}" == "Label") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "License Entry Name") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Key") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
+
+				var nonExpectedValue = "${productKey}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Purchase Key") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms");
+			}
+			else if ("${field}" == "Start Date") {
+				var nonExpectedValue = "${value2}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else {
+				fail("Negative assertions for this license field ${field} not testable via automation at the current time.");
+			}
+
+			echo("Non expected ${field} value: ${nonExpectedValue}");
+
+			echo("Actual API object value: ${objectFromAPI}");
+
+			if (contains("${objectFromAPI}", "${nonExpectedValue}")) {
+				fail("The non expected ${field} value ${nonExpectedValue} is present in the generate form");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} using okta session id ${table}"
+	macro _viewNoGenerateLicenseFormOptionsSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/json"
+			-H 'Content-Type: application/json'
+			''';
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Allow Permanent Licenses") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
+			}
+			else if ("${field}" == "End Date") {
+				var nonExpectedValue = "${value2}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else if ("${field}" == "Label") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "License Entry Name") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Key") {
+				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
+
+				var nonExpectedValue = "${productKey}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
+			}
+			else if ("${field}" == "Product Purchase Key") {
+				var nonExpectedValue = "${value1}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms");
+			}
+			else if ("${field}" == "Start Date") {
+				var nonExpectedValue = "${value2}";
+				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
+			}
+			else {
+				fail("Negative assertions for this license field ${field} not testable via automation at the current time.");
+			}
+
+			echo("Non expected ${field} value: ${nonExpectedValue}");
+
+			echo("Actual API object value: ${objectFromAPI}");
+
+			if (contains("${objectFromAPI}", "${nonExpectedValue}")) {
+				fail("The non expected ${field} value ${nonExpectedValue} is present in the generate form");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName}"
+	macro _viewNoLicenseKeyIdViaLicenseName {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%27${keyword}%27 --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "${keyword}")) {
+			fail("The license with the name ${licenseName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName} using okta session id"
+	macro _viewNoLicenseKeyIdViaLicenseNameSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var keyword = StringUtil.replace("${licenseName}", " ", "+");
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%27${keyword}%27 --tlsv1.2
+			-H "Okta-Session-ID: ${staticOktaSessionId}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var jsonObject = JSONCurlUtil.get("${curl}", "$");
+
+		if (contains("${jsonObject}", "${keyword}")) {
+			fail("The license with the name ${licenseName} is visible to a non permissioned user");
+		}
+	}
+
+	@prose = "the API response should have the exception message ${apiResponseMessage}"
+	macro assertApiResponse {
+		if (contains("${staticApiResponse}", "${apiResponseMessage}")) {
+			echo("The Exception has the message ${apiResponseMessage}");
+		}
+		else {
+			fail("The API response ${staticApiResponse} did not have the text ${apiResponseMessage}");
+		}
+	}
+
+	@prose = "I create a license with the following parameters on the account ${accountName} and product purchase ${productName} using okta session id with the following values ${table}"
+	macro createLicense {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
 		var productPurchaseKey = KoroneikiAccountAPI._getAccountProductPurchaseKeyViaAccountAndProductName(
 			accountName = "${accountName}",
 			productName = "${productName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1417,78 +1781,103 @@ definition {
 		if (!(isSet(active))) {
 			var active = "true";
 		}
+
 		if (!(isSet(additionalInfo))) {
 			var additionalInfo = "AdittionalInformation";
 		}
+
 		if (!(isSet(assetReceiptLicenseUuid))) {
 			var assetReceiptLicenseUuid = "";
 		}
+
 		if (!(isSet(clusterId))) {
 			var clusterId = "0";
 		}
+
 		if (!(isSet(description))) {
 			var description = "";
 		}
+
 		if (!(isSet(complimentary))) {
 			var complimentary = "false";
 		}
+
 		if (!(isSet(createDate))) {
 			var createDate = "${staticStartDate}";
 		}
+
 		if (!(isSet(expirationDate))) {
 			var expirationDate = "${staticEndDate}";
 		}
+
 		if (!(isSet(hostName))) {
 			var hostName = "localhost";
 		}
+
 		if (!(isSet(productPurchaseKey))) {
 			var productPurchaseKey = "${staticProductPurchaseKey}";
 		}
+
 		if (!(isSet(ipAddresses))) {
 			var ipAddresses = "123.45.67.89";
 		}
+
 		if (!(isSet(macAddresses))) {
 			var macAddresses = "0A-1B-2C-3D-4E-5F";
 		}
+
 		if (!(isSet(licenseEntryName))) {
 			var licenseEntryName = "";
 		}
+
 		if (!(isSet(maxClusterNodes))) {
 			var maxClusterNodes = "0";
 		}
+
 		if (!(isSet(licenseVersion))) {
 			var licenseVersion = "";
 		}
+
 		if (!(isSet(maxHttpSessions))) {
 			var maxHttpSessions = "";
 		}
+
 		if (!(isSet(maxServers))) {
 			var maxServers = "";
 		}
+
 		if (!(isSet(modifiedUserName))) {
 			var modifiedUserName = "";
 		}
+
 		if (!(isSet(modifiedUserUuid))) {
 			var modifiedUserUuid = "";
 		}
+
 		if (!(isSet(productId))) {
 			var productId = "";
 		}
+
 		if (!(isSet(productKey))) {
 			var productKey = "${productKey}";
 		}
+
 		if (!(isSet(productVersion))) {
 			var productVersion = "";
 		}
+
 		if (!(isSet(sizing))) {
 			var sizing = "Sizing 1";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "${staticStartDate}";
 		}
+
 		if (!(isSet(userName))) {
 			var userName = "";
 		}
+
 		if (!(isSet(userUuid))) {
 			var userUuid = "";
 		}
@@ -1503,7 +1892,6 @@ definition {
 		var partialUuid5 = StringUtil.randomString("12");
 
 		var userUuid = "${partialUuid1}-${partialUuid2}-${partialUuid3}-${partialUuid4}-${partialUuid5}";
-
 		var curl = '''
 			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys
 			-H "Okta-Session-ID: ${staticOktaSessionId}"
@@ -1542,13 +1930,13 @@ definition {
 	macro createMultipleLicenses {
 		var count = "0";
 
-		while (!("${count}" == "${licenseNumber}")) {
+		while ("${count}" != "${licenseNumber}") {
 			ProvisioningLicenseAPI.createLicense(
 				accountName = "${accountName}",
 				productName = "${productName}",
 				table = "${table}");
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 	}
 
@@ -1567,419 +1955,4 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName}"
-	macro _viewLicenseKeyIdViaLicenseName {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100 --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var licenseNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "[", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "]", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "&quot;", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "+", " ");
-
-		echo("Expected license key name value: ${licenseName}");
-		echo("Actual license key name value: ${licenseNameFromAPI}");
-
-		if (!("${licenseNameFromAPI}" == "${licenseName}")) {
-			fail("Actual license name ${licenseNameFromAPI} does not match expected license name value ${licenseName}");
-		}
-	}
-
-	@prose = "I should be able to view the license on the account ${accountName} with the name ${licenseName} using okta session id"
-	macro _viewLicenseKeyIdViaLicenseNameSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22\&pageSize=100 --tlsv1.2
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var licenseNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${licenseName}')].name");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "[", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "]", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "&quot;", "");
-
-		var licenseNameFromAPI = StringUtil.replace("${licenseNameFromAPI}", "+", " ");
-
-		echo("Expected license key name value: ${licenseName}");
-		echo("Actual license key name value: ${licenseNameFromAPI}");
-
-		if (!("${licenseNameFromAPI}" == "${licenseName}")) {
-			fail("Actual license name ${licenseNameFromAPI} does not match expected license name value ${licenseName}");
-		}
-	}
-
-	@prose = "I should be able to view a license search error when searching for a license with the name ${licenseName} on the account ${accountName}"
-	macro _viewLicenseKeySearchResultError {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "Access denied to")) {
-			echo("The user is not authorized to use this API");
-		}
-		else {
-			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
-		}
-	}
-
-	@prose = "I should be able to view a license search error when searching for a license with the name ${licenseName} on the account ${accountName} using okta session id"
-	macro _viewLicenseKeySearchResultErrorSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%22${keyword}%22
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "Access denied to")) {
-			echo("The user is not authorized to use this API");
-		}
-		else {
-			fail("The error message text may have changed or the user may not have been denied access. Please verify the API message.");
-		}
-	}
-
-	@prose = "I should not be able to view the active license on the account ${accountName} with the name ${licenseName}"
-	macro _viewNoActiveLicense {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var allActiveLicenses = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allActiveLicenses}", "${licenseName}")) {
-			fail("The license with the name ${licenseName} is returning as active unexpectedly on ${accountName}");
-		}
-	}
-
-	@prose = "I should not be able to view the active license on the account ${accountName} with the name ${licenseName} using okta session id"
-	macro _viewNoActiveLicenseSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+true
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var allActiveLicenses = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allActiveLicenses}", "${licenseName}")) {
-			fail("The license with the name ${licenseName} is returning as active unexpectedly on ${accountName}");
-		}
-	}
-
-	@prose = "I should not be able to download a license aggregate file on provisioning for the following license keys ${table}"
-	macro _viewNoDownloadLicenseAggregate {
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseKeyIds = "";
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIds}" == "") {
-				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
-			}
-		}
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}"
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var error = JSONCurlUtil.get("${curl}", "$");
-
-		if (!(contains("${error}","The specified activation keys cannot be aggregated together"))) {
-			fail("The error message may have changed or a non expected license aggregate may have been downloaded. Please investigate");
-		}
-	}
-
-	@prose = "I should not be able to download a license aggregate file on provisioning using okta session id for the following license keys ${table}"
-	macro _viewNoDownloadLicenseAggregateSessionId {
-		var RawTable rawTable = new RawTable("${table}");
-
-		var licenseKeyIds = "";
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIds}" == "") {
-				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIds = "${licenseKeyIds}&amp;licenseKeyIds=${licenseKeyId}";
-			}
-		}
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}"
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var error = JSONCurlUtil.get("${curl}", "$");
-
-		if (!(contains("${error}","The specified activation keys cannot be aggregated together"))) {
-			fail("The error message may have changed or a non expected license aggregate may have been downloaded. Please investigate");
-		}
-	}
-
-	@prose = "I should not be able to view the deactivated license on the account ${accountName} with the name ${licenseName}"
-	macro _viewNoDeactivatedLicense {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var allDeactivatedLicenses = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allDeactivatedLicenses}", "${licenseName}")) {
-			fail("The license with the name ${licenseName} is returning as deactivated unexpectedly on ${accountName}");
-		}
-	}
-
-	@prose = "I should not be able to view the deactivated license on the account ${accountName} with the name ${licenseName} using okta session id"
-	macro _viewNoDeactivatedLicenseSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=active+eq+false
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var allDeactivatedLicenses = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${allDeactivatedLicenses}", "${licenseName}")) {
-			fail("The license with the name ${licenseName} is returning as deactivated unexpectedly on ${accountName}");
-		}
-	}
-
-	@prose = "I should not be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} ${table}"
-	macro _viewNoGenerateLicenseFormOptions {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/json"
-			-H 'Content-Type: application/json'
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value1 = "${row[1]}";
-			var value2 = "${row[2]}";
-
-			if ("${field}" == "Allow Permanent Licenses") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
-			}
-			else if ("${field}" == "End Date") {
-				var nonExpectedValue = "${value2}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
-			}
-			else if ("${field}" == "Label") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "License Entry Name") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "Product Key") {
-				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
-				var nonExpectedValue = "${productKey}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "Product Purchase Key") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms");
-			}
-			else if ("${field}" == "Start Date") {
-				var nonExpectedValue = "${value2}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
-			}
-			else {
-				fail("Negative assertions for this license field ${field} not testable via automation at the current time.");
-			}
-
-			echo("Non expected ${field} value: ${nonExpectedValue}");
-			echo("Actual API object value: ${objectFromAPI}");
-
-			if (contains("${objectFromAPI}", "${nonExpectedValue}")) {
-				fail("The non expected ${field} value ${nonExpectedValue} is present in the generate form");
-			}
-		}
-	}
-
-	@prose = "I should not be able to view the following generate license form options for the account ${accountName} with the product group ${productGroupName} using okta session id ${table}"
-	macro _viewNoGenerateLicenseFormOptionsSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/product-groups/${productGroupName}/generate-form
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/json"
-			-H 'Content-Type: application/json'
-			''';
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value1 = "${row[1]}";
-			var value2 = "${row[2]}";
-
-			if ("${field}" == "Allow Permanent Licenses") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.allowPermanentLicenses");
-			}
-			else if ("${field}" == "End Date") {
-				var nonExpectedValue = "${value2}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
-			}
-			else if ("${field}" == "Label") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "License Entry Name") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "Product Key") {
-				var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${value1}");
-				var nonExpectedValue = "${productKey}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.versions");
-			}
-			else if ("${field}" == "Product Purchase Key") {
-				var nonExpectedValue = "${value1}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms");
-			}
-			else if ("${field}" == "Start Date") {
-				var nonExpectedValue = "${value2}";
-
-				var objectFromAPI = JSONCurlUtil.get("${curl}", "$.subscriptionTerms[?(@.productPurchaseKey=='${value1}')]");
-			}
-			else {
-				fail("Negative assertions for this license field ${field} not testable via automation at the current time.");
-			}
-
-			echo("Non expected ${field} value: ${nonExpectedValue}");
-			echo("Actual API object value: ${objectFromAPI}");
-
-			if (contains("${objectFromAPI}", "${nonExpectedValue}")) {
-				fail("The non expected ${field} value ${nonExpectedValue} is present in the generate form");
-			}
-		}
-	}
-
-	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName}"
-	macro _viewNoLicenseKeyIdViaLicenseName {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%27${keyword}%27 --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "${keyword}")) {
-			fail("The license with the name ${licenseName} is visible to a non permissioned user");
-		}
-	}
-
-	@prose = "I should not be able to view the license on the account ${accountName} with the name ${licenseName} using okta session id"
-	macro _viewNoLicenseKeyIdViaLicenseNameSessionId {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var keyword = StringUtil.replace("${licenseName}", " ", "+");
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?search=%27${keyword}%27 --tlsv1.2
-			-H "Okta-Session-ID: ${staticOktaSessionId}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var jsonObject = JSONCurlUtil.get("${curl}", "$");
-
-		if (contains("${jsonObject}", "${keyword}")) {
-			fail("The license with the name ${licenseName} is visible to a non permissioned user");
-		}
-	}
 }

@@ -1,35 +1,12 @@
 definition {
+
 	var apiToken = PropsUtil.get("koroneiki.non.permission.api.token");
 	var koroneikiURL = PropsUtil.get("koroneiki.liferay.url");
 	var roleName = PropsUtil.get("koroneiki.non.permission.role.name");
 
-	@prose = "I attempt to assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles as a non permissioned user ${table}"
-	macro _assignContactRolesToContactAttempt {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-		}
-	}
-
 	@prose = "I assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles as a permissioned user ${table}"
 	macro _assignContactRolesToContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -49,12 +26,9 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles via uuid as a non permissioned user ${table}"
-	macro _assignContactRolesToContactViaUuidAttempt {
+	@prose = "I attempt to assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles as a non permissioned user ${table}"
+	macro _assignContactRolesToContactAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -63,7 +37,7 @@ definition {
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -77,9 +51,7 @@ definition {
 	@prose = "I assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles via uuid as a permissioned user ${table}"
 	macro _assignContactRolesToContactViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -99,21 +71,19 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign customer contacts with the following email addresses to the account ${accountName} as a non permissioned user ${table}"
-	macro _assignCustomerContactsAttempt {
+	@prose = "I attempt to assign the contact with the email address ${contactEmailAddress} on the account ${accountName} to the following roles via uuid as a non permissioned user ${table}"
+	macro _assignContactRolesToContactViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var contactEmailAddress = "${row[0]}";
+			var contactRoleName = "${row[0]}";
 
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
-				contactRoleName = "Member",
-				contactRoleType = "Account Customer");
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -127,12 +97,10 @@ definition {
 	@prose = "I assign customer contacts with the following email addresses to the account ${accountName} as a permissioned user ${table}"
 	macro _assignCustomerContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Customer");
@@ -149,23 +117,19 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign customer contacts with the following email addresses to the account ${accountName} via uuid as a non permissioned user ${table}"
-	macro _assignCustomerContactsViaUuidAttempt {
+	@prose = "I attempt to assign customer contacts with the following email addresses to the account ${accountName} as a non permissioned user ${table}"
+	macro _assignCustomerContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
-
-			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Customer");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -179,14 +143,12 @@ definition {
 	@prose = "I assign customer contacts with the following email addresses to the account ${accountName} via uuid as a permissioned user ${table}"
 	macro _assignCustomerContactsViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Customer");
@@ -203,21 +165,21 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign the team with the name ${teamName} on the account ${accountName} to the following roles as a non permissioned user ${table}"
-	macro _assignTeamRolesToTeamAttempt {
+	@prose = "I attempt to assign customer contacts with the following email addresses to the account ${accountName} via uuid as a non permissioned user ${table}"
+	macro _assignCustomerContactsViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var teamRoleName = "${row[0]}";
+			var contactEmailAddress = "${row[0]}";
 
-			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
+				contactRoleName = "Member",
+				contactRoleType = "Account Customer");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/assigned-teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -231,9 +193,7 @@ definition {
 	@prose = "I assign the team with the name ${teamName} on the account ${accountName} to the following roles as a permissioned user ${table}"
 	macro _assignTeamRolesToTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -253,21 +213,19 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign worker contacts with the following email addresses to the account ${accountName} as a non permissioned user ${table}"
-	macro _assignWorkerContactsAttempt {
+	@prose = "I attempt to assign the team with the name ${teamName} on the account ${accountName} to the following roles as a non permissioned user ${table}"
+	macro _assignTeamRolesToTeamAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var contactEmailAddress = "${row[0]}";
+			var teamRoleName = "${row[0]}";
 
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
-				contactRoleName = "Member",
-				contactRoleType = "Account Worker");
+			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/assigned-teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -281,12 +239,10 @@ definition {
 	@prose = "I assign worker contacts with the following email addresses to the account ${accountName} as a permissioned user ${table}"
 	macro _assignWorkerContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Worker");
@@ -303,17 +259,38 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to assign worker contacts with the following email addresses to the account ${accountName} via uuid as a non permissioned user ${table}"
-	macro _assignWorkerContactsViaUuidAttempt {
+	@prose = "I attempt to assign worker contacts with the following email addresses to the account ${accountName} as a non permissioned user ${table}"
+	macro _assignWorkerContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
 
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
+				contactRoleName = "Member",
+				contactRoleType = "Account Worker");
+
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
+	@prose = "I assign worker contacts with the following email addresses to the account ${accountName} via uuid as a permissioned user ${table}"
+	macro _assignWorkerContactsViaUuid {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Worker");
@@ -330,17 +307,15 @@ definition {
 		}
 	}
 
-	@prose = "I assign worker contacts with the following email addresses to the account ${accountName} via uuid as a permissioned user ${table}"
-	macro _assignWorkerContactsViaUuid {
+	@prose = "I attempt to assign worker contacts with the following email addresses to the account ${accountName} via uuid as a non permissioned user ${table}"
+	macro _assignWorkerContactsViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
 			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleNameAndType(
 				contactRoleName = "Member",
 				contactRoleType = "Account Worker");
@@ -360,7 +335,6 @@ definition {
 	@prose = "I attempt to create an account on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountAttempt {
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -426,42 +400,55 @@ definition {
 		if (!(isSet(code))) {
 			var code = "";
 		}
+
 		if (!(isSet(contactEmailAddress))) {
 			var contactEmailAddress = "";
 		}
+
 		if (!(isSet(dataRegion))) {
 			var dataRegion = "";
 		}
+
 		if (!(isSet(description))) {
 			var description = "";
 		}
+
 		if (!(isSet(faxNumber))) {
 			var faxNumber = "";
 		}
+
 		if (!(isSet(internal))) {
 			var internal = "false";
 		}
+
 		if (!(isSet(language))) {
 			var language = "";
 		}
+
 		if (!(isSet(name))) {
 			var name = "";
 		}
+
 		if (!(isSet(phoneNumber))) {
 			var phoneNumber = "";
 		}
+
 		if (!(isSet(profileEmailAddress))) {
 			var profileEmailAddress = "";
 		}
+
 		if (!(isSet(region))) {
 			var region = "";
 		}
+
 		if (!(isSet(status))) {
 			var status = "";
 		}
+
 		if (!(isSet(tier))) {
 			var tier = "";
 		}
+
 		if (!(isSet(website))) {
 			var website = "";
 		}
@@ -526,7 +513,6 @@ definition {
 	@prose = "I attempt to create an external link for the account ${accountName} with the following values as a non permissioned user ${table}"
 	macro _createAccountExternalLinkAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -550,9 +536,11 @@ definition {
 		if (!(isSet(domain))) {
 			var domain = "";
 		}
+
 		if (!(isSet(entityId))) {
 			var entityId = "";
 		}
+
 		if (!(isSet(entityName))) {
 			var entityName = "";
 		}
@@ -573,28 +561,9 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I attempt to create a team with the name ${teamName} for the account ${accountName} as a non permissioned user"
-	macro _createAccountTeamAttempt {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"name": "${teamName}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-	}
-
 	@prose = "I attempt to create a postal address for an account with the name ${accountName} on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountPostalAddressAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -639,30 +608,39 @@ definition {
 		if (!(isSet(addressCountry))) {
 			var addressCountry = "";
 		}
+
 		if (!(isSet(addressLocality))) {
 			var addressLocality = "";
 		}
+
 		if (!(isSet(addressRegion))) {
 			var addressRegion = "";
 		}
+
 		if (!(isSet(addressType))) {
 			var addressType = "";
 		}
+
 		if (!(isSet(mailing))) {
 			var mailing = "false";
 		}
+
 		if (!(isSet(postalCode))) {
 			var postalCode = "";
 		}
+
 		if (!(isSet(primary))) {
 			var primary = "false";
 		}
+
 		if (!(isSet(streetAddressLine1))) {
 			var streetAddressLine1 = "";
 		}
+
 		if (!(isSet(streetAddressLine2))) {
 			var streetAddressLine2 = "";
 		}
+
 		if (!(isSet(streetAddressLine3))) {
 			var streetAddressLine3 = "";
 		}
@@ -693,11 +671,8 @@ definition {
 	@prose = "I create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values as a permissioned user ${table}"
 	macro _createAccountProductConsumption {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -734,9 +709,11 @@ definition {
 		if (!(isSet(endDate))) {
 			var endDate = "";
 		}
+
 		if (!(isSet(productPurchaseKey))) {
 			var productPurchaseKey = "";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
@@ -781,11 +758,8 @@ definition {
 	@prose = "I attempt to create a product consumption for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountProductConsumptionAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -822,9 +796,11 @@ definition {
 		if (!(isSet(endDate))) {
 			var endDate = "";
 		}
+
 		if (!(isSet(productPurchaseKey))) {
 			var productPurchaseKey = "";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
@@ -869,11 +845,8 @@ definition {
 	@prose = "I attempt to create a product purchase for an account with the name ${accountName} and the product ${productName} on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createAccountProductPurchaseAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var productKey = KoroneikiProductAPI._getProductKeyViaProductName(productName = "${productName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -919,18 +892,23 @@ definition {
 		if (!(isSet(endDate))) {
 			var endDate = "";
 		}
+
 		if (!(isSet(originalEndDate))) {
 			var originalEndDate = "";
 		}
+
 		if (!(isSet(perpetual))) {
 			var perpetual = "true";
 		}
+
 		if (!(isSet(quantity))) {
 			var quantity = "1";
 		}
+
 		if (!(isSet(startDate))) {
 			var startDate = "";
 		}
+
 		if (!(isSet(status))) {
 			var status = "";
 		}
@@ -978,12 +956,28 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
+	@prose = "I attempt to create a team with the name ${teamName} for the account ${accountName} as a non permissioned user"
+	macro _createAccountTeamAttempt {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/teams --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"name": "${teamName}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
 	@prose = "I attempt to create a child account for an account with the name ${accountName} on koroneiki with the following values as a non permissioned user ${table}"
 	macro _createChildAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1049,46 +1043,58 @@ definition {
 		if (!(isSet(code))) {
 			var code = "";
 		}
+
 		if (!(isSet(contactEmailAddress))) {
 			var contactEmailAddress = "";
 		}
+
 		if (!(isSet(dataRegion))) {
 			var dataRegion = "";
 		}
+
 		if (!(isSet(description))) {
 			var description = "";
 		}
+
 		if (!(isSet(faxNumber))) {
 			var faxNumber = "";
 		}
+
 		if (!(isSet(internal))) {
 			var internal = "false";
 		}
+
 		if (!(isSet(language))) {
 			var language = "";
 		}
+
 		if (!(isSet(name))) {
 			var name = "";
 		}
+
 		if (!(isSet(phoneNumber))) {
 			var phoneNumber = "";
 		}
+
 		if (!(isSet(profileEmailAddress))) {
 			var profileEmailAddress = "";
 		}
+
 		if (!(isSet(region))) {
 			var region = "";
 		}
+
 		if (!(isSet(status))) {
 			var status = "";
 		}
+
 		if (!(isSet(tier))) {
 			var tier = "";
 		}
+
 		if (!(isSet(website))) {
 			var website = "";
 		}
-
 
 		if ("${properties}" == "") {
 			var curl = '''
@@ -1149,8 +1155,8 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
 	}
 
-	@prose = "I attempt to delete an account on koroneiki with the name ${accountName} as a non permissioned user"
-	macro _deleteAccountAttempt {
+	@prose = "I delete an account on koroneiki with the name ${accountName} as a permissioned user"
+	macro _deleteAccount {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
@@ -1163,8 +1169,8 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I delete an account on koroneiki with the name ${accountName} as a permissioned user"
-	macro _deleteAccount {
+	@prose = "I attempt to delete an account on koroneiki with the name ${accountName} as a non permissioned user"
+	macro _deleteAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 
 		var curl = '''
@@ -1209,33 +1215,9 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I attempt to remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles as a non permissioned user ${table}"
-	macro _removeContactRolesFromContactAttempt {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
-
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-H "Content-Length: 0"
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-		}
-	}
-
 	@prose = "I remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles as a permissioned user ${table}"
 	macro _removeContactRolesFromContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1255,12 +1237,9 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles via uuid as a non permissioned user ${table}"
-	macro _removeContactRolesFromContactViaUuidAttempt {
+	@prose = "I attempt to remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles as a non permissioned user ${table}"
+	macro _removeContactRolesFromContactAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1269,7 +1248,7 @@ definition {
 			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${contactEmailAddress}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1283,9 +1262,7 @@ definition {
 	@prose = "I remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles via uuid as a permissioned user ${table}"
 	macro _removeContactRolesFromContactViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1305,17 +1282,19 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
-	macro _removeContactsAttempt {
+	@prose = "I attempt to remove the contact with the email address ${contactEmailAddress} on the account ${accountName} from the following roles via uuid as a non permissioned user ${table}"
+	macro _removeContactRolesFromContactViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var contactEmailAddress = "${row[0]}";
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleKey = KoroneikiContactRoleAPI._getContactRoleKeyViaContactRoleName(contactRoleName = "${contactRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid/${contactUuid}/roles?contactRoleKeys=${contactRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1329,7 +1308,6 @@ definition {
 	@prose = "I remove contacts with the following email addresses from the account ${accountName} as a permissioned user ${table}"
 	macro _removeContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1347,19 +1325,16 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
-	macro _removeContactsViaUuidAttempt {
+	@prose = "I attempt to remove contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
+	macro _removeContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
-			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1373,7 +1348,6 @@ definition {
 	@prose = "I remove contacts with the following email addresses from the account ${accountName} via uuid as a permissioned user ${table}"
 	macro _removeContactsViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1393,17 +1367,18 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove customer contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
-	macro _removeCustomerContactsAttempt {
+	@prose = "I attempt to remove contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
+	macro _removeContactsViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1417,7 +1392,6 @@ definition {
 	@prose = "I remove customer contacts with the following email addresses from the account ${accountName} as a permissioned user ${table}"
 	macro _removeCustomerContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1435,19 +1409,16 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove customer contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
-	macro _removeCustomerContactsViaUuidAttempt {
+	@prose = "I attempt to remove customer contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
+	macro _removeCustomerContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
-			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1461,7 +1432,6 @@ definition {
 	@prose = "I remove customer contacts with the following email addresses from the account ${accountName} via uuid as a permissioned user ${table}"
 	macro _removeCustomerContactsViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1481,21 +1451,18 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove the team with the name ${teamName} on the account ${accountName} from the following roles as a non permissioned user ${table}"
-	macro _removeTeamRolesFromTeamAttempt {
+	@prose = "I attempt to remove customer contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
+	macro _removeCustomerContactsViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var teamRoleName = "${row[0]}";
+			var contactEmailAddress = "${row[0]}";
 
-			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/assigned-teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1509,9 +1476,7 @@ definition {
 	@prose = "I remove the team with the name ${teamName} on the account ${accountName} from the following roles as a permissioned user ${table}"
 	macro _removeTeamRolesFromTeam {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1531,17 +1496,19 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove worker contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
-	macro _removeWorkerContactsAttempt {
+	@prose = "I attempt to remove the team with the name ${teamName} on the account ${accountName} from the following roles as a non permissioned user ${table}"
+	macro _removeTeamRolesFromTeamAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
-			var contactEmailAddress = "${row[0]}";
+			var teamRoleName = "${row[0]}";
+
+			var teamRoleKey = KoroneikiTeamRoleAPI._getTeamRoleKeyViaTeamRoleName(teamRoleName = "${teamRoleName}");
 
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/worker-contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/assigned-teams/${teamKey}/roles?teamRoleKeys=${teamRoleKey} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1555,7 +1522,6 @@ definition {
 	@prose = "I remove worker contacts with the following email addresses from the account ${accountName} as a permissioned user ${table}"
 	macro _removeWorkerContacts {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1573,19 +1539,16 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to remove worker contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
-	macro _removeWorkerContactsViaUuidAttempt {
+	@prose = "I attempt to remove worker contacts with the following email addresses from the account ${accountName} as a non permissioned user ${table}"
+	macro _removeWorkerContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var contactEmailAddress = "${row[0]}";
 
-			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
-
 			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/worker-contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/worker-contacts/by-email-address?contactEmailAddresses=${contactEmailAddress} --tlsv1.2
 				--header "API_Token: ${apiToken}"
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
@@ -1599,7 +1562,6 @@ definition {
 	@prose = "I remove worker contacts with the following email addresses from the account ${accountName} via uuid as a permissioned user ${table}"
 	macro _removeWorkerContactsViaUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1619,10 +1581,31 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to set the permissions for a koroneiki account with the name ${accountName} to have the following values for a non permissioned user as a non permissioned user ${table}"
-	macro _setAccountPermissionsAttempt {
+	@prose = "I attempt to remove worker contacts with the following email addresses from the account ${accountName} via uuid as a non permissioned user ${table}"
+	macro _removeWorkerContactsViaUuidAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
 
+		for (var row : table "${rawTable}") {
+			var contactEmailAddress = "${row[0]}";
+
+			var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/worker-contacts/by-uuid?contactUuids=${contactUuid} --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "I set the permissions for a koroneiki account with the name ${accountName} to have the following values for a non permissioned user as a permissioned user ${table}"
+	macro _setAccountPermissions {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1667,18 +1650,23 @@ definition {
 		if (!(isSet(assignContact))) {
 			var assignContact = "false";
 		}
+
 		if (!(isSet(assignTeam))) {
 			var assignTeam = "false";
 		}
+
 		if (!(isSet(delete))) {
 			var delete = "false";
 		}
+
 		if (!(isSet(permissions))) {
 			var permissions = "false";
 		}
+
 		if (!(isSet(update))) {
 			var update = "false";
 		}
+
 		if (!(isSet(view))) {
 			var view = "false";
 		}
@@ -1705,10 +1693,9 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I set the permissions for a koroneiki account with the name ${accountName} to have the following values for a non permissioned user as a permissioned user ${table}"
-	macro _setAccountPermissions {
+	@prose = "I attempt to set the permissions for a koroneiki account with the name ${accountName} to have the following values for a non permissioned user as a non permissioned user ${table}"
+	macro _setAccountPermissionsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1753,18 +1740,23 @@ definition {
 		if (!(isSet(assignContact))) {
 			var assignContact = "false";
 		}
+
 		if (!(isSet(assignTeam))) {
 			var assignTeam = "false";
 		}
+
 		if (!(isSet(delete))) {
 			var delete = "false";
 		}
+
 		if (!(isSet(permissions))) {
 			var permissions = "false";
 		}
+
 		if (!(isSet(update))) {
 			var update = "false";
 		}
+
 		if (!(isSet(view))) {
 			var view = "false";
 		}
@@ -1787,6 +1779,511 @@ definition {
 				"view": "${view}"
 			}
 			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
+	@prose = "I unset the following permissions for a koroneiki account with the name ${accountName} for a permissioned user as a permissioned user ${table}"
+	macro _unsetAccountPermissions {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Assign Contact") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignContact = "${value}";
+			}
+			else if ("${field}" == "Assign Team") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignTeam = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(assignContact))) {
+			var assignContact = "false";
+		}
+
+		if (!(isSet(assignTeam))) {
+			var assignTeam = "false";
+		}
+
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/account-permissions --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"assignContact": "${assignContact}",
+				"assignTeam": "${assignTeam}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I attempt to unset the following permissions for a koroneiki account with the name ${accountName} for a permissioned user as a non permissioned user ${table}"
+	macro _unsetAccountPermissionsAttempt {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Assign Contact") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignContact = "${value}";
+			}
+			else if ("${field}" == "Assign Team") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var assignTeam = "${value}";
+			}
+			else if ("${field}" == "Delete") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var delete = "${value}";
+			}
+			else if ("${field}" == "Permissions") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var permissions = "${value}";
+			}
+			else if ("${field}" == "Update") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var update = "${value}";
+			}
+			else if ("${field}" == "View") {
+				var value = StringUtil.lowerCase("${value}");
+
+				var view = "${value}";
+			}
+			else {
+				fail("No such permission field ${field}");
+			}
+		}
+
+		if (!(isSet(assignContact))) {
+			var assignContact = "false";
+		}
+
+		if (!(isSet(assignTeam))) {
+			var assignTeam = "false";
+		}
+
+		if (!(isSet(delete))) {
+			var delete = "false";
+		}
+
+		if (!(isSet(permissions))) {
+			var permissions = "false";
+		}
+
+		if (!(isSet(update))) {
+			var update = "false";
+		}
+
+		if (!(isSet(view))) {
+			var view = "false";
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/account-permissions --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			-d
+			{
+				"assignContact": "${assignContact}",
+				"assignTeam": "${assignTeam}",
+				"delete": "${delete}",
+				"permissions": "${permissions}",
+				"roleNames": [
+					"${roleName}"
+				],
+				"update": "${update}",
+				"view": "${view}"
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+	}
+
+	@prose = "I update a koroneiki account with the name ${accountName} to have the following values as a permissioned user ${table}"
+	macro _updateAccount {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var properties = "";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value1 = "${row[1]}";
+			var value2 = "${row[2]}";
+
+			if ("${field}" == "Account Field and Value") {
+				if ("${properties}" == "") {
+					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+				else {
+					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
+				}
+			}
+			else if ("${field}" == "Code") {
+				var code = "${value1}";
+			}
+			else if ("${field}" == "Contact Email Address") {
+				var contactEmailAddress = "${value1}";
+			}
+			else if ("${field}" == "Data Region") {
+				var dataRegion = "${value1}";
+			}
+			else if ("${field}" == "Description") {
+				var description = "${value1}";
+			}
+			else if ("${field}" == "Fax Number") {
+				var faxNumber = "${value1}";
+			}
+			else if ("${field}" == "Internal") {
+				var internal = "${value1}";
+			}
+			else if ("${field}" == "Language") {
+				var language = "${value1}";
+			}
+			else if ("${field}" == "Name") {
+				var name = "${value1}";
+			}
+			else if ("${field}" == "Phone Number") {
+				var phoneNumber = "${value1}";
+			}
+			else if ("${field}" == "Profile Email Address") {
+				var profileEmailAddress = "${value1}";
+			}
+			else if ("${field}" == "Region") {
+				var region = "${value1}";
+			}
+			else if ("${field}" == "Status") {
+				var status = "${value1}";
+			}
+			else if ("${field}" == "Tier") {
+				var tier = "${value1}";
+			}
+			else if ("${field}" == "Website") {
+				var website = "${value1}";
+			}
+			else {
+				fail("No such account field ${field}");
+			}
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		if (!(isSet(code))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "code=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.code");
+
+				var code = "${value1}";
+			}
+			else {
+				var code = "";
+			}
+		}
+
+		if (!(isSet(contactEmailAddress))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "contactEmailAddress=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
+
+				var contactEmailAddress = "${value1}";
+			}
+			else {
+				var contactEmailAddress = "";
+			}
+		}
+
+		if (!(isSet(dataRegion))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "dataRegion=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.dataRegion");
+
+				var dataRegion = "${value1}";
+			}
+			else {
+				var dataRegion = "";
+			}
+		}
+
+		if (!(isSet(description))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "description=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.description");
+
+				var description = "${value1}";
+			}
+			else {
+				var description = "";
+			}
+		}
+
+		if (!(isSet(faxNumber))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "faxNumber=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.faxNumber");
+
+				var faxNumber = "${value1}";
+			}
+			else {
+				var faxNumber = "";
+			}
+		}
+
+		if (!(isSet(internal))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "internal=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.internal");
+
+				var internal = "${value1}";
+			}
+			else {
+				var internal = "false";
+			}
+		}
+
+		if (!(isSet(language))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "language=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.language");
+
+				var language = "${value1}";
+			}
+			else {
+				var language = "";
+			}
+		}
+
+		if (!(isSet(name))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "name=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.name");
+
+				var name = "${value1}";
+			}
+			else {
+				var name = "";
+			}
+		}
+
+		if (!(isSet(phoneNumber))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "phoneNumber=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.phoneNumber");
+
+				var phoneNumber = "${value1}";
+			}
+			else {
+				var phoneNumber = "";
+			}
+		}
+
+		if (!(isSet(profileEmailAddress))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "profileEmailAddress=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
+
+				var profileEmailAddress = "${value1}";
+			}
+			else {
+				var profileEmailAddress = "";
+			}
+		}
+
+		if (!(isSet(properties))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "properties=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.properties");
+
+				var properties = "${value1}";
+			}
+			else {
+				var properties = "";
+			}
+		}
+
+		if (!(isSet(region))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "region=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.region");
+
+				var region = "${value1}";
+			}
+			else {
+				var region = "";
+			}
+		}
+
+		if (!(isSet(status))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "status=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.status");
+
+				var status = "${value1}";
+			}
+			else {
+				var status = "";
+			}
+		}
+
+		if (!(isSet(tier))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "tier=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.tier");
+
+				var tier = "${value1}";
+			}
+			else {
+				var tier = "";
+			}
+		}
+
+		if (!(isSet(website))) {
+			var accountObject = JSONCurlUtil.get("${curl}", "$");
+
+			if (contains("${accountObject}", "website=")) {
+				var value1 = JSONCurlUtil.get("${curl}", "$.website");
+
+				var website = "${value1}";
+			}
+			else {
+				var website = "";
+			}
+		}
+
+		if ("${properties}" == "") {
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
+		else {
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				-d
+				{
+					"code": "${code}",
+					"contactEmailAddress": "${contactEmailAddress}",
+					"dataRegion": "${dataRegion}",
+					"description": "${description}",
+					"faxNumber": "${faxNumber}",
+					"internal": ${internal},
+					"language": "${language}",
+					"name": "${name}",
+					"phoneNumber": "${phoneNumber}",
+					"profileEmailAddress": "${profileEmailAddress}",
+					"properties": {
+						${properties}
+					},
+					"region": "${region}",
+					"status": "${status}",
+					"tier": "${tier}",
+					"website": "${website}"
+				}
+				''';
+		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
@@ -1794,9 +2291,7 @@ definition {
 	@prose = "I attempt to update a koroneiki account with the name ${accountName} to have the following values as a non permissioned user ${table}"
 	macro _updateAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var properties = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1878,6 +2373,7 @@ definition {
 				var code = "";
 			}
 		}
+
 		if (!(isSet(contactEmailAddress))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1890,6 +2386,7 @@ definition {
 				var contactEmailAddress = "";
 			}
 		}
+
 		if (!(isSet(dataRegion))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1902,6 +2399,7 @@ definition {
 				var dataRegion = "";
 			}
 		}
+
 		if (!(isSet(description))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1914,6 +2412,7 @@ definition {
 				var description = "";
 			}
 		}
+
 		if (!(isSet(faxNumber))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1926,6 +2425,7 @@ definition {
 				var faxNumber = "";
 			}
 		}
+
 		if (!(isSet(internal))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1938,6 +2438,7 @@ definition {
 				var internal = "false";
 			}
 		}
+
 		if (!(isSet(language))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1950,6 +2451,7 @@ definition {
 				var language = "";
 			}
 		}
+
 		if (!(isSet(name))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1962,6 +2464,7 @@ definition {
 				var name = "";
 			}
 		}
+
 		if (!(isSet(phoneNumber))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1974,6 +2477,7 @@ definition {
 				var phoneNumber = "";
 			}
 		}
+
 		if (!(isSet(profileEmailAddress))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1986,6 +2490,7 @@ definition {
 				var profileEmailAddress = "";
 			}
 		}
+
 		if (!(isSet(properties))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -1998,6 +2503,7 @@ definition {
 				var properties = "";
 			}
 		}
+
 		if (!(isSet(region))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -2010,6 +2516,7 @@ definition {
 				var region = "";
 			}
 		}
+
 		if (!(isSet(status))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -2022,6 +2529,7 @@ definition {
 				var status = "";
 			}
 		}
+
 		if (!(isSet(tier))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -2034,6 +2542,7 @@ definition {
 				var tier = "";
 			}
 		}
+
 		if (!(isSet(website))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
 
@@ -2102,491 +2611,6 @@ definition {
 		}
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "I update a koroneiki account with the name ${accountName} to have the following values as a permissioned user ${table}"
-	macro _updateAccount {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var properties = "";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value1 = "${row[1]}";
-			var value2 = "${row[2]}";
-
-			if ("${field}" == "Account Field and Value") {
-				if ("${properties}" == "") {
-					var properties = "&quot;${value1}&quot;:&quot;${value2}&quot;";
-				}
-				else {
-					var properties = "${properties},&quot;${value1}&quot;:&quot;${value2}&quot;";
-				}
-			}
-			else if ("${field}" == "Code") {
-				var code = "${value1}";
-			}
-			else if ("${field}" == "Contact Email Address") {
-				var contactEmailAddress = "${value1}";
-			}
-			else if ("${field}" == "Data Region") {
-				var dataRegion = "${value1}";
-			}
-			else if ("${field}" == "Description") {
-				var description = "${value1}";
-			}
-			else if ("${field}" == "Fax Number") {
-				var faxNumber = "${value1}";
-			}
-			else if ("${field}" == "Internal") {
-				var internal = "${value1}";
-			}
-			else if ("${field}" == "Language") {
-				var language = "${value1}";
-			}
-			else if ("${field}" == "Name") {
-				var name = "${value1}";
-			}
-			else if ("${field}" == "Phone Number") {
-				var phoneNumber = "${value1}";
-			}
-			else if ("${field}" == "Profile Email Address") {
-				var profileEmailAddress = "${value1}";
-			}
-			else if ("${field}" == "Region") {
-				var region = "${value1}";
-			}
-			else if ("${field}" == "Status") {
-				var status = "${value1}";
-			}
-			else if ("${field}" == "Tier") {
-				var tier = "${value1}";
-			}
-			else if ("${field}" == "Website") {
-				var website = "${value1}";
-			}
-			else {
-				fail("No such account field ${field}");
-			}
-		}
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		if (!(isSet(code))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "code=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.code");
-
-				var code = "${value1}";
-			}
-			else {
-				var code = "";
-			}
-		}
-		if (!(isSet(contactEmailAddress))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "contactEmailAddress=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.contactEmailAddress");
-
-				var contactEmailAddress = "${value1}";
-			}
-			else {
-				var contactEmailAddress = "";
-			}
-		}
-		if (!(isSet(dataRegion))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "dataRegion=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.dataRegion");
-
-				var dataRegion = "${value1}";
-			}
-			else {
-				var dataRegion = "";
-			}
-		}
-		if (!(isSet(description))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "description=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.description");
-
-				var description = "${value1}";
-			}
-			else {
-				var description = "";
-			}
-		}
-		if (!(isSet(faxNumber))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "faxNumber=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.faxNumber");
-
-				var faxNumber = "${value1}";
-			}
-			else {
-				var faxNumber = "";
-			}
-		}
-		if (!(isSet(internal))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "internal=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.internal");
-
-				var internal = "${value1}";
-			}
-			else {
-				var internal = "false";
-			}
-		}
-		if (!(isSet(language))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "language=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.language");
-
-				var language = "${value1}";
-			}
-			else {
-				var language = "";
-			}
-		}
-		if (!(isSet(name))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "name=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.name");
-
-				var name = "${value1}";
-			}
-			else {
-				var name = "";
-			}
-		}
-		if (!(isSet(phoneNumber))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "phoneNumber=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.phoneNumber");
-
-				var phoneNumber = "${value1}";
-			}
-			else {
-				var phoneNumber = "";
-			}
-		}
-		if (!(isSet(profileEmailAddress))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "profileEmailAddress=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.profileEmailAddress");
-
-				var profileEmailAddress = "${value1}";
-			}
-			else {
-				var profileEmailAddress = "";
-			}
-		}
-		if (!(isSet(properties))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "properties=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.properties");
-
-				var properties = "${value1}";
-			}
-			else {
-				var properties = "";
-			}
-		}
-		if (!(isSet(region))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "region=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.region");
-
-				var region = "${value1}";
-			}
-			else {
-				var region = "";
-			}
-		}
-		if (!(isSet(status))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "status=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.status");
-
-				var status = "${value1}";
-			}
-			else {
-				var status = "";
-			}
-		}
-		if (!(isSet(tier))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "tier=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.tier");
-
-				var tier = "${value1}";
-			}
-			else {
-				var tier = "";
-			}
-		}
-		if (!(isSet(website))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "website=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.website");
-
-				var website = "${value1}";
-			}
-			else {
-				var website = "";
-			}
-		}
-
-		if ("${properties}" == "") {
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"code": "${code}",
-					"contactEmailAddress": "${contactEmailAddress}",
-					"dataRegion": "${dataRegion}",
-					"description": "${description}",
-					"faxNumber": "${faxNumber}",
-					"internal": ${internal},
-					"language": "${language}",
-					"name": "${name}",
-					"phoneNumber": "${phoneNumber}",
-					"profileEmailAddress": "${profileEmailAddress}",
-					"region": "${region}",
-					"status": "${status}",
-					"tier": "${tier}",
-					"website": "${website}"
-				}
-				''';
-		}
-		else {
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"code": "${code}",
-					"contactEmailAddress": "${contactEmailAddress}",
-					"dataRegion": "${dataRegion}",
-					"description": "${description}",
-					"faxNumber": "${faxNumber}",
-					"internal": ${internal},
-					"language": "${language}",
-					"name": "${name}",
-					"phoneNumber": "${phoneNumber}",
-					"profileEmailAddress": "${profileEmailAddress}",
-					"properties": {
-						${properties}
-					},
-					"region": "${region}",
-					"status": "${status}",
-					"tier": "${tier}",
-					"website": "${website}"
-				}
-				''';
-		}
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-	}
-
-	@prose = "I attempt to unset the following permissions for a koroneiki account with the name ${accountName} for a permissioned user as a non permissioned user ${table}"
-	macro _unsetAccountPermissionsAttempt {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Assign Contact") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var assignContact = "${value}";
-			}
-			else if ("${field}" == "Assign Team") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var assignTeam = "${value}";
-			}
-			else if ("${field}" == "Delete") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var delete = "${value}";
-			}
-			else if ("${field}" == "Permissions") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var permissions = "${value}";
-			}
-			else if ("${field}" == "Update") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var update = "${value}";
-			}
-			else if ("${field}" == "View") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var view = "${value}";
-			}
-			else {
-				fail("No such permission field ${field}");
-			}
-		}
-
-		if (!(isSet(assignContact))) {
-			var assignContact = "false";
-		}
-		if (!(isSet(assignTeam))) {
-			var assignTeam = "false";
-		}
-		if (!(isSet(delete))) {
-			var delete = "false";
-		}
-		if (!(isSet(permissions))) {
-			var permissions = "false";
-		}
-		if (!(isSet(update))) {
-			var update = "false";
-		}
-		if (!(isSet(view))) {
-			var view = "false";
-		}
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/account-permissions --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"assignContact": "${assignContact}",
-				"assignTeam": "${assignTeam}",
-				"delete": "${delete}",
-				"permissions": "${permissions}",
-				"roleNames": [
-					"${roleName}"
-				],
-				"update": "${update}",
-				"view": "${view}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
-	}
-
-	@prose = "I unset the following permissions for a koroneiki account with the name ${accountName} for a permissioned user as a permissioned user ${table}"
-	macro _unsetAccountPermissions {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Assign Contact") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var assignContact = "${value}";
-			}
-			else if ("${field}" == "Assign Team") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var assignTeam = "${value}";
-			}
-			else if ("${field}" == "Delete") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var delete = "${value}";
-			}
-			else if ("${field}" == "Permissions") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var permissions = "${value}";
-			}
-			else if ("${field}" == "Update") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var update = "${value}";
-			}
-			else if ("${field}" == "View") {
-				var value = StringUtil.lowerCase("${value}");
-
-				var view = "${value}";
-			}
-			else {
-				fail("No such permission field ${field}");
-			}
-		}
-
-		if (!(isSet(assignContact))) {
-			var assignContact = "false";
-		}
-		if (!(isSet(assignTeam))) {
-			var assignTeam = "false";
-		}
-		if (!(isSet(delete))) {
-			var delete = "false";
-		}
-		if (!(isSet(permissions))) {
-			var permissions = "false";
-		}
-		if (!(isSet(update))) {
-			var update = "false";
-		}
-		if (!(isSet(view))) {
-			var view = "false";
-		}
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/account-permissions --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			-d
-			{
-				"assignContact": "${assignContact}",
-				"assignTeam": "${assignTeam}",
-				"delete": "${delete}",
-				"permissions": "${permissions}",
-				"roleNames": [
-					"${roleName}"
-				],
-				"update": "${update}",
-				"view": "${view}"
-			}
-			''';
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
 	@prose = "I should be able to view a koroneiki account with the name ${accountName} and the following values as a permissioned user ${table}"
@@ -2599,7 +2623,6 @@ definition {
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -2658,6 +2681,7 @@ definition {
 
 			if ("${field}" == "Account Field and Value") {
 				echo("Expected property field ${value1} value: ${value2}");
+
 				echo("Actual property field ${value1} value: ${valueFromAPI}");
 
 				if (!(contains("${value2}", "${valueFromAPI}"))) {
@@ -2666,6 +2690,7 @@ definition {
 			}
 			else {
 				echo("Expected ${field} Value: ${value1}");
+
 				echo("Actual ${field} Value: ${valueFromAPI}");
 
 				if (!(contains("${value1}", "${valueFromAPI}"))) {
@@ -2692,12 +2717,13 @@ definition {
 
 		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "]", "");
 
-		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "&quot;", "");
+		var teamNameFromAPI = StringUtil.replace("${teamNameFromAPI}", "\"", "");
 
 		echo("Expected team name value: ${teamName}");
+
 		echo("Actual team name value: ${teamNameFromAPI}");
 
-		if (!("${teamNameFromAPI}" == "${teamName}")) {
+		if ("${teamNameFromAPI}" != "${teamName}") {
 			fail("Actual team name ${teamNameFromAPI} does not match expected team name value ${teamName}");
 		}
 	}
@@ -2719,39 +2745,13 @@ definition {
 
 		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
 
-		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "&quot;", "");
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "\"", "");
 
 		echo("Expected contact email address value: ${contactEmailAddress}");
+
 		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
 
-		if (!("${contactEmailAddressFromAPI}" == "${contactEmailAddress}")) {
-			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
-		}
-	}
-
-	@prose = "the customer contact with the email address ${contactEmailAddress} assigned the account ${accountName} should be visible to a permissioned user"
-	macro _viewCustomerContact {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-			''';
-
-		var contactEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].emailAddress");
-
-		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "[", "");
-
-		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
-
-		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "&quot;", "");
-
-		echo("Expected contact email address value: ${contactEmailAddress}");
-		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
-
-		if (!("${contactEmailAddressFromAPI}" == "${contactEmailAddress}")) {
+		if ("${contactEmailAddressFromAPI}" != "${contactEmailAddress}") {
 			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
 		}
 	}
@@ -2773,12 +2773,13 @@ definition {
 
 		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
 
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
+		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "\"", "");
 
 		echo("Expected contact role name value: ${contactRoleName}");
+
 		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
 
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
+		if ("${contactRoleNameFromAPI}" != "${contactRoleName}") {
 			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
 		}
 	}
@@ -2786,7 +2787,6 @@ definition {
 	@prose = "the contact with the email address ${contactEmailAddress} assigned the account ${accountName} with the contact role ${contactRoleName} should be visible via uuid to a permissioned user"
 	macro _viewContactRoleViaContactUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
 		var curl = '''
@@ -2802,13 +2802,42 @@ definition {
 
 		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "]", "");
 
-		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "&quot;", "");
+		var contactRoleNameFromAPI = StringUtil.replace("${contactRoleNameFromAPI}", "\"", "");
 
 		echo("Expected contact role name value: ${contactRoleName}");
+
 		echo("Actual contact role name value: ${contactRoleNameFromAPI}");
 
-		if (!("${contactRoleNameFromAPI}" == "${contactRoleName}")) {
+		if ("${contactRoleNameFromAPI}" != "${contactRoleName}") {
 			fail("Actual contact role name value ${contactRoleNameFromAPI} does not match expected contact role name value ${contactRoleName}");
+		}
+	}
+
+	@prose = "the customer contact with the email address ${contactEmailAddress} assigned the account ${accountName} should be visible to a permissioned user"
+	macro _viewCustomerContact {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/customer-contacts --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var contactEmailAddressFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.emailAddress=='${contactEmailAddress}')].emailAddress");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "[", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
+
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "\"", "");
+
+		echo("Expected contact email address value: ${contactEmailAddress}");
+
+		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
+
+		if ("${contactEmailAddressFromAPI}" != "${contactEmailAddress}") {
+			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
 		}
 	}
 
@@ -2863,7 +2892,7 @@ definition {
 
 		var accountAuditEntries = JSONCurlUtil.get("${curl}", "$");
 
-		if ((contains("${accountAuditEntries}", "${fieldName}")) || (contains("${accountAuditEntries}", "${oldValue}")) || (contains("${accountAuditEntries}", "${newValue}"))) {
+		if (contains("${accountAuditEntries}", "${fieldName}") || contains("${accountAuditEntries}", "${oldValue}") || contains("${accountAuditEntries}", "${newValue}")) {
 			fail("The account audit entry for a change to the account ${accountName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
 		}
 
@@ -2882,7 +2911,7 @@ definition {
 
 		var accountAuditEntry = JSONCurlUtil.get("${curl}", "$");
 
-		if ((contains("${accountAuditEntry}", "${fieldName}")) || (contains("${accountAuditEntry}", "${oldValue}")) || (contains("${accountAuditEntry}", "${newValue}"))) {
+		if (contains("${accountAuditEntry}", "${fieldName}") || contains("${accountAuditEntry}", "${oldValue}") || contains("${accountAuditEntry}", "${newValue}")) {
 			fail("The account audit entry for a change to the account ${accountName} field ${fieldName} from the old value ${oldValue} to the new value ${newValue} is visible to a non permissioned user");
 		}
 	}
@@ -3013,7 +3042,6 @@ definition {
 	@prose = "the contact with the email address ${contactEmailAddress} assigned the account ${accountName} should not have the contact role ${contactRoleName} visible via uuid to a non permissioned user"
 	macro _viewNoContactRoleViaContactUuid {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
 
 		var curl = '''
@@ -3051,7 +3079,6 @@ definition {
 	@prose = "the team with the name ${teamName} assigned the account ${accountName} should not have the team role ${teamRoleName} visible to a non permissioned user"
 	macro _viewNoTeamRole {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 
 		var curl = '''
@@ -3103,13 +3130,15 @@ definition {
 
 		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "]", "");
 
-		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "&quot;", "");
+		var contactEmailAddressFromAPI = StringUtil.replace("${contactEmailAddressFromAPI}", "\"", "");
 
 		echo("Expected contact email address value: ${contactEmailAddress}");
+
 		echo("Actual contact email address value: ${contactEmailAddressFromAPI}");
 
-		if (!("${contactEmailAddressFromAPI}" == "${contactEmailAddress}")) {
+		if ("${contactEmailAddressFromAPI}" != "${contactEmailAddress}") {
 			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
 		}
 	}
+
 }

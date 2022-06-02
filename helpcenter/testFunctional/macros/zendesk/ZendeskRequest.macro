@@ -1,4 +1,5 @@
 definition {
+
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
@@ -6,7 +7,6 @@ definition {
 	@prose = "I should be able to see the downloaded file ${file}"
 	macro assertDownloadedFile {
 		var tempFileDirectory = selenium.getOutputDirName();
-
 		var downloadedFilePath = "/home/me/Downloads/${file}";
 
 		var fileExists = FileUtil.exists("${downloadedFilePath}");
@@ -22,15 +22,15 @@ definition {
 	@prose = "I click the option ${option}"
 	macro clickOption {
 		Click(
-			locator1 = "ZendeskRequestAdd#OPTION",
-			key_option = "${option}");
+			key_option = "${option}",
+			locator1 = "ZendeskRequestAdd#OPTION");
 	}
 
 	@prose = "I click on the ${dropdownLabel} dropdown"
 	macro clickRequestDropdown {
 		Click(
-			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
-			key_dropdownLabel = "${dropdownLabel}");
+			key_dropdownLabel = "${dropdownLabel}",
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK");
 	}
 
 	@prose = "I create a request with the following values ${table}"
@@ -48,36 +48,42 @@ definition {
 
 			if ("${field}" == "Organization") {
 				Click(locator1 = "ZendeskRequestAdd#ORGANIZATION_DROPDOWN_LINK");
+
 				Click(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
 			}
 			else if ("${field}" == "Product") {
 				Click(locator1 = "ZendeskRequestAdd#PRODUCT_DROPDOWN_LINK");
+
 				Click(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
-				if (!("${subValue}" == "")) {
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
+
+				if ("${subValue}" != "") {
 					Click(
-						locator1 = "ZendeskRequestAdd#OPTION",
-						key_option = "${subValue}");
+						key_option = "${subValue}",
+						locator1 = "ZendeskRequestAdd#OPTION");
 				}
 			}
 			else if ("${field}" == "Component") {
 				Click(locator1 = "ZendeskRequestAdd#COMPONENT_DROPDOWN_LINK");
+
 				Click(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
 			}
 			else if ("${field}" == "System Status") {
 				Click(locator1 = "ZendeskRequestAdd#SYSTEM_STATUS_DROPDOWN_LINK");
+
 				Click(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
-				if (!("${subValue}" == "")) {
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
+
+				if ("${subValue}" != "") {
 					Click(
-						locator1 = "ZendeskRequestAdd#OPTION",
-						key_option = "${subValue}");
+						key_option = "${subValue}",
+						locator1 = "ZendeskRequestAdd#OPTION");
 				}
 			}
 			else if ("${field}" == "Subject") {
@@ -110,7 +116,7 @@ definition {
 
 		Click(locator1 = "ZendeskRequestAdd#SUBMIT_BUTTON");
 
-		while(IsElementPresent(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD_ERROR_MESSAGE")) {
+		while (IsElementPresent(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD_ERROR_MESSAGE")) {
 			MakeVisible(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD");
 
 			UploadCommonFile(
@@ -164,10 +170,28 @@ definition {
 		return "${staticRequestId}";
 	}
 
+	@prose = "I download the attached file ${fileName} on position ${positionValue}"
+	macro downloadAttachedFile {
+		Click(
+			key_attachmentName = "${fileName}",
+			key_positionValue = "${positionValue}",
+			locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT_POSITIONED");
+
+		DownloadTempFile();
+	}
+
+	@prose = "I download the attached file ${attachmentName} on request details"
+	macro downloadAttachedFileOnRequestDetails {
+		Click(
+			key_attachmentName = "${attachmentName}",
+			locator1 = "ZendeskRequestView#REQUEST_DETAILS_ATTACHMENT");
+
+		DownloadTempFile();
+	}
+
 	@prose = "I download the attached large file ${fileName} with the comment ${commentContent}"
 	macro downloadLargeFIle {
 		var key_commentContent = "${commentContent}";
-
 		var key_fileName = "${fileName}";
 
 		Click(locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_ATTACHMENT");
@@ -183,9 +207,9 @@ definition {
 	@prose = "I click on the request with the subject ${requestSubject} in the index"
 	macro gotoViaIndex {
 		Click(
+			key_requestSubject = "${requestSubject}",
 			locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
-			value1 = "${value}",
-			key_requestSubject = "${requestSubject}");
+			value1 = "${value}");
 	}
 
 	@prose = "I mark the request as solved"
@@ -298,6 +322,7 @@ definition {
 				fail("No such request field ${field}");
 			}
 		}
+
 		Click(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
 
 		AssertTextEquals(
@@ -321,7 +346,6 @@ definition {
 	@prose = "I upload a file using the large file uploader with the following parameters ${table}"
 	macro uploadFileViaLargeFileUploader {
 		var uploadComplete = "false";
-
 		var currentIteration = "0";
 
 		ScrollWebElementIntoView(locator1 = "ZendeskRequestView#LARGE_ATTACHMENT_LINK");
@@ -330,66 +354,64 @@ definition {
 
 		ZendeskHomepage.pause(timeInSeconds = "10");
 
-//		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${uploadComplete}" == "true"))) {
-			var RawTable rawTable = new RawTable("${table}");
+		//		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${uploadComplete}" == "true"))) {
+		var RawTable rawTable = new RawTable("${table}");
 
-			for (var row : table "${rawTable}") {
-				var field = "${row[0]}";
-				var value = "${row[1]}";
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
 
-				if ("${field}" == "Attachment") {
-					MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
+			if ("${field}" == "Attachment") {
+				MakeVisible(locator1 = "LargeFileUploader#ATTACHMENT_FIELD");
 
-					UploadCommonFile(
-						locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
-						value1 = "${value}");
+				UploadCommonFile(
+					locator1 = "LargeFileUploader#ATTACHMENT_FIELD",
+					value1 = "${value}");
 
-					ZendeskHomepage.pause(timeInSeconds = "10");
-				}
-				else if ("${field}" == "Comment") {
-					Type(
-						locator1 = "LargeFileUploader#COMMENT_FIELD",
-						value1 = "${value}");
-				}
-				else if ("${field}" == "Data Region") {
-					AssertTextEquals.assertPartialText(
-						locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
-						value1 = "Your file will be uploaded to a file server in the ${value}.");
-				}
-				else if ("${field}" == "No Personal Data") {
-					if ("${value}" == "true") {
-						Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
-					}
-					else {
-						Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
-					}
+				ZendeskHomepage.pause(timeInSeconds = "10");
+			}
+			else if ("${field}" == "Comment") {
+				Type(
+					locator1 = "LargeFileUploader#COMMENT_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Data Region") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE_FILE_UPLOAD_LOCATION",
+					value1 = "Your file will be uploaded to a file server in the ${value}.");
+			}
+			else if ("${field}" == "No Personal Data") {
+				if ("${value}" == "true") {
+					Check(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
 				}
 				else {
-					fail("No such large file uploader field ${field}");
+					Uncheck(locator1 = "LargeFileUploader#NO_PERSONAL_DATA_CHECKBOX");
 				}
 			}
+			else {
+				fail("No such large file uploader field ${field}");
+			}
+		}
 
-			AssertTextEquals.assertPartialText(
-				locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
-				value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
+		AssertTextEquals.assertPartialText(
+			locator1 = "LargeFileUploader#DATA_REGION_INFO_MESSAGE",
+			value1 = "Please note that the location of the server to which the file will be uploaded is based on the location of the Liferay center providing support to your company. For more detail regarding the applicable server locations and location of Liferay support staff who might access the data please consult this article.");
 
-			Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
+		Click(locator1 = "LargeFileUploader#SUBMIT_BUTTON");
 
-//			if (IsElementNotPresent(locator1 = "LargeFileUploader#ATTACHMENT_FIELD_ERROR_MESSAGE")) {
-//				var uploadComplete = "true";
-//			}
-//			else {
-//				var currentIteration = MathUtil.sum("${currentIteration}", "1");
-//
-//				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-//
-//				Click(locator1 = "LargeFileUploader#CLEAR_BUTTON");
-//			}
-//		}
-//
-//		if ("${currentIteration}" == "${pollMaximumIterations}") {
-//			fail("After ${currentIteration} checks, the file couldn't be uploaded.");
-//		}
+		//			if (IsElementNotPresent(locator1 = "LargeFileUploader#ATTACHMENT_FIELD_ERROR_MESSAGE")) {
+		//				var uploadComplete = "true";
+		//}
+		//			else {
+		//				var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		//				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+		//				Click(locator1 = "LargeFileUploader#CLEAR_BUTTON");
+		//}
+		//}
+		//		if ("${currentIteration}" == "${pollMaximumIterations}") {
+		//			fail("After ${currentIteration} checks, the file couldn't be uploaded.");
+		//}
+
 	}
 
 	@prose = "I should be able to view a request with the following details ${table}"
@@ -467,23 +489,14 @@ definition {
 			}
 			else if ("${field}" == "Attachments") {
 				AssertTextEquals(
+					key_attachmentName = "${value}",
 					locator1 = "ZendeskRequestView#REQUEST_DETAILS_ATTACHMENT",
-					value1 = "${value}",
-					key_attachmentName = "${value}");
+					value1 = "${value}");
 			}
 			else {
 				fail("No such request field ${field}");
 			}
 		}
-	}
-
-	@prose = "I download the attached file ${attachmentName} on request details"
-	macro downloadAttachedFileOnRequestDetails {
-		Click(
-			locator1 = "ZendeskRequestView#REQUEST_DETAILS_ATTACHMENT",
-			key_attachmentName = "${attachmentName}");
-
-		DownloadTempFile();
 	}
 
 	@prose = "I should see the closed comment message"
@@ -507,28 +520,28 @@ definition {
 
 			if ("${field}" == "Author") {
 				AssertTextEquals(
+					key_commentContent = "${commentContent}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_AUTHOR",
-					value1 = "${value}",
-					key_commentContent = "${commentContent}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Comment") {
 				AssertTextEquals(
+					key_commentContent = "${commentContent}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT",
-					value1 = "${value}",
-					key_commentContent = "${commentContent}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Partial Comment") {
 				AssertTextEquals.assertPartialText(
+					key_commentContent = "${commentContent}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT",
-					value1 = "${value}",
-					key_commentContent = "${commentContent}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Attachments") {
 				AssertTextEquals(
-					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT",
-					value1 = "${value}",
+					key_attachmentName = "${value}",
 					key_commentContent = "${commentContent}",
-					key_attachmentName = "${value}");
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT",
+					value1 = "${value}");
 			}
 			else {
 				fail("No such request comment field ${field}");
@@ -539,8 +552,11 @@ definition {
 	@prose = "I should see the request comment field"
 	macro viewCommentField {
 		AssertVisible(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
 		Click(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
 		AssertVisible(locator1 = "ZendeskRequestView#REQUEST_COMMENT_TEXT_IFRAME");
+
 		AssertVisible(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
 	}
 
@@ -554,43 +570,33 @@ definition {
 
 			if ("${field}" == "Author") {
 				AssertTextEquals(
+					key_positionValue = "${positionValue}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_AUTHOR_POSITIONED",
-					value1 = "${value}",
-					key_positionValue = "${positionValue}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Comment") {
 				AssertTextEquals(
+					key_positionValue = "${positionValue}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT_POSITIONED",
-					value1 = "${value}",
-					key_positionValue = "${positionValue}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Partial Comment") {
 				AssertTextEquals.assertPartialText(
+					key_positionValue = "${positionValue}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_CONTENT_POSITIONED",
-					value1 = "${value}",
-					key_positionValue = "${positionValue}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Attachments") {
 				AssertTextEquals(
-					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT_POSITIONED",
-					value1 = "${value}",
+					key_attachmentName = "${value}",
 					key_positionValue = "${positionValue}",
-					key_attachmentName = "${value}");
+					locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT_POSITIONED",
+					value1 = "${value}");
 			}
 			else {
 				fail("No such request comment field ${field}");
 			}
 		}
-	}
-
-	@prose = "I download the attached file ${fileName} on position ${positionValue}"
-	macro downloadAttachedFile {
-		Click(
-			locator1 = "ZendeskRequestView#REQUEST_COMMENT_ATTACHMENT_POSITIONED",
-			key_positionValue = "${positionValue}",
-			key_attachmentName = "${fileName}");
-
-		DownloadTempFile();
 	}
 
 	@prose = "I should see the Description text field"
@@ -605,22 +611,22 @@ definition {
 	@prose = "I should see the ${dropdownLabel} dropdown"
 	macro viewDropdownMenu {
 		AssertVisible(
-			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
-			key_dropdownLabel = "${dropdownLabel}");
+			key_dropdownLabel = "${dropdownLabel}",
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK");
 	}
 
 	@prose = "the ${dropdownLabel} dropdown should not be present"
 	macro viewDropdownMenuNotPresent {
 		AssertElementNotPresent(
-			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
-			key_dropdownLabel = "${dropdownLabel}");
+			key_dropdownLabel = "${dropdownLabel}",
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK");
 	}
 
 	@prose = "the ${dropdownLabel} dropdown should not be visible"
 	macro viewDropdownMenuNotVisible {
 		AssertNotVisible(
-			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
-			key_dropdownLabel = "${dropdownLabel}");
+			key_dropdownLabel = "${dropdownLabel}",
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK");
 	}
 
 	@prose = "I should be able to view a large file comment containing the text ${commentContent} with the following details ${table}"
@@ -633,22 +639,22 @@ definition {
 
 			if ("${field}" == "Author") {
 				AssertTextEquals(
+					key_commentContent = "${commentContent}",
 					locator1 = "ZendeskRequestView#REQUEST_COMMENT_AUTHOR",
-					value1 = "${value}",
-					key_commentContent = "${commentContent}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Comment") {
 				AssertTextEquals.assertPartialText(
+					key_commentContent = "${commentContent}",
 					locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_CONTENT",
-					value1 = "${value}",
-					key_commentContent = "${commentContent}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Attachment") {
 				AssertTextEquals.assertPartialText(
-					locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_ATTACHMENT",
-					value1 = "${value}",
 					key_commentContent = "${commentContent}",
-					key_fileName = "${value}");
+					key_fileName = "${value}",
+					locator1 = "ZendeskRequestView#REQUEST_LARGE_FILE_COMMENT_ATTACHMENT",
+					value1 = "${value}");
 			}
 			else {
 				fail("No such large file request comment field ${field}");
@@ -675,21 +681,24 @@ definition {
 	@prose = "I should not see the closed comment message"
 	macro viewNoClosedCommentMessage {
 		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_CLOSED_COMMENT_MESSAGE");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestView#CREATE_FOLLOW_UP_LINK");
 	}
 
 	@prose = "I should not see the request comment field"
 	macro viewNoCommentField {
 		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_COMMENT_FIELD");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestView#REQUEST_COMMENT_TEXT_IFRAME");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestView#SUBMIT_BUTTON");
 	}
 
 	@prose = "I should not see the ${dropdownLabel} dropdown"
 	macro viewNoDropdownMenu {
 		AssertElementNotPresent(
-			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK",
-			key_dropdownLabel = "${dropdownLabel}");
+			key_dropdownLabel = "${dropdownLabel}",
+			locator1 = "ZendeskRequestAdd#DROPDOWN_LINK");
 	}
 
 	@prose = "I should not see the follow up link"
@@ -705,8 +714,8 @@ definition {
 	@prose = "I should not see the ${value} option"
 	macro viewNoOption {
 		AssertElementNotPresent(
-			locator1 = "ZendeskRequestAdd#OPTION",
-			key_option = "${value}");
+			key_option = "${value}",
+			locator1 = "ZendeskRequestAdd#OPTION");
 	}
 
 	@prose = "the following options should not be present ${table}"
@@ -717,8 +726,8 @@ definition {
 			var value = "${row[0]}";
 
 			AssertElementNotPresent(
-				locator1 = "ZendeskRequestAdd#OPTION",
-				key_option = "${value}");
+				key_option = "${value}",
+				locator1 = "ZendeskRequestAdd#OPTION");
 		}
 	}
 
@@ -737,22 +746,30 @@ definition {
 			value1 = "email support.");
 
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#ORGANIZATION_DROPDOWN_LINK");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#PRODUCT_DROPDOWN_LINK");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#COMPONENT_DROPDOWN_LINK");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#SYSTEM_STATUS_DROPDOWN_LINK");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#SUBJECT_FIELD");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#DESCRIPTION_FIELD_IFRAME");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD_LINK");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#ATTACHMENTS_FIELD");
+
 		AssertElementNotPresent(locator1 = "ZendeskRequestAdd#SUBMIT_BUTTON");
 	}
 
 	@prose = "I should not see a request with the subject ${requestSubject} in the index"
 	macro viewNoRequestViaIndex {
 		AssertElementNotPresent(
+			key_requestSubject = "${requestSubject}",
 			locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
-			value1 = "${requestSubject}",
-			key_requestSubject = "${requestSubject}");
+			value1 = "${requestSubject}");
 	}
 
 	@prose = "the following options should not be visible ${table}"
@@ -763,8 +780,8 @@ definition {
 			var value = "${row[0]}";
 
 			AssertNotVisible(
-				locator1 = "ZendeskRequestAdd#OPTION",
-				key_option = "${value}");
+				key_option = "${value}",
+				locator1 = "ZendeskRequestAdd#OPTION");
 		}
 	}
 
@@ -775,15 +792,15 @@ definition {
 		for (var row : table "${rawTable}") {
 			var value = "${row[0]}";
 
-			if (IsVisible(locator1 = "ZendeskRequestAdd#OPTION", key_option = "${value}")) {
+			if (IsVisible(key_option = "${value}", locator1 = "ZendeskRequestAdd#OPTION")) {
 				AssertVisible(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
 			}
 			else {
 				AssertElementPresent(
-					locator1 = "ZendeskRequestAdd#OPTION",
-					key_option = "${value}");
+					key_option = "${value}",
+					locator1 = "ZendeskRequestAdd#OPTION");
 			}
 		}
 	}
@@ -803,37 +820,38 @@ definition {
 
 			if ("${field}" == "Subject") {
 				AssertTextEquals(
+					key_requestSubject = "${requestSubject}",
 					locator1 = "ZendeskRequestIndex#REQUEST_SUBJECT",
-					value1 = "${value}",
-					key_requestSubject = "${requestSubject}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Id") {
 				AssertTextEquals(
+					key_requestSubject = "${requestSubject}",
 					locator1 = "ZendeskRequestIndex#REQUEST_ID",
-					value1 = "${value}",
-					key_requestSubject = "${requestSubject}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Created") {
 				AssertTextEquals(
+					key_requestSubject = "${requestSubject}",
 					locator1 = "ZendeskRequestIndex#REQUEST_CREATED",
-					value1 = "${value}",
-					key_requestSubject = "${requestSubject}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Last activity") {
 				AssertTextEquals(
+					key_requestSubject = "${requestSubject}",
 					locator1 = "ZendeskRequestIndex#REQUEST_LAST_ACTIVITY",
-					value1 = "${value}",
-					key_requestSubject = "${requestSubject}");
+					value1 = "${value}");
 			}
 			else if ("${field}" == "Status") {
 				AssertTextEquals(
+					key_requestSubject = "${requestSubject}",
 					locator1 = "ZendeskRequestIndex#REQUEST_STATUS",
-					value1 = "${value}",
-					key_requestSubject = "${requestSubject}");
+					value1 = "${value}");
 			}
 			else {
 				fail("No such request index field ${field}");
 			}
 		}
 	}
+
 }

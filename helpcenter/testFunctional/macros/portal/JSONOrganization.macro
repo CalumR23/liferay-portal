@@ -1,4 +1,5 @@
 definition {
+
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
@@ -38,7 +39,7 @@ definition {
 
 		var organizationId = JSONCurlUtil.post("${curl}");
 
-		var organizationId = StringUtil.replace("${organizationId}", "&quot;", "");
+		var organizationId = StringUtil.replace("${organizationId}", "\"", "");
 
 		var organizationId = StringUtil.replace("${organizationId}", "Finished executing commands.", "");
 
@@ -103,11 +104,10 @@ definition {
 			''';
 
 		var organizationMembers = JSONCurlUtil.post("${curl}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationMembers}", "${userEmailAddress}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${organizationMembers}", "${userEmailAddress}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -126,7 +126,7 @@ definition {
 
 		if (contains("${organizationMembers}", "${userEmailAddress}")) {
 			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to be in the support organization ${organizationName}");
-		}		
+		}
 	}
 
 	@prose = "the organization ${organizationName} should have the user with the email address ${userEmailAddress} as a member"
@@ -142,11 +142,10 @@ definition {
 			''';
 
 		var organizationMembers = JSONCurlUtil.post("${curl}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMembers}", "${userEmailAddress}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationMembers}", "${userEmailAddress}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -165,6 +164,7 @@ definition {
 
 		if (!(contains("${organizationMembers}", "${userEmailAddress}"))) {
 			fail("After ${currentIteration} checks, the user with the email address ${userEmailAddress} appears to have not been added to the support organization ${organizationName}");
-		}		
+		}
 	}
+
 }

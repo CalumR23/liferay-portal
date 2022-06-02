@@ -1,4 +1,5 @@
 definition {
+
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
@@ -48,24 +49,31 @@ definition {
 		if (!(isSet(subject))) {
 			var subject = "";
 		}
+
 		if (!(isSet(description))) {
 			var description = "";
 		}
+
 		if (!(isSet(liferayVersion))) {
 			var liferayVersion = "";
 		}
+
 		if (!(isSet(organizationId))) {
 			var organizationId = "";
 		}
+
 		if (!(isSet(tags))) {
 			var tags = "";
 		}
+
 		if (!(isSet(product))) {
 			var product = "";
 		}
+
 		if (!(isSet(component))) {
 			var component = "";
 		}
+
 		if (!(isSet(systemStatus))) {
 			var systemStatus = "";
 		}
@@ -112,12 +120,13 @@ definition {
 
 		echo("Request ID: ${requestId}");
 
-		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+		if (!(isSet(staticRequestIdList))) {
 			static var staticRequestIdList = "${requestId}";
 		}
 		else {
 			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 		}
+
 		echo("Request ID List: ${staticRequestIdList}");
 
 		return "${staticRequestIdList}";
@@ -177,113 +186,13 @@ definition {
 
 			echo("Request ID: ${requestId}");
 
-			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			if (!(isSet(staticRequestIdList))) {
 				static var staticRequestIdList = "${requestId}";
 			}
 			else {
 				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 			}
-			echo("Request ID List: ${staticRequestIdList}");
 
-			ZendeskHomepage.pause(timeInSeconds = "5");
-		}
-
-		return "${staticRequestIdList}";
-	}
-
-	@prose = "I create several requests as a user with the email address ${requesterEmail} with the following product and component values ${table}"
-	macro _createMultipleRequestsWithProductAndComponentValues {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var product = "${row[0]}";
-			var component = "${row[1]}";
-
-			if (!(isSet(component))) {
-				var component = "";
-			}
-
-			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || (contains("${product}", "prd_liferay_commerce"))) {
-				var curl = '''
-					${zendeskURL}/api/v2/requests.json --tlsv1.2
-					-u ${requesterEmail}/token:${apiToken}
-					-H "Content-Type: application/json"
-					-d
-					{
-						"request":
-						{
-							"subject": "Subject",
-							"comment":
-							{
-								"body": "Description"
-							},
-							"custom_fields":
-							[
-								{
-									"id": "360006041192",
-									"value": "${product}"
-								},
-								{
-									"id": "360011314571",
-									"value": "${component}"
-								},
-								{
-									"id": "360009385592",
-									"value": "production_functioning_with_limited_capabilities"
-								},
-								{
-									"id": "360033422312",
-									"value": "liferay_version_7_2"
-								}
-							]
-						}
-					}
-					''';
-			}
-			else {
-				var curl = '''
-					${zendeskURL}/api/v2/requests.json --tlsv1.2
-					-u ${requesterEmail}/token:${apiToken}
-					-H "Content-Type: application/json"
-					-d
-					{
-						"request":
-						{
-							"subject": "Subject",
-							"comment":
-							{
-								"body": "Description"
-							},
-							"custom_fields":
-							[
-								{
-									"id": "360006041192",
-									"value": "${product}"
-								},
-								{
-									"id": "360011314571",
-									"value": "${component}"
-								},
-								{
-									"id": "360009385592",
-									"value": "production_functioning_with_limited_capabilities"
-								}
-							]
-						}
-					}
-					''';
-			}
-
-			static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
-
-			echo("Request ID: ${requestId}");
-
-			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
-				static var staticRequestIdList = "${requestId}";
-			}
-			else {
-				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
-			}
 			echo("Request ID List: ${staticRequestIdList}");
 
 			ZendeskHomepage.pause(timeInSeconds = "5");
@@ -307,7 +216,7 @@ definition {
 				var component = "";
 			}
 
-			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || (contains("${product}", "prd_liferay_commerce"))) {
+			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || contains("${product}", "prd_liferay_commerce")) {
 				var curl = '''
 					${zendeskURL}/api/v2/requests.json --tlsv1.2
 					-u ${requesterEmail}/token:${apiToken}
@@ -384,12 +293,13 @@ definition {
 
 			echo("Request ID: ${requestId}");
 
-			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			if (!(isSet(staticRequestIdList))) {
 				static var staticRequestIdList = "${requestId}";
 			}
 			else {
 				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 			}
+
 			echo("Request ID List: ${staticRequestIdList}");
 
 			ZendeskHomepage.pause(timeInSeconds = "5");
@@ -411,7 +321,7 @@ definition {
 				var component = "";
 			}
 
-			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || (contains("${product}", "prd_liferay_commerce"))) {
+			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || contains("${product}", "prd_liferay_commerce")) {
 				var curl = '''
 						${zendeskURL}/api/v2/requests.json --tlsv1.2
 						-u ${requesterEmail}/token:${apiToken}
@@ -486,12 +396,115 @@ definition {
 
 			echo("Request ID: ${requestId}");
 
-			if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+			if (!(isSet(staticRequestIdList))) {
 				static var staticRequestIdList = "${requestId}";
 			}
 			else {
 				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 			}
+
+			echo("Request ID List: ${staticRequestIdList}");
+
+			ZendeskHomepage.pause(timeInSeconds = "5");
+		}
+
+		return "${staticRequestIdList}";
+	}
+
+	@prose = "I create several requests as a user with the email address ${requesterEmail} with the following product and component values ${table}"
+	macro _createMultipleRequestsWithProductAndComponentValues {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var product = "${row[0]}";
+			var component = "${row[1]}";
+
+			if (!(isSet(component))) {
+				var component = "";
+			}
+
+			if (("${product}" == "prd_liferay_dxp_cloud") || ("${product}" == "prd_liferay_analytics_cloud") || contains("${product}", "prd_liferay_commerce")) {
+				var curl = '''
+					${zendeskURL}/api/v2/requests.json --tlsv1.2
+					-u ${requesterEmail}/token:${apiToken}
+					-H "Content-Type: application/json"
+					-d
+					{
+						"request":
+						{
+							"subject": "Subject",
+							"comment":
+							{
+								"body": "Description"
+							},
+							"custom_fields":
+							[
+								{
+									"id": "360006041192",
+									"value": "${product}"
+								},
+								{
+									"id": "360011314571",
+									"value": "${component}"
+								},
+								{
+									"id": "360009385592",
+									"value": "production_functioning_with_limited_capabilities"
+								},
+								{
+									"id": "360033422312",
+									"value": "liferay_version_7_2"
+								}
+							]
+						}
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					${zendeskURL}/api/v2/requests.json --tlsv1.2
+					-u ${requesterEmail}/token:${apiToken}
+					-H "Content-Type: application/json"
+					-d
+					{
+						"request":
+						{
+							"subject": "Subject",
+							"comment":
+							{
+								"body": "Description"
+							},
+							"custom_fields":
+							[
+								{
+									"id": "360006041192",
+									"value": "${product}"
+								},
+								{
+									"id": "360011314571",
+									"value": "${component}"
+								},
+								{
+									"id": "360009385592",
+									"value": "production_functioning_with_limited_capabilities"
+								}
+							]
+						}
+					}
+					''';
+			}
+
+			static var requestId = JSONCurlUtil.post("${curl}", "$.request.id");
+
+			echo("Request ID: ${requestId}");
+
+			if (!(isSet(staticRequestIdList))) {
+				static var staticRequestIdList = "${requestId}";
+			}
+			else {
+				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
+			}
+
 			echo("Request ID List: ${staticRequestIdList}");
 
 			ZendeskHomepage.pause(timeInSeconds = "5");
@@ -542,21 +555,27 @@ definition {
 		if (!(isSet(subject))) {
 			var subject = "";
 		}
+
 		if (!(isSet(description))) {
 			var description = "";
 		}
+
 		if (!(isSet(organizationId))) {
 			var organizationId = "";
 		}
+
 		if (!(isSet(tags))) {
 			var tags = "";
 		}
+
 		if (!(isSet(product))) {
 			var product = "";
 		}
+
 		if (!(isSet(component))) {
 			var component = "";
 		}
+
 		if (!(isSet(systemStatus))) {
 			var systemStatus = "";
 		}
@@ -599,12 +618,13 @@ definition {
 
 		echo("Request ID: ${requestId}");
 
-		if (contains("${staticRequestIdList}", "{staticRequestIdList}")) {
+		if (!(isSet(staticRequestIdList))) {
 			static var staticRequestIdList = "${requestId}";
 		}
 		else {
 			static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 		}
+
 		echo("Request ID List: ${staticRequestIdList}");
 
 		return "${staticRequestIdList}";
@@ -640,10 +660,9 @@ definition {
 			''';
 
 		var numberOfTickets = JSONCurlUtil.get("${curl}", "$.count");
-
 		var count = "0";
 
-		while (!("${count}" == "${numberOfTickets}")) {
+		while ("${count}" != "${numberOfTickets}") {
 			var requestId = JSONCurlUtil.get("${curl}", "$.tickets[${count}].id");
 
 			if (!(isSet(staticRequestIdList))) {
@@ -653,7 +672,7 @@ definition {
 				static var staticRequestIdList = "${staticRequestIdList},${requestId}";
 			}
 
-			var count = MathUtil.sum("${count}", "1");
+			var count = ${count} + 1;
 		}
 
 		if (!(isSet(staticRequestIdList))) {
@@ -664,4 +683,5 @@ definition {
 
 		return "${staticRequestIdList}";
 	}
+
 }

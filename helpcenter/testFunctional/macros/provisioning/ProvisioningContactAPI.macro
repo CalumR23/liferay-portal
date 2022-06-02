@@ -1,73 +1,16 @@
 definition {
+
 	var provisioningAdminEmail = PropsUtil.get("provisioning.admin.email.address");
 	var provisioningAdminPassword = PropsUtil.get("provisioning.admin.password");
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
 	var roleName = PropsUtil.get("provisioning.non.permission.role.name");
 
-    @prose = "I assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
-	macro _assignContactRolesToContact {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
-
-		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
-
-			var curl = '''
-				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
-				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-				-H "accept: application/json"
-				-H 'Content-Type: application/json'
-				''';
-
-			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
-		}
-	}
-
-	@prose = "I attempt to assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} that has exceeded its max developer contacts ${table}"
-	macro _assignContactRolesToContactOnAccountWithMaxDeveloperContactsAttempt {
-		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
-		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
-
-		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var contactRoleName = "${row[0]}";
-
-			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
-
-			var curl = '''
-				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
-				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-				-H "accept: application/json"
-				-H 'Content-Type: application/json'
-				''';
-
-			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
-
-			if (!(contains("${responseOfContactApi}", "Account has reached the maximum allowed ticket requesters"))) {
-				fail("The contact may have been added to the account instead of failing due to the maximum contact number");
-			}
-		}
-	}
-
-@prose = "I attempt to assign the following roles already assigned to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	@prose = "I attempt to assign the following roles already assigned to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
 	macro _assignAlreadyAssignedContactRolesToContactAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -90,14 +33,12 @@ definition {
 		}
 	}
 
-@prose = "I attempt to assign the following nonexisting contact roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
-	macro _assignNonexistingContactRolesToContactAttempt {
+	@prose = "I assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _assignContactRolesToContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -106,7 +47,31 @@ definition {
 			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
 
 			var curl = '''
-				--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName}
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
+				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+				-H "accept: application/json"
+				-H 'Content-Type: application/json'
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
+	@prose = "I attempt to assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} that has exceeded its max developer contacts ${table}"
+	macro _assignContactRolesToContactOnAccountWithMaxDeveloperContactsAttempt {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+			var curl = '''
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
 				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
 				-H "accept: application/json"
 				-H 'Content-Type: application/json'
@@ -114,8 +79,8 @@ definition {
 
 			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
 
-			if (!(contains("${responseOfContactApi}", "No contact role exists"))) {
-				fail("The role contact may have been added to the account instead of failing due to the adding nonexisting contact role");
+			if (!(contains("${responseOfContactApi}", "Account has reached the maximum allowed ticket requesters"))) {
+				fail("The contact may have been added to the account instead of failing due to the maximum contact number");
 			}
 		}
 	}
@@ -123,13 +88,10 @@ definition {
 	@prose = "I attempt to assign the following roles to the user with a invalid email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
 	macro _assignContactRolesToContactWithInvalidEmailAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailDomain = StringUtil.extractLast("${userEmailAddress}", "@");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -155,13 +117,10 @@ definition {
 	@prose = "I attempt to assign the following roles to the user with a non okta email address ${userEmailAddress} on an inactive account with the name ${accountName} ${table}"
 	macro _assignContactRolesToContactWithNonOktaEmailOnInactiveAccountAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailDomain = StringUtil.extractLast("${userEmailAddress}", "@");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -184,14 +143,40 @@ definition {
 		}
 	}
 
-	@prose = "I attempt to unassign the following roles from the last remaining user containing them with email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
-	macro _unassignContactRolesFromLastRemainingContactContainingThem {
+	@prose = "I attempt to assign the following nonexisting contact roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _assignNonexistingContactRolesToContactAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+		var RawTable rawTable = new RawTable("${table}");
 
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+			var curl = '''
+				--tlsv1.2 ${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName}
+				-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+				-H "accept: application/json"
+				-H 'Content-Type: application/json'
+				''';
+
+			var responseOfContactApi = JSONCurlUtil.put("${curl}", "$");
+
+			if (!(contains("${responseOfContactApi}", "No contact role exists"))) {
+				fail("The role contact may have been added to the account instead of failing due to the adding nonexisting contact role");
+			}
+		}
+	}
+
+	@prose = "I attempt to unassign the following roles from the last remaining user containing them with email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	macro _unassignContactRolesFromLastRemainingContactContainingThem {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -214,14 +199,12 @@ definition {
 		}
 	}
 
-    @prose = "I unassign the following roles from the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
+	@prose = "I unassign the following roles from the user with the email address ${userEmailAddress} on the account with the name ${accountName} ${table}"
 	macro _unassignContactRolesToContact {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
-
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
 
 		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -239,4 +222,5 @@ definition {
 			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
 	}
+
 }

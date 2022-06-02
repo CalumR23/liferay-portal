@@ -1,4 +1,5 @@
 definition {
+
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
@@ -17,13 +18,13 @@ definition {
 
 	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
 	macro _tearDownTicketByIds {
-		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
-		var curl = '''
+		if (isSet(ticketIdList)) {
+			var curl = '''
 			${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 		}
 	}
 
@@ -36,15 +37,15 @@ definition {
 
 		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
 
-		var commentArrayValue = MathUtil.difference("${commentCount}", "1");
+		var commentArrayValue = ${commentCount} - 1;
 
 		var commentFromAPI = JSONCurlUtil.get("${curl}", "$.comments[${commentArrayValue}].body");
 
-		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "&quot;", "");
+		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "\"", "");
 
 		if (!(contains("${commentFromAPI}", "${commentContent}"))) {
 			fail("Actual comment ${commentFromAPI} as the most recent comment body does not contain the expected comment body content ${commentContent}.");
 		}
-
 	}
+
 }

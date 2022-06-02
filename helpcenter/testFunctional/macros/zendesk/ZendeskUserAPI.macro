@@ -1,4 +1,5 @@
 definition {
+
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
@@ -55,12 +56,10 @@ definition {
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		var tag = "osb_${organizationId}_watcher";
-
 		var curl = '''
 			${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
-
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
@@ -110,19 +109,19 @@ definition {
 				var organization = "${value}";
 			}
 			else if ("${field}" == "Language") {
-				if("${value}" == "English") {
+				if ("${value}" == "English") {
 					var localeId = "1";
 				}
-				else if("${value}" == "Japanese") {
+				else if ("${value}" == "Japanese") {
 					var localeId = "67";
 				}
-				else if("${value}" == "Portuguese") {
+				else if ("${value}" == "Portuguese") {
 					var localeId = "1011";
 				}
-				else if("${value}" == "Simplified Chinese") {
+				else if ("${value}" == "Simplified Chinese") {
 					var localeId = "10";
 				}
-				else if("${value}" == "Spanish") {
+				else if ("${value}" == "Spanish") {
 					var localeId = "2";
 				}
 				else {
@@ -152,36 +151,47 @@ definition {
 		if (!(isSet(userName))) {
 			var userName = "";
 		}
+
 		if (!(isSet(role))) {
 			var role = "";
 		}
+
 		if (!(isSet(access))) {
 			var access = "";
 		}
+
 		if (!(isSet(email))) {
 			var email = "";
 		}
+
 		if (!(isSet(phoneNumber))) {
 			var phoneNumber = "";
 		}
+
 		if (!(isSet(tags))) {
 			var tags = "";
 		}
+
 		if (!(isSet(organization))) {
 			var organization = "";
 		}
+
 		if (!(isSet(localeId))) {
 			var localeId = "";
 		}
+
 		if (!(isSet(timeZone))) {
 			var timeZone = "";
 		}
+
 		if (!(isSet(details))) {
 			var details = "";
 		}
+
 		if (!(isSet(notes))) {
 			var notes = "";
 		}
+
 		if (!(isSet(externalId))) {
 			var externalId = "";
 		}
@@ -237,7 +247,7 @@ definition {
 	macro _getDefaultUserEmailAddress {
 		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
-		if (!("${organizations}" == "[]")) {
+		if ("${organizations}" != "[]") {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 			static var staticUserEmailAddress = "no-reply@${organizationExternalId}.com.broken";
@@ -245,7 +255,6 @@ definition {
 			echo("Default User Email Address of ${organizationName}: ${staticUserEmailAddress}");
 
 			return "${staticUserEmailAddress}";
-
 		}
 		else {
 			static var staticUserEmailAddress = "";
@@ -260,14 +269,14 @@ definition {
 	macro _getDefaultUserId {
 		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 
-		if (!("${organizations}" == "[]")) {
+		if ("${organizations}" != "[]") {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 			var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-			if (!("${users}" == "[]")) {
+			if ("${users}" != "[]") {
 				var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 				static var staticDefaultUserId = "${userId}";
@@ -297,7 +306,6 @@ definition {
 	macro _getMultipleUserExternalIdsByEmailAddress {
 		var userCount = "0";
 		var userExternalIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -305,17 +313,17 @@ definition {
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-			if (!("${users}" == "[]")) {
+			if ("${users}" != "[]") {
 				var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-				if("${userCount}" == "0") {
+				if ("${userCount}" == "0") {
 					var userExternalIds = "${userExternalIds}${userExternalId}";
 				}
 				else {
 					var userExternalIds = "${userExternalIds},${userExternalId}";
 				}
 
-				var userCount = MathUtil.sum("${userCount}", "1");
+				var userCount = ${userCount} + 1;
 			}
 		}
 
@@ -330,7 +338,6 @@ definition {
 	macro _getMultipleUserIdsByEmailAddress {
 		var userCount = "0";
 		var userIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -338,17 +345,17 @@ definition {
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-			if (!("${users}" == "[]")) {
+			if ("${users}" != "[]") {
 				var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-				if("${userCount}" == "0") {
+				if ("${userCount}" == "0") {
 					var userIds = "${userIds}${userId}";
 				}
 				else {
 					var userIds = "${userIds},${userId}";
 				}
 
-				var userCount = MathUtil.sum("${userCount}", "1");
+				var userCount = ${userCount} + 1;
 			}
 		}
 
@@ -362,10 +369,8 @@ definition {
 	@prose = "I obtain the IDs of the following user names from zendesk.liferay.com ${table}"
 	macro _getMultipleUserIdsByName {
 		var userName = StringUtil.replace("${userName}", " ", "+");
-
 		var userCount = "0";
 		var userIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -373,7 +378,7 @@ definition {
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByName(userName = "${userName}");
 
-			if (!("${users}" == "[]")) {
+			if ("${users}" != "[]") {
 				var userIds = ZendeskUserAPI._viewUserIdsByName(userName = "${userName}");
 			}
 		}
@@ -399,13 +404,13 @@ definition {
 	@prose = "the uuid of the okta user with the email address ${userEmailAddress} should match the user external ID on zendesk.liferay.com"
 	macro _matchOsbUserUuIdWithZendeskUserId {
 		var oktaUserUuId = JSONOkta.getOktaUserUuid(userEmailAddress = "${userEmailAddress}");
-
 		var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		echo("User uuid from Okta: ${oktaUserUuId}");
+
 		echo("User External ID from Zendesk: ${userExternalId}");
 
-		if (!("${oktaUserUuId}" == "${userExternalId}")) {
+		if ("${oktaUserUuId}" != "${userExternalId}") {
 			fail("Actual value ${oktaUserUuId} obtained from the okta site and ${userExternalId} obtained from zendesk.liferay.com do not match");
 		}
 	}
@@ -415,7 +420,6 @@ definition {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
@@ -429,7 +433,7 @@ definition {
 
 		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "]", "");
 
-		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "&quot;", "");
+		var organizationMembershipId = StringUtil.replace("${organizationMembershipId}", "\"", "");
 
 		var curl = '''
 			${zendeskURL}/api/v2/users/${userId}/organization_memberships/${organizationMembershipId}.json --tlsv1.2
@@ -459,25 +463,18 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I rename the fifth default user ID variable"
+	macro _renameFifthDefaultUserIdVariable {
+		static var staticDefaultUserId5 = "${staticDefaultUserId}";
+
+		return "${staticDefaultUserId5}";
+	}
+
 	@prose = "I rename the first default user ID variable"
 	macro _renameFirstDefaultUserIdVariable {
 		static var staticDefaultUserId1 = "${staticDefaultUserId}";
 
 		return "${staticDefaultUserId1}";
-	}
-
-	@prose = "I rename the second default user ID variable"
-	macro _renameSecondDefaultUserIdVariable {
-		static var staticDefaultUserId2 = "${staticDefaultUserId}";
-
-		return "${staticDefaultUserId2}";
-	}
-
-	@prose = "I rename the third default user ID variable"
-	macro _renameThirdDefaultUserIdVariable {
-		static var staticDefaultUserId3 = "${staticDefaultUserId}";
-
-		return "${staticDefaultUserId3}";
 	}
 
 	@prose = "I rename the fourth default user ID variable"
@@ -487,11 +484,11 @@ definition {
 		return "${staticDefaultUserId4}";
 	}
 
-	@prose = "I rename the fifth default user ID variable"
-	macro _renameFifthDefaultUserIdVariable {
-		static var staticDefaultUserId5 = "${staticDefaultUserId}";
+	@prose = "I rename the second default user ID variable"
+	macro _renameSecondDefaultUserIdVariable {
+		static var staticDefaultUserId2 = "${staticDefaultUserId}";
 
-		return "${staticDefaultUserId5}";
+		return "${staticDefaultUserId2}";
 	}
 
 	@prose = "I rename the sixth default user ID variable"
@@ -501,9 +498,16 @@ definition {
 		return "${staticDefaultUserId6}";
 	}
 
+	@prose = "I rename the third default user ID variable"
+	macro _renameThirdDefaultUserIdVariable {
+		static var staticDefaultUserId3 = "${staticDefaultUserId}";
+
+		return "${staticDefaultUserId3}";
+	}
+
 	@prose = "I teardown the user with userId ${userId} from zendesk.liferay.com"
 	macro _tearDownUserById {
-		if ((!(contains("${userId}", "{userId}"))) && (!("${userId}" == ""))) {
+		if (isSet(userId) && ("${userId}" != "")) {
 			var curl = '''
 				${zendeskURL}/api/v2/users/destroy_many.json?ids=${userId} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -518,7 +522,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -530,13 +534,16 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The user tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The user tear down may have failed");
+
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -570,10 +577,9 @@ definition {
 			var allRequestedTickets = JSONCurlUtil.get("${curl}");
 
 			var numberOfRequestedTickets = StringUtil.count("${allRequestedTickets}", "id");
-
 			var ticketObjectNumber = "0";
 
-			while (!("${numberOfRequestedTickets}" == "${ticketObjectNumber}")) {
+			while ("${numberOfRequestedTickets}" != "${ticketObjectNumber}") {
 				var ticketId = JSONCurlUtil.get("${curl}", "$.tickets[${ticketObjectNumber}].id");
 
 				if ("${ticketObjectNumber}" == "0") {
@@ -584,7 +590,7 @@ definition {
 				}
 			}
 
-			if ((!(contains("${ticketIdList}", "{ticketIdList}"))) && (!("${ticketIdList}" == ""))) {
+			if (isSet(ticketIdList) && ("${ticketIdList}" != "")) {
 				ZendeskTicketAPI._tearDownTicketByIds(ticketIdList = "${ticketIdList}");
 			}
 		}
@@ -610,10 +616,9 @@ definition {
 			var allRequestedTickets = JSONCurlUtil.get("${curl}");
 
 			var numberOfRequestedTickets = StringUtil.count("${allRequestedTickets}", "id");
-
 			var ticketObjectNumber = "0";
 
-			while (!("${numberOfRequestedTickets}" == "${ticketObjectNumber}")) {
+			while ("${numberOfRequestedTickets}" != "${ticketObjectNumber}") {
 				var ticketId = JSONCurlUtil.get("${curl}", "$.tickets[${ticketObjectNumber}].id");
 
 				if ("${ticketObjectNumber}" == "0") {
@@ -624,7 +629,7 @@ definition {
 				}
 			}
 
-			if ((!(contains("${ticketIdList}", "{ticketIdList}"))) && (!("${ticketIdList}" == ""))) {
+			if (isSet(ticketIdList) && ("${ticketIdList}" != "")) {
 				ZendeskTicketAPI._tearDownTicketByIds(ticketIdList = "${ticketIdList}");
 			}
 		}
@@ -632,7 +637,7 @@ definition {
 
 	@prose = "I teardown users with the following userExternalIds ${userExternalIds} from zendesk.liferay.com"
 	macro _tearDownUsersByExternalIdList {
-		if ((!(contains("${userExternalIds}", "{userExternalIds}"))) && (!("${userExternalIds}" == ""))) {
+		if (isSet(userExternalIds) && ("${userExternalIds}" != "")) {
 			var userIDs = "";
 
 			for (var userExternalId : list "${userExternalIds}") {
@@ -669,7 +674,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -681,13 +686,16 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The user tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The user tear down may have failed");
+
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -707,20 +715,19 @@ definition {
 	macro _tearDownUsersByExternalIdTable {
 		var userCount = "0";
 		var userExternalIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var userExternalId = "${row[0]}";
 
-			if("${userCount}" == "0") {
+			if ("${userCount}" == "0") {
 				var userExternalIds = "${userExternalIds}${userExternalId}";
 			}
 			else {
 				var userExternalIds = "${userExternalIds},${userExternalId}";
 			}
 
-			var userCount = MathUtil.sum("${userCount}", "1");
+			var userCount = ${userCount} + 1;
 		}
 
 		ZendeskUserAPI._tearDownUsersByExternalIdList(userExternalIds = "${userExternalIds}");
@@ -728,7 +735,7 @@ definition {
 
 	@prose = "I teardown users with the following userIds ${userIds} from zendesk.liferay.com"
 	macro _tearDownUsersByIdList {
-		if ((!(contains("${userIds}", "{userIds}"))) && (!("${userIds}" == ""))) {
+		if (isSet(userIds) && ("${userIds}" != "")) {
 			var curl = '''
 				${zendeskURL}/api/v2/users/destroy_many.json?ids=${userIds} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -743,7 +750,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -755,13 +762,16 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The user tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The user tear down may have failed");
+
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -802,7 +812,6 @@ definition {
 	@prose = "I update the user with the email address ${userEmailAddress} to have the custom role ${customRoleName}"
 	macro _updateUserCustomRoleByEmailAddress {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var customRoleId = ZendeskCustomRoleAPI._getCustomRoleIdByName(customRoleName = "${customRoleName}");
 
 		var curl = '''
@@ -923,17 +932,14 @@ definition {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-
 		var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
 
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
-
 		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMemberships}", "${organizationId}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationMemberships}", "${organizationId}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -941,6 +947,7 @@ definition {
 		}
 
 		echo("Expected User Organization: ${organizationId}");
+
 		echo("Actual User Organization Memberships: ${organizationMemberships}");
 
 		if (!(contains("${organizationMemberships}", "${organizationId}"))) {
@@ -955,18 +962,17 @@ definition {
 		var userEmailAddress = "no-reply@${organizationExternalId}.com.broken";
 
 		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${users}" == "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 		}
 
-		if (!("${users}" == "[]")) {
+		if ("${users}" != "[]") {
 			var curl = '''
 				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -979,9 +985,10 @@ definition {
 		}
 
 		echo("Expected User Email Address: ${userEmailAddress}");
+
 		echo("Actual User Email Address: ${userEmailAddressFromAPI}");
 
-		if (!("${userEmailAddressFromAPI}" == "${userEmailAddress}")) {
+		if ("${userEmailAddressFromAPI}" != "${userEmailAddress}") {
 			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}
@@ -992,13 +999,11 @@ definition {
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
-
 		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationMemberships}", "${organizationId}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${organizationMemberships}", "${organizationId}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1006,6 +1011,7 @@ definition {
 		}
 
 		echo("Non-expected User Organization: ${organizationId}");
+
 		echo("Actual User Organization Memberships: ${organizationMemberships}");
 
 		if (contains("${organizationMemberships}", "${organizationId}")) {
@@ -1019,13 +1025,11 @@ definition {
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
-
 		var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${organizationSubscriptions}", "${organizationId}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${organizationSubscriptions}", "${organizationId}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1033,6 +1037,7 @@ definition {
 		}
 
 		echo("Non-expected User Organization Subscription: ${organizationId}");
+
 		echo("Actual User Organization Subscriptions: ${organizationSubscriptions}");
 
 		if (contains("${organizationSubscriptions}", "${organizationId}")) {
@@ -1059,11 +1064,10 @@ definition {
 	@prose = "the user with the email address ${userEmailAddress} should not have the ${tag} tag"
 	macro _viewNoUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${existingTags}", "${tag}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${existingTags}", "${tag}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1071,6 +1075,7 @@ definition {
 		}
 
 		echo("Non-expected User Tag: ${tag}");
+
 		echo("Actual User Tags: ${existingTags}");
 
 		if (contains("${existingTags}", "${tag}")) {
@@ -1085,13 +1090,11 @@ definition {
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		var watcherTag = "osb_${organizationId}_watcher";
-
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${existingTags}", "${watcherTag}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${existingTags}", "${watcherTag}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1099,6 +1102,7 @@ definition {
 		}
 
 		echo("Non-expected User Watcher Tag: ${watcherTag}");
+
 		echo("Actual User Tags: ${existingTags}");
 
 		if (contains("${existingTags}", "${watcherTag}")) {
@@ -1118,7 +1122,7 @@ definition {
 
 		var existingTags = StringUtil.replace("${existingTags}", "]", "");
 
-		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+		var existingTags = StringUtil.replace("${existingTags}", "\"", "");
 
 		return "${existingTags}";
 	}
@@ -1185,24 +1189,24 @@ definition {
 			''';
 
 		var count = JSONCurlUtil.get("${curl}", "$.count");
-
 		var userNumber = "0";
-
 		var userIds = "";
 
-		while (!("${count}" == "${userNumber}")) {
+		while ("${count}" != "${userNumber}") {
 			echo("Count: ${count}");
+
 			echo("Current User Number: ${userNumber}");
 
 			var userId = JSONCurlUtil.get("${curl}", "$.users[${userNumber}].id");
 
-			if("${userIds}" == "") {
+			if ("${userIds}" == "") {
 				var userIds = "${userId}";
 			}
 			else {
 				var userIds = "${userIds},${userId}";
 			}
-			var userNumber = MathUtil.sum("${userNumber}", "1");
+
+			var userNumber = ${userNumber} + 1;
 		}
 
 		return "${userIds}";
@@ -1220,9 +1224,10 @@ definition {
 		var userNameFromAPI = JSONCurlUtil.get("${curl}", "$.user.name");
 
 		echo("Expected User Name: ${userName}");
+
 		echo("Actual User Name: ${userNameFromAPI}");
 
-		if (!("${userNameFromAPI}" == "${userName}")) {
+		if ("${userNameFromAPI}" != "${userName}") {
 			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
 		}
 	}
@@ -1237,9 +1242,10 @@ definition {
 		var userNameFromAPI = JSONCurlUtil.get("${curl}", "$.users[0].name");
 
 		echo("Expected User Name: ${userName}");
+
 		echo("Actual User Name: ${userNameFromAPI}");
 
-		if (!("${userNameFromAPI}" == "${userName}")) {
+		if ("${userNameFromAPI}" != "${userName}") {
 			fail("Actual value ${userNameFromAPI} does not match expected value ${userName}");
 		}
 	}
@@ -1247,11 +1253,10 @@ definition {
 	@prose = "the user with the email address ${userEmailAddress} should not be present on zendesk.liferay.com"
 	macro _viewUserNoSyncFromOsb {
 		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${users}" == "[]"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${users}" != "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1259,9 +1264,10 @@ definition {
 		}
 
 		echo("Non-expected User Email Address: ${userEmailAddress}");
+
 		echo("Actual User Search Results: ${users}");
 
-		if (!("${users}" == "[]")) {
+		if ("${users}" != "[]") {
 			var curl = '''
 				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1292,13 +1298,11 @@ definition {
 
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
-
 		var organizationMemberships = ZendeskUserAPI._viewUserOrganizationMembershipsById(userId = "${userId}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationMemberships}", "${organizationId}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationMemberships}", "${organizationId}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1306,37 +1310,11 @@ definition {
 		}
 
 		echo("Expected User Organization: ${organizationId}");
+
 		echo("Actual User Organization Memberships: ${organizationMemberships}");
 
 		if (!(contains("${organizationMemberships}", "${organizationId}"))) {
 			fail("After ${currentIteration} checks, the user appears to have not been added to the organization with the ID ${organizationId}");
-		}
-	}
-
-	@prose = "the user with the email address ${userEmailAddress} should be subscribed to the organization ${organizationName}"
-	macro _viewUserOrganizationSubscriptionSync {
-		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
-
-		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
-		var currentIteration = "0";
-
-		var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
-
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${organizationSubscriptions}", "${organizationId}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
-			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-
-			var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
-		}
-
-		echo("Expected User Organization Subscription: ${organizationId}");
-		echo("Actual User Organization Subscriptions: ${organizationSubscriptions}");
-
-		if (!(contains("${organizationSubscriptions}", "${organizationId}"))) {
-			fail("After ${currentIteration} checks, the user appears to not be subscribed to the organization with the ID ${organizationId}");
 		}
 	}
 
@@ -1362,6 +1340,32 @@ definition {
 		return "${organizationSubscriptions}";
 	}
 
+	@prose = "the user with the email address ${userEmailAddress} should be subscribed to the organization ${organizationName}"
+	macro _viewUserOrganizationSubscriptionSync {
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
+
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+		var currentIteration = "0";
+		var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationSubscriptions}", "${organizationId}"))) {
+			var currentIteration = ${currentIteration} + 1;
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var organizationSubscriptions = ZendeskUserAPI._viewUserOrganizationSubscriptionsById(userId = "${userId}");
+		}
+
+		echo("Expected User Organization Subscription: ${organizationId}");
+
+		echo("Actual User Organization Subscriptions: ${organizationSubscriptions}");
+
+		if (!(contains("${organizationSubscriptions}", "${organizationId}"))) {
+			fail("After ${currentIteration} checks, the user appears to not be subscribed to the organization with the ID ${organizationId}");
+		}
+	}
+
 	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the phone number ${userPhoneNumber}"
 	macro _viewUserPhoneNumberByEmailAddress {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
@@ -1374,9 +1378,10 @@ definition {
 		var userPhoneNumberFromAPI = JSONCurlUtil.get("${curl}", "$.user.phone");
 
 		echo("Expected User Phone Number: ${userPhoneNumber}");
+
 		echo("Actual User Phone Number: ${userPhoneNumberFromAPI}");
 
-		if (!("${userPhoneNumberFromAPI}" == "${userPhoneNumber}")) {
+		if ("${userPhoneNumberFromAPI}" != "${userPhoneNumber}") {
 			fail("Actual value ${userPhoneNumberFromAPI} does not match expected value ${userPhoneNumber}");
 		}
 	}
@@ -1386,7 +1391,6 @@ definition {
 		var roleName = StringUtil.replace("${roleName}", " ", "-");
 
 		var roleName = StringUtil.lowerCase("${roleName}");
-
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
@@ -1397,9 +1401,10 @@ definition {
 		var roleNameFromAPI = JSONCurlUtil.get("${curl}", "$.user.role");
 
 		echo("Expected User Role: ${roleName}");
+
 		echo("Actual User Role: ${roleNameFromAPI}");
 
-		if (!("${roleNameFromAPI}" == "${roleName}")) {
+		if ("${roleNameFromAPI}" != "${roleName}") {
 			fail("Actual value ${roleNameFromAPI} does not match expected value ${roleName}");
 		}
 	}
@@ -1440,18 +1445,17 @@ definition {
 	@prose = "the user with the email address ${userEmailAddress} should be present on zendesk.liferay.com"
 	macro _viewUserSyncFromOsb {
 		var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${users}" == "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByEmailAddress(userEmailAddress = "${userEmailAddress}");
 		}
 
-		if (!("${users}" == "[]")) {
+		if ("${users}" != "[]") {
 			var curl = '''
 				${zendeskURL}/api/v2/users/search.json?query=${userEmailAddress} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1464,9 +1468,10 @@ definition {
 		}
 
 		echo("Expected User Email Address: ${userEmailAddress}");
+
 		echo("Actual User Email Address: ${userEmailAddressFromAPI}");
 
-		if (!("${userEmailAddressFromAPI}" == "${userEmailAddress}")) {
+		if ("${userEmailAddressFromAPI}" != "${userEmailAddress}") {
 			fail("Actual value ${userEmailAddressFromAPI} does not match expected value ${userEmailAddress}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}
@@ -1476,18 +1481,17 @@ definition {
 		var userExternalId = ZendeskUserAPI._viewUserExternalIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var users = ZendeskUserAPI._viewUserSearchResultsByExternalId(userExternalId = "${userExternalId}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${users}" == "[]")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${users}" == "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var users = ZendeskUserAPI._viewUserSearchResultsByExternalId(userExternalId = "${userExternalId}");
 		}
 
-		if (!("${users}" == "[]")) {
+		if ("${users}" != "[]") {
 			var curl = '''
 				${zendeskURL}/api/v2/users/search.json?external_id=${userExternalId} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1500,9 +1504,10 @@ definition {
 		}
 
 		echo("Expected User External ID: ${userExternalId}");
+
 		echo("Actual User External ID: ${userExternalIdFromAPI}");
 
-		if (!("${userExternalIdFromAPI}" == "${userExternalId}")) {
+		if ("${userExternalIdFromAPI}" != "${userExternalId}") {
 			fail("Actual value ${userExternalIdFromAPI} does not match expected value ${userExternalId}.  There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}
@@ -1510,11 +1515,10 @@ definition {
 	@prose = "the user with the email address ${userEmailAddress} should have the ${tag} tag"
 	macro _viewUserTagSync {
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${existingTags}", "${tag}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${existingTags}", "${tag}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1522,6 +1526,7 @@ definition {
 		}
 
 		echo("Expected User Tag: ${tag}");
+
 		echo("Actual User Tags: ${existingTags}");
 
 		if (!(contains("${existingTags}", "${tag}"))) {
@@ -1534,7 +1539,7 @@ definition {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
 		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
@@ -1568,13 +1573,11 @@ definition {
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		var watcherTag = "osb_${organizationId}_watcher";
-
 		var existingTags = ZendeskUserAPI._viewUserExistingTagsByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${existingTags}", "${watcherTag}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${existingTags}", "${watcherTag}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -1582,10 +1585,12 @@ definition {
 		}
 
 		echo("Expected User Watcher Tag: ${watcherTag}");
+
 		echo("Actual User Tags: ${existingTags}");
 
 		if (!(contains("${existingTags}", "${watcherTag}"))) {
 			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected watcher tag ${watcherTag}");
 		}
 	}
+
 }

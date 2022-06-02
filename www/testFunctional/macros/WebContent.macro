@@ -1,23 +1,4 @@
 definition {
-	@prose = "I click the publish button"
-	macro clickPublish {
-		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#PUBLISH_BUTTON");
-
-		WaitForSPARefresh();
-	}
-
-	@prose = "I collapse the ${sidePanelCategory} header in the side panel"
-	macro collapseSidePanelHeader {
-		var sidePanelCategory = StringUtil.replace("${sidePanelCategory}", " ", "");	
-
-		var key_sidePanelCategory = StringUtil.lowerCaseFirstLetter("${sidePanelCategory}");
-
-		if (IsElementPresent(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED")) {
-			ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
-
-			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
-		}
-	}
 
 	@prose = "I change the current localization to ${localization}"
 	macro changeCurrentLocalization {
@@ -31,14 +12,11 @@ definition {
 	@prose = "I change the display date to ${timeInMinutes} minutes into the future"
 	macro changeDisplayDate {
 		var key_field = "Display Date";
-
 		var key_positionValue = "5";
-
 		var currentTime = selenium.getElementValue("WebContentCreate#SIDE_PANEL_INPUT_FIELD_APPROXIMATE");
 
 		var currentHour = StringUtil.extractFirst("${currentTime}", ":");
 		var currentAmPm = StringUtil.extractLast("${currentTime}", " ");
-
 		var currentMinute = StringUtil.replace("${currentTime}", "${currentHour}:", "");
 
 		var currentMinute = StringUtil.replace("${currentMinute}", " ${currentAmPm}", "");
@@ -46,27 +24,24 @@ definition {
 		echo("Current time via input field: ${currentTime}");
 
 		var futureHours = "0";
-
 		var futureMinutes = "${timeInMinutes}";
 
 		var futureMinutesOverSixty = MathUtil.isGreaterThanOrEqualTo("${futureMinutes}", "60");
 
-		while ("${futureMinutesOverSixty}" == "true") {
-			var futureHours = MathUtil.sum("${futureHours}", "1");
-
-			var futureMinutes = MathUtil.difference("${futureMinutes}", "60");
+		while (("${futureMinutesOverSixty}" == "true")) {
+			var futureHours = ${futureHours} + 1;
+			var futureMinutes = ${futureMinutes} - 60;
 
 			var futureMinutesOverSixty = MathUtil.isGreaterThanOrEqualTo("${futureMinutes}", "60");
 		}
 
-		var futureMinute = MathUtil.sum("${currentMinute}", "${futureMinutes}");
+		var futureMinute = ${currentMinute} + ${futureMinutes};
 
 		var futureMinuteOverSixty = MathUtil.isGreaterThanOrEqualTo("${futureMinute}", "60");
 
 		if ("${futureMinuteOverSixty}" == "true") {
-			var futureHours = MathUtil.sum("${futureHours}", "1");
-
-			var futureMinute = MathUtil.difference("${futureMinute}", "60");
+			var futureHours = ${futureHours} + 1;
+			var futureMinute = ${futureMinute} - 60;
 		}
 		else {
 			var futureMinute = "${futureMinute}";
@@ -83,9 +58,9 @@ definition {
 
 		var futureDays = "0";
 
-		if (!("${futureHours}" == "0")) {
-			if (("${currentAmPm}" == "PM") && (!("${currentHour}" == "12"))) {
-				var futureHour = MathUtil.sum("${currentHour}", "12");
+		if ("${futureHours}" != "0") {
+			if (("${currentAmPm}" == "PM") && ("${currentHour}" != "12")) {
+				var futureHour = ${currentHour} + 12;
 			}
 			else if (("${currentAmPm}" == "AM") && ("${currentHour}" == "12")) {
 				var futureHour = "0";
@@ -94,38 +69,33 @@ definition {
 				var futureHour = "${currentHour}";
 			}
 
-			while (!("${futureHours}" == "0")) {
-				var futureHour = MathUtil.sum("${futureHour}", "1");
+			while ("${futureHours}" != "0") {
+				var futureHour = ${futureHour} + 1;
 
 				if ("${futureHour}" == "24") {
 					var futureHour = "0";
-
-					var futureDays = MathUtil.sum("${futureDays}", "1");
+					var futureDays = ${futureDays} + 1;
 				}
 
-				var futureHours = MathUtil.difference("${futureHours}", "1");
+				var futureHours = ${futureHours} - 1;
 			}
 
 			var futureHourOverTwelve = MathUtil.isGreaterThanOrEqualTo("${futureHour}", "12");
 
-			if ((!("${futureHourOverTwelve}" == "true")) && (!("${futureHour}" == "0"))) {
+			if (("${futureHourOverTwelve}" != "true") && ("${futureHour}" != "0")) {
 				var futureHour = "${futureHour}";
-
 				var futureAmPm = "AM";
 			}
-			else if ((!("${futureHourOverTwelve}" == "true")) && ("${futureHour}" == "0")) {
+			else if (("${futureHourOverTwelve}" != "true") && ("${futureHour}" == "0")) {
 				var futureHour = "12";
-
 				var futureAmPm = "AM";
 			}
 			else if (("${futureHourOverTwelve}" == "true") && ("${futureHour}" == "12")) {
 				var futureHour = "12";
-
 				var futureAmPm = "PM";
 			}
 			else {
-				var futureHour = MathUtil.difference("${futureHour}", "12");
-
+				var futureHour = ${futureHour} - 12;
 				var futureAmPm = "PM";
 			}
 		}
@@ -152,7 +122,6 @@ definition {
 		var futureDay = DateUtil.getDate("${futureDays}");
 		var futureMonth = DateUtil.getMonth("${futureDays}");
 		var futureYear = DateUtil.getYear("${futureDays}");
-
 		var futureDayUnderTen = MathUtil.isLessThan("${futureDay}", "10");
 
 		if ("${futureDayUnderTen}" == "true") {
@@ -176,13 +145,11 @@ definition {
 		echo("Future calculated date: ${futureDate}");
 
 		var key_field = "Never Expire";
-
 		var key_positionValue = "1";
 
 		ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_CHECKBOX_APPROXIMATE");
 
 		var key_field = "Display Date";
-
 		var key_positionValue = "1";
 
 		Type.clickAtType(
@@ -204,6 +171,7 @@ definition {
 			value1 = "${futureTime}");
 
 		WebContent.collapseSidePanelHeader(sidePanelCategory = "Schedule");
+
 		WebContent.expandSidePanelHeader(sidePanelCategory = "Schedule");
 	}
 
@@ -222,12 +190,10 @@ definition {
 			}
 			else if (contains("${fieldName}", "Quote")) {
 				if ("${fieldType}" == "Input") {
-					WebContent.clearViaExactInputField(			
-						field = "${fieldName}");
+					WebContent.clearViaExactInputField(field = "${fieldName}");
 				}
 				else if ("${fieldType}" == "Textarea") {
-					WebContent.clearViaExactTextareaField(
-						field = "${fieldName}");
+					WebContent.clearViaExactTextareaField(field = "${fieldName}");
 				}
 				else {
 					fail("Invalid field type ${fieldType}. Please set second column value to Input or Textarea");
@@ -235,12 +201,10 @@ definition {
 			}
 			else {
 				if ("${fieldType}" == "Input") {
-					WebContent.clearViaApproximateInputField(			
-						field = "${fieldName}");
+					WebContent.clearViaApproximateInputField(field = "${fieldName}");
 				}
 				else if ("${fieldType}" == "Textarea") {
-					WebContent.clearViaApproximateTextareaField(
-						field = "${fieldName}");
+					WebContent.clearViaApproximateTextareaField(field = "${fieldName}");
 				}
 				else {
 					fail("Invalid field type ${fieldType}. Please set second column value to Input or Textarea");
@@ -254,7 +218,7 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextEqual.isValue(locator1 = "WebContentCreate#INPUT_FIELD_APPROXIMATE", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 		}
 
 		KeyPress.keyDown(
@@ -279,7 +243,7 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextEqual.isValue(locator1 = "WebContentCreate#TEXTAREA_FIELD_APPROXIMATE", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 		}
 
 		KeyPress.keyDown(
@@ -293,7 +257,7 @@ definition {
 		KeyPress(
 			locator1 = "WebContentCreate#TEXTAREA_FIELD_APPROXIMATE",
 			value1 = "\DELETE");
-		
+
 		KeyPress.keyUp(
 			locator1 = "WebContentCreate#TEXTAREA_FIELD_APPROXIMATE",
 			value1 = "\CONTROL");
@@ -304,7 +268,7 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextEqual.isValue(locator1 = "WebContentCreate#INPUT_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 		}
 
 		KeyPress.keyDown(
@@ -329,7 +293,7 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextEqual.isValue(locator1 = "WebContentCreate#TEXTAREA_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 		}
 
 		KeyPress.keyDown(
@@ -349,6 +313,26 @@ definition {
 			value1 = "\CONTROL");
 	}
 
+	@prose = "I click the publish button"
+	macro clickPublish {
+		Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#PUBLISH_BUTTON");
+
+		WaitForSPARefresh();
+	}
+
+	@prose = "I collapse the ${sidePanelCategory} header in the side panel"
+	macro collapseSidePanelHeader {
+		var sidePanelCategory = StringUtil.replace("${sidePanelCategory}", " ", "");
+
+		var key_sidePanelCategory = StringUtil.lowerCaseFirstLetter("${sidePanelCategory}");
+
+		if (IsElementPresent(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED")) {
+			ScrollWebElementIntoView(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
+
+			Click.pauseMakeVisibleClickAt(locator1 = "WebContentCreate#SIDE_PANEL_HEADER_EXPANDED");
+		}
+	}
+
 	@prose = "I populate the following web content fields and values ${table}"
 	macro createWebContent {
 		var RawTable rawTable = new RawTable("${table}");
@@ -363,9 +347,9 @@ definition {
 					locator1 = "WebContentCreate#TITLE_FIELD",
 					value1 = "${value}");
 			}
-			else if ((contains("${fieldName}", "Quote")) || (contains("${fieldName}", "Topic"))) {
+			else if (contains("${fieldName}", "Quote") || contains("${fieldName}", "Topic")) {
 				if ("${fieldType}" == "Input") {
-					WebContent.typeViaExactInputField(			
+					WebContent.typeViaExactInputField(
 						field = "${fieldName}",
 						value = "${value}");
 				}
@@ -395,7 +379,7 @@ definition {
 			}
 			else {
 				if ("${fieldType}" == "Input") {
-					WebContent.typeViaApproximateInputField(			
+					WebContent.typeViaApproximateInputField(
 						field = "${fieldName}",
 						value = "${value}");
 				}
@@ -428,7 +412,7 @@ definition {
 
 	@prose = "I expand the ${sidePanelCategory} header in the side panel"
 	macro expandSidePanelHeader {
-		var sidePanelCategory = StringUtil.replace("${sidePanelCategory}", " ", "");	
+		var sidePanelCategory = StringUtil.replace("${sidePanelCategory}", " ", "");
 
 		var key_sidePanelCategory = StringUtil.lowerCaseFirstLetter("${sidePanelCategory}");
 
@@ -453,6 +437,7 @@ definition {
 	@prose = "I go to a new form for a ${type} web content"
 	macro gotoNewWebContentForm {
 		Click(locator1 = "WebContent#ADD_BUTTON");
+
 		Click(locator1 = "WebContent#MORE_BUTTON");
 
 		SelectFrame(locator1 = "WebContent#MORE_MENU_IFRAME");
@@ -616,7 +601,7 @@ definition {
 	@prose = "I tear down the following web content entries ${table}"
 	macro tearDownCP {
 		ProductMenu.gotoPortlet(
-			category = "Content &amp; Data",
+			category = "Content & Data",
 			panel = "Site Administration",
 			portlet = "Web Content");
 
@@ -663,14 +648,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#INPUT_FIELD_APPROXIMATE", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#INPUT_FIELD_APPROXIMATE")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -684,14 +669,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_APPROXIMATE", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_APPROXIMATE")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -705,14 +690,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#TEXTAREA_FIELD_APPROXIMATE", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#TEXTAREA_FIELD_APPROXIMATE")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_APPROXIMATE");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -726,14 +711,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#INPUT_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#INPUT_FIELD_EXACT")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -747,14 +732,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#RICH_TEXT_EDITOR_FIELD_EXACT")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -768,14 +753,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#TEXTAREA_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#TEXTAREA_FIELD_EXACT")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -827,14 +812,14 @@ definition {
 		var key_positionValue = "1";
 
 		while (IsTextNotEqual.isNotValue(locator1 = "WebContentCreate#INPUT_FIELD_EXACT", value1 = "")) {
-			var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+			var key_positionValue = ${key_positionValue} + 1;
 
 			if (IsElementNotPresent(locator1 = "WebContentCreate#INPUT_FIELD_EXACT")) {
-				var key_positionValue = MathUtil.difference("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} - 1;
 
 				Click(locator1 = "WebContentCreate#ADD_DUPLICATE_FIELD_BUTTON_EXACT");
 
-				var key_positionValue = MathUtil.sum("${key_positionValue}", "1");
+				var key_positionValue = ${key_positionValue} + 1;
 			}
 		}
 
@@ -869,4 +854,5 @@ definition {
 
 		SelectFrameTop();
 	}
+
 }

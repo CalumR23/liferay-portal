@@ -1,4 +1,5 @@
 definition {
+
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
@@ -8,13 +9,12 @@ definition {
 	@prose = "I assign a ticket with the ID ${ticketId} with the following tags ${table}"
 	macro _assignTagsToTicket {
 		var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var tag = "${row[0]}";
 
-			if (contains("${tagList}", "{tagList}")) {
+			if (!(isSet(tagList))) {
 				var tagList = "${tag}";
 			}
 			else {
@@ -42,13 +42,12 @@ definition {
 	macro _assignTagsToTickets {
 		for (var ticketId : list "${ticketIdList}") {
 			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
-
 			var RawTable rawTable = new RawTable("${table}");
 
 			for (var row : table "${rawTable}") {
 				var tag = "${row[0]}";
 
-				if (contains("${tagList}", "{tagList}")) {
+				if (!(isSet(tagList))) {
 					var tagList = "${tag}";
 				}
 				else {
@@ -184,17 +183,6 @@ definition {
 		return "${priority}";
 	}
 
-	macro _getTicketStatusById {
-		var curl = '''
-			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var status = JSONCurlUtil.get("${curl}", "$.ticket.status");
-
-		return "${status}";
-	}
-
 	macro _getTicketRequesterIdById {
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
@@ -206,17 +194,25 @@ definition {
 		return "${requesterId}";
 	}
 
+	macro _getTicketStatusById {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var status = JSONCurlUtil.get("${curl}", "$.ticket.status");
+
+		return "${status}";
+	}
+
 	@prose = "I teardown multiple tickets with the following keywords from zendesk.liferay.com ${table}"
 	macro _tearDownMultipleTicketsByKeywords {
 		var ticketIdList = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var keywords = "${row[0]}";
-
 			var ticketId = "";
-
 			var results = ZendeskTicketAPI._viewTicketSearchResultsByKeywords(keywords = "${keywords}");
 
 			if (contains("${results}", "${keywords}")) {
@@ -224,7 +220,7 @@ definition {
 			}
 		}
 
-		if (!("${ticketIds}" == "")) {
+		if ("${ticketIds}" != "") {
 			var curl = '''
 				${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIds} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -239,7 +235,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -251,13 +247,61 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The ticket tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The ticket tear down may have failed");
+
+					echo("Tear Down Job Status: ${status}");
+				}
+			}
+		}
+	}
+
+	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
+	macro _tearDownTicketByIds {
+		if (isSet(ticketIdList)) {
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList} --tlsv1.2
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
+
+			var curl = '''
+				${statusUrl} --tlsv1.2
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+
+			if ("${status}" != "completed") {
+				if (("${status}" == "queued") || ("${status}" == "working")) {
+					while (("${status}" == "queued") || ("${status}" == "working")) {
+						ZendeskHomepage.pause(timeInSeconds = "2");
+
+						var curl = '''
+							${statusUrl} --tlsv1.2
+							-u ${zendeskAdminEmail}/token:${apiToken}
+							''';
+
+						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
+					}
+
+					if ("${status}" != "completed") {
+						echo("Warning: The ticket tear down may have failed");
+
+						echo("Tear Down Job Status: ${status}");
+					}
+				}
+				else {
+					echo("Warning: The ticket tear down may have failed");
+
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -267,21 +311,18 @@ definition {
 	@prose = "I teardown the tickets with the following keywords from zendesk.liferay.com ${table}"
 	macro _tearDownTicketsByKeywords {
 		var ticketIdList = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var keywords = "${row[0]}";
-
 			var ticketId = "";
-
 			var results = ZendeskTicketAPI._viewTicketSearchResultsByKeywords(keywords = "${keywords}");
 
 			if (contains("${results}", "${keywords}")) {
 				var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
 			}
 
-			if (!("${ticketId}" == "")) {
+			if ("${ticketId}" != "") {
 				if ("${ticketIdList}" == "") {
 					var ticketIdList = "${ticketId}";
 				}
@@ -291,7 +332,7 @@ definition {
 			}
 		}
 
-		if (!("${ticketIdList}" == "")) {
+		if ("${ticketIdList}" != "") {
 			var curl = '''
 				${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList} --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -306,7 +347,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -318,55 +359,16 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The ticket tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The ticket tear down may have failed");
-					echo("Tear Down Job Status: ${status}");
-				}
-			}
-		}
-	}
 
-	@prose = "I teardown the tickets with ticketIds ${ticketIdList} from zendesk.liferay.com"
-	macro _tearDownTicketByIds {
-		if (!(contains("${ticketIdList}", "{ticketIdList}"))) {
-			var curl = '''
-				${zendeskURL}/api/v2/tickets/destroy_many.json?ids=${ticketIdList} --tlsv1.2
-				-u ${zendeskAdminEmail}/token:${apiToken}
-				''';
-
-			var statusUrl = JSONCurlUtil.delete("${curl}", "$.job_status.url");
-
-			var curl = '''
-				${statusUrl} --tlsv1.2
-				-u ${zendeskAdminEmail}/token:${apiToken}
-				''';
-
-			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
-
-			if (!("${status}" == "completed")) {
-				if (("${status}" == "queued") || ("${status}" == "working")) {
-					while (("${status}" == "queued") || ("${status}" == "working")) {
-						ZendeskHomepage.pause(timeInSeconds = "2");
-
-						var curl = '''
-							${statusUrl} --tlsv1.2
-							-u ${zendeskAdminEmail}/token:${apiToken}
-							''';
-
-						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
-					}
-					if (!("${status}" == "completed")) {
-						echo("Warning: The ticket tear down may have failed");
-						echo("Tear Down Job Status: ${status}");
-					}
-				}
-				else {
-					echo("Warning: The ticket tear down may have failed");
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -399,14 +401,11 @@ definition {
 	macro _viewAccountCodeAndExternalId {
 		for (var ticketId : list "${ticketIdList}") {
 			var organizationAccountCode = ZendeskOrganizationAPI._getOrganizationAccountCodeByOrganizationName(organizationName = "${organizationName}");
-
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
-
 			var curl = '''
 				${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
 				''';
-
 			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Account Entry ID");
 
 			var organizationExternalIdFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
@@ -415,8 +414,7 @@ definition {
 
 			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "]", "");
 
-			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "&quot;", "");
-
+			var organizationExternalIdFromAPI = StringUtil.replace("${organizationExternalIdFromAPI}", "\"", "");
 			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Account Code");
 
 			var organizationAccountCodeFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
@@ -425,19 +423,21 @@ definition {
 
 			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "]", "");
 
-			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "&quot;", "");
+			var organizationAccountCodeFromAPI = StringUtil.replace("${organizationAccountCodeFromAPI}", "\"", "");
 
 			echo("Expected Organization External ID: ${organizationExternalId}");
+
 			echo("Actual Organization External ID: ${organizationExternalIdFromAPI}");
 
-			if (!("${organizationExternalIdFromAPI}" == "${organizationExternalId}")) {
+			if ("${organizationExternalIdFromAPI}" != "${organizationExternalId}") {
 				fail("Actual value ${organizationExternalIdFromAPI} does not match the expected value of ${organizationExternalId}");
 			}
 
 			echo("Expected Account Code: ${organizationAccountCode}");
+
 			echo("Actual Account Code: ${organizationAccountCodeFromAPI}");
 
-			if (!("${organizationAccountCodeFromAPI}" == "${organizationAccountCode}")) {
+			if ("${organizationAccountCodeFromAPI}" != "${organizationAccountCode}") {
 				fail("Actual value ${organizationAccountCodeFromAPI} does not match the expected value of ${organizationAccountCode}");
 			}
 		}
@@ -450,13 +450,11 @@ definition {
 		var requesterEmailAddress = "no-reply@${organizationExternalId}.com.broken";
 
 		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
-
 		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${requesterId}" == "${requesterIdFromAPI}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${requesterId}" != "${requesterIdFromAPI}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -464,37 +462,11 @@ definition {
 		}
 
 		echo("Expected Requester ID: ${requesterId}");
+
 		echo("Actual Requester ID: ${requesterIdFromAPI}");
 
-		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+		if ("${requesterIdFromAPI}" != "${requesterId}") {
 			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
-		}
-	}
-
-	@prose = "the tickets with ticketIds ${ticketIdList} should have the environment ${environment}"
-	macro _viewMultipleTicketEnvironments {
-		for (var ticketId : list "${ticketIdList}") {
-			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
-
-			var curl = '''
-				${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
-				-u ${zendeskAdminEmail}/token:${apiToken}
-				''';
-
-			var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
-
-			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "[", "");
-
-			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "]", "");
-
-			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "&quot;", "");
-
-			echo("Expected Environment Name: ${environment}");
-			echo("Actual Environment Name: ${environmentFromAPI}");
-
-			if (!("${environmentFromAPI}" == "${environment}")) {
-				fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
-			}
 		}
 	}
 
@@ -533,10 +505,12 @@ definition {
 							var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 						}
 					}
+
 					echo("Expected Recipients: ${value}");
+
 					echo("Actual Recipients: ${recipientsFromAPI}");
 
-					if (!("${recipientsFromAPI}" == "${value}")) {
+					if ("${recipientsFromAPI}" != "${value}") {
 						fail("Actual recipients ${recipientsFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not match expected recipients ${value}");
 					}
 				}
@@ -566,6 +540,136 @@ definition {
 						fail("Actual body ${bodyFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not contain the text ${value}");
 					}
 				}
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should have the environment ${environment}"
+	macro _viewMultipleTicketEnvironments {
+		for (var ticketId : list "${ticketIdList}") {
+			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
+			var curl = '''
+				${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
+				-u ${zendeskAdminEmail}/token:${apiToken}
+				''';
+
+			var environmentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "[", "");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "]", "");
+
+			var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "\"", "");
+
+			echo("Expected Environment Name: ${environment}");
+
+			echo("Actual Environment Name: ${environmentFromAPI}");
+
+			if ("${environmentFromAPI}" != "${environment}") {
+				fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee}"
+	macro _viewMultipleTicketGroupAssignees {
+		for (var ticketId : list "${ticketIdList}") {
+			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
+
+			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
+
+			var groupAssigneeFromAPI = "${groupName}";
+
+			echo("Expected Assignee Name: ${groupAssignee}");
+
+			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+			if ("${groupAssigneeFromAPI}" != "${groupAssignee}") {
+				fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected value ${groupAssignee}");
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to either the group ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}"
+	macro _viewMultipleTicketGroupAssigneesWithThreePossibleAssignees {
+		for (var ticketId : list "${ticketIdList}") {
+			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
+
+			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
+
+			var groupAssigneeFromAPI = "${groupName}";
+
+			echo("Expected possible Assignee Names: ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}");
+
+			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+			if ("${groupAssigneeFromAPI}" != "${possibleGroupAssignee1}") {
+				if ("${groupAssigneeFromAPI}" != "${possibleGroupAssignee2}") {
+					if ("${groupAssigneeFromAPI}" != "${possibleGroupAssignee3}") {
+						fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}");
+					}
+				}
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to either the group ${possibleGroupAssignee1} or ${possibleGroupAssignee2}"
+	macro _viewMultipleTicketGroupAssigneesWithTwoPossibleAssignees {
+		for (var ticketId : list "${ticketIdList}") {
+			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
+
+			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
+
+			var groupAssigneeFromAPI = "${groupName}";
+
+			echo("Expected possible Assignee Names: ${possibleGroupAssignee1} or ${possibleGroupAssignee2}");
+
+			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+			if ("${groupAssigneeFromAPI}" != "${possibleGroupAssignee1}") {
+				if ("${groupAssigneeFromAPI}" != "${possibleGroupAssignee2}") {
+					fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${possibleGroupAssignee1} or ${possibleGroupAssignee2}");
+				}
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee1} or ${groupAssignee2}"
+	macro _viewMultipleTicketPossibleGroupAssignees {
+		for (var ticketId : list "${ticketIdList}") {
+			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
+
+			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
+
+			var groupAssigneeFromAPI = "${groupName}";
+
+			echo("First Expected Assignee Name: ${groupAssignee1}");
+
+			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+			if ("${groupAssigneeFromAPI}" != "${groupAssignee1}") {
+				echo("Second Expected Assignee Name: ${groupAssignee2}");
+
+				echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
+
+				if ("${groupAssigneeFromAPI}" != "${groupAssignee2}") {
+					fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${groupAssignee1} or ${groupAssignee2}");
+				}
+			}
+		}
+	}
+
+	@prose = "the tickets with ticketIds ${ticketIdList} should be given the priority level ${priority}"
+	macro _viewMultipleTicketPriorities {
+		for (var ticketId : list "${ticketIdList}") {
+			var priorityFromAPI = ZendeskTicketAPI._getTicketPriorityById(ticketId = "${ticketId}");
+
+			echo("Expected Priority Level: ${priority}");
+
+			echo("Actual Priority Level: ${priorityFromAPI}");
+
+			if ("${priorityFromAPI}" != "${priority}") {
+				fail("Actual value ${priorityFromAPI} given to ticket ID ${ticketId} does not match expected value ${priority}");
 			}
 		}
 	}
@@ -605,10 +709,12 @@ definition {
 							var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 						}
 					}
+
 					echo("Expected Recipients: ${value}");
+
 					echo("Actual Recipients: ${recipientsFromAPI}");
 
-					if (!("${recipientsFromAPI}" == "${value}")) {
+					if ("${recipientsFromAPI}" != "${value}") {
 						fail("Actual recipients ${recipientsFromAPI} in the email regarding the creation of ticket ID ${ticketId} does not match expected recipients ${value}");
 					}
 				}
@@ -642,108 +748,10 @@ definition {
 		}
 	}
 
-	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee}"
-	macro _viewMultipleTicketGroupAssignees {
-		for (var ticketId : list "${ticketIdList}") {
-			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
-
-			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
-
-			var groupAssigneeFromAPI = "${groupName}";
-
-			echo("Expected Assignee Name: ${groupAssignee}");
-			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
-
-			if (!("${groupAssigneeFromAPI}" == "${groupAssignee}")) {
-				fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected value ${groupAssignee}");
-			}
-		}
-	}
-
-	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to either the group ${possibleGroupAssignee1} or ${possibleGroupAssignee2}"
-	macro _viewMultipleTicketGroupAssigneesWithTwoPossibleAssignees {
-		for (var ticketId : list "${ticketIdList}") {
-			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
-
-			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
-
-			var groupAssigneeFromAPI = "${groupName}";
-
-			echo("Expected possible Assignee Names: ${possibleGroupAssignee1} or ${possibleGroupAssignee2}");
-			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
-
-			if (!("${groupAssigneeFromAPI}" == "${possibleGroupAssignee1}")) {
-				if (!("${groupAssigneeFromAPI}" == "${possibleGroupAssignee2}")) {
-					fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${possibleGroupAssignee1} or ${possibleGroupAssignee2}");
-				}
-			}
-		}
-	}
-
-	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to either the group ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}"
-	macro _viewMultipleTicketGroupAssigneesWithThreePossibleAssignees {
-		for (var ticketId : list "${ticketIdList}") {
-			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
-
-			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
-
-			var groupAssigneeFromAPI = "${groupName}";
-
-			echo("Expected possible Assignee Names: ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}");
-			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
-
-			if (!("${groupAssigneeFromAPI}" == "${possibleGroupAssignee1}")) {
-				if (!("${groupAssigneeFromAPI}" == "${possibleGroupAssignee2}")) {
-					if (!("${groupAssigneeFromAPI}" == "${possibleGroupAssignee3}")) {
-						fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${possibleGroupAssignee1} or ${possibleGroupAssignee2} or ${possibleGroupAssignee3}");
-					}
-				}
-			}
-		}
-	}
-
-	@prose = "the tickets with ticketIds ${ticketIdList} should be assigned to the group ${groupAssignee1} or ${groupAssignee2}"
-	macro _viewMultipleTicketPossibleGroupAssignees {
-		for (var ticketId : list "${ticketIdList}") {
-			var groupAssigneeId = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
-
-			var groupName = ZendeskGroupAPI._getGroupNameById(groupId = "${groupAssigneeId}");
-
-			var groupAssigneeFromAPI = "${groupName}";
-
-			echo("First Expected Assignee Name: ${groupAssignee1}");
-			echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
-
-			if (!("${groupAssigneeFromAPI}" == "${groupAssignee1}")) {
-				echo("Second Expected Assignee Name: ${groupAssignee2}");
-				echo("Actual Assignee Name: ${groupAssigneeFromAPI}");
-
-				if (!("${groupAssigneeFromAPI}" == "${groupAssignee2}")) {
-					fail("Actual value ${groupAssigneeFromAPI} assigned to ticket ID ${ticketId} does not match expected values ${groupAssignee1} or ${groupAssignee2}");
-				}
-			}
-		}
-	}
-
-	@prose = "the tickets with ticketIds ${ticketIdList} should be given the priority level ${priority}"
-	macro _viewMultipleTicketPriorities {
-		for (var ticketId : list "${ticketIdList}") {
-			var priorityFromAPI = ZendeskTicketAPI._getTicketPriorityById(ticketId = "${ticketId}");
-
-			echo("Expected Priority Level: ${priority}");
-			echo("Actual Priority Level: ${priorityFromAPI}");
-
-			if (!("${priorityFromAPI}" == "${priority}")) {
-				fail("Actual value ${priorityFromAPI} given to ticket ID ${ticketId} does not match expected value ${priority}");
-			}
-		}
-	}
-
 	@prose = "the tickets with ticketIds ${ticketIdList} should have the sub-status ${subStatus}"
 	macro _viewMultipleTicketSubStatuses {
 		for (var ticketId : list "${ticketIdList}") {
 			var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
-
 			var curl = '''
 				${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 				-u ${zendeskAdminEmail}/token:${apiToken}
@@ -755,12 +763,13 @@ definition {
 
 			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "]", "");
 
-			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "&quot;", "");
+			var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "\"", "");
 
 			echo("Expected Sub-Status: ${subStatus}");
+
 			echo("Actual Sub-Status: ${subStatusFromAPI}");
 
-			if (!("${subStatusFromAPI}" == "${subStatus}")) {
+			if ("${subStatusFromAPI}" != "${subStatus}") {
 				fail("Actual value ${subStatusFromAPI} does not match expected value ${subStatus}");
 			}
 		}
@@ -782,7 +791,7 @@ definition {
 
 			echo("Legacy ticket email event: ${legacyTicketEmailEvent}");
 
-			if (!("${legacyTicketEmailEvent}" == "")) {
+			if ("${legacyTicketEmailEvent}" != "") {
 				fail("A ${portalLegacyVersion} legacy ticket email may have been sent out.");
 			}
 		}
@@ -804,7 +813,7 @@ definition {
 
 			echo("Non-legacy ticket email event: ${nonLegacyTicketEmailEvent}");
 
-			if (!("${nonLegacyTicketEmailEvent}" == "")) {
+			if ("${nonLegacyTicketEmailEvent}" != "") {
 				fail("A non-legacy ticket email may have been sent out.");
 			}
 		}
@@ -816,6 +825,7 @@ definition {
 			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
 
 			echo("Expected Tag Value: ${tagName}");
+
 			echo("Actual Existing Tags: ${existingTags}");
 
 			if (contains("${existingTags}", "${tagName}")) {
@@ -838,11 +848,10 @@ definition {
 			''';
 
 		var results = JSONCurlUtil.get("${curl}", "$.results");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "5")) && (!(contains("${results}", "${keywords}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "5") && !(contains("${results}", "${keywords}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -888,10 +897,12 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
-				if (!("${recipientsFromAPI}" == "${value}")) {
+				if ("${recipientsFromAPI}" != "${value}") {
 					fail("Actual recipients ${recipientsFromAPI} in the email regarding the reopening of ticket ${ticketId} does not match expected recipients ${value}");
 				}
 			}
@@ -963,7 +974,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1043,7 +1056,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1085,6 +1100,7 @@ definition {
 			var existingTags = ZendeskTicketAPI._viewTicketExistingTagsById(ticketId = "${ticketId}");
 
 			echo("Expected Tag Value: ${tagName}");
+
 			echo("Actual Existing Tags: ${existingTags}");
 
 			if (!(contains("${existingTags}", "${tagName}"))) {
@@ -1096,7 +1112,6 @@ definition {
 	@prose = "the ticket with the ticket ID ${ticketId} should be assigned to the user with the email address ${userEmailAddress}"
 	macro _viewTicketAssignee {
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1105,9 +1120,10 @@ definition {
 		var userIdFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.assignee_id");
 
 		echo("Expected User ID: ${userId}");
+
 		echo("Actual User ID: ${userIdFromAPI}");
 
-		if (!("${userIdFromAPI}" == "${userId}")) {
+		if ("${userIdFromAPI}" != "${userId}") {
 			fail("Actual value ${userIdFromAPI} does not match expected value ${userId}");
 		}
 	}
@@ -1146,10 +1162,12 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
-				if (!("${recipientsFromAPI}" == "${value}")) {
+				if ("${recipientsFromAPI}" != "${value}") {
 					fail("Actual recipients ${recipientsFromAPI} in the email regarding the assignment of ticket ID ${ticketId} does not match expected recipients ${value}");
 				}
 			}
@@ -1221,7 +1239,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1301,7 +1321,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1346,11 +1368,11 @@ definition {
 
 		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
 
-		var commentArrayValue = MathUtil.difference("${commentCount}", "1");
+		var commentArrayValue = ${commentCount} - 1;
 
 		var commentFromAPI = JSONCurlUtil.get("${curl}", "$.comments[${commentArrayValue}].body");
 
-		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "&quot;", "");
+		var commentFromAPI = StringUtil.replace("${commentFromAPI}", "\"", "");
 
 		if (!(contains("${commentFromAPI}", "${commentContent}"))) {
 			fail("Actual comment ${commentFromAPI} as the most recent comment body does not contain the expected comment body content ${commentContent}.");
@@ -1391,10 +1413,12 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
-				if (!("${recipientsFromAPI}" == "${value}")) {
+				if ("${recipientsFromAPI}" != "${value}") {
 					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
 				}
 			}
@@ -1466,7 +1490,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1546,7 +1572,9 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
 				if (!(contains("${recipientsFromAPI}", "${value}"))) {
@@ -1616,10 +1644,12 @@ definition {
 						var recipientsFromAPI = "${recipientsFromAPI},${recipientFromAPI}";
 					}
 				}
+
 				echo("Expected Recipients: ${value}");
+
 				echo("Actual Recipients: ${recipientsFromAPI}");
 
-				if (!("${recipientsFromAPI}" == "${value}")) {
+				if ("${recipientsFromAPI}" != "${value}") {
 					fail("Actual recipients ${recipientsFromAPI} in the email regarding the comment for ticket ID ${ticketId} does not match expected recipients ${value}");
 				}
 			}
@@ -1664,6 +1694,7 @@ definition {
 		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
 
 		echo("Expected Description Text: ${descriptionText}");
+
 		echo("Actual Description: ${descriptionFromAPI}");
 
 		if (!(contains("${descriptionFromAPI}", "${descriptionText}"))) {
@@ -1683,6 +1714,7 @@ definition {
 		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
 
 		echo("Expected Description Text: ${descriptionText}");
+
 		echo("Actual Description: ${descriptionFromAPI}");
 
 		if (contains("${descriptionFromAPI}", "${descriptionText}")) {
@@ -1693,9 +1725,7 @@ definition {
 	@prose = "the ticket with keywords ${keywords} should have the email cc ${userEmailAddress}"
 	macro _viewTicketEmailCc {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1708,6 +1738,7 @@ definition {
 		var emailCcIdsFromAPI = StringUtil.replace("${emailCcIdsFromAPI}", "]", "");
 
 		echo("Expected Email CC ID: ${userId}");
+
 		echo("Actual Email CC IDs: ${emailCcIdsFromAPI}");
 
 		if (!(contains("${emailCcIdsFromAPI}", "${userId}"))) {
@@ -1718,9 +1749,7 @@ definition {
 	@prose = "the ticket with ticket subject ${ticketSubject} should have the environment ${environment}"
 	macro _viewTicketEnvironment {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Environment");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1732,12 +1761,13 @@ definition {
 
 		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "]", "");
 
-		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "&quot;", "");
+		var environmentFromAPI = StringUtil.replace("${environmentFromAPI}", "\"", "");
 
 		echo("Expected Environment Name: ${environment}");
+
 		echo("Actual Environment Name: ${environmentFromAPI}");
 
-		if (!("${environmentFromAPI}" == "${environment}")) {
+		if ("${environmentFromAPI}" != "${environment}") {
 			fail("Actual value ${environmentFromAPI} does not match expected value ${environment}");
 		}
 	}
@@ -1754,7 +1784,7 @@ definition {
 
 		var existingTags = StringUtil.replace("${existingTags}", "]", "");
 
-		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+		var existingTags = StringUtil.replace("${existingTags}", "\"", "");
 
 		return "${existingTags}";
 	}
@@ -1778,9 +1808,10 @@ definition {
 		var assigneeFromAPI = JSONCurlUtil.get("${curl}", "$.group.name");
 
 		echo("Expected Assignee Name: ${assignee}");
+
 		echo("Actual Assignee Name: ${assigneeFromAPI}");
 
-		if (!("${assigneeFromAPI}" == "${assignee}")) {
+		if ("${assigneeFromAPI}" != "${assignee}") {
 			fail("Actual value ${assigneeFromAPI} does not match expected value ${assignee}");
 		}
 	}
@@ -1788,16 +1819,40 @@ definition {
 	@prose = "the ticket with keywords ${keywords} should be assigned to the group ${groupName}"
 	macro _viewTicketGroupAssigneeByKeywords {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var groupId = ZendeskGroupAPI._getGroupIdByName(groupName = "${groupName}");
-
 		var groupIdFromAPI = ZendeskTicketAPI._getTicketGroupAssigneeIdById(ticketId = "${ticketId}");
 
 		echo("Expected Group ID: ${groupId}");
+
 		echo("Actual Group ID: ${groupIdFromAPI}");
 
-		if (!("${groupIdFromAPI}" == "${groupId}")) {
+		if ("${groupIdFromAPI}" != "${groupId}") {
 			fail("Actual group ID ${groupIdFromAPI} assigned to the ticket does not match expected value ${groupId}");
+		}
+	}
+
+	@prose = "the ticket with the ID ${ticketId} should have the heat score ${heatScore}"
+	macro _viewTicketHeatScore {
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Heat Score");
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var heatScoreFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "[", "");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "]", "");
+
+		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "\"", "");
+
+		echo("Expected Heat Score Value: ${heatScore}");
+
+		echo("Actual Heat Score Value: ${heatScoreFromAPI}");
+
+		if ("${heatScoreFromAPI}" != "${heatScore}") {
+			fail("Actual value ${heatScoreFromAPI} does not match expected value ${heatScore}");
 		}
 	}
 
@@ -1818,6 +1873,18 @@ definition {
 		return "${ticketId}";
 	}
 
+	macro _viewTicketIdByTicketSubject {
+		var curl = '''
+			${zendeskURL}/api/v2/search.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-G --data-urlencode "query=type:ticket subject:${ticketSubject}"
+			''';
+
+		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
+
+		return "${ticketId}";
+	}
+
 	macro _viewTicketIdsByKeywords {
 		var keywords = StringUtil.replace("${keywords}", " ", "+");
 
@@ -1831,47 +1898,33 @@ definition {
 			''';
 
 		var count = JSONCurlUtil.get("${curl}", "$.count");
-
 		var ticketNumber = "0";
-
 		var ticketIds = "";
 
-		while (!("${count}" == "${ticketNumber}")) {
+		while ("${count}" != "${ticketNumber}") {
 			echo("Count: ${count}");
+
 			echo("Current Ticket Number: ${ticketNumber}");
 
 			var ticketId = JSONCurlUtil.get("${curl}", "$.results[${ticketNumber}].id");
 
-			if("${ticketIds}" == "") {
+			if ("${ticketIds}" == "") {
 				var ticketIds = "${ticketId}";
 			}
 			else {
 				var ticketIds = "${ticketIds},${ticketId}";
 			}
-			var ticketNumber = MathUtil.sum("${ticketNumber}", "1");
+
+			var ticketNumber = ${ticketNumber} + 1;
 		}
 
 		return "${ticketIds}";
 	}
 
-	macro _viewTicketIdByTicketSubject {
-		var curl = '''
-			${zendeskURL}/api/v2/search.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			-G --data-urlencode "query=type:ticket subject:${ticketSubject}"
-			''';
-
-		var ticketId = JSONCurlUtil.get("${curl}", "$.results[0].id");
-
-		return "${ticketId}";
-	}
-
 	@prose = "the ticket with keywords ${keywords} should have the opportunity owner ${opportunityOwner}"
 	macro _viewTicketOpportunityOwner {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Opportunity Owner");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1883,12 +1936,13 @@ definition {
 
 		var opportunityOwnerFromAPI = StringUtil.replace("${opportunityOwnerFromAPI}", "]", "");
 
-		var opportunityOwnerFromAPI = StringUtil.replace("${opportunityOwnerFromAPI}", "&quot;", "");
+		var opportunityOwnerFromAPI = StringUtil.replace("${opportunityOwnerFromAPI}", "\"", "");
 
 		echo("Expected Opportunity Owner: ${opportunityOwner}");
+
 		echo("Actual Opportunity Owner: ${opportunityOwnerFromAPI}");
 
-		if (!("${opportunityOwnerFromAPI}" == "${opportunityOwner}")) {
+		if ("${opportunityOwnerFromAPI}" != "${opportunityOwner}") {
 			fail("Actual value ${opportunityOwnerFromAPI} does not match expected value ${opportunityOwner}");
 		}
 	}
@@ -1912,9 +1966,10 @@ definition {
 		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organization.name");
 
 		echo("Expected Organization Name: ${organizationName}");
+
 		echo("Actual Organization Name: ${organizationNameFromAPI}");
 
-		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+		if ("${organizationNameFromAPI}" != "${organizationName}") {
 			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
 		}
 	}
@@ -1938,9 +1993,10 @@ definition {
 		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organization.name");
 
 		echo("Expected Organization Name: ${organizationName}");
+
 		echo("Actual Organization Name: ${organizationNameFromAPI}");
 
-		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+		if ("${organizationNameFromAPI}" != "${organizationName}") {
 			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
 		}
 	}
@@ -1948,9 +2004,7 @@ definition {
 	@prose = "the ticket with keywords ${keywords} should have the primary address country ${primaryAddressCountry}"
 	macro _viewTicketPrimaryAddressCountry {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Provisioning - Country");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -1962,40 +2016,14 @@ definition {
 
 		var primaryAddressCountryFromAPI = StringUtil.replace("${primaryAddressCountryFromAPI}", "]", "");
 
-		var primaryAddressCountryFromAPI = StringUtil.replace("${primaryAddressCountryFromAPI}", "&quot;", "");
+		var primaryAddressCountryFromAPI = StringUtil.replace("${primaryAddressCountryFromAPI}", "\"", "");
 
 		echo("Expected Primary Address Country: ${primaryAddressCountry}");
+
 		echo("Actual Primary Address Country: ${primaryAddressCountryFromAPI}");
 
-		if (!("${primaryAddressCountryFromAPI}" == "${primaryAddressCountry}")) {
+		if ("${primaryAddressCountryFromAPI}" != "${primaryAddressCountry}") {
 			fail("Actual value ${primaryAddressCountryFromAPI} does not match expected value ${primaryAddressCountry}");
-		}
-	}
-
-	@prose = "the ticket with keywords ${keywords} should have the provisioning component ${provisioningComponent}"
-	macro _viewTicketProvisioningComponent {
-		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
-		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Provisioning Component");
-
-		var curl = '''
-			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var provisioningComponentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
-
-		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "[", "");
-
-		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "]", "");
-
-		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "&quot;", "");
-
-		echo("Expected Provisioning Component Name: ${provisioningComponent}");
-		echo("Actual Provisioning Component Name: ${provisioningComponentFromAPI}");
-
-		if (!("${provisioningComponentFromAPI}" == "${provisioningComponent}")) {
-			fail("Actual value ${provisioningComponentFromAPI} does not match expected value ${provisioningComponent}");
 		}
 	}
 
@@ -2011,44 +2039,18 @@ definition {
 		var priorityFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.priority");
 
 		echo("Expected Priority Name: ${priority}");
+
 		echo("Actual Priority Name: ${priorityFromAPI}");
 
-		if (!("${priorityFromAPI}" == "${priority}")) {
+		if ("${priorityFromAPI}" != "${priority}") {
 			fail("Actual value ${priorityFromAPI} does not match expected value ${priority}");
-		}
-	}
-
-	@prose = "the ticket with the ID ${ticketId} should have the heat score ${heatScore}"
-	macro _viewTicketHeatScore{
-		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Heat Score");
-
-		var curl = '''
-			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var heatScoreFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
-
-		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "[", "");
-
-		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "]", "");
-
-		var heatScoreFromAPI = StringUtil.replace("${heatScoreFromAPI}", "&quot;", "");
-
-		echo("Expected Heat Score Value: ${heatScore}");
-		echo("Actual Heat Score Value: ${heatScoreFromAPI}");
-
-		if (!("${heatScoreFromAPI}" == "${heatScore}")) {
-			fail("Actual value ${heatScoreFromAPI} does not match expected value ${heatScore}");
 		}
 	}
 
 	@prose = "the ticket with keywords ${keywords} should have the product ${product}"
 	macro _viewTicketProduct {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Product");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -2060,28 +2062,54 @@ definition {
 
 		var productFromAPI = StringUtil.replace("${productFromAPI}", "]", "");
 
-		var productFromAPI = StringUtil.replace("${productFromAPI}", "&quot;", "");
+		var productFromAPI = StringUtil.replace("${productFromAPI}", "\"", "");
 
 		echo("Expected Product Name: ${product}");
+
 		echo("Actual Product Name: ${productFromAPI}");
 
-		if (!("${productFromAPI}" == "${product}")) {
+		if ("${productFromAPI}" != "${product}") {
 			fail("Actual value ${productFromAPI} does not match expected value ${product}");
+		}
+	}
+
+	@prose = "the ticket with keywords ${keywords} should have the provisioning component ${provisioningComponent}"
+	macro _viewTicketProvisioningComponent {
+		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Provisioning Component");
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var provisioningComponentFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.custom_fields[?(@.id==${fieldId})].value");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "[", "");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "]", "");
+
+		var provisioningComponentFromAPI = StringUtil.replace("${provisioningComponentFromAPI}", "\"", "");
+
+		echo("Expected Provisioning Component Name: ${provisioningComponent}");
+
+		echo("Actual Provisioning Component Name: ${provisioningComponentFromAPI}");
+
+		if ("${provisioningComponentFromAPI}" != "${provisioningComponent}") {
+			fail("Actual value ${provisioningComponentFromAPI} does not match expected value ${provisioningComponent}");
 		}
 	}
 
 	@prose = "the ticket with keywords ${keywords} should have the requester with the email address ${requesterEmailAddress}"
 	macro _viewTicketRequester {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
-
 		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
 
 		echo("Expected Requester ID: ${requesterId}");
+
 		echo("Actual Requester ID: ${requesterIdFromAPI}");
 
-		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+		if ("${requesterIdFromAPI}" != "${requesterId}") {
 			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
 		}
 	}
@@ -2089,13 +2117,11 @@ definition {
 	@prose = "the ticket with ticketId ${ticketId} should have the requester with the email address ${requesterEmailAddress}"
 	macro _viewTicketRequesterSync {
 		var requesterId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${requesterEmailAddress}");
-
 		var requesterIdFromAPI = ZendeskTicketAPI._getTicketRequesterIdById(ticketId = "${ticketId}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${requesterId}" == "${requesterIdFromAPI}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${requesterId}" != "${requesterIdFromAPI}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -2103,9 +2129,10 @@ definition {
 		}
 
 		echo("Expected Requester ID: ${requesterId}");
+
 		echo("Actual Requester ID: ${requesterIdFromAPI}");
 
-		if (!("${requesterIdFromAPI}" == "${requesterId}")) {
+		if ("${requesterIdFromAPI}" != "${requesterId}") {
 			fail("After ${currentIteration} checks, actual requester ID ${requesterIdFromAPI} for ticket ID ${ticketId} does not match expected requester ID ${requesterId}");
 		}
 	}
@@ -2130,11 +2157,10 @@ definition {
 	@prose = "the ticket with ticketId ${ticketId} should have the status ${status}"
 	macro _viewTicketStatusSync {
 		var statusFromAPI = ZendeskTicketAPI._getTicketStatusById(ticketId = "${ticketId}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${statusFromAPI}" == "${status}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${statusFromAPI}" != "${status}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -2142,9 +2168,10 @@ definition {
 		}
 
 		echo("Expected Status: ${status}");
+
 		echo("Actual Status: ${statusFromAPI}");
 
-		if (!("${statusFromAPI}" == "${status}")) {
+		if ("${statusFromAPI}" != "${status}") {
 			fail("After ${currentIteration} checks, actual value ${statusFromAPI} status for ticket ID ${ticketId} does not match expected status value ${status}");
 		}
 	}
@@ -2161,19 +2188,18 @@ definition {
 		var subjectFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.subject");
 
 		echo("Expected Subject: ${subject}");
+
 		echo("Actual Subject: ${subjectFromAPI}");
 
-		if (!("${subjectFromAPI}" == "${subject}")) {
+		if ("${subjectFromAPI}" != "${subject}") {
 			fail("Actual value ${subjectFromAPI} does not match expected value ${subject}");
 		}
 	}
 
 	@prose = "the ticket with ticket subject ${ticketSubject} should have the sub-status ${subStatus}"
-	macro _viewTicketSubStatus{
+	macro _viewTicketSubStatus {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByTicketSubject(ticketSubject = "${ticketSubject}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -2185,12 +2211,13 @@ definition {
 
 		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "]", "");
 
-		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "&quot;", "");
+		var subStatusFromAPI = StringUtil.replace("${subStatusFromAPI}", "\"", "");
 
 		echo("Expected Environment Name: ${subStatus}");
+
 		echo("Actual Environment Name: ${subStatusFromAPI}");
 
-		if (!("${subStatusFromAPI}" == "${subStatus}")) {
+		if ("${subStatusFromAPI}" != "${subStatus}") {
 			fail("Actual value ${subStatusFromAPI} does not match expected value ${subStatus}");
 		}
 	}
@@ -2198,9 +2225,7 @@ definition {
 	@prose = "the ticket with keywords ${keywords} should have the support region ${supportRegion}"
 	macro _viewTicketSupportRegion {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
-
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Provisioning - Support Region");
-
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -2212,12 +2237,13 @@ definition {
 
 		var supportRegionFromAPI = StringUtil.replace("${supportRegionFromAPI}", "]", "");
 
-		var supportRegionFromAPI = StringUtil.replace("${supportRegionFromAPI}", "&quot;", "");
+		var supportRegionFromAPI = StringUtil.replace("${supportRegionFromAPI}", "\"", "");
 
 		echo("Expected Support Region: ${supportRegion}");
+
 		echo("Actual Support Region: ${supportRegionFromAPI}");
 
-		if (!("${supportRegionFromAPI}" == "${supportRegion}")) {
+		if ("${supportRegionFromAPI}" != "${supportRegion}") {
 			fail("Actual value ${supportRegionFromAPI} does not match expected value ${supportRegion}");
 		}
 	}
@@ -2235,14 +2261,15 @@ definition {
 
 		var supportSchedule = StringUtil.replace("${supportSchedule}", "]", "");
 
-		var supportSchedule = StringUtil.replace("${supportSchedule}", "&quot;", "");
+		var supportSchedule = StringUtil.replace("${supportSchedule}", "\"", "");
 
 		var supportRegionAbbreviationFromAPI = StringUtil.replace("${supportSchedule}", "Set schedule to ", "");
 
 		echo("Expected Support Schedule: ${supportRegionAbbreviation}");
+
 		echo("Actual Support Schedule: ${supportRegionAbbreviationFromAPI}");
 
-		if (!("${supportRegionAbbreviation}" == "${supportRegionAbbreviationFromAPI}")) {
+		if ("${supportRegionAbbreviation}" != "${supportRegionAbbreviationFromAPI}") {
 			fail("Actual support schedule ${supportRegionAbbreviationFromAPI} does not match the expected support schedule ${supportRegionAbbreviation}");
 		}
 
@@ -2252,22 +2279,21 @@ definition {
 
 		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "]", "");
 
-		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "&quot;", "");
+		var supportScheduleId = StringUtil.replace("${supportScheduleId}", "\"", "");
 
 		var supportScheduleName = ZendeskScheduleAPI._getScheduleNameById(scheduleId = "${supportScheduleId}");
 
 		var supportScheduleName = StringUtil.replace("${supportScheduleName}", "[", "");
 
 		var supportSchedule = StringUtil.replace("${supportScheduleName}", "]", "");
-
-		var supportSchedule = StringUtil.replace("${supportScheduleName}", "&quot;", "");
-
+		var supportSchedule = StringUtil.replace("${supportScheduleName}", "\"", "");
 		var supportRegionAbbreviationFromAPI = StringUtil.replace("${supportScheduleName}", " - Schedule", "");
 
 		echo("Expected Support Schedule in Trigger: ${supportRegionAbbreviation}");
+
 		echo("Actual Support Schedule in Trigger: ${supportRegionAbbreviationFromAPI}");
 
-		if (!("${supportRegionAbbreviation}" == "${supportRegionAbbreviationFromAPI}")) {
+		if ("${supportRegionAbbreviation}" != "${supportRegionAbbreviationFromAPI}") {
 			fail("The schedule trigger may be incorrect as it is setting ${supportRegionAbbreviationFromAPI} schedule to the ${supportRegionAbbreviation} trigger.");
 		}
 	}
@@ -2286,11 +2312,10 @@ definition {
 			''';
 
 		var results = JSONCurlUtil.get("${curl}", "$.results");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${results}", "${keywords}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${results}", "${keywords}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -2301,4 +2326,5 @@ definition {
 			fail("After ${currentIteration} checks, the ticket with the keywords ${keywords} has not been synced to zendesk");
 		}
 	}
+
 }

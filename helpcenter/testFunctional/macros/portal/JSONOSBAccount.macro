@@ -1,4 +1,5 @@
 definition {
+
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
@@ -53,13 +54,11 @@ definition {
 			-u ${supportAdminEmailAddress}:${supportAdminPassword}
 			-d code=${accountCode}
 			''';
-
 		var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${accountCode}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${accountEntryObject}", "${accountCode}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${accountEntryObject}", "${accountCode}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -78,13 +77,11 @@ definition {
 			-u ${supportAdminEmailAddress}:${supportAdminPassword}
 			-d code=${accountCode}
 			''';
-
 		var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${accountCode}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${accountEntryObject}", "${accountCode}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${accountEntryObject}", "${accountCode}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -95,4 +92,5 @@ definition {
 			fail("After ${currentIteration} checks, the support organization with code ${accountCode} appears to have not been added to the support site");
 		}
 	}
+
 }

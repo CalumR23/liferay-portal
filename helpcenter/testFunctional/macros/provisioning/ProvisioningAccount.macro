@@ -1,7 +1,824 @@
 definition {
+
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
 	var provisioningURL = PropsUtil.get("provisioning.liferay.url");
+
+	@prose = "I should be able to view the contact with the email address ${emailAddress} and the following values ${table}"
+	macro _viewAccountContact {
+		var key_contactEmailAddress = "${emailAddress}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#CONTACT_ROLE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "User Status") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#CONTACT_USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such contact field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the following account values in the account details page ${table}"
+	macro _viewAccountDetails {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_HEADER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Code") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_HEADER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_STATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Region") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_SUPPORT_REGION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Country") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_COUNTRY",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "SLA") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_SLA",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Tier") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_TIER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "EWSA") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_EWSA",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Seats") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_SUPPORT_SEATS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "FLS Partner") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_FLS_PARTNER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Primary Contact") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_PRIMARY_CONTACT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account detail field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the following account values under the account details tab ${table}"
+	macro _viewAccountDetailsViaDetailsTab {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+			var positionValue = "${row[2]}";
+			var key_field = "${field}";
+
+			if ("${positionValue}" == "") {
+				var key_positionValue = "1";
+			}
+			else {
+				var key_positionValue = "${positionValue}";
+			}
+
+			AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_LABEL");
+
+			if (("${field}" == "Permanent Licenses") || ("${field}" == "Self Provisioning") || ("${field}" == "Primary")) {
+				if ("${value}" == "true") {
+					AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_ON");
+				}
+				else {
+					AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_OFF");
+				}
+			}
+			else if ((IsElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE")) && ("${field}" != "State")) {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "OEM Instructions") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_LINK",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_LABEL",
+					value1 = "${value}");
+			}
+			else {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE",
+					value1 = "${value}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the account external link ${externalLink}"
+	macro _viewAccountExternalLink {
+		var key_externalLink = "${externalLink}";
+
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_LINK",
+			value1 = "${externalLink}");
+	}
+
+	@prose = "I should be able to view the account external link ${externalLink} with the href ${href}"
+	macro _viewAccountExternalLinkClickable {
+		var key_externalLink = "${externalLink}";
+		var key_href = "${href}";
+
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_CLICKABLE_LINK",
+			value1 = "${externalLink}");
+	}
+
+	@prose = "I should be able to view the account external links empty state"
+	macro _viewAccountExternalLinksEmptyState {
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_EMPTY_TEXT",
+			value1 = "No external links were found.");
+	}
+
+	@prose = "I should be able to view the license with the keyword ${licenseKeyword} and the following values on the account details page ${table}"
+	macro _viewAccountLicense {
+		var key_licenseKeyword = "${licenseKeyword}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#LICENSE_ROW");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Description") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_DESCRIPTION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Expiration Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_EXPIRATION_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Product") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_PRODUCT",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Type") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_TYPE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Details") {
+				var key_label = StringUtil.extractFirst("${value}", ":");
+
+				var key_label = StringUtil.trim("${key_label}");
+				var value = StringUtil.extractLast("${value}", ":");
+
+				var value = StringUtil.trim("${value}");
+
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#LICENSE_DETAILS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Status") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#LICENSE_STATUS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Complimentary") {
+				if ("${value}" == "true") {
+					AssertElementPresent(
+						locator1 = "ProvisioningAccount#LICENSE_COMPLIMENTARY_CHECKED",
+						value1 = "${value}");
+				}
+				else {
+					AssertElementPresent(
+						locator1 = "ProvisioningAccount#LICENSE_COMPLIMENTARY_NOT_CHECKED",
+						value1 = "${value}");
+				}
+			}
+			else {
+				fail("No such account license field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the ${noteType} type note with the content ${noteContent} and the following values ${table}"
+	macro _viewAccountNote {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_noteContent = "${noteContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#NOTE_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account note field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the ${noteType} type note with the content ${noteContent} in the position number ${notePosition}"
+	macro _viewAccountNoteByPosition {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_notePosition = "${notePosition}";
+
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#NOTE_CONTENT_POSITION",
+			value1 = "${noteContent}");
+	}
+
+	@prose = "I should be able to view the account notes empty state"
+	macro _viewAccountNotesEmptyState {
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#NOTE_EMPTY_TEXT",
+			value1 = "No notes were found.");
+	}
+
+	@prose = "I should be able to view the archived note with the content ${noteContent} and the following values ${table}"
+	macro _viewAccountNoteViaArchive {
+		var key_noteContent = "${noteContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such archived account note field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the ${noteType} type note with the partial content ${noteContent} and the following values ${table}"
+	macro _viewAccountNoteWithPartialContent {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_noteContent = "${noteContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#NOTE_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#NOTE_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#NOTE_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account note field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the product with the name ${productName} and the following values on the account details page ${table}"
+	macro _viewAccountProduct {
+		var key_productName = "${productName}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#PRODUCT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Instance Size") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#PRODUCT_INSTANCE_SIZE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Life") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Next Term Starts") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE_SECONDARY_INFORMATION",
+					value1 = "Next Term Starts: ${value}");
+			}
+			else if ("${field}" == "Grace Period End Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE_SECONDARY_INFORMATION",
+					value1 = "Grace Period End Date: ${value}");
+			}
+			else if ("${field}" == "Current Provisioned") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_CURRENT_PROVISIONED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Provisioned") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_PROVISIONED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Current Purchased") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_CURRENT_PURCHASED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Latest Purchased") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_LATEST_PURCHASED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Approved Purchased") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_APPROVED_PURCHASED",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#PRODUCT_STATE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account product field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the product with the name ${productName} under the ${productSection} section"
+	macro _viewAccountProductUnderSection {
+		var key_productName = "${productName}";
+		var key_productSection = "${productSection}";
+
+		AssertVisible(locator1 = "ProvisioningAccount#PRODUCT_SECTION_ROW");
+	}
+
+	@prose = "I should be able to view the related account with the name ${accountName} and the following values on the account details page ${table}"
+	macro _viewAccountRelatedAccount {
+		var key_accountName = "${accountName}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
+
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Code") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_CODE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support End Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SUPPORT_END_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Partner") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_PARTNER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Region") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_REGION",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "SLA") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SLA",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Tier") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TIER",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_STATE",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account related account field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the related account with the name ${accountName} under the ${accountSection} section"
+	macro _viewAccountRelatedAccountUnderSection {
+		var key_accountName = "${accountName}";
+		var key_accountSection = "${accountSection}";
+
+		AssertVisible(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SECTION_ROW");
+	}
+
+	@prose = "I should be able to view the sales info note with the content ${salesInfoContent} and the following values ${table}"
+	macro _viewAccountSalesInfo {
+		var key_salesInfoContent = "${salesInfoContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#SALES_INFO_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account sales info field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the account sales info empty state"
+	macro _viewAccountSalesInfoEmptyState {
+		AssertTextEquals(
+			locator1 = "ProvisioningAccount#SALES_INFO_EMPTY_TEXT",
+			value1 = "No sales info were found.");
+	}
+
+	@prose = "I should be able to view the archived sales info note with the content ${salesInfoContent} and the following values ${table}"
+	macro _viewAccountSalesInfoViaArchive {
+		var key_salesInfoContent = "${salesInfoContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such archived account sales info field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the sales info note with the partial content ${salesInfoContent} and the following values ${table}"
+	macro _viewAccountSalesInfoWithPartialContent {
+		var key_salesInfoContent = "${salesInfoContent}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Author") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR",
+					value1 = "${value}");
+
+				AssertVisible(locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR_PORTRAIT");
+			}
+			else if ("${field}" == "Create Date") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Content") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#SALES_INFO_CONTENT",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such account sales info field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the team with the name ${teamName} and the following values ${table}"
+	macro _viewAccountTeam {
+		var key_teamName = "${teamName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Member") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_MEMBERS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Partner/Reseller/SI Accounts") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_PARTNER_RESELLER_SI_ACCOUNTS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "First Line Support Accounts") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#TEAM_FIRST_LINE_SUPPORT_ACCOUNTS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such team field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should be able to view the worker with the email address ${emailAddress} and the following values ${table}"
+	macro _viewAccountWorker {
+		var key_workerEmailAddress = "${emailAddress}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "ProvisioningAccount#WORKER_ROLE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "User Status") {
+				AssertTextEquals(
+					locator1 = "ProvisioningAccount#WORKER_USER_STATUS",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such worker field ${field}");
+			}
+		}
+	}
+
+	@prose = "I shoud see the hyperlink to ${hyperlink} on the ${noteType} type note with the content ${noteContent}"
+	macro _viewHiperlinkOnNote {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_noteContent = "${noteContent}";
+		var key_hyperlink = "${hyperlink}";
+
+		AssertVisible(locator1 = "ProvisioningAccount#NOTE_CONTENT_HYPERLINK");
+	}
+
+	@prose = "I should not be able to view the contact with the email address ${emailAddress}"
+	macro _viewNoAccountContact {
+		var key_contactEmailAddress = "${emailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#CONTACT_ROW");
+	}
+
+	@prose = "I should not be able to view the account external link ${externalLink}"
+	macro _viewNoAccountExternalLink {
+		var key_externalLink = "${externalLink}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#EXTERNAL_LINKS_LINK");
+	}
+
+	@prose = "I should not be able to view the license with the keyword ${licenseKeyword} on the account details page"
+	macro _viewNoAccountLicense {
+		var key_licenseKeyword = "${licenseKeyword}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ROW");
+	}
+
+	@prose = "I should not be able to view the ${noteType} type note with the content ${noteContent}"
+	macro _viewNoAccountNote {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_noteContent = "${noteContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_ROW");
+	}
+
+	@prose = "I should not be able to view an edit mark for the ${noteType} type note with the content ${noteContent}"
+	macro _viewNoAccountNoteEditMark {
+		var key_noteType = StringUtil.lowerCase("${noteType}");
+		var key_noteContent = "${noteContent}";
+
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
+			value1 = "Edited");
+	}
+
+	@prose = "I should not be able to view an edit mark for the archived note with the content ${noteContent}"
+	macro _viewNoAccountNoteEditMarkViaArchive {
+		var key_noteContent = "${noteContent}";
+
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CREATE_DATE",
+			value1 = "Edited");
+	}
+
+	@prose = "I should not be able to view the archived note with the content ${noteContent}"
+	macro _viewNoAccountNoteViaArchive {
+		var key_noteContent = "${noteContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_ROW");
+	}
+
+	@prose = "I should not be able to view the product with the name ${productName} on the account details page"
+	macro _viewNoAccountProduct {
+		var key_productName = "${productName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
+	}
+
+	@prose = "I should not be able to view the related account with the name ${accountName} on the account details page"
+	macro _viewNoAccountRelatedAccount {
+		var key_accountName = "${accountName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
+	}
+
+	@prose = "I should not be able to view the sales info note with the content ${salesInfoContent}"
+	macro _viewNoAccountSalesInfo {
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#SALES_INFO_ROW");
+	}
+
+	@prose = "I should not be able to view an edit mark for the sales info note with the content ${salesInfoContent}"
+	macro _viewNoAccountSalesInfoEditMark {
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
+			value1 = "Edited");
+	}
+
+	@prose = "I should not be able to view an edit mark for the archived sales info note with the content ${salesInfoContent}"
+	macro _viewNoAccountSalesInfoEditMarkViaArchive {
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		AssertTextNotEquals.assertNotPartialText(
+			locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CREATE_DATE",
+			value1 = "Edited");
+	}
+
+	@prose = "I should not be able to view the archived sales info note with the content ${salesInfoContent}"
+	macro _viewNoAccountSalesInfoViaArchive {
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_ROW");
+	}
+
+	@prose = "I should not be able to view the team with the name ${teamName}"
+	macro _viewNoAccountTeam {
+		var key_teamName = "${teamName}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#TEAM_ROW");
+	}
+
+	@prose = "I should not be able to view the worker with the email address ${emailAddress}"
+	macro _viewNoAccountWorker {
+		var key_workerEmailAddress = "${emailAddress}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#WORKER_ROW");
+	}
+
+	@prose = "the email address field should be read only"
+	macro _viewReadOnlyEmailAddressField {
+		AssertElementPresent(locator1 = "ProvisioningAccountAssignUser#EMAIL_ADDRESS_FIELD_READ_ONLY");
+	}
 
 	@prose = "I activate the account with the name ${accountName} and code ${accountCode}"
 	macro activateAccount {
@@ -23,22 +840,20 @@ definition {
 		Click(locator1 = "ProvisioningAccountActivateAccount#ACTIVATE_ACCOUNT_BUTTON");
 	}
 
-	@prose = "the ${field} toggle switch in position ${positionValue} should be enabled"
-	macro assertToggleSwitchEnabled {
-		var key_field = "${field}";
-
-		var key_positionValue = "${positionValue}";
-
-		AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_ON");
-	}
-
 	@prose = "the ${field} toggle switch in position ${positionValue} should be disabled"
 	macro assertToggleSwitchDisabled {
 		var key_field = "${field}";
-
 		var key_positionValue = "${positionValue}";
 
 		AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_OFF");
+	}
+
+	@prose = "the ${field} toggle switch in position ${positionValue} should be enabled"
+	macro assertToggleSwitchEnabled {
+		var key_field = "${field}";
+		var key_positionValue = "${positionValue}";
+
+		AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_ON");
 	}
 
 	@prose = "I cancel a note with the content ${content} on the account details page"
@@ -119,7 +934,7 @@ definition {
 
 	@prose = "I click on the add subscriptions button"
 	macro clickAddSubscriptionsButton {
-		while(IsElementNotPresent(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME")) {
+		while (IsElementNotPresent(locator1 = "ProvisioningSubscriptionSelect#SELECT_IFRAME")) {
 			Click(locator1 = "ProvisioningAccount#ADD_SUBSCRIPTIONS_BUTTON");
 		}
 	}
@@ -220,6 +1035,11 @@ definition {
 		Click(locator1 = "ProvisioningSubscriptionExtend#EXTEND_BUTTON");
 	}
 
+	@prose = "I click on the Generate License button on the account page"
+	macro clickGenerateLicenseButton {
+		Click(locator1 = "ProvisioningAccount#ACCOUNT_GENERATE_LICENSE_BUTTON");
+	}
+
 	@prose = "I click on the ${action} button in the dropdown menu for all licenses under the license tab"
 	macro clickLicensesActionDropdownButton {
 		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_ACTION_BUTTON");
@@ -248,7 +1068,7 @@ definition {
 		}
 		else {
 			Click(locator1 = "ProvisioningSubscription#LICENSE_ALL_DROPDOWN_ACTION_BUTTON");
-		}	
+		}
 	}
 
 	@prose = "I click on the download button for all licenses under the license tab"
@@ -256,14 +1076,14 @@ definition {
 		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_DOWNLOAD_BUTTON");
 	}
 
-	@prose = "I click on the replace button for all licenses under the license tab"
-	macro clickLicensesReplaceButton {
-		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_REPLACE_BUTTON");
-	}
-
 	@prose = "I click on the extend button for all licenses under the license tab"
 	macro clickLicensesExtendButton {
 		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_EXTEND_BUTTON");
+	}
+
+	@prose = "I click on the replace button for all licenses under the license tab"
+	macro clickLicensesReplaceButton {
+		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_REPLACE_BUTTON");
 	}
 
 	@prose = "I click on the ${tabName} license tab"
@@ -329,6 +1149,16 @@ definition {
 		Click(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TAB");
 	}
 
+	@prose = "I click on the ${action} button for the sales info note with the content ${salesInfoContent}"
+	macro clickSalesInfoActionButton {
+		var key_action = StringUtil.lowerCase("${action}");
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		MouseOver(locator1 = "ProvisioningAccount#SALES_INFO_ROW");
+
+		Click.clickNoMouseOver(locator1 = "ProvisioningAccount#SALES_INFO_ACTION_BUTTON");
+	}
+
 	@prose = "I click on the ${action} button in the dropdown menu for the sales info note with the content ${salesInfoContent}"
 	macro clickSalesInfoActionDropdownButton {
 		var key_salesInfoContent = "${salesInfoContent}";
@@ -338,16 +1168,6 @@ definition {
 		var key_action = "${action}";
 
 		Click(locator1 = "ProvisioningAccount#SALES_INFO_DROPDOWN_ACTION_BUTTON");
-	}
-
-	@prose = "I click on the ${action} button for the sales info note with the content ${salesInfoContent}"
-	macro clickSalesInfoActionButton {
-		var key_action = StringUtil.lowerCase("${action}");
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		MouseOver(locator1 = "ProvisioningAccount#SALES_INFO_ROW");
-
-		Click.clickNoMouseOver(locator1 = "ProvisioningAccount#SALES_INFO_ACTION_BUTTON");
 	}
 
 	@prose = "I click on the ${tabName} side panel tab"
@@ -385,11 +1205,6 @@ definition {
 		Click(locator1 = "ProvisioningAccount#PRODUCT_ALL_DROPDOWN_ACTION_BUTTON");
 	}
 
-	@prose = "I click on the Generate License button on the account page"
-	macro clickGenerateLicenseButton {
-		Click(locator1 = "ProvisioningAccount#ACCOUNT_GENERATE_LICENSE_BUTTON");
-	}
-
 	@prose = "I click on the Sync To Zendesk button on the account page"
 	macro clickSyncToZendeskButton {
 		var currentIteration = "0";
@@ -409,8 +1224,8 @@ definition {
 
 		echo("Zendesk Sync Success: ${zendeskSyncSuccess}");
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${zendeskSyncSuccess}" == "false")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${zendeskSyncSuccess}" == "false")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -435,13 +1250,6 @@ definition {
 		}
 	}
 
-	@prose = "I click on the ${teamName} team link"
-	macro clickTeamLink {
-		var key_teamName = "${teamName}";
-
-		Click(locator1 = "ProvisioningAccount#TEAM_NAME");
-	}
-
 	@prose = "I click on the delete button for the team ${teamName}"
 	macro clickTeamDeleteButton {
 		var key_teamName = "${teamName}";
@@ -449,6 +1257,13 @@ definition {
 		ClickNoError(locator1 = "ProvisioningAccount#TEAM_DELETE_BUTTON");
 
 		Confirm(value1 = "Are you sure you want to delete this team?");
+	}
+
+	@prose = "I click on the ${teamName} team link"
+	macro clickTeamLink {
+		var key_teamName = "${teamName}";
+
+		Click(locator1 = "ProvisioningAccount#TEAM_NAME");
 	}
 
 	@prose = "I click on the view archived notes link"
@@ -491,6 +1306,26 @@ definition {
 		Click(locator1 = "ProvisioningAccount#WORKER_LINK");
 	}
 
+	@prose = "I close the account with the name ${accountName} and code ${accountCode}"
+	macro closeAccount {
+		var key_accountCode = "${accountCode}";
+		var key_accountName = "${accountName}";
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_CLOSE_MESSAGE",
+			value1 = "Are you sure you want to close the account listed below?");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_NAME",
+			value1 = "${accountName}");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_CODE",
+			value1 = "${accountCode}");
+
+		Click(locator1 = "ProvisioningAccountCloseAccount#CLOSE_ACCOUNT_BUTTON");
+	}
+
 	@prose = "I collapse the side panel on the account details page"
 	macro collapseSidePanel {
 		if (IsElementPresent(locator1 = "ProvisioningAccount#SIDE_PANEL_COLLAPSE_BUTTON")) {
@@ -509,7 +1344,9 @@ definition {
 		Click(locator1 = "ProvisioningAccount#NEW_NOTE_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_SUCCESS_MESSAGE");
 	}
 
@@ -530,11 +1367,13 @@ definition {
 				locator1 = "ProvisioningAccount#NEW_NOTE_CONTENT_FIELD",
 				value1 = "\ENTER");
 		}
-	
+
 		Click(locator1 = "ProvisioningAccount#NEW_NOTE_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_NOTE_SUCCESS_MESSAGE");
 	}
 
@@ -549,7 +1388,9 @@ definition {
 		Click(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SUCCESS_MESSAGE");
 	}
 
@@ -574,28 +1415,10 @@ definition {
 		Click(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_SUCCESS_MESSAGE");
-	}
-
-	@prose = "I close the account with the name ${accountName} and code ${accountCode}"
-	macro closeAccount {
-		var key_accountCode = "${accountCode}";
-		var key_accountName = "${accountName}";
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_CLOSE_MESSAGE",
-			value1 = "Are you sure you want to close the account listed below?");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_NAME",
-			value1 = "${accountName}");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "ProvisioningAccountCloseAccount#ACCOUNT_CODE",
-			value1 = "${accountCode}");
-
-		Click(locator1 = "ProvisioningAccountCloseAccount#CLOSE_ACCOUNT_BUTTON");
 	}
 
 	@prose = "I delete the account address in position ${positionValue}"
@@ -614,9 +1437,7 @@ definition {
 			var field = "${row[0]}";
 			var type = "${row[1]}";
 			var value = "${row[2]}";
-
 			var key_field = "${field}";
-
 			var key_positionValue = "${positionValue}";
 
 			OSBAdmin.pause(timeInSeconds = "3");
@@ -639,7 +1460,7 @@ definition {
 
 				Select(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "Toggle Switch") {
 				var key_positionValue = "${positionValue}";
@@ -661,28 +1482,6 @@ definition {
 		}
 	}
 
-	@prose = "I edit the following account address fields and types in position ${positionValue} to the following values under the account details tab ${table}"
-	macro editAndSaveAccountAddressDetails {
-		ProvisioningAccount.editAccountAddressDetails(
-			table = "${table}",
-			positionValue = "${positionValue}");
-
-		var key_positionValue = "1";
-
-		Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_SAVE_ADDRESS_CHANGES_BUTTON");
-	}
-
-	@prose = "I edit and cancel the following account address fields and types in position ${positionValue} to the following values under the account details tab ${table}"
-	macro editAndCancelAccountAddressDetails {		
-		ProvisioningAccount.editAccountAddressDetails(
-			table = "${table}",
-			positionValue = "${positionValue}");
-
-		var key_positionValue = "1";
-
-		Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_CANCEL_ADDRESS_CHANGES_BUTTON");
-	}
-
 	@prose = "I edit the following account fields and types to the following values under the account details tab ${table}"
 	macro editAccountDetails {
 		var RawTable rawTable = new RawTable("${table}");
@@ -692,7 +1491,6 @@ definition {
 			var type = "${row[1]}";
 			var value = "${row[2]}";
 			var positionValue = "${row[3]}";
-
 			var key_field = "${field}";
 
 			if ("${positionValue}" == "") {
@@ -706,7 +1504,7 @@ definition {
 
 			AssertVisible(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_LABEL");
 
-			if ((!("${type}" == "File Upload")) && (!("${type}" == "Toggle Switch"))) {
+			if (("${type}" != "File Upload") && ("${type}" != "Toggle Switch")) {
 				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
 			}
 
@@ -718,17 +1516,17 @@ definition {
 			else if ("${type}" == "Select") {
 				Select(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "Textarea") {
 				Type(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TEXTAREA",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "File Upload") {
 				UploadCommonFile(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_FILE_UPLOAD",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "Toggle Switch") {
 				if ("${value}" == "true") {
@@ -747,7 +1545,7 @@ definition {
 
 				SelectFrame(locator1 = "ProvisioningAccountSelect#SELECT_IFRAME");
 
- 				var keyword = StringUtil.extractFirst("${value}", " ");
+				var keyword = StringUtil.extractFirst("${value}", " ");
 
 				Type(
 					locator1 = "ProvisioningAccountSelect#SELECT_SEARCH_FIELD",
@@ -778,16 +1576,27 @@ definition {
 			else if ("${type}" == "Delete Entity") {
 				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_DELETE_BUTTON");
 			}
- 			else {
+			else {
 				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, Toggle Switch, File Upload, Select Entity, or Delete Entity.");
 			}
 
-			if ((!("${type}" == "File Upload")) && (!("${type}" == "Select Entity")) && (!("${type}" == "Delete Entity"))) {
+			if (("${type}" != "File Upload") && ("${type}" != "Select Entity") && ("${type}" != "Delete Entity")) {
 				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SAVE_BUTTON");
 			}
 
 			Message.dismissSuccessMessage();
 		}
+	}
+
+	@prose = "I edit and cancel the following account address fields and types in position ${positionValue} to the following values under the account details tab ${table}"
+	macro editAndCancelAccountAddressDetails {
+		ProvisioningAccount.editAccountAddressDetails(
+			positionValue = "${positionValue}",
+			table = "${table}");
+
+		var key_positionValue = "1";
+
+		Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_CANCEL_ADDRESS_CHANGES_BUTTON");
 	}
 
 	@prose = "I edit and cancel the following account fields and types to the following values under the account details tab ${table}"
@@ -799,7 +1608,6 @@ definition {
 			var type = "${row[1]}";
 			var value = "${row[2]}";
 			var positionValue = "${row[3]}";
-
 			var key_field = "${field}";
 
 			if ("${positionValue}" == "") {
@@ -811,7 +1619,7 @@ definition {
 
 			AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_LABEL");
 
-			if (!("${type}" == "Toggle Switch")) {
+			if ("${type}" != "Toggle Switch") {
 				Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
 			}
 
@@ -823,12 +1631,12 @@ definition {
 			else if ("${type}" == "Select") {
 				Select(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "Textarea") {
 				Type(
 					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TEXTAREA",
-					value1 = "${value}");	
+					value1 = "${value}");
 			}
 			else if ("${type}" == "Toggle Switch") {
 				if ("${value}" == "true") {
@@ -850,6 +1658,17 @@ definition {
 		}
 	}
 
+	@prose = "I edit the following account address fields and types in position ${positionValue} to the following values under the account details tab ${table}"
+	macro editAndSaveAccountAddressDetails {
+		ProvisioningAccount.editAccountAddressDetails(
+			positionValue = "${positionValue}",
+			table = "${table}");
+
+		var key_positionValue = "1";
+
+		Click(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_SAVE_ADDRESS_CHANGES_BUTTON");
+	}
+
 	@prose = "I edit a ${noteType} note with the content ${noteContent} on the account details page to have the new content ${contentEdit}"
 	macro editNote {
 		var key_noteType = StringUtil.lowerCase("${noteType}");
@@ -866,7 +1685,9 @@ definition {
 		Click(locator1 = "ProvisioningAccount#NOTE_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_SUCCESS_MESSAGE");
 	}
 
@@ -885,7 +1706,9 @@ definition {
 		Click(locator1 = "ProvisioningAccount#SALES_INFO_SAVE_BUTTON");
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#SALES_INFO_SAVE_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#SALES_INFO_CANCEL_BUTTON");
+
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#SALES_INFO_SUCCESS_MESSAGE");
 	}
 
@@ -913,7 +1736,6 @@ definition {
 			var field = "${row[0]}";
 			var type = "${row[1]}";
 			var value = "${row[2]}";
-
 			var key_field = "${field}";
 
 			if ("${type}" == "Input") {
@@ -1012,6 +1834,50 @@ definition {
 			}
 			else {
 				fail("No such contact field ${field}. Please set the field value to Email Address, Assign Role, or Unassign Role.");
+			}
+		}
+
+		Click(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON");
+	}
+
+	@prose = "I populate and save the assign contact okta form with the following values ${table}"
+	macro populateAssignContactOktaFormAndSave {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "First Name") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#FIRST_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Last Name") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#LAST_NAME_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email") {
+				Type(
+					locator1 = "ProvisioningAccountAssignContact#EMAIL_FIELD",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Roles") {
+				var key_role = "${value}";
+
+				if (IsElementNotPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+
+				Click(locator1 = "ProvisioningAccountAssignContact#ROLE_LINK");
+
+				if (IsElementPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
+					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
+				}
+			}
+			else {
+				fail("No such contact field ${field}. Please set the field value to First Name, Last Name, Email or Role.");
 			}
 		}
 
@@ -1167,6 +2033,11 @@ definition {
 		Check(locator1 = "ProvisioningAccount#LICENSE_ALL_CHECKBOX");
 	}
 
+	@prose = "I select all products under the subscriptions tab"
+	macro selectAllProductsViaSubscriptionsTab {
+		Check(locator1 = "ProvisioningAccount#PRODUCT_ALL_CHECKBOX");
+	}
+
 	@prose = "I select the following licenses under the licenses tab ${table}"
 	macro selectLicensesViaLicensesTab {
 		var RawTable rawTable = new RawTable("${table}");
@@ -1178,11 +2049,6 @@ definition {
 
 			Check(locator1 = "ProvisioningAccount#LICENSE_CHECKBOX");
 		}
-	}
-
-	@prose = "I select all products under the subscriptions tab"
-	macro selectAllProductsViaSubscriptionsTab {
-		Check(locator1 = "ProvisioningAccount#PRODUCT_ALL_CHECKBOX");
 	}
 
 	@prose = "I select the following products under the subscriptions tab ${table}"
@@ -1198,191 +2064,8 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view the contact with the email address ${emailAddress} and the following values ${table}"
-	macro _viewAccountContact {
-		var key_contactEmailAddress = "${emailAddress}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#CONTACT_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Email Address") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#CONTACT_EMAIL_ADDRESS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Role") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#CONTACT_ROLE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "User Status") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#CONTACT_USER_STATUS",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such contact field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the following account values in the account details page ${table}"
-	macro _viewAccountDetails {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_HEADER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Code") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_HEADER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "State") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_STATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Support Region") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_SUPPORT_REGION",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Country") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_COUNTRY",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "SLA") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_SLA",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Tier") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_TIER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "EWSA") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_EWSA",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Support Seats") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_SUPPORT_SEATS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "FLS Partner") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_FLS_PARTNER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Primary Contact") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_PRIMARY_CONTACT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account detail field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the following account values under the account details tab ${table}"
-	macro _viewAccountDetailsViaDetailsTab {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-			var positionValue = "${row[2]}";
-
-			var key_field = "${field}";
-
-			if ("${positionValue}" == "") {
-				var key_positionValue = "1";
-			}
-			else {
-				var key_positionValue = "${positionValue}";
-			}
-
-			AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_LABEL");
-
-			if (("${field}" == "Permanent Licenses") || ("${field}" == "Self Provisioning") || ("${field}" == "Primary")) {
-				if ("${value}" == "true") {
-					AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_ON");
-				}
-				else {
-					AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_OFF");
-				}
-			}
-			else if ((IsElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE")) && (!("${field}" == "State"))) {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "OEM Instructions") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_LINK",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "State") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_LABEL",
-					value1 = "${value}");
-			}
-			else {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE",
-					value1 = "${value}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the account external link ${externalLink}"
-	macro _viewAccountExternalLink {
-		var key_externalLink = "${externalLink}";
-
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_LINK",
-			value1 = "${externalLink}");
-	}
-
-	@prose = "I should be able to view the account external link ${externalLink} with the href ${href}"
-	macro _viewAccountExternalLinkClickable {
-		var key_externalLink = "${externalLink}";
-
-		var key_href = "${href}";
-
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_CLICKABLE_LINK",
-			value1 = "${externalLink}");
-	}
-
-	@prose = "I should be able to view the account external links empty state"
-	macro _viewAccountExternalLinksEmptyState {
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#EXTERNAL_LINKS_EMPTY_TEXT",
-			value1 = "No external links were found.");
-	}
-
 	@prose = "I should be able to view a required field message for the field ${field}"
-	macro viewAccountFormRequiredFieldMessage  {
+	macro viewAccountFormRequiredFieldMessage {
 		var key_field = "${field}";
 
 		AssertTextEquals.assertPartialText(
@@ -1394,7 +2077,6 @@ definition {
 	macro viewAccountHistoryEntry {
 		var key_positionValue = "${positionValue}";
 		var key_fieldName = "${fieldName}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1449,7 +2131,7 @@ definition {
 				}
 				else {
 					fail("No such history entry field ${field}");
-				}				
+				}
 			}
 		}
 	}
@@ -1458,7 +2140,6 @@ definition {
 	macro viewAccountHistoryEntryByKeyword {
 		var key_keyword = "${keyword}";
 		var key_fieldName = "${fieldName}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1525,7 +2206,7 @@ definition {
 				}
 				else {
 					fail("No such history entry field ${field}");
-				}				
+				}
 			}
 		}
 	}
@@ -1535,7 +2216,6 @@ definition {
 		var key_keyword = "${keyword}";
 		var key_fieldName = "${fieldName}";
 		var key_positionValue = "${positionValue}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1590,7 +2270,7 @@ definition {
 				}
 				else {
 					fail("No such history entry field ${field}");
-				}				
+				}
 			}
 		}
 	}
@@ -1600,7 +2280,6 @@ definition {
 		var key_keyword1 = "${keyword1}";
 		var key_keyword2 = "${keyword2}";
 		var key_fieldName = "${fieldName}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1655,7 +2334,7 @@ definition {
 				}
 				else {
 					fail("No such history entry field ${field}");
-				}				
+				}
 			}
 		}
 	}
@@ -1666,7 +2345,6 @@ definition {
 		var key_keyword2 = "${keyword2}";
 		var key_keyword3 = "${keyword3}";
 		var key_fieldName = "${fieldName}";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
@@ -1721,7 +2399,7 @@ definition {
 				}
 				else {
 					fail("No such history entry field ${field}");
-				}				
+				}
 			}
 		}
 	}
@@ -1740,534 +2418,6 @@ definition {
 		var key_fieldName = "${fieldName}";
 
 		AssertVisible(locator1 = "ProvisioningAccount#HISTORY_UPDATE_ROW_BY_KEYWORD");
-	}
-
-	@prose = "I should be able to view the license with the keyword ${licenseKeyword} and the following values on the account details page ${table}"
-	macro _viewAccountLicense {
-		var key_licenseKeyword = "${licenseKeyword}";
-
-		AssertElementPresent(locator1 = "ProvisioningAccount#LICENSE_ROW");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Description") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_DESCRIPTION",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Expiration Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_EXPIRATION_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Product") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_PRODUCT",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Type") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_TYPE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Details") {
-				var key_label = StringUtil.extractFirst("${value}", ":");
-				var key_label = StringUtil.trim("${key_label}");
-
-				var value = StringUtil.extractLast("${value}", ":");
-				var value = StringUtil.trim("${value}");
-
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#LICENSE_DETAILS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Status") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#LICENSE_STATUS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Complimentary") {
-				if ("${value}" == "true") {
-					AssertElementPresent(
-						locator1 = "ProvisioningAccount#LICENSE_COMPLIMENTARY_CHECKED",
-						value1 = "${value}");
-				}
-				else {
-					AssertElementPresent(
-						locator1 = "ProvisioningAccount#LICENSE_COMPLIMENTARY_NOT_CHECKED",
-						value1 = "${value}");
-				}
-			}
-			else {
-				fail("No such account license field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the ${noteType} type note with the content ${noteContent} and the following values ${table}"
-	macro _viewAccountNote {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_noteContent = "${noteContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#NOTE_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#NOTE_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#NOTE_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account note field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the ${noteType} type note with the partial content ${noteContent} and the following values ${table}"
-	macro _viewAccountNoteWithPartialContent {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_noteContent = "${noteContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#NOTE_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#NOTE_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#NOTE_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account note field ${field}");
-			}
-		}
-	}	
-
-	@prose = "I should be able to view the ${noteType} type note with the content ${noteContent} in the position number ${notePosition}"
-	macro _viewAccountNoteByPosition {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_notePosition = "${notePosition}";
-
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#NOTE_CONTENT_POSITION",
-			value1 = "${noteContent}");
-	}
-
-	@prose = "I shoud see the hyperlink to ${hyperlink} on the ${noteType} type note with the content ${noteContent}"
-	macro _viewHiperlinkOnNote {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_noteContent = "${noteContent}";
-
-		var key_hyperlink = "${hyperlink}";
-
-		AssertVisible(locator1 = "ProvisioningAccount#NOTE_CONTENT_HYPERLINK");
-	}
-	
-	@prose = "I should be able to view the account notes empty state"
-	macro _viewAccountNotesEmptyState {
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#NOTE_EMPTY_TEXT",
-			value1 = "No notes were found.");
-	}
-
-	@prose = "I should be able to view the product with the name ${productName} and the following values on the account details page ${table}"
-	macro _viewAccountProduct {
-		var key_productName = "${productName}";
-
-		AssertElementPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#PRODUCT_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Instance Size") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#PRODUCT_INSTANCE_SIZE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Support Life") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Next Term Starts") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE_SECONDARY_INFORMATION",
-					value1 = "Next Term Starts: ${value}");
-			}
-			else if ("${field}" == "Grace Period End Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#PRODUCT_SUPPORT_LIFE_SECONDARY_INFORMATION",
-					value1 = "Grace Period End Date: ${value}");
-			}
-			else if ("${field}" == "Current Provisioned") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_CURRENT_PROVISIONED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Provisioned") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_PROVISIONED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Current Purchased") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_CURRENT_PURCHASED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Latest Purchased") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_LATEST_PURCHASED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Approved Purchased") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_APPROVED_PURCHASED",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "State") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#PRODUCT_STATE",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account product field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the product with the name ${productName} under the ${productSection} section"
-	macro _viewAccountProductUnderSection {
-		var key_productName = "${productName}";
-		var key_productSection = "${productSection}";
-
-		AssertVisible(locator1 = "ProvisioningAccount#PRODUCT_SECTION_ROW");
-	}
-
-	@prose = "I should be able to view the archived note with the content ${noteContent} and the following values ${table}"
-	macro _viewAccountNoteViaArchive {
-		var key_noteContent = "${noteContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such archived account note field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the related account with the name ${accountName} and the following values on the account details page ${table}"
-	macro _viewAccountRelatedAccount {
-		var key_accountName = "${accountName}";
-
-		AssertElementPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Code") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_CODE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Support End Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SUPPORT_END_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Partner") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_PARTNER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Region") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_REGION",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "SLA") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SLA",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Tier") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_TIER",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "State") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#RELATED_ACCOUNT_STATE",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account related account field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the related account with the name ${accountName} under the ${accountSection} section"
-	macro _viewAccountRelatedAccountUnderSection {
-		var key_accountName = "${accountName}";
-		var key_accountSection = "${accountSection}";
-
-		AssertVisible(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_SECTION_ROW");
-	}
-
-	@prose = "I should be able to view the sales info note with the content ${salesInfoContent} and the following values ${table}"
-	macro _viewAccountSalesInfo {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#SALES_INFO_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account sales info field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the sales info note with the partial content ${salesInfoContent} and the following values ${table}"
-	macro _viewAccountSalesInfoWithPartialContent {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#SALES_INFO_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#SALES_INFO_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such account sales info field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the account sales info empty state"
-	macro _viewAccountSalesInfoEmptyState {
-		AssertTextEquals(
-			locator1 = "ProvisioningAccount#SALES_INFO_EMPTY_TEXT",
-			value1 = "No sales info were found.");
-	}
-
-	@prose = "I should be able to view the archived sales info note with the content ${salesInfoContent} and the following values ${table}"
-	macro _viewAccountSalesInfoViaArchive {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Author") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_AUTHOR",
-					value1 = "${value}");
-
-				AssertVisible(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_AUTHOR_PORTRAIT");
-			}
-			else if ("${field}" == "Create Date") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CREATE_DATE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Content") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CONTENT",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such archived account sales info field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the team with the name ${teamName} and the following values ${table}"
-	macro _viewAccountTeam {
-		var key_teamName = "${teamName}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#TEAM_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Member") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#TEAM_MEMBERS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Partner/Reseller/SI Accounts") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#TEAM_PARTNER_RESELLER_SI_ACCOUNTS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "First Line Support Accounts") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#TEAM_FIRST_LINE_SUPPORT_ACCOUNTS",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such team field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should be able to view the worker with the email address ${emailAddress} and the following values ${table}"
-	macro _viewAccountWorker {
-		var key_workerEmailAddress = "${emailAddress}";
-
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#WORKER_NAME",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Email Address") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#WORKER_EMAIL_ADDRESS",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Role") {
-				AssertTextEquals.assertPartialText(
-					locator1 = "ProvisioningAccount#WORKER_ROLE",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "User Status") {
-				AssertTextEquals(
-					locator1 = "ProvisioningAccount#WORKER_USER_STATUS",
-					value1 = "${value}");
-			}
-			else {
-				fail("No such worker field ${field}");
-			}
-		}
 	}
 
 	@prose = "the header and account name ${accountName} should be present on the add address form"
@@ -2299,15 +2449,53 @@ definition {
 			value1 = "Primary or Secondary contact is already assigned to another user.");
 	}
 
-	@prose = "I should be able to view the error message for overlapping roles"
-	macro viewErrorMessageForOverlappingRoles {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Overlapping Roles");
+	@prose = "I should be able to view an error message stating that the parent account ${accountName} cannot be assigned a descendant as a parent"
+	macro viewErrorMessageForDescendantAccountAssignmentAsParentToParent {
+		var accountId = KoroneikiAccountAPI._getAccountId(accountName = "${accountName}");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Please only select one support role or one partner role.");
+			value1 = "Error: The parent account must not be a descendant of ${accountId}");
+	}
+
+	@prose = "I should be able to view an error message stating that the account code ${accountCode} is already in use"
+	macro viewErrorMessageForDuplicateAccountCode {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error: An account with code ${accountCode} is already in use");
+	}
+
+	@prose = "I should be able to view an error message stating that the account must have a unique Dossiera key"
+	macro viewErrorMessageForDuplicateDossieraKey {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Dossiera keys must be unique.");
+	}
+
+	@prose = "I should be able to view an error message stating that the contact could not be found"
+	macro viewErrorMessageForNonCreatedUserOnOktaViaActiveAccount {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "The contact could not be found. Enter the contact's first and last name to create one.");
+	}
+
+	@prose = "I should be able to view an error message stating that the user must create his own okta account"
+	macro viewErrorMessageForNonCreatedUserOnOktaViaInactiveAccount {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "The contact could not be found. The user must create his own Okta account.");
 	}
 
 	@prose = "I should be able to view the error message for open zendesk tickets"
@@ -2325,64 +2513,15 @@ definition {
 			value1 = "Zendesk tickets before unassigning.");
 	}
 
-	@prose = "I should be able to view an error message stating that the parent account ${accountName} cannot be assigned a descendant as a parent"
-	macro viewErrorMessageForDescendantAccountAssignmentAsParentToParent  {
-		var accountId = KoroneikiAccountAPI._getAccountId(accountName = "${accountName}");
+	@prose = "I should be able to view the error message for overlapping roles"
+	macro viewErrorMessageForOverlappingRoles {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Overlapping Roles");
 
 		AssertTextEquals.assertPartialText(
 			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error: The parent account must not be a descendant of ${accountId}");
-	}
-
-	@prose = "I should be able to view an error message stating that the account code ${accountCode} is already in use"
-	macro viewErrorMessageForDuplicateAccountCode  {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error: An account with code ${accountCode} is already in use");
-	}
-
-	@prose = "I should be able to view an error message stating that the account must have a unique Dossiera key"
-	macro viewErrorMessageForDuplicateDossieraKey  {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error:");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Dossiera keys must be unique.");
-	}
-
-	@prose = "I should be able to view an error message stating that the user must create his own okta account"
-	macro viewErrorMessageForNonCreatedUserOnOktaViaInactiveAccount  {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error:");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "The contact could not be found. The user must create his own Okta account.");
-	}
-
-	@prose = "I should be able to view an error message stating that the contact could not be found"
-	macro viewErrorMessageForNonCreatedUserOnOktaViaActiveAccount  {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error:");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "The contact could not be found. Enter the contact's first and last name to create one.");
-	}
-
-	@prose = "I should be able to view an error message stating that the account can only have one Dossiera key"
-	macro viewErrorMessageForSecondDossieraKey  {
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "Error:");
-
-		AssertTextEquals.assertPartialText(
-			locator1 = "Provisioning#ERROR_MESSAGE",
-			value1 = "An account can only have one Dossiera key.");
+			value1 = "Please only select one support role or one partner role.");
 	}
 
 	@prose = "I should be able to view an error message stating that the parent account ${accountName} cannot be assigned as a parent to itself"
@@ -2394,6 +2533,17 @@ definition {
 			value1 = "Error: The parent account ${accountId} cannot be itself");
 	}
 
+	@prose = "I should be able to view an error message stating that the account can only have one Dossiera key"
+	macro viewErrorMessageForSecondDossieraKey {
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "Error:");
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Provisioning#ERROR_MESSAGE",
+			value1 = "An account can only have one Dossiera key.");
+	}
+
 	@prose = "the ${tabName} license tab should have the count value ${countValue}"
 	macro viewLicenseTabCount {
 		var key_tabName = "${tabName}";
@@ -2403,22 +2553,8 @@ definition {
 			value1 = "${countValue}");
 	}
 
-	@prose = "I should not be able to view the contact with the email address ${emailAddress}"
-	macro _viewNoAccountContact {
-		var key_contactEmailAddress = "${emailAddress}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#CONTACT_ROW");
-	}
-
-	@prose = "I should not be able to view the account external link ${externalLink}"
-	macro _viewNoAccountExternalLink {
-		var key_externalLink = "${externalLink}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#EXTERNAL_LINKS_LINK");
-	}
-
 	@prose = "I should not be able to view a required field message for the field ${field}"
-	macro viewNoAccountFormRequiredFieldMessage  {
+	macro viewNoAccountFormRequiredFieldMessage {
 		var key_field = "${field}";
 
 		AssertElementNotPresent(locator1 = "ProvisioningAccountForm#REQUIRED_FIELD_ERROR_MESSAGE");
@@ -2440,139 +2576,6 @@ definition {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#HISTORY_UPDATE_ROW_BY_KEYWORD");
 	}
 
-	@prose = "I should not be able to view the license with the keyword ${licenseKeyword} on the account details page"
-	macro _viewNoAccountLicense {
-		var key_licenseKeyword = "${licenseKeyword}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ROW");
-	}
-
-	@prose = "the assign contact okta form should not be visible"
-	macro viewNoAssignContactOktaFormAndSave {
-		AssertElementNotPresent(locator1 = "ProvisioningAccountAssignContact#FIRST_NAME_FIELD");
-		AssertElementNotPresent(locator1 = "ProvisioningAccountAssignContact#LAST_NAME_FIELD");
-	}
-
-	@prose = "I should not be able to view the ${action} button in the dropdown menu for all licenses under the license tab"
-	macro viewNoLicensesActionDropdownButton {
-		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_ACTION_BUTTON");
-
-		var key_action = "${action}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_DROPDOWN_ACTION_BUTTON");
-	}
-
-	@prose = "I should not be able to view the extend button for all licenses under the license tab"
-	macro viewNoLicensesExtendButton {
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_EXTEND_BUTTON");
-	}
-
-	@prose = "I should not be able to view the extend all active subscriptions button"
-	macro viewNoExtendAllActiveSubscriptionsButton {
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#EXTEND_ALL_ACTIVE_SUBSCRIPTIONS_BUTTON");
-	}
-
-	@prose = "I should not be able to view the replace button for all licenses under the license tab"
-	macro viewNoLicensesReplaceButton {
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_REPLACE_BUTTON");
-	}
-
-	@prose = "I should not be able to view the ${noteType} type note with the content ${noteContent}"
-	macro _viewNoAccountNote {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_noteContent = "${noteContent}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#NOTE_ROW");
-	}
-
-	@prose = "I should not be able to view an edit mark for the ${noteType} type note with the content ${noteContent}"
-	macro _viewNoAccountNoteEditMark {
-		var key_noteType = StringUtil.lowerCase("${noteType}");
-
-		var key_noteContent = "${noteContent}";
-
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "ProvisioningAccount#NOTE_CREATE_DATE",
-			value1 = "Edited");
-	}
-
-	@prose = "I should not be able to view an edit mark for the archived note with the content ${noteContent}"
-	macro _viewNoAccountNoteEditMarkViaArchive {
-		var key_noteContent = "${noteContent}";
-
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "ProvisioningAccount#ARCHIVED_NOTE_CREATE_DATE",
-			value1 = "Edited");
-	}
-
-	@prose = "I should not be able to view the archived note with the content ${noteContent}"
-	macro _viewNoAccountNoteViaArchive {
-		var key_noteContent = "${noteContent}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_ROW");
-	}
-
-	@prose = "I should not be able to view the product with the name ${productName} on the account details page"
-	macro _viewNoAccountProduct {
-		var key_productName = "${productName}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#PRODUCT_ROW");
-	}
-
-	@prose = "I should not be able to view the related account with the name ${accountName} on the account details page"
-	macro _viewNoAccountRelatedAccount {
-		var key_accountName = "${accountName}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#RELATED_ACCOUNT_ROW");
-	}
-
-	@prose = "I should not be able to view the sales info note with the content ${salesInfoContent}"
-	macro _viewNoAccountSalesInfo {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#SALES_INFO_ROW");
-	}
-
-	@prose = "I should not be able to view an edit mark for the sales info note with the content ${salesInfoContent}"
-	macro _viewNoAccountSalesInfoEditMark {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "ProvisioningAccount#SALES_INFO_CREATE_DATE",
-			value1 = "Edited");
-	}
-
-	@prose = "I should not be able to view an edit mark for the archived sales info note with the content ${salesInfoContent}"
-	macro _viewNoAccountSalesInfoEditMarkViaArchive {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		AssertTextNotEquals.assertNotPartialText(
-			locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_CREATE_DATE",
-			value1 = "Edited");
-	}
-
-	@prose = "I should not be able to view the archived sales info note with the content ${salesInfoContent}"
-	macro _viewNoAccountSalesInfoViaArchive {
-		var key_salesInfoContent = "${salesInfoContent}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_ROW");
-	}
-
-	@prose = "I should not be able to view the team with the name ${teamName}"
-	macro _viewNoAccountTeam {
-		var key_teamName = "${teamName}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#TEAM_ROW");		
-	}
-
-	@prose = "I should not be able to view the worker with the email address ${emailAddress}"
-	macro _viewNoAccountWorker {
-		var key_workerEmailAddress = "${emailAddress}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#WORKER_ROW");
-	}
-
 	@prose = "the add account address button in position ${positionValue} should not be present"
 	macro viewNoAddAddressButton {
 		var key_positionValue = "${positionValue}";
@@ -2585,9 +2588,23 @@ definition {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#ADD_SUBSCRIPTIONS_BUTTON");
 	}
 
+	@prose = "I should not be able to view the dropdown menu button for the archived note with the content ${noteContent}"
+	macro viewNoArchivedNoteDropdownButton {
+		var key_noteContent = "${noteContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_DROPDOWN_BUTTON");
+	}
+
 	@prose = "I should not be able to view the view archived notes link"
 	macro viewNoArchivedNotesLink {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#VIEW_ARCHIVED_NOTES_LINK");
+	}
+
+	@prose = "I should not be able to view the dropdown menu button for the archived sales info note with the content ${salesInfoContent}"
+	macro viewNoArchivedSalesInfoDropdownButton {
+		var key_salesInfoContent = "${salesInfoContent}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_DROPDOWN_BUTTON");
 	}
 
 	@prose = "I should not be able to view the view archived sales info link"
@@ -2598,6 +2615,13 @@ definition {
 	@prose = "the assign contact button should not be present"
 	macro viewNoAssignContactButton {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#ASSIGN_CONTACT_BUTTON");
+	}
+
+	@prose = "the assign contact okta form should not be visible"
+	macro viewNoAssignContactOktaFormAndSave {
+		AssertElementNotPresent(locator1 = "ProvisioningAccountAssignContact#FIRST_NAME_FIELD");
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccountAssignContact#LAST_NAME_FIELD");
 	}
 
 	@prose = "the assign worker button should not be present"
@@ -2624,33 +2648,132 @@ definition {
 		AssertElementNotPresent(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON_DISABLED");
 	}
 
-	@prose = "I should not be able to view an error message"
-	macro viewNoErrorMessage  {
-		AssertElementNotPresent(locator1 = "Provisioning#ERROR_MESSAGE");
-	}
-
 	@prose = "the edit subscriptions button should not be present"
 	macro viewNoEditSubscriptionsButton {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#PRODUCT_ALL_EDIT_BUTTON");
 	}
 
-	@prose = "the new team button should not be present"
-	macro viewNoNewTeamButton {
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_TEAM_BUTTON");
+	@prose = "I should not be able to view an error message"
+	macro viewNoErrorMessage {
+		AssertElementNotPresent(locator1 = "Provisioning#ERROR_MESSAGE");
 	}
 
-	@prose = "I should not be able to view the dropdown menu button for the archived note with the content ${noteContent}"
-	macro viewNoArchivedNoteDropdownButton {
-		var key_noteContent = "${noteContent}";
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_NOTE_DROPDOWN_BUTTON");
+	@prose = "I should not be able to view the extend all active subscriptions button"
+	macro viewNoExtendAllActiveSubscriptionsButton {
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#EXTEND_ALL_ACTIVE_SUBSCRIPTIONS_BUTTON");
 	}
 
-	@prose = "I should not be able to view the dropdown menu button for the archived sales info note with the content ${salesInfoContent}"
-	macro viewNoArchivedSalesInfoDropdownButton {
-		var key_salesInfoContent = "${salesInfoContent}";
+	@prose = "I should not be able to view the ${action} button in the dropdown menu for all licenses under the license tab"
+	macro viewNoLicensesActionDropdownButton {
+		Click(locator1 = "ProvisioningAccount#LICENSE_ALL_ACTION_BUTTON");
 
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#ARCHIVED_SALES_INFO_DROPDOWN_BUTTON");
+		var key_action = "${action}";
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_DROPDOWN_ACTION_BUTTON");
+	}
+
+	@prose = "I should not be able to view the extend button for all licenses under the license tab"
+	macro viewNoLicensesExtendButton {
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_EXTEND_BUTTON");
+	}
+
+	@prose = "I should not be able to view the replace button for all licenses under the license tab"
+	macro viewNoLicensesReplaceButton {
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#LICENSE_ALL_REPLACE_BUTTON");
+	}
+
+	@prose = "the following account address fields and types in position ${positionValue} under the account details tab should be disabled ${table}"
+	macro viewNonEditableAccountAddressDetailsFields {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var key_field = "${field}";
+			var key_positionValue = "${positionValue}";
+
+			OSBAdmin.pause(timeInSeconds = "3");
+
+			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
+
+			if ("${type}" == "Toggle Switch") {
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_ALT");
+			}
+			else {
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE");
+			}
+
+			var key_positionValue = "1";
+
+			if ("${type}" == "Input") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_INPUT");
+			}
+			else if ("${type}" == "Select") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT");
+			}
+			else if ("${type}" == "Toggle Switch") {
+				AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_DISABLED");
+			}
+			else {
+				fail("No such account address detail field type ${type}. Please use Input, Select, or Toggle Switch.");
+			}
+		}
+
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_SAVE_ADDRESS_CHANGES_BUTTON");
+	}
+
+	@prose = "the following account fields and types under the account details tab should be disabled ${table}"
+	macro viewNonEditableAccountDetailsFields {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var type = "${row[1]}";
+			var positionValue = "${row[2]}";
+			var key_field = "${field}";
+
+			if ("${positionValue}" == "") {
+				var key_positionValue = "1";
+			}
+			else {
+				var key_positionValue = "${positionValue}";
+			}
+
+			OSBAdmin.pause(timeInSeconds = "3");
+
+			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
+
+			if ("${type}" != "File Upload") {
+				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE");
+			}
+
+			if ("${type}" == "Input") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_INPUT");
+			}
+			else if ("${type}" == "Select") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT");
+			}
+			else if ("${type}" == "Textarea") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TEXTAREA");
+			}
+			else if ("${type}" == "File Upload") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_FILE_UPLOAD");
+			}
+			else if ("${type}" == "Toggle Switch") {
+				AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_DISABLED");
+			}
+			else if ("${type}" == "Select Entity") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT_BUTTON");
+			}
+			else if ("${type}" == "Delete Entity") {
+				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_DELETE_BUTTON");
+			}
+			else {
+				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, Toggle Switch, File Upload, Select Entity, or Delete Entity.");
+			}
+
+			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SAVE_BUTTON");
+		}
 	}
 
 	@prose = "the new note content field should not be present"
@@ -2661,6 +2784,11 @@ definition {
 	@prose = "the new sales info note content field should not be present"
 	macro viewNoNewSalesInfoContentField {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_SALES_INFO_CONTENT_FIELD");
+	}
+
+	@prose = "the new team button should not be present"
+	macro viewNoNewTeamButton {
+		AssertElementNotPresent(locator1 = "ProvisioningAccount#NEW_TEAM_BUTTON");
 	}
 
 	@prose = "I should not be able to view the ${action} button for the ${noteType} note with the content ${noteContent}"
@@ -2718,103 +2846,6 @@ definition {
 		AssertElementNotPresent(locator1 = "ProvisioningAccount#WORKER_ACTION_BUTTON");
 	}
 
-	@prose = "the following account address fields and types in position ${positionValue} under the account details tab should be disabled ${table}"
-	macro viewNonEditableAccountAddressDetailsFields {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var type = "${row[1]}";
-
-			var key_field = "${field}";
-
-			var key_positionValue = "${positionValue}";
-
-			OSBAdmin.pause(timeInSeconds = "3");
-
-			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
-
-			if ("${type}" == "Toggle Switch") {
-				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_ALT");
-			}
-			else {
-				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE");
-			}
-
-			var key_positionValue = "1";
-
-			if ("${type}" == "Input") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_INPUT");
-			}
-			else if ("${type}" == "Select") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT");
-			}
-			else if ("${type}" == "Toggle Switch") {
-				AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_DISABLED");
-			}
-			else {
-				fail("No such account address detail field type ${type}. Please use Input, Select, or Toggle Switch.");
-			}
-		}
-
-		AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_SAVE_ADDRESS_CHANGES_BUTTON");
-	}
-
-	@prose = "the following account fields and types under the account details tab should be disabled ${table}"
-	macro viewNonEditableAccountDetailsFields {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var type = "${row[1]}";
-			var positionValue = "${row[2]}";
-
-			var key_field = "${field}";
-
-			if ("${positionValue}" == "") {
-				var key_positionValue = "1";
-			}
-			else {
-				var key_positionValue = "${positionValue}";
-			}
-
-			OSBAdmin.pause(timeInSeconds = "3");
-
-			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_EDITABLE");
-
-			if (!("${type}" == "File Upload")) {
-				Click.pauseMakeVisibleClickAt(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE");
-			}
-
-			if ("${type}" == "Input") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_INPUT");
-			}
-			else if ("${type}" == "Select") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT");
-			}
-			else if ("${type}" == "Textarea") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TEXTAREA");
-			}
-			else if ("${type}" == "File Upload") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_FILE_UPLOAD");
-			}
-			else if ("${type}" == "Toggle Switch") {
-				AssertElementPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_TOGGLE_SWITCH_DISABLED");
-			}
-			else if ("${type}" == "Select Entity") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SELECT_BUTTON");
-			}
-			else if ("${type}" == "Delete Entity") {
-				AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_DELETE_BUTTON");
-			}
-			else {
-				fail("No such account detail field type ${type}. Please use Input, Select, Textarea, Toggle Switch, File Upload, Select Entity, or Delete Entity.");
-			}
-
-			AssertElementNotPresent(locator1 = "ProvisioningAccount#ACCOUNT_DETAILS_FIELD_VALUE_SAVE_BUTTON");
-		}
-	}
-
 	@prose = "the ${tabName} product tab should have the count value ${countValue}"
 	macro viewProductTabCount {
 		var key_tabName = "${tabName}";
@@ -2822,11 +2853,6 @@ definition {
 		AssertTextEquals(
 			locator1 = "ProvisioningAccount#PRODUCT_TAB_COUNTER",
 			value1 = "${countValue}");
-	}
-
-	@prose = "the email address field should be read only"
-	macro _viewReadOnlyEmailAddressField {
-		AssertElementPresent(locator1 = "ProvisioningAccountAssignUser#EMAIL_ADDRESS_FIELD_READ_ONLY");
 	}
 
 	@prose = "the ${tabName} related account tab should have the count value ${countValue}"
@@ -2838,47 +2864,4 @@ definition {
 			value1 = "${countValue}");
 	}
 
-	@prose = "I populate and save the assign contact okta form with the following values ${table}"
-	macro populateAssignContactOktaFormAndSave {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "First Name") {
-				Type(
-					locator1 = "ProvisioningAccountAssignContact#FIRST_NAME_FIELD",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Last Name") {
-				Type(
-					locator1 = "ProvisioningAccountAssignContact#LAST_NAME_FIELD",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Email") {
-				Type(
-					locator1 = "ProvisioningAccountAssignContact#EMAIL_FIELD",
-					value1 = "${value}");
-			}
-			else if ("${field}" == "Roles") {
-				var key_role = "${value}";
-
-				if (IsElementNotPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
-					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
-				}
-
-				Click(locator1 = "ProvisioningAccountAssignContact#ROLE_LINK");
-
-				if (IsElementPresent(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_DROPDOWN_VISIBLE")) {
-					Click(locator1 = "ProvisioningAccountAssignContact#ROLE_SELECT_LINK");
-				}
-			}
-			else {
-				fail("No such contact field ${field}. Please set the field value to First Name, Last Name, Email or Role.");
-			}
-		}
-
-		Click(locator1 = "ProvisioningAccountAssignContact#SAVE_BUTTON");
-	}
 }

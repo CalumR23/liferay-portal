@@ -1,4 +1,5 @@
 definition {
+
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var pollIntervalInSeconds = PropsUtil.get("osb.to.zendesk.sync.poll.interval.in.seconds");
 	var pollMaximumIterations = PropsUtil.get("osb.to.zendesk.sync.poll.maximum.iterations");
@@ -11,14 +12,14 @@ definition {
 	@prose = "I assign an organization ${organizationName} with the following tags while replacing existing tags ${table}"
 	macro _assignAndReplaceTagsToOrganization {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
-		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
+		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var tag = "${row[0]}";
 
-			if (contains("${tagList}", "{tagList}")) {
+			if (!(isSet(tagList))) {
 				var tagList = "${tag}";
 			}
 			else {
@@ -48,13 +49,12 @@ definition {
 
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByExternalId(organizationExternalId = "${organizationExternalId}");
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var tag = "${row[0]}";
 
-			if (contains("${tagList}", "{tagList}")) {
+			if (!(isSet(tagList))) {
 				var tagList = "${tag}";
 			}
 			else {
@@ -82,13 +82,12 @@ definition {
 	macro _assignTagsToOrganizationViaOrganizationExternalID {
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByExternalId(organizationExternalId = "${organizationExternalId}");
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var tag = "${row[0]}";
 
-			if (contains("${tagList}", "{tagList}")) {
+			if (!(isSet(tagList))) {
 				var tagList = "${tag}";
 			}
 			else {
@@ -177,45 +176,59 @@ definition {
 		if (!(isSet(organizationName))) {
 			var organizationName = "";
 		}
+
 		if (!(isSet(tags))) {
 			var tags = "";
 		}
+
 		if (!(isSet(sharedTicketsEnabled))) {
 			var sharedTicketsEnabled = "false";
 		}
+
 		if (!(isSet(sharedCommentsEnabled))) {
 			var sharedCommentsEnabled = "false";
 		}
+
 		if (!(isSet(status))) {
 			var status = "";
 		}
+
 		if (!(isSet(sla))) {
 			var sla = "";
 		}
+
 		if (!(isSet(tier))) {
 			var tier = "";
 		}
+
 		if (!(isSet(supportRegion))) {
 			var supportRegion = "";
 		}
+
 		if (!(isSet(supportLanguage))) {
 			var supportLanguage = "";
 		}
+
 		if (!(isSet(partnerFirstLineSupportEnabled))) {
 			var partnerFirstLineSupportEnabled = "";
 		}
+
 		if (!(isSet(partnerOrganization))) {
 			var partnerOrganization = "";
 		}
+
 		if (!(isSet(partnerJiraProject))) {
 			var partnerJiraProject = "";
 		}
+
 		if (!(isSet(partnerEnabled))) {
 			var partnerEnabled = "";
 		}
+
 		if (!(isSet(externalId))) {
 			var externalId = "";
 		}
+
 		if (!(isSet(subOrganization))) {
 			var subOrganization = "";
 		}
@@ -262,32 +275,30 @@ definition {
 	macro _getMultipleOrganizationExternalIdsByOrganizationNameIfStillPresent {
 		var organizationCount = "0";
 		var organizationExternalIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var organizationName = "${row[0]}";
 
 			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
-
 			var currentIteration = "0";
 
-			while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${organizations}" == "[]"))) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
+			while (("${currentIteration}" != "${pollMaximumIterations}") && ("${organizations}" != "[]")) {
+				var currentIteration = ${currentIteration} + 1;
 				var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 			}
 
-			if (!("${organizations}" == "[]")) {
+			if ("${organizations}" != "[]") {
 				var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 
-				if("${organizationCount}" == "0") {
+				if ("${organizationCount}" == "0") {
 					var organizationExternalIds = "${organizationExternalIds}${organizationExternalId}";
 				}
 				else {
 					var organizationExternalIds = "${organizationExternalIds},${organizationExternalId}";
 				}
-				var organizationCount = MathUtil.sum("${organizationCount}", "1");
+
+				var organizationCount = ${organizationCount} + 1;
 			}
 		}
 
@@ -351,7 +362,7 @@ definition {
 
 	@prose = "I teardown organizations with the following organizationExternalIds ${organizationExternalIds} from zendesk.liferay.com"
 	macro _tearDownOrganizationsByExternalIdList {
-		if ((!(contains("${organizationExternalIds}", "{organizationExternalIds}"))) && (!("${organizationExternalIds}" == ""))) {
+		if (isSet(organizationExternalIds) && ("${organizationExternalIds}" != "")) {
 			for (var organizationExternalId : list "${organizationExternalIds}") {
 				var curl = '''
 					${supportURL}/api/jsonws/osb.accountentry/delete-account-entry
@@ -376,7 +387,7 @@ definition {
 
 			var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 
-			if (!("${status}" == "completed")) {
+			if ("${status}" != "completed") {
 				if (("${status}" == "queued") || ("${status}" == "working")) {
 					while (("${status}" == "queued") || ("${status}" == "working")) {
 						ZendeskHomepage.pause(timeInSeconds = "2");
@@ -388,13 +399,16 @@ definition {
 
 						var status = JSONCurlUtil.get("${curl}", "$.job_status.status");
 					}
-					if (!("${status}" == "completed")) {
+
+					if ("${status}" != "completed") {
 						echo("Warning: The organization tear down may have failed");
+
 						echo("Tear Down Job Status: ${status}");
 					}
 				}
 				else {
 					echo("Warning: The organization tear down may have failed");
+
 					echo("Tear Down Job Status: ${status}");
 				}
 			}
@@ -405,20 +419,19 @@ definition {
 	macro _tearDownOrganizationsByExternalIdTable {
 		var organizationCount = "0";
 		var organizationExternalIds = "";
-
 		var RawTable rawTable = new RawTable("${table}");
 
 		for (var row : table "${rawTable}") {
 			var organizationExternalId = "${row[0]}";
 
-			if("${organizationCount}" == "0") {
+			if ("${organizationCount}" == "0") {
 				var organizationExternalIds = "${organizationExternalIds}${organizationExternalId}";
 			}
 			else {
 				var organizationExternalIds = "${organizationExternalIds},${organizationExternalId}";
 			}
 
-			var organizationCount = MathUtil.sum("${organizationCount}", "1");
+			var organizationCount = ${organizationCount} + 1;
 		}
 
 		ZendeskOrganizationAPI._tearDownOrganizationsByExternalIdList(organizationExternalIds = "${organizationExternalIds}");
@@ -426,17 +439,15 @@ definition {
 
 	macro _viewOrganizationExistingFieldValueByName {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
-
 		var field = StringUtil.lowerCase("${field}");
 
 		var field = StringUtil.replace("${field}", " ", "_");
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		if ((!("${field}" == "name")) && (!("${field}" == "details"))) {
+		if (("${field}" != "name") && ("${field}" != "details")) {
 			var value = JSONCurlUtil.get("${curl}", "$.organizations[0].organization_fields.${field}");
 		}
 		else {
@@ -447,7 +458,7 @@ definition {
 
 		var value = StringUtil.replace("${value}", "]", "");
 
-		var value = StringUtil.replace("${value}", "&quot;", "");
+		var value = StringUtil.replace("${value}", "\"", "");
 
 		return "${value}";
 	}
@@ -464,7 +475,7 @@ definition {
 
 		var existingTags = StringUtil.replace("${existingTags}", "]", "");
 
-		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+		var existingTags = StringUtil.replace("${existingTags}", "\"", "");
 
 		return "${existingTags}";
 	}
@@ -483,26 +494,9 @@ definition {
 
 		var existingTags = StringUtil.replace("${existingTags}", "]", "");
 
-		var existingTags = StringUtil.replace("${existingTags}", "&quot;", "");
+		var existingTags = StringUtil.replace("${existingTags}", "\"", "");
 
 		return "${existingTags}";
-	}
-
-	@prose = "the organization with organizationExternalId ${organizationExternalId} on zendesk.liferay.com should have the name ${organizationName}"
-	macro _viewOrganizationNameByExternalId {
-		var curl = '''
-			${zendeskURL}/api/v2/organizations/search.json?external_id=${organizationExternalId} --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organizations[0].name");
-
-		echo("Expected Organization Name: ${organizationName}");
-		echo("Actual Organization Name: ${organizationNameFromAPI}");
-
-		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
-			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
-		}
 	}
 
 	macro _viewOrganizationIdByExternalId {
@@ -516,14 +510,31 @@ definition {
 		return "${organizationID}";
 	}
 
+	@prose = "the organization with organizationExternalId ${organizationExternalId} on zendesk.liferay.com should have the name ${organizationName}"
+	macro _viewOrganizationNameByExternalId {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/search.json?external_id=${organizationExternalId} --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organizationNameFromAPI = JSONCurlUtil.get("${curl}", "$.organizations[0].name");
+
+		echo("Expected Organization Name: ${organizationName}");
+
+		echo("Actual Organization Name: ${organizationNameFromAPI}");
+
+		if ("${organizationNameFromAPI}" != "${organizationName}") {
+			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}");
+		}
+	}
+
 	@prose = "the organization ${organizationName} should not be present on zendesk.liferay.com"
 	macro _viewOrganizationNoSyncFromOsb {
 		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${organizations}" == "[]"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${organizations}" != "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -531,9 +542,10 @@ definition {
 		}
 
 		echo("Non-expected Organization Name: ${organizationName}");
+
 		echo("Actual Organization Search Results: ${organizations}");
 
-		if (!("${organizations}" == "[]")) {
+		if ("${organizations}" != "[]") {
 			var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 
 			var curl = '''
@@ -552,11 +564,10 @@ definition {
 	@prose = "the organization ${organizationName} should not have the tag ${tag}"
 	macro _viewOrganizationNoTagSync {
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (contains("${existingTags}", "${tag}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${existingTags}", "${tag}")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -564,10 +575,50 @@ definition {
 		}
 
 		echo("Non-expected Organization Tag: ${tag}");
+
 		echo("Actual Organization Tags: ${existingTags}");
 
 		if (contains("${existingTags}", "${tag}")) {
 			fail("After ${currentIteration} checks, actual organization tags ${existingTags} shows that the organization ${organizationName} does has the unexpected tag ${tag}");
+		}
+	}
+
+	@prose = "the organization ${organizationName} should have the following parameters ${table}"
+	macro _viewOrganizationParameterSync {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if (("${field}" != "Name") && ("${field}" != "Details") && ("${field}" != "Account Code") && ("${field}" != "Partner Organization")) {
+				var value = StringUtil.lowerCase("${value}");
+
+				var value = StringUtil.replace("${value}", " ", "_");
+			}
+
+			var valueFromAPI = ZendeskOrganizationAPI._viewOrganizationExistingFieldValueByName(
+				field = "${field}",
+				organizationName = "${organizationName}");
+			var currentIteration = "0";
+
+			while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${valueFromAPI}", "${value}"))) {
+				var currentIteration = ${currentIteration} + 1;
+
+				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+				var valueFromAPI = ZendeskOrganizationAPI._viewOrganizationExistingFieldValueByName(
+					field = "${field}",
+					organizationName = "${organizationName}");
+			}
+
+			echo("Expected Organization Value for ${field}: ${value}");
+
+			echo("Actual Organization Value for ${field}: ${valueFromAPI}");
+
+			if (!(contains("${valueFromAPI}", "${value}"))) {
+				fail("After ${currentIteration} checks, actual organization value for ${field} ${valueFromAPI} shows that the organization ${organizationName} does not have the expected value for ${field} ${value}");
+			}
 		}
 	}
 
@@ -587,18 +638,17 @@ definition {
 	@prose = "the organization ${organizationName} should be present on zendesk.liferay.com"
 	macro _viewOrganizationSyncFromOsb {
 		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && ("${organizations}" == "[]")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && ("${organizations}" == "[]")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
 		}
 
-		if (!("${organizations}" == "[]")) {
+		if ("${organizations}" != "[]") {
 			var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 
 			var curl = '''
@@ -613,9 +663,10 @@ definition {
 		}
 
 		echo("Expected Organization Name: ${organizationName}");
+
 		echo("Actual Organization Name: ${organizationNameFromAPI}");
 
-		if (!("${organizationNameFromAPI}" == "${organizationName}")) {
+		if ("${organizationNameFromAPI}" != "${organizationName}") {
 			fail("Actual value ${organizationNameFromAPI} does not match expected value ${organizationName}. There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
 		}
 	}
@@ -623,11 +674,10 @@ definition {
 	@prose = "the organization ${organizationName} should have the tag ${tag}"
 	macro _viewOrganizationTagSync {
 		var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
-
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${existingTags}", "${tag}")))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${existingTags}", "${tag}"))) {
+			var currentIteration = ${currentIteration} + 1;
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
@@ -635,6 +685,7 @@ definition {
 		}
 
 		echo("Expected Organization Tag: ${tag}");
+
 		echo("Actual Organization Tags: ${existingTags}");
 
 		if (!(contains("${existingTags}", "${tag}"))) {
@@ -642,38 +693,4 @@ definition {
 		}
 	}
 
-	@prose = "the organization ${organizationName} should have the following parameters ${table}"
-	macro _viewOrganizationParameterSync {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ((!("${field}" == "Name")) && (!("${field}" == "Details")) && (!("${field}" == "Account Code")) && (!("${field}" == "Partner Organization"))) {
-				var value = StringUtil.lowerCase("${value}");
-
-				var value = StringUtil.replace("${value}", " ", "_");
-			}
-
-			var valueFromAPI = ZendeskOrganizationAPI._viewOrganizationExistingFieldValueByName(organizationName = "${organizationName}", field = "${field}");
-
-			var currentIteration = "0";
-
-			while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!(contains("${valueFromAPI}", "${value}")))) {
-				var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
-				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-
-				var valueFromAPI = ZendeskOrganizationAPI._viewOrganizationExistingFieldValueByName(organizationName = "${organizationName}", field = "${field}");
-			}
-
-			echo("Expected Organization Value for ${field}: ${value}");
-			echo("Actual Organization Value for ${field}: ${valueFromAPI}");
-
-			if (!(contains("${valueFromAPI}", "${value}"))) {
-				fail("After ${currentIteration} checks, actual organization value for ${field} ${valueFromAPI} shows that the organization ${organizationName} does not have the expected value for ${field} ${value}");
-			}
-		}
-	}
 }

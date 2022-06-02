@@ -1,7 +1,25 @@
 definition {
+
 	var apiToken = PropsUtil.get("zendesk.api.token");
 	var zendeskAdminEmail = PropsUtil.get("zendesk.admin.email.address");
 	var zendeskURL = PropsUtil.get("zendesk.liferay.url");
+
+	macro _getSLANameById {
+		var curl = '''
+			${zendeskURL}/api/v2/organization_fields.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var slaName = JSONCurlUtil.get("${curl}", "$.organization_fields[?(@.title=='SLA')].custom_field_options[?(@.id==${slaId})].name");
+
+		var slaName = StringUtil.replace("${slaName}", "[", "");
+
+		var slaName = StringUtil.replace("${slaName}", "]", "");
+
+		var slaName = StringUtil.replace("${slaName}", "\"", "");
+
+		return "${slaName}";
+	}
 
 	macro _getSubOrganizationIdByName {
 		var curl = '''
@@ -15,7 +33,7 @@ definition {
 
 		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "]", "");
 
-		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "&quot;", "");
+		var subOrganizationId = StringUtil.replace("${subOrganizationId}", "\"", "");
 
 		return "${subOrganizationId}";
 	}
@@ -32,7 +50,7 @@ definition {
 
 		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "]", "");
 
-		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "&quot;", "");
+		var subOrganizationName = StringUtil.replace("${subOrganizationName}", "\"", "");
 
 		return "${subOrganizationName}";
 	}
@@ -49,7 +67,7 @@ definition {
 
 		var supportRegionId = StringUtil.replace("${supportRegionId}", "]", "");
 
-		var supportRegionId = StringUtil.replace("${supportRegionId}", "&quot;", "");
+		var supportRegionId = StringUtil.replace("${supportRegionId}", "\"", "");
 
 		return "${supportRegionId}";
 	}
@@ -66,25 +84,9 @@ definition {
 
 		var supportRegionName = StringUtil.replace("${supportRegionName}", "]", "");
 
-		var supportRegionName = StringUtil.replace("${supportRegionName}", "&quot;", "");
+		var supportRegionName = StringUtil.replace("${supportRegionName}", "\"", "");
 
 		return "${supportRegionName}";
 	}
 
-	macro _getSLANameById {
-		var curl = '''
-			${zendeskURL}/api/v2/organization_fields.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var slaName = JSONCurlUtil.get("${curl}", "$.organization_fields[?(@.title=='SLA')].custom_field_options[?(@.id==${slaId})].name");
-
-		var slaName = StringUtil.replace("${slaName}", "[", "");
-
-		var slaName = StringUtil.replace("${slaName}", "]", "");
-
-		var slaName = StringUtil.replace("${slaName}", "&quot;", "");
-
-		return "${slaName}";
-	}
 }

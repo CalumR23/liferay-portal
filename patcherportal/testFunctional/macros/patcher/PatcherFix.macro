@@ -1,4 +1,5 @@
 definition {
+
 	var fixCompletionPollIntervalInSeconds = PropsUtil.get("fix.completion.poll.interval.in.seconds");
 	var fixCompletionPollMaximumIterations = PropsUtil.get("fix.completion.poll.maximum.iterations");
 	var patcherAdminEmailAddress = PropsUtil.get("patcher.admin.email.address");
@@ -34,8 +35,8 @@ definition {
 
 		var currentIteration = "0";
 
-		while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && (("${fixPatcherStatus}" == "Adding") || ("${fixPatcherStatus}" == "")) && (maxIterations = "30")) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+		while (("${currentIteration}" != "${fixCompletionPollMaximumIterations}") && (("${fixPatcherStatus}" == "Adding") || ("${fixPatcherStatus}" == "")) && (maxIterations = "30")) {
+			var currentIteration = ${currentIteration} + 1;
 
 			Patcher.pause(timeInSeconds = "${fixCompletionPollIntervalInSeconds}");
 
@@ -47,7 +48,7 @@ definition {
 
 			var key_fixContent = "${fixContent}";
 
-			while ((!("${currentIteration}" == "${fixCompletionPollMaximumIterations}")) && (IsElementNotPresent(locator1 = "Patcher#FIX_ID"))  && (maxIterations = "30")) {
+			while (("${currentIteration}" != "${fixCompletionPollMaximumIterations}") && (IsElementNotPresent(locator1 = "Patcher#FIX_ID")) && (maxIterations = "30")) {
 				Refresh();
 
 				PatcherSearch.searchAdvanced(
@@ -69,10 +70,10 @@ definition {
 			fail("After ${currentIteration} attempts while waiting at ${fixCompletionPollIntervalInSeconds} seconds in between each attempt, the Patcher fix is still in Adding status.");
 		}
 		else if ("${fixPatcherStatus}" == "Failed") {
-			fail("The fix returned a Failed status. Please investigate.");		
+			fail("The fix returned a Failed status. Please investigate.");
 		}
 		else if ("${fixPatcherStatus}" == "") {
-			fail("The fix search result did not show up in the final search attempt. The fix may either not be present, it may have completed, or there may be an issue with the search. Please investigate.");		
+			fail("The fix search result did not show up in the final search attempt. The fix may either not be present, it may have completed, or there may be an issue with the search. Please investigate.");
 		}
 		else {
 			echo("Fix status: ${fixPatcherStatus}");
@@ -223,7 +224,7 @@ definition {
 		static var staticFixContent6 = "LPQAF-${randomNumber}";
 
 		return "${staticFixContent6}";
-	 }
+	}
 
 	@prose = "I generate random fix content for the seventh fix"
 	macro generateRandomFixContentForFix7 {
@@ -279,27 +280,6 @@ definition {
 		return "${staticFixContent12}";
 	}
 
-	macro getFixId {
-		Patcher.gotoFixes();
-
-		PatcherSearch.searchAdvanced(
-			fixContentKeyword = "${fixContent}",
-			typeKeyword = "${fixType}");
-
-		var key_fixContent = "${fixContent}";
-
-		if (IsElementPresent(locator1 = "Patcher#FIX_ID")) {
-			var fixId = selenium.getText("Patcher#FIX_ID");
-
-			return "${fixId}";
-		}
-		else {
-			var fixId = "";
-
-			return "${fixId}";
-		}
-	}
-
 	macro getFirstConflictFixId {
 		Patcher.gotoFixes();
 
@@ -329,6 +309,27 @@ definition {
 
 		if (IsElementPresent(locator1 = "Patcher#PATCHER_UAT_FIX_ID")) {
 			var fixId = selenium.getText("Patcher#PATCHER_UAT_FIX_ID");
+
+			return "${fixId}";
+		}
+		else {
+			var fixId = "";
+
+			return "${fixId}";
+		}
+	}
+
+	macro getFixId {
+		Patcher.gotoFixes();
+
+		PatcherSearch.searchAdvanced(
+			fixContentKeyword = "${fixContent}",
+			typeKeyword = "${fixType}");
+
+		var key_fixContent = "${fixContent}";
+
+		if (IsElementPresent(locator1 = "Patcher#FIX_ID")) {
+			var fixId = selenium.getText("Patcher#FIX_ID");
 
 			return "${fixId}";
 		}
@@ -384,9 +385,9 @@ definition {
 		while (("${conflictFixesForTypeExists1}" == "true") && ("${conflictFixesForTypeExists2}" == "true") && (maxIterations = "200")) {
 			var fixId = PatcherFix.getFirstConflictFixId(
 				fixType = "${fixType}",
-				projectVersion = "${projectVersion}");			
+				projectVersion = "${projectVersion}");
 
-			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+			if (isSet(fixId) && ("${fixId}" != "")) {
 				var curl = '''
 					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
 					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
@@ -407,9 +408,9 @@ definition {
 		var uatFixesForTypeExists2 = "true";
 
 		while (("${uatFixesForTypeExists1}" == "true") && ("${uatFixesForTypeExists2}" == "true") && (maxIterations = "200")) {
-			var fixId = PatcherFix.getFirstUATFixId(fixType = "${fixType}");			
+			var fixId = PatcherFix.getFirstUATFixId(fixType = "${fixType}");
 
-			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+			if (isSet(fixId) && ("${fixId}" != "")) {
 				var curl = '''
 					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
 					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
@@ -426,12 +427,12 @@ definition {
 
 	@prose = "I tear down the Patcher fix containing the content ${fixContent} and type ${fixType}"
 	macro tearDownFix {
-		if ((!(contains("${fixContent}", "{"))) && (!(contains("${fixContent}", "}"))) && (!("${fixContent}" == ""))) {
+		if (!(contains("${fixContent}", "{")) && !(contains("${fixContent}", "}")) && ("${fixContent}" != "")) {
 			var fixId = PatcherFix.getFixId(
 				fixContent = "${fixContent}",
 				fixType = "${fixType}");
 
-			if ((!(contains("${fixId}", "{fixId}"))) && (!("${fixId}" == ""))) {
+			if (isSet(fixId) && ("${fixId}" != "")) {
 				var curl = '''
 					${portalURL}/group/guest/patching/-/osb_patcher/fixes/${fixId}/delete.json
 					-u ${patcherAdminEmailAddress}:${patcherAdminPassword}
@@ -596,4 +597,5 @@ definition {
 			}
 		}
 	}
+
 }

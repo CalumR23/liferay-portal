@@ -1,9 +1,27 @@
 definition {
+
 	var popupTitle = PropsUtil.get("osb.admin.popup.title");
 	var supportURL = PropsUtil.get("support.liferay.url");
 
+	@prose = "the support account ID of the project with the code ${projectCode} should match the organization external ID on zendesk.liferay.com"
+	macro _matchOsbProjectIdWithZendeskOrganizationId {
+		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
+		var accountEntryName = JSONOSBAccount.getOSBAccountEntryName(accountCode = "${projectCode}");
+
+		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${accountEntryName}");
+
+		echo("Account ID from Support: ${accountEntryId}");
+
+		echo("Organization External ID from Zendesk: ${organizationExternalId}");
+
+		if ("${accountEntryId}" != "${organizationExternalId}") {
+			fail("Actual value ${accountEntryId} obtained from the support site and ${organizationExternalId} obtained from zendesk.liferay.com do not match");
+		}
+	}
+
 	macro addSupportLanguage {
 		Click(locator1 = "OSBAdminProjectAdd#SUPPORT_LANGUAGES_TAB");
+
 		Click(locator1 = "OSBAdminProjectAdd#ADD_SUPPORT_LANGUAGE_BUTTON");
 
 		SelectWindow(locator1 = "title=${popupTitle}");
@@ -17,6 +35,7 @@ definition {
 
 	macro addSupportRegion {
 		Click(locator1 = "OSBAdminProjectAdd#SUPPORT_REGIONS_TAB");
+
 		Click(locator1 = "OSBAdminProjectAdd#ADD_SUPPORT_REGION_BUTTON");
 
 		SelectWindow(locator1 = "title=${popupTitle}");
@@ -172,6 +191,7 @@ definition {
 	@prose = "I create a project with the following values ${table}"
 	macro create {
 		Click(locator1 = "OSBAdmin#ACCOUNTS_TAB");
+
 		Click(locator1 = "OSBAdmin#ADD_PROJECT_BUTTON");
 
 		var RawTable rawTable = new RawTable("${table}");
@@ -204,6 +224,7 @@ definition {
 				fail("No such writeable project field ${field}");
 			}
 		}
+
 		Button.save();
 
 		Message.success();
@@ -220,6 +241,7 @@ definition {
 		var key_emailAddress = "${emailAddress}";
 
 		Click(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#REMOVE_MENU_ITEM");
 
 		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -241,6 +263,7 @@ definition {
 
 		while (IsElementPresent(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON")) {
 			Click(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON");
+
 			ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#REMOVE_MENU_ITEM");
 
 			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -260,6 +283,7 @@ definition {
 
 		while (IsElementPresent(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON")) {
 			Click(locator1 = "OSBAdminProjectAssignCustomer#ACTION_BUTTON");
+
 			ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#REMOVE_MENU_ITEM");
 
 			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -281,13 +305,17 @@ definition {
 		var key_emailAddress = "${emailAddress}";
 
 		Click(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#REMOVE_MENU_ITEM");
 
 		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
 
 		Message.error(errorMessage = "Your request failed to complete.");
+
 		// Update when LRIS-34692 is resolved
-		// Message.error(errorMessage = "AccountCustomerRemovalException");
+
+		//Message.error(errorMessage = "AccountCustomerRemovalException");
+
 	}
 
 	macro deleteUsers {
@@ -311,6 +339,7 @@ definition {
 		var key_emailAddress = "${emailAddress}";
 
 		Click(locator1 = "OSBAdminProjectAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignWorker#REMOVE_MENU_ITEM");
 
 		Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -332,6 +361,7 @@ definition {
 
 		while (IsElementPresent(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON")) {
 			Click(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON");
+
 			ClickNoError(locator1 = "OSBAdminProjectAssignWorker#REMOVE_MENU_ITEM");
 
 			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -351,6 +381,7 @@ definition {
 
 		while (IsElementPresent(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON")) {
 			Click(locator1 = "OSBAdminProjectAssignWorker#ACTION_BUTTON");
+
 			ClickNoError(locator1 = "OSBAdminProjectAssignWorker#REMOVE_MENU_ITEM");
 
 			Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -359,20 +390,6 @@ definition {
 
 			Refresh();
 		}
-	}
-
-	macro editPartner {
-		Click(locator1 = "OSBAdminProject#PARTNER_SELECT_BUTTON");
-
-		SelectWindow(locator1 = "title=${popupTitle}");
-
-		OSBAdminSearch.searchBasic(keyword = "${partnerCode}");
-
-		var key_code = "${partnerCode}";
-
-		ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_CODE");
-
-		SelectWindow(locator1 = "null");
 	}
 
 	@prose = "I edit the product ${product} offering status from ${previousStatus} to ${newStatus} for the project with the code ${projectCode}"
@@ -408,6 +425,20 @@ definition {
 		Button.save();
 
 		Message.success();
+	}
+
+	macro editPartner {
+		Click(locator1 = "OSBAdminProject#PARTNER_SELECT_BUTTON");
+
+		SelectWindow(locator1 = "title=${popupTitle}");
+
+		OSBAdminSearch.searchBasic(keyword = "${partnerCode}");
+
+		var key_code = "${partnerCode}";
+
+		ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_CODE");
+
+		SelectWindow(locator1 = "null");
 	}
 
 	@prose = "I automatically have all expired projects moved to on hold status"
@@ -474,25 +505,10 @@ definition {
 		Check(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_CLOSED_WATCHER_CHECKBOX");
 
 		Click(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#UPDATE_MENU_ITEM");
 
 		Message.success();
-	}
-
-	@prose = "the support account ID of the project with the code ${projectCode} should match the organization external ID on zendesk.liferay.com"
-	macro _matchOsbProjectIdWithZendeskOrganizationId {
-		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
-
-		var accountEntryName = JSONOSBAccount.getOSBAccountEntryName(accountCode = "${projectCode}");
-
-		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${accountEntryName}");
-
-		echo("Account ID from Support: ${accountEntryId}");
-		echo("Organization External ID from Zendesk: ${organizationExternalId}");
-
-		if (!("${accountEntryId}" == "${organizationExternalId}")) {
-			fail("Actual value ${accountEntryId} obtained from the support site and ${organizationExternalId} obtained from zendesk.liferay.com do not match");
-		}
 	}
 
 	@prose = "I automatically have all non Source Code Access users removed from the GitHub repository"
@@ -550,7 +566,7 @@ definition {
 	macro removePartnerFirstLineSupport {
 		OSBAdminProject.gotoProject(projectCode = "${projectCode}");
 
-		Uncheck(locator1 = "OSBAdminProjectAdd#PARTNER_MANAGED_SUPPORT_CHECKBOX");			
+		Uncheck(locator1 = "OSBAdminProjectAdd#PARTNER_MANAGED_SUPPORT_CHECKBOX");
 
 		Button.save();
 
@@ -615,6 +631,7 @@ definition {
 				OSBAdminSearch.searchBasicProject(projectCode = "${projectCode}");
 
 				Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON");
+
 				ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
 
 				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -633,7 +650,7 @@ definition {
 
 			var accountEntryObject = JSONOSBAccount.getOSBAccountEntryObject(accountCode = "${projectCode}");
 
-			if ((contains("${accountEntryObject}", "${projectCode}")) && (!(contains("${accountEntryObject}", "NoSuchAccountEntryException")))) {
+			if (contains("${accountEntryObject}", "${projectCode}") && !(contains("${accountEntryObject}", "NoSuchAccountEntryException"))) {
 				var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${projectCode}");
 
 				var script = '''
@@ -691,6 +708,7 @@ definition {
 				OSBAdminSearch.searchBasicProjectViaName(projectName = "${projectName}");
 
 				Click(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_BUTTON_VIA_NAME");
+
 				ClickNoError(locator1 = "OSBAdmin#SEARCH_RESULT_ACTION_MENU_DELETE");
 
 				Confirm(value1 = "Are you sure you want to delete this? It will be deleted immediately.");
@@ -747,6 +765,7 @@ definition {
 		Uncheck(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_CLOSED_WATCHER_CHECKBOX");
 
 		Click(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#UPDATE_MENU_ITEM");
 
 		Message.success();
@@ -789,6 +808,7 @@ definition {
 				fail("No such writeable project field ${field}");
 			}
 		}
+
 		Button.save();
 
 		Message.success();
@@ -807,6 +827,7 @@ definition {
 			value1 = "${role}");
 
 		Click(locator1 = "OSBAdminProjectAssignCustomer#ASSIGNED_CUSTOMER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignCustomer#UPDATE_MENU_ITEM");
 
 		Message.success();
@@ -825,6 +846,7 @@ definition {
 			value1 = "${role}");
 
 		Click(locator1 = "OSBAdminProjectAssignWorker#ASSIGNED_WORKER_ACTION_BUTTON");
+
 		ClickNoError(locator1 = "OSBAdminProjectAssignWorker#UPDATE_MENU_ITEM");
 
 		Message.success();
@@ -927,7 +949,6 @@ definition {
 		OSBAdminProject.gotoProjectViaName(projectName = "${projectName}");
 
 		var RawTable rawTable = new RawTable("${table}");
-
 		var key_product = "${productName}";
 
 		for (var row : table "${rawTable}") {
@@ -965,7 +986,7 @@ definition {
 					if (IsTextNotEqual(locator1 = "OSBAdminProjectAdd#OFFERING_START_DATE", value1 = "${startDate}")) {
 						var day = DateUtil.getDate("1");
 						var month = DateUtil.getMonthName("1");
-						var year = DateUtil.getYear("1");	
+						var year = DateUtil.getYear("1");
 
 						var startDate = "${month} ${day}, ${year}";
 
@@ -988,7 +1009,6 @@ definition {
 			else if ("${field}" == "Support End Date") {
 				if (contains("${value}", "month from now")) {
 					var numberOfDaysFromNow = StringUtil.replace("${value}", " month from now", "");
-
 					var day = DateUtil.getDate("30");
 					var month = DateUtil.getMonthName("30");
 					var year = DateUtil.getYear("30");
@@ -1051,7 +1071,6 @@ definition {
 		Click(locator1 = "OSBAdminProject#ALL_OFFERINGS_TAB");
 
 		var RawTable rawTable = new RawTable("${table}");
-
 		var key_product = "${productName}";
 
 		for (var row : table "${rawTable}") {
@@ -1089,7 +1108,7 @@ definition {
 					if (IsTextNotEqual(locator1 = "OSBAdminProjectAdd#OFFERING_START_DATE", value1 = "${startDate}")) {
 						var day = DateUtil.getDate("1");
 						var month = DateUtil.getMonthName("1");
-						var year = DateUtil.getYear("1");	
+						var year = DateUtil.getYear("1");
 
 						var startDate = "${month} ${day}, ${year}";
 
@@ -1112,7 +1131,6 @@ definition {
 			else if ("${field}" == "Support End Date") {
 				if (contains("${value}", "month from now")) {
 					var numberOfDaysFromNow = StringUtil.replace("${value}", " month from now", "");
-
 					var day = DateUtil.getDate("30");
 					var month = DateUtil.getMonthName("30");
 					var year = DateUtil.getYear("30");
@@ -1180,4 +1198,5 @@ definition {
 			locator1 = "OSBAdminProjectAssignWorker#ASSIGNED_WORKER_EMAIL",
 			value1 = "${emailAddress}");
 	}
+
 }

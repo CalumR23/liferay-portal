@@ -1,9 +1,9 @@
 definition {
+
 	var adminEmailAddress = PropsUtil.get("admin.email.address");
 	var adminPassword = PropsUtil.get("admin.password");
 
 	macro _addGroup {
-
 		if (isSet(groupDescription)) {
 			var groupDescriptionEncoded = URLUtil.encode("${groupDescription}", "UTF-8");
 
@@ -52,7 +52,6 @@ definition {
 	}
 
 	macro _addUserGroup {
-
 		if (isSet(userGroupDescription)) {
 			var userGroupDescriptionEncoded = URLUtil.encode("${userGroupDescription}", "UTF-8");
 
@@ -201,6 +200,7 @@ definition {
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d groupId=${groupId}
 		''';
+
 		var temp = JSONCurlUtil.post("${curl}", "$");
 	}
 
@@ -211,8 +211,7 @@ definition {
 
 		JSONGroup._addGroup(
 			groupDescription = "${groupDescription}",
-			groupName = "${groupName}"
-		);
+			groupName = "${groupName}");
 	}
 
 	macro assignGroupRoleToUser {
@@ -246,8 +245,7 @@ definition {
 		JSONGroup._assignGroupRoleToUser(
 			groupId = "${groupId}",
 			roleId = "${roleId}",
-			userId = "${userId}"
-		);
+			userId = "${userId}");
 	}
 
 	macro assignUserToGroup {
@@ -260,10 +258,11 @@ definition {
 		}
 
 		var groupId = JSONGroup.getGroupIdByName(groupName = "${groupName}");
-
 		var userId = JSONUser.getUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
 
-		JSONGroup._assignUserToGroup(groupId = "${groupId}", userId = "${userId}");
+		JSONGroup._assignUserToGroup(
+			groupId = "${groupId}",
+			userId = "${userId}");
 	}
 
 	macro deleteGroupByName {
@@ -282,7 +281,6 @@ definition {
 		}
 
 		var companyId = JSONCompany.getCompanyId();
-
 		var portalURL = JSONCompany.getPortalURL();
 
 		var curl = '''
@@ -292,9 +290,12 @@ definition {
 				-d parentGroupId=0 \
 				-d site=true
 		''';
+
 		var groupId = JSONCurlUtil.post("${curl}", "$.[?(@['nameCurrentValue'] == '${groupName}')]['groupId']");
-		var groupId = StringUtil.replace("${groupId}", "[&quot;", "");
-		var groupId = StringUtil.replace("${groupId}", "&quot;]", "");
+
+		var groupId = StringUtil.replace("${groupId}", "[\"", "");
+
+		var groupId = StringUtil.replace("${groupId}", "\"]", "");
 
 		return "${groupId}";
 	}
@@ -305,7 +306,6 @@ definition {
 		}
 
 		var companyId = JSONCompany.getCompanyId();
-
 		var portalURL = JSONCompany.getPortalURL();
 
 		var curl = '''
@@ -313,8 +313,10 @@ definition {
 				-u ${adminEmailAddress}:${adminPassword} \
 				-d groupId=${groupId}
 		''';
+
 		var groupName = JSONCurlUtil.post("${curl}", "$['nameCurrentValue']");
 
 		return "${groupName}";
 	}
+
 }
