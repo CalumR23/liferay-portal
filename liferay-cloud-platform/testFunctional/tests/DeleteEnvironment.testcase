@@ -1,0 +1,58 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	var projectName = "poshitest";
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+
+		ProjectsPage.createNewProject(projectName = "${projectName}");
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Delete Environment tab contains specific information about the implications of this action e environment information"
+	@priority = "5"
+	test DisplayInformation {
+		task ("When: The user accesses the delete environment area") {
+			Utils.goToPage(page = "projects/${projectName}/settings/delete-environment");
+		}
+
+		task ("Then: The user sees specific information about the implications of the exclusion action") {
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Settings#IMPLICATIONS_INFORMATION",
+				value1 = "Deleting an environment cannot be undone.");
+		}
+
+		task ("When: The user attempts to delete the environment") {
+			Default.Click(locator1 = "Utils#DANGER_BUTTON");
+		}
+
+		task ("Then: The user sees that a warning message is displayed on the page") {
+			Default.AssertTextEquals(
+				locator1 = "DeleteProject#WARNING_MESSAGE",
+				value1 = "Warning: deleting an environment cannot be undone! Confirm the deletion before proceeding.");
+		}
+
+		task ("And: Environment information is displayed") {
+			Default.AssertElementPresent(
+				key_environment = "${projectName}",
+				key_information = "poshitest",
+				locator1 = "DeleteProject#ENVIRONMENT_INFORMATION_TABLE");
+
+			Default.AssertElementPresent(
+				key_environment = "${projectName}",
+				key_information = "-",
+				locator1 = "DeleteProject#ENVIRONMENT_INFORMATION_TABLE");
+		}
+	}
+
+}
