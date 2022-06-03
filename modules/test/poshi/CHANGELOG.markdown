@@ -8,7 +8,7 @@
 
 ### Logger
 
-* [POSHI-316](https://issues.liferay.com/browse/POSHI-316) - As a Test Engineer, when the test fails on an ocular assertion, I want to view the baseline and checkpoint screenshots in Testray
+* [POSHI-316](https://issues.liferay.com/browse/POSHI-316) - As a Test Engineer, when the test fails on an ocular assertion, I want to view the baseline and checkpoint screenshots in Testray
 
 ### Other
 
