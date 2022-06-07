@@ -1227,38 +1227,6 @@ definition {
 		}
 	}
 
-	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the verified value as ${userVerified}"
-	macro _viewUserVerificationByEmailAddress {
-		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
-
-		var curl = '''
-			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var userVerifiedFromAPI = JSONCurlUtil.get("${curl}", "$.user.verified");
-
-		echo("Expected User Verified Value: ${userVerified}");
-		echo("Actual User Verified Value: ${userVerifiedFromAPI}");
-
-		var currentIteration = "0";
-
-		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${userVerifiedFromAPI}" == "${userVerifiedFromAPI}"))) {
-			var currentIteration = MathUtil.sum("${currentIteration}", "1");
-
-			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-
-			var userVerifiedFromAPI = JSONCurlUtil.get("${curl}", "$.user.verified");
-
-			echo("Expected User Verified Value: ${userVerified}");
-			echo("Actual User Verified Value: ${userVerifiedFromAPI}");
-		}
-
-		if (!("${userVerifiedFromAPI}" == "${userVerified}")) {
-			fail("Actual verification value ${userVerifiedFromAPI} for the email ${userEmailAddress} does not match expected value ${userVerified}");
-		}
-	}
-
 	@prose = "the user with userExternalId ${userExternalId} on zendesk.liferay.com should have the name ${userName}"
 	macro _viewUserNameByExternalId {
 		var curl = '''
@@ -1558,6 +1526,38 @@ definition {
 
 		if (!(contains("${existingTags}", "${tag}"))) {
 			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected tag ${tag}");
+		}
+	}
+
+	@prose = "the user with the email address ${userEmailAddress} on zendesk.liferay.com should have the verified value of ${userVerified}"
+	macro _viewUserVerificationByEmailAddress {
+		var userId = ZendeskUserAPI._viewUserIdByEmailAddress(userEmailAddress = "${userEmailAddress}");
+
+		var curl = '''
+			--tlsv1.2 ${zendeskURL}/api/v2/users/${userId}.json
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var userVerifiedFromAPI = JSONCurlUtil.get("${curl}", "$.user.verified");
+
+		echo("Expected User Verified Value: ${userVerified}");
+		echo("Actual User Verified Value: ${userVerifiedFromAPI}");
+
+		var currentIteration = "0";
+
+		while ((!("${currentIteration}" == "${pollMaximumIterations}")) && (!("${userVerifiedFromAPI}" == "${userVerifiedFromAPI}"))) {
+			var currentIteration = MathUtil.sum("${currentIteration}", "1");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var userVerifiedFromAPI = JSONCurlUtil.get("${curl}", "$.user.verified");
+
+			echo("Expected User Verified Value: ${userVerified}");
+			echo("Actual User Verified Value: ${userVerifiedFromAPI}");
+		}
+
+		if (!("${userVerifiedFromAPI}" == "${userVerified}")) {
+			fail("Actual verification value ${userVerifiedFromAPI} for the email ${userEmailAddress} does not match expected value ${userVerified}");
 		}
 	}
 
