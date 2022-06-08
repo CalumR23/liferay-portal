@@ -19,6 +19,40 @@ definition {
 		Authentication.logout();
 	}
 
+	@description = "Delete Environment button is disabled if all checkboxes are not checked"
+	@priority = "5"
+	test DeleteConfirmationCheckboxes {
+		task ("When: User accesses the delete project page") {
+			Utils.goToPage(page = "projects/${projectName}/delete-project");
+		}
+
+		task ("Then: User sees that all checkboxes are not checked") {
+			for (var delete : list "access,domains,data") {
+				Default.AssertNotChecked.assertNotCheckedNotVisible(
+					key_checkboxName = "${delete}",
+					locator1 = "Utils#ANY_CHECKBOX");
+			}
+		}
+
+		task ("And: Delete Environment button is disabled") {
+			Default.AssertElementPresent(locator1 = "Utils#DANGER_BUTTON_DISABLED");
+		}
+
+		task ("When: User selects all checkboxes") {
+			for (var delete : list "access,domains,data") {
+				Default.Check.toggleSwitch(
+					key_checkboxName = "${delete}",
+					locator1 = "Utils#ANY_CHECKBOX");
+			}
+		}
+
+		task ("Then: User sees that the Delete environment button is enabled") {
+			Default.AssertElementNotPresent(locator1 = "Utils#DANGER_BUTTON_DISABLED");
+
+			Default.AssertElementPresent(locator1 = "Utils#DANGER_BUTTON");
+		}
+	}
+
 	@description = "Delete Environment tab contains specific information about the implications of this action e environment information"
 	@priority = "5"
 	test DisplayInformation {
