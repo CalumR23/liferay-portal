@@ -921,8 +921,6 @@ YUI.add(
 
 						var detailsNodes = instance.get(STR_SYNTAX_LOG).all(SELECTOR_FAIL + ', ' + SELECTOR_SCREENSHOT + ', ' + SELECTOR_WARNING);
 
-						var failNodes = instance.get(STR_SYNTAX_LOG).all(SELECTOR_FAIL);
-
 						instance.set(STR_DETAILS, detailsNodes);
 
 						instance._transitionCommandLog(commandLog);
@@ -937,6 +935,8 @@ YUI.add(
 							detailsNodes.each(instance._displayNode, instance);
 
 							var lastFailNode = detailsNodes.first();
+
+							var failNodes = instance.get(STR_SYNTAX_LOG).all(SELECTOR_FAIL);
 
 							if(failNodes.size() > 0) {
 								lastFailNode = failNodes.first();
