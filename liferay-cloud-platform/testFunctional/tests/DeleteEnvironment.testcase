@@ -75,6 +75,52 @@ definition {
 		}
 	}
 
+	@description = "If user deletes the root environment, all project's environments are deleted, it redirects to the project page and a toast is displayed informing that the environment was deleted"
+	@priority = "4"
+	test DeleteRootEnvironment {
+		task ("Given: The project has more than one environment") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "DEV",
+				location = "Oregon, USA");
+
+			Utils.goToPage(page = "projects");
+
+			for (var environment : list "poshitest,poshitest-dev") {
+				Default.AssertElementPresent(
+					key_environment = "${environment}",
+					key_index = "1",
+					locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
+			}
+		}
+
+		task ("When: The user deletes the root environment") {
+			Utils.goToPage(page = "projects/${projectName}/settings");
+
+			SettingsPage.deleteEnvironment();
+		}
+
+		task ("Then: All project environments are deleted") {
+			for (var environment : list "poshitest,poshitest-dev") {
+				Default.AssertElementNotPresent(
+					key_environment = "${environment}",
+					key_index = "1",
+					locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
+			}
+		}
+
+		task ("And: The console is redirected to the Projects page") {
+			Default.AssertElementPresent(
+				key_headerTitle = "Projects",
+				locator1 = "Utils#HEADER_TITLE");
+		}
+
+		task ("And: A toast showing a success message is displayed") {
+			Default.AssertElementPresent(
+				key_message = "Environments deleted",
+				locator1 = "Utils#GENERIC_TOAST_NOTIFICATION");
+		}
+	}
+
 	@description = "Delete Environment tab contains specific information about the implications of this action e environment information"
 	@priority = "5"
 	test DisplayInformation {
