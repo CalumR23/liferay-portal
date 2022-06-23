@@ -1953,7 +1953,7 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to view a koroneiki team with the name ${teamName} with the external link nested field value ${teamExternalLinkNestedFieldValue}"
+	@prose = "I should be able to view a koroneiki team with the name ${teamName} with the external link nested field partial value ${teamExternalLinkNestedFieldPartialValue}"
 	macro _viewTeamWithExternalLink {
 		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
 
@@ -1974,34 +1974,14 @@ definition {
 			fail("Actual team name value ${teamNameFromAPI} does not match expected team name value ${teamName}");
 		}
 
-		var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
-		var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
-		var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-		var externalLinkObjectNumber = "0";
+		var teamExternalLinkNestedFieldValueFromAPI = JSONCurlUtil.get("${curl}", "$.externalLinks");
 
-		while ("${externalLinkObjectNumber}" != "${numberOfExternalLinks}") {
-			var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
-			var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
-
-			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "\"dateCreated\":\"${dateCreated}\",", "");
-			var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
-
-			var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",\"key\":\"${key}\"", "");
-			var externalLinkObjectNumber = ${externalLinkObjectNumber} + 1;
-		}
-
-		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
-
-		var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
-
-		var teamExternalLinkNestedFieldValueFromAPI = "${externalLinksObjectsEdit}";
-
-		echo("Expected External Link Nested Field Value: ${teamExternalLinkNestedFieldValue}");
+		echo("Expected External Link Nested Field Partial Value: ${teamExternalLinkNestedFieldPartialValue}");
 
 		echo("Actual External Link Nested Field Value: ${teamExternalLinkNestedFieldValueFromAPI}");
 
-		if (!(contains("${teamExternalLinkNestedFieldValue}", "${teamExternalLinkNestedFieldValueFromAPI}"))) {
-			fail("Actual team external link nested field value ${teamExternalLinkNestedFieldValueFromAPI} does not match expected team external link nested field value ${teamExternalLinkNestedFieldValue}");
+		if (!(contains("${teamExternalLinkNestedFieldValueFromAPI}", "${teamExternalLinkNestedFieldPartialValue}"))) {
+			fail("Actual team external link nested field value ${teamExternalLinkNestedFieldValueFromAPI} does not contain the expected team external link nested field partial value ${teamExternalLinkNestedFieldPartialValue}");
 		}
 	}
 
