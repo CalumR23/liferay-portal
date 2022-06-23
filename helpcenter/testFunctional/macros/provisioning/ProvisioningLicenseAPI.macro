@@ -263,7 +263,7 @@ definition {
 		}
 	}
 
-	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} for the following license keys with ${aggregatedFilePattern} XML file pattern ${table}"
+	@prose = "I should be able to download a license aggregate file on provisioning on the account ${accountName} for the following license keys with the ${aggregatedFilePattern} XML file pattern ${table}"
 	macro _downloadLicenseAggregate {
 		var RawTable rawTable = new RawTable("${table}");
 		var licenseKeyIds = "";
@@ -309,37 +309,7 @@ definition {
 			}
 		}
 		else {
-			echo("check to see if the XML file pattern was inputed correctly");
-		}
-	}
-
-	@prose = "I should be able to view an error message is shown when attempting to download the aggregate licenses on the account ${accountName} for the following license keys ${table}"
-	macro _downloadLicenseAggregateErrorMessage {
-		var RawTable rawTable = new RawTable("${table}");
-		var licenseKeyIds = "";
-
-		for (var row : table "${rawTable}") {
-			var licenseKeyId = "${row[0]}";
-
-			if ("${licenseKeyIds}" == "") {
-				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
-			}
-			else {
-				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
-			}
-		}
-
-		var curl = '''
-			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
-			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
-			-H "accept: application/*"
-			-H 'Content-Type: application/*'
-			''';
-
-		var errorMessage = JSONCurlUtil.get("${curl}");
-
-		if (!(contains("${errorMessage}", "The specified activation keys cannot be aggregated together"))) {
-			fail("There was no error message when downloading the aggregated licenses");
+			echo("Invalid aggregate file pattern type ${aggregatedFilePattern}. Please set the aggregatedFilePattern variable to old or new.");
 		}
 	}
 
@@ -1312,6 +1282,36 @@ definition {
 			if ("${expectedValue}" != "${valueFromAPI}") {
 				fail("Actual ${field} value ${valueFromAPI} does not match expected ${field} value ${expectedValue}");
 			}
+		}
+	}
+
+	@prose = "I should be able to view an error message when attempting to download an aggregate license on the account ${accountName} for the following license keys ${table}"
+	macro _viewLicenseAggregateErrorMessage {
+		var RawTable rawTable = new RawTable("${table}");
+		var licenseKeyIds = "";
+
+		for (var row : table "${rawTable}") {
+			var licenseKeyId = "${row[0]}";
+
+			if ("${licenseKeyIds}" == "") {
+				var licenseKeyIds = "licenseKeyIds=${licenseKeyId}";
+			}
+			else {
+				var licenseKeyIds = "${licenseKeyIds}&licenseKeyIds=${licenseKeyId}";
+			}
+		}
+
+		var curl = '''
+			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download?"${licenseKeyIds}" --tlsv1.2
+			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
+			-H "accept: application/*"
+			-H 'Content-Type: application/*'
+			''';
+
+		var errorMessage = JSONCurlUtil.get("${curl}");
+
+		if (!(contains("${errorMessage}", "The specified activation keys cannot be aggregated together"))) {
+			fail("There was no error message when downloading the aggregated licenses");
 		}
 	}
 
