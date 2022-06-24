@@ -1,0 +1,53 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	var projectName = "qaposhitest";
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+
+		ProjectsPage.createNewProject(projectName = "qaposhitest");
+
+		Utils.goToPage(page = "projects");
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Project status displays as 'None' when there are no services"
+	@priority = "4"
+	test DisplaysNoneForNoServices {
+		task ("Given: I am on projects page and have project 'qaposhitest'") {
+			Default.AssertElementPresent(
+				key_environment = "qaposhitest",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("Then: Status should show 'None' on projects page") {
+			Default.AssertElementPresent(
+				key_projectId = "qaposhitest",
+				key_status = "None",
+				locator1 = "Projects#PROJECT_WITH_STATUS");
+		}
+
+		task ("And: Hovering on 'None' status displays 'No service is running on this environment' tooltip") {
+			Default.MouseOver(
+				key_projectId = "qaposhitest",
+				key_status = "None",
+				locator1 = "Projects#PROJECT_WITH_STATUS");
+
+			Default.AssertVisible(
+				key_text = "No service is running on this environment",
+				locator1 = "Projects#TOOLTIP_WITH_TEXT"
+				);
+		}
+	}
+
+}
