@@ -3619,8 +3619,8 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
-	@prose = "I update a koroneiki account with the name ${accountName} including nested fields to have the following values ${table}"
-	macro _updateAccountIncludingNestedFields {
+	@prose = "I update a koroneiki account with the name ${accountName} including assigned teams to have the following values ${table}"
+	macro _updateAccountIncludingAssignedTeams {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
 		var properties = "";
 		var RawTable rawTable = new RawTable("${table}");
@@ -3648,17 +3648,11 @@ definition {
 			else if ("${field}" == "Contact Email Address") {
 				var contactEmailAddress = "${value1}";
 			}
-			else if ("${field}" == "Contact Nested Field") {
-				var contactsNestedField = "${value1}";
-			}
 			else if ("${field}" == "Data Region") {
 				var dataRegion = "${value1}";
 			}
 			else if ("${field}" == "Description") {
 				var description = "${value1}";
-			}
-			else if ("${field}" == "External Link Nested Field") {
-				var externalLinksNestedField = "${value1}";
 			}
 			else if ("${field}" == "Fax Number") {
 				var faxNumber = "${value1}";
@@ -3677,12 +3671,6 @@ definition {
 			}
 			else if ("${field}" == "Phone Number") {
 				var phoneNumber = "${value1}";
-			}
-			else if ("${field}" == "Postal Address Nested Field") {
-				var postalAddressesNestedField = "${value1}";
-			}
-			else if ("${field}" == "Product Purchase Nested Field") {
-				var productPurchasesNestedField = "${value1}";
 			}
 			else if ("${field}" == "Profile Email Address") {
 				var profileEmailAddress = "${value1}";
@@ -3705,27 +3693,14 @@ definition {
 		}
 
 		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts --tlsv1.2
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams --tlsv1.2
 			--header "API_Token: ${apiToken}"
 			-H "accept: application/json"
 			-H "Content-Type: application/json"
 			''';
 
 		if (!(isSet(assignedTeamsNestedField))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "assignedTeams=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.assignedTeams");
-
-				var value1 = StringUtil.replace("${value1}", "[", "");
-
-				var value1 = StringUtil.replace("${value1}", "]", "");
-
-				var assignedTeamsNestedField = "${value1}";
-			}
-			else {
-				var assignedTeamsNestedField = "";
-			}
+			var assignedTeamsNestedField = "";
 		}
 
 		if (!(isSet(code))) {
@@ -3754,22 +3729,6 @@ definition {
 			}
 		}
 
-		if (!(isSet(contactsNestedField))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "contacts=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.contacts");
-
-				var value1 = StringUtil.replace("${value1}", "[", "");
-
-				var value1 = StringUtil.replace("${value1}", "]", "");
-
-				var contactsNestedField = "${value1}";
-			}
-			else {
-				var contactsNestedField = "";
-			}
-		}
 
 		if (!(isSet(dataRegion))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
@@ -3797,49 +3756,6 @@ definition {
 			}
 		}
 
-		if (!(isSet(externalLinksNestedField))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "externalLinks=")) {
-				var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.externalLinks");
-				var externalLinksObjectsEdit = JSONCurlUtil.get("${curl}", "$.externalLinks");
-				var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-				var externalLinkObjectNumber = "0";
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "=", "\":\"");
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ", ", "\",\"");
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "{", "{\"");
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "}", "\"}");
-
-				while ("${externalLinkObjectNumber}" != "${numberOfExternalLinks}") {
-					var externalLinkObject = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}]");
-					var dateCreated = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].dateCreated");
-
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "\"dateCreated\":\"${dateCreated}\",", "");
-					var key = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].key");
-
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",\"key\":\"${key}\"", "");
-					var url = JSONCurlUtil.get("${curl}", "$.externalLinks[${externalLinkObjectNumber}].url");
-
-					var urlEdit = StringUtil.replace("${url}", "/", "\/");
-
-					var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", ",\"url\":\"${urlEdit}\"", "");
-					var externalLinkObjectNumber = ${externalLinkObjectNumber} + 1;
-				}
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "[", "");
-
-				var externalLinksObjectsEdit = StringUtil.replace("${externalLinksObjectsEdit}", "]", "");
-
-				var externalLinksNestedField = "${externalLinksObjectsEdit}";
-			}
-			else {
-				var externalLinksNestedField = "";
-			}
-		}
 
 		if (!(isSet(faxNumber))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
@@ -3919,96 +3835,6 @@ definition {
 			}
 		}
 
-		if (!(isSet(postalAddressesNestedField))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "postalAddresses=")) {
-				var value1 = JSONCurlUtil.get("${curl}", "$.postalAddresses");
-
-				var value1 = StringUtil.replace("${value1}", "[", "");
-
-				var value1 = StringUtil.replace("${value1}", "]", "");
-
-				var postalAddressesNestedField = "${value1}";
-			}
-			else {
-				var postalAddressesNestedField = "";
-			}
-		}
-
-		if (!(isSet(productPurchasesNestedField))) {
-			var accountObject = JSONCurlUtil.get("${curl}", "$");
-
-			if (contains("${accountObject}", "productPurchases=")) {
-				var productPurchasesObjects = JSONCurlUtil.get("${curl}", "$.productPurchases");
-				var productPurchasesObjectsEdit = JSONCurlUtil.get("${curl}", "$.productPurchases");
-				var numberOfProductPurchases = StringUtil.count("${productPurchasesObjects}", "accountKey");
-				var productPurchaseObjectNumber = "0";
-
-				var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "=", "\":\"");
-
-				var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", ", ", "\",\"");
-
-				var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "{", "{\"");
-
-				var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "}", "\"}");
-
-				while ("${productPurchaseObjectNumber}" != "${numberOfProductPurchases}") {
-					var productPurchaseObject = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}]");
-					var accountKey = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].accountKey");
-
-					var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "\"accountKey\":\"${accountKey}\",", "");
-					var dateCreated = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].dateCreated");
-
-					var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "\"dateCreated\":\"${dateCreated}\",", "");
-
-					if (contains("${productPurchaseObject}", "externalLinks")) {
-						var externalLinksObjects = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].externalLinks");
-
-						var numberOfExternalLinks = StringUtil.count("${externalLinksObjects}", "entityId");
-						var externalLinkObjectNumber = "0";
-
-						while ("${externalLinkObjectNumber}" != "${numberOfExternalLinks}") {
-							var externalLinkDateCreated = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].externalLinks[${externalLinkObjectNumber}].dateCreated");
-							var externalLinkKey = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].externalLinks[${externalLinkObjectNumber}].key");
-							var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "\"dateCreated\":\"${externalLinkDateCreated}\",", "");
-
-							var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", ",\"key\":\"${externalLinkKey}\"", "");
-							var externalLinkObjectNumber = ${externalLinkObjectNumber} + 1;
-						}
-					}
-
-					var key = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].key");
-
-					var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "\"key\":\"${key}\",", "");
-					var product = JSONCurlUtil.get("${curl}", "$.productPurchases[${productPurchaseObjectNumber}].product");
-
-					var product = StringUtil.replace("${product}", "=", "\":\"");
-
-					var product = StringUtil.replace("${product}", ", ", "\",\"");
-
-					var product = StringUtil.replace("${product}", "{", "{\"");
-
-					var product = StringUtil.replace("${product}", "}", "\"}");
-
-					var productPurchasesObjectsEdit = StringUtil.replace("${productPurchasesObjectsEdit}", "\"product\":${product},", "");
-					var productPurchaseObjectNumber = ${productPurchaseObjectNumber} + 1;
-				}
-
-				var productPurchasesObjectsEdit = StringUtil.replaceFirst("${productPurchasesObjectsEdit}", "[", "");
-
-				var productPurchasesObjectsEdit = StringUtil.reverse("${productPurchasesObjectsEdit}");
-
-				var productPurchasesObjectsEdit = StringUtil.replaceFirst("${productPurchasesObjectsEdit}", "]", "");
-
-				var productPurchasesObjectsEdit = StringUtil.reverse("${productPurchasesObjectsEdit}");
-
-				var productPurchasesNestedField = "${productPurchasesObjectsEdit}";
-			}
-			else {
-				var productPurchasesNestedField = "";
-			}
-		}
 
 		if (!(isSet(profileEmailAddress))) {
 			var accountObject = JSONCurlUtil.get("${curl}", "$");
@@ -4088,71 +3914,125 @@ definition {
 			}
 		}
 
-		if ("${properties}" == "") {
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"assignedTeams": [${assignedTeamsNestedField}],
-					"code": "${code}",
-					"contactEmailAddress": "${contactEmailAddress}",
-					"contacts": [${contactsNestedField}],
-					"dataRegion": "${dataRegion}",
-					"description": "${description}",
-					"externalLinks": [${externalLinksNestedField}],
-					"faxNumber": "${faxNumber}",
-					"internal": ${internal},
-					"language": "${language}",
-					"name": "${name}",
-					"parentAccountKey": "${parentAccountKey}",
-					"phoneNumber": "${phoneNumber}",
-					"postalAddresses": [${postalAddressesNestedField}],
-					"productPurchases": [${productPurchasesNestedField}],
-					"profileEmailAddress": "${profileEmailAddress}",
-					"region": "${region}",
-					"status": "${status}",
-					"tier": "${tier}",
-					"website": "${website}"
-				}
-				''';
+		if ("${assignedTeamsNestedField}" == "") {
+			if ("${properties}" == "") {
+				var curl = '''
+					${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"code": "${code}",
+						"contactEmailAddress": "${contactEmailAddress}",
+						"dataRegion": "${dataRegion}",
+						"description": "${description}",
+						"faxNumber": "${faxNumber}",
+						"internal": ${internal},
+						"language": "${language}",
+						"name": "${name}",
+						"parentAccountKey": "${parentAccountKey}",
+						"phoneNumber": "${phoneNumber}",
+						"profileEmailAddress": "${profileEmailAddress}",
+						"region": "${region}",
+						"status": "${status}",
+						"tier": "${tier}",
+						"website": "${website}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey} --tlsv1.2
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"code": "${code}",
+						"contactEmailAddress": "${contactEmailAddress}",
+						"contacts": [${contactsNestedField}],
+						"dataRegion": "${dataRegion}",
+						"description": "${description}",
+						"faxNumber": "${faxNumber}",
+						"internal": ${internal},
+						"language": "${language}",
+						"name": "${name}",
+						"parentAccountKey": "${parentAccountKey}",
+						"phoneNumber": "${phoneNumber}",
+						"profileEmailAddress": "${profileEmailAddress}",
+						"properties": {
+							${properties}
+						},
+						"region": "${region}",
+						"status": "${status}",
+						"tier": "${tier}",
+						"website": "${website}"
+					}
+					''';
+			}
 		}
 		else {
-			var curl = '''
-				${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams,contacts,customerContacts,externalLinks,postalAddresses,productPurchases,workerContacts --tlsv1.2
-				--header "API_Token: ${apiToken}"
-				-H "accept: application/json"
-				-H "Content-Type: application/json"
-				-d
-				{
-					"assignedTeams": [${assignedTeamsNestedField}],
-					"code": "${code}",
-					"contactEmailAddress": "${contactEmailAddress}",
-					"contacts": [${contactsNestedField}],
-					"dataRegion": "${dataRegion}",
-					"description": "${description}",
-					"externalLinks": [${externalLinksNestedField}],
-					"faxNumber": "${faxNumber}",
-					"internal": ${internal},
-					"language": "${language}",
-					"name": "${name}",
-					"parentAccountKey": "${parentAccountKey}",
-					"phoneNumber": "${phoneNumber}",
-					"postalAddresses": [${postalAddressesNestedField}],
-					"productPurchases": [${productPurchasesNestedField}],
-					"profileEmailAddress": "${profileEmailAddress}",
-					"properties": {
-						${properties}
-					},
-					"region": "${region}",
-					"status": "${status}",
-					"tier": "${tier}",
-					"website": "${website}"
-				}
-				''';
+			if ("${properties}" == "") {
+				var curl = '''
+					${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams --tlsv1.2
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"assignedTeams": [${assignedTeamsNestedField}],
+						"code": "${code}",
+						"contactEmailAddress": "${contactEmailAddress}",
+						"dataRegion": "${dataRegion}",
+						"description": "${description}",
+						"faxNumber": "${faxNumber}",
+						"internal": ${internal},
+						"language": "${language}",
+						"name": "${name}",
+						"parentAccountKey": "${parentAccountKey}",
+						"phoneNumber": "${phoneNumber}",
+						"profileEmailAddress": "${profileEmailAddress}",
+						"region": "${region}",
+						"status": "${status}",
+						"tier": "${tier}",
+						"website": "${website}"
+					}
+					''';
+			}
+			else {
+				var curl = '''
+					${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}?nestedFields=assignedTeams --tlsv1.2
+					--header "API_Token: ${apiToken}"
+					-H "accept: application/json"
+					-H "Content-Type: application/json"
+					-d
+					{
+						"assignedTeams": [${assignedTeamsNestedField}],
+						"code": "${code}",
+						"contactEmailAddress": "${contactEmailAddress}",
+						"contacts": [${contactsNestedField}],
+						"dataRegion": "${dataRegion}",
+						"description": "${description}",
+						"faxNumber": "${faxNumber}",
+						"internal": ${internal},
+						"language": "${language}",
+						"name": "${name}",
+						"parentAccountKey": "${parentAccountKey}",
+						"phoneNumber": "${phoneNumber}",
+						"profileEmailAddress": "${profileEmailAddress}",
+						"properties": {
+							${properties}
+						},
+						"region": "${region}",
+						"status": "${status}",
+						"tier": "${tier}",
+						"website": "${website}"
+					}
+					''';
+			}
 		}
+
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
