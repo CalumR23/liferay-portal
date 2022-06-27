@@ -136,6 +136,37 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
 	}
 
+	@prose = "I change the status and sub-status and long-term resolution of the ticket with the ID ${ticketId} to ${ticketStatus} and ${ticketSubStatus} and ${ticketLongTermResolution} respectively"
+	macro _changeTicketStatusAndSubStatusAndLongTermResolution {
+		var fieldId1 = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
+		var fieldId2 = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Long-Term Resolution");
+
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			-H "Content-Type: application/json"
+			-d
+			{
+				"ticket":
+				{
+					"status": "${ticketStatus}",
+					"custom_fields": [
+						{
+							"id": "${fieldId1}",
+							"value": "${ticketSubStatus}"
+						},
+						{
+							"id": "${fieldId2}",
+							"value": "${ticketLongTermResolution}"
+						}
+					]
+				}
+			}
+			''';
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+	}
+
 	@prose = "I change the sub-status of the ticket with the ID ${ticketId} to ${ticketSubStatus}"
 	macro _changeTicketSubStatus {
 		var fieldId = ZendeskTicketFieldsAPI._getTicketFieldIdByName(fieldName = "Sub-Status");
