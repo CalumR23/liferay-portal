@@ -46,12 +46,46 @@ definition {
 			value1 = "${fileType}");
 	}
 
+	macro teardownDownloadedFile {
+		var tempDir = PropsUtil.get("output.dir.name");
+
+		var filePath = "${tempDir}/${fileName}";
+
+		var fileExists = FileUtil.exists("${filePath}");
+
+		if ("${fileExists}" == "true") {
+			FileUtil.delete("${filePath}");
+
+			echo("File ${fileName} deleted.");
+		}
+		else {
+			echo("File ${fileName} not found.");
+		}
+	}
+
+	@prose = "I teardown the list of downloaded files ${list}"
+	macro teardownDownloadedListedFiles {
+		for (var fileName : list "${list}") {
+			Downloads.teardownDownloadedFile(fileName = "${fileName}");
+		}
+	}
+
+	@prose = "I teardown the following downloaded files ${table}"
+	macro teardownDownloadedTableFiles {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			Downloads.teardownDownloadedFile(fileName = "${row[0]}");
+		}
+	}
+
 	@prose = "the download with the name ${downloadName} should be visible with the following values ${table}"
 	macro viewDownload {
 		var key_downloadName = "${downloadName}";
 
 		if (IsElementPresent(locator1 = "Downloads#DOWNLOAD_SELECT")) {
 			AssertVisible(locator1 = "Downloads#DOWNLOAD_SELECT");
+
 			AssertVisible(locator1 = "Downloads#DOWNLOAD_BUTTON");
 		}
 		else {
@@ -168,35 +202,4 @@ definition {
 		AssertElementPresent(locator1 = "Downloads#CURRENT_PAGE_NUMBER");
 	}
 
-	@prose = "I teardown the following downloaded files ${table}"
-	macro teardownDownloadedTableFiles {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			Downloads.teardownDownloadedFile(fileName = "${row[0]}");
-		}
-	}
-
-	@prose = "I teardown the list of downloaded files ${list}"
-	macro teardownDownloadedListedFiles {
-		for (var fileName : list "${list}") {
-			Downloads.teardownDownloadedFile(fileName = "${fileName}");
-		}
-	}
-
-	macro teardownDownloadedFile {
-		var tempDir = PropsUtil.get("output.dir.name");
-
-		var filePath = "${tempDir}/${fileName}";
-
-		var fileExists = FileUtil.exists("${filePath}");
-
-		if ("${fileExists}" == "true") {
-			FileUtil.delete("${filePath}");
-
-			echo("File ${fileName} deleted.");
-		} else {
-			echo("File ${fileName} not found.");
-		}
-	}
 }
