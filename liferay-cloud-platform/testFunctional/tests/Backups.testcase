@@ -1,0 +1,58 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	var projectID = "projtest-dev";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+
+		Utils.checkServiceReadyStatus(
+			projectID = "${projectID}",
+			serviceID = "backup");
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "User can create a backup manually"
+	@priority = "5"
+	test CreateManualBackup {
+		task ("Given: A non-production environment") {
+			Utils.goToPage(page = "projects/${projectID}/backups");
+		}
+
+		task ("When: A user manually creates a backup using the Backup Now button") {
+			Backups.backupProject();
+
+			Backups.assertBackupCardMessage(backupText = "Backup creation in progress...");
+
+			Default.Pause(locator1 = "25000");
+
+			Backups.assertBackupCardMessage(backupText = "Backup creation succeeded");
+
+			Backups.assertLatestBackup(
+				creationType = "Manual",
+				projectID = "${projectID}");
+		}
+
+		task ("Then: A backup is successfully created and shows on the activities page") {
+			Utils.goToPage(page = "projects/${projectID}/activities");
+
+			Activities.assertActivityMessage(
+				activityRow = "2",
+				activityText = "Backup started");
+
+			Activities.assertActivityMessage(
+				activityRow = "1",
+				activityText = "Backup succeeded");
+		}
+	}
+
+}
