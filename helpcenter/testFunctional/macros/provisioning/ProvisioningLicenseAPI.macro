@@ -379,27 +379,31 @@ definition {
 			}
 		}
 
-		var tempDir = PropsUtil.get("output.dir.name");
+		var testDirs = PropsUtil.get("test.dirs");
 
 		var curl = '''
 			${provisioningURL}/o/provisioning-rest/v1.0/license-keys/download-zip?"${licenseKeyIds}" --tlsv1.2
 			-u ${provisioningAdminEmail}:${provisioningAdminPassword}
 			-H "accept: application/*"
 			-H 'Content-Type: application/*'
-			--output ${tempDir}/licenseZipFile.zip
+			--output ${testDirs}/licenseZipFile.zip
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
 
 		ZendeskHomepage.pause(timeInSeconds = "5");
 
-		var fileExists = FileUtil.exists("${tempDir}/licenseZipFile.zip");
+		var fileExists = FileUtil.exists("${testDirs}/licenseZipFile.zip");
 
 		if ("${fileExists}" == "true") {
 			echo("File named licenseZipFile.zip was downloaded.");
+
+			FileUtil.delete("${testDirs}/licenseZipFile.zip");
+
+			echo("File named licenseZipFile.zip was deleted.");
 		}
 		else {
-			fail("Files named licenseZipFile.zip NOT FOUND in folder ${tempDir}!");
+			fail("File named licenseZipFile.zip NOT FOUND in folder ${testDirs}!");
 		}
 	}
 
