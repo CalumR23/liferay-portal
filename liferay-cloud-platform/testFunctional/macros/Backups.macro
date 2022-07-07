@@ -1,0 +1,44 @@
+definition {
+
+	macro assertBackupCardMessage {
+		Default.AssertTextEquals.assertPartialText(
+			locator1 = "Backups#BACKUP_CARD_STATUS_MESSAGE",
+			value1 = "${backupText}");
+	}
+
+	macro assertLatestBackup {
+		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
+		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
+		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
+		var projectID = "${projectID}";
+
+		var curl = '''
+			https://${baseURL}/projects/${projectID}/services/backup \
+			-u ${user}:${password} \
+    	''';
+
+		var projectUID = JSONCurlUtil.get("${curl}", "$['projectUid']");
+		var displayDate = DateUtil.getFormattedCurrentDate("YYYYMMddHH", "GMT");
+		var createdTime = DateUtil.getFormattedCurrentDate("MMM dd YYYY, h:");
+		var backupName = "dxpcloud-${projectUID}-${displayDate}";
+
+		Default.AssertTextEquals.assertPartialText(
+			locator1 = "Backups#BACKUP_HISTORY_NAME",
+			value1 = "${backupName}");
+
+		Default.AssertTextEquals.assertPartialText(
+			locator1 = "Backups#BACKUP_HISTORY_TYPE",
+			value1 = "${creationType}");
+
+		Default.AssertTextEquals.assertPartialText(
+			locator1 = "Backups#BACKUP_HISTORY_TIME",
+			value1 = "${createdTime}");
+	}
+
+	macro backupProject {
+		Default.Click(
+			key_btnName = "Backup Now",
+			locator1 = "Utils#CLICK_BUTTON");
+	}
+
+}
