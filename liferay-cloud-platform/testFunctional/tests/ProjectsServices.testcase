@@ -1,0 +1,39 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Clicking service icon redirects to service logs page for selected service"
+	@priority = "4"
+	test ServiceIconRedirects {
+		task ("When: I click on the service icon") {
+			Default.Click(
+				key_environment = "projtest-infra",
+				key_serviceName = "ci",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+		}
+
+		task ("Then: Console redirects to corresponding service logs page") {
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "ServicesLogs#SERVICE_VERSION",
+				value1 = "liferaycloud/jenkins:");
+
+			Default.AssertTextEquals(
+				locator1 = "Environment#ENVIRONMENTS_DROPDOWN",
+				value1 = "infra");
+		}
+	}
+
+}
