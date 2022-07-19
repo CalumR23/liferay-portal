@@ -11,6 +11,9 @@ definition {
 	var supportAdminEmailAddress = PropsUtil.get("support.admin.email.address");
 	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
+	var webAdminEmailAddress = PropsUtil.get("web.admin.email.address");
+	var webAdminPassword = PropsUtil.get("web.admin.password");
+	var webURL = PropsUtil.get("web.liferay.url");
 
 	@prose = "I assign the provisioning user with the email address ${userEmailAddress} to the provisioning role ${roleName}"
 	macro assignUserToProvisioningRole {
@@ -449,13 +452,6 @@ definition {
 			var userObject = JSONCurlUtil.post("${curl}");
 			var currentIteration = "0";
 
-			while (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
-				var currentIteration = ${currentIteration} + 1;
-				var userObject = JSONCurlUtil.post("${curl}");
-
-				ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-			}
-
 			if (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
 
@@ -474,6 +470,94 @@ definition {
 					${supportURL}/api/jsonws/user/delete-user
 					-u ${supportAdminEmailAddress}:${supportAdminPassword}
 					-d userId=${supportUserId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
+	@prose = "I tear down the users with the following email addresses from web.liferay.com ${table}"
+	macro tearDownUsers {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userEmailAddress = "${row[0]}";
+
+			var companyId = JSONCompany.getWebCompanyId();
+
+			var userScreenName = StringUtil.extractFirst("${userEmailAddress}", "@");
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var userObject = JSONCurlUtil.post("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+				echo("Web User ID: ${webUserId}");
+
+				var curl = '''
+					${webURL}/api/secure/jsonws/user/update-status
+					-u ${webAdminEmailAddress}:${webAdminPassword}
+					-d userId=${webUserId}
+	  				-d status=5
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+				var curl = '''
+					${webURL}/api/secure/jsonws/user/delete-user
+					-u ${webAdminEmailAddress}:${webAdminPassword}
+					-d userId=${webUserId}
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+			}
+		}
+	}
+
+	@prose = "I tear down the users with the following screen names from web.liferay.com ${table}"
+	macro tearDownUsersByScreenName {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var userScreenName = "${row[0]}";
+
+			var companyId = JSONCompany.getWebCompanyId();
+
+			var curl = '''
+				${webURL}/api/secure/jsonws/user/get-user-by-screen-name
+				-u ${webAdminEmailAddress}:${webAdminPassword}
+				-d companyId=${companyId}
+				-d screenName=${userScreenName}
+				''';
+
+			var userObject = JSONCurlUtil.post("${curl}");
+
+			if ((contains("${userObject}", "${userScreenName}")) && (!(contains("${userObject}", "NoSuchUserException")))) {
+				var webUserId = JSONCurlUtil.post("${curl}", "$.userId");
+
+				echo("Web User ID: ${webUserId}");
+
+				var curl = '''
+					${webURL}/api/secure/jsonws/user/update-status
+					-u ${webAdminEmailAddress}:${webAdminPassword}
+					-d userId=${webUserId}
+	  				-d status=5
+					''';
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+				var curl = '''
+					${webURL}/api/secure/jsonws/user/delete-user
+					-u ${webAdminEmailAddress}:${webAdminPassword}
+					-d userId=${webUserId}
 					''';
 
 				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
@@ -668,11 +752,6 @@ definition {
 
 			var userObject = JSONCurlUtil.post("${curl}");
 			var currentIteration = "0";
-
-			while (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
-				var currentIteration = ${currentIteration} + 1;
-				var userObject = JSONCurlUtil.post("${curl}");
-			}
 
 			if (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
 				var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
