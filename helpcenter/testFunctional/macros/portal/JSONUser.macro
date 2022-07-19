@@ -434,49 +434,6 @@ definition {
 		return "${supportUserUuId}";
 	}
 
-	@prose = "I tear down the employee users with the following email addresses from customer.liferay.com ${table}"
-	macro tearDownEmployeeUsersViaSupport {
-		var RawTable rawTable = new RawTable("${table}");
-
-		for (var row : table "${rawTable}") {
-			var userEmailAddress = "${row[0]}";
-			var companyId = JSONCompany.getSupportCompanyId();
-
-			var curl = '''
-				${supportURL}/api/jsonws/user/get-user-by-email-address
-				-u ${supportAdminEmailAddress}:${supportAdminPassword}
-				-d companyId=${companyId}
-				-d emailAddress=${userEmailAddress}
-				''';
-
-			var userObject = JSONCurlUtil.post("${curl}");
-			var currentIteration = "0";
-
-			if (contains("${userObject}", "${userEmailAddress}") && !(contains("${userObject}", "NoSuchUserException"))) {
-				var supportUserId = JSONCurlUtil.post("${curl}", "$.userId");
-
-				echo("Support User ID: ${supportUserId}");
-
-				var curl = '''
-					${supportURL}/api/jsonws/user/update-status
-					-u ${supportAdminEmailAddress}:${supportAdminPassword}
-					-d userId=${supportUserId}
-					-d status=5
-					''';
-
-				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-
-				var curl = '''
-					${supportURL}/api/jsonws/user/delete-user
-					-u ${supportAdminEmailAddress}:${supportAdminPassword}
-					-d userId=${supportUserId}
-					''';
-
-				com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
-			}
-		}
-	}
-
 	@prose = "I tear down the users with the following email addresses from web.liferay.com ${table}"
 	macro tearDownUsers {
 		var RawTable rawTable = new RawTable("${table}");
