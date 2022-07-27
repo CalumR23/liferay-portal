@@ -117,4 +117,72 @@ definition {
 		}
 	}
 
+	@description = "Project/environment list is updated when project is deleted"
+	@priority = "4"
+	test ProjectsListIsUpdatedUponDeletion {
+		task ("When: I am a project member with additional environment") {
+			ProjectsPage.createNewProject(projectName = "${projectName}");
+
+			ProjectsPage.addNewEnvironment(
+				environmentType = "DEV",
+				location = "Oregon, USA");
+
+			Utils.goToPage(page = "projects");
+
+			var initialCountOfEnvironments = ProjectsPage.countOfEnvironments();
+		}
+
+		task ("And: Project environment is deleted") {
+			Utils.goToPage(page = "projects/${projectName}-dev/settings");
+
+			SettingsPage.deleteEnvironment();
+		}
+
+		task ("Then: The project/environment list is updated and the environment is not shown") {
+			Utils.goToPage(page = "projects");
+
+			Default.WaitForElementPresent(
+				key_headerTitle = "Projects",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertElementNotPresent(
+				key_environment = "${projectName}-dev",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("And: Environment count is updated") {
+			var environmentCount = ${initialCountOfEnvironments} - 1;
+
+			Default.AssertTextEquals(
+				locator1 = "Projects#ENVIRONMENT_COUNT",
+				value1 = "Environment (${environmentCount})");
+		}
+
+		task ("When: Project is deleted ") {
+			Utils.goToPage(page = "projects/${projectName}/settings");
+
+			SettingsPage.deleteEnvironment();
+		}
+
+		task ("Then: The project/environment list is updated and the project is not shown") {
+			Utils.goToPage(page = "projects");
+
+			Default.WaitForElementPresent(
+				key_headerTitle = "Projects",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertElementNotPresent(
+				key_environment = "${projectName}",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("And: Environment count is updated again") {
+			var environmentCount = ${initialCountOfEnvironments} - 2;
+
+			Default.AssertTextEquals(
+				locator1 = "Projects#ENVIRONMENT_COUNT",
+				value1 = "Environment (${environmentCount})");
+		}
+	}
+
 }
