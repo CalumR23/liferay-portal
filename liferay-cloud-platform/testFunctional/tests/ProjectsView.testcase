@@ -67,4 +67,54 @@ definition {
 		}
 	}
 
+	@description = "Count and project/environment list are updated when the user is a member of an additional project/environment"
+	@priority = "4"
+	test ProjectsListIsUpdated {
+		var initialCountOfEnvironments = ProjectsPage.countOfEnvironments();
+
+		task ("When: I create a new project") {
+			ProjectsPage.createNewProject();
+		}
+
+		task ("Then: The project is shown in the project list") {
+			Utils.goToPage(page = "projects");
+
+			Default.AssertElementPresent(
+				key_environment = "${projectName}",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("And: Environment count is updated") {
+			var environmentCount = ${initialCountOfEnvironments} + 1;
+
+			Default.AssertTextEquals(
+				locator1 = "Projects#ENVIRONMENT_COUNT",
+				value1 = "Environment (${environmentCount})");
+		}
+
+		task ("When: A new environment is added to the project") {
+			Utils.goToPage(page = "projects/${projectName}/overview");
+
+			ProjectsPage.addNewEnvironment(
+				environmentType = "DEV",
+				location = "Oregon, USA");
+		}
+
+		task ("Then: The new environment is shown in the project list") {
+			Utils.goToPage(page = "projects");
+
+			Default.AssertElementPresent(
+				key_environment = "${projectName}-dev",
+				locator1 = "Projects#PROJECT_NAME");
+		}
+
+		task ("And: Environment count is updated again") {
+			var environmentCount = ${initialCountOfEnvironments} + 2;
+
+			Default.AssertTextEquals(
+				locator1 = "Projects#ENVIRONMENT_COUNT",
+				value1 = "Environment (${environmentCount})");
+		}
+	}
+
 }
