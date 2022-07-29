@@ -55,4 +55,40 @@ definition {
 		}
 	}
 
+	@description = "If the user has no privileges, the information 'No VPN' is displayed, as well as a message about the roles with this permission and a link to the team page"
+	@priority = "5"
+	test NoVPNInformationForGuestRoles {
+		task ("Given: The user has no privileges and the project has no VPN") {
+			Authentication.logout();
+
+			Authentication.loginAsGuest();
+		}
+
+		task ("When: User navigates to VPN tab on Settings page") {
+			Utils.goToPage(page = "projects/projtest-infra/settings/vpn");
+		}
+
+		task ("Then: 'No VPN' message is displayed") {
+			Default.AssertElementPresent(locator1 = "Settings#NO_VPN_MESSAGE");
+		}
+
+		task ("And: User can see a link to the team page") {
+			Default.AssertElementPresent(
+				key_linkText = "go to Team page",
+				locator1 = "Utils#EXTERNAL_LINK");
+		}
+
+		task ("And: User's permission information is displayed") {
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Utils#INFO_ALERT_MESSAGE",
+				value1 = "Info: Only Admin and contributor users can create a VPN to this environment");
+		}
+
+		task ("And: The 'Create New VPN' button is not displayed") {
+			Default.AssertElementNotPresent(
+				key_btnName = "Create New VPN",
+				locator1 = "Settings#CREATE_BUTTON");
+		}
+	}
+
 }
