@@ -6,272 +6,260 @@ definition {
 		}
 	}
 
-    tearDown {
-        ATLUtils.tearDown();
-    }
+	tearDown {
+		ATLUtils.tearDown();
+	}
 
-    @description = "Verify that the Top Menu is displayed with the options: Inverstors, Governance, Media and Download Center"
-    test TopMenuIsDisplayed {
+	@description = "Verify that the Carousel article can be accessed"
+	@refactor
+	test CarouselArticlesCanBeAccessed {
+		task ("Given carousel article is clicked") {
+			Default.WaitForElementPresent(
+				key_itemName = "Our Climate Action Plan",
+				locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW");
 
-        task ("Assert that user can navigate to Investors > Results") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Investors",
-                subItemName = "Results");
-        }
+			//Default.Click(
+			//locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW",
+			//key_itemName = "Our Climate Action Plan");
 
-        task ("Assert that user can navigate to Investors > Rating") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Investors",
-                subItemName = "Rating");
-        }
+			ATLUtils.formateURL(passedURL = "//div[contains(@class,'h1') and contains(.,'Our Climate Action Plan')]//following-sibling::a[contains(@class,'icon')]");
+		}
 
-        task ("Assert that user can navigate to Investors > Shareholders") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Investors",
-                subItemName = "Shareholders");
-        }
+		task ("Then the user is redirected to article page") {
+			Default.AssertElementPresent(
+				key_title = "Our Climate Action Plan",
+				locator1 = "Portal.Header#H1_TITLE");
+		}
+	}
 
-        task ("Assert that user can navigate to InvestGovernanceors > Board of Directors") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Governance",
-                subItemName = "Board of Directors");
-        }
+	@description = "Verify that the Carousel with 4 (four) articles are displayed on page"
+	test CarouselIsDisplayed {
+		task ("Given that carousel contains only 4 articles") {
+			for (var count : list "1,2,3,4") {
+				Default.AssertElementPresent(
+					key_itemNumber = "${count}",
+					key_totalNumber = "4",
+					locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER");
+			}
+		}
 
-        task ("Assert that user can navigate to Governance > Engagement") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Governance",
-                subItemName = "Engagement");
-        }
+		task ("Then a fifth article will not be found") {
+			Default.AssertElementNotPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "5",
+				locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER");
+		}
+	}
 
-        task ("Assert that user can navigate to Governance > Remuneration") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Governance",
-                subItemName = "Remuneration");
-        }
+	@description = "Verify that General Meetings shows past meetings"
+	test GeneralMeetingsShowsPastMeetings {
+		task ("Given General Meetings show only past events") {
+			var allDate1 = selenium.getText("ATLHomePage#GENERAL_MEETINGS_FIRST_DATE");
 
-        task ("Assert that user can navigate to Media > Media Gallery") {
-            ATLNavigator.goToTopMenu(
-                menuItemName = "Media",
-                subItemName = "Media Gallery");
-        }
-        
-    }
+			var formatedDate1 = ATLUtils.formateDate(
+				format = "dd m yyyy",
+				oldDate = "${allDate1}");
+			var allDate2 = selenium.getText("ATLHomePage#GENERAL_MEETINGS_SECOND_DATE");
 
-    @description = "Verify that the Main Menu is displayed with the options: About Us, Mobility, Sustainability and Careers"
-    test MainMenuIsDisplayed {
+			var formatedDate2 = ATLUtils.formateDate(
+				format = "dd m yyyy",
+				oldDate = "${allDate2}");
+		}
 
-        task ("Assert that user can navigate to About Us > The Group") {
-            ATLNavigator.goToMainMenu(
-                menuItemName = "About Us",
-                subItemName = "The Group");
-        }
+		task ("Then the listed items are in correct rule") {
+			var currentDate = DateUtil.getFormattedCurrentDate("MM/dd/yyyy");
 
-        task ("Assert that user can navigate to Mobility > Our partners") {
-            ATLNavigator.goToMainMenu(
-                menuItemName = "Mobility",
-                subItemName = "Our partners");
-        }
+			ATLUtils.compareDate(
+				firstDate = "${currentDate}",
+				secondDate = "${formatedDate1}");
 
-        task ("Assert that user can navigate to Sustainability > Transparency") {
-            ATLNavigator.goToMainMenu(
-                menuItemName = "Sustainability",
-                subItemName = "Transparency");
-        }
+			ATLUtils.compareDate(
+				firstDate = "${currentDate}",
+				secondDate = "${formatedDate2}");
+		}
+	}
 
-        task ("Assert that user can navigate to Careers > Why Atlantia") {
-            ATLNavigator.goToMainMenu(
-                menuItemName = "Careers",
-                subItemName = "Why Atlantia");
-        }
-        
-    }
+	@description = "Verify that a new item can be added on Carousel"
+	test ItemCanBeAddedInCarousel {
+		task ("Given that the admin user logs into the portal") {
+			ATLLogin.signIn();
+		}
 
-    @description = "Verify that Search Bar is displayed"
-    test SearchBarIsDisplayed {
+		task ("When a new item is added into carousel banner and back to home page") {
+			Portal.ProductMenuHelper.openProductMenu();
 
-        task ("Given search icon is clicked") {
-            Default.AssertNotVisible(locator1 = "ATLSearch#SEARCH_FIELD");
+			Portal.ProductMenuHelper.expandCategory(category = "Content & Data");
 
-            Default.Click(locator1 = "ATLSearch#SEARCH_ICON");
-        }
+			Portal.ProductMenuHelper.gotoPortlet(portlet = "Web Content");
 
-        task ("Then search bar will appear") {
-            Default.AssertVisible(locator1 = "ATLSearch#SEARCH_FIELD");
-        }
-        
-    }
+			Portal.WebContent.searchCP(webContentTitle = "Banner Emotional HP");
 
-    @description = "Verify that the Carousel with 4 (four) articles are displayed on page"
-    test CarouselIsDisplayed {
+			Portal.WebContentNavigator.gotoEntryMenuItem(
+				entry = "Banner Emotional HP",
+				menuItem = "Edit");
 
-        task ("Given that carousel contains only 4 articles") {
-            for (var count : list "1,2,3,4") {
-                Default.AssertElementPresent(
-                    locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER",
-                    key_itemNumber= "${count}",
-                    key_totalNumber = "4");
-            }
-        }
+			ATLWC.addCarouselItem(itemName = "New Carousel Item");
 
-        task ("Then a fifth article will not be found") {
-            Default.AssertElementNotPresent(
-                locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER",
-                key_itemNumber= "1",
-                key_totalNumber = "5");
-        }
-    }
+			ATLUtils.launchPortal();
+		}
 
-    @description = "Verify that a new item can be added on Carousel"
-    test ItemCanBeAddedInCarousel {
-        task ("Given that the admin user logs into the portal") {
-            ATLLogin.signIn();
-        }
+		task ("Then the new item appears") {
+			Default.AssertElementPresent(
+				key_itemName = "New Carousel Item",
+				locator1 = "ATLHomePage#CAROUSEL_ITEM");
+		}
 
-        task ("When a new item is added into carousel banner and back to home page") {
-            Portal.ProductMenuHelper.openProductMenu();
+		task ("And then the max number os items is increased by one") {
+			Default.AssertElementPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "5",
+				locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER");
+		}
+	}
 
-            Portal.ProductMenuHelper.expandCategory(category = "Content & Data");
+	@description = "Verify that the Main Menu is displayed with the options: About Us, Mobility, Sustainability and Careers"
+	test MainMenuIsDisplayed {
+		task ("Assert that user can navigate to About Us > The Group") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "About Us",
+				subItemName = "The Group");
+		}
 
-            Portal.ProductMenuHelper.gotoPortlet(portlet = "Web Content");
+		task ("Assert that user can navigate to Mobility > Our partners") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "Mobility",
+				subItemName = "Our partners");
+		}
 
-            Portal.WebContent.searchCP(webContentTitle = "Banner Emotional HP");
+		task ("Assert that user can navigate to Sustainability > Transparency") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "Sustainability",
+				subItemName = "Transparency");
+		}
 
-            Portal.WebContentNavigator.gotoEntryMenuItem(
-                entry = "Banner Emotional HP",
-                menuItem = "Edit");
+		task ("Assert that user can navigate to Careers > Why Atlantia") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "Careers",
+				subItemName = "Why Atlantia");
+		}
+	}
 
-            ATLWC.addCarouselItem(itemName = "New Carousel Item");
+	@description = "Verify that the Press Release items are organized by date"
+	test PressReleaseIsOrganizedByDate {
+		task ("Given Press Releases are organizad by date") {
+			var allDate1 = selenium.getText("ATLHomePage#PRESS_RELEASE_FIRST_DATE");
 
-            ATLUtils.launchPortal();
-        }
+			var formatedDate1 = ATLUtils.formateDate(
+				format = "m dd, yyyy",
+				oldDate = "${allDate1}");
+			var allDate2 = selenium.getText("ATLHomePage#PRESS_RELEASE_SECOND_DATE");
 
-        task ("Then the new item appears") {
-            Default.AssertElementPresent(
-                locator1 = "ATLHomePage#CAROUSEL_ITEM",
-                key_itemName = "New Carousel Item");
-        }
+			var formatedDate2 = ATLUtils.formateDate(
+				format = "m dd, yyyy",
+				oldDate = "${allDate2}");
+		}
 
-        task ("And then the max number os items is increased by one") {
-            Default.AssertElementPresent(
-                locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER",
-                key_itemNumber= "1",
-                key_totalNumber = "5");
-        }
-        
-    }
+		task ("Then the listed items are in correct order") {
+			ATLUtils.compareDate(
+				firstDate = "${formatedDate1}",
+				secondDate = "${formatedDate2}");
+		}
+	}
 
-    @description = "Verify that the Carousel article can be accessed"
-    @refactor
-    test CarouselArticlesCanBeAccessed {
-        task ("Given carousel article is clicked") {
-            Default.WaitForElementPresent(
-                locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW",
-                key_itemName = "Our Climate Action Plan");
+	@description = "Verify that Search Bar is displayed"
+	test SearchBarIsDisplayed {
+		task ("Given search icon is clicked") {
+			Default.AssertNotVisible(locator1 = "ATLSearch#SEARCH_FIELD");
 
-            // Default.Click(
-            //     locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW",
-            //     key_itemName = "Our Climate Action Plan");
+			Default.Click(locator1 = "ATLSearch#SEARCH_ICON");
+		}
 
-            ATLUtils.formateURL(passedURL = "//div[contains(@class,'h1') and contains(.,'Our Climate Action Plan')]//following-sibling::a[contains(@class,'icon')]");
-        }
+		task ("Then search bar will appear") {
+			Default.AssertVisible(locator1 = "ATLSearch#SEARCH_FIELD");
+		}
+	}
 
-        task ("Then the user is redirected to article page") {
-            Default.AssertElementPresent(
-                locator1 = "Portal.Header#H1_TITLE",
-                key_title = "Our Climate Action Plan");
-        }
-        
-    }
+	@description = "Verify that the Storie slide can be accessed"
+	@refactor
+	test StorieSlideCanBeAccessed {
+		task ("Given storie article is clicked") {
 
-    @description = "Verify that the Storie Slide with 12 (twelve) articles are displayed on page"
-    test StorieSlideIsDisplayed {
-        task ("Given that carousel contains 12 articles") {
-            for (var count : list "1,2,3,4,5,6,7,8,9,10,11,12") {
-                Default.AssertElementPresent(
-                    locator1 = "ATLHomePage#STORIE_ITEM_NUMBER",
-                    key_itemNumber= "${count}",
-                    key_totalNumber = "12");
-            }
-        }
+			//Default.Click(
+			//locator1 = "ATLHomePage#STORY_ITEM",
+			//key_storyTitle = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months");
 
-        task ("Then a thirteenth article will not be found") {
-            Default.AssertElementNotPresent(
-                locator1 = "ATLHomePage#STORIE_ITEM_NUMBER",
-                key_itemNumber= "1",
-                key_totalNumber = "13");
-        }
-    }
+			ATLUtils.formateURL(passedURL = "//div[contains(@class,'story_slide')]//div[contains(.,'Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months')]/..//a[contains(@class,'h3')]");
+		}
 
-    @description = "Verify that the Storie slide can be accessed"
-    @refactor
-    test StorieSlideCanBeAccessed {
+		task ("Then the user is redirected to article page") {
+			Default.AssertElementPresent(
+				key_title = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months",
+				locator1 = "Portal.Header#H1_TITLE");
+		}
+	}
 
-        task ("Given storie article is clicked") {
-            // Default.Click(
-            //     locator1 = "ATLHomePage#STORY_ITEM",
-            //     key_storyTitle = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months");
+	@description = "Verify that the Storie Slide with 12 (twelve) articles are displayed on page"
+	test StorieSlideIsDisplayed {
+		task ("Given that carousel contains 12 articles") {
+			for (var count : list "1,2,3,4,5,6,7,8,9,10,11,12") {
+				Default.AssertElementPresent(
+					key_itemNumber = "${count}",
+					key_totalNumber = "12",
+					locator1 = "ATLHomePage#STORIE_ITEM_NUMBER");
+			}
+		}
 
-            ATLUtils.formateURL(passedURL = "//div[contains(@class,'story_slide')]//div[contains(.,'Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months')]/..//a[contains(@class,'h3')]");
-        }
+		task ("Then a thirteenth article will not be found") {
+			Default.AssertElementNotPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "13",
+				locator1 = "ATLHomePage#STORIE_ITEM_NUMBER");
+		}
+	}
 
-        task ("Then the user is redirected to article page") {
-            Default.AssertElementPresent(
-                locator1 = "Portal.Header#H1_TITLE",
-                key_title = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months");
-        }
-        
-    }
+	@description = "Verify that the Top Menu is displayed with the options: Inverstors, Governance, Media and Download Center"
+	test TopMenuIsDisplayed {
+		task ("Assert that user can navigate to Investors > Results") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Results");
+		}
 
-    @description = "Verify that the Press Release items are organized by date"
-    test PressReleaseIsOrganizedByDate {
-        task ("Given Press Releases are organizad by date") {
-            var allDate1 = selenium.getText("ATLHomePage#PRESS_RELEASE_FIRST_DATE");
+		task ("Assert that user can navigate to Investors > Rating") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Rating");
+		}
 
-            var formatedDate1 = ATLUtils.formateDate(
-                oldDate = "${allDate1}",
-                format = "m dd, yyyy");
+		task ("Assert that user can navigate to Investors > Shareholders") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Shareholders");
+		}
 
-            var allDate2 = selenium.getText("ATLHomePage#PRESS_RELEASE_SECOND_DATE");
-            
-            var formatedDate2 = ATLUtils.formateDate(
-                oldDate = "${allDate2}",
-                format = "m dd, yyyy");
+		task ("Assert that user can navigate to InvestGovernanceors > Board of Directors") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Board of Directors");
+		}
 
-        }
+		task ("Assert that user can navigate to Governance > Engagement") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Engagement");
+		}
 
-        task ("Then the listed items are in correct order") {
-            ATLUtils.compareDate(
-                firstDate = "${formatedDate1}",
-                secondDate = "${formatedDate2}");
-        }
-        
-    }
+		task ("Assert that user can navigate to Governance > Remuneration") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Remuneration");
+		}
 
-    @description = "Verify that General Meetings shows past meetings"
-    test GeneralMeetingsShowsPastMeetings {
-        task ("Given General Meetings show only past events") {
-            var allDate1 = selenium.getText("ATLHomePage#GENERAL_MEETINGS_FIRST_DATE");
-            var formatedDate1 = ATLUtils.formateDate(
-                oldDate = "${allDate1}",
-                format = "dd m yyyy");
-
-            var allDate2 = selenium.getText("ATLHomePage#GENERAL_MEETINGS_SECOND_DATE");
-            
-            var formatedDate2 = ATLUtils.formateDate(
-                oldDate = "${allDate2}",
-                format = "dd m yyyy");
-        }
-        task ("Then the listed items are in correct rule") {
-            var currentDate = DateUtil.getFormattedCurrentDate("MM/dd/yyyy");
-
-            ATLUtils.compareDate(
-                firstDate = "${currentDate}",
-                secondDate = "${formatedDate1}");
-
-            ATLUtils.compareDate(
-                firstDate = "${currentDate}",
-                secondDate = "${formatedDate2}");
-        }
-    }
+		task ("Assert that user can navigate to Media > Media Gallery") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Media",
+				subItemName = "Media Gallery");
+		}
+	}
 
 }
