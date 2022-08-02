@@ -1,0 +1,92 @@
+definition {
+
+	property test.env = "uat";
+	property testray.main.component.name = "Cosette";
+
+	@description = "Automation ID: LRQA-75379 | Test Summary: Veify Savings Card is properly downloaded from Welchol page"
+	@priority = "5"
+	test CanDownloadSavingsCardFromWelchol {
+		task ("Given I go to the Welchol page") {
+			Utils.launchWelcholUat();
+		}
+
+		task ("When I click on the PRINT SAVINGS CARD NOW button") {
+			Default.Click(
+				key_buttonName = "PRINT SAVINGS",
+				locator1 = "PageElements#PRINT_SAVINGS_CARD_BUTTON");
+
+			Default.WaitForElementNotPresent(locator1 = "PageElements#PRINT_SAVINGS_CARD_BUTTON");
+
+			Default.SelectWindow.selectPopUp(locator1 = "null");
+		}
+
+		task ("Then I should be able to download the Savings Card coupon/pdf") {
+			if (Default.IsElementPresent(locator1 = "CouponWhitelabelErrorPage#GENERIC_ERROR_MESSAGE")) {
+				fail("FAIL! Unexpected errors may be present. Expected coupon/pdf may not have been properly loaded.");
+			}
+			else {
+				var outputFolderName = "downloads";
+				var fileName = "welchol.pdf";
+				var currentURL = selenium.getCurrentUrl();
+
+				var curl = '''${currentURL} --create-dirs -o ${outputFolderName}/${fileName}''';
+
+				echo("curl = ${curl}");
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+
+				// LRQA-76323 - We need to have an explicit wait (Pause) in order to wait for the download process to complete.
+
+				Default.Pause(locator1 = "4000");
+			}
+		}
+
+		task ("And Then Assert the donwloaded coupon/pdf file is right") {
+			Portal.ImportExport.assertDownloadedFileName(downloadedFile = "${fileName}");
+		}
+	}
+
+	@description = "Automation ID: LRQA-75379 | Test Summary: Veify Savings Card is properly downloaded from Welcholhcp page"
+	@priority = "5"
+	test CanDownloadSavingsCardFromWelcholhcp {
+		task ("Given I go to the Welchol page") {
+			Utils.launchWelcholhcpUat();
+		}
+
+		task ("When I click on the PRINT SAVINGS CARD NOW button") {
+			Default.Click(
+				key_buttonName = "PRINT SAVINGS",
+				locator1 = "PageElements#PRINT_SAVINGS_CARD_BUTTON");
+
+			Default.WaitForElementNotPresent(locator1 = "PageElements#PRINT_SAVINGS_CARD_BUTTON");
+
+			Default.SelectWindow.selectPopUp(locator1 = "null");
+		}
+
+		task ("Then I should be able to download the Savings Card coupon/pdf") {
+			if (Default.IsElementPresent(locator1 = "CouponWhitelabelErrorPage#GENERIC_ERROR_MESSAGE")) {
+				fail("FAIL! Unexpected errors may be present. Expected coupon/pdf may not have been properly loaded.");
+			}
+			else {
+				var outputFolderName = "downloads";
+				var fileName = "welchol-hcp.pdf";
+				var currentURL = selenium.getCurrentUrl();
+
+				var curl = '''${currentURL} --create-dirs -o ${outputFolderName}/${fileName}''';
+
+				echo("curl = ${curl}");
+
+				com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+
+				// LRQA-76323 - We need to have an explicit wait (Pause) in order to wait for the download process to complete.
+
+				Default.Pause(locator1 = "4000");
+			}
+		}
+
+		task ("And Then Assert the donwloaded coupon/pdf file is right") {
+			Portal.ImportExport.assertDownloadedFileName(downloadedFile = "${fileName}");
+		}
+	}
+
+}
