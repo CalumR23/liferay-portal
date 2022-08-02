@@ -1,0 +1,45 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	var projectID = "projtest";
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Authentication.logout();
+	}
+
+	@description = "Clicking Branch opens github page in new tab -- github.com/dxpcoud-dev/:projectId/tree/:branch"
+	@priority = "3"
+	test BranchInfoRedirects {
+		task ("When: I access the Builds page") {
+			Utils.goToPage(page = "projects/${projectID}/builds");
+		}
+
+		task ("And: Click on the Branch pill") {
+			var branchName = Builds.getPillText(
+				key_index = "2",
+				key_typePill = "Branch");
+
+			Default.Click(
+				key_index = "2",
+				key_typePill = "branch",
+				locator1 = "Builds#BUILD_LINK_PILL");
+		}
+
+		task ("Then: Open the GitHub Branch page in a new tab") {
+			Default.SelectWindow(locator1 = "title=Page not found · GitHub · GitHub");
+
+			Default.AssertLocation.assertPartialLocation(value1 = "github.com/dxpcloud-dev/${projectID}/tree/${branchName}");
+
+			Default.Close.closeWindow();
+		}
+	}
+
+}
