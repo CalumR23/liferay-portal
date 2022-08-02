@@ -43,7 +43,6 @@ public class TableUtil {
 
 				rowList.add(entry.trim());
 			}
-
 		}
 
 		return tableDataList;
@@ -78,46 +77,35 @@ public class TableUtil {
 	}
 
 	public static final class Table {
-		public Table (String tableString, String tableType) {
 
-			if (tableType.equals("table")) {
+		public Table(List<List<String>> tableDataList) {
+			for (List<String> row : tableDataList) {
+				Row newRow = new Row(row);
 
-				Matcher rowMatcher = _rowPattern.matcher(tableString);
-
-				while (rowMatcher.find()) {
-					String row = rowMatcher.group("row");
-
-					Row tableRow = new Row(row, tableType);
-
-					_tableRows.add(tableRow);
-				}
+				tableRows.add(newRow);
 			}
-			else if (tableType.equals("html")){
+		}
 
+		public Row getRow(int index) {
+			return tableRows.get(index);
+		}
+
+		public int getTableSize() {
+			return tableRows.size();
+		}
+
+		public List<Row> tableRows = new ArrayList<>();
+
+		public static final class Row extends ArrayList<String> {
+
+			public Row(List<String> row) {
+				for (String entry : row) {
+					add(entry);
+				}
 			}
 
 		}
 
-		public static final class Row extends ArrayList<String>{
-			public Row(String rowData, String rowType){
-				if (rowType.equals("table")){
-					Matcher entryMatcher = _entryPattern.matcher(rowData);
-
-					List<String> rowList = new ArrayList<>();
-
-					while (entryMatcher.find()) {
-						String entry = entryMatcher.group("entry");
-
-						rowList.add(entry.trim());
-					}
-				}
-				else if (rowType.equals("html")){
-
-				}
-			}
-		}
-
-		public List<Row> _tableRows = new ArrayList<>();
 	}
 
 	private static final Pattern _entryPattern = Pattern.compile(
