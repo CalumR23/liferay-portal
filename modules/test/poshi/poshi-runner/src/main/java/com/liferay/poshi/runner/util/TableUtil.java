@@ -44,7 +44,6 @@ public class TableUtil {
 				rowList.add(entry.trim());
 			}
 
-			tableDataList.add(rowList);
 		}
 
 		return tableDataList;
@@ -76,6 +75,49 @@ public class TableUtil {
 		}
 
 		return transposedTableDataList;
+	}
+
+	public static final class Table {
+		public Table (String tableString, String tableType) {
+
+			if (tableType.equals("table")) {
+
+				Matcher rowMatcher = _rowPattern.matcher(tableString);
+
+				while (rowMatcher.find()) {
+					String row = rowMatcher.group("row");
+
+					Row tableRow = new Row(row, tableType);
+
+					_tableRows.add(tableRow);
+				}
+			}
+			else if (tableType.equals("html")){
+
+			}
+
+		}
+
+		public static final class Row extends ArrayList<String>{
+			public Row(String rowData, String rowType){
+				if (rowType.equals("table")){
+					Matcher entryMatcher = _entryPattern.matcher(rowData);
+
+					List<String> rowList = new ArrayList<>();
+
+					while (entryMatcher.find()) {
+						String entry = entryMatcher.group("entry");
+
+						rowList.add(entry.trim());
+					}
+				}
+				else if (rowType.equals("html")){
+
+				}
+			}
+		}
+
+		public List<Row> _tableRows = new ArrayList<>();
 	}
 
 	private static final Pattern _entryPattern = Pattern.compile(
