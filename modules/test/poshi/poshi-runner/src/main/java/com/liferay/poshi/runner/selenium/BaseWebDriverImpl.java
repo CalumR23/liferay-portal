@@ -706,28 +706,30 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	public void assertTable(String locator, String tableString)
 		throws Exception {
 
-		List<List<String>> htmlTableDataList = getHTMLTableDataList(locator);
+		TableUtil.Table htmlTable = getHTMLTable(locator);
 
 		List<List<String>> tableDataList = TableUtil.getTableDataListFromString(
 			tableString);
 
-		if (htmlTableDataList.size() != tableDataList.size()) {
+		TableUtil.Table parsedTable = new TableUtil.Table(tableDataList);
+
+		if (htmlTable.getTableSize() != parsedTable.getTableSize()) {
 			throw new Exception("Table row numbers do not match");
 		}
 
-		for (int i = 0; i < htmlTableDataList.size(); i++) {
-			List<String> htmlRows = htmlTableDataList.get(i);
+		for (int i = 0; i < htmlTable.getTableSize(); i++) {
+			TableUtil.Table.Row htmlRow = htmlTable.getRow(i);
 
-			List<String> rows = tableDataList.get(i);
+			TableUtil.Table.Row parsedRow = parsedTable.getRow(i);
 
-			if (htmlRows.size() != rows.size()) {
+			if (htmlRow.size() != parsedRow.size()) {
 				throw new Exception("Table entry numbers do not match");
 			}
 
-			for (int j = 0; j < htmlRows.size(); j++) {
-				String htmlEntry = htmlRows.get(j);
+			for (int j = 0; j < htmlRow.size(); j++) {
+				String htmlEntry = htmlRow.get(j);
 
-				String entry = rows.get(j);
+				String entry = parsedRow.get(j);
 
 				if (!htmlEntry.equals(entry)) {
 					throw new Exception(
@@ -3802,7 +3804,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		return _frameWebElements;
 	}
 
-	protected List<List<String>> getHTMLTableDataList(String locator) {
+	protected TableUtil.Table getHTMLTable(String locator) {
 		List<List<String>> htmlTableDataList = new ArrayList<>();
 
 		List<WebElement> htmlRowElements = findElements(
@@ -3824,7 +3826,7 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			htmlTableDataList.add(htmlRowList);
 		}
 
-		return htmlTableDataList;
+		return new TableUtil.Table(htmlTableDataList);
 	}
 
 	protected ImageTarget getImageTarget(String image) throws Exception {
