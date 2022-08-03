@@ -10,101 +10,50 @@ definition {
 		ATLUtils.tearDown();
 	}
 
-    @description = "Verify that articles are filted by category"
-    test ArticlesCanBeFilteredByCategory {
-        task ("Given user navigate to Explore Atlantia") {
-            ATLNavigator.goToMainMenu(
+	@description = "Verify that articles are filted by category"
+	test ArticlesCanBeFilteredByCategory {
+		task ("Given user navigate to Explore Atlantia") {
+			ATLNavigator.goToMainMenu(
 				menuItemName = "About Us",
 				subItemName = "Explore Atlantia");
-        }
+		}
 
-        task ("When user selects a filter") {
-            ATLAboutUs.selectCategoryFilter(categoryName = "ADR");
-        }
+		task ("When user selects a filter") {
+			ATLAboutUs.selectCategoryFilter(categoryName = "ADR");
+		}
 
-        task ("Then only articles with ADR category will be displayed") {
-            ATLAboutUs.viewFilterResults(categoryName = "ADR");
-        }
-    }
+		task ("Then only articles with ADR category will be displayed") {
+			ATLAboutUs.viewFilterResults(categoryName = "ADR");
+		}
+	}
 
-    @description = "Verify that articles can be filtered by clicking on article categorie on articles list"
-    @refactor
-    test CanFilterByCategoryClickingInArticleTag {
-        task ("Given user navigate to Explore Atlantia") {
-            ATLNavigator.goToMainMenu(
+	@description = "Verify that a filter can be cleared"
+	test CanClearFilter {
+		task ("Given user navigate to Explore Atlantia") {
+			ATLNavigator.goToMainMenu(
 				menuItemName = "About Us",
 				subItemName = "Explore Atlantia");
-        }
+		}
 
-        task ("When user selects a filter") {
-            // Default.Click(
-            //     locator1 = "ATLCategory#TAG_ARTICLE",
-            //     key_tagName = "Innovation");
+		task ("And given user selects a filter") {
+			ATLAboutUs.selectCategoryFilter(categoryName = "ADR");
+		}
 
-            ATLUtils.formateURL(passedURL = "//div[contains(@class,'story-tag')]//span[contains(@class,'tag-item')]//a[contains(.,'Innovation')]");
-        }
+		task ("When user clear the filter") {
+			ATLAboutUs.clearFilter();
+		}
 
-        task ("Then only articles with ADR category will be displayed") {
-            ATLAboutUs.viewFilterResults(categoryName = "Innovation");
-        }
+		task ("Then the filter is not displayed anymore") {
+			Default.AssertElementNotPresent(
+				key_categoryName = "ADR",
+				locator1 = "ATLCategory#SELECTED_CATEGORY");
+		}
+	}
 
-    }
-
-    @description = "Verify that a filter can be cleared"
-    test CanClearFilter {
-        task ("Given user navigate to Explore Atlantia") {
-            ATLNavigator.goToMainMenu(
-				menuItemName = "About Us",
-				subItemName = "Explore Atlantia");
-        }
-
-        task ("And given user selects a filter") {
-            ATLAboutUs.selectCategoryFilter(categoryName = "ADR");
-        }
-
-        task ("When user clear the filter") {
-            ATLAboutUs.clearFilter();
-        }
-
-        task ("Then the filter is not displayed anymore") {
-            Default.AssertElementNotPresent(
-                locator1 = "ATLCategory#SELECTED_CATEGORY",
-                key_categoryName = "ADR");
-        }
-    }
-
-    @description = "Verify that articles can be filtered by clicking on categorie on article page"
-    @refactor
-    test CanFilterArticleByClickingInCategoryOnArticlePage {
-        task ("Given user navigate to Explore Atlantia") {
-            ATLNavigator.goToMainMenu(
-				menuItemName = "About Us",
-				subItemName = "Explore Atlantia");
-        }
-
-        task ("And given user selects a article") {
-            Default.Click(
-                locator1 = "ATLAboutUs#ARTICLE_EXPLORE_ATLANTIA",
-                key_articleName = "Our Climate Action Plan");
-        }
-
-        task ("When user click's on article category") {
-            // Default.Click(
-            //     locator1 = "ATLCategory#TAG_ARTICLE",
-            //     key_tagName = "Sustainability");
-
-            ATLUtils.formateURL(passedURL = "//div[contains(@class,'story-tag')]//span[contains(@class,'tag-item')]//a[contains(.,'Sustainability')]");
-        }
-
-        task ("Then the user is redirected to a page with articles that contains the same category") {
-            ATLAboutUs.viewFilterResults(categoryName = "Sustainability");
-        }
-    }
-
-    @description = "Verify that manager content structure is: picture, name, role and bio link"
-    test ViewManagerInfoStructure {
-        task ("Given user navigate to Our Managers") {
-            Default.MouseOver(
+	@description = "Verify that manager bio can be downloaded"
+	test CanDownloadManagerBio {
+		task ("Given user navigate to Our Managers") {
+			Default.MouseOver(
 				key_mainMenuItem = "About Us",
 				locator1 = "ATLNavigation#MAIN_MENU_ITEM");
 
@@ -115,19 +64,77 @@ definition {
 			Default.Click(
 				key_mainMenuSubItem = "Our managers",
 				locator1 = "ATLNavigation#MAIN_MENU_SUB_ITEM");
-        }
+		}
 
-        task ("Then he can see managers info like picture, role and name") {
-            ATLAboutUs.viewManagerInfo(
-                managerName = "Carlo Bertazzo",
-                managerRole = "Chief Executive Officer and General Manager");
-        }
-    }
+		task ("Then he can see managers info like picture, role and name") {
+			Default.Click(
+				key_managerName = "Carlo Bertazzo",
+				locator1 = "ATLAboutUs#MANAGER");
 
-    @description = "Verify that manager bio can be downloaded"
-    test CanDownloadManagerBio {
-        task ("Given user navigate to Our Managers") {
-            Default.MouseOver(
+			Default.Click(locator1 = "ATLAboutUs#DOWNLOAD_BIO");
+
+			ATLUtils.downloadFileViaCurl(fileName = "bioManager.pdf");
+
+			Portal.ImportExport.assertDownloadedFileName(downloadedFile = "bioManager.pdf");
+		}
+	}
+
+	@description = "Verify that articles can be filtered by clicking on categorie on article page"
+	@refactor
+	test CanFilterArticleByClickingInCategoryOnArticlePage {
+		task ("Given user navigate to Explore Atlantia") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "About Us",
+				subItemName = "Explore Atlantia");
+		}
+
+		task ("And given user selects a article") {
+			Default.Click(
+				key_articleName = "Our Climate Action Plan",
+				locator1 = "ATLAboutUs#ARTICLE_EXPLORE_ATLANTIA");
+		}
+
+		task ("When user click's on article category") {
+
+			//Default.Click(
+			//locator1 = "ATLCategory#TAG_ARTICLE",
+			//key_tagName = "Sustainability");
+
+			ATLUtils.formateURL(passedURL = "//div[contains(@class,'story-tag')]//span[contains(@class,'tag-item')]//a[contains(.,'Sustainability')]");
+		}
+
+		task ("Then the user is redirected to a page with articles that contains the same category") {
+			ATLAboutUs.viewFilterResults(categoryName = "Sustainability");
+		}
+	}
+
+	@description = "Verify that articles can be filtered by clicking on article categorie on articles list"
+	@refactor
+	test CanFilterByCategoryClickingInArticleTag {
+		task ("Given user navigate to Explore Atlantia") {
+			ATLNavigator.goToMainMenu(
+				menuItemName = "About Us",
+				subItemName = "Explore Atlantia");
+		}
+
+		task ("When user selects a filter") {
+
+			//Default.Click(
+			//locator1 = "ATLCategory#TAG_ARTICLE",
+			//key_tagName = "Innovation");
+
+			ATLUtils.formateURL(passedURL = "//div[contains(@class,'story-tag')]//span[contains(@class,'tag-item')]//a[contains(.,'Innovation')]");
+		}
+
+		task ("Then only articles with ADR category will be displayed") {
+			ATLAboutUs.viewFilterResults(categoryName = "Innovation");
+		}
+	}
+
+	@description = "Verify that manager content structure is: picture, name, role and bio link"
+	test ViewManagerInfoStructure {
+		task ("Given user navigate to Our Managers") {
+			Default.MouseOver(
 				key_mainMenuItem = "About Us",
 				locator1 = "ATLNavigation#MAIN_MENU_ITEM");
 
@@ -138,20 +145,13 @@ definition {
 			Default.Click(
 				key_mainMenuSubItem = "Our managers",
 				locator1 = "ATLNavigation#MAIN_MENU_SUB_ITEM");
-        }
+		}
 
-        task ("Then he can see managers info like picture, role and name") {
-            Default.Click(
-                locator1 = "ATLAboutUs#MANAGER",
-                key_managerName = "Carlo Bertazzo");
-
-            Default.Click(
-                locator1 = "ATLAboutUs#DOWNLOAD_BIO");
-
-            ATLUtils.downloadFileViaCurl(fileName = "bioManager.pdf");
-
-            Portal.ImportExport.assertDownloadedFileName(downloadedFile = "bioManager.pdf");
-        }
-    }
+		task ("Then he can see managers info like picture, role and name") {
+			ATLAboutUs.viewManagerInfo(
+				managerName = "Carlo Bertazzo",
+				managerRole = "Chief Executive Officer and General Manager");
+		}
+	}
 
 }

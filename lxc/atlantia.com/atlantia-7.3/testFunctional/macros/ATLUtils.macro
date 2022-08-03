@@ -56,6 +56,18 @@ definition {
 		}
 	}
 
+	macro downloadFileViaCurl {
+		var outputFolderName = "downloads";
+		var fileName = "${fileName}";
+		var currentURL = selenium.getCurrentUrl();
+
+		var curl = '''${currentURL} --create-dirs -o ${outputFolderName}/${fileName}''';
+
+		echo("curl = ${curl}");
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
 	macro formateDate {
 		if ("${format}" == "m dd, yyyy") {
 			var monthName = StringUtil.extractFirst("${oldDate}", " ");
@@ -188,10 +200,16 @@ definition {
 		ATLUtils.launchPortal();
 
 		ATLUtils.removeBannerItem();
-		
-		if (Default.IsElementPresent(locator1 = "ATLHomePage#TRANSLATE_PAGE", key_translateItem = "English")) {
+
+		if (Default.IsElementPresent(key_translateItem = "English", locator1 = "ATLHomePage#TRANSLATE_PAGE")) {
 			ATLUtils.changeSiteLanguage(translateItem = "English");
 		}
+	}
+
+	macro verifyArticleCategory {
+		Default.AssertElementPresent(
+			key_tagName = "${tagName}",
+			locator1 = "ATLCategory#TAG_ARTICLE");
 	}
 
 	macro verifySiteLanguage {
@@ -236,24 +254,6 @@ definition {
 		Default.AssertElementNotPresent(
 			key_highlightItem = "${beforeTranslateHighlightItem}",
 			locator1 = "ATLHomePage#HIGHLIGHT_ITEM");
-	}
-
-	macro verifyArticleCategory {
-		Default.AssertElementPresent(
-            locator1 = "ATLCategory#TAG_ARTICLE",
-            key_tagName = "${tagName}");
-	}
-
-	macro downloadFileViaCurl {
-		var outputFolderName = "downloads";
-		var fileName = "${fileName}";
-		var currentURL = selenium.getCurrentUrl();
-
-		var curl = '''${currentURL} --create-dirs -o ${outputFolderName}/${fileName}''';
-
-		echo("curl = ${curl}");
-
-		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
 	}
 
 }
