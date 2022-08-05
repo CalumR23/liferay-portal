@@ -37,7 +37,7 @@ Teardown:
 	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
 
 Scenario: Deactivate and activate new DXP license
-	Testing the ability to deactivate and activate licenses via API.
+	Testing the ability to deactivate and activate licenses via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -132,8 +132,105 @@ Scenario: Deactivate and activate new DXP license
 	| Status        | ACTIVE                         |
 	| Complimentary | false                          |
 
+Scenario: Deactivate and activate new Portal license
+	Testing the ability to deactivate and activate new Portal License via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Portal Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account       | Select Entity | Korlic - ${staticProjectName} | |
+	| Product       | Select        | Portal Production             | |
+	| Version       | Select        | 6.1 GA1                       | |
+	| Type          | Select        | Portal Production             | |
+	| Instance Size | Select        | 1                             | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | Portal Production             | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName}  |
+	| Description   | Korlic - ${staticProjectName}  |
+	| Account       | Korlic - ${staticProjectName}  |
+	| Product       | Portal Production              |
+	| Type          | Production                     |
+	| Details       | Host Name: localhost           |
+	| Details       | IP Address: 123.45.67.89       |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F |
+	| Status        | ACTIVE                         |
+	| Complimentary | false                          |
+	When I deactivate the license on provisioning with the name "Korlic - ${staticProjectName}" on the account "Korlic - ${staticProjectName}"
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName}  |
+	| Description   | Korlic - ${staticProjectName}  |
+	| Account       | Korlic - ${staticProjectName}  |
+	| Product       | Portal Production              |
+	| Type          | Production                     |
+	| Details       | Host Name: localhost           |
+	| Details       | IP Address: 123.45.67.89       |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F |
+	| Status        | DEACTIVATED                    |
+	| Complimentary | false                          |
+	When I activate the license on provisioning with the name "Korlic - ${staticProjectName}" on the account "Korlic - ${staticProjectName}"
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName}  |
+	| Description   | Korlic - ${staticProjectName}  |
+	| Account       | Korlic - ${staticProjectName}  |
+	| Product       | Portal Production              |
+	| Type          | Production                     |
+	| Details       | Host Name: localhost           |
+	| Details       | IP Address: 123.45.67.89       |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F |
+	| Status        | ACTIVE                         |
+	| Complimentary | false                          |
+
 Scenario: View active and deactivated licenses
-	Testing the ability to view active and deactivated licenses via API.
+	Testing the ability to view active and deactivated licenses via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -211,9 +308,19 @@ Scenario: View active and deactivated licenses
 	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name" and the following values
 	| Name               | Korlic - ${staticProjectName} License1 Name |
 	| License Entry Type | Production                                  |
+	| License Version    | 6                                           |
+	| Product Version    | 7.2                                         |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
 	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name" and the following values
 	| Name               | Korlic - ${staticProjectName} License2 Name |
 	| License Entry Type | Production                                  |
+	| License Version    | 6                                           |
+	| Product Version    | 7.2                                         |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
 	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name"
 	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name"
 	When I go to the license index page
@@ -221,14 +328,145 @@ Scenario: View active and deactivated licenses
 	And I click on the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the provisioning index
 	And I click on the deactivate button for the license in position "1" on the license page
 	Then I should be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name" and the following values
-	| Name | Korlic - ${staticProjectName} License1 Name |
+	| Name               | Korlic - ${staticProjectName} License1 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 6                                           |
+	| Product Version    | 7.2                                         |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
 	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name" and the following values
-	| Name | Korlic - ${staticProjectName} License2 Name |
+	| Name               | Korlic - ${staticProjectName} License2 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 6                                           |
+	| Product Version    | 7.2                                         |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
+	And I should not be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name"
+	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name"
+
+Scenario: View active and deactivated Portal licenses
+	Testing the ability to view active and deactivated Portal licenses via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Portal Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account       | Select Entity | Korlic - ${staticProjectName} | |
+	| Product       | Select        | Portal Production             | |
+	| Version       | Select        | 6.2 EE                        | |
+	| Type          | Select        | Portal Production             | |
+	| Instance Size | Select        | 1                             | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name          | Input    | Korlic - ${staticProjectName} License1 Name        | |
+	| Description   | Input    | Korlic - ${staticProjectName} License1 Description | |
+	| Host Name     | Input    | localhost                                          | |
+	| IP Addresses  | Textarea | 123.45.67.89                                       | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | Portal Production             | |
+	When I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account       | Select Entity | Korlic - ${staticProjectName} | |
+	| Product       | Select        | Portal Production             | |
+	| Version       | Select        | 6.2 EE                        | |
+	| Type          | Select        | Portal Production             | |
+	| Instance Size | Select        | 1                             | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Name          | Input    | Korlic - ${staticProjectName} License2 Name        | |
+	| Description   | Input    | Korlic - ${staticProjectName} License2 Description | |
+	| Host Name     | Input    | localhost                                          | |
+	| IP Addresses  | Textarea | 123.45.67.89                                       | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F                                  | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName} | |
+	| Product | Portal Production             | |
+	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name" and the following values
+	| Name               | Korlic - ${staticProjectName} License1 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 4                                           |
+	| Product Version    | 6.2 EE                                      |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
+	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name" and the following values
+	| Name               | Korlic - ${staticProjectName} License2 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 4                                           |
+	| Product Version    | 6.2 EE                                      |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
+	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name"
+	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name"
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	And I click on the license with the keyword "Korlic - ${staticProjectName} License1 Name" on the provisioning index
+	And I click on the deactivate button for the license in position "1" on the license page
+	Then I should be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name" and the following values
+	| Name               | Korlic - ${staticProjectName} License1 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 4                                           |
+	| Product Version    | 6.2 EE                                      |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
+	And I should be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name" and the following values
+	| Name               | Korlic - ${staticProjectName} License2 Name |
+	| License Entry Type | Production                                  |
+	| License Version    | 4                                           |
+	| Product Version    | 6.2 EE                                      |
+	| Host Name          | localhost                                   |
+	| Ip Adress          | 123.45.67.89                                |
+	| Mac Adress         | 0A-1B-2C-3D-4E-5F                           |
 	And I should not be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License1 Name"
 	And I should not be able to view the deactivated license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName} License2 Name"
 
 Scenario: View license filtered by name
-	Testing the ability to view licenses filtered by name via API.
+	Testing the ability to view licenses filtered by name via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -307,7 +545,7 @@ Scenario: View license filtered by name
 	| Name | License1 |
 
 Scenario: View license filtered by complimentary
-	Testing the ability to view licenses filtered by complimentary via API.
+	Testing the ability to view licenses filtered by complimentary via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -387,7 +625,7 @@ Scenario: View license filtered by complimentary
 	| Complimentary | true |
 
 Scenario: View license filtered by description
-	Testing the ability to view licenses filtered by description via API.
+	Testing the ability to view licenses filtered by description via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -466,7 +704,7 @@ Scenario: View license filtered by description
 	| Description | Description1 |
 
 Scenario: View license filtered by Host Name
-	Testing the ability to view licenses filtered by Host Name via API.
+	Testing the ability to view licenses filtered by Host Name via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -545,7 +783,7 @@ Scenario: View license filtered by Host Name
 	| Host Name | localhost |
 
 Scenario: View license filtered by IP Address
-	Testing the ability to view licenses filtered by IP Address via API.
+	Testing the ability to view licenses filtered by IP Address via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -624,7 +862,7 @@ Scenario: View license filtered by IP Address
 	| IP Addresses | 123.45.67.89 |
 
 Scenario: View license filtered by MAC Address
-	Testing the ability to view licenses filtered by MAC Address via API.
+	Testing the ability to view licenses filtered by MAC Address via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -703,7 +941,7 @@ Scenario: View license filtered by MAC Address
 	| MAC Addresses | 0A-1B-2C-3D-4E-5F |
 
 Scenario: View license filtered by instance size
-	Testing the ability to view licenses filtered by instance size via API.
+	Testing the ability to view licenses filtered by instance size via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -783,7 +1021,7 @@ Scenario: View license filtered by instance size
 	| Instance Size | 2 |
 
 Scenario: View license filtered by Maximum Cluster Nodes
-	Testing the ability to view licenses filtered by Max Cluster Nodes via API.
+	Testing the ability to view licenses filtered by Max Cluster Nodes via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -860,7 +1098,7 @@ Scenario: View license filtered by Maximum Cluster Nodes
 	| Maximum Cluster Nodes | 1 |
 
 Scenario: View license filtered by product name
-	Testing the ability to view licenses filtered by product name via API.
+	Testing the ability to view licenses filtered by product name via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -940,7 +1178,7 @@ Scenario: View license filtered by product name
 	| Product Name | DXP Production |
 
 Scenario: View license filtered by multiple filters
-	Testing the ability to view licenses filtered by multiple filters via API.
+	Testing the ability to view licenses filtered by multiple filters via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1027,7 +1265,7 @@ Scenario: View license filtered by multiple filters
 	| Product Name          | DXP Production    |
 
 Scenario: Extend new DXP license
-	Testing the ability to extend new DXP license via API.
+	Testing the ability to extend new DXP license via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1287,7 +1525,7 @@ Scenario: Download new DXP license developer license key
 	And I should be able to download a "DXP" developer license with version "7.2" on the account "Korlic - ${staticProjectName}"
 
 Scenario: View the generate license form options for DXP Production account
-	Testing the ability to view the generate license form options for an account with a DXP Production purchase via API.
+	Testing the ability to view the generate license form options for an account with a DXP Production purchase via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1351,8 +1589,156 @@ Scenario: View the generate license form options for DXP Production account
 	| License Entry Name | DXP Unlimited Enterprise-Wide | |
 	| Product Key        | DXP Unlimited Enterprise-Wide | |
 
+Scenario: View the generate license form options for DXP Production and Commerce account
+	Testing the ability to view the generate license form options for an account with a DXP Production and Commerce purchases via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Commerce Subscription Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Commerce Subscription Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	Then I should be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Commerce"
+	| Allow Permanent Licenses | true                        |                                  |                 |
+	| End Date                 | ${staticProductPurchaseKey} | ${staticOriginalEndDate}         |                 |
+	| Label                    | 1                           |                                  |                 |
+	| License Entry Name       | 1                           | Commerce Subscription Production |                 |
+	| License Entry Type       | 1                           | Commerce Subscription Production | production      |
+	| Product Key              | 1                           | Commerce Subscription Production |                 |
+	| Product Purchase Key     | ${staticProductPurchaseKey} |                                  |                 |
+	| Required Details         | 1                           | Commerce Subscription Production | Server Id       |
+	| Start Date               | ${staticProductPurchaseKey} | ${staticStartDate}               |                 |
+	And I should not be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Commerce"
+	| License Entry Name | DXP Non-Production            | |
+	| Product Key        | DXP Non-Production            | |
+	| License Entry Name | DXP Development               | |
+	| Product Key        | DXP Development               | |
+	| License Entry Name | DXP Backup                    | |
+	| Product Key        | DXP Backup                    | |
+	| License Entry Name | DXP Flex                      | |
+	| Product Key        | DXP Flex                      | |
+	| License Entry Name | DXP OEM                       | |
+	| Product Key        | DXP OEM                       | |
+	| License Entry Name | DXP Unlimited Enterprise-Wide | |
+	| Product Key        | DXP Unlimited Enterprise-Wide | |
+
+Scenario: View the generate license form options for Portal Production account
+	Testing the ability to view the generate license form options for an account with a Portal Production purchase via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Portal Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	Then I should be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Portal"
+	| Allow Permanent Licenses | true                        |                                     |                 |
+	| End Date                 | ${staticProductPurchaseKey} | ${staticOriginalEndDate}            |                 |
+	| Label                    | 6.1 GA1                     |                                     |                 |
+	| License Entry Name       | 6.1 GA1                     | Portal Production                   |                 |
+	| License Entry Type       | 6.1 GA1                     | Portal Production (Cluster)         | cluster         |
+	| Product Key              | 6.1 GA1                     | Portal Production                   |                 |
+	| Product Purchase Key     | ${staticProductPurchaseKey} |                                     |                 |
+	| Required Details         | 6.1 GA1                     | Portal Production                   | Server Id       |
+	| Start Date               | ${staticProductPurchaseKey} | ${staticStartDate}                  |                 |
+	And I should be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Portal"
+	| Label                    | 6.1 GA1                     |                                     |                 |
+	| Label                    | 6.1 GA2                     |                                     |                 |
+	| Label                    | 6.1 GA3                     |                                     |                 |
+	| Label                    | 6.2                         |                                     |                 |
+	And I should not be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Portal"
+	| License Entry Name | DXP Non-Production            | |
+	| Product Key        | DXP Non-Production            | |
+	| License Entry Name | DXP Development               | |
+	| Product Key        | DXP Development               | |
+	| License Entry Name | DXP Backup                    | |
+	| Product Key        | DXP Backup                    | |
+	| License Entry Name | DXP Flex                      | |
+	| Product Key        | DXP Flex                      | |
+	| License Entry Name | DXP OEM                       | |
+	| Product Key        | DXP OEM                       | |
+	| License Entry Name | DXP Unlimited Enterprise-Wide | |
+	| Product Key        | DXP Unlimited Enterprise-Wide | |
+	| Label              | 5.1                           | |
+	| Label              | 5.1 SP4                       | |
+	| Label              | 5.2                           | |
+	| Label              | 5.2 SP1                       | |
+
 Scenario: View the generate license form options for DXP and Portal account
-	Testing the ability to view the generate license form options for an account with DXP and Portal Production purchases via API.
+	Testing the ability to view the generate license form options for an account with DXP and Portal Production purchases via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1458,7 +1844,7 @@ Scenario: View the generate license form options for DXP and Portal account
 	| Product Key        | DXP Production                   | |
 
 Scenario: View the generate license form options for DXP Production account with multiple purchases
-	Testing the ability to view the generate license form options for an account with multiple DXP Production purchases via API.
+	Testing the ability to view the generate license form options for an account with multiple DXP Production purchases via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1539,7 +1925,7 @@ Scenario: View the generate license form options for DXP Production account with
 	| Product Key        | DXP Unlimited Enterprise-Wide | |
 
 Scenario: View the generate license form options for DXP account with different purchases
-	Testing the ability to view the generate license form options for an account with different DXP purchases via API.
+	Testing the ability to view the generate license form options for an account with different DXP purchases via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1623,7 +2009,7 @@ Scenario: View the generate license form options for DXP account with different 
 	| Product Key        | DXP Unlimited Enterprise-Wide | |
 
 Scenario: Download DXP license via API
-	Testing the ability to download a license via API.
+	Testing the ability to download a license via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1693,8 +2079,184 @@ Scenario: Download DXP license via API
 	| Complimentary | false                          |
 	And I should be able to download a single license on provisioning with the name "Korlic - ${staticProjectName}" on the account "Korlic - ${staticProjectName}"
 
+Scenario: Download Enterprise Search license via API
+	Testing the ability to download a Enterprise Search license via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Enterprise Search - Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Commerce Subscription Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Commerce Subscription Production"
+	And I generate the product purchase key value for the product purchase made by "Korlic - ${staticProjectName}" for "Enterprise Search - Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | Commerce Subscription Production | |
+	| Version | Select        | 1                                | |
+	| Type    | Select        | Commerce Subscription Production | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName}    | |
+	| Product | Commerce Subscription Production | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName}   |
+	| Description   | Korlic - ${staticProjectName}   |
+	| Account       | Korlic - ${staticProjectName}   |
+	| Product       | Commerce Subscription Production|
+	| Type          | Production                      |
+	| Details       | Host Name: localhost            |
+	| Details       | IP Address: 123.45.67.89        |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F  |
+	| Status        | ACTIVE                          |
+	| Complimentary | false                           |
+	And I should be able to download a single license on provisioning with the name "Korlic - ${staticProjectName}" on the account "Korlic - ${staticProjectName}" via api containing the following values
+	| Product Name | Commerce Subscription Production |
+	| License Type | production                       |
+
+Scenario: Download Commerce license via API
+	Testing the ability to download a Commerce license via API
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I generate static start and end dates
+	And I generate static full start and end dates
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Commerce Subscription Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "Commerce Subscription Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the license index page
+	And I click on the generate license button on the license index
+	And I populate the generate license form with the following values
+	| Account | Select Entity | Korlic - ${staticProjectName}    | |
+	| Product | Select        | Commerce Subscription Production | |
+	| Version | Select        | 1                                | |
+	| Type    | Select        | Commerce Subscription Production | |
+	And I click on the choose button for the product purchase in position "1" on the license form
+	And I populate the generate license form with the following values
+	| Host Name     | Input    | localhost         | |
+	| IP Addresses  | Textarea | 123.45.67.89      | |
+	| MAC Addresses | Textarea | 0A-1B-2C-3D-4E-5F | |
+	And I click on the generate button on the license form
+	Then I should be able to view the following license values on the license page
+	| Header  | Korlic - ${staticProjectName}    | |
+	| Product | Commerce Subscription Production | |
+	When I go to the license index page
+	And I search the licenses page using the keyword "${staticAccountKey}"
+	Then I should be able to view a license on the provisioning index with the keyword "Korlic - ${staticProjectName}" and the following values
+	| Name          | Korlic - ${staticProjectName}    |
+	| Description   | Korlic - ${staticProjectName}    |
+	| Account       | Korlic - ${staticProjectName}    |
+	| Product       | Commerce Subscription Production |
+	| Type          | Production                       |
+	| Details       | Host Name: localhost             |
+	| Details       | IP Address: 123.45.67.89         |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F   |
+	| Status        | ACTIVE                           |
+	| Complimentary | false                            |
+	And I should be able to download a single license on provisioning with the name "Korlic - ${staticProjectName}" on the account "Korlic - ${staticProjectName}" via api containing the following values
+	| Product Name | Commerce Subscription Production |
+	| License Type | production                       |
+
 Scenario: Download portal license via API
-	Testing the ability to download a portal license via API.
+	Testing the ability to download a portal license via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1757,7 +2319,7 @@ Scenario: Download portal license via API
 	| Product Version | 6.1 GA1 |
 
 Scenario: Download DXP license aggregate via API
-	Testing the ability to download a license aggregate file via API.
+	Testing the ability to download a license aggregate file via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1841,7 +2403,7 @@ Scenario: Download DXP license aggregate via API
 	| ${staticLicenseKeyId2} |
 
 Scenario: View no download DXP license aggregate via API due to different products
-	Testing the inability to download a license aggregate file via API due to different products.
+	Testing the inability to download a license aggregate file via API due to different products
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -1938,7 +2500,7 @@ Scenario: View no download DXP license aggregate via API due to different produc
 	| ${staticLicenseKeyId2} |
 
 Scenario: Download DXP license zip via API
-	Testing the ability to download a license zip file via API.
+	Testing the ability to download a license zip file via API
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -2022,7 +2584,7 @@ Scenario: Download DXP license zip via API
 	| ${staticLicenseKeyId2} |
 
 Scenario: Download developer DXP license via API for an account with self provisioning enabled
-	Testing that a user can download a developer license for an account via API if the account has self provisioning enabled.
+	Testing that a user can download a developer license for an account via API if the account has self provisioning enabled
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
@@ -2114,7 +2676,7 @@ Scenario: Download developer DXP license via API for an account with self provis
 	And I should be able to download a "DXP" developer license with version "7.2" on the account "Korlic - ${staticProjectName}"
 
 Scenario: Attempt developer DXP license download via API for an account with self provisioning disabled
-	Testing that a user can not download a developer license for an account via API if the account has self provisioning disabled.
+	Testing that a user can not download a developer license for an account via API if the account has self provisioning disabled
 
 	Given I generate a provisioning project name
 	And I create an account on koroneiki with the following values
