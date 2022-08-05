@@ -3481,4 +3481,66 @@ definition {
 		}
 	}
 
+	@prose = "the team with the name ${teamName} should not be assigned the contact with the email address ${contactEmailAddress} via automatic sync"
+	macro _viewNoTeamSyncViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoles = JSONCurlUtil.get("${curl}");
+		var currentIteration = "0";
+
+		while ((contains("${teamRoles}", "Member")) && ("${currentIteration}" != "${pollMaximumIterations}")) {
+			var currentIteration = ${currentIteration} + 1;
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var teamRoles = JSONCurlUtil.get("${curl}");
+		}
+	}
+
+	@prose = "the team with the name ${teamName} should be assigned the contact with the email address ${contactEmailAddress} via automatic sync"
+	macro _viewTeamSyncViaUuid {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+		var teamKey = KoroneikiTeamAPI._getTeamKeyViaTeamName(teamName = "${teamName}");
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var teamRoles = JSONCurlUtil.get("${curl}");
+		var currentIteration = "0";
+
+		while ((!(contains("${teamRoles}", "Member"))) && ("${currentIteration}" != "${pollMaximumIterations}")) {
+			var currentIteration = ${currentIteration} + 1;
+
+			OSBAdmin.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var curl = '''
+				${koroneikiURL}/o/koroneiki-rest/v1.0/teams/${teamKey}/contacts/by-uuid/${contactUuid}/roles --tlsv1.2
+				--header "API_Token: ${apiToken}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var teamRoles = JSONCurlUtil.get("${curl}");
+		}
+	}
+
 }
