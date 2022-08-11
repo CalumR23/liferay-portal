@@ -4726,6 +4726,92 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view an audit entry for the summary ${summary} related to the account ${accountName} field ${field} executed by ${agentName}"
+	macro _viewAccountAuditEntryWithoutOldAndNewValues {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+
+		if ("${field}" != "Address") {
+			var field = StringUtil.lowerCaseFirstLetter("${field}");
+
+			var field = StringUtil.replace("${field}", " ", "");
+		}
+
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/${accountKey}/audit-entries?pageSize=100 --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+			''';
+
+		var summaryFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}')].summary");
+
+		var summaryFromAPI = StringUtil.replace("${summaryFromAPI}", "[", "");
+
+		var summaryFromAPI = StringUtil.replace("${summaryFromAPI}", "]", "");
+
+		var summaryFromAPI = StringUtil.replace("${summaryFromAPI}", "\"", "");
+
+		echo("Expected Summary Value: ${summaryFromAPI}");
+
+		echo("Actual Summary Value: ${summary}");
+
+		if ("${summary}" != "${summaryFromAPI}") {
+			fail("Actual summary value ${summaryFromAPI} does not match expected summary value ${summary}");
+		}
+
+		var fieldFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}')].field");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "[", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "]", "");
+
+		var fieldFromAPI = StringUtil.replace("${fieldFromAPI}", "\"", "");
+
+		echo("Expected Field Value: ${field}");
+
+		echo("Actual Field Value: ${fieldFromAPI}");
+
+		if ("${field}" != "${fieldFromAPI}") {
+			fail("Actual field value ${fieldFromAPI} does not match expected field value ${field}");
+		}
+
+		var agentNameFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}')].agentName");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "[", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "]", "");
+
+		var agentNameFromAPI = StringUtil.replace("${agentNameFromAPI}", "\"", "");
+
+		echo("Expected Agent: ${agentName}");
+
+		echo("Actual Agent: ${agentNameFromAPI}");
+
+		if ("${agentName}" != "${agentNameFromAPI}") {
+			fail("Actual agent ${agentNameFromAPI} does not match expected agent ${agentName}");
+		}
+
+		var auditEntry = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}')]");
+
+		if (("${agentName}" != "Koroneiki QA Service Producer") && ("${agentName}" != "Auto")) {
+			var agentUIDFromAPI = JSONCurlUtil.get("${curl}", "$.items[?(@.summary=='${summary}' && @.field=='${field}')].agentUID");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "[", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "]", "");
+
+			var agentUIDFromAPI = StringUtil.replace("${agentUIDFromAPI}", "\"", "");
+
+			echo("Expected Agent UID: a1b2c3d4-e5f6-g7h8-i9j1-0k11l12m13n1");
+
+			echo("Actual Agent UID: ${agentUIDFromAPI}");
+
+			if ("a1b2c3d4-e5f6-g7h8-i9j1-0k11l12m13n1" != "${agentUIDFromAPI}") {
+				fail("Actual agent UID ${agentUIDFromAPI} does not match expected agent UID a1b2c3d4-e5f6-g7h8-i9j1-0k11l12m13n1");
+			}
+		}
+	}
+
 	@prose = "the account entitlement definition with the name ${entitlementDefinitionName} should be present with the following values ${table}"
 	macro _viewAccountEntitlementDefinition {
 		if (contains("${entitlementDefinitionName}", " ")) {
