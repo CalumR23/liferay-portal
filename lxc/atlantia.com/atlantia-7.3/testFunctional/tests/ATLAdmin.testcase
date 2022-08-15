@@ -1,0 +1,53 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			ATLUtils.launchPortal();
+
+			ATLLogin.signIn();
+		}
+	}
+
+	tearDown {
+		ATLUtils.tearDown();
+	}
+
+	@description = "Verify that the user can add Categorization to a Web Content Storie"
+	test CanAddCategorizationToWebContent {
+		task ("Given user add a new Web Content Storie and add a Tag") {
+			Default.WaitForPageLoad();
+
+			Portal.Navigator.openWithAppendToBaseURL(
+				baseURL = PropsUtil.get("test.this.atlantia.portal.partial.url"),
+				urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+
+			ATLWebContent.addStorie(
+				tagName = "ADR",
+				webContentTitle = "Storie Title");
+		}
+
+		task ("When user go to Explore Atlantia and filter by Tag") {
+			ATLUtils.launchPortal();
+
+			ATLNavigator.goToMainMenu(
+				menuItemName = "About Us",
+				subItemName = "Explore Atlantia");
+
+			ATLAboutUs.selectCategoryFilter(categoryName = "ADR");
+		}
+
+		task ("Then the new content is displayed in selected filter") {
+			Default.ScrollBy(value1 = "0, 1000");
+
+			while (Default.IsElementNotPresent(locator1 = "ATLCategory#ARTICLE_CATEGORY", key_articleTag = "ADR", key_articleTitle = "Storie Title")) {
+				Default.ScrollBy(value1 = "0, 1000");
+			}
+
+			Default.AssertElementPresent(
+				key_articleTag = "ADR",
+				key_articleTitle = "Storie Title",
+				locator1 = "ATLCategory#ARTICLE_CATEGORY");
+		}
+	}
+
+}
