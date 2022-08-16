@@ -77,4 +77,46 @@ definition {
 		}
 	}
 
+	@description = "Validation error message appears on submit if environment id already exists or contains non-alphanumeric characters"
+	@priority = "4"
+	test DisplayValidationMessages {
+		var location = "Oregon, USA";
+
+		task ("When: I create a new environment in a project") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "dev",
+				location = "${location}");
+		}
+
+		task ("And: I try to create a new environment with the same name") {
+			Default.WaitForElementPresent(
+				key_headerTitle = "Overview",
+				locator1 = "Utils#HEADER_TITLE");
+
+			ProjectsPage.addNewEnvironment(
+				environmentType = "dev",
+				location = "${location}");
+		}
+
+		task ("Then: The validation message is displayed") {
+			Default.AssertTextEquals(
+				key_warningMessageId = "projectIdHelp",
+				locator1 = "Utils#ALREADY_EXISTING_ID_WARNING",
+				value1 = "This environment ID already exists, try another one");
+		}
+
+		task ("When: I try to name an environment with non-alphanumeric characters") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "#dev",
+				location = "${location}");
+		}
+
+		task ("Then: The validation message is displayed") {
+			Default.AssertTextEquals(
+				key_warningMessageId = "projectIdHelp",
+				locator1 = "Utils#INVALID_ID_WARNING",
+				value1 = "Environment ID must only contain alphanumeric characters");
+		}
+	}
+
 }
