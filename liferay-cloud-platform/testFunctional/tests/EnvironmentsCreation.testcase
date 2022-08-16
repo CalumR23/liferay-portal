@@ -1,0 +1,50 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	var projectName = "poshitest";
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+
+		ProjectsPage.createNewProject(projectName = "${projectName}");
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "When adding new environment, redirects to new environment's overview page and related activity is generated"
+	@priority = "4"
+	test CanAddEnvironment {
+		task ("When: I create a new environment in a project") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "dev",
+				location = "Oregon, USA");
+		}
+
+		task ("Then: Console redirects to Environment Overview page") {
+			Default.AssertElementPresent(
+				key_headerTitle = "Overview",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertTextEquals(
+				locator1 = "Environment#ENVIRONMENTS_DROPDOWN",
+				value1 = "dev");
+		}
+
+		task ("And: An activity is generated and shown in the environment's activity history") {
+			Utils.goToPage(page = "projects/${projectName}-dev/activities");
+
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				value1 = "Environment created");
+		}
+	}
+
+}
