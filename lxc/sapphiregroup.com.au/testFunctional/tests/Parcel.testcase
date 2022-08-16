@@ -1,0 +1,49 @@
+definition {
+
+	property test.env = "uat";
+	property testray.main.component.name = "Sapphire";
+
+	setUp {
+		Utils.launchSapphireUat();
+
+		Login.signInWithAdminUser();
+	}
+
+	@description = "Automation ID: LRQA-LRQA-76384 | Test Summary: Verify Admin user can place a new Parcel Order "
+	@priority = "5"
+	test CanPlaceParcelOrder {
+		task ("Setting up the new parcel order form name") {
+			var parcelOrderFormName = "Test Parcel Order Form Name - ${displayDateAndTime}";
+			var displayDateAndTime = DateUtil.getFormattedCurrentDate("MMM dd, yyyy HH:mm");
+		}
+
+		task ("Getting the latest order ID to compare with next orders") {
+			var previousOrderId = Orders.getLastPlacedOrderId();
+		}
+
+		task ("Given an admin user adds a linked Parcel Order Form to the home page") {
+			Parcel.addParcelOrderForm(parcelOrderFormName = "${parcelOrderFormName}");
+
+			Utils.launchSapphireUat();
+
+			PageEditor.addParcelFragmentToHomePage(parcelOrderFormName = "${parcelOrderFormName}");
+		}
+
+		task ("When a new Parcel Order Form is placed") {
+			Navigator.goToParcelOrderByIndex(index = "3");
+
+			Checkout.placeParcelOrder();
+
+			Default.Refresh();
+		}
+
+		task ("Then the user should see the ID for the new placed order at the top") {
+			var actualOrderId = Orders.getLastPlacedOrderId();
+
+			Portal.TestUtils.assertNotEquals(
+				actual = "${actualOrderId}",
+				expected = "${previousOrderId}");
+		}
+	}
+
+}
