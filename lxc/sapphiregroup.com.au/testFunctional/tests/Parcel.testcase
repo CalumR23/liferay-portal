@@ -7,26 +7,25 @@ definition {
 		Utils.launchSapphireUat();
 
 		Login.signInWithAdminUser();
+
+		task ("Setting up the new parcel order form name") {
+			Parcel.generateParcelOrderName();
+		}
+
+		task ("Getting the latest order ID to compare with next orders") {
+			Orders.getLastPlacedOrderIdBeforePurchase();
+		}
 	}
 
 	@description = "Automation ID: LRQA-LRQA-76384 | Test Summary: Verify Admin user can place a new Parcel Order "
 	@priority = "5"
 	test CanPlaceParcelOrder {
-		task ("Setting up the new parcel order form name") {
-			var parcelOrderFormName = "Test Parcel Order Form Name - ${displayDateAndTime}";
-			var displayDateAndTime = DateUtil.getFormattedCurrentDate("MMM dd, yyyy HH:mm");
-		}
-
-		task ("Getting the latest order ID to compare with next orders") {
-			var previousOrderId = Orders.getLastPlacedOrderId();
-		}
-
 		task ("Given an admin user adds a linked Parcel Order Form to the home page") {
-			Parcel.addParcelOrderForm(parcelOrderFormName = "${parcelOrderFormName}");
+			Parcel.addParcelOrderForm(parcelOrderFormName = "${staticParcelOrderFormName}");
 
 			Utils.launchSapphireUat();
 
-			PageEditor.addParcelFragmentToHomePage(parcelOrderFormName = "${parcelOrderFormName}");
+			PageEditor.addParcelFragmentToHomePage(parcelOrderFormName = "${staticParcelOrderFormName}");
 		}
 
 		task ("When a new Parcel Order Form is placed") {
@@ -38,11 +37,11 @@ definition {
 		}
 
 		task ("Then the user should see the ID for the new placed order at the top") {
-			var actualOrderId = Orders.getLastPlacedOrderId();
+			var latestOrderId = Orders.getLastPlacedOrderIdAfterPurchase();
 
 			Portal.TestUtils.assertNotEquals(
-				actual = "${actualOrderId}",
-				expected = "${previousOrderId}");
+				actual = "${latestOrderId}",
+				expected = "${staticPreviousOrderId}");
 		}
 	}
 
