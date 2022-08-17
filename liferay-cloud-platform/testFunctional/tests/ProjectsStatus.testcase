@@ -1,12 +1,12 @@
 @component-name = "liferay-cloud-platform"
 definition {
 
-	var projectName = "qaposhitest";
-
 	property testray.main.component.name = "liferay-cloud-platform";
 
 	setUp {
 		Utils.launchLCP();
+
+		Projects.createProject(projectID = "qaposhitest");
 
 		Authentication.login();
 	}
@@ -20,11 +20,7 @@ definition {
 	@description = "Project status displays as 'None' when there are no services"
 	@priority = "4"
 	test DisplaysNoneForNoServices {
-		task ("Given: No services are deployed to a new project") {
-			ProjectsPage.createNewProject(projectName = "qaposhitest");
-		}
-
-		task ("When: User navigates to projects page") {
+		task ("Given: User has a new project When: User navigates to projects page") {
 			Utils.goToPage(page = "projects");
 		}
 
@@ -35,14 +31,14 @@ definition {
 				locator1 = "Projects#PROJECT_WITH_STATUS");
 		}
 
-		task ("When: User hovers over 'None'") {
+		task ("And: User hovers over 'None'") {
 			Default.MouseOver(
 				key_projectId = "qaposhitest",
 				key_status = "None",
 				locator1 = "Projects#PROJECT_WITH_STATUS");
 		}
 
-		task ("Then: A tooltip displays 'No service is running on this environment'") {
+		task ("And: A tooltip displays 'No service is running on this environment'") {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Utils#TOOLTIP_BODY",
 				value1 = "No service is running on this environment");
@@ -52,6 +48,44 @@ definition {
 			Default.AssertElementPresent(
 				key_environment = "qaposhitest",
 				locator1 = "Projects#ENVIRONMENT_NO_SERVICES");
+		}
+	}
+
+	@description = "Project status displays as an ellipsis when there is at least one service pending"
+	@priority = "3"
+	test PendingServiceStatus {
+		task ("Given: A service was just deployed to a new project") {
+			NewDeployment.deployFromRepo(
+				projectID = "qaposhitest",
+				repo = "hosting");
+		}
+
+		task ("When: User navigates to projects page") {
+			Default.Pause(locator1 = "5000");
+
+			Utils.goToPage(page = "projects");
+		}
+
+		task ("And: User waits for pending status") {
+			Default.WaitForElementPresent(
+				key_projectId = "qaposhitest",
+				locator1 = "Projects#PROJECT_PENDING_STATUS");
+		}
+
+		task ("Then: Status should show 'Pending' on projects page") {
+			Default.AssertElementPresent(
+				key_projectId = "qaposhitest",
+				locator1 = "Projects#PROJECT_PENDING_STATUS");
+		}
+
+		task ("And: Hovering on 'Pending' status displays 'One or more services are getting ready' tooltip") {
+			Default.MouseOver(
+				key_projectId = "qaposhitest",
+				locator1 = "Projects#PROJECT_PENDING_STATUS");
+
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Utils#TOOLTIP_BODY",
+				value1 = "One or more services are getting ready");
 		}
 	}
 
