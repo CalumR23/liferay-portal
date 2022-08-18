@@ -1776,6 +1776,11 @@ public class PoshiValidation {
 
 		validatePossibleAttributeNames(poshiElement, possibleAttributeNames);
 
+		if (Validator.isNotNull(poshiElement.attributeValue("value"))) {
+			validateAttributeValue(
+				poshiElement, poshiElement.attributeValue("value"));
+		}
+
 		if (Validator.isNotNull(poshiElement.attributeValue("method"))) {
 			String methodAttributeValue = poshiElement.attributeValue("method");
 
