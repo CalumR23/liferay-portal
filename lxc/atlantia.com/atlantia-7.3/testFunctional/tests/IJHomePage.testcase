@@ -136,5 +136,43 @@ definition {
 		}
 	}
 
+	@description = "Verify that a new item can be added on Carousel"
+	test ItemCanBeAddedInCarousel {
+		task ("Given that the admin user logs into the portal") {
+			ATLLogin.signIn();
+		}
+
+		task ("And given that a new Web Content is added") {
+			Portal.Navigator.openWithAppendToBaseURL(
+				baseURL = PropsUtil.get("test.this.atlantia.portal.partial.url"),
+				urlAppend = "group/infrajournal/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+
+			Portal.WebContentNavigator.gotoAddWithStructureCP(structureName = "Basic Web Content");
+
+			Portal.WebContent.addWithStructureCP(webContentTitle = "Test Article");
+
+			Portal.PortletEntry.publish();
+		}
+
+		task ("When a new item is added into carousel banner") {
+			ATLUtils.launchPortal(infraJournal = "true");
+
+			IJAdmin.addCarouselItem(entryName = "Test Article");
+		}
+
+		task ("Then the new item appears") {
+			Default.AssertElementPresent(
+				key_itemName = "Test Article",
+				locator1 = "IJHomePage#CAROUSEL_ITEM");
+		}
+
+		task ("And then the max number os items is increased by one") {
+			Default.AssertElementPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "8",
+				locator1 = "IJHomePage#CAROUSEL_ITEM_NUMBER");
+		}
+	}
+
 
 }
