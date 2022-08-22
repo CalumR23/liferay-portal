@@ -12,7 +12,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectIdList = "qaposhitest");
 
 		Authentication.logout();
 	}
@@ -88,6 +88,47 @@ definition {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Utils#TOOLTIP_BODY",
 				value1 = "One or more services are getting ready");
+		}
+	}
+
+	@description = "Project status displays as 'Ready' when services are ready"
+	@priority = "4"
+	test ReadyServiceStatus {
+		task ("Given: A service was just deployed to a new project") {
+			NewDeploymentAPI.deployFromRepo(
+				projectID = "qaposhitest",
+				repo = "hosting");
+		}
+
+		task ("When: User navigates to projects page") {
+			Utils.goToPage(page = "projects");
+
+			Default.WaitForElementPresent(
+				key_headerTitle = "Projects",
+				locator1 = "Utils#HEADER_TITLE");
+		}
+
+		task ("Then: Status show 'Ready' on projects page when service successfully spins up") {
+			Default.WaitForElementPresent(
+				key_projectId = "qaposhitest",
+				key_status = "Ready",
+				locator1 = "Projects#PROJECT_WITH_STATUS");
+
+			Default.AssertElementPresent(
+				key_projectId = "qaposhitest",
+				key_status = "Ready",
+				locator1 = "Projects#PROJECT_WITH_STATUS");
+		}
+
+		task ("And: Hovering on 'Ready' status displays 'All services are ready to receive requests' tooltip") {
+			Default.MouseOver(
+				key_projectId = "qaposhitest",
+				key_status = "Ready",
+				locator1 = "Projects#PROJECT_WITH_STATUS");
+
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Utils#TOOLTIP_BODY",
+				value1 = "All services are ready to receive requests");
 		}
 	}
 
