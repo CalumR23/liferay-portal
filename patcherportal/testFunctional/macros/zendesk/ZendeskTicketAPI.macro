@@ -28,6 +28,24 @@ definition {
 		}
 	}
 
+	@prose = "the ticket with the ticketId ${ticketId} should not have the comment containing the text ${commentContent}"
+	macro _verifyNoRecentTicketComment {
+		var curl = '''
+			${zendeskURL}/api/v2/tickets/${ticketId}/comments.json --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
+
+		var commentsFromAPI = JSONCurlUtil.get("${curl}", "$.comments");
+
+		var commentsFromAPI = StringUtil.replace("${commentsFromAPI}", "\"", "");
+
+		if (contains("${commentsFromAPI}", "${commentContent}")) {
+			fail("Actual comment ${commentFromAPI} as the most recent comment body contains the comment body content ${commentContent}.");
+		}
+	}
+
 	@prose = "the ticket with the ticketId ${ticketId} should have the comment containing the text ${commentContent}"
 	macro _verifyRecentTicketComment {
 		var curl = '''
@@ -45,24 +63,6 @@ definition {
 
 		if (!(contains("${commentFromAPI}", "${commentContent}"))) {
 			fail("Actual comment ${commentFromAPI} as the most recent comment body does not contain the expected comment body content ${commentContent}.");
-		}
-	}
-
-	@prose = "the ticket with the ticketId ${ticketId} should not have the comment containing the text ${commentContent}"
-	macro _verifyNoRecentTicketComment {
-		var curl = '''
-			${zendeskURL}/api/v2/tickets/${ticketId}/comments.json --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var commentCount = JSONCurlUtil.get("${curl}", "$.count");
-
-		var commentsFromAPI = JSONCurlUtil.get("${curl}", "$.comments");
-
-		var commentsFromAPI = StringUtil.replace("${commentsFromAPI}", "\"", "");
-
-		if (contains("${commentsFromAPI}", "${commentContent}")) {
-			fail("Actual comment ${commentFromAPI} as the most recent comment body contains the comment body content ${commentContent}.");
 		}
 	}
 
