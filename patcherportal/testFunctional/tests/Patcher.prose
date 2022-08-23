@@ -187,7 +187,7 @@ Feature: Patcher UAT
       | Jenkins         | fixpack-builder-agent(uat)                                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat)                                   |
 
-  Scenario: Create and release a 71 build with public child build
+  Scenario: Create a 71 build with public child build and change the status to ready for release
     @priority = "3"
     @test.group = "1"
     As a TSE, I should be able to create and release a 7.1 build that contains a public child build
@@ -328,9 +328,18 @@ Feature: Patcher UAT
       | Patcher Status  | Complete Merging Only                                            |
       | Jenkins         | fixpack-builder-hotfix-7x(uat)                                   |
       | Jenkins         | fixpack-builder-agent(uat)                                       |
-    When I release a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
-    Then the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "liferay-hotfix-"
-    And the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "-7110.zip"
+    When I change a Patcher build status to ready for release for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
+    Then the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "-7110.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  |${staticRequestIdList}          |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-7-7110            |
+      | Content         | 0 Fix Packs + 3 Tickets        |
+      | Patcher Status  | Ready for Release              |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
 
   Scenario: Create a public MP build
     @priority = "4"
@@ -703,7 +712,7 @@ Feature: Patcher UAT
     And I should be able to view a Patcher child build fix with the name "${staticFixContent2}" for the child build with the name "${staticFixContent2}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
       | Name    | ${staticFixContent2} |
       | Version | 1.0                  |
-      | Status  | Rebasing             |
+      | Status  | Complete             |
       | Type    | Rebase               |
     And I should be able to view a Patcher child build fix with the name "${staticFixContent3}" for the child build with the name "${staticFixContent3}" for the ticket "${staticTicketNumber}" on the account "DOEWAIKON" with the following values
       | Name     | ${staticFixContent3} |
@@ -853,7 +862,6 @@ Feature: Patcher UAT
       | Project Version | fix-pack-dxp-8-7110            |
       | Patcher Status  | Complete Merging Only          |
       | Jenkins         | fixpack-builder-agent(uat)     |
-      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
 
   Scenario: Create a 71 build with a rebased child build
     @priority = "3"
@@ -7819,7 +7827,7 @@ Feature: Patcher UAT
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
 
-  Scenario: Check for successful DXP 72 dxp 16 build creation
+  Scenario: Check for successful DXP 72 dxp 16 build creation and successful release manually
     @priority = "4"
     @test.group = "12"
     As a TSE, I should be able to for successful DXP 72 dxp16 build creation
@@ -7849,34 +7857,52 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                   |
       | Type            | Patch                      |
       | Jenkins         | fixpack-builder-agent(uat) |
-    When I generate a random ticket number
+    When I create a request as a user with the email address "no-reply@intuitive.com.broken" with the following values
+      | Product           | prd_liferay_dxp_7_2                              |
+      | Component         | activation_key_project_administration            |
+      | System Status     | production_functioning_with_limited_capabilities |
+      | Subject           | Patcher Request Subject                          |
+      | Description       | Patcher Request Description                      |
+      | Organization Name | Intuitive Surgical-EE-IT                         |
     And I create a Patcher build for a new account with the following values
-      | Product         | DXP 7.2               |
-      | Project Version | fix-pack-dxp-16-7210  |
-      | Tickets List    | ${staticFixContent}   |
-      | Account Code    | INTUITIVE             |
-      | Support Ticket  | ${staticTicketNumber} |
+      | Product         | DXP 7.2                |
+      | Project Version | fix-pack-dxp-16-7210   |
+      | Tickets List    | ${staticFixContent}    |
+      | Account Code    | INTUITIVE              |
+      | Support Ticket  | ${staticRequestIdList} |
     And I set the account code "INTUITIVE" as a static variable
     And I wait for "5" seconds
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" with the following values
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                |
-      | Support Ticket  | ${staticTicketNumber}   |
+      | Support Ticket  | ${staticRequestIdList}  |
       | Version         | 1.0                     |
       | Project Version | fix-pack-dxp-16-7210    |
       | Content         | 0 Fix Packs + 1 Tickets |
       | Patcher Status  | Compiling               |
-    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" with the following values
+    When I check the Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                       |
-      | Support Ticket  | ${staticTicketNumber}          |
+      | Support Ticket  | ${staticRequestIdList}         |
       | Version         | 1.0                            |
       | Project Version | fix-pack-dxp-16-7210           |
       | Content         | 0 Fix Packs + 1 Tickets        |
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
+    When I release a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" manually
+    Then the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "-7210.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-16-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Released                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
 
-  Scenario: Check for successful DXP 72 dxp 17 build creation
+  Scenario: Check for successful DXP 72 dxp 17 build creation and successful release to Help Center
     @priority = "4"
     @test.group = "0"
     As a TSE, I should be able to for successful DXP 72 dxp17 build creation
@@ -7906,34 +7932,52 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                   |
       | Type            | Patch                      |
       | Jenkins         | fixpack-builder-agent(uat) |
-    When I generate a random ticket number
+    When I create a request as a user with the email address "no-reply@intuitive.com.broken" with the following values
+      | Product           | prd_liferay_dxp_7_2                              |
+      | Component         | activation_key_project_administration            |
+      | System Status     | production_functioning_with_limited_capabilities |
+      | Subject           | Patcher Request Subject                          |
+      | Description       | Patcher Request Description                      |
+      | Organization Name | Intuitive Surgical-EE-IT                         |
     And I create a Patcher build for a new account with the following values
-      | Product         | DXP 7.2               |
-      | Project Version | fix-pack-dxp-17-7210  |
-      | Tickets List    | ${staticFixContent}   |
-      | Account Code    | HITACHIGP             |
-      | Support Ticket  | ${staticTicketNumber} |
-    And I set the account code "HITACHIGP" as a static variable
+      | Product         | DXP 7.2                |
+      | Project Version | fix-pack-dxp-17-7210   |
+      | Tickets List    | ${staticFixContent}    |
+      | Account Code    | INTUITIVE              |
+      | Support Ticket  | ${staticRequestIdList} |
+    And I set the account code "INTUITIVE" as a static variable
     And I wait for "5" seconds
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                |
-      | Support Ticket  | ${staticTicketNumber}   |
+      | Support Ticket  | ${staticRequestIdList}  |
       | Version         | 1.0                     |
       | Project Version | fix-pack-dxp-17-7210    |
       | Content         | 0 Fix Packs + 1 Tickets |
       | Patcher Status  | Compiling               |
-    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+    When I check the Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                       |
-      | Support Ticket  | ${staticTicketNumber}          |
+      | Support Ticket  | ${staticRequestIdList}         |
       | Version         | 1.0                            |
       | Project Version | fix-pack-dxp-17-7210           |
       | Content         | 0 Fix Packs + 1 Tickets        |
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
+    When I release a Patcher build to Help Center for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
+    Then the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "-7210.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-17-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Released                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
 
-  Scenario: Check for successful DXP 72 dxp 18 build creation
+  Scenario: Check for successful DXP 72 dxp 18 build creation and change Patcher build status to ready for release and release manually
     @priority = "4"
     @test.group = "1"
     As a TSE, I should be able to for successful DXP 72 dxp18 build creation
@@ -7963,34 +8007,64 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                   |
       | Type            | Patch                      |
       | Jenkins         | fixpack-builder-agent(uat) |
-    When I generate a random ticket number
+    When I create a request as a user with the email address "no-reply@intuitive.com.broken" with the following values
+      | Product           | prd_liferay_dxp_7_2                              |
+      | Component         | activation_key_project_administration            |
+      | System Status     | production_functioning_with_limited_capabilities |
+      | Subject           | Patcher Request Subject                          |
+      | Description       | Patcher Request Description                      |
+      | Organization Name | Intuitive Surgical-EE-IT                         |
     And I create a Patcher build for a new account with the following values
-      | Product         | DXP 7.2               |
-      | Project Version | fix-pack-dxp-18-7210  |
-      | Tickets List    | ${staticFixContent}   |
-      | Account Code    | INTUITIVE             |
-      | Support Ticket  | ${staticTicketNumber} |
+      | Product         | DXP 7.2                |
+      | Project Version | fix-pack-dxp-18-7210   |
+      | Tickets List    | ${staticFixContent}    |
+      | Account Code    | INTUITIVE              |
+      | Support Ticket  | ${staticRequestIdList} |
     And I set the account code "INTUITIVE" as a static variable
     And I wait for "5" seconds
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" with the following values
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                |
-      | Support Ticket  | ${staticTicketNumber}   |
+      | Support Ticket  | ${staticRequestIdList}  |
       | Version         | 1.0                     |
       | Project Version | fix-pack-dxp-18-7210    |
       | Content         | 0 Fix Packs + 1 Tickets |
       | Patcher Status  | Compiling               |
-    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "INTUITIVE" with the following values
+    When I check the Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                       |
-      | Support Ticket  | ${staticTicketNumber}          |
+      | Support Ticket  | ${staticRequestIdList}         |
       | Version         | 1.0                            |
       | Project Version | fix-pack-dxp-18-7210           |
       | Content         | 0 Fix Packs + 1 Tickets        |
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
+    When I change a Patcher build status to ready for release for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
+    Then the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "-7110.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-18-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Ready for Release              |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
+    When I release a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" manually
+    Then the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "-7110.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-18-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Released                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
 
-  Scenario: Check for successful DXP 72 dxp 19 build creation
+  Scenario: Check for successful DXP 72 dxp 19 build creation and change Patcher build status to ready for release and release to Help Center
     @priority = "4"
     @test.group = "2"
     As a TSE, I should be able to for successful DXP 72 dxp19 build creation
@@ -8020,30 +8094,60 @@ Feature: Patcher UAT
       | Patcher Status  | Complete                   |
       | Type            | Patch                      |
       | Jenkins         | fixpack-builder-agent(uat) |
-    When I generate a random ticket number
+    When I create a request as a user with the email address "no-reply@intuitive.com.broken" with the following values
+      | Product           | prd_liferay_dxp_7_2                              |
+      | Component         | activation_key_project_administration            |
+      | System Status     | production_functioning_with_limited_capabilities |
+      | Subject           | Patcher Request Subject                          |
+      | Description       | Patcher Request Description                      |
+      | Organization Name | Intuitive Surgical-EE-IT                         |
     And I create a Patcher build for a new account with the following values
-      | Product         | DXP 7.2               |
-      | Project Version | fix-pack-dxp-19-7210  |
-      | Tickets List    | ${staticFixContent}   |
-      | Account Code    | HITACHIGP             |
-      | Support Ticket  | ${staticTicketNumber} |
-    And I set the account code "HITACHIGP" as a static variable
+      | Product         | DXP 7.2                |
+      | Project Version | fix-pack-dxp-19-7210   |
+      | Tickets List    | ${staticFixContent}    |
+      | Account Code    | INTUITIVE              |
+      | Support Ticket  | ${staticRequestIdList} |
+    And I set the account code "INTUITIVE" as a static variable
     And I wait for "5" seconds
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                |
-      | Support Ticket  | ${staticTicketNumber}   |
+      | Support Ticket  | ${staticRequestIdList}  |
       | Version         | 1.0                     |
       | Project Version | fix-pack-dxp-19-7210    |
       | Content         | 0 Fix Packs + 1 Tickets |
       | Patcher Status  | Compiling               |
-    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
-    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "HITACHIGP" with the following values
+    When I check the Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
       | Type            | Official                       |
-      | Support Ticket  | ${staticTicketNumber}          |
+      | Support Ticket  | ${staticRequestIdList}         |
       | Version         | 1.0                            |
       | Project Version | fix-pack-dxp-19-7210           |
       | Content         | 0 Fix Packs + 1 Tickets        |
       | Patcher Status  | Complete                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
+    When I change a Patcher build status to ready for release for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
+    Then the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should not have the comment containing the text "-7110.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-19-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Ready for Release              |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
+    When I release a Patcher build to Help Center for the ticket "${staticRequestIdList}" on the account "INTUITIVE"
+    Then the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "liferay-hotfix-"
+    And the ticket with the ticketId "${staticRequestIdList}" should have the comment containing the text "-7210.zip"
+    And I should be able to view a Patcher build for the ticket "${staticRequestIdList}" on the account "INTUITIVE" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticRequestIdList}         |
+      | Version         | 1.0                            |
+      | Project Version | fix-pack-dxp-19-7210           |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Released                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
 
@@ -8453,11 +8557,11 @@ Feature: Patcher UAT
     Given I log into the Patcher homepage as the admin user
     And I generate random fix content
     And I create a Patcher fix with the following values
-      | Product         | DXP 7.4                                               |
-      | Project Version | 7.4.13-u38                                            |
-      | Content         | ${staticFixContent}                                   |
-      | Branch Name     | test-u38                                              |
-      | Github URL      | git@github.com:alessandromalves/liferay-portal-ee.git |
+      | Product         | DXP 7.4                                                  |
+      | Project Version | 7.4.13-u38                                               |
+      | Content         | ${staticFixContent}                                      |
+      | Branch Name     | test-u38                                                 |
+      | Github URL      | git@github.com:eszterdudasschveder/liferay-portal-ee.git |
     And I wait for "5" seconds
     Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
       | Content         | ${staticFixContent} |
