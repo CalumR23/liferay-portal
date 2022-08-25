@@ -1,5 +1,89 @@
 definition {
 
+	@summary = "Change 'Parcels' layout grid back to 2 columns for teardown"
+	macro changeBackParcelsGridLayout {
+		task ("Go to page editor from home page") {
+			Navigator.openAustraliaHomePage();
+
+			Default.Click.clickNoMouseOver(locator1 = "HomePage#EDIT_BUTTON");
+
+			Portal.PageEditor.assertFragmentSidebarLoaded();
+		}
+
+		task ("Change back the number of columns from Parcels section to 2 columns") {
+			PageEditor.editLayoutGrid(
+				columnCount = "2",
+				panel = "General",
+				position = "2");
+
+			Default.Click(
+				key_text = "Publish",
+				locator1 = "Portal.Button#ANY");
+
+			Portal.Alert.viewSuccessMessage();
+		}
+	}
+
+	@summary = "Change 'Parcels' layout grid back to 2 columns for teardown"
+	macro deleteParcelOrderFormsByName {
+		Navigator.openParcelOrderFormsPage();
+
+		while ((Default.IsElementPresent(key_partialFormName = "${partialFormName}", locator1 = "ParcelOrderFormsPage#DROPDOUWN_MENU_BUTTON")) && (maxIterations = "5")) {
+			Default.Click(
+				key_partialFormName = "${partialFormName}",
+				locator1 = "ParcelOrderFormsPage#DROPDOUWN_MENU_BUTTON");
+
+			Default.Click(
+				key_menuItem = "Delete",
+				locator1 = "Portal.MenuItem#ANY_MENU_ITEM");
+
+			Default.AssertConfirm.waitForConfirmation(value1 = "Are you sure you want to delete this entry?");
+
+			Portal.Alert.viewSuccessMessage();
+
+			Default.Refresh();
+		}
+	}
+
+	@summary = "Change 'Parcels' layout grid back to 2 columns for teardown"
+	macro deleteUploadedImagesByName {
+		task ("Go to 'Documents and Media' page to see all uploaded files") {
+			Portal.ProductMenuHelper.openProductMenu();
+
+			Portal.ProductMenuHelper.expandCategory(category = "Content & Data");
+
+			Default.Click(
+				key_portlet = "Documents and Media",
+				locator1 = "Portal.ProductMenu#PORTLET");
+
+			Default.WaitForElementPresent(
+				key_groupName = "Documents",
+				locator1 = "DocumentsAndMedia#LIST_GROUP_TITLE");
+
+			Portal.ProductMenuHelper.closeProductMenu();
+		}
+
+		task ("Delete all uploaded images which names contains the given partial name") {
+			while ((Default.IsElementPresent(key_partialName = "${partialName}", locator1 = "DocumentsAndMedia#ANY_UNCHECKED_CHECKBOX")) && (maxIterations = "50")) {
+				Default.Click(
+					key_partialName = "${partialName}",
+					locator1 = "DocumentsAndMedia#ANY_UNCHECKED_CHECKBOX");
+
+				Default.WaitForElementPresent(locator1 = "DocumentsAndMedia#DELETE_BUTTON");
+
+				Default.Click.javaScriptClick(locator1 = "DocumentsAndMedia#DELETE_BUTTON");
+
+				Portal.Alert.viewSuccessMessage();
+
+				Default.Refresh();
+
+				Default.WaitForElementPresent(
+					key_groupName = "Documents",
+					locator1 = "DocumentsAndMedia#LIST_GROUP_TITLE");
+			}
+		}
+	}
+
 	@summary = "Get directory to upload/import files"
 	macro getFilePath {
 		var dependenciesDir = "testFunctional/dependencies";
