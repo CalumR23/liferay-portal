@@ -1,0 +1,47 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "From Builds page, selecting 'Deploy build to' from ellipses menu redirects to 'Deploy build to...' page"
+	@priority = "5"
+	test RedirectsToDeployBuildToPage {
+		var buildID = "4";
+
+		task ("When: The user navigates to the Builds page") {
+			Utils.goToPage(page = "projects/projtest/builds");
+		}
+
+		task ("And: The user clicks on 'Deploy build to...' from ellipses menu") {
+			Default.Click(
+				key_buildID = "${buildID}",
+				key_column = "settings",
+				locator1 = "Builds#BUILDS_TABLE_ITEM");
+
+			Default.Click(
+				key_item = "Deploy build to...",
+				locator1 = "Builds#ELLIPSIS_MENU_ITEM");
+		}
+
+		task ("Then: Console redirects to 'Deploy build to...' page") {
+			Default.AssertElementPresent(
+				key_headerTitle = "Deploy build to...",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertLocation.assertPartialLocation(value1 = "projects/projtest/deploy/${buildID}");
+		}
+	}
+
+}
