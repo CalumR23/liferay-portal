@@ -21,31 +21,34 @@ definition {
 		Utils.deleteParcelOrderFormsByName(partialFormName = "Test Parcel Order Form Name");
 	}
 
-	@description = "Automation ID: LRQA-LRQA-76384 | Test Summary: Verify Admin user can place a new Parcel Order "
+	@description = "Automation ID: LRQA-76384 | Test Summary: Verify Admin user can place a new Parcel Order"
 	@priority = "5"
 	test CanPlaceParcelOrder {
 		task ("Given an admin user adds a linked Parcel Order Form to the home page") {
 			Parcel.addParcelOrderForm(parcelOrderFormName = "${staticParcelOrderFormName}");
 
-			Utils.launchSapphireUat();
+			Navigator.openAustraliaHomePage();
 
 			PageEditor.addParcelFragmentToHomePage(parcelOrderFormName = "${staticParcelOrderFormName}");
 		}
 
-		task ("When a new Parcel Order Form is placed") {
+		task ("When a new Parcel Order is placed") {
 			Navigator.goToParcelOrderByIndex(index = "3");
 
 			Checkout.placeParcelOrder();
-
-			Default.Refresh();
 		}
 
-		task ("Then the user should see the ID for the new placed order at the top") {
-			var latestOrderId = Orders.getLastPlacedOrderIdAfterPurchase();
+		task ("Then the details of the new placed order should be visible in Placed Orders page and into the order") {
+			Checkout.goToOrdersDetailsFromCheckout();
 
-			Portal.TestUtils.assertNotEquals(
-				actual = "${latestOrderId}",
-				expected = "${staticPreviousOrderId}");
+			var orderIdFromDetails = Orders.getOrderIdFromOderDetails();
+			var orderTotalValueFromDetails = Orders.getOrderTotalValueFromOderDetails();
+
+			Navigator.openAustraliaPlacedOrders();
+
+			Orders.viewOrder(
+				orderId = "${orderIdFromDetails}",
+				orderTotalValue = "${orderTotalValueFromDetails}");
 		}
 	}
 
