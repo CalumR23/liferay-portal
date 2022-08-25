@@ -52,4 +52,69 @@ definition {
 		}
 	}
 
+	@description = "Automation ID: LRQA-76483 | Test Summary: Verify Admin user can place a new Split Parcel Order"
+	@priority = "5"
+	test CanPlaceSplitParcelOrder {
+
+		// LXC Refactor: The macro Orders.assertSplitOrderDetails which is into Orders.viewSplitOrder needs to be improved to assert product name and quantity
+		// LXC Refactor ticket: LRQA-76799
+
+		task ("Given an admin user adds a linked Parcel Order Form to the home page") {
+			Parcel.addParcelOrderForm(parcelOrderFormName = "${staticParcelOrderFormName}");
+
+			Navigator.openAustraliaHomePage();
+
+			PageEditor.addParcelFragmentToHomePage(parcelOrderFormName = "${staticParcelOrderFormName}");
+		}
+
+		task ("When a new Split Parcel Order is placed") {
+			Navigator.goToParcelOrderByIndex(index = "3");
+
+			Checkout.placeParcelOrder(parcelDropSplit = "true");
+		}
+
+		task ("Then the user should see different products and quantities for each split order placed") {
+			Checkout.goToOrdersDetailsFromCheckout();
+
+			var mainOrderIdFromDetails = Orders.getOrderIdFromOderDetails();
+			var mainOrderTotalValueFromDetails = Orders.getOrderTotalValueFromOderDetails();
+
+			Navigator.openAustraliaPlacedOrders();
+
+			// LXC Refactor: The macro Orders.assertSplitOrderDetails which is into Orders.viewSplitOrder needs to be improved to assert product name and quantity
+
+			Orders.viewSplitOrder(
+				mainOrderId = "${mainOrderIdFromDetails}",
+				mainOrderPosition = "6",
+				mainOrderTotalValue = "${mainOrderTotalValueFromDetails}",
+				productName = "GF 380g Candle - Christmas - Gingerbread House - X22",
+				productQuantity = "9",
+				splitOrderPosition = "2");
+
+			Navigator.openAustraliaPlacedOrders();
+
+			// LXC Refactor: The macro Orders.assertSplitOrderDetails which is into Orders.viewSplitOrder needs to be improved to assert product name and quantity
+
+			Orders.viewSplitOrder(
+				mainOrderId = "${mainOrderIdFromDetails}",
+				mainOrderPosition = "6",
+				mainOrderTotalValue = "${mainOrderTotalValueFromDetails}",
+				productName = "GF 380g Candle - Christmas - Under The Mistletoe - X22",
+				productQuantity = "9",
+				splitOrderPosition = "3");
+
+			Navigator.openAustraliaPlacedOrders();
+
+			// LXC Refactor: The macro Orders.assertSplitOrderDetails which is into Orders.viewSplitOrder needs to be improved to assert product name and quantity
+
+			Orders.viewSplitOrder(
+				mainOrderId = "${mainOrderIdFromDetails}",
+				mainOrderPosition = "6",
+				mainOrderTotalValue = "${mainOrderTotalValueFromDetails}",
+				productName = "GF 380g Candle - Christmas - Night Before Christmas - X22",
+				productQuantity = "12",
+				splitOrderPosition = "4");
+		}
+	}
+
 }
