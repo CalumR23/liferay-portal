@@ -47,6 +47,110 @@ definition {
 		}
 	}
 
+	@description = "When adding new environment, redirects to new environment's overview page and related activity is generated"
+	@priority = "5"
+	test CanCopyServices {
+		task ("When: The user adds a project") {
+			ProjectsAPI.createProject(projectID = "qaposhitest");
+		}
+
+		task ("And: Deploy a service") {
+			NewDeploymentAPI.deployFromRepo(
+				projectID = "qaposhitest",
+				repo = "hosting");
+		}
+
+		task ("Then: The deployed service icon is displayed on the projects page") {
+			Default.WaitForElementPresent(
+				key_headerTitle = "Projects",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.WaitForElementPresent(
+				key_environment = "qaposhitest",
+				key_serviceName = "ui",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+
+			Utils.goToPage(page = "projects/qaposhitest/overview");
+
+			Default.AssertElementPresent(
+				key_serviceName = "ui",
+				locator1 = "Overview#SERVICE_NAME");
+		}
+
+		task ("When: The user adds a new environment") {
+			ProjectsPage.addNewEnvironment(
+				environmentType = "dev",
+				location = "Oregon, USA");
+		}
+
+		task ("And: Fills in the fields to add a new environment") {
+			Default.WaitForElementPresent(
+				key_headerTitle = "Overview",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.Click(locator1 = "Environment#ENVIRONMENTS_DROPDOWN");
+
+			Default.Click(
+				key_menuOption = "Add new environment",
+				locator1 = "Utils#ANY_MENU_OPTION");
+
+			Default.WaitForElementPresent(
+				key_headerTitle = "Add New Environment",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.Type(
+				key_inputId = "environmentId",
+				locator1 = "Utils#GENERIC_INPUT_FIELD",
+				value1 = "test");
+
+			Utils.selectMenuOption(menuOption = "Oregon, USA");
+		}
+
+		task ("And: Check the 'Copy all services from an existing environment' checkbox") {
+			Default.Click(locator1 = "NewEnvironment#COPY_ALL_SERVICES_CHECKBOX");
+		}
+
+		task ("Then: Environment drop-down is displayed") {
+			Default.AssertElementPresent(locator1 = "NewEnvironment#ALL_ENVIRONMENTS_DROPDOWN");
+		}
+
+		task ("When: User clicks on the drop-down") {
+			Default.Click(locator1 = "NewEnvironment#ALL_ENVIRONMENTS_DROPDOWN");
+		}
+
+		task ("Then: All project environments are displayed") {
+			Default.AssertElementPresent(
+				key_menuOption = "qaposhitest",
+				locator1 = "Utils#ANY_MENU_OPTION");
+
+			Default.AssertElementPresent(
+				key_menuOption = "qaposhitest-dev",
+				locator1 = "Utils#ANY_MENU_OPTION");
+		}
+
+		task ("When: The user elects to copy all services in an environment") {
+			Default.Click(
+				key_menuOption = "qaposhitest",
+				locator1 = "Utils#ANY_MENU_OPTION");
+
+			Default.Click(locator1 = "Utils#SUBMIT_BUTTON");
+		}
+
+		task ("Then: Services are deployed in the new environment") {
+			Default.WaitForElementPresent(
+				key_headerTitle = "Overview",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertTextEquals(
+				locator1 = "Environment#ENVIRONMENTS_DROPDOWN",
+				value1 = "test");
+
+			Default.AssertElementPresent(
+				key_serviceName = "ui",
+				locator1 = "Overview#SERVICE_NAME");
+		}
+	}
+
 	@description = "Validation error message appears on submit if the input field is blank"
 	@priority = "4"
 	test DisplayErrorMessageForBlankCredentials {
