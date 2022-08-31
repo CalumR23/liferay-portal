@@ -1,0 +1,43 @@
+definition {
+
+	property test.env = "uat";
+	property testray.main.component.name = "Sapphire";
+
+	setUp {
+		Utils.launchSapphireUat();
+
+		Login.signInWithPrepayUser();
+
+		Navigator.openAustraliaHomePage();
+	}
+
+	@description = "Automation ID: LRQA-75826 | Test Summary: Verify prepaid user can place an order"
+	@priority = "5"
+	test CanPayOrder {
+		task ("Given the prepay user navigates to the product catalogue's page and adds a product to cart") {
+			Navigator.goToCataloguePage();
+
+			Catalogue.addProductToCart(
+				productName = "GF Candle Care Set",
+				productQuantity = "6");
+		}
+
+		task ("When a new order is placed") {
+			Checkout.proceedToCheckoutFromCart();
+
+			Checkout.placeOrder();
+		}
+
+		task ("Then the details of the new placed order should be visible in Placed Orders page and into the order") {
+			var orderIdFromBPoint = BPoint.getOrderId();
+			var orderTotalValue = "${staticOrderTotalValueFromCheckout}";
+
+			Navigator.openAustraliaPlacedOrders();
+
+			Orders.viewPrepaidOrder(
+				orderId = "${orderIdFromBPoint}",
+				orderTotalValue = "${orderTotalValue}");
+		}
+	}
+
+}
