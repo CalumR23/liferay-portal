@@ -1,0 +1,80 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	setUp {
+		Utils.launchLCP();
+
+		Authentication.login();
+	}
+
+	tearDown {
+		Utils.tearDownProjects();
+
+		Authentication.logout();
+	}
+
+	@description = "Clicking the liveness probe section displays the configurations for the liveness probe"
+	@priority = "5"
+	test DisplaysLivenessProbeInfo {
+		var service = "database";
+
+		var key_serviceName = "${service}";
+
+		task ("When: User opens service status popover") {
+			Utils.goToPage(page = "projects/projtest-dev/services");
+
+			Default.MouseOver(locator1 = "Services#SERVICE_ICON");
+
+			Default.WaitForElementPresent(locator1 = "Services#POPOVER_SERVICE_STATUS");
+
+			Default.MouseOver(locator1 = "Services#POPOVER_SERVICE_STATUS");
+		}
+
+		task ("And: Click 'Liveness probe parameters'") {
+			Default.Click(
+				key_probeType = "Liveness",
+				locator1 = "Services#PROBE_SECTION");
+		}
+
+		task ("Then: Liveliness probe configurations are displayed") {
+			Default.AssertElementPresent(
+				key_parametersInfo = "initialDelaySeconds",
+				locator1 = "Services#PROBE_SECTION_INFO");
+
+			Default.AssertTextEquals(
+				key_parametersInfo = "initialDelaySeconds",
+				locator1 = "Services#PROBE_SECTION_INFO_VALUE",
+				value1 = "600");
+
+			Default.AssertElementPresent(
+				key_parametersInfo = "periodSeconds",
+				locator1 = "Services#PROBE_SECTION_INFO");
+
+			Default.AssertTextEquals(
+				key_parametersInfo = "periodSeconds",
+				locator1 = "Services#PROBE_SECTION_INFO_VALUE",
+				value1 = "60");
+
+			Default.AssertElementPresent(
+				key_parametersInfo = "timeoutSeconds",
+				locator1 = "Services#PROBE_SECTION_INFO");
+
+			Default.AssertTextEquals(
+				key_parametersInfo = "timeoutSeconds",
+				locator1 = "Services#PROBE_SECTION_INFO_VALUE",
+				value1 = "60");
+
+			Default.AssertElementPresent(
+				key_parametersInfo = "failureThreshold",
+				locator1 = "Services#PROBE_SECTION_INFO");
+
+			Default.AssertTextEquals(
+				key_parametersInfo = "failureThreshold",
+				locator1 = "Services#PROBE_SECTION_INFO_VALUE",
+				value1 = "3");
+		}
+	}
+
+}
