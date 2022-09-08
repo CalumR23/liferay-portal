@@ -1,0 +1,105 @@
+definition {
+
+	var customerURL = PropsUtil.get("customer.portal.url"); 
+
+	@prose = "I log into the customer homepage as ${userEmailAddress} with password ${userPassword}"
+	macro loginToCustomer {
+		Open(locator1 = "${customerURL}");
+
+		Type(
+			locator1 = "OktaLogin#EMAIL_ADDRESS_FIELD",
+			value1 = "${userEmailAddress}");
+
+		Type(
+			locator1 = "OktaLogin#PASSWORD_FIELD",
+			value1 = "${userPassword}");
+
+		Click(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+
+		AssertElementNotPresent(locator1 = "OktaLogin#SIGN_IN_BUTTON");
+    }
+
+    @prose = "I should be able to view the following project ${projectName} values in the customer project details page ${table}"
+	macro _viewCustomerProjectDetails {
+		var key_projectName = "${projectName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Ends On") {
+				key_projectEndDate = "${value}";
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerProject#CUSTOMER_PROJECT_ENDS_ON",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Code") {
+					key_projectCode = "${value}";
+					echo("${value}");
+					echo("${key_projectCode}");
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerProject#CUSTOMER_PROJECT_CODE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "State") {
+				key_projectState = "${value}";
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerProject#CUSTOMER_PROJECT_STATE",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Support Region") {
+				key_projectSupportRegion = "${value}";
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerProject#CUSTOMER_PROJECT_SUPPORT_REGION",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such project detail field ${field}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the following project ${projectName} in the customer project details page"
+	macro _viewNoCustomerProjectDetails {
+		var key_projectName = "${projectName}";
+
+		AssertElementNotPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
+	}
+
+
+	@prose = "I click on the project with the name ${projectName} on the customer project details page"
+	macro clickCustomerProject {
+		var key_projectName = "${projectName}";
+
+		Click(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
+	}
+
+	@prose = "I search the customer projects page using the keyword ${keyword}"
+	macro searchCustomerProject {
+		CustomerProject.typeKeywordViaSearchCustomerProjectField(keyword = "${keyword}");
+
+		CustomerProject.clickSearchCustomerProjectButton();
+	}
+
+	@prose = "I type in the keyword ${keyword} into the Customer Search Projects field"
+	macro typeKeywordViaSearchCustomerProjectField {
+		while (IsElementNotPresent(locator1 = "CustomerProject#CUSTOMER_SEARCH_PROJECTS_FIELD")) {
+			Refresh();
+		}
+
+		Type(
+			locator1 = "CustomerProject#CUSTOMER_SEARCH_PROJECTS_FIELD",
+			value1 = "${keyword}");
+	}
+
+	@prose = "I click on customer search accounts button"
+	macro clickSearchCustomerProjectButton {
+		Click(locator1 = "CustomerProject#CUSTOMER_SEARCH_PROJECTS_FIELD");
+	}
+}

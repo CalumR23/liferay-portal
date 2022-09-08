@@ -1,0 +1,65 @@
+definition {
+
+	var customerAdminEmailAddress = PropsUtil.get("customer.admin.email.address");
+	var customerAdminPassword = PropsUtil.get("customer.admin.password");
+    var customerURL = PropsUtil.get("customer.portal.url");
+
+    @prose = "I should not be able to view a user on the customer index with the name ${userName}"
+	macro _viewNoCustomerUserViaIndex {
+		var key_userName = "${userName}";
+
+		AssertElementNotPresent(locator1 = "CustomerUser#USER_NAME");
+	}
+
+    @prose = "I should be able to view an user on the customer project index page with the name ${userName} and the following values ${table}"
+	macro _viewCustomerUserViaIndex {
+		var key_userName = "${userName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertTextEquals.assertPartialText(
+					locator1 = "CustomerUser#USER_NAME",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Email Address") {
+				var key_userEmailAddress = "${value}";
+				AssertTextEquals(
+					locator1 = "CustomerUser#USER_EMAIL_ADDRESS",
+					value1 = "${value}");
+			}
+			else if ("${field}" == "Role") {
+				var key_userRoles = "${value}";
+				AssertTextEquals(
+					locator1 = "CustomerUser#USER_ROLES",
+					value1 = "${value}");
+			}
+			else {
+				fail("No such user field ${field}");
+			}
+		}
+	}
+
+	@prose = "I filter the subscriptions details page to show only ${filter} subscriptions"
+	macro filterCustomer {
+
+		Click.makeVisibleClickAt(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN");
+
+		if ("${filter}" == "Active") {
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_ALL");
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_ACTIVE");
+		}
+		else if ("${filter}" == "Expired") {
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_ALL");
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_EXPIRED");
+		}
+		else if ("${filter}" == "Future") {
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_ALL");
+			Click(locator1 = "CustomerSubscription#SUBSCRIPTION_DROPDOWN_FUTURE");
+		}
+	}
+
+}
