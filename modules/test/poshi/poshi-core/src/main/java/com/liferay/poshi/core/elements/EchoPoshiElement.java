@@ -53,9 +53,17 @@ public class EchoPoshiElement extends PoshiElement {
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
-		String content = getDoubleQuotedContent(poshiScript);
+		String parentheticalContent = getParentheticalContent(poshiScript);
 
-		addAttribute("message", content);
+		if (!isQuotedContent(parentheticalContent)){
+
+			addAttribute("message", parentheticalContent);
+		}
+		else {
+			String content = getDoubleQuotedContent(poshiScript);
+
+			addAttribute("message", content);
+		}
 	}
 
 	@Override
