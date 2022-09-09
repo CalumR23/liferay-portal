@@ -965,6 +965,13 @@ public abstract class PoshiElement
 		return poshiElementAttributes;
 	}
 
+	protected boolean isQuotedContent(String content){
+		if (content.matches(NONQUOTED_REGEX)){
+			return false;
+		}
+		return true;
+	}
+
 	protected List<PoshiNode<?, ?>> toPoshiNodes(List<?> list) {
 		if (list == null) {
 			return null;
@@ -992,6 +999,8 @@ public abstract class PoshiElement
 
 	protected static final String QUOTED_REGEX = "\".*\"";
 
+	protected static final String NONQUOTED_REGEX = "(\\$\\{.*\\}|\\d+)";
+
 	protected static final String STATEMENT_END_REGEX = ";$";
 
 	protected static final String VAR_NAME_REGEX =
@@ -1005,8 +1014,6 @@ public abstract class PoshiElement
 			Pattern.DOTALL);
 	protected static final Pattern poshiScriptBlockPattern = Pattern.compile(
 		"^[^{]*\\{[\\s\\S]*\\}$");
-	protected static final Pattern quotedPattern = Pattern.compile(
-		QUOTED_REGEX);
 
 	private void _addAttributes(Element element) {
 		for (Attribute attribute :
