@@ -76,11 +76,30 @@ public class EqualsPoshiElement extends PoshiElement {
 	public String toPoshiScript() {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("\"");
-		sb.append(attributeValue("arg1"));
-		sb.append("\" == \"");
-		sb.append(attributeValue("arg2"));
-		sb.append("\"");
+		String arg1 = attributeValue("arg1");
+
+		String arg2 = attributeValue("arg2");
+
+		if (isQuotedContent(arg1)) {
+			sb.append("\"");
+		}
+
+		sb.append(arg1);
+
+		if (isQuotedContent(arg1) && isQuotedContent(arg2)) {
+			sb.append("\" == \"");
+			sb.append(arg2);
+			sb.append("\"");
+		}
+		else if (isQuotedContent(arg2)) {
+			sb.append(" == \"");
+			sb.append(arg2);
+			sb.append("\"");
+		}
+		else {
+			sb.append(" == ");
+			sb.append(arg2);
+		}
 
 		PoshiElement parentPoshiElement = (PoshiElement)getParent();
 
