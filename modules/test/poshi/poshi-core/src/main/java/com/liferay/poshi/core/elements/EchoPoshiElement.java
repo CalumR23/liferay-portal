@@ -55,8 +55,7 @@ public class EchoPoshiElement extends PoshiElement {
 
 		String parentheticalContent = getParentheticalContent(poshiScript);
 
-		if (!isQuotedContent(parentheticalContent)){
-
+		if (!isQuotedContent(parentheticalContent)) {
 			addAttribute("message", parentheticalContent);
 		}
 		else {
