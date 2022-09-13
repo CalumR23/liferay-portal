@@ -183,9 +183,9 @@ public class ExecutePoshiElement extends PoshiElement {
 					if (isQuotedContent(value)) {
 						value = getDoubleQuotedContent(value);
 
-					value = value.replace("\\\"", "\"");
+						value = value.replace("\\\"", "\"");
 
-					value = StringEscapeUtils.unescapeXml(value);
+						value = StringEscapeUtils.unescapeXml(value);
 					}
 
 					add(
