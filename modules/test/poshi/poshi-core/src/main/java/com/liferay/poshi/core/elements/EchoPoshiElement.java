@@ -119,9 +119,18 @@ public class EchoPoshiElement extends PoshiElement {
 		sb.append("\n\n");
 		sb.append(getPad());
 		sb.append(getBlockName());
-		sb.append("(\"");
-		sb.append(content);
-		sb.append("\");");
+		sb.append("(");
+
+		if (isQuotedContent(content)) {
+			sb.append("\"");
+			sb.append(content);
+			sb.append("\"");
+		}
+		else {
+			sb.append(content);
+		}
+
+		sb.append(");");
 
 		return sb.toString();
 	}
