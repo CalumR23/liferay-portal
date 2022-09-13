@@ -799,6 +799,14 @@ public abstract class PoshiElement
 		return false;
 	}
 
+	protected boolean isQuotedContent(String content) {
+		if (content.matches(NONQUOTED_REGEX)) {
+			return false;
+		}
+
+		return true;
+	}
+
 	protected boolean isValidFunctionFileName(String poshiScriptInvocation) {
 		poshiScriptInvocation = poshiScriptInvocation.trim();
 
@@ -965,13 +973,6 @@ public abstract class PoshiElement
 		return poshiElementAttributes;
 	}
 
-	protected boolean isQuotedContent(String content){
-		if (content.matches(NONQUOTED_REGEX)){
-			return false;
-		}
-		return true;
-	}
-
 	protected List<PoshiNode<?, ?>> toPoshiNodes(List<?> list) {
 		if (list == null) {
 			return null;
@@ -995,11 +996,11 @@ public abstract class PoshiElement
 
 	protected static final String INVOCATION_REGEX;
 
+	protected static final String NONQUOTED_REGEX = "(\\$\\{.*\\}|\\d+)";
+
 	protected static final String PARAMETER_REGEX = "\\(.*\\)";
 
 	protected static final String QUOTED_REGEX = "\".*\"";
-
-	protected static final String NONQUOTED_REGEX = "(\\$\\{.*\\}|\\d+)";
 
 	protected static final String STATEMENT_END_REGEX = ";$";
 

@@ -57,8 +57,7 @@ public class EqualsPoshiElement extends PoshiElement {
 
 		String arg1 = equalsContentArray[0].trim();
 
-		if (!isQuotedContent(arg1)){
-
+		if (!isQuotedContent(arg1)) {
 			addAttribute("arg1", arg1);
 		}
 		else {
@@ -69,8 +68,7 @@ public class EqualsPoshiElement extends PoshiElement {
 
 		String arg2 = equalsContentArray[1].trim();
 
-		if (!isQuotedContent(arg2)){
-
+		if (!isQuotedContent(arg2)) {
 			addAttribute("arg2", arg2);
 		}
 		else {
