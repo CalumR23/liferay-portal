@@ -49,6 +49,178 @@ definition {
 		}
 	}
 
+	@description = "If user elected to add environment variables, they are added to the services in the new environment"
+	@priority = "4"
+	test CanAddEnvironmentVariable {
+		task ("When: User deploys a service to a project") {
+			NewDeploymentAPI.deployFromRepo(
+				projectID = "${projectName}",
+				repo = "hosting-with-reserved-env-var");
+
+			Default.WaitForElementPresent(
+				key_environment = "${projectName}",
+				key_serviceName = "ui",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+		}
+
+		task ("And: User adds a new environment to the project with name and location") {
+			Utils.goToPage(page = "projects/${projectName}/overview");
+
+			Default.Click(locator1 = "Environment#ENVIRONMENTS_DROPDOWN");
+
+			Default.Click(
+				key_menuOption = "Add new environment",
+				locator1 = "Utils#ANY_MENU_OPTION");
+
+			Default.Type(
+				key_inputId = "environmentId",
+				locator1 = "Utils#INPUT_FIELD",
+				value1 = "test");
+
+			Utils.selectMenuOption(menuOption = "Oregon, USA");
+		}
+
+		task ("And: Select the 'Copy all services from an existing environment' checkbox") {
+			Default.Click(locator1 = "NewEnvironment#COPY_ALL_SERVICES_CHECKBOX");
+		}
+
+		task ("Then: 'Add environment variables' checkbox is displayed") {
+			Default.AssertElementPresent(locator1 = "NewEnvironment#ADD_ENVIRONMENT_VARIABLES_CHECKBOX");
+		}
+
+		task ("When: Select the 'Add environment variables' checkbox") {
+			Default.Click(locator1 = "NewEnvironment#ADD_ENVIRONMENT_VARIABLES_CHECKBOX");
+		}
+
+		task ("Then: A list of key and values pairs is displayed for each service in the selected environmen") {
+			Default.AssertElementPresent(
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#ENVIRONMENT_SERVICE_NAME");
+
+			Default.AssertElementPresent(
+				key_index = "0",
+				key_inputType = "key",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD");
+
+			Default.AssertElementPresent(
+				key_index = "0",
+				key_inputType = "value",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD");
+		}
+
+		task ("When: User inputs a value in the variable field Then: A new environment variable is added") {
+			Default.Type(
+				key_index = "1",
+				key_inputType = "key",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+				value1 = "LCP_NEW_KEY");
+
+			Default.Type(
+				key_index = "1",
+				key_inputType = "value",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+				value1 = "01");
+
+			Default.Type(
+				key_index = "2",
+				key_inputType = "key",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+				value1 = "LCP_ANOTHER_KEY");
+
+			Default.Type(
+				key_index = "2",
+				key_inputType = "value",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+				value1 = "02");
+		}
+
+		task ("When: User enters text into an already filled field Then: The environment variable is updated") {
+			Default.Type(
+				key_index = "0",
+				key_inputType = "value",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+				value1 = "00");
+		}
+
+		task ("When: User clicks on the X button of a row") {
+			Default.Click(
+				key_index = "1",
+				key_serviceName = "ui",
+				locator1 = "NewEnvironment#DELETE_SERVICE_VARIABLE_BUTTON");
+		}
+
+		task ("Then: The removed environment variable is excluded") {
+			for (var index : list "0,1,2") {
+				Default.AssertTextNotPresent(
+					key_index = "${index}",
+					key_inputType = "value",
+					key_serviceName = "ui",
+					locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+					value1 = "01");
+			}
+
+			for (var index : list "0,1,2") {
+				Default.AssertTextNotPresent(
+					key_index = "${index}",
+					key_inputType = "key",
+					key_serviceName = "ui",
+					locator1 = "NewEnvironment#SERVICE_VARIABLE_FIELD",
+					value1 = "LCP_NEW_KEY");
+			}
+		}
+
+		task ("When: User adds the new environment") {
+			Default.Click(locator1 = "Utils#SUBMIT_BUTTON");
+		}
+
+		task ("Then: The environment variables are added to the corresponding service in the new environment") {
+			Default.WaitForElementPresent(
+				key_headerTitle = "Overview",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Utils.goToPage(page = "projects/qaposhitest-test/services/ui/environment-variables");
+
+			Default.Click(
+				key_index = "0",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_VALUE_EYE_BUTTON");
+
+			Default.AssertTextEquals(
+				key_index = "0",
+				key_inputType = "key",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_FIELD",
+				value1 = "LCP_CONTAINER_CPU");
+
+			Default.AssertTextEquals(
+				key_index = "0",
+				key_inputType = "value",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_FIELD",
+				value1 = "00");
+
+			Default.Click(
+				key_index = "1",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_VALUE_EYE_BUTTON");
+
+			Default.AssertTextEquals(
+				key_index = "1",
+				key_inputType = "key",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_FIELD",
+				value1 = "LCP_ANOTHER_KEY");
+
+			Default.AssertTextEquals(
+				key_index = "1",
+				key_inputType = "value",
+				locator1 = "ServicesEnvironmentVariables#VARIABLE_FIELD",
+				value1 = "02");
+		}
+	}
+
 	@description = "When adding new environment, redirects to new environment's overview page and related activity is generated"
 	@priority = "5"
 	test CanCopyServices {
