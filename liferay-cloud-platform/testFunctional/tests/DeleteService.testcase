@@ -1,0 +1,59 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	var projectName = "qaposhitest";
+
+	setUp {
+		Utils.launchLCP();
+
+		ProjectsAPI.createProject(projectID = "qaposhitest");
+
+		NewDeploymentAPI.deployFromRepo(
+			projectID = "${projectName}",
+			repo = "hosting");
+
+		Authentication.login();
+	}
+
+	tearDown {
+		UtilsAPI.tearDownProjects(projectIdList = "qaposhitest");
+
+		Authentication.logout();
+	}
+
+	@description = "Clicking Cancel button returns user to previous page"
+	@priority = "5"
+	test CancelButtonRedirects {
+		task ("When: User navigates to delete service page") {
+			Default.WaitForElementPresent(
+				key_environment = "${projectName}",
+				key_serviceName = "ui",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+
+			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+		}
+
+		task ("Then: Cancel button is displayed") {
+			Default.AssertElementPresent(
+				key_btnName = "Cancel",
+				locator1 = "Utils#CLICK_BUTTON");
+		}
+
+		task ("When: Clicks the 'Cancel' button") {
+			Default.Click(
+				key_btnName = "Cancel",
+				locator1 = "Utils#CLICK_BUTTON");
+		}
+
+		task ("Then: The console is redirected to the service page") {
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "ServicesLogs#SERVICE_NAME",
+				value1 = "ui-${projectName}");
+
+			Default.AssertLocation.assertPartialLocation(value1 = "projects/${projectName}/services/ui/logs");
+		}
+	}
+
+}
