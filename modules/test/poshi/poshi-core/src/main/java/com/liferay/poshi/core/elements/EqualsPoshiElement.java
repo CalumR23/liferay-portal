@@ -81,25 +81,18 @@ public class EqualsPoshiElement extends PoshiElement {
 		String arg2 = attributeValue("arg2");
 
 		if (isQuotedContent(arg1)) {
-			sb.append("\"");
+			arg1 = "\"" + arg1 + "\"";
 		}
 
 		sb.append(arg1);
 
-		if (isQuotedContent(arg1) && isQuotedContent(arg2)) {
-			sb.append("\" == \"");
-			sb.append(arg2);
-			sb.append("\"");
+		sb.append(" == ");
+
+		if (isQuotedContent(arg2)) {
+			arg2 = "\"" + arg2 + "\"";
 		}
-		else if (isQuotedContent(arg2)) {
-			sb.append(" == \"");
-			sb.append(arg2);
-			sb.append("\"");
-		}
-		else {
-			sb.append(" == ");
-			sb.append(arg2);
-		}
+
+		sb.append(arg2);
 
 		PoshiElement parentPoshiElement = (PoshiElement)getParent();
 
