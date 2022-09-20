@@ -85,4 +85,46 @@ definition {
 		}
 	}
 
+	@description = "The status column will show Ongoing alerts for events that are still happening and Resolved when they are finished"
+	@priority = "5"
+	test StatusUpdates {
+		task ("Given: I create a project and deploy nodehog as a service") {
+			ProjectsAPI.createProject(projectID = "qaposhitest");
+
+			NewDeploymentAPI.deployFromRepo(
+				projectID = "qaposhitest",
+				repo = "nodehog");
+		}
+
+		task ("When: The CPU usage for the nodehog service exceeds 80%") {
+			Utils.goToPage(page = "alerts");
+
+			Default.Pause(locator1 = "420000");
+
+			Alerts.assertAlertMessage(
+				alertMessage = "The nodehog service exceeded 80% of its allocated CPU.",
+				messageRow = "1");
+		}
+
+		task ("Then: The status of the alert will be Ongoing") {
+			Alerts.assertAlertStatus(
+				alertStatus = "Ongoing",
+				messageRow = "1");
+		}
+
+		task ("Then: The status of the alert will be Resolved after 3min duration") {
+			Default.Pause(locator1 = "180000");
+
+			Default.Refresh();
+
+			Alerts.assertAlertStatus(
+				alertStatus = "Resolved",
+				messageRow = "1");
+
+			Alerts.assertAlertDuration(
+				alertDuration = "3min",
+				messageRow = "1");
+		}
+	}
+
 }
