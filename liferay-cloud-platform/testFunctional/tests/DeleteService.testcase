@@ -56,6 +56,59 @@ definition {
 		}
 	}
 
+	@description = "Toast appears when a service is deleted and a <serviceId> activity is generated"
+	@priority = "5"
+	test CanDeletesService {
+		task ("When: User deletes the service") {
+			Default.WaitForElementPresent(
+				key_environment = "${projectName}",
+				key_serviceName = "ui",
+				locator1 = "Projects#ENVIRONMENT_SERVICE");
+
+			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+
+			for (var checkbox : list "deletion is not advised,redeploy") {
+				Default.Check.toggleSwitch(
+					key_checkboxName = "${checkbox}",
+					locator1 = "Utils#ANY_CHECKBOX");
+			}
+
+			Default.Click(locator1 = "Utils#DANGER_BUTTON");
+		}
+
+		task ("Then: A toast display indicating that the service has been deleted") {
+			Default.AssertTextEquals(
+				locator1 = "Utils#GENERIC_TOAST_NOTIFICATION",
+				value1 = "Service deleted");
+		}
+
+		task ("And: User is redirected to the service page") {
+			Default.AssertElementPresent(
+				key_headerTitle = "Services",
+				locator1 = "Utils#HEADER_TITLE");
+
+			Default.AssertLocation.assertPartialLocation(value1 = "projects/${projectName}/services");
+		}
+
+		task ("And: The deleted service is not displayed in the list of deployed services") {
+			Default.AssertElementNotPresent(
+				key_serviceName = "ui",
+				locator1 = "Services#SERVICE_NAME");
+		}
+
+		task ("And: An activity is generated and shown in the environment's activity history") {
+			Utils.goToPage(page = "projects/${projectName}/activities");
+
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				value1 = "Service deleted");
+
+			Default.AssertTextEquals.assertPartialText(
+				locator1 = "Activities#LAST_ACTIVITY_MESSAGE_SUBTITLE",
+				value1 = "Ui");
+		}
+	}
+
 	@description = "Delete service button is enabled when all checkboxes are selected"
 	@priority = "5"
 	test DeleteServiceConfirmationCheckboxes {
