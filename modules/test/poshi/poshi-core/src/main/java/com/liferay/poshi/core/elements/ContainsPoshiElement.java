@@ -67,7 +67,7 @@ public class ContainsPoshiElement extends PoshiElement {
 		String substring = matcher.group(2);
 
 		if (isQuotedContent(substring)) {
-			substring = getDoubleQuotedContent(string);
+			substring = getDoubleQuotedContent(substring);
 		}
 
 		addAttribute("substring", substring);
