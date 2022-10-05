@@ -1921,6 +1921,70 @@ definition {
 		}
 	}
 
+	@prose = "I publish an update RabbitMQ message with routing key ${routingKey} with the following values ${table}"
+	macro publishUpdateMessage {
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Extended Patch Policy") {
+				var extendedPatchPolicy = "${value}";
+			}
+			else if ("${field}" == "Project Solution") {
+				var projectSolution = "${value}";
+			}
+			else if ("${field}" == "Salesforce Project Key") {
+				var salesforceProjectKey = "${value}";
+			}
+			else {
+				fail("No such project field ${field}");
+			}
+		}
+
+		if (!(isSet(extendedPatchPolicy))) {
+			var extendedPatchPolicy = "false";
+		}
+
+		if (!(isSet(projectSolution))) {
+			var projectSolution = "";
+		}
+
+		if (!(isSet(salesforceProjectKey))) {
+			var salesforceProjectKey = "";
+		}
+
+		var message = OSBAdminRabbitMQ.createUpdateMessage(
+			extendedPatchPolicy = "${extendedPatchPolicy}",
+			projectSolution = "${projectSolution}",
+			salesforceProjectKey = "${salesforceProjectKey}");
+		var httpAuth = HttpRequestUtil.getHttpAuthorization("basic", "${rabbitMQAdminPassword}:${rabbitMQAdminUserName}");
+		var requestHeader = HttpRequestUtil.addRequestHeaders("Poshi.NULL", "Content-Type=application/json; charset=utf-8");
+		var formattedPayload = JSONUtil.formatJSONString("${message}");
+
+		var formattedPayload = StringUtil.replace("${formattedPayload}", "\"", "\\"");
+
+		echo("Formatted payload:  ${formattedPayload}");
+
+		var postData = '''
+		{
+			"properties": {},
+			"routing_key": "${routingKey}",
+			"payload": "${formattedPayload}",
+			"payload_encoding": "string"
+		}
+		''';
+
+		echo("Auth: ${httpAuth}");
+
+		echo("Header: ${requestHeader}");
+
+		echo("Post data:  ${postData}");
+
+		var response = HttpRequestUtil.request("${httpAuth}", "${postData}", "${requestHeader}", "POST", "${rabbitMQURL}/api/exchanges/%2f/is_dossiera_v1/publish");
+	}
+
 	@prose = "I publish a project RabbitMQ message with routing key ${routingKey} and multiple contacts and products and no partner with the following values ${table}"
 	macro publishCreateProjectWithMultipleContactsAndProductsAndNoPartnerMessage {
 		var RawTable rawTable = new RawTable("${table}");
