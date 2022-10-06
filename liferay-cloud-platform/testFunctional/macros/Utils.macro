@@ -57,6 +57,39 @@ definition {
 		echo("The service status is: ${serviceStatus}");
 	}
 
+	macro getApiBaseURL {
+		var remote = Utils.getRemote();
+
+		return "https://api.${remote}";
+	}
+
+	macro getConsoleURL {
+		var remote = Utils.getRemote();
+
+		return "https://console.${remote}";
+	}
+
+	macro getRemote {
+		var cloudEnv = PropsUtil.getEnvironmentVariable("CLOUD_ENVIRONMENT");
+		var sandbox = PropsUtil.getEnvironmentVariable("SANDBOX");
+		var remote = "";
+
+		if (isSet(sandbox)) {
+			if ("${cloudEnv}" != "sh") {
+				fail("CLOUD_ENVIRONMENT must be 'sh' if SANDBOX is set");
+			}
+
+			var remote = "${sandbox}.liferay.${cloudEnv}";
+		}
+		else {
+			var remote = "liferay.${cloudEnv}";
+		}
+
+		echo("Remote is ${remote}");
+
+		return "${remote}";
+	}
+
 	macro goToPage {
 		var keyPage = "${page}";
 
@@ -64,7 +97,11 @@ definition {
 	}
 
 	macro launchLCP {
-		Default.Open(locator1 = "${portalURL}");
+		var consoleURL = Utils.getConsoleURL();
+
+		echo("Console url is ${consoleURL}");
+
+		Default.Open(locator1 = "${consoleURL}");
 	}
 
 	macro selectMenuOption {
