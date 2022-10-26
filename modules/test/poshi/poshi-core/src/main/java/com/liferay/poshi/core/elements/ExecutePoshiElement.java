@@ -432,7 +432,7 @@ public class ExecutePoshiElement extends PoshiElement {
 		QUOTED_REGEX + "|\\$\\{\\S+\\}|\\d*";
 
 	private static final String _UNQUOTED_PARAMETER_REGEX =
-		"\\w*\\s*=\\s\"(\\$\\{\\S+\\}|\\d+)\"";
+		"\\w*\\s*=\\s\"(\\$\\{[\\w_-]+\\}|\\d+)\"";
 
 	private static final String _UTILITY_INVOCATION_REGEX =
 		"(echo|fail|takeScreenshot)\\(.*?\\)";
