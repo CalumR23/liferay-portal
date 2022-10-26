@@ -126,6 +126,7 @@ public class ContainsPoshiElement extends PoshiElement {
 	private static final String _ELEMENT_NAME = "contains";
 
 	private static final Pattern _conditionPattern = Pattern.compile(
-		"^" + _ELEMENT_NAME + "\\((.*)[\\s]*,[\\s]*(.*)\\)$");
+		"^" + _ELEMENT_NAME + "\\((.*)[\\s]*,[\\s]*(\\d+|(?:\\$\\{|\\\")" +
+			"[\\s\\S]*(?:\\}|\"))\\)$");
 
 }
