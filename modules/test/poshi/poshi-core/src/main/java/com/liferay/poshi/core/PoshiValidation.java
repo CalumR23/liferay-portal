@@ -1978,6 +1978,10 @@ public class PoshiValidation {
 				put("paste", "a variable storing the desired value");
 				put("typeAlloyEditor", "\"selenium.typeEditor\"");
 				put("typeCKEditor", "\"selenium.typeEditor\"");
+				put("robotType", "\"selenium.type\"");
+				put(
+					"robotTypeShortcut",
+					"\"selenium.typeKeys/selenium.sendKeys\"");
 			}
 		};
 	private static final Set<Exception> _exceptions = new HashSet<>();
