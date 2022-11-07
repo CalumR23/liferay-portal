@@ -1,0 +1,393 @@
+definition {
+
+	var marketplaceAdminEmailAddress = PropsUtil.get("marketplace.admin.email.address");
+	var marketplaceAdminPassword = PropsUtil.get("marketplace.admin.password");
+	var wwwURL = PropsUtil.get("www.liferay.url");
+
+	macro getURL {
+		WaitForSPARefresh();
+
+		if (IsElementPresent(locator1 = "//meta[@property='og:url'][1]")) {
+			var url = selenium.getAttribute("//meta[@property='og:url'][1]@content");
+		}
+		else if (IsElementPresent(locator1 = "//link[@rel='canonical']")) {
+			var url = selenium.getAttribute("//link[@rel='canonical']@href");
+		}
+		else {
+			var url = selenium.getAttribute("//link[contains(@href,'http')][1]@href");
+		}
+
+		return "${url}";
+	}
+	
+	@prose = "I go to the www page with the relative url ${url}"
+	macro gotoRelativeURL {
+		Open(locator1 = "${wwwURL}/${url}");
+
+		WaitForSPARefresh();
+
+		var currentUrl = Marketplace.getURL();
+
+		if ("${currentUrl}" != "https://www-uat.liferay.com/${url}") {
+			Open(locator1 = "${wwwURL}/${url}");
+
+			WaitForSPARefresh();
+		}
+	}
+
+	macro populateAndSubmitForm {
+		var key_inputPositionValue = "1";
+		var key_textAreaPositionValue = "1";
+		var key_selectPositionValue = "1";
+
+		WaitForSPARefresh();
+
+		Pause(locator1 = "5000");
+
+		if (IsElementPresent(locator1 = "Marketplace#MARKETING_FORM")) {
+
+			var pageElementsFound = ${pageElementsFound} + 1;
+
+			while (IsElementPresent(locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD")) {
+				var key_inputPositionValue = ${key_inputPositionValue} + 1;
+
+				var nonExistentPathPositionValueInput = "${key_inputPositionValue}";
+			}
+
+			while (IsElementPresent(locator1 = "Marketplace#MARKETING_FORM_TEXT_AREA")) {
+				var key_textAreaPositionValue = ${key_textAreaPositionValue} + 1;
+
+				var nonExistentPathPositionValueTextArea = "${key_textAreaPositionValue}";
+			}
+
+			while (IsElementPresent(locator1 = "Marketplace#MARKETING_FORM_SELECT_FIELD")) {
+				var key_selectPositionValue = ${key_selectPositionValue} + 1;
+
+				var nonExistentPathPositionValueSelect = "${key_selectPositionValue}";
+			}
+
+			var key_inputPositionValue = "1";
+
+			var key_textAreaPositionValue = "1";
+
+			var key_selectPositionValue = "1";
+
+			while ("${key_inputPositionValue}" != "${nonExistentPathPositionValueInput}") {
+				WaitForSPARefresh();
+
+				AssertElementPresent(locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD");
+
+				var inputFieldName = selenium.getAttribute("xpath=(//input[contains(@class,'mktoRequired')])[${key_inputPositionValue}]@name");
+
+				if ("${inputFieldName}" == "Email") {
+					Type(
+						locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD",
+						value1 = "usr.liferay@lrcustomer.com.broken");
+				}
+				else if ("${inputFieldName}" == "Phone") {
+					ScrollWebElementIntoView(locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD");
+
+					Type(
+						locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD",
+						value1 = "555-555-5678");
+				}
+				else {
+					ScrollWebElementIntoView(locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD");
+
+					if (IsElementPresent(locator1 = "Marketplace#REQUEST_A_LIVE_DEMO_FOOTER_ROW")) {
+                        ScrollBy(value1 = "0,100");
+                    }
+
+					Type(
+						locator1 = "Marketplace#MARKETING_FORM_INPUT_FIELD",
+						value1 = "Test Form");
+				}
+
+				var key_inputPositionValue = ${key_inputPositionValue} + 1;
+			}
+			if (IsElementPresent(locator1 = "Marketplace#MARKETING_FORM_TEXT_AREA")) {
+
+				while ("${key_textAreaPositionValue}" != "${nonExistentPathPositionValueTextArea}") {
+					AssertElementPresent(locator1 = "Marketplace#MARKETING_FORM_TEXT_AREA");
+
+					ScrollWebElementIntoView(locator1 = "Marketplace#MARKETING_FORM_TEXT_AREA");
+
+					Type(
+						locator1 = "Marketplace#MARKETING_FORM_TEXT_AREA",
+						value1 = "Test Form");
+
+					var key_textAreaPositionValue = ${key_textAreaPositionValue} + 1;
+				}
+			}
+
+			while ("${key_selectPositionValue}" != "${nonExistentPathPositionValueSelect}") {
+				ScrollWebElementIntoView(locator1= "Marketplace#MARKETING_FORM_SELECT_FIELD");
+
+				if (IsElementPresent(locator1 = "Marketplace#REQUEST_A_LIVE_DEMO_FOOTER_ROW")) {
+                        ScrollBy(value1 = "0,100");
+                    }
+
+				var selectOptionValue = selenium.getText("xpath=(//select[contains(@class,'mktoField')])[${key_selectPositionValue}]/option[2]");
+
+				var selectFieldName = selenium.getAttribute("xpath=(//select[contains(@class,'mktoField')])[${key_selectPositionValue}]@name");
+
+				if ("${selectFieldName}" == "Country") {
+					Select(
+						locator1 = "Marketplace#MARKETING_FORM_SELECT_FIELD", 
+						value1 = "Australia");
+
+					var key_selectPositionValue = ${key_selectPositionValue} + 1;
+
+					var nonExistentPathPositionValueSelect = ${nonExistentPathPositionValueSelect} + 1;
+
+					var selectOptionValue = selenium.getText("xpath=(//select[contains(@class,'mktoField')])[${key_selectPositionValue}]/option[2]");
+
+					Select(
+						locator1 = "Marketplace#MARKETING_FORM_SELECT_FIELD", 
+						value1 = "${selectOptionValue}");
+				}
+				else {
+					Select(
+						locator1 = "Marketplace#MARKETING_FORM_SELECT_FIELD", 
+						value1 = "${selectOptionValue}");
+				}
+
+				var key_selectPositionValue = ${key_selectPositionValue} + 1;
+			}
+
+			ScrollWebElementIntoView(locator1 = "Marketplace#MARKETING_FORM_SUBMIT_BUTTON");
+
+			Click(locator1 = "Marketplace#MARKETING_FORM_SUBMIT_BUTTON");
+
+			Pause(locator1 = "30000");
+
+			Marketplace.viewNoErrors();
+
+			GoBack();
+		}
+	}
+	
+	macro viewApplicationImages {
+		var key_positionValue = "1";
+		var imagesRemain = "true";
+
+		var pageElementsFound = ${pageElementsFound} + 1;
+
+		WaitForPageLoad();
+
+		Marketplace.viewNoErrors();
+
+		while (("${imagesRemain}" == "true") && (maxIterations = "100")) {
+			WaitForElementPresent(locator1 = "Marketplace#CARD_IMAGE");
+
+			while (IsElementPresent(locator1 = "Marketplace#CARD_IMAGE") && (maxIterations = "100")) {
+				if (IsNotVisible(locator1 = "Marketplace#CARD_IMAGE")) {
+
+					AssertElementPresent(locator1 = "Marketplace#CARD_IMAGE");
+
+					ScrollWebElementIntoView(locator1 = "Marketplace#CARD_IMAGE");
+				}
+				else if (IsVisible(locator1 = "Marketplace#CARD_IMAGE")) {
+					AssertVisible(locator1 = "Marketplace#CARD_IMAGE");
+				}
+
+				var key_positionValue = ${key_positionValue} + 1;
+			}
+			if (IsElementNotPresent(locator1 = "Marketplace#NEXT_LINK_DISABLED") && (IsElementPresent(locator1 = "Marketplace#NEXT_LINK"))) {
+				var key_positionValue = "1";
+
+				Click(locator1 = "Marketplace#NEXT_LINK");
+			}
+			else {
+				var imagesRemain = "false";
+			}
+		}
+
+		Marketplace.gotoRelativeURL(url = "${url}");
+	}
+
+	macro viewApplicationLinksAndForms {
+		var key_positionValue = "1";
+		var linksRemain = "true";
+
+		var pageElementsFound = ${pageElementsFound} + 1;
+
+		WaitForPageLoad();
+
+		Marketplace.viewNoErrors();
+
+		while (("${linksRemain}" == "true") && (maxIterations = "100")) {
+			WaitForElementPresent(locator1 = "Marketplace#CARD_LINK");
+
+			while (IsElementPresent(locator1 = "Marketplace#CARD_LINK") && (maxIterations = "100")) {
+				ScrollWebElementIntoView(locator1 = "Marketplace#CARD_LINK");
+
+				var applicationLink = selenium.getAttribute("xpath=(//a[contains(@class,'search-results-card')])[${key_positionValue}]@href");
+
+				if (IsVisible(locator1 = "Marketplace#CARD_LINK")) {
+					AssertVisible(locator1 = "Marketplace#CARD_LINK");
+
+					Click.clickNoMouseOver(locator1 = "Marketplace#CARD_LINK");
+				}
+
+				WaitForPageLoad();
+
+				echo("Application url page: ${applicationLink}.");
+
+				Marketplace.viewNoErrors();
+
+				Marketplace.populateAndSubmitForm(url = "${url}");
+
+				GoBack();
+
+				var key_positionValue = ${key_positionValue} + 1;
+			}
+			if (IsElementNotPresent(locator1 = "Marketplace#NEXT_LINK_DISABLED") && (IsElementPresent(locator1 = "Marketplace#NEXT_LINK"))) {
+				var key_positionValue = "1";
+
+				Click(locator1 = "Marketplace#NEXT_LINK");
+			}
+			else {
+				var linksRemain = "false";
+			}
+		}
+
+		Marketplace.gotoRelativeURL(url = "${url}");
+	}
+
+	macro viewCheckboxFilters {
+		var key_positionValue = "1";
+		var checkboxFiltersRemain = "true";
+
+		var pageElementsFound = ${pageElementsFound} + 1;
+
+		WaitForPageLoad();
+
+		Marketplace.viewNoErrors();
+
+		while (("${checkboxFiltersRemain}" == "true") && (maxIterations = "100")) {
+			WaitForElementPresent(locator1 = "Marketplace#CHECKBOX_FILTER");
+
+			while (IsElementPresent(locator1 = "Marketplace#CHECKBOX_FILTER") && (maxIterations = "100")) {
+				ScrollWebElementIntoView(locator1 = "Marketplace#CHECKBOX_FILTER");
+
+				Check.checkNotVisible(locator1 = "Marketplace#CHECKBOX_FILTER");
+
+				Marketplace.viewNoErrors();
+
+				Marketplace.viewApplicationLinksAndForms();
+
+				Uncheck.uncheckNotVisible(locator1 = "Marketplace#CHECKBOX_FILTER");
+
+				var key_positionValue = ${key_positionValue} + 1;
+			}
+
+			var checkboxFiltersRemain = "false";
+		}
+	}
+
+	macro viewFooterNavigationLinks {
+		var key_positionValue = "1";
+
+		if (IsElementPresent(locator1 = "Marketplace#FOOTER_LINK")) {
+
+			var pageElementsFound = ${pageElementsFound} + 1;
+
+			while (IsElementPresent(locator1 = "Marketplace#FOOTER_LINK", value1 = "")) {
+				var key_positionValue = ${key_positionValue} + 1;
+
+				var nonExistentPathPositionValue = "${key_positionValue}";
+			}
+
+			var key_positionValue = "1";
+
+			while ("${key_positionValue}" != "${nonExistentPathPositionValue}") {
+				WaitForSPARefresh();
+
+				ScrollBy(value1 = "0, 9999");
+
+				AssertElementPresent(locator1 = "Marketplace#FOOTER_LINK");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "Marketplace#FOOTER_LINK");
+
+				WaitForPageLoad();
+
+				Marketplace.viewNoErrors();
+
+				Marketplace.gotoRelativeURL(url = "${url}");
+
+				var key_positionValue = ${key_positionValue} + 1;
+			}
+		}
+	}
+
+	@prose = "I should be able to view the marketplace page with the relative url ${url}"
+	macro viewMarketplacePage {
+		static var pageElementsFound = "0";
+
+		Marketplace.gotoRelativeURL(url = "${url}");
+
+		Marketplace.viewApplicationImages(url = "${url}");
+
+		Marketplace.viewApplicationLinksAndForms(url = "${url}");
+
+		Marketplace.viewCheckboxFilters();
+
+		if ("${url}" == "web/marketplace") {
+            Marketplace.viewFooterNavigationLinks(url = "${url}");
+        }
+
+        if ("${url}" == "web/marketplace") {
+            Marketplace.viewSocialMediaFooterNavigationLinks(url = "${url}");
+        }
+
+		echo("Total page elements found: ${pageElementsFound}");
+
+		if ("${pageElementsFound}" == "0") {
+			fail("No page elements were found on the page with the relative url ${url}. This could mean that the page element paths need to be updated or it could indicate a problem with the site page. Please investigate.");
+		}
+	}
+
+	@prose = "there should be no errors on the page"
+	macro viewNoErrors {
+		AssertElementNotPresent(locator1 = "Marketplace#ERROR_BLOCK");
+
+		AssertElementNotPresent(locator1 = "Marketplace#PAGE_DOES_NOT_EXIST_MESSAGE_1");
+
+		AssertElementNotPresent(locator1 = "Marketplace#PAGE_DOES_NOT_EXIST_MESSAGE_2");
+
+		AssertElementNotPresent(locator1 = "Marketplace#ERROR_MESSAGE_1");
+
+		AssertElementNotPresent(locator1 = "Marketplace#ERROR_MESSAGE_2");
+	}
+
+	macro viewSocialMediaFooterNavigationLinks {
+		var key_positionValue = "1";
+
+		if (IsElementPresent(locator1 = "Marketplace#FOOTER_SOCIAL_MEDIA_LINK")) {
+
+			var pageElementsFound = ${pageElementsFound} + 1;
+
+			while (IsElementPresent(locator1 = "Marketplace#FOOTER_SOCIAL_MEDIA_LINK", value1 = "")) {
+				var key_positionValue = ${key_positionValue} + 1;
+
+				var nonExistentPathPositionValue = "${key_positionValue}";
+			}
+
+			var key_positionValue = "1";
+
+			while ("${key_positionValue}" != "${nonExistentPathPositionValue}") {
+				WaitForSPARefresh();
+
+				ScrollBy(value1 = "0, 9999");
+
+				AssertVisible(locator1 = "Marketplace#FOOTER_SOCIAL_MEDIA_LINK");
+
+				Click.pauseMakeVisibleClickAt(locator1 = "Marketplace#FOOTER_SOCIAL_MEDIA_LINK");
+
+				var key_positionValue = ${key_positionValue} + 1;
+			}
+		}
+	}
+
+}
