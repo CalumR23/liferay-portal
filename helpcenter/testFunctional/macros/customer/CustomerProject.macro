@@ -1,13 +1,42 @@
 definition {
 
-	var customerURL = PropsUtil.get("customer.portal.url"); 
+	var customerURL = PropsUtil.get("customer.portal.url");
+
+	@prose = "I should be able to view the following project ${projectName} values in the customer project details page ${table}"
+	macro _viewCustomerProjectDetails {
+		var key_projectName = "${projectName}";
+		var RawTable rawTable = new RawTable("${table}");
+
+		WaitForSPARefresh();
+
+		for (var row : table "${rawTable}") {
+			var field = "${row[0]}";
+			var value = "${row[1]}";
+
+			if ("${field}" == "Name") {
+				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
+			}
+			else {
+				var key_projectFieldValue = "${value}";
+
+				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_FIELD");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the following project ${projectName} in the customer project details page"
+	macro _viewNoCustomerProjectDetails {
+		var key_projectName = "${projectName}";
+
+		AssertElementNotPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
+	}
 
 	@prose = "I click on the project with the name ${projectName} on the customer project details page"
 	macro clickCustomerProject {
 		var key_projectName = "${projectName}";
 
 		while (IsElementNotPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME")) {
-			OSBAdmin.pause(timeInSeconds="1");
+			OSBAdmin.pause(timeInSeconds = "1");
 		}
 
 		Click(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
@@ -33,7 +62,7 @@ definition {
 		Click(locator1 = "OktaLogin#SIGN_IN_BUTTON");
 
 		AssertElementNotPresent(locator1 = "OktaLogin#SIGN_IN_BUTTON");
-    }
+	}
 
 	@prose = "I search the customer projects page using the keyword ${keyword}"
 	macro searchCustomerProject {
@@ -57,47 +86,3 @@ definition {
 			value1 = "${keyword}");
 	}
 
-    @prose = "I should be able to view the following project ${projectName} values in the customer project details page ${table}"
-	macro _viewCustomerProjectDetails {
-		var key_projectName = "${projectName}";
-		var RawTable rawTable = new RawTable("${table}");
-
-		WaitForSPARefresh();
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var value = "${row[1]}";
-
-			if ("${field}" == "Name") {
-				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
-			}
-			else if ("${field}" == "Ends On") {
-				key_projectField = "${value}";
-				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_FIELD");
-			}
-			else if ("${field}" == "Code") {
-				key_projectField = "${value}";
-				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_FIELD");
-			}
-			else if ("${field}" == "State") {
-				key_projectField = "${value}";
-				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_FIELD");
-			}
-			else if ("${field}" == "Support Region") {
-				key_projectField = "${value}";
-				AssertElementPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_FIELD");
-			}
-			else {
-				fail("No such project detail field ${field}");
-			}
-		}
-	}
-
-	@prose = "I should not be able to view the following project ${projectName} in the customer project details page"
-	macro _viewNoCustomerProjectDetails {
-		var key_projectName = "${projectName}";
-
-		AssertElementNotPresent(locator1 = "CustomerProject#CUSTOMER_PROJECT_NAME");
-	}
-
-}
