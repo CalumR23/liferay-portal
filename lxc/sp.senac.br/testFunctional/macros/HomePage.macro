@@ -60,22 +60,25 @@ definition {
 		Default.WaitForVisible(locator1 = "HomePage#FOOTER_SOCIAL_MEDIA");
 	}
 
-	@summary = "Navigating to any option from top navigation menu"
-	macro goToNavigationMenu {
-		if (isSet(navigationMenu)) {
-			Default.MouseOver(
-				key_navigationMenu = "${navigationMenu}",
-				locator1 = "HomePage#NAVIGATION_MENU");
+	@summary = "Navigating to any menu and submenu option"
+	macro gotoNavigationMenuAndSubmenu {
+		var portalURL = PropsUtil.get("portal.url");
 
-			Default.Click(
-				key_navigationMenu = "${navigationMenu}",
-				key_navigationSubmenu = "${navigationSubmenu}",
-				locator1 = "HomePage#NAVIGATION_SUBMENU");
-		}
-		else {
-			Default.Click(
-				key_navigationMenu = "${navigationMenu}",
-				locator1 = "HomePage#NAVIGATION_MENU");
+		for (var index : list "${submenuIndex}") {
+
+			// SSP Refactor: This macro is a workaround, it is needed for 7.2 (due to search issues we are facing) but we can remove on 7.4
+
+			var indexSubmenu = selenium.getAttribute("xpath=(//div[contains(@class,'ssp-mega-menu')]//*[contains(text(),'${navigationMenu}')]//following-sibling::div//a)[${index}]@href");
+			var submenuName = selenium.getText("xpath=(//div[contains(@class,'ssp-mega-menu')]//*[contains(text(),'${navigationMenu}')]//following-sibling::div//a)[${index}]");
+			var submenuURL = StringUtil.extractLast("${indexSubmenu}", "br/");
+
+			Default.Open(locator1 = "${portalURL}/${submenuURL}");
+
+			Default.AssertElementPresent(
+				key_courseName = "${index}",
+				locator1 = "HomePage#TITLE_PAGE_COURSE");
+
+			Utils.launchSenacHomePage();
 		}
 	}
 
