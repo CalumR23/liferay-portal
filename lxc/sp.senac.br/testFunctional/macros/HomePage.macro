@@ -1,5 +1,27 @@
 definition {
 
+	@summary = "See the links in the list under 'Acesso rápido' and make sure they are redirecting to the page"
+	macro gotoAcessoRapido {
+		var portalURL = PropsUtil.get("portal.url");
+
+		for (var index : list "${acessoRapidoList}") {
+
+			// SSP Refactor: This macro is a workaround, it is needed for 7.2 (due to search issues we are facing) but we can remove on 7.4
+
+			var indexAcessoRapido = selenium.getAttribute("xpath=(//div[contains(@id,'slick-slide')]/a[contains(@class,'ssp-card-acesso-rapido')]/.)[${index}]@href");
+			var acessoRapido = selenium.getText("xpath=(//div[contains(@id,'slick-slide')]/a[contains(@class,'ssp-card-acesso-rapido')]/.)[${index}]");
+			var acessoRapidoURL = StringUtil.extractLast("${indexAcessoRapido}", "8080/");
+
+			Default.Open(locator1 = "${portalURL}/${acessoRapidoURL}");
+
+			Default.AssertElementPresent(
+				key_titlePage = "${index}",
+				locator1 = "HomePage#TITLE_PAGE");
+
+			Utils.launchSenacHomePage();
+		}
+	}
+
 	@summary = "See the list of courses in the category and check if they are redirecting to the page"
 	macro gotoCourseCategory {
 		var portalURL = PropsUtil.get("portal.url");
