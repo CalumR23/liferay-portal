@@ -3,9 +3,31 @@ definition {
 	macro signIn {
 		LDNavigation.goToLogin();
 
-		OktaLogin.signIn(
-			userEmailAddress = "${userEmailAddress}",
-			userPassword = "${userPassword}");
+		// This TripleClick + KeyPress BACKSPACE is a workaround because the webElement.clear() method at Type function is not working/cleaning the field before typing, I tried SelectFieldText or RobotTypeShortcut without success
+		// LXC Refactor: Improve LDLogin.signIn macro once webElement.clear() method is back to work
+		// LXC Refactor ticket: LRQA-78351
+
+		Default.TripleClick(locator1 = "Portal.TextInput#EMAIL_ADDRESS");
+
+		Default.KeyPress(
+			locator1 = "Portal.TextInput#EMAIL_ADDRESS",
+			value1 = "\BACK_SPACE");
+
+		Default.Type(
+			locator1 = "Portal.TextInput#EMAIL_ADDRESS",
+			value1 = "${userEmailAddress}");
+
+		Default.Type(
+			locator1 = "Portal.TextInput#PASSWORD",
+			value1 = "${userPassword}");
+
+		Portal.Button.click(button = "Sign In");
+
+		// LRQA-78208 - We need to have an explicit wait (Pause) in order to wait for the login process be completed
+
+		Default.Pause(locator1 = "5000");
+
+		Default.WaitForElementPresent(locator1 = "Portal.UserBar#USER_AVATAR_BUTTON");
 	}
 
 	macro signInWithAdminUser {
