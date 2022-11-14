@@ -471,6 +471,10 @@ public class RetryWebElementImpl extends RemoteWebElement {
 
 		String webElementValue = _webElement.getAttribute("value");
 
+		if(webElementValue.equals("")){
+			return;
+		}
+
 		for (int i = 0; i < webElementValue.length(); i++) {
 			_webElement.sendKeys(Keys.BACK_SPACE);
 		}
