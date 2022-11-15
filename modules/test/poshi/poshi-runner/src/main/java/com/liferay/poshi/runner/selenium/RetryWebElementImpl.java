@@ -16,6 +16,7 @@ package com.liferay.poshi.runner.selenium;
 
 import com.liferay.poshi.core.util.OSDetector;
 import com.liferay.poshi.core.util.PropsValues;
+import com.liferay.poshi.core.util.Validator;
 
 import java.util.List;
 
@@ -471,7 +472,7 @@ public class RetryWebElementImpl extends RemoteWebElement {
 
 		String webElementValue = _webElement.getAttribute("value");
 
-		if(webElementValue.equals("")){
+		if (webElementValue.equals("") || Validator.isNull(webElementValue)) {
 			return;
 		}
 
