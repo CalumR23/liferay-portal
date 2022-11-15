@@ -472,7 +472,7 @@ public class RetryWebElementImpl extends RemoteWebElement {
 
 		String webElementValue = _webElement.getAttribute("value");
 
-		if (webElementValue.equals("") || Validator.isNull(webElementValue)) {
+		if (Validator.isNull(webElementValue) || webElementValue.equals("")) {
 			return;
 		}
 
