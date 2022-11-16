@@ -222,7 +222,7 @@ definition {
 			while (IsElementPresent(locator1 = "Marketplace#CARD_LINK") && (maxIterations = "100")) {
 				ScrollWebElementIntoView(locator1 = "Marketplace#CARD_LINK");
 
-				var applicationLink = selenium.getAttribute("xpath=(//a[contains(@class,'search-results-card')])[${key_positionValue}]@href");
+				var applicationPageLink = selenium.getAttribute("xpath=(//a[contains(@class,'search-results-card')])[${key_positionValue}]@href");
 
 				if (IsVisible(locator1 = "Marketplace#CARD_LINK")) {
 					AssertVisible(locator1 = "Marketplace#CARD_LINK");
@@ -232,9 +232,11 @@ definition {
 
 				WaitForPageLoad();
 
-				echo("Application url page: ${applicationLink}.");
+				echo("Application url page: ${applicationPageLink}.");
 
 				Marketplace.viewNoErrors();
+
+				Marketplace.viewApplicationPageLinks(url = "${url}");
 
 				Marketplace.populateAndSubmitForm(url = "${url}");
 
@@ -254,6 +256,48 @@ definition {
 
 		Marketplace.gotoRelativeURL(url = "${url}");
 	}
+
+	macro viewApplicationPageLinks {
+        var key_positionValue = "1";
+        var linksRemain = "true";
+
+        var pageElementsFound = ${pageElementsFound} + 1;
+
+        while (("${linksRemain}" == "true") && ("${key_positionValue}" != "10")) {
+            while (IsElementPresent(locator1 = "Marketplace#PAGE_LINK")) {
+
+                var pageLink = selenium.getAttribute("xpath=(//div[contains(@class,'pt-md-5')]/div[contains(@class,'align-items-start')]//a)[${key_positionValue}]@href");
+
+				if (!(contains("${pageLink}", "Liferay")) && (!(contains("${pageLink}", "liferay")))) {
+					var key_positionValue = ${key_positionValue} + 1;
+				}
+				else {
+					var curl = '''
+						${pageLink}
+						-I ${pageLink}
+						''';
+
+					var httpResponseStatusCode = JSONCurlUtil.get("${curl}");
+
+					if (contains("${httpResponseStatusCode}", "Server: Github.com") && (!(contains("${httpResponseStatusCode}", "HTTP/2 200")))) {
+						echo("No permission to view this ${pageLink} Github page.");
+
+						var key_positionValue = ${key_positionValue} + 1;
+					}
+					else if (!(contains("${httpResponseStatusCode}", "HTTP/2 200"))) {
+						fail("The ${pageLink} page is not working properly.");
+					}
+					else {
+						echo("The ${pageLink} page is working properly.");
+
+						var key_positionValue = ${key_positionValue} + 1;
+					}
+				}
+            }
+
+			var linksRemain = "false";
+        }
+    }
 
 	macro viewCheckboxFilters {
 		var key_positionValue = "1";
