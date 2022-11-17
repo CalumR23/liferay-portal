@@ -3,6 +3,8 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	var projectId = "qaposhimembers";
+
 	setUp {
 		Utils.launchLCP();
 
@@ -10,7 +12,82 @@ definition {
 	}
 
 	tearDown {
+		UtilsAPI.tearDownProjects(projectIdList = "${projectId}");
+
 		Authentication.logout();
+	}
+
+	@description = "Members list reflects users which are members of the environment"
+	@priority = "4"
+	test DisplayMemberIcons {
+		task ("When: I create a project And: I invite three users to my project") {
+			ProjectsAPI.createProject(projectID = "${projectId}");
+
+			Invitation.addTeamMember(
+				email = PropsUtil.get("test.this.account.guest.user1.email"),
+				projectId = "${projectId}",
+				role = "admin");
+
+			Invitation.addTeamMember(
+				email = PropsUtil.get("test.this.account.guest.user2.email"),
+				projectId = "${projectId}",
+				role = "contributor");
+
+			Invitation.addTeamMember(
+				email = PropsUtil.get("test.this.account.guest.user3.email"),
+				projectId = "${projectId}",
+				role = "guest");
+		}
+
+		task ("Then: The project reflects the added users") {
+			for (var member : list "Poshi Tester,QA1 PTester,QA2 PTester,QA3 PTester") {
+				Default.AssertElementPresent(
+					key_environment = "${projectId}",
+					key_memberName = "${member}",
+					locator1 = "Projects#ENVIRONMENT_MEMBER");
+			}
+		}
+
+		task ("When: Another user is added to the project") {
+			Invitation.addTeamMember(
+				email = PropsUtil.get("test.this.account.guest.user4.email"),
+				projectId = "${projectId}",
+				role = "guest");
+		}
+
+		task ("Then: The project reflects the first three users") {
+			for (var member : list "Poshi Tester,QA1 PTester,QA2 PTester") {
+				Default.AssertElementPresent(
+					key_environment = "${projectId}",
+					key_memberName = "${member}",
+					locator1 = "Projects#ENVIRONMENT_MEMBER");
+			}
+		}
+
+		task ("And: The last two users are replaced with an avatar with the additional user count") {
+			Default.AssertElementNotPresent(
+				key_environment = "${projectId}",
+				key_memberName = "QA3 PTester",
+				locator1 = "Projects#ENVIRONMENT_MEMBER");
+
+			Default.AssertElementNotPresent(
+				key_environment = "${projectId}",
+				key_memberName = "QA4 PTester",
+				locator1 = "Projects#ENVIRONMENT_MEMBER");
+
+			Default.AssertTextEquals.assertPartialText(
+				key_environment = "${projectId}",
+				locator1 = "Projects#MORE_MEMBERS_AVATAR",
+				value1 = "+2");
+
+			Default.MouseOver(
+				key_environment = "${projectId}",
+				locator1 = "Projects#MORE_MEMBERS_AVATAR");
+
+			Default.AssertTextEquals(
+				locator1 = "Utils#TOOLTIP_BODY",
+				value1 = "2 more members");
+		}
 	}
 
 	@description = "Individual member icon displays tooltip with full name and email on hover"
