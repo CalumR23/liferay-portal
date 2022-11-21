@@ -59,6 +59,30 @@ definition {
 		}
 	}
 
+	@prose = "I assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} using okta session id ${table}"
+	macro _assignContactRolesToContactUsingOktaSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+			var curl = '''
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
+				-H "Okta-Session-ID: ${staticOktaSessionId}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.put("${curl}");
+		}
+	}
+
 	@prose = "I attempt to assign the following roles to the user with the email address ${userEmailAddress} on the account with the name ${accountName} that has exceeded its max developer contacts ${table}"
 	macro _assignContactRolesToContactOnAccountWithMaxDeveloperContactsAttempt {
 		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
@@ -225,6 +249,30 @@ definition {
 				-H "accept: application/json"
 				-H "Content-Type: application/json"
 				-H "Content-Length: 0"
+				''';
+
+			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
+		}
+	}
+
+	@prose = "I unassign the following roles from the user with the email address ${userEmailAddress} on the account with the name ${accountName} using okta session id ${table}"
+	macro _unassignContactRolesToContactUsingOktaSessionId {
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", " ", "%20");
+
+		var userEmailAddress = StringUtil.replace("${userEmailAddress}", "@", "%40");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var contactRoleName = "${row[0]}";
+
+			var contactRoleName = StringUtil.replace("${contactRoleName}", " ", "%20");
+
+			var curl = '''
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/contacts/by-email-address/${userEmailAddress}/roles?contactRoleNames=${contactRoleName} --tlsv1.2
+				-H "Okta-Session-ID: ${staticOktaSessionId}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
 				''';
 
 			com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
