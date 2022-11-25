@@ -75,8 +75,43 @@ definition {
 
 		AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
-		static var staticJobBuildNumber = selenium.getText("Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+		Click(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+		
+		Click(
+			locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
+			menuOption = "Parameters");
 
+		var flag = "false";
+
+		while ("${flag}" == "false"){
+
+			while (IsElementNotPresent(key_content = "${staticGitRevision}", key_parameter= "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")) {
+				Click(
+				locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
+				menuOption = "Previous Build");
+			}
+
+			if (IsElementPresent(key_content = "${staticGitRevision}", key_parameter= "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")){
+					flag = "true";
+				}
+				
+			else{
+				Click(
+					locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
+					menuOption = "Back to Project");
+
+				Click(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+			}
+		}
+
+		AssertTextEquals(
+					key_content = "${staticGitRevision}",
+					key_parameter= "git.revision",
+					locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT",
+					value1 = "${staticGitRevision}");
+
+		static var staticJobBuildNumber = selenium.getText("Jenkins#JENKINS_JOB_BREADCRUMBS_BUILD_NUMBER");
+		
 		return "${staticJobBuildNumber}";
 	}
 
@@ -417,6 +452,7 @@ definition {
 			}
 			else if ("${field}" == "git.revision") {
 				var gitRevision = "${value}";
+				static var staticGitRevision = "${value}";
 			}
 			else if ("${field}" == "patcher.build.id") {
 				var patcherBuildId = "${value}";
@@ -530,6 +566,8 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+
+		return "${staticGitRevision}";
 	}
 
 	@prose = "I start the test-fixpack-builder-hotfix-copy job with the following parameters ${table}"
