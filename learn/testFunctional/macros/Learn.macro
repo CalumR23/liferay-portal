@@ -1,0 +1,139 @@
+definition {
+
+	var learnAdminEmailAddress = PropsUtil.get("learn.admin.email.address");
+	var learnAdminPassword = PropsUtil.get("learn.admin.password");
+	var learnURL = PropsUtil.get("www.learn.url");
+
+    macro getURL {
+		WaitForSPARefresh();
+
+		if (IsElementPresent(locator1 = "//meta[@property='og:url'][1]")) {
+			var url = selenium.getAttribute("//meta[@property='og:url'][1]@content");
+		}
+		else if (IsElementPresent(locator1 = "//link[@rel='canonical']")) {
+			var url = selenium.getAttribute("//link[@rel='canonical']@href");
+		}
+		else {
+			var url = selenium.getAttribute("//link[contains(@href,'http')][1]@href");
+		}
+
+		return "${url}";
+	}
+
+    @prose = "I go to the www page with the relative url ${url}"
+	macro gotoRelativeURL {
+		Open(locator1 = "${learnURL}/${url}");
+
+		WaitForSPARefresh();
+
+		var currentUrl = Learn.getURL();
+
+		if ("${currentUrl}" != "http://learn-uat.liferay.com.s3-website-us-east-1.amazonaws.com/${url}") {
+			Open(locator1 = "${learnURL}/${url}");
+
+			WaitForSPARefresh();
+		}
+	}
+
+	macro viewFooterLanguageDropdown {
+        var key_positionValue = "1";
+        var languagesRemain = "true";
+
+        var pageElementsFound = ${pageElementsFound} + 1;
+
+        if(IsElementPresent(locator1 = "Learn#FOOTER_LANGUAGE_DROPDOWN")) {
+
+            while (("${languagesRemain}" == "true") && ("${key_positionValue}" != "3")) {
+                Click(locator1 = "Learn#FOOTER_LANGUAGE_DROPDOWN");
+
+                Click(locator1 = "Learn#FOOTER_DROPDOWN_LANGUAGE_LINK");
+
+                var key_positionValue = ${key_positionValue} + 1;
+            }
+
+            var languagesRemain = "false";
+        }
+    }
+
+	macro viewLearnHomepageLinks {
+        var key_positionValue = "1";
+        var linksRemain = "true";
+
+        var pageElementsFound = ${pageElementsFound} + 1;
+
+        while (("${linksRemain}" == "true") && ("${key_positionValue}" != "11")) {
+            while (IsElementPresent(locator1 = "Learn#PAGE_LINK")) {
+
+                var homepageLink = selenium.getAttribute("xpath=(//*[contains(@class,'row')]//a)[${key_positionValue}]@href");
+
+				var curl = '''
+					${homepageLink}
+					-I ${homepageLink}
+					''';
+
+				var httpResponseStatusCode = JSONCurlUtil.get("${curl}");
+
+				if (!(contains("${httpResponseStatusCode}", "HTTP/2 200")) && (!(contains("${httpResponseStatusCode}", "HTTP/2 301")))) {
+					echo("The ${homepageLink} page is not working properly.");
+
+					var key_positionValue = ${key_positionValue} + 1;
+				}
+            }
+
+			var linksRemain = "false";
+        }
+    }
+
+    @prose = "I should be able to view the learn page with the relative url ${url}"
+	macro viewLearnPage {
+		static var pageElementsFound = "0";
+
+		Learn.gotoRelativeURL(url = "${url}");
+
+        if ("${url}" == "index.html") {
+			Learn.viewLearnPageNavigationLinks();
+		}
+
+        if ("${url}" == "index.html") {
+			Learn.viewLearnHomepageLinks();
+		}
+
+        Learn.viewFooterLanguageDropdown();
+
+		echo("Total page elements found: ${pageElementsFound}");
+
+		if ("${pageElementsFound}" == "0") {
+			fail("No page elements were found on the page with the relative url ${url}. This could mean that the page element paths need to be updated or it could indicate a problem with the site page. Please investigate.");
+		}
+	}
+
+    macro viewLearnPageNavigationLinks {
+        var key_positionValue = "1";
+        var linksRemain = "true";
+
+        var pageElementsFound = ${pageElementsFound} + 1;
+
+        while (("${linksRemain}" == "true") && ("${key_positionValue}" != "5")) {
+            while (IsElementPresent(locator1 = "Learn#TOP_NAVIGATION_LINKS")) {
+
+                var topNavigationLink = selenium.getAttribute("//div[contains(@class,'header-links') and contains(@aria-label,'navigation')]/a[${key_positionValue}]@href");
+
+				var curl = '''
+					${topNavigationLink}
+					-I ${topNavigationLink}
+					''';
+
+				var httpResponseStatusCode = JSONCurlUtil.get("${curl}");
+
+				if (!(contains("${httpResponseStatusCode}", "HTTP/2 200")) && (!(contains("${httpResponseStatusCode}", "HTTP/2 301")))) {
+					echo("The ${topNavigationLink} page is not working properly.");
+
+					var key_positionValue = ${key_positionValue} + 1;
+				}
+            }
+
+			var linksRemain = "false";
+        }
+    }
+
+}
