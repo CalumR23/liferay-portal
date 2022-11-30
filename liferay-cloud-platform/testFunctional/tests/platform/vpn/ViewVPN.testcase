@@ -22,48 +22,57 @@ definition {
 	@description = "If VPN is not connected, the 'Connect' button is shown"
 	@priority = "5"
 	test CanConnect {
-		task ("When: the user click on ellipsis menu and disconnect VPN") {
+		task ("When: User disconnects VPN") {
+			ViewVPN.disconnectVPN();
+		}
+
+		task ("Then: Connect button is displayed") {
+			Default.AssertElementPresent(
+				key_buttonName = "Connect",
+				locator1 = "Utils#GENERIC_BUTTON");
+		}
+
+		task ("When: User clicks connect button") {
+			Default.Click(
+				key_buttonName = "Connect",
+				locator1 = "Utils#GENERIC_BUTTON");
+		}
+
+		task ("Then: Connected vpn") {
+			Default.AssertTextEquals(
+				locator1 = "ViewVPN#VPN_STATUS",
+				value1 = "Connected");
+		}
+	}
+
+	@description = "Selecting 'Disconnect' in the VPN menu will disconnect the VPN"
+	@priority = "5"
+	test CanDisconnect {
+		task ("When: User goes to ellipsis and clicks disconnect") {
 			Default.Click(locator1 = "ViewVPN#ELLIPSIS_BUTTON");
 
 			Default.Click(
-				key_ellipsis = "Disconnect",
-				locator1 = "ViewVPN#DISCONNECT_VPN");
+				key_item = "Disconnect",
+				locator1 = "Utils#ELLIPSIS_MENU_ITEM");
 		}
 
-		task ("Then: the user goes the checkboxes and disconnect the VPN") {
-			Default.Click(
-				key_indexNumber = "1",
-				locator1 = "ViewVPN#CHECKBOX_VPN");
-
-			Default.Click(
-				key_indexNumber = "2",
-				locator1 = "ViewVPN#CHECKBOX_VPN");
+		task ("And: User confirms that he wants to disconnect the VPN") {
+			for (var checkbox : list "disconnection will permanently interrupt,disconnection may cause") {
+				Default.Click(
+					key_stackItem = "${checkbox}",
+					locator1 = "DisconnectVPN#DISCONNECT_CONFIRMATION_CHECKBOX");
+			}
 
 			Default.Click(
 				key_btnName = "Disconnect VPN",
 				locator1 = "Utils#CLICK_BUTTON");
 		}
 
-		task ("Then: the user returns to the View-VPN connect page again and checks the status") {
-			Utils.goToPage(page = "projects/projtest-dev/settings/view-vpn");
-
-			Default.AssertElementPresent(
-				key_buttonName = "Connect",
-				locator1 = "Utils#GENERIC_BUTTON");
-
-			Default.Click(
-				key_buttonName = "Connect",
-				locator1 = "Utils#GENERIC_BUTTON");
+		task ("Then: VPN status is 'not connected'") {
+			Default.AssertTextEquals(
+				locator1 = "ViewVPN#VPN_STATUS",
+				value1 = "Not Connected");
 		}
-	}
-
-	@description = "Selecting 'Disconnect' in the VPN menu will disconnect the VPN"
-	@ignore = "Test Stub"
-	@priority = "5"
-	test CanDisconnect {
-
-		// LRQA-77846 CanDisconnect pending implementation
-
 	}
 
 	@description = "Clicking 'Show more activities' will redirect the user to /view-vpn/activities page"
