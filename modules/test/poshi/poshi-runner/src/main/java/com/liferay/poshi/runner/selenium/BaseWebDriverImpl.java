@@ -1945,6 +1945,15 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public void maximizeWindow() {
+		Options option = _webDriver.manage();
+
+		Window window = option.window();
+
+		window.maximize();
+	}
+
+	@Override
 	public void mouseDown(String locator) {
 		mouseDownAt(locator, null);
 	}
@@ -2103,6 +2112,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		ocularConfiguration.globalSimilarity(GetterUtil.getInteger(match));
 
 		WebElement webElement = getWebElement(locator);
+
+		maximizeWindow();
 
 		SnapshotBuilder snapshotBuilder = Ocular.snapshot();
 
