@@ -74,30 +74,37 @@ definition {
 		AssertElementPresent(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
 		AssertVisible(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
+		var lastJobBuildNumber = selenium.getText("Jenkins#MOST_RECENT_JENKINS_JOB_BUILD_NUMBER");
 
 		Click(locator1 = "Jenkins#CURRENT_JENKINS_JOB_BUILD_NUMBER");
 
 		var hasFoundTheCorrectJob = "false";
-
 		var count = "0";
 
 		while (("${hasFoundTheCorrectJob}" == "false") && (maxIterations = "30")){
 			var count = ${count} + 1;
 
+			var firstJobBuildNumber = selenium.getText("Jenkins#JENKINS_JOB_BREADCRUMBS_BUILD_NUMBER");
+			var currentJobBuildNumber = "${firstJobBuildNumber}";
+
 			Click(
 				locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
 				menuOption = "Parameters");
 
-			while (IsElementNotPresent(key_content = "${staticGitRevision}", key_parameter= "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")) {
+			while ((IsElementNotPresent(key_content = "${staticGitRevision}", key_parameter = "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")) && ("${currentJobBuildNumber}" != "${lastJobBuildNumber}")) {
 				Click(
 					locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
 					menuOption = "Previous Build");
+
+				var currentJobBuildNumber = selenium.getText("Jenkins#JENKINS_JOB_BREADCRUMBS_BUILD_NUMBER");
 			}
 
-			if (IsElementPresent(key_content = "${staticGitRevision}", key_parameter= "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")) {
-				hasFoundTheCorrectJob = "true";
+			if (IsElementPresent(key_content = "${staticGitRevision}", key_parameter = "git.revision", locator1 = "Jenkins#JENKINS_JOB_PARAMETERS_CONTENT")) {
+				var hasFoundTheCorrectJob = "true";
 			}
-			else{
+			else {
+				var lastJobBuildNumber = "${firstJobBuildNumber}";
+
 				Click(
 					locator1 = "Jenkins#JENKINS_JOB_SIDE_MENU",
 					menuOption = "Back to Project");
@@ -106,9 +113,9 @@ definition {
 			}
 		}
 
-		if("${hasFoundTheCorrectJob}" == "false") {
-            fail("After ${count} attempts the build could not be found!");
-        }
+		if ("${hasFoundTheCorrectJob}" == "false") {
+			fail("After ${count} attempts the build could not be found!");
+		}
 
 		AssertTextEquals(
 			key_content = "${staticGitRevision}",
@@ -458,7 +465,6 @@ definition {
 			}
 			else if ("${field}" == "git.revision") {
 				var gitRevision = "${value}";
-
 				static var staticGitRevision = "${value}";
 			}
 			else if ("${field}" == "patcher.build.id") {
