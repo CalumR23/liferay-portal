@@ -867,6 +867,8 @@ definition {
 
 	@prose = "the ticket with keywords ${keywords} should not be synced to zendesk"
 	macro _viewNoTicketSyncByKeywords {
+		var results = "";
+
 		var keywordsNoSpaces = StringUtil.replace("${keywords}", " ", "+");
 
 		var keywordsNoSpaces = StringUtil.replace("${keywordsNoSpaces}", ")", "");
@@ -878,19 +880,14 @@ definition {
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var results = JSONCurlUtil.get("${curl}", "$.results");
-		var currentIteration = "0";
-
-		while (("${currentIteration}" != "5") && !(contains("${results}", "${keywords}"))) {
-			var currentIteration = ${currentIteration} + 1;
-
+		while (("${results}" == "") && (maxIterations = "${pollMaximumIterations}")) {
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var results = JSONCurlUtil.get("${curl}", "$.results");
 		}
 
 		if (contains("${results}", "${keywords}")) {
-			fail("The unexpected ticket with the keywords ${keywords} appears to have been synced to zendesk");
+			fail("After 25 checks, the unexpected ticket with the keywords ${keywords} appears to have been synced to zendesk");
 		}
 	}
 
@@ -1716,33 +1713,47 @@ definition {
 	@prose = "the ticket with keywords ${keywords} should have the text ${descriptionText} in its description"
 	macro _viewTicketDescription {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+		var descriptionFromAPI = "";
 
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+		while (("${descriptionFromAPI}" == "") && (maxIterations = "${pollMaximumIterations}") ) {
+			var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+		}
+		
+		var descriptionFromAPI = StringUtil.replace("${descriptionFromAPI}", "%0", " ");
 
 		echo("Expected Description Text: ${descriptionText}");
 
 		echo("Actual Description: ${descriptionFromAPI}");
 
 		if (!(contains("${descriptionFromAPI}", "${descriptionText}"))) {
-			fail("Actual description ${descriptionFromAPI} does not contain the text ${descriptionText}");
+			fail("After 25 iteractions, actual description ${descriptionFromAPI} does not contain the text ${descriptionText}");
 		}
 	}
 
 	@prose = "the ticket with keywords ${keywords} should not have the text ${descriptionText} in its description"
 	macro _viewTicketDescriptionNonText {
 		var ticketId = ZendeskTicketAPI._viewTicketIdByKeywords(keywords = "${keywords}");
+		var descriptionFromAPI = "";
 
 		var curl = '''
 			${zendeskURL}/api/v2/tickets/${ticketId}.json --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+		while (("${descriptionFromAPI}" == "") && (maxIterations = "${pollMaximumIterations}") ) {
+			var descriptionFromAPI = JSONCurlUtil.get("${curl}", "$.ticket.description");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+		}
+
+		var descriptionFromAPI = StringUtil.replace("${descriptionFromAPI}", "%0", " ");
 
 		echo("Expected Description Text: ${descriptionText}");
 
@@ -2342,20 +2353,16 @@ definition {
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		var results = JSONCurlUtil.get("${curl}", "$.results");
-		var currentIteration = "0";
+		var results = "";
 
-		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${results}", "${keywords}"))) {
-			var currentIteration = ${currentIteration} + 1;
-
+		while (("${results}" == "") && (maxIterations = "${pollMaximumIterations}")) {
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
 
 			var results = JSONCurlUtil.get("${curl}", "$.results");
 		}
 
 		if (!(contains("${results}", "${keywords}"))) {
-			fail("After ${currentIteration} checks, the ticket with the keywords ${keywords} has not been synced to zendesk");
+			fail("After 25 checks, the ticket with the keywords ${keywords} has not been synced to zendesk");
 		}
 	}
-
 }
