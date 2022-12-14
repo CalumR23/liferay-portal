@@ -1,0 +1,153 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			ATLUtils.launchAtlantiaPortal();
+		}
+	}
+
+	tearDown {
+		ATLUtils.tearDown();
+	}
+
+	@description = "Verify that a dropdown with the options 'Board of Directors, Nomination Remuneration and Human Capital Committee, Control Risk and Corporate Governance Committee, Sustainability Committee, Committee of Independent Directors with responsibility for Related Party Transactions' is displayed"
+	test DropdownIsDisplayedWithOptions {
+		task ("Given user goes to Board of Directors") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Board of Directors");
+		}
+
+		task ("Then it is possible to see different filter options on dropdown") {
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Nomination, Remuneration and Human Capital Committee");
+
+			Default.AssertElementPresent(
+				key_filterName = "Nomination",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_ACTIVE_DROPDOWN");
+
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Control, Risk and Corporate Governance Committee");
+
+			Default.AssertElementPresent(
+				key_filterName = "Control",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_ACTIVE_DROPDOWN");
+
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Sustainability Committee");
+
+			Default.AssertElementPresent(
+				key_filterName = "Sustainability",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_ACTIVE_DROPDOWN");
+
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Committee of Independent Directors with responsibility for Related Party Transactions");
+
+			Default.AssertElementPresent(
+				key_filterName = "Transactions",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_ACTIVE_DROPDOWN");
+
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Board of directors");
+
+			Default.AssertElementPresent(
+				key_filterName = "directors",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_ACTIVE_DROPDOWN");
+		}
+	}
+
+	@description = "Verify that, when the user chooses an option, the information on page changes"
+	test InformationChangesWhenUserChoosesOption {
+		task ("Given user goes to Board of Directors") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Board of Directors");
+		}
+
+		task ("When the filter is changed") {
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Nomination, Remuneration and Human Capital Committee");
+		}
+
+		task ("Then the page content change too") {
+			Default.AssertVisible(
+				key_memberName = "Anna Chiara Invernizzi",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_MEMBER");
+		}
+
+		task ("When the filter is changed") {
+			Default.Select(
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_DROPDOWN",
+				value1 = "Control, Risk and Corporate Governance Committee");
+		}
+
+		task ("Then the page content change too") {
+			Default.AssertVisible(
+				key_memberName = "Gaia Mazzalveri",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_MEMBER");
+
+			Default.AssertNotVisible(
+				key_memberName = "Anna Chiara Invernizzi",
+				locator1 = "ATLGovernance#BOARD_OF_DIRECTORS_MEMBER");
+		}
+	}
+
+	@description = "Verify that there is a link to another page on the popup"
+	@refactor
+	test LinkIsAvailableOnPopup {
+
+		// ATL Refactor: The link is not complete when running it locally, it is needed to make a change with the macro ATLUtils.formatURL.
+		// ATL Refactor ticket: ATU2206-142
+
+		task ("Given user goes to Governance System") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Governance system");
+		}
+
+		task ("When the user clicks on Popup link") {
+			ATLGovernance.viewControlSystemItem(
+				imageContent = "The Committee makes proposals and advises the Board on social and environmental sustainability issues.",
+				imageName = "Sustainability");
+
+			//Default.Click(locator1 = "ATLGovernance#POPUP_LINK");
+
+		}
+
+		task ("Then the user will be redirected to link page.") {
+			ATLUtils.formatURL(passedURL = "//div[contains(@class,'popup in_view')]//a");
+
+			Default.AssertElementPresent(
+				key_title = "Sustainability Committee",
+				locator1 = "Portal.Header#H1_TITLE");
+		}
+	}
+
+	@description = "Verify that, when the user clicks on the image, a popup is displayed with a brief explanation"
+	test PopupIsDisplayedOnImageClick {
+		task ("Given user goes to Governance System") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Governance",
+				subItemName = "Governance system");
+		}
+
+		task ("Then it is possible to view the Control System Pop up clicking on Image") {
+			ATLGovernance.viewControlSystemItem(
+				imageContent = "The Committee makes proposals and advises the Board on social and environmental sustainability issues.",
+				imageName = "Sustainability");
+
+			Default.Click(locator1 = "ATLGovernance#CLOSE_POPUP");
+
+			ATLGovernance.viewControlSystemItem(
+				imageContent = "The Committee submits proposals and provides advice to the Board on matters related to the remuneration of the members of the corporate bodies and top management.",
+				imageName = "Nomination");
+		}
+	}
+
+}

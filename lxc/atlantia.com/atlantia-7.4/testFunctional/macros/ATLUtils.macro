@@ -1,0 +1,281 @@
+definition {
+
+	macro changeSiteLanguage {
+		Default.Click(
+			key_translateItem = "${translateItem}",
+			locator1 = "ATLHomePage#TRANSLATE_PAGE");
+	}
+
+	macro compareDate {
+		var firstDate = "${firstDate}";
+		var secondDate = "${secondDate}";
+		var firstMonth = StringUtil.extractFirst("${firstDate}", "/");
+
+		var firstDateDY = StringUtil.extractLast("${firstDate}", "${firstMonth}/");
+
+		var firstDay = StringUtil.extractFirst("${firstDateDY}", "/");
+		var firstYear = StringUtil.extractLast("${firstDateDY}", "/");
+		var secondMonth = StringUtil.extractFirst("${secondDate}", "/");
+
+		var secondDateDY = StringUtil.extractLast("${secondDate}", "${secondMonth}/");
+
+		var secondDay = StringUtil.extractFirst("${secondDateDY}", "/");
+		var secondYear = StringUtil.extractLast("${secondDateDY}", "/");
+
+		if ("${firstYear}" == "${secondYear}") {
+			if ("${firstMonth}" == "${secondMonth}") {
+				var dayValue = MathUtil.isGreaterThan("${firstDay}", "${secondDay}");
+
+				if ("${dayValue}" == "true") {
+					echo("PASSED");
+				}
+				else {
+					fail("the second day '${secondDay}' is greather than the first day '${firstDay}'");
+				}
+			}
+			else {
+				var monthValue = MathUtil.isGreaterThan("${firstMonth}", "${secondMonth}");
+
+				if ("${monthValue}" == "true") {
+					echo("PASSED");
+				}
+				else {
+					fail("the second month '${secondMonth}' is greather than the first month '${firstMonth}'");
+				}
+			}
+		}
+		else {
+			var yearValue = MathUtil.isGreaterThan("${firstYear}", "${secondYear}");
+
+			if ("${yearValue}" == "true") {
+				echo("PASSED");
+			}
+			else {
+				fail("the second year '${secondYear}' is greather than the first year '${firstYear}'");
+			}
+		}
+	}
+
+	macro downloadFileViaCurl {
+		var outputFolderName = "downloads";
+		var fileName = "${fileName}";
+		var currentURL = selenium.getCurrentUrl();
+
+		var curl = '''${currentURL} --create-dirs -o ${outputFolderName}/${fileName}''';
+
+		echo("curl = ${curl}");
+
+		com.liferay.poshi.runner.util.JSONCurlUtil.get("${curl}");
+	}
+
+	macro formatDate {
+		if ("${format}" == "m dd, yyyy") {
+			var monthName = StringUtil.extractFirst("${oldDate}", " ");
+
+			var dayYear = StringUtil.extractLast("${oldDate}", "${monthName} ");
+
+			var day = StringUtil.extractFirst("${dayYear}", ",");
+			var year = StringUtil.extractLast("${dayYear}", ", ");
+		}
+
+		if ("${format}" == "dd m yyyy") {
+			var oldDate = StringUtil.replace("${oldDate}", " ", "/");
+
+			var day = StringUtil.extractFirst("${oldDate}", "/");
+
+			var monthYear = StringUtil.extractLast("${oldDate}", "${day}/");
+
+			var monthName = StringUtil.extractFirst("${monthYear}", "/");
+			var year = StringUtil.extractLast("${monthYear}", "/");
+		}
+
+		var monthName = StringUtil.lowerCase("${monthName}");
+
+		if ("${monthName}" == "january") {
+			var monthNumber = "1";
+		}
+
+		if ("${monthName}" == "february") {
+			var monthNumber = "2";
+		}
+
+		if ("${monthName}" == "march") {
+			var monthNumber = "3";
+		}
+
+		if ("${monthName}" == "april") {
+			var monthNumber = "5";
+		}
+
+		if ("${monthName}" == "may") {
+			var monthNumber = "5";
+		}
+
+		if ("${monthName}" == "june") {
+			var monthNumber = "6";
+		}
+
+		if ("${monthName}" == "july") {
+			var monthNumber = "7";
+		}
+
+		if ("${monthName}" == "august") {
+			var monthNumber = "8";
+		}
+
+		if ("${monthName}" == "september") {
+			var monthNumber = "9";
+		}
+
+		if ("${monthName}" == "october") {
+			var monthNumber = "10";
+		}
+
+		if ("${monthName}" == "november") {
+			var monthNumber = "11";
+		}
+
+		if ("${monthName}" == "december") {
+			var monthNumber = "12";
+		}
+
+		var formattedDate = "${monthNumber}/${day}/${year}";
+
+		echo("${formattedDate}");
+
+		return "${formattedDate}";
+	}
+
+	macro formatURL {
+		var passedURL = selenium.getAttribute("${passedURL}@href");
+
+		var passedURL = StringUtil.extractLast("${passedURL}", "/en");
+		var portalURL = PropsUtil.get("test.this.atlantia.portal.url");
+
+		var formattedURL = "${portalURL}${passedURL}";
+
+		Default.WaitForPageLoad();
+
+		Default.Open(locator1 = "${formattedURL}");
+	}
+
+	@summary = "Open portal"
+	macro launchAtlantiaPortal {
+		var portalURL = PropsUtil.get("test.this.atlantia.portal.url");
+
+		Default.Open(locator1 = "${portalURL}");
+	}
+
+	macro removeBannerItem {
+		if (Default.IsElementPresent(locator1 = "ATLHomePage#CAROUSEL_ITEM_NUMBER_2")) {
+			var itemName = selenium.getText("ATLHomePage#CAROUSEL_ITEM_NUMBER_2");
+
+			ATLUtils.launchAtlantiaPortal();
+
+			ATLLogin.signIn();
+
+			Portal.Navigator.openWithAppendToBaseURL(
+				baseURL = PropsUtil.get("test.this.atlantia.portal.partial.url"),
+				urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+
+			Portal.WebContent.searchCP(webContentTitle = "Banner Emotional HP");
+
+			Portal.WebContentNavigator.gotoEntryMenuItem(
+				entry = "Banner Emotional HP",
+				menuItem = "Edit");
+
+			Default.Click(
+				key_itemName = "${itemName}",
+				locator1 = "ATLWebContent#REMOVE_BUTTON");
+
+			Portal.Button.clickPublish();
+
+			ATLUtils.launchAtlantiaPortal();
+		}
+	}
+
+	macro removeMember {
+		ATLUtils.launchAtlantiaPortal();
+
+		ATLLogin.signIn();
+
+		Portal.Navigator.openWithAppendToBaseURL(
+			baseURL = PropsUtil.get("test.this.atlantia.portal.partial.url"),
+			urlAppend = "group/guest/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+
+		Portal.WebContent.searchCP(webContentTitle = "${memberName}");
+
+		if (Default.IsElementPresent(key_webContentTitle = "${memberName}", locator1 = "Portal.WC#ENTRY_LIST_TITLE")) {
+			Portal.WebContentNavigator.gotoEntryMenuItem(
+				entry = "${memberName}",
+				menuItem = "Move to Recycle Bin");
+
+			Default.Confirm.acceptAlert();
+		}
+	}
+
+	macro tearDown {
+		ATLUtils.launchAtlantiaPortal();
+
+		ATLUtils.removeBannerItem();
+
+		if (Default.IsElementPresent(key_translateItem = "English", locator1 = "ATLHomePage#TRANSLATE_PAGE")) {
+			ATLUtils.changeSiteLanguage(translateItem = "English");
+		}
+
+		if (isSet(addMember)) {
+			ATLUtils.removeMember(memberName = "${addMember}");
+		}
+	}
+
+	macro verifyArticleCategory {
+		Default.AssertElementPresent(
+			key_tagName = "${tagName}",
+			locator1 = "ATLCategory#TAG_ARTICLE");
+	}
+
+	macro verifySiteLanguage {
+		for (var afterTranslateMenuItem : list "${afterTranslateMenuItem}") {
+			Default.AssertElementPresent(
+				key_mainMenuItem = "${afterTranslateMenuItem}",
+				locator1 = "ATLNavigation#MAIN_MENU_ITEM");
+		}
+
+		for (var beforeTranslateMenuItem : list "${beforeTranslateMenuItem}") {
+			Default.AssertElementNotPresent(
+				key_mainMenuItem = "${beforeTranslateMenuItem}",
+				locator1 = "ATLNavigation#MAIN_MENU_ITEM");
+		}
+
+		for (var afterTranslateMenuItem : list "${afterTranslateMenuItem}") {
+			Default.MouseOver(
+				key_mainMenuItem = "${afterTranslateMenuItem}",
+				locator1 = "ATLNavigation#MAIN_MENU_ITEM");
+		}
+
+		Default.AssertElementPresent(
+			key_itemName = "${afterTranslateCarousel}",
+			locator1 = "ATLHomePage#CAROUSEL_ITEM");
+
+		Default.AssertElementNotPresent(
+			key_itemName = "${beforeTranslateCarousel}",
+			locator1 = "ATLHomePage#CAROUSEL_ITEM");
+
+		Default.AssertElementPresent(
+			key_storyTitle = "${afterTranslateStory}",
+			locator1 = "ATLHomePage#STORY_ITEM");
+
+		Default.AssertElementNotPresent(
+			key_storyTitle = "${beforeTranslateStory}",
+			locator1 = "ATLHomePage#STORY_ITEM");
+
+		Default.AssertElementPresent(
+			key_highlightItem = "${afterTranslateHighlightItem}",
+			locator1 = "ATLHomePage#HIGHLIGHT_ITEM");
+
+		Default.AssertElementNotPresent(
+			key_highlightItem = "${beforeTranslateHighlightItem}",
+			locator1 = "ATLHomePage#HIGHLIGHT_ITEM");
+	}
+
+}

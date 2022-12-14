@@ -1,0 +1,86 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			ATLUtils.launchAtlantiaPortal();
+		}
+	}
+
+	tearDown {
+		ATLUtils.tearDown();
+	}
+
+	@description = "Verify that Categories are translated when page language is changed"
+	@refactor
+	test ArticleCategoriesAreTranslated {
+
+		// ATL Refactor: The link is not complete when running it locally, it is needed to make a change with the macro ATLUtils.formatURL.
+		// ATL Refactor ticket: ATU2206-142
+
+		task ("Given user selects an article") {
+			Default.WaitForElementPresent(
+				key_itemName = "Our Climate Action Plan",
+				locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW");
+
+			//Default.Click(
+			//locator1 = "ATLHomePage#CAROUSEL_ITEM_ARROW",
+			//key_itemName = "Our Climate Action Plan");
+
+			ATLUtils.formatURL(passedURL = "//div[contains(@class,'h1') and contains(.,'Our Climate Action Plan')]//following-sibling::a[contains(@class,'icon')]");
+		}
+
+		task ("And given that the article has a category") {
+			ATLUtils.verifyArticleCategory(tagName = "Sustainability");
+		}
+
+		task ("When the user change site language") {
+			ATLUtils.changeSiteLanguage(translateItem = "Italiano");
+		}
+
+		task ("Then the category tag is translated too") {
+			ATLUtils.verifyArticleCategory(tagName = "Sostenibilità");
+
+			Default.AssertElementNotPresent(
+				key_tagName = "Sustainability",
+				locator1 = "ATLCategory#TAG_ARTICLE");
+		}
+	}
+
+	@description = "Verify if when change site language, the site content will be translated"
+	test CanTranslateToItalianAndBackToEnglish {
+		task ("Given user change site language to Italiano") {
+			ATLUtils.changeSiteLanguage(translateItem = "Italiano");
+		}
+
+		task ("Then all site is translated") {
+			ATLUtils.verifySiteLanguage(
+				afterTranslateCarousel = "Il nostro Climate Action Plan",
+				afterTranslateHighlightItem = "concessioni in 11 Paesi",
+				afterTranslateMenuItem = "Chi siamo,Mobilità,Sostenibilità,Lavora con noi",
+				afterTranslateStory = "Atlantia4Ukraine: al via dal 13 giugno il Summer Camp dedicato alle famiglie urcaine arrivate a Roma negli ultimi mesi",
+				afterTranslateSubItem = "Il Gruppo,Business Aeroportuale,Transparenza,Opportunità",
+				beforeTranslateCarousel = "Our Climate Action Plan",
+				beforeTranslateHighlightItem = "concessions in 11 countries",
+				beforeTranslateMenuItem = "About Us,Mobility,Sustainability,Careers",
+				beforeTranslateStory = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months");
+		}
+
+		task ("And given user back site language to English") {
+			ATLUtils.changeSiteLanguage(translateItem = "English");
+		}
+
+		task ("Then the site language backs to English") {
+			ATLUtils.verifySiteLanguage(
+				afterTranslateCarousel = "Our Climate Action Plan",
+				afterTranslateHighlightItem = "concessions in 11 countries",
+				afterTranslateMenuItem = "About Us,Mobility,Sustainability,Careers",
+				afterTranslateStory = "Atlantia4Ukraine: on June 13 starts the Summer Camp dedicated to Ukrainian families arrived in Rome in recent months",
+				beforeTranslateCarousel = "Il nostro Climate Action Plan",
+				beforeTranslateHighlightItem = "concessioni in 11 Paesi",
+				beforeTranslateMenuItem = "Chi siamo,Mobilità,Sostenibilità,Lavora con noi",
+				beforeTranslateStory = "Atlantia4Ukraine: al via dal 13 giugno il Summer Camp dedicato alle famiglie urcaine arrivate a Roma negli ultimi mesi",
+				beforeTranslateSubItem = "Il Gruppo,Business Aeroportuale,Transparenza,Opportunità");
+		}
+	}
+
+}

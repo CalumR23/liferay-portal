@@ -1,0 +1,164 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			ATLUtils.launchAtlantiaPortal();
+		}
+
+		task ("Go to Press Release") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Media",
+				subItemName = "Press Release");
+		}
+	}
+
+	tearDown {
+		ATLUtils.tearDown();
+	}
+
+	@description = "Verify that the Press Release Date filters can be choosen by texting in the field or selecting a date on calendar"
+	test CanBeFilteredByCalendarIcon {
+		task ("Given user selects a date from calendar icon and search this date") {
+			ATLPressRelease.selectDate(
+				fromDay = "10",
+				fromMonth = "October",
+				fromYear = "2022");
+		}
+
+		task ("Then the search is done and only 1 date from this range is displayed") {
+			Default.AssertElementPresent(
+				key_index = "1",
+				key_tableDate = "June 10, 2022",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+
+			Default.AssertElementNotPresent(
+				key_index = "2",
+				key_tableDate = "",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+		}
+	}
+
+	@description = "Verify that the Press Release items can be filtered by From Date"
+	test CanBeFilteredByFromDate {
+		task ("Given user selects a from date input") {
+			Default.Type(
+				locator1 = "ATLPressRelease#FROM_DATE_INPUT",
+				value1 = "06/10");
+
+			Default.KeyPress(
+				locator1 = "ATLPressRelease#FROM_DATE_INPUT",
+				value1 = "\ENTER");
+		}
+
+		task ("When the user search this date") {
+			Default.Click(locator1 = "ATLPressRelease#SEARCH_BUTTON");
+		}
+
+		task ("Then only 1 date from this range is displayed") {
+			Default.AssertElementPresent(
+				key_index = "1",
+				key_tableDate = "June 10, 2022",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+
+			Default.AssertElementNotPresent(
+				key_index = "2",
+				key_tableDate = "",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+		}
+	}
+
+	@description = "Verify that the Press Release items can be filtered by To Date"
+	test CanBeFilteredByToDate {
+		task ("Given user selects a to date input") {
+			Default.Type(
+				locator1 = "ATLPressRelease#TO_DATE_INPUT",
+				value1 = "01/03/2011");
+
+			Default.KeyPress(
+				locator1 = "ATLPressRelease#TO_DATE_INPUT",
+				value1 = "\ENTER");
+		}
+
+		task ("When the user search this date") {
+			Default.Click(locator1 = "ATLPressRelease#SEARCH_BUTTON");
+		}
+
+		task ("Then only 1 date from this range is displayed") {
+			Default.AssertElementPresent(
+				key_index = "1",
+				key_tableDate = "January 02, 2011",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+
+			Default.AssertElementPresent(
+				key_index = "3",
+				key_tableDate = "January 02, 2011",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+
+			Default.AssertElementNotPresent(
+				key_index = "4",
+				key_tableDate = "",
+				locator1 = "ATLPressRelease#TABLE_DATE");
+		}
+	}
+
+	@description = "Verify that releases can be filtered by year"
+	test CanBeFilteredByYear {
+		task ("Given user filter results by year 2021") {
+			Default.Click(
+				key_yearFilter = "2021",
+				locator1 = "ATLPressRelease#FILTER_YEAR");
+		}
+
+		task ("Then only 2021 results will be displayed") {
+			ATLPressRelease.viewTableItemYear(tableDate = "2021");
+		}
+
+		task ("Given user filter results by year 2019") {
+			Default.Click(
+				key_yearFilter = "2019",
+				locator1 = "ATLPressRelease#FILTER_YEAR");
+		}
+
+		task ("Then only 2019 results will be displayed") {
+			ATLPressRelease.viewTableItemYear(tableDate = "2019");
+		}
+	}
+
+	@description = "Verfiy that releases can be searched"
+	test CanBeSearched {
+		task ("Given user search for 'Italia' term") {
+			Default.Type(
+				locator1 = "ATLPressRelease#SEARCH_BAR",
+				value1 = "Italia");
+
+			Default.KeyPress(
+				locator1 = "ATLPressRelease#SEARCH_BAR",
+				value1 = "\ENTER");
+		}
+
+		task ("Then only 2021 results will be displayed") {
+			ATLPressRelease.viewTableResultsTerm(searchedTerm = "Italia");
+		}
+	}
+
+	@description = "Verify that reports can be downloaded"
+	test ReportCanBeDownloaded {
+		task ("Given user selects a report do download") {
+			Default.Click(
+				key_index = "1",
+				key_tableContent = "Atlantia",
+				locator1 = "ATLPressRelease#TABLE_CONTENT");
+		}
+
+		task ("When click in Download button") {
+			Default.Click(locator1 = "ATLPressRelease#DOWNLOAD_ICON");
+		}
+
+		task ("Then the report is downloaded") {
+			ATLUtils.downloadFileViaCurl(fileName = "report.pdf");
+
+			Portal.ImportExport.assertDownloadedFileName(downloadedFile = "report.pdf");
+		}
+	}
+
+}

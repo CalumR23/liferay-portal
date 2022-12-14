@@ -1,0 +1,137 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			ATLUtils.launchAtlantiaPortal();
+		}
+	}
+
+	tearDown {
+		ATLUtils.tearDown();
+	}
+
+	@description = "Verify that the user can expanded / hide the Shareholders agreement card"
+	test CardCanBeExpandedAndHidden {
+		task ("Given user goes to Shareholders") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Shareholders");
+		}
+
+		task ("When the Shareholders agreement card is clicked") {
+			Default.Click(
+				key_text = "Shareholders agreement",
+				locator1 = "Portal.Button#ANY");
+		}
+
+		task ("Then the card is collapsed and new items are visible") {
+			Default.AssertElementPresent(
+				key_cardName = "Shareholders agreement",
+				locator1 = "ATLInvestors#COLLAPSED_CARD_HEADER");
+
+			Default.AssertVisible(
+				key_itemName = "Extract from the Investment and Partnership Agreement published on the newspapers “Sole24Ore” and “MF” on 19/4/2022 (Italian-only)",
+				locator1 = "ATLInvestors#CARD_ITEM");
+		}
+
+		task ("And when the user click's in card again") {
+			Default.Click(
+				key_text = "Shareholders agreement",
+				locator1 = "Portal.Button#ANY");
+		}
+
+		task ("And then the card is no more collapsed and the items are not visible") {
+			Default.AssertElementNotPresent(
+				key_cardName = "Shareholders agreement",
+				locator1 = "ATLInvestors#COLLAPSED_CARD_HEADER");
+
+			Default.AssertNotVisible(
+				key_itemName = "Extract from the Investment and Partnership Agreement published on the newspapers “Sole24Ore” and “MF” on 19/4/2022 (Italian-only)",
+				locator1 = "ATLInvestors#CARD_ITEM");
+		}
+	}
+
+	@description = "Verify that the diagram areas are highlighted when hovering"
+	test DiagramAreasAreHighlightedOnHover {
+		task ("Given user goes to Shareholders") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Shareholders");
+		}
+
+		task ("When an item on diagram is hovered") {
+			Default.MouseOver(
+				key_itemName = "Free Float",
+				locator1 = "ATLInvestors#DIAGRAM_ITEM");
+		}
+
+		task ("Then the item is highlighted") {
+			Default.AssertElementPresent(locator1 = "ATLInvestors#ACTIVE_DIAGRAM_ITEM");
+		}
+	}
+
+	@description = "Verify that the graph changes according to the user's choice"
+	test GraphChangesAccordingToUserChoice {
+		task ("Given user goes to Share performance") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Share performance");
+		}
+
+		task ("When a filter is selected") {
+			Default.SelectFrame(locator1 = "ATLInvestors#CHART_FRAME");
+
+			Default.Click(
+				key_filterName = "3 years",
+				locator1 = "ATLInvestors#PERFORMANCE_CHART_FILTER");
+		}
+
+		task ("Then the graph's range changes according the filter") {
+			var currentYear = DateUtil.getCurrentYear();
+
+			var currentYear = StringUtil.extractLast("${currentYear}", "20");
+
+			var pastYear = ${currentYear} - 3;
+
+			Default.AssertElementPresent(
+				key_chartRange = "${pastYear}",
+				locator1 = "ATLInvestors#PERFORMANCE_CHART_RANGE");
+		}
+	}
+
+	@description = "Verify that the Sustainability ratings tables can be expanded to display past Atlantia Scores"
+	test TableCanBeExpandedToDisplayPastScores {
+		var pastYears = "2019,2020,2021";
+
+		task ("Given user goes to Rating") {
+			ATLNavigator.goToTopMenu(
+				menuItemName = "Investors",
+				subItemName = "Rating");
+		}
+
+		task ("Then only the most recent info are displayed") {
+			Default.AssertElementPresent(
+				key_tableItem = "Most recent",
+				locator1 = "ATLInvestors#RATING_TABLE");
+
+			for (var pastYear : list "${pastYears}") {
+				Default.AssertNotVisible(
+					key_tableItem = "${pastYear}",
+					locator1 = "ATLInvestors#RATING_TABLE");
+			}
+		}
+
+		task ("And when plus button is clicked") {
+			Default.Click(locator1 = "ATLInvestors#PLUS_BUTTON");
+		}
+
+		task ("Then past results are displayed") {
+			for (var pastYear : list "${pastYears}") {
+				Default.AssertVisible(
+					key_tableItem = "${pastYear}",
+					locator1 = "ATLInvestors#RATING_TABLE");
+			}
+		}
+	}
+
+}

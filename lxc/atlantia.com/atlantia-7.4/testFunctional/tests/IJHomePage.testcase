@@ -1,0 +1,244 @@
+definition {
+
+	setUp {
+		task ("Open Portal") {
+			IJUtils.launchInfraJournalPortal();
+		}
+	}
+
+	tearDown {
+		IJUtils.tearDown();
+	}
+
+	@description = "Verify that the user can browse the articles by clicking the arrows"
+	test CanBrowseByClickingArrows {
+		task ("Given user see the first article from slide") {
+			var articleName = selenium.getText("IJHomePage#GREEN_SLIDE_ARTICLE");
+		}
+
+		task ("When the user clicks on arrow icon to see the next article") {
+			Default.Click(
+				key_arrowSlide = "Right",
+				key_slideName = "Green",
+				locator1 = "IJHomePage#SLIDE_ARROW_NAVIGATOR");
+		}
+
+		task ("Then the first article from the slide will be not visible anymore") {
+			Default.AssertNotVisible(
+				key_articleName = "${articleName}",
+				locator1 = "IJHomePage#HOME_PAGE_ARTICLE");
+		}
+
+		task ("And when the user clicks on back arrow icon") {
+			Default.Click(
+				key_arrowSlide = "Left",
+				key_slideName = "Green",
+				locator1 = "IJHomePage#SLIDE_ARROW_NAVIGATOR");
+		}
+
+		task ("Then the first article will be visible again") {
+			Default.AssertVisible(
+				key_articleName = "${articleName}",
+				locator1 = "IJHomePage#HOME_PAGE_ARTICLE");
+		}
+	}
+
+	@description = "Verify that the Editor's Hub section displays 2 (two) articles"
+	test CanSeeArticlesOnEditorsHub {
+		task ("Given that Editor's Hub section has only two articles") {
+			for (var count : list "1,2") {
+				Default.AssertElementPresent(
+					key_index = "${count}",
+					locator1 = "IJHomePage#EDITORS_HUB_ARTICLE_BY_INDEX");
+			}
+		}
+
+		task ("Then a third article will not be found") {
+			Default.AssertElementNotPresent(
+				key_index = "3",
+				locator1 = "IJHomePage#EDITORS_HUB_ARTICLE_BY_INDEX");
+		}
+	}
+
+	@description = "Verify that the Most Popular article is displayed when the user clicks on 'Most Popular'"
+	test CanSeeMostPopularArticle {
+		task ("Given that the user clicks in Most Popular button on Carousel") {
+			Default.Click(locator1 = "IJHomePage#MOST_POPULAR_BUTTON");
+		}
+
+		task ("Then the most popular article will be showed") {
+			Default.AssertElementPresent(locator1 = "IJHomePage#MOST_POPULAR_CARD");
+		}
+
+		task ("And when the user closes the card") {
+			Default.Click(locator1 = "IJHomePage#MOST_POPULAR_CLOSE");
+		}
+
+		task ("Then the card is not displayed anymore") {
+			Default.AssertElementNotPresent(locator1 = "IJHomePage#MOST_POPULAR_CARD");
+		}
+	}
+
+	@description = "Verify that the Most Shared article is displayed when the user clicks on 'Most Shared'"
+	test CanSeeMostSharedArticle {
+		task ("Given that the user clicks in Most Shared button on Carousel") {
+			Default.Click(locator1 = "IJHomePage#MOST_SHARED_BUTTON");
+		}
+
+		task ("Then the most shared article will be showed") {
+			Default.AssertElementPresent(locator1 = "IJHomePage#MOST_SHARED_CARD");
+		}
+
+		task ("And when the user close the card") {
+			Default.Click(locator1 = "IJHomePage#MOST_SHARED_CLOSE");
+		}
+
+		task ("Then the card is not displayed anymore") {
+			Default.AssertElementNotPresent(locator1 = "IJHomePage#MOST_SHARED_CARD");
+		}
+	}
+
+	@description = "Verify that the Carousel article can be accessed"
+	test CarouselArticlesCanBeAccessed {
+		task ("Given carousel article is clicked") {
+			Default.WaitForElementPresent(
+				key_itemName = "Mobility as a social inclusion driver in cities",
+				locator1 = "IJHomePage#CAROUSEL_ITEM");
+
+			Default.Click(
+				key_itemName = "Mobility as a social inclusion driver in cities",
+				locator1 = "IJHomePage#CAROUSEL_ITEM");
+		}
+
+		task ("Then the user is redirected to article page") {
+			Default.AssertElementPresent(
+				key_title = "Mobility as a social inclusion driver in cities",
+				locator1 = "Portal.Header#H1_TITLE");
+		}
+	}
+
+	@description = "Verify that the Carousel with 7 (seven) articles is displayed on page"
+	test CarouselIsDisplayed {
+		task ("Given that carousel contains only 7 articles") {
+			for (var count : list "1,2,3,4,5,6,7") {
+				Default.AssertElementPresent(
+					key_itemNumber = "${count}",
+					key_totalNumber = "7",
+					locator1 = "IJHomePage#CAROUSEL_ITEM_NUMBER");
+			}
+		}
+
+		task ("Then a fifth article will not be found") {
+			Default.AssertElementNotPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "8",
+				locator1 = "IJHomePage#CAROUSEL_ITEM_NUMBER");
+		}
+	}
+
+	@description = "Verify that a new item can be added on Carousel"
+	test ItemCanBeAddedInCarousel {
+		task ("Given that the admin user logs into the portal") {
+			ATLLogin.signIn();
+		}
+
+		task ("And given that a new Web Content is added") {
+			Portal.Navigator.openWithAppendToBaseURL(
+				baseURL = PropsUtil.get("test.this.atlantia.portal.partial.url"),
+				urlAppend = "group/infrajournal/~/control_panel/manage?p_p_id=com_liferay_journal_web_portlet_JournalPortlet");
+
+			Portal.WebContentNavigator.gotoAddWithStructureCP(structureName = "Basic Web Content");
+
+			Portal.WebContent.addWithStructureCP(webContentTitle = "Test Article");
+
+			Portal.PortletEntry.publish();
+		}
+
+		task ("When a new item is added into carousel banner") {
+			IJUtils.launchInfraJournalPortal();
+
+			IJAdmin.addCarouselItem(entryName = "Test Article");
+		}
+
+		task ("Then the new item appears") {
+			Default.AssertElementPresent(
+				key_itemName = "Test Article",
+				locator1 = "IJHomePage#CAROUSEL_ITEM");
+		}
+
+		task ("And then the max number of items is increased by one") {
+			Default.AssertElementPresent(
+				key_itemNumber = "1",
+				key_totalNumber = "8",
+				locator1 = "IJHomePage#CAROUSEL_ITEM_NUMBER");
+		}
+	}
+
+	@description = "Verify that the Menu is displayed with the options: Home, Green, Infrastructure, Mobility, Technology and Travel"
+	test MenuIsDisplayed {
+		task ("Verify that Green Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Green");
+
+			Default.WaitForElementPresent(
+				key_pageTitle = "green",
+				locator1 = "IJNavigation#PAGE_TITLE");
+
+			Default.AssertElementPresent(
+				key_pageTitle = "green",
+				locator1 = "IJNavigation#PAGE_TITLE");
+		}
+
+		task ("Verify that Infrastructure Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Infrastructure");
+
+			Default.WaitForElementPresent(
+				key_pageTitle = "infrastructure",
+				locator1 = "IJNavigation#PAGE_TITLE");
+
+			Default.AssertElementPresent(
+				key_pageTitle = "infrastructure",
+				locator1 = "IJNavigation#PAGE_TITLE");
+		}
+
+		task ("Verify that Mobility Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Mobility");
+
+			Default.WaitForElementPresent(
+				key_pageTitle = "mobility",
+				locator1 = "IJNavigation#PAGE_TITLE");
+
+			Default.AssertElementPresent(
+				key_pageTitle = "mobility",
+				locator1 = "IJNavigation#PAGE_TITLE");
+		}
+
+		task ("Verify that Technology Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Technology");
+
+			Default.WaitForElementPresent(
+				key_pageTitle = "technology",
+				locator1 = "IJNavigation#PAGE_TITLE");
+
+			Default.AssertElementPresent(
+				key_pageTitle = "technology",
+				locator1 = "IJNavigation#PAGE_TITLE");
+		}
+
+		task ("Verify that Travel Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Travel");
+
+			Default.WaitForElementPresent(
+				key_pageTitle = "travel",
+				locator1 = "IJNavigation#PAGE_TITLE");
+
+			Default.AssertElementPresent(
+				key_pageTitle = "technology",
+				locator1 = "IJNavigation#PAGE_TITLE");
+		}
+
+		task ("Verify that Home Menu is displayed and can be selected") {
+			IJNavigator.goToMenu(menuItem = "Home");
+		}
+	}
+
+}
