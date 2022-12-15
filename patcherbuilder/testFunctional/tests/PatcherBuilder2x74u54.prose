@@ -1,0 +1,36 @@
+@testray.main.component.name = "Patcher Builder"
+Feature: Patcher Builder and 74 u54 builds
+    Testing creation of 74 u54 builds on Patcher Builder.
+
+  Setup:
+    * I go to the Patcher Builder Jenkins homepage
+
+  Scenario: Run fix pack builder hotfix 7x job
+    @priority = "5"
+    As a TSE, I should be able to run the fixpack-builder-hotfix-7x, test-fixpack-builder-install and test-fixpack-builder-revert jobs
+
+    Given I start the fixpack-builder-hotfix-7x job with the following parameters
+      | fix.pack.baseCommittish          | 7.4.13-u54                               |
+      | fix.pack.built.for               | STVINTRA                                 |
+      | fix.pack.customer.ticket         | 12345                                    |
+      | fix.pack.fixed.issues            | LRPK-4329                                |
+      | fix.pack.hotfixed.issues         | LRPK-4329                                |
+      | fix.pack.id                      | 1886                                     |
+      | git.revision                     | 49fce216a5c11d10864dd213e8974033869eb435 |
+      | patcher.build.id                 | 236732088                                |
+      | patcher.combined.branch          | true                                     |
+      | patcher.fix.delivery.method      | Fix Pack 3.0                             |
+      | patcher.request.key              | 8ae74379e83c2774b19ffa56f97f8a5619167de6 |
+      | patcher.security.patch           | false                                    |
+      | patcher.user.id                  | 10196                                    |
+    And I wait for "5" seconds
+    And I go to the Patcher Builder Jenkins homepage
+    And I get the current build number for the job titled "fixpack-builder-hotfix-7x(2x-uat)"
+    And I check the job with the name "fixpack-builder-hotfix-7x(2x-uat)" and build number "${staticJobBuildNumber}" for completion
+    And I go to the Patcher Builder Jenkins homepage
+    When the job with the name "fixpack-builder-hotfix-7x(2x-uat)" and build number "${staticJobBuildNumber}" should have been successful
+    Then I test the patching tool install and revert features with the following parameters
+      | bundle                   | /mnt/mfs-hdd1-172.16.168/ee/portal/7.4.13-u54/liferay-dxp-tomcat-7.4.13.u54-20221208110142351.tar.gz |
+      | hotfix                   | /mnt/mfs-hdd1-172.16.168/ee/hotfix/liferay-hotfix-1886-7413.zip                                      |
+      | patchingTool             | /mnt/mfs-hdd1-172.16.168/ee/fix-packs/patching-tool/patching-tool-3.0.37-internal.zip                |
+      | patchingToolMajorVersion | 3                                                                                                    |
