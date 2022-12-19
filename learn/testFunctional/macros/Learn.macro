@@ -111,6 +111,8 @@ definition {
 			Learn.viewLearnHomepageLinks();
 		}
 
+		Learn.viewLearnPageSidePanelNavigationLinks();
+
 		Learn.viewLearnPageCardLinks();
 
 		Learn.viewFooterLanguageDropdown();
@@ -134,6 +136,43 @@ definition {
 				while (IsElementPresent(locator1 = "Learn#PAGE_CARD_LINK") && (maxIterations = "100")) {
 
 					var pageLink = selenium.getAttribute("xpath=(//div/ul[contains(@class,'subsection') and not(contains(@style,'display'))]/li[not(contains(@style,'display'))]//a)[${key_positionValue}]@href");
+
+					var curl = '''
+						${pageLink}
+						-I --retry 5 --retry-all-errors ${pageLink}
+						''';
+
+					var httpResponseStatusCode = JSONCurlUtil.get("${curl}");
+
+					if (contains("${httpResponseStatusCode}", "HTTP/2 400") || (contains("${httpResponseStatusCode}", "HTTP/2 404"))) {
+						echo("The ${pageLink} page is not working properly.");
+
+						var key_positionValue = ${key_positionValue} + 1;
+					}
+					else {
+						echo("The ${pageLink} page is working properly.");
+
+						var key_positionValue = ${key_positionValue} + 1;
+					}
+				}
+			}
+
+			var linksRemain = "false";
+		}
+	}
+
+		macro viewLearnPageSidePanelNavigationLinks {
+		var key_positionValue = "1";
+		var linksRemain = "true";
+
+		var pageElementsFound = ${pageElementsFound} + 1;
+
+		if (IsElementPresent(locator1 = "Learn#PAGE_SIDE_PANEL_NAVIGATION_LINKS")) {
+
+			while (("${linksRemain}" == "true") && (maxIterations = "100")) {
+				while (IsElementPresent(locator1 = "Learn#PAGE_SIDE_PANEL_NAVIGATION_LINKS") && (maxIterations = "100")) {
+
+					var pageLink = selenium.getAttribute("xpath=(//div[contains(@class,'doc-nav')]//ul[not(contains(@aria-labelledby,'languageSelector'))]/li/a)[${key_positionValue}]@href");
 
 					var curl = '''
 						${pageLink}
