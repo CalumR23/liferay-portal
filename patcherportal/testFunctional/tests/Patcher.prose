@@ -9829,3 +9829,59 @@ Scenario: Check for successful DXP 74 u54 build creation
       | Patcher Status  | Complete                       |
       | Jenkins         | fixpack-builder-hotfix-7x(uat) |
       | Jenkins         | fixpack-builder-agent(uat)     |
+
+Scenario: Check for successful DXP 74 u55 build creation
+    @priority = "5"
+    As a TSE, I should be able to for successful DXP 74 u55 build creation
+    Given I log into the Patcher homepage as the admin user
+    And I generate random fix content
+    And I create a Patcher fix with the following values
+      | Product         | DXP 7.4                                                         |
+      | Project Version | 7.4.13-u55                                                      |
+      | Content         | ${staticFixContent}                                             |
+      | Branch Name     | test-u55                                                        |
+      | Github URL      | git@github.com:Liferay-Patcher-Test-Fixes/liferay-portal-ee.git |
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+      | Content         | ${staticFixContent} |
+      | Version         | 1.0                 |
+      | Product         | DXP 7.4             |
+      | Project Version | 7.4.13-u55          |
+      | Patcher Status  | Adding              |
+      | Type            | Patch               |
+    When I check the Patcher fix containing the content "${staticFixContent}" and type "Patch" for add completion
+    Then I should be able to view a Patcher fix containing the content "${staticFixContent}" and type "Patch" with the following values
+      | Content         | ${staticFixContent}        |
+      | Version         | 1.0                        |
+      | Product         | DXP 7.4                    |
+      | Project Version | 7.4.13-u55                 |
+      | Git Hash        | cb82e65877                 |
+      | Patcher Status  | Complete                   |
+      | Type            | Patch                      |
+      | Jenkins         | fixpack-builder-agent(uat) |
+    When I generate a random ticket number
+    And I create a Patcher build for a new account with the following values
+      | Product         | DXP 7.4               |
+      | Project Version | 7.4.13-u55            |
+      | Tickets List    | ${staticFixContent}   |
+      | Account Code    | STVINTRA              |
+      | Support Ticket  | ${staticTicketNumber} |
+    And I set the account code "STVINTRA" as a static variable
+    And I wait for "5" seconds
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                |
+      | Support Ticket  | ${staticTicketNumber}   |
+      | Version         | 1.0                     |
+      | Project Version | 7.4.13-u55              |
+      | Content         | 0 Fix Packs + 1 Tickets |
+      | Patcher Status  | Compiling               |
+    When I check the Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" for compile completion using the "fixpack-builder-hotfix-7x(uat)" Jenkins job
+    Then I should be able to view a Patcher build for the ticket "${staticTicketNumber}" on the account "STVINTRA" with the following values
+      | Type            | Official                       |
+      | Support Ticket  | ${staticTicketNumber}          |
+      | Version         | 1.0                            |
+      | Project Version | 7.4.13-u55                     |
+      | Content         | 0 Fix Packs + 1 Tickets        |
+      | Patcher Status  | Complete                       |
+      | Jenkins         | fixpack-builder-hotfix-7x(uat) |
+      | Jenkins         | fixpack-builder-agent(uat)     |
