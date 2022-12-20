@@ -6,6 +6,13 @@ Feature: Koroneiki To Provisioning License API
 
 Setup:
 	* I get all test passwords and admin emails
+	* I generate static start and end dates
+	* I generate static full start and end dates
+	* I generate static infinite end dates
+	* I generate static mmddyyyy start and end dates
+	* I generate past static start and end dates
+	* I generate future static start and end dates
+	* I generate future static full start and end dates
 
 Teardown:
 	* I get the ID of the default user belonging to the organization "Korlic - ${staticProjectName}" from zendesk.liferay.com
@@ -39,6 +46,236 @@ Teardown:
 	* I teardown organizations with the following organizationExternalIds "${staticOrganizationExternalIdList}" from zendesk.liferay.com
 	* I teardown the user with userId "${staticDefaultUserId}" from zendesk.liferay.com
 
+Scenario: Generate a Dxp Production license using Provisioning API with matching subscription and license dates and no permanent licenses allowed
+	Testing the ability to generate a license using Provisioning API with matching subscription and license dates and no permanent licenses allowed
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I update a koroneiki account with the name "Korlic - ${staticProjectName}" to have the following values
+	| Account Field and Value | allowPermanentLicenses | false |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I create a license with the following parameters on the account "Korlic - ${staticProjectName}" and product purchase "DXP Production" with the following values
+	| Active                     | true                          |
+	| Expiration Date            | ${staticOriginalEndDate}      |
+	| License Entry Type         | production                    |
+	| Max Cluster Nodes          | 0                             |
+	| Name                       | Korlic - ${staticProjectName} |
+	| Product Version            | 7.4                           |
+	| Start Date                 | ${staticStartDate}            |
+	And I go to the license index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	When I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName}  |
+	| Description   | Korlic - ${staticProjectName}  |
+	| Product       | DXP Production                 |
+	| Type          | Production                     |
+	| Details       | Host Name: localhost           |
+	| Details       | IP Address: 123.45.67.89       |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F |
+	| Status        | ACTIVE                         |
+	| Complimentary | false                          |
+
+Scenario: Attempt to generate a Dxp Production license using Provisioning API with mismatching subscription and license dates and no permanent licenses allowed
+	Testing the attempt to generate a license using Provisioning API with mismatching subscription and license dates and no permanent licenses allowed
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I update a koroneiki account with the name "Korlic - ${staticProjectName}" to have the following values
+	| Account Field and Value | allowPermanentLicenses | false |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         |   |
+	| Original End Date       | ${staticOriginalEndDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I create a license with the following parameters on the account "Korlic - ${staticProjectName}" and product purchase "DXP Production" with the following values
+	| Active                     | true                          |
+	| Expiration Date            | ${staticEndDate}              |
+	| License Entry Type         | production                    |
+	| Max Cluster Nodes          | 0                             |
+	| Name                       | Korlic - ${staticProjectName} |
+	| Product Version            | 7.4                           |
+	| Start Date                 | ${staticStartDate}            | 
+	And I go to the license index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	When I click on the "Licenses" tab
+	Then I should not be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName}"
+
+Scenario: Generate a Dxp Production complimentary license using Provisioning API with 30 days
+	Testing the ability to generate a license using Provisioning API with 30 days
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I update a koroneiki account with the name "Korlic - ${staticProjectName}" to have the following values
+	| Account Field and Value | allowPermanentLicenses | false |
+	| Account Field and Value | allowComplimentary     | true  |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticFutureStartDate} |   |
+	| Original End Date       | ${staticFutureStartDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I create a license with the following parameters on the account "Korlic - ${staticProjectName}" and product purchase "DXP Production" with the following values
+	| Active                     | true                          |
+	| Complimentary              | true                          |
+	| Expiration Date            | ${staticFutureStartDate}      |
+	| License Entry Type         | production                    |
+	| Max Cluster Nodes          | 0                             |
+	| Name                       | Korlic - ${staticProjectName} |
+	| Product Version            | 7.4                           |
+	| Start Date                 | ${staticStartDate}            |
+	And I go to the license index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	When I click on the "Licenses" tab
+	Then I should be able to view the license with the keyword "Korlic - ${staticProjectName}" and the following values on the account details page
+	| Name          | Korlic - ${staticProjectName}  |
+	| Description   | Korlic - ${staticProjectName}  |
+	| Product       | DXP Production                 |
+	| Type          | Production                     |
+	| Details       | Host Name: localhost           |
+	| Details       | IP Address: 123.45.67.89       |
+	| Details       | MAC Address: 0A-1B-2C-3D-4E-5F |
+	| Status        | ACTIVE                         |
+	| Complimentary | true                           |
+
+Scenario: Attempt to generate a Dxp Production complimentary license using Provisioning API without 30 days
+	Testing the attempt to generate a Dxp Production complimentary license using Provisioning API without 30 days
+
+	Given I generate a provisioning project name
+	And I create an account on koroneiki with the following values
+	| Code                  | KORLICKORLIC                         | |
+	| Contact Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Description           | Test osb account on koroneiki        | |
+	| Fax Number            | 555-555-1234                         | |
+	| Name                  | Korlic - ${staticProjectName}        | |
+	| Phone Number          | 555-555-5678                         | |
+	| Profile Email Address | lic.koroneiki1@lrcustomer.com.broken | |
+	| Region                | United States                        | |
+	| Status                | Active                               | |
+	| Tier                  | T4                                   | |
+	| Website               | www.koroneikicorporation.com         | |
+	And I update a koroneiki account with the name "Korlic - ${staticProjectName}" to have the following values
+	| Account Field and Value | allowPermanentLicenses | false |
+	| Account Field and Value | allowComplimentary     | true  |
+	And I generate the account key value for "Korlic - ${staticProjectName}"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
+	| End Date                | ${staticFutureStartDate} |   |
+	| Original End Date       | ${staticFutureStartDate} |   |
+	| Perpetual               | false                    |   |
+	| Product Field and Value | sizing                   | 1 |
+	| Product Field and Value | licenses                 | 1 |
+	| Product Field and Value | version                  | 7 |
+	| Quantity                | 1                        |   |
+	| Start Date              | ${staticStartDate}       |   |
+	| Status                  | Approved                 |   |
+	And I generate the product purchase ID value for the product purchase made by "Korlic - ${staticProjectName}" for "DXP Production"
+	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Platinum Subscription" on koroneiki with the following values
+	| End Date                | ${staticEndDate}         | |
+	| Original End Date       | ${staticOriginalEndDate} | |
+	| Perpetual               | false                    | |
+	| Quantity                | 1                        | |
+	| Start Date              | ${staticStartDate}       | |
+	| Status                  | Approved                 | |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I create a license with the following parameters on the account "Korlic - ${staticProjectName}" and product purchase "DXP Production" with the following values
+	| Active                     | true                          |
+	| Complimentary              | true                          |
+	| Expiration Date            | ${staticEndDate}              |
+	| License Entry Type         | production                    |
+	| Max Cluster Nodes          | 0                             |
+	| Name                       | Korlic - ${staticProjectName} |
+	| Product Version            | 7.4                           |
+	| Start Date                 | ${staticStartDate}            |
+	And I go to the license index page
+	And I search the accounts page using the keyword "Korlic"
+	And I click on the account with the name "Korlic - ${staticProjectName}" on the provisioning index
+	When I click on the "Licenses" tab
+	Then I should not be able to view the active license on the account "Korlic - ${staticProjectName}" with the name "Korlic - ${staticProjectName}"
+
 Scenario: Deactivate and activate new DXP license
 	Testing the ability to deactivate and activate licenses via API
 
@@ -56,10 +293,6 @@ Scenario: Deactivate and activate new DXP license
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -152,10 +385,6 @@ Scenario: Deactivate and activate new Portal license
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -249,10 +478,6 @@ Scenario: View active and deactivated licenses
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -366,10 +591,6 @@ Scenario: View active and deactivated Portal licenses
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -485,10 +706,6 @@ Scenario: View license filtered by name
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -564,10 +781,6 @@ Scenario: View license filtered by product version
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -643,12 +856,6 @@ Scenario: View license filtered by expiration date
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
-	And I generate static infinite end dates
-	And I generate static mmddyyyy start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -726,12 +933,6 @@ Scenario: View license filtered by start date
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
-	And I generate static infinite end dates
-	And I generate static mmddyyyy start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -809,10 +1010,6 @@ Scenario: View license filtered by complimentary
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -889,10 +1086,6 @@ Scenario: View license filtered by description
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -968,10 +1161,6 @@ Scenario: View license filtered by Host Name
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1047,10 +1236,6 @@ Scenario: View license filtered by IP Address
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1126,10 +1311,6 @@ Scenario: View license filtered by MAC Address
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1205,10 +1386,6 @@ Scenario: View license filtered by instance size
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1285,10 +1462,6 @@ Scenario: View license filtered by Maximum Cluster Nodes
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1362,10 +1535,6 @@ Scenario: View license filtered by product name
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1442,10 +1611,6 @@ Scenario: View license filtered by multiple filters
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1704,10 +1869,6 @@ Scenario: Download new DXP license developer license key
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1789,10 +1950,6 @@ Scenario: View the generate license form options for DXP Production account
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1854,10 +2011,6 @@ Scenario: View the generate license form options for DXP Production and Commerce
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1929,10 +2082,6 @@ Scenario: View the generate license form options for DXP OEM account
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP OEM" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -1987,10 +2136,6 @@ Scenario: View the generate license form options for DXP Unlimited Enterprise-Wi
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Unlimited Enterprise-Wide" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2045,10 +2190,6 @@ Scenario: View the generate license form options for Portal Production account
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2069,7 +2210,7 @@ Scenario: View the generate license form options for Portal Production account
 	| Status                  | Approved                 | |
 	And I synchronize the account entitlement definition with the name "Platinum Subscription"
 	Then I should be able to view the following generate license form options for the account "Korlic - ${staticProjectName}" with the product group "Portal"
-	| Allow Permanent Licenses | true                        |                                     |            |
+	| Allow Permanent Licenses | true                        |                                     |           |
 	| End Date                 | ${staticProductPurchaseKey} | ${staticOriginalEndDate}            |           |
 	| Label                    | 6.1 GA1                     |                                     |           |
 	| License Entry Name       | 6.1 GA1                     | Portal Production                   |           |
@@ -2118,10 +2259,6 @@ Scenario: View the generate license form options for DXP and Portal account
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2224,10 +2361,6 @@ Scenario: View the generate license form options for DXP Production account with
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2305,10 +2438,6 @@ Scenario: View the generate license form options for DXP account with different 
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2389,10 +2518,6 @@ Scenario: Download DXP license via API
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2460,10 +2585,6 @@ Scenario: Download Commerce license via API
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2544,10 +2665,6 @@ Scenario: Download portal license via API
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "Portal Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         | |
 	| Original End Date       | ${staticOriginalEndDate} | |
@@ -2607,10 +2724,6 @@ Scenario: Download DXP license aggregate via API
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2691,10 +2804,6 @@ Scenario: View no download DXP license aggregate via API due to different produc
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2788,10 +2897,6 @@ Scenario: Download DXP license zip via API
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2872,10 +2977,6 @@ Scenario: Download developer DXP license via API for an account with self provis
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
@@ -2964,10 +3065,6 @@ Scenario: Attempt developer DXP license download via API for an account with sel
 	| Tier                  | T4                                   | |
 	| Website               | www.koroneikicorporation.com         | |
 	And I generate the account key value for "Korlic - ${staticProjectName}"
-	And I generate static start and end dates
-	And I generate static full start and end dates
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
 	And I create a product purchase for an account with the name "Korlic - ${staticProjectName}" and the product "DXP Production" on koroneiki with the following values
 	| End Date                | ${staticEndDate}         |   |
 	| Original End Date       | ${staticOriginalEndDate} |   |
