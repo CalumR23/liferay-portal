@@ -726,6 +726,72 @@ definition {
 		}
 	}
 
+	@prose = "I should be able to view the contact with the email address ${contactEmailAddress} on the account ${accountName} subscribed to the following licenses using okta session id ${table}"
+	macro _subscribedToLicenseViaSessionId {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var value = "${row[0]}";
+
+			var curl = '''
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=subscriptionContactUuids/any%28s:contains%28s,%27${contactUuid}%27%29%29 --tlsv1.2
+				-H "Okta-Session-ID: ${staticOktaSessionId}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var licensesSubscribed = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${value}')].name");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "[", "");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "]", "");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "\"", "");
+
+
+			echo("The License that the user ${contactEmailAddress} is subscribed to is ${licensesSubscribed}");
+
+			if("${licensesSubscribed}" != "${value}"){
+				fail("The license ${value} isn't subscribed to the user ${contactEmailAddress}");
+			}
+		}
+	}
+
+	@prose = "I should not be able to view the contact with the email address ${contactEmailAddress} on the account ${accountName} subscribed to the following licenses using okta session id ${table}"
+	macro _unsubscribedToLicenseViaSessionId {
+		var contactUuid = KoroneikiContactAPI._getContactUuidViaContactEmailAddress(contactEmailAddress = "${contactEmailAddress}");
+		var accountKey = KoroneikiAccountAPI._getAccountKeyViaAccountName(accountName = "${accountName}");
+		var RawTable rawTable = new RawTable("${table}");
+
+		for (var row : table "${rawTable}") {
+			var value = "${row[0]}";
+
+			var curl = '''
+				${provisioningURL}/o/provisioning-rest/v1.0/accounts/${accountKey}/license-keys?filter=subscriptionContactUuids/any%28s:contains%28s,%27${contactUuid}%27%29%29 --tlsv1.2
+				-H "Okta-Session-ID: ${staticOktaSessionId}"
+				-H "accept: application/json"
+				-H "Content-Type: application/json"
+				''';
+
+			var licensesSubscribed = JSONCurlUtil.get("${curl}", "$.items[?(@.name=='${value}')].name");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "[", "");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "]", "");
+
+			var licensesSubscribed = StringUtil.replace("${licensesSubscribed}", "\"", "");
+
+
+			echo("The License that the user ${contactEmailAddress} is subscribed to is ${licensesSubscribed} , if it's empty is not subscribed to it!");
+
+			if (contains("${licensesSubscribed}", "${value}")) {
+				fail("The license ${value} isn't subscribed to the user ${contactEmailAddress} when it shouldn't be");
+			}
+		}
+	}
+
 	@prose = "I unsubscribe the license on provisioning with the name ${licenseName} on the account ${accountName} using okta session id"
 	macro _unsubscribeToLicenseViaSessionId {
 		var licenseKeyId = ProvisioningLicenseAPI._getLicenseKeyIdViaLicenseName(
@@ -742,10 +808,10 @@ definition {
 		var apiReturn = JSONCurlUtil.delete("${curl}");
 
 		if (contains("${apiReturn}", "FORBIDDEN")) {
-			fail("There an error message when subscribing the user to the license");
+			fail("There is an error message when subscribing the user to the license");
 		}
 		else if (contains("${apiReturn}", "INTERNAL_SERVER_ERROR")) {
-			fail("There an error message when subscribing the user to the license");
+			fail("There is an error message when subscribing the user to the license");
 		}
 	}
 
