@@ -2346,6 +2346,106 @@ Scenario: View okta user creation form on active account
 	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
 	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
 
+Scenario: View okta user creation form on future account
+	Testing the ability to create a customer contact via the view form for okta user creation on a future account in provisioning.
+
+	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrkor - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
+	| Contact First Name                     | USR                                        |
+	| Contact Last Name                      | Koroneiki1                                 |
+	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
+	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
+	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Automotive                                 |
+	| Owner Email Address                    | usr.koroneiki4@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki4                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Type                           | New                                        |
+	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
+	| Project Name                           | Korusr - ${staticProjectName}              |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	| Subscription Level                     | Platinum                                   |
+	| Version Number                         | 7.1                                        |
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Quantity                | 1                              | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Quantity                | 1                              | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
+	| Assign Role   | Support User                         |
+	Then I should be able to view an info message stating that the contact could not be found
+	And I populate and save the assign contact okta form with the following values
+	| First Name | USR                                  |
+	| Last Name  | Koroneiki5                           |
+	| Email      | usr.koroneiki5@lrcustomer.com.broken |
+	| Roles      | Support User                         |
+	And I go to the account index page
+	And I search the accounts page using the keyword "Korusr"
+	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Korusr - ${staticProjectName} |
+	| Code           | USRKORKORUSR                  |
+	| State          | ACTIVE                        |
+	| Support Region | United States                 |
+	| SLA            | Platinum                      |
+	| Tier           | T4                            |
+	When I click on the "Contacts" tab
+	Then I should be able to view the contact with the email address "usr.koroneiki1@lrcustomer.com.broken" and the following values
+	| Name          | USR Koroneiki1                       |
+	| Email Address | usr.koroneiki1@lrcustomer.com.broken |
+	| Role          | Support User                         |
+	| User Status   | VERIFIED                             |
+	And I should be able to view the contact with the email address "usr.koroneiki5@lrcustomer.com.broken" and the following values
+	| Name          | USR Koroneiki5                       |
+	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
+	| Role          | Support User                         |
+	| User Status   | UNVERIFIED                           |
+	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
+	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
+
 Scenario: View okta user error message on expired account
 	Testing the inability to create a customer contact via the view form for okta user creation on an inactive account in provisioning.
 
@@ -2469,6 +2569,93 @@ Scenario: View okta user creation form on active partner account
 	| Start Day                              | ${staticStartDay}                          |
 	| Start Month                            | ${staticStartMonth}                        |
 	| Start Year                             | ${staticStartYear}                         |
+	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
+	And I go to the account index page
+	And I search the accounts page using the keyword "Usrpar"
+	And I click on the account with the name "Usrpar - ${staticCompanyName}" on the provisioning index
+	And I click on the "Contacts" tab
+	And I click on the assign contact button
+	And I populate and save the assign contact form with the following values
+	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
+	| Assign Role   | Partner Member                       |
+	Then I should be able to view an info message stating that the contact could not be found
+	When I populate and save the assign contact okta form with the following values
+	| First Name | USR                                  |
+	| Last Name  | Koroneiki5                           |
+	| Email      | usr.koroneiki5@lrcustomer.com.broken |
+	| Roles      | Partner Member                       |
+	And I go to the account index page
+	And I search the accounts page using the keyword "Usrpar"
+	And I click on the account with the name "Usrpar - ${staticCompanyName}" on the provisioning index
+	Then I should be able to view the following account values in the account details page
+	| Name           | Usrpar - ${staticCompanyName} |
+	| Code           | USRPAR                        |
+	When I click on the "Liferay Workers" tab
+	Then I should be able to view the worker with the email address "usr.koroneiki2@lrcustomer.com.broken" and the following values
+	| Name          | USR Koroneiki2                       |
+	| Email Address | usr.koroneiki2@lrcustomer.com.broken |
+	| Role          | Liferay Sales                        |
+	| Role          | Secondary Contact                    |
+	| User Status   | VERIFIED                             |
+	When I click on the "Contacts" tab
+	Then I should be able to view the contact with the email address "usr.koroneiki5@lrcustomer.com.broken" and the following values
+	| Name          | USR Koroneiki5                       |
+	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
+	| Role          | Partner Member                       |
+	| User Status   | UNVERIFIED                           |
+	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
+	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
+
+Scenario: View okta user creation form on future partner account
+	Testing the ability to create a partner contact via the view form for okta user creation on a future partner account in provisioning.
+
+	Given I publish a partner account RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
+	| Account Name                           | Usrpar - ${staticCompanyName}              |
+	| Address City                           | Diamond Bar                                |
+	| Address Country                        | United States                              |
+	| Address Postal Code                    | 91765                                      |
+	| Address Region                         | California                                 |
+	| Address Street                         | 456 Fake Street                            |
+	| Dossiera Account Key                   | efghabcd6789012345                         |
+	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
+	| End Day                                | ${staticEndDay}                            |
+	| End Month                              | ${staticEndMonth}                          |
+	| End Year                               | ${staticEndYear}                           |
+	| Industry                               | Professional Services (Technical/Web/IT)   |
+	| Owner Email Address                    | usr.koroneiki2@lrcustomer.com.broken       |
+	| Owner First Name                       | USR                                        |
+	| Owner Last Name                        | Koroneiki2                                 |
+	| Partner First Line Support             | false                                      |
+	| Product Name                           | Service Partnership                        |
+	| Product Type                           | New                                        |
+	| Renewal                                | false                                      |
+	| Salesforce Opportunity Key             | 000000f6e7fa1b2c3d4e5                      |
+	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
+	| Salesforce Opportunity Sold By         | Liferay US                                 |
+	| Salesforce Opportunity Stage Name      | Closed Won                                 |
+	| Salesforce Opportunity Territory       | United States                              |
+	| Salesforce Opportunity Type            | New Business                               |
+	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
+	| Start Day                              | ${staticStartDay}                          |
+	| Start Month                            | ${staticStartMonth}                        |
+	| Start Year                             | ${staticStartYear}                         |
+	And I generate future static start and end dates
+	And I generate future static full start and end dates
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "DXP Production" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Quantity                | 1                              | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
+	| End Date                | ${staticFutureEndDate}         | |
+	| Original End Date       | ${staticFutureOriginalEndDate} | |
+	| Perpetual               | false                          | |
+	| Quantity                | 1                              | |
+	| Start Date              | ${staticFutureStartDate}       | |
+	| Status                  | Approved                       | |
+	And I synchronize the account entitlement definition with the name "Platinum Subscription"
 	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
 	And I go to the account index page
 	And I search the accounts page using the keyword "Usrpar"
@@ -2986,190 +3173,3 @@ Scenario: View okta updated user uuid
 	| UUID from email address | Read Only Input | usr.koroneiki1@lrcustomer.com.broken |
 	| First Name              | Read Only Input | USR                                  |
 	| Last Name               | Read Only Input | Koroneiki1                           |
-
-	Scenario: View okta user creation form on future account
-	Testing the ability to create a customer contact via the view form for okta user creation on an active account in provisioning.
-
-	Given I publish a project with no partner RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
-	| Account Name                           | Usrkor - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
-	| Contact Email Address                  | usr.koroneiki1@lrcustomer.com.broken       |
-	| Contact First Name                     | USR                                        |
-	| Contact Last Name                      | Koroneiki1                                 |
-	| Dossiera Account Key                   | ${staticDossieraAccountKey}                |
-	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
-	| Dossiera Address Key 2                 | ${staticDossieraAddressKey2}               |
-	| Dossiera Contact Key                   | ${staticDossieraContactKey}                |
-	| Dossiera Project Key                   | ${staticDossieraProjectKey}                |
-	| End Day                                | ${staticEndDay}                            |
-	| End Month                              | ${staticEndMonth}                          |
-	| End Year                               | ${staticEndYear}                           |
-	| Industry                               | Automotive                                 |
-	| Owner Email Address                    | usr.koroneiki4@lrcustomer.com.broken       |
-	| Owner First Name                       | USR                                        |
-	| Owner Last Name                        | Koroneiki4                                 |
-	| Partner First Line Support             | false                                      |
-	| Product Type                           | New                                        |
-	| Product Name                           | Liferay Digital Enterprise - Prod Sizing 4 |
-	| Project Name                           | Korusr - ${staticProjectName}              |
-	| Renewal                                | false                                      |
-	| Salesforce Opportunity Key             | ${staticSalesforceOpportunityKey}          |
-	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
-	| Salesforce Opportunity Line Item Key 2 | ${staticSalesforceOpportunityLineItemKey2} |
-	| Salesforce Opportunity Sold By         | Liferay US                                 |
-	| Salesforce Opportunity Stage Name      | Closed Won                                 |
-	| Salesforce Opportunity Territory       | United States                              |
-	| Salesforce Opportunity Type            | New Business                               |
-	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
-	| Salesforce Project Key                 | ${staticSalesforceProjectKey}              |
-	| Start Day                              | ${staticStartDay}                          |
-	| Start Month                            | ${staticStartMonth}                        |
-	| Start Year                             | ${staticStartYear}                         |
-	| Subscription Level                     | Platinum                                   |
-	| Version Number                         | 7.1                                        |
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
-	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "DXP Production" to have the following values
-	| End Date                | ${staticFutureEndDate}         | |
-	| Original End Date       | ${staticFutureOriginalEndDate} | |
-	| Perpetual               | false                          | |
-	| Quantity                | 1                              | |
-	| Start Date              | ${staticFutureStartDate}       | |
-	| Status                  | Approved                       | |
-	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
-	| End Date                | ${staticFutureEndDate}         | |
-	| Original End Date       | ${staticFutureOriginalEndDate} | |
-	| Perpetual               | false                          | |
-	| Quantity                | 1                              | |
-	| Start Date              | ${staticFutureStartDate}       | |
-	| Status                  | Approved                       | |
-	And I synchronize the account entitlement definition with the name "Platinum Subscription"
-	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
-	And I go to the account index page
-	And I search the accounts page using the keyword "Korusr"
-	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
-	And I click on the "Contacts" tab
-	And I click on the assign contact button
-	And I populate and save the assign contact form with the following values
-	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
-	| Assign Role   | Support User                         |
-	Then I should be able to view an info message stating that the contact could not be found
-	And I populate and save the assign contact okta form with the following values
-	| First Name | USR                                  |
-	| Last Name  | Koroneiki5                           |
-	| Email      | usr.koroneiki5@lrcustomer.com.broken |
-	| Roles      | Support User                         |
-	And I go to the account index page
-	And I search the accounts page using the keyword "Korusr"
-	And I click on the account with the name "Korusr - ${staticProjectName}" on the provisioning index
-	Then I should be able to view the following account values in the account details page
-	| Name           | Korusr - ${staticProjectName} |
-	| Code           | USRKORKORUSR                  |
-	| State          | ACTIVE                        |
-	| Support Region | United States                 |
-	| SLA            | Platinum                      |
-	| Tier           | T4                            |
-	When I click on the "Contacts" tab
-	Then I should be able to view the contact with the email address "usr.koroneiki1@lrcustomer.com.broken" and the following values
-	| Name          | USR Koroneiki1                       |
-	| Email Address | usr.koroneiki1@lrcustomer.com.broken |
-	| Role          | Support User                         |
-	| User Status   | VERIFIED                             |
-	And I should be able to view the contact with the email address "usr.koroneiki5@lrcustomer.com.broken" and the following values
-	| Name          | USR Koroneiki5                       |
-	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
-	| Role          | Support User                         |
-	| User Status   | UNVERIFIED                           |
-	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
-	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
-
-	Scenario: View okta user creation form on future partner account
-	Testing the ability to create a partner contact via the view form for okta user creation on an active partner account in provisioning.
-
-	Given I publish a partner account RabbitMQ message with routing key "dossiera.provisioning.create" with the following values
-	| Account Name                           | Usrpar - ${staticCompanyName}              |
-	| Address City                           | Diamond Bar                                |
-	| Address Country                        | United States                              |
-	| Address Postal Code                    | 91765                                      |
-	| Address Region                         | California                                 |
-	| Address Street                         | 456 Fake Street                            |
-	| Dossiera Account Key                   | efghabcd6789012345                         |
-	| Dossiera Address Key 1                 | ${staticDossieraAddressKey1}               |
-	| End Day                                | ${staticEndDay}                            |
-	| End Month                              | ${staticEndMonth}                          |
-	| End Year                               | ${staticEndYear}                           |
-	| Industry                               | Professional Services (Technical/Web/IT)   |
-	| Owner Email Address                    | usr.koroneiki2@lrcustomer.com.broken       |
-	| Owner First Name                       | USR                                        |
-	| Owner Last Name                        | Koroneiki2                                 |
-	| Partner First Line Support             | false                                      |
-	| Product Name                           | Service Partnership                        |
-	| Product Type                           | New                                        |
-	| Renewal                                | false                                      |
-	| Salesforce Opportunity Key             | 000000f6e7fa1b2c3d4e5                      |
-	| Salesforce Opportunity Line Item Key 1 | ${staticSalesforceOpportunityLineItemKey1} |
-	| Salesforce Opportunity Sold By         | Liferay US                                 |
-	| Salesforce Opportunity Stage Name      | Closed Won                                 |
-	| Salesforce Opportunity Territory       | United States                              |
-	| Salesforce Opportunity Type            | New Business                               |
-	| Salesforce Owner User Key              | ${staticSalesforceOwnerUserKey}            |
-	| Start Day                              | ${staticStartDay}                          |
-	| Start Month                            | ${staticStartMonth}                        |
-	| Start Year                             | ${staticStartYear}                         |
-	And I generate future static start and end dates
-	And I generate future static full start and end dates
-	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "DXP Production" to have the following values
-	| End Date                | ${staticFutureEndDate}         | |
-	| Original End Date       | ${staticFutureOriginalEndDate} | |
-	| Perpetual               | false                          | |
-	| Quantity                | 1                              | |
-	| Start Date              | ${staticFutureStartDate}       | |
-	| Status                  | Approved                       | |
-	And I update a product purchase on koroneiki made by the account "Korusr - ${staticProjectName}" for the product "Platinum Subscription" to have the following values
-	| End Date                | ${staticFutureEndDate}         | |
-	| Original End Date       | ${staticFutureOriginalEndDate} | |
-	| Perpetual               | false                          | |
-	| Quantity                | 1                              | |
-	| Start Date              | ${staticFutureStartDate}       | |
-	| Status                  | Approved                       | |
-	And I synchronize the account entitlement definition with the name "Platinum Subscription"
-	And I log into the provisioning homepage as "${staticProvisioningAdminEmailAddress}" with password "${staticProvisioningAdminPassword}"
-	And I go to the account index page
-	And I search the accounts page using the keyword "Usrpar"
-	And I click on the account with the name "Usrpar - ${staticCompanyName}" on the provisioning index
-	And I click on the "Contacts" tab
-	And I click on the assign contact button
-	And I populate and save the assign contact form with the following values
-	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
-	| Assign Role   | Partner Member                       |
-	Then I should be able to view an info message stating that the contact could not be found
-	When I populate and save the assign contact okta form with the following values
-	| First Name | USR                                  |
-	| Last Name  | Koroneiki5                           |
-	| Email      | usr.koroneiki5@lrcustomer.com.broken |
-	| Roles      | Partner Member                       |
-	And I go to the account index page
-	And I search the accounts page using the keyword "Usrpar"
-	And I click on the account with the name "Usrpar - ${staticCompanyName}" on the provisioning index
-	Then I should be able to view the following account values in the account details page
-	| Name           | Usrpar - ${staticCompanyName} |
-	| Code           | USRPAR                        |
-	When I click on the "Liferay Workers" tab
-	Then I should be able to view the worker with the email address "usr.koroneiki2@lrcustomer.com.broken" and the following values
-	| Name          | USR Koroneiki2                       |
-	| Email Address | usr.koroneiki2@lrcustomer.com.broken |
-	| Role          | Liferay Sales                        |
-	| Role          | Secondary Contact                    |
-	| User Status   | VERIFIED                             |
-	When I click on the "Contacts" tab
-	Then I should be able to view the contact with the email address "usr.koroneiki5@lrcustomer.com.broken" and the following values
-	| Name          | USR Koroneiki5                       |
-	| Email Address | usr.koroneiki5@lrcustomer.com.broken |
-	| Role          | Partner Member                       |
-	| User Status   | UNVERIFIED                           |
-	And the user with the email address "usr.koroneiki5@lrcustomer.com.broken" should be present on okta
-	And the koroneiki contact and the okta user with the email address "usr.koroneiki5@lrcustomer.com.broken" should have matching uuid values
