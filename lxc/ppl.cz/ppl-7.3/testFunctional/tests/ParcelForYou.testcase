@@ -1,0 +1,107 @@
+definition {
+
+	setUp {
+		Utils.launchUatHomePage();
+	}
+
+	@description = "Automation ID: PPLUPGD1122-34 | Test Summary: Verify that the user can send a parcel using the the options: Large Parcel, PickUp, Address, Cash on delivery"
+	@priority = "5"
+	test CanSendLargeParcelPickUpAddressAndCash {
+		task ("When that I navigate to 'Send a package' and select the type of shipment") {
+			var addressCity = "Říčany";
+			var addressEmail = "test@liferay.com";
+			var addressName = "Test Test";
+			var addressPhone = "123456789";
+			var addressStreet = "K Borovému 99";
+			var addresszipCode = "25101";
+			var addressNameRecipient = "Test Test";
+			var addressPhoneRecipient = "123456789";
+			var addressEmailRecipient = "test@liferay.com";
+			var addressStreetRecipient = "Olivova 116/7";
+
+			Menu.gotoMenuItens(menuItens = "Send a parcel");
+
+			ParcelForYou.sendParcelShipments(index = "1");
+
+			ParcelForYou.sendAParcel();
+		}
+
+		task ("Given I accept cookies and change the language of the page") {
+			General.acceptCookies();
+
+			General.selectLanguage();
+		}
+
+		task ("When I choose the pack size and accept the conditions") {
+			ParcelForYou.selectPackageSize(packageSize = "Large");
+
+			General.acceptConditions();
+
+			General.submit();
+		}
+
+		task ("Given the sender form is completed and sent") {
+			ParcelForYou.typeFormSendShipment(
+				addressCity = "${addressCity}",
+				addressEmail = "${addressEmail}",
+				addressName = "${addressName}",
+				addressPhone = "${addressPhone}",
+				addressStreet = "${addressStreet}",
+				addresszipCode = "${addresszipCode}");
+
+			General.submit();
+		}
+
+		task ("When choosing which 'Parcelshop' it will be delivered to and select the 'Cash on Delivery' option") {
+			Maps.findPlaceParcelBox(mapInput = "Olivova 116/7");
+
+			ParcelForYou.buttonCashOnDelivery();
+		}
+
+		task ("Given I fill in the bank details") {
+			ParcelForYou.typeFormBankCashOnDelivery(
+				codBankAccount = "123",
+				codValue = "138");
+		}
+
+		task ("Given the recipient form is completed and sent") {
+			ParcelForYou.typeFormRecipientShipment(
+				addressEmailRecipient = "${addressEmailRecipient}",
+				addressNameRecipient = "${addressNameRecipient}",
+				addressPhoneRecipient = "${addressPhoneRecipient}");
+
+			General.submit();
+		}
+
+		task ("TThen the sender and recipient information overview is displayed") {
+			ParcelForYou.viewSenderForms(
+				addressEmail = "${addressEmail}",
+				addressName = "${addressName}",
+				addressPhone = "${addressPhone}",
+				addressStreet = "${addressStreet}",
+				senderOrRecipient = "Sender");
+
+			ParcelForYou.viewRecipientForms(
+				addressEmailRecipient = "${addressEmailRecipient}",
+				addressNameRecipient = "${addressNameRecipient}",
+				addressPhoneRecipient = "${addressPhoneRecipient}",
+				addressStreetRecipient = "${addressStreetRecipient}",
+				senderOrRecipient = "Recipient");
+		}
+
+		task ("Then the overview of selected items are displayed and terms accepted") {
+			ParcelForYou.viewSelectionOverview(selectionOverviewList = "Large");
+
+			ParcelForYou.viewSelectionOverview(selectionOverviewList = "Drop off at Parcelshop");
+
+			ParcelForYou.viewSelectionOverview(selectionOverviewList = "To a Parcelshop");
+
+			ParcelForYou.viewSelectionOverview(selectionOverviewList = "Cash on delivery");
+
+			General.acceptTermsAndConditions();
+
+			General.buttonPay();
+		}
+	}
+
+}
