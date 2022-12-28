@@ -1,43 +1,50 @@
 definition {
 
 	macro createProject {
+		var baseURL = Utils.getApiBaseURL();
 		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
-		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
-		var projectID = "${projectID}";
+
+		if (!(isSet(projectId))) {
+			var projectId = Utils.createProjectId();
+		}
+
+		if (!(isSet(environment))) {
+			var environment = "false";
+		}
 
 		var curl = '''
-            https://${baseURL}/projects \
+            ${baseURL}/projects \
             -u ${user}:${password} \
             -H "accept: application/json" \
             -H "Content-Type: application/json" \
             -d '{
-                "projectId": "${projectID}",
-                "cluster": "us-west1-c1"
-                }'
+				"projectId": "${projectId}",
+				"cluster": "us-west1-c1",
+				"environment": '${environment}'
+				}'
         ''';
 
-		var createProject = JSONCurlUtil.post("${curl}");
+		var apiResponse = JSONCurlUtil.post("${curl}");
 
 		UtilsAPI.assertApiResponse(response = "${apiResponse}");
+
+		return "${projectId}";
 	}
 
 	macro deleteProject {
+		var baseURL = Utils.getApiBaseURL();
 		var user = PropsUtil.get("test.this.lcp.test.account.user.email");
 		var password = PropsUtil.get("test.this.lcp.test.account.user.password");
-		var baseURL = PropsUtil.get("test.this.lcp.test.base.url.api");
-		var projectID = "${projectID}";
 
-		if (contains("${projectID}", "qaposhi")) {
-			var curl = '''
-                https://${baseURL}/projects/${projectID} \
+		var curl = '''
+                ${baseURL}/projects/${projectId} \
                 -u ${user}:${password} \
             ''';
 
-			var apiResponse = JSONCurlUtil.delete("${curl}");
+		var apiResponse = JSONCurlUtil.delete("${curl}");
 
-			UtilsAPI.assertApiResponse(response = "${apiResponse}");
-		}
+		UtilsAPI.assertApiResponse(response = "${apiResponse}");
 	}
 
 	macro fetchProjectUid {
