@@ -1138,6 +1138,8 @@ public class PoshiValidation {
 		List<String> possibleAttributeNames = Arrays.asList(
 			"line-number", "message");
 
+		String poshiElementName = poshiElement.getName();
+
 		validateHasNoChildElements(poshiElement);
 		validatePossibleAttributeNames(poshiElement, possibleAttributeNames);
 
@@ -1147,6 +1149,18 @@ public class PoshiValidation {
 			_exceptions.add(
 				new PoshiElementException(
 					poshiElement, "Missing message attribute"));
+		}
+
+		if (poshiElementName.equals("description")) {
+			String attributeNameValue = poshiElement.attributeValue("message");
+
+			if (attributeNameValue.contains("<") &&
+				attributeNameValue.contains(">")) {
+
+				_exceptions.add(
+					new PoshiElementException(
+						poshiElement, "Message cannot contain <>"));
+			}
 		}
 	}
 
