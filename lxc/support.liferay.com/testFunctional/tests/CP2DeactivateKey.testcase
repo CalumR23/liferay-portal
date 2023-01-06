@@ -1,0 +1,40 @@
+definition {
+
+	property test.env = "uat";
+	property testray.main.component.name = "Customer Portal 2.0";
+
+	setUp {
+		Utils.launchUatPage();
+
+		Login.loginAsAdminUser();
+	}
+
+	@description = "Automation ID: LRQA-79016 | Test Summary: Verify that after the user clicks on the 'Confirm and deactivate keys' button the keys are no longer visible to the user on the product activation page"
+	@priority = "5"
+	test CannotViewDeactivatedKeys {
+		task ("Given a new activation key is generated for the DXP product into an existing project") {
+			HomePage.searchProject(projectName = "2022 FIFA World Cup Qatar - FAN ID");
+
+			Portal.CustomerPortal.enterOnProject(title = "2022 FIFA World Cup Qatar - FAN ID");
+
+			Portal.CP2NavigationMenu.goToProductActivation();
+
+			Portal.CP2NavigationMenu.clickOnProductButton(product = "DXP");
+
+			CP2ActivationKeys.generateNewKey(environmentName = "Environment Test Name");
+		}
+
+		task ("When I deactivate this new key") {
+			CP2ActivationKeys.searchActivationKey(searchTerm = "Environment Test Name");
+
+			CP2ActivationKeys.deactivateExistingKey(environmentName = "Environment Test Name");
+		}
+
+		task ("Then the activation key should no longer be available") {
+			CP2ActivationKeys.searchActivationKey(searchTerm = "Environment Test Name");
+
+			CP2ActivationKeys.assertActivationKeyNotPresent(environmentName = "Environment Test Name");
+		}
+	}
+
+}
