@@ -3,14 +3,21 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
 		LoginPage.login();
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -19,7 +26,7 @@ definition {
 	@priority = "4"
 	test BuildLinkRedirects {
 		task ("When: User accesses a project's environment") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+			ProjectsPage.openEnvironment(environmentName = "${staticProjectId}");
 		}
 
 		task ("And: The user clicks on the 'Build' link") {
@@ -39,7 +46,7 @@ definition {
 	@priority = "4"
 	test DeploymentsLinkRedirects {
 		task ("When: User accesses a project's environment") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-infra");
+			ProjectsPage.openEnvironment(environmentName = "${staticProjectId}");
 		}
 
 		task ("And: The user clicks on the 'Deployments' link") {
@@ -59,7 +66,11 @@ definition {
 	@priority = "5"
 	test DisplayCurrentEnvironment {
 		task ("When: The user navigates to the project environment overview page") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+			var projectIdDev = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${staticProjectId}-dev");
+
+			ProjectsPage.openEnvironment(environmentName = "${projectIdDev}");
 		}
 
 		task ("Then: Topbar display a current environment") {
@@ -143,7 +154,7 @@ definition {
 		}
 
 		task ("When: The user navigates to the project environment") {
-			Utils.goToPage(page = "projects/projtest-dev/overview");
+			Utils.goToPage(page = "projects/${projectIdDev}/overview");
 		}
 
 		task ("Then: The project specific elements are shown in the topbar") {
@@ -171,7 +182,11 @@ definition {
 	@priority = "4"
 	test DisplayEndpointDropdown {
 		task ("When: User clicks in 'Visit Site' button") {
-			Utils.goToPage(page = "projects/projtest-dev");
+			var projectIdDev = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${staticProjectId}-dev");
+
+			Utils.goToPage(page = "projects/${projectIdDev}");
 
 			Default.Click(
 				key_btnName = "Visit Site",
@@ -191,7 +206,7 @@ definition {
 	@priority = "4"
 	test DisplayHelpDropdown {
 		task ("When: The user navigates to the project environment") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-infra");
+			ProjectsPage.openEnvironment(environmentName = "${staticProjectId}");
 		}
 
 		task ("And: The user clicks the Help icon in the top bar") {
@@ -257,7 +272,7 @@ definition {
 	@priority = "4"
 	test DisplayVisitSite {
 		task ("When: User navigates to an environment that has a webserver service") {
-			Utils.goToPage(page = "projects/projtest-dev");
+			Utils.goToPage(page = "projects/${staticProjectId}");
 		}
 
 		task ("Then: The 'Visit Site' button is shown in the top bar") {
@@ -289,10 +304,14 @@ definition {
 	@priority = "5"
 	test RedirectsToEnvironmentOverviewPage {
 		task ("When: The user navigates to the project environment overview page") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+			var projectIdInfra = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${staticProjectId}-infra");
+
+			ProjectsPage.openEnvironment(environmentName = "${staticProjectId}");
 		}
 
-		task ("And:The user selects a different environment from the current one from the drop-down menu") {
+		task ("And: The user selects a different environment from the current one from the drop-down menu") {
 			Default.Click(locator1 = "Environment#ENVIRONMENTS_DROPDOWN");
 
 			Default.Click(
@@ -309,15 +328,15 @@ definition {
 				locator1 = "Environment#ENVIRONMENTS_DROPDOWN",
 				value1 = "infra");
 
-			Default.AssertLocation.assertPartialLocation(value1 = "console.liferay.coffee/projects/projtest-infra/overview");
+			Default.AssertLocation.assertPartialLocation(value1 = "/projects/${projectIdInfra}/overview");
 		}
 	}
 
 	@description = "Clicking on DXP Cloud logo or DXP Cloud icon redirects to Projects page"
 	@priority = "4"
 	test RedirectsToProjectsPage {
-		task ("When: User clikcs on the DXP Cloud title on a page other than the Projects page") {
-			Utils.goToPage(page = "projects/projtest-infra/overview");
+		task ("When: User clicks on the DXP Cloud title on a page other than the Projects page") {
+			Utils.goToPage(page = "projects/${staticProjectId}/overview");
 
 			Default.Click(locator1 = "Topbar#TOPBAR_DXP_CLOUD_TITLE");
 		}
@@ -345,7 +364,7 @@ definition {
 	@priority = "5"
 	test RedirectToAddNewEnvironmentPage {
 		task ("When: The user navigates to the project environment overview page") {
-			ProjectsPage.openEnvironment(environmentName = "projtest-dev");
+			ProjectsPage.openEnvironment(environmentName = "${staticProjectId}");
 		}
 
 		task ("And: The user clicks on 'Add new environment' at the environment's dropdown") {

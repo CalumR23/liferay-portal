@@ -3,22 +3,25 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
-	var projectName = "qaposhitest";
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
 
 	setUp {
 		Utils.launchLCP();
 
-		ProjectsAPI.createProject(projectID = "qaposhitest");
+		LoginPage.login();
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
 
 		NewDeploymentAPI.deployFromRepo(
-			projectID = "${projectName}",
+			projectID = "${staticProjectId}",
 			repo = "hosting");
-
-		LoginPage.login();
 	}
 
 	tearDown {
-		UtilsAPI.tearDownProjects(projectIdList = "qaposhitest");
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -28,11 +31,11 @@ definition {
 	test CancelButtonRedirects {
 		task ("When: User navigates to delete service page") {
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+			Utils.goToPage(page = "projects/${staticProjectId}/services/ui/delete");
 		}
 
 		task ("Then: Cancel button is displayed") {
@@ -50,9 +53,9 @@ definition {
 		task ("Then: The console is redirected to the service page") {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "ServicesLogs#SERVICE_NAME",
-				value1 = "ui-${projectName}");
+				value1 = "ui-${staticProjectId}");
 
-			Default.AssertLocation.assertPartialLocation(value1 = "projects/${projectName}/services/ui/logs");
+			Default.AssertLocation.assertPartialLocation(value1 = "projects/${staticProjectId}/services/ui/logs");
 		}
 	}
 
@@ -60,12 +63,14 @@ definition {
 	@priority = "5"
 	test CanDeletesService {
 		task ("When: User deletes the service") {
+			Utils.goToPage(page = "projects");
+
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+			Utils.goToPage(page = "projects/${staticProjectId}/services/ui/delete");
 
 			for (var checkbox : list "deletion is not advised,redeploy") {
 				Default.Check.toggleSwitch(
@@ -87,7 +92,7 @@ definition {
 				key_headerTitle = "Services",
 				locator1 = "Utils#HEADER_TITLE");
 
-			Default.AssertLocation.assertPartialLocation(value1 = "projects/${projectName}/services");
+			Default.AssertLocation.assertPartialLocation(value1 = "projects/${staticProjectId}/services");
 		}
 
 		task ("And: The deleted service is not displayed in the list of deployed services") {
@@ -97,15 +102,15 @@ definition {
 		}
 
 		task ("And: An activity is generated and shown in the environment's activity history") {
-			Utils.goToPage(page = "projects/${projectName}/activities");
+			Utils.goToPage(page = "projects/${staticProjectId}/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Service deleted");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE_SUBTITLE",
-				value1 = "Ui");
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE_SUBTITLE",
+				value1 = "ui");
 		}
 	}
 
@@ -114,11 +119,11 @@ definition {
 	test DeleteServiceConfirmationCheckboxes {
 		task ("When: User accesses the Delete Service page") {
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+			Utils.goToPage(page = "projects/${staticProjectId}/services/ui/delete");
 		}
 
 		task ("Then: User sees that all checkboxes are not checked") {
@@ -153,11 +158,11 @@ definition {
 	test DisplaysServiceInformation {
 		task ("When: User navigates to delete service page") {
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+			Utils.goToPage(page = "projects/${staticProjectId}/services/ui/delete");
 		}
 
 		task ("Then: Service section displays service name, image name, status, and instances") {
@@ -182,11 +187,11 @@ definition {
 	test DisplayWarningMessage {
 		task ("When: User navigates to delete service page") {
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/services/ui/delete");
+			Utils.goToPage(page = "projects/${staticProjectId}/services/ui/delete");
 		}
 
 		task ("Then: Warning message is displayed") {

@@ -1,20 +1,23 @@
 @component-name = "liferay-cloud-platform"
 definition {
 
-	var projectName = "poshitest";
-
 	property testray.main.component.name = "liferay-cloud-platform";
+
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
 
 	setUp {
 		Utils.launchLCP();
 
 		LoginPage.login();
 
-		ProjectsPage.createNewProject(projectName = "${projectName}");
+		var staticProjectId = ProjectsAPI.createProject();
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -23,7 +26,7 @@ definition {
 	@priority = "5"
 	test DeleteConfirmationCheckboxes {
 		task ("When: User accesses the delete project page") {
-			Utils.goToPage(page = "projects/${projectName}/delete-project");
+			Utils.goToPage(page = "projects/${staticProjectId}/delete-project");
 		}
 
 		task ("Then: User sees that all checkboxes are not checked") {
@@ -57,7 +60,7 @@ definition {
 	@priority = "4"
 	test DeleteEnvironmentRedirect {
 		task ("When: The user deletes an environment") {
-			Utils.goToPage(page = "projects/${projectName}/settings");
+			Utils.goToPage(page = "projects/${staticProjectId}/settings");
 
 			SettingsPage.deleteEnvironment();
 		}
@@ -79,13 +82,13 @@ definition {
 	@priority = "4"
 	test DeleteRootEnvironment {
 		task ("Given: The project has more than one environment") {
-			ProjectsPage.addNewEnvironment(
-				environmentType = "DEV",
-				location = "Oregon, USA");
+			var projectId = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${staticProjectId}-dev");
 
 			Utils.goToPage(page = "projects");
 
-			for (var environment : list "poshitest,poshitest-dev") {
+			for (var environment : list "${staticProjectId},${staticProjectId}-dev") {
 				Default.AssertElementPresent(
 					key_environment = "${environment}",
 					key_index = "1",
@@ -94,13 +97,13 @@ definition {
 		}
 
 		task ("When: The user deletes the root environment") {
-			Utils.goToPage(page = "projects/${projectName}/settings");
+			Utils.goToPage(page = "projects/${staticProjectId}/settings");
 
 			SettingsPage.deleteEnvironment();
 		}
 
 		task ("Then: All project environments are deleted") {
-			for (var environment : list "poshitest,poshitest-dev") {
+			for (var environment : list "${staticProjectId},${staticProjectId}-dev") {
 				Default.AssertElementNotPresent(
 					key_environment = "${environment}",
 					key_index = "1",
@@ -125,7 +128,7 @@ definition {
 	@priority = "5"
 	test DisplayInformation {
 		task ("When: The user accesses the delete environment area") {
-			Utils.goToPage(page = "projects/${projectName}/settings/delete-environment");
+			Utils.goToPage(page = "projects/${staticProjectId}/settings/delete-environment");
 		}
 
 		task ("Then: The user sees specific information about the implications of the exclusion action") {
@@ -146,12 +149,12 @@ definition {
 
 		task ("And: Environment information is displayed") {
 			Default.AssertElementPresent(
-				key_environment = "${projectName}",
-				key_information = "poshitest",
+				key_environment = "${staticProjectId}",
+				key_information = "${staticProjectId}",
 				locator1 = "DeleteProject#ENVIRONMENT_INFORMATION_TABLE");
 
 			Default.AssertElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_information = "-",
 				locator1 = "DeleteProject#ENVIRONMENT_INFORMATION_TABLE");
 		}
@@ -161,7 +164,7 @@ definition {
 	@priority = "4"
 	test DisplayTooltips {
 		task ("When: The user accesses the delete project page") {
-			Utils.goToPage(page = "projects/${projectName}/delete-project");
+			Utils.goToPage(page = "projects/${staticProjectId}/delete-project");
 		}
 
 		task ("Then: The user can see a tooltip by hovering the mouse over the question mark icon.") {

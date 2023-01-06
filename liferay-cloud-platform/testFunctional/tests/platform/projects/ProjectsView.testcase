@@ -1,9 +1,9 @@
 @component-name = "liferay-cloud-platform"
 definition {
 
-	var projectName = "poshitest";
-
 	property testray.main.component.name = "liferay-cloud-platform";
+
+	static var projectIdTearDowns = ListUtil.newList();
 
 	setUp {
 		Utils.launchLCP();
@@ -12,7 +12,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -73,14 +73,16 @@ definition {
 		var initialCountOfEnvironments = ProjectsPage.countOfEnvironments();
 
 		task ("When: I create a new project") {
-			ProjectsPage.createNewProject();
+			var projectId = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
 		}
 
 		task ("Then: The project is shown in the project list") {
 			Utils.goToPage(page = "projects");
 
 			Default.AssertElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${projectId}",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 
@@ -93,18 +95,16 @@ definition {
 		}
 
 		task ("When: A new environment is added to the project") {
-			Utils.goToPage(page = "projects/${projectName}/overview");
-
-			ProjectsPage.addNewEnvironment(
-				environmentType = "DEV",
-				location = "Oregon, USA");
+			var projectIdDev = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${projectId}");
 		}
 
 		task ("Then: The new environment is shown in the project list") {
 			Utils.goToPage(page = "projects");
 
 			Default.AssertElementPresent(
-				key_environment = "${projectName}-dev",
+				key_environment = "${projectIdDev}",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 
@@ -121,21 +121,20 @@ definition {
 	@priority = "4"
 	test ProjectsListIsUpdatedUponDeletion {
 		task ("When: I am a project member with additional environment") {
-			ProjectsPage.createNewProject(projectName = "${projectName}");
-
-			ProjectsPage.addNewEnvironment(
-				environmentType = "DEV",
-				location = "Oregon, USA");
-
 			Utils.goToPage(page = "projects");
 
+			var projectId = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+
+			var projectIdDev = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${projectId}-dev");
 			var initialCountOfEnvironments = ProjectsPage.countOfEnvironments();
 		}
 
 		task ("And: Project environment is deleted") {
-			Utils.goToPage(page = "projects/${projectName}-dev/settings");
-
-			SettingsPage.deleteEnvironment();
+			ProjectsAPI.deleteProject(projectId = "${projectIdDev}");
 		}
 
 		task ("Then: The project/environment list is updated and the environment is not shown") {
@@ -146,7 +145,7 @@ definition {
 				locator1 = "Utils#HEADER_TITLE");
 
 			Default.AssertElementNotPresent(
-				key_environment = "${projectName}-dev",
+				key_environment = "${projectIdDev}",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 
@@ -158,10 +157,8 @@ definition {
 				value1 = "Environment (${environmentCount})");
 		}
 
-		task ("When: Project is deleted ") {
-			Utils.goToPage(page = "projects/${projectName}/settings");
-
-			SettingsPage.deleteEnvironment();
+		task ("When: Project is deleted") {
+			ProjectsAPI.deleteProject(projectId = "${projectId}");
 		}
 
 		task ("Then: The project/environment list is updated and the project is not shown") {
@@ -172,7 +169,7 @@ definition {
 				locator1 = "Utils#HEADER_TITLE");
 
 			Default.AssertElementNotPresent(
-				key_environment = "${projectName}",
+				key_environment = "${projectId}",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 

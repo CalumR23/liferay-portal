@@ -3,13 +3,25 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var staticProjectId = "";
+	static var staticProjectIdInfra = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		var staticProjectIdInfra = ProjectsAPI.createProject(
+			environment = "true",
+			projectId = "${staticProjectId}-infra");
 
 		LoginPage.login();
 	}
 
 	tearDown {
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
+
 		Topbar.logout();
 	}
 
@@ -17,7 +29,7 @@ definition {
 	@priority = "5"
 	test CanSwitchSupportAccess {
 		task ("Given: I have permission to enable/disable support access When: I disable support access") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 
 			if (!(Default.IsTextEqual.isPartialText(locator1 = "Settings#SUPPORT_ACCESS_STATUS", value1 = "Enabled"))) {
 				Default.Click(locator1 = "Utils#SWITCH_BUTTON");
@@ -35,7 +47,7 @@ definition {
 		task ("And: Information about Support Access status is updated") {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Settings#SUPPORT_ACCESS_STATUS_DESCRIPTION",
-				value1 = "Disabled. Liferay Support Access not allowed on projtest INFRA");
+				value1 = "Disabled. Liferay Support Access not allowed on ${staticProjectId} INFRA");
 		}
 
 		task ("When: I enable support access") {
@@ -51,7 +63,7 @@ definition {
 		task ("And: Information about Support Access status is updated") {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Settings#SUPPORT_ACCESS_STATUS_DESCRIPTION",
-				value1 = "Enabled. Liferay Support Access allowed on projtest INFRA");
+				value1 = "Enabled. Liferay Support Access allowed on ${staticProjectId}");
 		}
 	}
 
@@ -59,7 +71,7 @@ definition {
 	@priority = "4"
 	test DisplaySupportAccessInformation {
 		task ("When: I access the Support Access tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 		}
 
 		task ("Then: I can see information about enabling and disabling support access") {
@@ -71,7 +83,7 @@ definition {
 		task ("And: I can see the project name and the environment badge") {
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Settings#ENVIRONMENT_NAME",
-				value1 = "projtest");
+				value1 = "${staticProjectId}");
 
 			Default.AssertTextEquals(
 				locator1 = "Settings#ENVIRONMENT_BADGE",
@@ -83,7 +95,7 @@ definition {
 	@priority = "3"
 	test LinkToDocumentation {
 		task ("When: I access the Support Access Tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 		}
 
 		task ("And: I click the Learn More link") {
@@ -103,7 +115,7 @@ definition {
 	@priority = "5"
 	test SupportAccessActivityGenerated {
 		task ("When: I access the Support Access tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 		}
 
 		task ("And: Support Access is enabled") {
@@ -113,24 +125,24 @@ definition {
 		}
 
 		task ("Then: An activity about the Support Access is Enabled is displayed on Activities Page") {
-			Utils.goToPage(page = "projects/projtest-infra/activities");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Liferay support access enabled on");
 		}
 
 		task ("When: I disable support access") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 
 			Default.Click(locator1 = "Utils#SWITCH_BUTTON");
 		}
 
 		task ("Then: An activity about the Support Access is Disabled is displayed on Activities Page") {
-			Utils.goToPage(page = "projects/projtest-infra/activities");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Liferay support access disabled on");
 		}
 	}
@@ -139,7 +151,7 @@ definition {
 	@priority = "4"
 	test SupportAccessRedirects {
 		task ("When: I click the badge") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 
 			Default.AssertElementPresent(
 				key_cardTitle = "Support Access",
@@ -159,7 +171,7 @@ definition {
 		}
 
 		task ("When: I click the username") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/support-access");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/support-access");
 
 			Default.AssertElementPresent(
 				key_cardTitle = "Support Access",

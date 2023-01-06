@@ -3,18 +3,21 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
-	var projectName = "qaposhitest";
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
 
 	setUp {
 		Utils.launchLCP();
 
-		ProjectsAPI.createProject(projectID = "qaposhitest");
-
 		LoginPage.login();
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
 	}
 
 	tearDown {
-		UtilsAPI.tearDownProjects(projectIdList = "qaposhitest");
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -23,7 +26,7 @@ definition {
 	@priority = "4"
 	test CanAddEnvironment {
 		task ("When: I create a new environment in a project") {
-			Utils.goToPage(page = "projects/${projectName}/overview");
+			Utils.goToPage(page = "projects/${staticProjectId}/new-environment");
 
 			ProjectsPage.addNewEnvironment(
 				environmentType = "dev",
@@ -41,10 +44,10 @@ definition {
 		}
 
 		task ("And: An activity is generated and shown in the environment's activity history") {
-			Utils.goToPage(page = "projects/${projectName}-dev/activities");
+			Utils.goToPage(page = "projects/${staticProjectId}-dev/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Environment created");
 		}
 	}
@@ -54,17 +57,17 @@ definition {
 	test CanAddEnvironmentVariable {
 		task ("When: User deploys a service to a project") {
 			NewDeploymentAPI.deployFromRepo(
-				projectID = "${projectName}",
+				projectID = "${staticProjectId}",
 				repo = "hosting-with-reserved-env-var");
 
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 		}
 
 		task ("And: User adds a new environment to the project with name and location") {
-			Utils.goToPage(page = "projects/${projectName}/overview");
+			Utils.goToPage(page = "projects/${staticProjectId}/overview");
 
 			Default.Click(locator1 = "Environment#ENVIRONMENTS_DROPDOWN");
 
@@ -226,7 +229,7 @@ definition {
 	test CanCopyServices {
 		task ("When: Deploy a service in a project") {
 			NewDeploymentAPI.deployFromRepo(
-				projectID = "${projectName}",
+				projectID = "${staticProjectId}",
 				repo = "hosting");
 		}
 
@@ -236,11 +239,11 @@ definition {
 				locator1 = "Utils#HEADER_TITLE");
 
 			Default.WaitForElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${staticProjectId}",
 				key_serviceName = "ui",
 				locator1 = "Projects#ENVIRONMENT_SERVICE");
 
-			Utils.goToPage(page = "projects/${projectName}/overview");
+			Utils.goToPage(page = "projects/${staticProjectId}/overview");
 
 			Default.AssertElementPresent(
 				key_serviceName = "ui",
@@ -325,7 +328,7 @@ definition {
 	@priority = "4"
 	test DisplayErrorMessageForBlankCredentials {
 		task ("When: User submits the form with a blank environment ID") {
-			Utils.goToPage(page = "projects/${projectName}/overview");
+			Utils.goToPage(page = "projects/${staticProjectId}/overview");
 
 			ProjectsPage.addNewEnvironment(
 				environmentType = "",
@@ -359,7 +362,7 @@ definition {
 		var location = "Oregon, USA";
 
 		task ("When: I create a new environment in a project") {
-			Utils.goToPage(page = "projects/${projectName}/overview");
+			Utils.goToPage(page = "projects/${staticProjectId}/overview");
 
 			ProjectsPage.addNewEnvironment(
 				environmentType = "dev",

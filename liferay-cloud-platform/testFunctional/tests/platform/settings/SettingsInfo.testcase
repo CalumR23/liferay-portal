@@ -3,13 +3,27 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var staticProjectId = "";
+	static var staticProjectIdInfra = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
 		LoginPage.login();
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		var staticProjectIdInfra = ProjectsAPI.createProject(
+			environment = "true",
+			projectId = "${staticProjectId}-infra");
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
 	}
 
 	tearDown {
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
+
 		Topbar.logout();
 	}
 
@@ -17,14 +31,14 @@ definition {
 	@priority = "4"
 	test DisplayEnvironmentInformation {
 		task ("When: I access the Info tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/info");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/info");
 		}
 
 		task ("Then: I can see current environment information") {
 			Default.AssertTextEquals(
 				key_infoItem = "Project Name",
 				locator1 = "Settings#ENVIRONMENT_SPECIFIC_INFORMATION",
-				value1 = "projtest");
+				value1 = "${staticProjectId}");
 
 			Default.AssertTextEquals(
 				key_infoItem = "Environment ID",
@@ -47,7 +61,7 @@ definition {
 	@priority = "3"
 	test DisplayTooltips {
 		task ("When: I access the Info tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/info");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/info");
 		}
 
 		task ("Then: I can see a tooltip by hovering over each question mark icon") {
@@ -93,7 +107,7 @@ definition {
 
 			Default.AssertTextEquals.assertPartialText(
 				locator1 = "Settings#QUESTION_MARK_TOOLTIP",
-				value1 = "projtest-infra is operating from Oregon, USA.");
+				value1 = "${staticProjectIdInfra} is operating from Oregon, USA.");
 		}
 	}
 
@@ -101,7 +115,7 @@ definition {
 	@priority = "4"
 	test EnvironmentBadgeRedirects {
 		task ("When: User clicks on the environment badge in the Environment Info tab in Settings page") {
-			Utils.goToPage(page = "projects/projtest-dev/settings/info");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/info");
 
 			Default.Click(locator1 = "Settings#ENVIRONMENT_BADGE");
 		}
@@ -113,7 +127,7 @@ definition {
 
 			Default.AssertTextEquals(
 				locator1 = "Environment#ENVIRONMENTS_DROPDOWN",
-				value1 = "dev");
+				value1 = "infra");
 		}
 	}
 
@@ -121,7 +135,7 @@ definition {
 	@priority = "3"
 	test LinkToDocumentation {
 		task ("When: I access the Environment Info tab on the Settings page") {
-			Utils.goToPage(page = "projects/projtest-infra/settings/info");
+			Utils.goToPage(page = "projects/${staticProjectIdInfra}/settings/info");
 		}
 
 		task ("And: I click the Learn More link") {

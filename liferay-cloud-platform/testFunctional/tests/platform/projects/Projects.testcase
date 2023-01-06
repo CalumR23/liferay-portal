@@ -3,6 +3,9 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
@@ -10,7 +13,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -18,10 +21,10 @@ definition {
 	@description = "Environment can be added to a project"
 	@priority = "5"
 	test CanAddEnvironmentToProject {
-		var projectName = "poshitest";
-
 		task ("Given: I create a project") {
-			ProjectsPage.createNewProject(projectName = "${projectName}");
+			var projectId = ProjectsPage.createNewProject(projectName = "${staticProjectId}");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
 		}
 
 		task ("When: I add an environment to the project") {
@@ -34,7 +37,7 @@ definition {
 			Utils.goToPage(page = "projects");
 
 			Default.AssertElementPresent(
-				key_environment = "${projectName}-dev",
+				key_environment = "${projectId}-dev",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 	}
@@ -42,10 +45,10 @@ definition {
 	@description = "Project is created when location and alphanumeric characters are provided for projectId and deleted in the Settings Page"
 	@priority = "5"
 	test CanCreateNewProject {
-		var projectName = "poshitest";
-
 		task ("Given: I create a project") {
-			ProjectsPage.createNewProject(projectName = "${projectName}");
+			var projectId = ProjectsPage.createNewProject(projectName = "${staticProjectId}");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
 		}
 
 		task ("When: I access the Project page") {
@@ -54,7 +57,7 @@ definition {
 
 		task ("Then: The project is shown on the page") {
 			Default.AssertElementPresent(
-				key_environment = "${projectName}",
+				key_environment = "${projectId}",
 				locator1 = "Projects#PROJECT_NAME");
 		}
 	}

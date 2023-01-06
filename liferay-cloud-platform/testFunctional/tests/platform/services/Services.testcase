@@ -3,6 +3,9 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
@@ -10,7 +13,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -18,15 +21,19 @@ definition {
 	@description = "Can assert environment location on overview page"
 	@priority = "5"
 	test AssertEnvironmentLocation {
-		var location = "Iowa, USA";
+		task ("Given: A project is created When: The user navigates to Overview page") {
+			var cluster = Utils.getAltCluster();
 
-		task ("Given: A project is created When: The console is redirected to Overview page") {
-			ProjectsPage.createNewProject(
-				location = "${location}",
-				projectName = "poshitest");
+			var projectId = ProjectsAPI.createProject(cluster = "${cluster}");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+
+			Utils.goToPage(page = "projects/${projectId}/overview");
 		}
 
 		task ("Then: The location is shown on the Location card") {
+			var location = UtilsAPI.getClusterLocation(projectId = "${projectId}");
+
 			Default.AssertElementPresent(
 				key_location = "${location}",
 				locator1 = "Overview#SERVICE_LOCATION_NAME");
@@ -87,7 +94,7 @@ definition {
 			Utils.goToPage(page = "projects/projtest-infra/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Service restarted");
 		}
 	}
@@ -120,13 +127,15 @@ definition {
 	@priority = "5"
 	test DeployedDisplaysOnTable {
 		task ("Given: A new project is created When: The user deploys new services") {
-			ProjectsAPI.createProject(projectID = "qaposhitest");
+			var projectId = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
 
 			NewDeploymentAPI.deployFromRepo(
-				projectID = "qaposhitest",
+				projectID = "${projectId}",
 				repo = "2-services");
 
-			Utils.goToPage(page = "projects/qaposhitest/services");
+			Utils.goToPage(page = "projects/${projectId}/services");
 		}
 
 		task ("Then: The service list will display the services that are deployed") {
@@ -196,9 +205,11 @@ definition {
 	@priority = "3"
 	test DisplaysMessageForNoServicesYet {
 		task ("Given: A new project is created When: The console is redirected to the Services page") {
-			ProjectsAPI.createProject(projectID = "qaposhitest");
+			var projectId = ProjectsAPI.createProject();
 
-			Utils.goToPage(page = "projects/qaposhitest/services");
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+
+			Utils.goToPage(page = "projects/${projectId}/services");
 		}
 
 		task ("Then: The service page will show there are no services yet") {
@@ -212,16 +223,18 @@ definition {
 	@priority = "4"
 	test DisplayTableHeaderCount {
 		task ("Given: A new project is created When: The user navigates to the services page and deploys a service") {
-			ProjectsAPI.createProject(projectID = "qaposhitest");
+			var projectId = ProjectsAPI.createProject();
 
-			Utils.goToPage(page = "projects/qaposhitest/services");
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+
+			Utils.goToPage(page = "projects/${projectId}/services");
 
 			Default.AssertTextEquals(
 				locator1 = "Services#NO_SERVICE_TITLE",
 				value1 = "No services yet");
 
 			NewDeploymentAPI.deployFromRepo(
-				projectID = "qaposhitest",
+				projectID = "${projectId}",
 				repo = "hosting");
 		}
 

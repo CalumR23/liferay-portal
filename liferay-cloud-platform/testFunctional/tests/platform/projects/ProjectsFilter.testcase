@@ -3,6 +3,8 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
@@ -10,7 +12,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -28,6 +30,10 @@ definition {
 		task ("When: User create a new project") {
 			ProjectsPage.createNewProject(projectName = "zeta");
 
+			var projectId = ProjectsAPI.createProject(projectId = "zetaqaposhi");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+
 			Default.WaitForElementPresent(
 				key_headerTitle = "Overview",
 				locator1 = "Utils#HEADER_TITLE");
@@ -43,14 +49,14 @@ definition {
 				locator1 = "Projects#PROJECT_DROPDOWN_MENU_OPTION");
 		}
 
-		task ("Then:The newly created/updated project is displayed first") {
+		task ("Then: The newly created/updated project is displayed first") {
 			Default.AssertElementPresent(
 				key_environment = "projtest",
 				key_index = "2",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 
 			Default.AssertElementPresent(
-				key_environment = "zeta",
+				key_environment = "${projectId}",
 				key_index = "1",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 		}
@@ -60,9 +66,13 @@ definition {
 	@priority = "4"
 	test CanSortProjectsByNewest {
 		task ("Given: I create projects") {
-			ProjectsPage.createNewProject(projectName = "alpha");
+			var projectIdA = ProjectsAPI.createProject(projectId = "alphaqaposhi");
 
-			ProjectsPage.createNewProject(projectName = "beta");
+			ListUtil.add("${projectIdTearDowns}", "${projectIdA}");
+
+			var projectIdB = ProjectsAPI.createProject(projectId = "betaqaposhi");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdB}");
 		}
 
 		task ("When: I open the Projects page and sort filter to 'Newest'") {
@@ -81,12 +91,12 @@ definition {
 
 		task ("Then: Projects are shown in newest order") {
 			Default.AssertElementPresent(
-				key_environment = "alpha",
+				key_environment = "${projectIdA}",
 				key_index = "2",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 
 			Default.AssertElementPresent(
-				key_environment = "beta",
+				key_environment = "${projectIdB}",
 				key_index = "1",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 		}
@@ -96,13 +106,17 @@ definition {
 	@priority = "3"
 	test DifferentProjectsAreNotGrouped {
 		task ("When: I create project families") {
-			ProjectsPage.createNewProject(projectName = "alpha");
+			var projectIdA = ProjectsAPI.createProject(projectId = "charlieqaposhi");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdA}");
 
 			ProjectsPage.addNewEnvironment(
 				environmentType = "DEV",
 				location = "Oregon, USA");
 
-			ProjectsPage.createNewProject(projectName = "beta");
+			var projectIdB = ProjectsAPI.createProject(projectId = "deltaqaposhi");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdB}");
 
 			ProjectsPage.addNewEnvironment(
 				environmentType = "INFRA",
@@ -114,14 +128,14 @@ definition {
 		}
 
 		task ("Then: Different project families are separately grouped") {
-			for (var environment : list "alpha,alpha-dev") {
+			for (var environment : list "${projectIdA},${projectIdA}-dev") {
 				Default.AssertElementPresent(
 					key_environment = "${environment}",
 					key_index = "1",
 					locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 			}
 
-			for (var environment : list "beta,beta-infra") {
+			for (var environment : list "${projectIdB},${projectIdB}-infra") {
 				Default.AssertElementPresent(
 					key_environment = "${environment}",
 					key_index = "2",
@@ -171,9 +185,13 @@ definition {
 	@priority = "3"
 	test SortProjectsAlphanumerically {
 		task ("Given: I create projects") {
-			ProjectsPage.createNewProject(projectName = "alpha");
+			var projectIdA = ProjectsAPI.createProject(projectId = "echoqaposhi");
 
-			ProjectsPage.createNewProject(projectName = "beta");
+			ListUtil.add("${projectIdTearDowns}", "${projectIdA}");
+
+			var projectIdB = ProjectsAPI.createProject(projectId = "foxtrotqaposhi");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdB}");
 		}
 
 		task ("When: I open the Project Page") {
@@ -186,12 +204,12 @@ definition {
 				locator1 = "Projects#PROJECT_DROPDOWN_MENU_OPTION_SELECTED");
 
 			Default.AssertElementPresent(
-				key_environment = "alpha",
+				key_environment = "${projectIdA}",
 				key_index = "1",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 
 			Default.AssertElementPresent(
-				key_environment = "beta",
+				key_environment = "${projectIdB}",
 				key_index = "2",
 				locator1 = "Projects#PROJECT_ENVIRONMENT_FAMILY_POSITION");
 		}

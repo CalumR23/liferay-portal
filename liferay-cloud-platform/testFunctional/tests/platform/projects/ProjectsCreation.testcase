@@ -3,6 +3,8 @@ definition {
 
 	property testray.main.component.name = "liferay-cloud-platform";
 
+	static var projectIdTearDowns = ListUtil.newList();
+
 	setUp {
 		Utils.launchLCP();
 
@@ -10,7 +12,7 @@ definition {
 	}
 
 	tearDown {
-		Utils.tearDownProjects();
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
 
 		Topbar.logout();
 	}
@@ -122,17 +124,17 @@ definition {
 	@description = "Project created <projectId> activity is generated on project creation"
 	@priority = "5"
 	test GenerateActivityForProjectCreated {
-		var projectName = "poshitest";
-
 		task ("When: User creates a new project") {
-			ProjectsPage.createNewProject(projectName = "${projectName}");
+			var projectId = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
 		}
 
 		task ("Then: An activity is generated and shown in the project's activity history") {
-			Utils.goToPage(page = "projects/${projectName}/activities");
+			Utils.goToPage(page = "projects/${projectId}/activities");
 
 			Default.AssertTextEquals.assertPartialText(
-				locator1 = "Activities#LAST_ACTIVITY_MESSAGE",
+				locator1 = "Activities#LASTEST_ACTIVITY_MESSAGE",
 				value1 = "Project created");
 		}
 	}
@@ -142,6 +144,8 @@ definition {
 	test ProjectIDUppercaseToLowercase {
 		task ("When: User creates a project with uppercase alphabetic characters") {
 			ProjectsPage.createNewProject(projectName = "POSHITEST");
+
+			UtilsAPI.tearDownProjects(projectId = "poshitest");
 		}
 
 		task ("Then: The characters are converted to lowercase characters") {
