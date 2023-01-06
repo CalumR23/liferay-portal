@@ -1,0 +1,104 @@
+@component-name = "liferay-cloud-platform"
+definition {
+
+	property testray.main.component.name = "liferay-cloud-platform";
+
+	static var staticProjectId = "";
+	static var projectIdTearDowns = ListUtil.newList();
+
+	setUp {
+		Utils.launchLCP();
+
+		LoginPage.login();
+
+		Utils.goToPage(page = "projects");
+
+		var staticProjectId = ProjectsAPI.createProject();
+
+		ListUtil.add("${projectIdTearDowns}", "${staticProjectId}");
+	}
+
+	tearDown {
+		UtilsAPI.tearDownProjects(projectId = "${projectIdTearDowns}");
+
+		Topbar.logout();
+	}
+
+	@description = "Test main project"
+	@ignore = "Test example"
+	@priority = "4"
+	test AssertMainProjectId {
+		task ("When: I navigate to the main projectId") {
+			Utils.goToPage(page = "projects/${mainProjectId}/overview");
+		}
+	}
+
+	@description = "Test create custom name and random gen"
+	@ignore = "Test example"
+	@priority = "4"
+	test CreateCustomProjectIdWithRandomId {
+		task ("When: I create a project with a custom name And: create a project without the id provided") {
+			var projectIdA = ProjectsAPI.createProject(projectId = "tncustomid");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdA}");
+
+			var projectIdB = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdB}");
+
+			var projectIdC = ProjectsAPI.createProject(projectId = "tncustomid2");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdC}");
+
+			var projectIdD = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdD}");
+		}
+	}
+
+	@description = "Test create a project"
+	@ignore = "Test example"
+	@priority = "4"
+	test CreateProject {
+		task ("When: I create a project") {
+			var projectId = ProjectsAPI.createProject();
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+		}
+	}
+
+	@description = "Test create project in a different cluster from default us-west1-c1"
+	@ignore = "Test example"
+	@priority = "4"
+	test CreateProjectInDifferentCluster {
+		task ("When: I create a project") {
+			var cluster = Utils.getAltCluster();
+
+			var projectId = ProjectsAPI.createProject(cluster = "${cluster}");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectId}");
+		}
+	}
+
+	@description = "Test create projects with environments"
+	@ignore = "Test example"
+	@priority = "4"
+	test CreateProjectWithEnvironment {
+		task ("When: I create a project with an environment") {
+
+			// Since this is a child project, we do not need to add the projectId to the projectIdTearDowns list
+
+			var staticProjectIdAEnv = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "${staticProjectId}-dev");
+			var projectIdA = ProjectsAPI.createProject(projectId = "tncustomid");
+
+			ListUtil.add("${projectIdTearDowns}", "${projectIdA}");
+
+			var projectIdAEnv = ProjectsAPI.createProject(
+				environment = "true",
+				projectId = "tncustomid-dev");
+		}
+	}
+
+}
