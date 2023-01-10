@@ -875,7 +875,18 @@ definition {
 			-d passwordReset=false
 			''';
 
-		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+		var response = JSONCurlUtil.post("${curl}");
+
+		var currentIteration = "0";
+
+		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${response}", "must not be changed until")) {
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+
+			var currentIteration = ${currentIteration} + 1;
+
+			var response = JSONCurlUtil.post("${curl}");
+		}
+
 	}
 
 	@prose = "the support user with the email address ${userEmailAddress} should not be part of the support organization with the name ${organizationName}"
