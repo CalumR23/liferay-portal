@@ -307,15 +307,15 @@ definition {
 	macro _getOrganizationAccountCodeByOrganizationName {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var accountCode = KoroneikiAccountAPI._getAccountCode(accountName = "${organizationName}");
+
 		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${accountCode}");
 		var organizationAccountCode = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/search.json?external_id=${accountEntryId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		while ("${organizationAccountCode}" == "" && (maxIterations = "35")) {
+		while (("${organizationAccountCode}" == "") && (maxIterations = "35")) {
 			var organizationAccountCode = JSONCurlUtil.get("${curl}", "$.organizations");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
@@ -332,37 +332,15 @@ definition {
 	macro _getOrganizationExternalIdByOrganizationName {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var accountCode = KoroneikiAccountAPI._getAccountCode(accountName = "${organizationName}");
+
 		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${accountCode}");
 		var organizationExternalId = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/search.json?external_id=${accountEntryId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-		while ("${organizationExternalId}" == "" && (maxIterations = "35")) {
-			var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations");
-
-			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-		}
-
-		var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations[0].external_id");
-
-		echo("Actual organizationExternalId Value is : ${organizationExternalId}");
-
-		return "${organizationExternalId}";
-	}
-
-	macro _getZendeskOrganizationExternalId {
-		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
-		var organizationExternalId = "";
-
-		var curl = '''
-			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces} --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		while ("${organizationExternalId}" == "" && (maxIterations = "35")) {
+		while (("${organizationExternalId}" == "") && (maxIterations = "35")) {
 			var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
@@ -386,6 +364,27 @@ definition {
 		echo("Organization ID: ${staticOrganizationID}");
 
 		return "${staticOrganizationID}";
+	}
+
+	macro _getZendeskOrganizationExternalId {
+		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
+		var organizationExternalId = "";
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces} --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		while ("${organizationExternalId}" == "" && (maxIterations = "35")) {
+			var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+		}
+
+		var organizationExternalId = JSONCurlUtil.get("${curl}", "$.organizations[0].external_id");
+
+		echo("Actual organizationExternalId Value is : ${organizationExternalId}");
+
+		return "${organizationExternalId}";
 	}
 
 	@prose = "I teardown the organization with organizationId ${staticOrganizationId} from zendesk.liferay.com"
@@ -521,9 +520,9 @@ definition {
 	macro _viewOrganizationExistingTagsByName {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var accountCode = KoroneikiAccountAPI._getAccountCode(accountName = "${organizationName}");
+
 		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${accountCode}");
 		var existingTags = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/search.json?external_id=${accountEntryId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -584,7 +583,7 @@ definition {
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-			var organizations = JSONCurlUtil.get("${curl}");
+		var organizations = JSONCurlUtil.get("${curl}");
 
 		echo("Non-expected Organization Name: ${organizationName}");
 
@@ -593,14 +592,13 @@ definition {
 		if (contains("${organizations}", "${organizationName}")) {
 			fail("The organization ${organizationName} appears to have been added to zendesk in spite of there not being an expectation to do so.");
 		}
-		
 	}
 
 	@prose = "the organization ${organizationName} should not have the tag ${tag}"
 	macro _viewOrganizationNoTagSync {
 		var existingTags = "";
 
-		while ("${existingTags}" == "" && (maxIterations = "35")) {
+		while (("${existingTags}" == "") && (maxIterations = "35")) {
 			var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
 
 			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
@@ -657,9 +655,9 @@ definition {
 	macro _viewOrganizationSearchResultsByName {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var accountCode = KoroneikiAccountAPI._getAccountCode(accountName = "${organizationName}");
+
 		var accountEntryId = JSONOSBAccount.getOSBAccountEntryId(accountCode = "${accountCode}");
 		var organizations = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/search.json?external_id=${accountEntryId} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -678,10 +676,37 @@ definition {
 		return "${organizations}";
 	}
 
+	@prose = "the organization ${organizationName} should be present on zendesk.liferay.com"
+	macro _viewOrganizationSyncFromOsb {
+		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+
+		if (!(contains("${organizations}", "${organizationName}"))) {
+			fail("Actual value ${organizations} does not match expected value ${organizationName}. There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
+		}
+	}
+
+	@prose = "the organization ${organizationName} should have the tag ${tag}"
+	macro _viewOrganizationTagSync {
+		var existingTags = "";
+
+		while (("${existingTags}" == "") && (maxIterations = "35")) {
+			var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
+
+			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
+		}
+
+		echo("Expected Organization Tag: ${tag}");
+
+		echo("Actual Organization Tags: ${existingTags}");
+
+		if (!(contains("${existingTags}", "${tag}"))) {
+			fail("After checks, actual organization tags ${existingTags} shows that the organization ${organizationName} does not have the expected tag ${tag}");
+		}
+	}
+
 	macro _viewZendeskOrganizationSearchResults {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var organizations = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
@@ -703,42 +728,28 @@ definition {
 	macro _viewZendeskOrganizationSearchResultsNoLoop {
 		var organizationNameNoSpaces = StringUtil.replace("${organizationName}", " ", "+");
 		var organizations = "";
-
 		var curl = '''
 			${zendeskURL}/api/v2/organizations/autocomplete.json?name=${organizationNameNoSpaces} --tlsv1.2
 			-u ${zendeskAdminEmail}/token:${apiToken}
 			''';
 
-			var organizations = JSONCurlUtil.get("${curl}", "$.organizations");
+		var organizations = JSONCurlUtil.get("${curl}", "$.organizations");
 
 		return "${organizations}";
 	}
 
-	@prose = "the organization ${organizationName} should be present on zendesk.liferay.com"
-	macro _viewOrganizationSyncFromOsb {
-		var organizations = ZendeskOrganizationAPI._viewOrganizationSearchResultsByName(organizationName = "${organizationName}");
+	@prose = "I check that the fields below are presente at the zendesk organization ${table}"
+	macro checkCurrentZendeskOrganizarionFields {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/ --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
 
-		if (!(contains("${organizations}", "${organizationName}"))) {
-			fail("Actual value ${organizations} does not match expected value ${organizationName}. There may be something wrong with Zendesk search or there may be similar data or the sync may have unsuccessful");
-		}
+		var organization = JSONCurlUtil.get("${curl}", "$.organizations[0]");
+
+		JSONOkta._checkJSOMFieldIsPresent(
+			currentJson = "${organization}",
+			table = "${table}");
 	}
 
-	@prose = "the organization ${organizationName} should have the tag ${tag}"
-	macro _viewOrganizationTagSync {
-		var existingTags = "";
-
-		while ("${existingTags}" == "" && (maxIterations = "35")) {
-			var existingTags = ZendeskOrganizationAPI._viewOrganizationExistingTagsByName(organizationName = "${organizationName}");
-
-			ZendeskHomepage.pause(timeInSeconds = "${pollIntervalInSeconds}");
-		}
-
-		echo("Expected Organization Tag: ${tag}");
-
-		echo("Actual Organization Tags: ${existingTags}");
-
-		if (!(contains("${existingTags}", "${tag}"))) {
-			fail("After checks, actual organization tags ${existingTags} shows that the organization ${organizationName} does not have the expected tag ${tag}");
-		}
-	}
 }

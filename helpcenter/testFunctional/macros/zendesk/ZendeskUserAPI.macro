@@ -1035,7 +1035,7 @@ definition {
 		else {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 		}
-		
+
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${organizationMemberships}", "${organizationId}")) {
@@ -1137,7 +1137,7 @@ definition {
 		else {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 		}
-		
+
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		while (("${currentIteration}" != "${pollMaximumIterations}") && contains("${existingTags}", "${watcherTag}")) {
@@ -1351,7 +1351,7 @@ definition {
 		else {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 		}
-		
+
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationMemberships}", "${organizationId}"))) {
@@ -1405,7 +1405,7 @@ definition {
 		else {
 			var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
 		}
-		
+
 		var organizationId = ZendeskOrganizationAPI._viewOrganizationIdByExternalId(organizationExternalId = "${organizationExternalId}");
 
 		while (("${currentIteration}" != "${pollMaximumIterations}") && !(contains("${organizationSubscriptions}", "${organizationId}"))) {
@@ -1652,6 +1652,20 @@ definition {
 		if (!(contains("${existingTags}", "${watcherTag}"))) {
 			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected watcher tag ${watcherTag}");
 		}
+	}
+
+	@prose = "I check that the fields below are presente at the zendesk user ${table}"
+	macro checkCurrentZendeskUserFields {
+		var curl = '''
+			${zendeskURL}/api/v2/users --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var zendeskUser = JSONCurlUtil.get("${curl}", "$.users[0]");
+
+		JSONOkta._checkJSOMFieldIsPresent(
+			currentJson = "${zendeskUser}",
+			table = "${table}");
 	}
 
 }
