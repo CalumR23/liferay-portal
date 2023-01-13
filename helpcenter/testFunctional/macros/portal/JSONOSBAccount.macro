@@ -6,6 +6,7 @@ definition {
 	var supportAdminPassword = PropsUtil.get("support.admin.password");
 	var supportURL = PropsUtil.get("support.liferay.url");
 	var supportWebId = PropsUtil.get("support.liferay.web.id");
+	var testAccountCode = PropsUtil.get("test.account.code");
 
 	macro deleteOSBAccountEntry {
 		var curl = '''
@@ -15,6 +16,36 @@ definition {
 			''';
 
 		com.liferay.poshi.runner.util.JSONCurlUtil.post("${curl}");
+	}
+
+	@prose = "the following account entry json fields and their respective quantities should be present ${table}"
+	macro getAccountEntryFields {
+		var curl = '''
+			${supportURL}/api/jsonws/osb.accountentry/get-account-entry-by-code --tlsv1.2
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d code='${testAccountCode}'
+		''';
+
+		var currentCustomerAccountEntry = JSONCurlUtil.post("${curl}");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${currentCustomerAccountEntry}",
+			table = "${table}");
+	}
+
+	@prose = "the following account customer user json fields and their respective quantities should be present ${table}"
+	macro getAccountCustomerUserFields {
+		var curl = '''
+			${supportURL}/api/jsonws/osb.accountcustomer/get-corp-project-account-customer-users --tlsv1.2
+			-u ${supportAdminEmailAddress}:${supportAdminPassword}
+			-d corpProjectUuid=''
+		''';
+
+		var currentCustomerProjectAccount = JSONCurlUtil.post("${curl}");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${currentCustomerProjectAccount}",
+			table = "${table}");
 	}
 
 	macro getOSBAccountEntryId {

@@ -353,6 +353,20 @@ definition {
 		return "${organizationExternalId}";
 	}
 
+	@prose = "the following organization json fields and their respective quantities should be present ${table}"
+	macro _getOrganizationFields {
+		var curl = '''
+			${zendeskURL}/api/v2/organizations/ --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var organization = JSONCurlUtil.get("${curl}", "$.organizations[0]");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${organization}",
+			table = "${table}");
+	}
+
 	@prose = "I get the organization ID of the organization ${organizationName} from zendesk.liferay.com"
 	macro _getOrganizationIdByOrganizationName {
 		var organizationExternalId = ZendeskOrganizationAPI._getOrganizationExternalIdByOrganizationName(organizationName = "${organizationName}");
@@ -736,20 +750,6 @@ definition {
 		var organizations = JSONCurlUtil.get("${curl}", "$.organizations");
 
 		return "${organizations}";
-	}
-
-	@prose = "I check that the fields below are presente at the zendesk organization ${table}"
-	macro checkCurrentZendeskOrganizarionFields {
-		var curl = '''
-			${zendeskURL}/api/v2/organizations/ --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var organization = JSONCurlUtil.get("${curl}", "$.organizations[0]");
-
-		JSONOkta._checkJSOMFieldIsPresent(
-			currentJson = "${organization}",
-			table = "${table}");
 	}
 
 }

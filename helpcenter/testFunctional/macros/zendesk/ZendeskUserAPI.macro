@@ -390,6 +390,20 @@ definition {
 		return "${staticUserIdList}";
 	}
 
+	@prose = "the following user json fields and their respective quantities should be present ${table}"
+	macro _getUserFields {
+		var curl = '''
+			${zendeskURL}/api/v2/users --tlsv1.2
+			-u ${zendeskAdminEmail}/token:${apiToken}
+			''';
+
+		var zendeskUser = JSONCurlUtil.get("${curl}", "$.users[0]");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${zendeskUser}",
+			table = "${table}");
+	}
+
 	macro _getUserNameById {
 		var curl = '''
 			${zendeskURL}/api/v2/users/${userId}.json --tlsv1.2
@@ -1652,20 +1666,6 @@ definition {
 		if (!(contains("${existingTags}", "${watcherTag}"))) {
 			fail("After ${currentIteration} checks, actual user tags ${existingTags} shows that the user with the email ${userEmailAddress} does not have the expected watcher tag ${watcherTag}");
 		}
-	}
-
-	@prose = "I check that the fields below are presente at the zendesk user ${table}"
-	macro checkCurrentZendeskUserFields {
-		var curl = '''
-			${zendeskURL}/api/v2/users --tlsv1.2
-			-u ${zendeskAdminEmail}/token:${apiToken}
-			''';
-
-		var zendeskUser = JSONCurlUtil.get("${curl}", "$.users[0]");
-
-		JSONOkta._checkJSOMFieldIsPresent(
-			currentJson = "${zendeskUser}",
-			table = "${table}");
 	}
 
 }

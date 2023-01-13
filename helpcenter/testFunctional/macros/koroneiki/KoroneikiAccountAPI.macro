@@ -1970,6 +1970,22 @@ definition {
 		return "${externalLinkKey}";
 	}
 
+	@prose = "the following account entitlement definition json fields and their respective quantities should be present ${table}"
+	macro getAccountEntitlementDefinitionFields {
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+		''';
+
+		var currentKoroneikiAccountEntitlementDefinition = JSONCurlUtil.get("${curl}", "$.items[0]");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${currentKoroneikiAccountEntitlementDefinition}",
+			table = "${table}");
+	}
+
 	macro _getAccountEntitlementDefinitionKey {
 		if (contains("${entitlementDefinitionName}", " ")) {
 			var keyword = StringUtil.replace("${entitlementDefinitionName}", " ", "+");
@@ -2042,6 +2058,22 @@ definition {
 		echo("External link key value for ${entityId} and domain ${domain} on account ${accountName}: ${externalLinkKey}");
 
 		return "${externalLinkKey}";
+	}
+
+	@prose = "the following account json fields and their respective quantities should be present ${table}"
+	macro getAccountFields {
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+		''';
+
+		var currentKoroneikiAccount = JSONCurlUtil.get("${curl}", "$.items[0]");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${currentKoroneikiAccount}",
+			table = "${table}");
 	}
 
 	macro _getAccountId {
@@ -7055,38 +7087,6 @@ definition {
 		if ("${contactEmailAddressFromAPI}" != "${contactEmailAddress}") {
 			fail("Actual contact email address value ${contactEmailAddressFromAPI} does not match expected contact email address value ${contactEmailAddress}");
 		}
-	}
-
-	@prose = "I check that the fields below are presente at the current koroneiki account ${table}"
-	macro getCurrentKoroneikiAccount {
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-		''';
-
-		var currentKoroneikiAccount = JSONCurlUtil.get("${curl}", "$.items[0]");
-
-		JSONOkta._checkJSOMFieldIsPresent(
-			currentJson = "${currentKoroneikiAccount}",
-			table = "${table}");
-	}
-
-	@prose = "I check that the fields below are presente at the current koroneiki account entitlement definition ${table}"
-	macro getCurrentKoroneikiAccountEntitlementDefinition {
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/accounts/entitlement-definitions --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-		''';
-
-		var currentKoroneikiAccountEntitlementDefinition = JSONCurlUtil.get("${curl}", "$.items[0]");
-
-		JSONOkta._checkJSOMFieldIsPresent(
-			currentJson = "${currentKoroneikiAccountEntitlementDefinition}",
-			table = "${table}");
 	}
 
 }

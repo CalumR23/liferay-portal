@@ -4,28 +4,6 @@ definition {
 	var oktaApiToken = PropsUtil.get("okta.api.token");
 	var oktaUserPassword = PropsUtil.get("okta.user.password");
 
-	macro _checkJSONFieldIsPresent {
-		var RawTable rawTable = new RawTable("${table}");
-		var currentJson = StringUtil.replace("${currentJson}", " ", "");
-
-		for (var row : table "${rawTable}") {
-			var field = "${row[0]}";
-			var quantity = "${row[1]}";
-			var currentJson = StringUtil.replace("${currentJson}", "${field}=", "(${field})");
-
-			var currentJson = StringUtil.replace("${currentJson}", "\"${field}\":", "(${field})");
-
-			var fieldQuantity = StringUtil.count("${currentJson}", "(${field})");
-
-			if ("${fieldQuantity}" == "${quantity}") {
-				echo("The current JSON contains ${fieldQuantity} field(s) named ${field}.");
-			}
-			else {
-				fail("The current JSON was expected to have ${quantity} for the field named ${field}, but ${fieldQuantity} was found.");
-			}
-		}
-	}
-
 	@prose = "I assign the okta user with the email address ${userEmailAddress} to a different okta role ${roleName}"
 	macro assignUserToDifferentOktaRole {
 		var roleId = JSONOkta.getOktaRoleIdByName(roleName = "${roleName}");
@@ -288,8 +266,8 @@ definition {
 		com.liferay.poshi.runner.util.JSONCurlUtil.delete("${curl}");
 	}
 
-	@prose = "I check that the fields below are presente at the current okta user ${table}"
-	macro getCurrentOktaUser {
+	@prose = "the following okta user json fields and their respective quantities should be present ${table}"
+	macro getOktaUserFields {
 		var curl = '''
 			${oktaURL}/api/v1/users/me
 			-H "Authorization: SSWS ${oktaApiToken}"
@@ -299,7 +277,7 @@ definition {
 
 		var currentOktaUser = JSONCurlUtil.get("${curl}");
 
-		JSONOkta._checkJSOMFieldIsPresent(
+		JSONAPI._checkJSONFields(
 			currentJson = "${currentOktaUser}",
 			table = "${table}");
 	}

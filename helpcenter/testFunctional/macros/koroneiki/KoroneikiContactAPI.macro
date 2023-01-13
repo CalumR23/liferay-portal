@@ -1204,6 +1204,22 @@ definition {
 		return "${externalLinkKey}";
 	}
 
+	@prose = "the following contact json fields and their respective quantities should be present ${table}"
+	macro getContactFields {
+		var curl = '''
+			${koroneikiURL}/o/koroneiki-rest/v1.0/contacts --tlsv1.2
+			--header "API_Token: ${apiToken}"
+			-H "accept: application/json"
+			-H "Content-Type: application/json"
+		''';
+
+		var currentKoroneikiContacts = JSONCurlUtil.get("${curl}", "$.items[0]");
+
+		JSONAPI._checkJSONFields(
+			currentJson = "${currentKoroneikiContacts}",
+			table = "${table}");
+	}
+
 	macro _getContactKeyViaContactEmailAddress {
 		var curl = '''
 			${koroneikiURL}/o/koroneiki-rest/v1.0/contacts?search=${contactEmailAddress} --tlsv1.2
@@ -3541,22 +3557,6 @@ definition {
 
 			var teamRoles = JSONCurlUtil.get("${curl}");
 		}
-	}
-
-	@prose = "I check that the fields below are presente at the current koroneiki contacts ${table}"
-	macro getCurrentKoroneikiContacts {
-		var curl = '''
-			${koroneikiURL}/o/koroneiki-rest/v1.0/contacts --tlsv1.2
-			--header "API_Token: ${apiToken}"
-			-H "accept: application/json"
-			-H "Content-Type: application/json"
-		''';
-
-		var currentKoroneikiContacts = JSONCurlUtil.get("${curl}", "$.items[0]");
-
-		JSONOkta._checkJSOMFieldIsPresent(
-			currentJson = "${currentKoroneikiContacts}",
-			table = "${table}");
 	}
 
 }
