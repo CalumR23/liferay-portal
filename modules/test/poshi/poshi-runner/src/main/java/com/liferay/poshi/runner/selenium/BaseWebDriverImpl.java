@@ -746,6 +746,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public void assertText(String locator, String pattern) throws Exception {
+		System.out.println("assert locator: " + locator);
+		System.out.println("assert text: " + pattern);
 		assertElementPresent(locator);
 
 		Condition textCondition = getTextCondition(locator, pattern);
