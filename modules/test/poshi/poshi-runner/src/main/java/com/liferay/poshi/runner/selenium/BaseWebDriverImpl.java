@@ -746,6 +746,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	@Override
 	public void assertText(String locator, String pattern) throws Exception {
+		System.out.println("assert locator: " + locator);
+		System.out.println("assert text: " + pattern);
 		assertElementPresent(locator);
 
 		Condition textCondition = getTextCondition(locator, pattern);
@@ -1430,6 +1432,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 			return getHtmlNodeText(locator);
 		}
 
+		System.out.println(locator);
+
 		WebElement webElement = getWebElement(locator, timeout);
 
 		scrollWebElementIntoView(webElement);
@@ -1437,6 +1441,8 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		String text = webElement.getText();
 
 		text = text.trim();
+
+		System.out.println(text);
 
 		return StringUtil.replace(text, "\n", " ");
 	}
