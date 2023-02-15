@@ -942,13 +942,18 @@ public class PoshiRunnerExecutor {
 
 		PoshiStackTraceUtil.setCurrentElement(executeElement);
 
-		List<String> arguments = new ArrayList<>();
-		List<Class<?>> parameterClasses = new ArrayList<>();
-
 		String selenium = executeElement.attributeValue("selenium");
 
 		LiferaySeleniumMethod liferaySeleniumMethod =
 			PoshiContext.getLiferaySeleniumMethod(selenium);
+
+		if (liferaySeleniumMethod == null) {
+			throw new RuntimeException(
+				"Selenium method does not exist: " + selenium);
+		}
+
+		List<String> arguments = new ArrayList<>();
+		List<Class<?>> parameterClasses = new ArrayList<>();
 
 		int parameterCount = liferaySeleniumMethod.getParameterCount();
 
