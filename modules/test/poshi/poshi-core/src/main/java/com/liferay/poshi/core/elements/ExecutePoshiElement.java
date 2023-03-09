@@ -68,6 +68,23 @@ public class ExecutePoshiElement extends PoshiElement {
 	public void parsePoshiScript(String poshiScript)
 		throws PoshiScriptParserException {
 
+		checkSemicolon(poshiScript);
+
+		String trimmedPoshiScript = poshiScript.trim();
+
+		Element element = getParent();
+
+		if (!trimmedPoshiScript.endsWith(";") &&
+			!(element instanceof AndPoshiElement ||
+			  element instanceof IfPoshiElement ||
+			  element instanceof NotPoshiElement)) {
+
+			PoshiElement parentPoshiElement = (PoshiElement)getParent();
+
+			throw new PoshiScriptParserException(
+				"Missing semicolon", poshiScript, parentPoshiElement);
+		}
+
 		String poshiScriptParentheticalContent = getParentheticalContent(
 			poshiScript);
 		String fileExtension = getFileExtension();
@@ -409,10 +426,17 @@ public class ExecutePoshiElement extends PoshiElement {
 		return "selenium." + attributeValue("selenium");
 	}
 
+	@Override
+	protected Pattern getStatementPattern() {
+		return _statementPattern;
+	}
+
 	private boolean _isElementType(
 		PoshiElement parentPoshiElement, String poshiScript) {
 
-		if (parentPoshiElement instanceof ExecutePoshiElement) {
+		if (isConditionValidInParent(parentPoshiElement) ||
+			(parentPoshiElement instanceof ExecutePoshiElement)) {
+
 			return false;
 		}
 
@@ -421,8 +445,7 @@ public class ExecutePoshiElement extends PoshiElement {
 			!isValidPoshiScriptStatement(
 				_utilityInvocationStatementPattern, poshiScript)) {
 
-			return PoshiScriptParserUtil.isBalancedPoshiScript(
-				getParentheticalContent(poshiScript));
+			return true;
 		}
 
 		return false;
@@ -449,7 +472,7 @@ public class ExecutePoshiElement extends PoshiElement {
 	private static final Pattern _functionParameterPattern = Pattern.compile(
 		_FUNCTION_PARAMETER_REGEX);
 	private static final Pattern _statementPattern = Pattern.compile(
-		"^" + INVOCATION_REGEX + STATEMENT_END_REGEX, Pattern.DOTALL);
+		"^" + INVOCATION_REGEX, Pattern.DOTALL);
 	private static final Pattern _utilityInvocationStatementPattern =
 		Pattern.compile("^" + _UTILITY_INVOCATION_REGEX + STATEMENT_END_REGEX);
 
