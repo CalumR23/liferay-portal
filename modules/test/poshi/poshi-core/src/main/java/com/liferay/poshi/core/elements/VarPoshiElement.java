@@ -559,7 +559,7 @@ public class VarPoshiElement extends PoshiElement {
 	protected String valueAttributeName;
 
 	private boolean _isElementType(String poshiScript) {
-		if (isValidPoshiScriptStatement(_statementPattern, poshiScript) ||
+		if (isValidPoshiScriptStatement(_partialStatementPattern, poshiScript) ||
 			isVarAssignedToMacroInvocation(poshiScript)) {
 
 			return true;
@@ -570,7 +570,7 @@ public class VarPoshiElement extends PoshiElement {
 
 	private static final String _ELEMENT_NAME = "var";
 
-	private static final String _VAR_VALUE_INTEGER_REGEX = "\\d+";
+	private static final String _VAR_VALUE_INTEGER_REGEX = "\\d+[\\s]*(?![\\+-\\/\\*])";
 
 	private static final String _VAR_VALUE_MATH_EXPRESSION_REGEX;
 
@@ -602,6 +602,7 @@ public class VarPoshiElement extends PoshiElement {
 	private static final Pattern _nestedCDATAPattern = Pattern.compile(
 		"(?<cdata1><.+]])(?<cdata2>>.*>?)");
 	private static final Pattern _statementPattern;
+	private static final Pattern _partialStatementPattern;
 	private static final Pattern _varValueMathExpressionPattern;
 
 	static {
@@ -615,8 +616,12 @@ public class VarPoshiElement extends PoshiElement {
 			_VAR_VALUE_OBJECT_REGEX, "|", _VAR_VALUE_VARIABLE_REGEX, ")");
 
 		_statementPattern = Pattern.compile(
-			"^" + VAR_NAME_REGEX + ASSIGNMENT_REGEX + _VAR_VALUE_REGEX,
+			"^" + VAR_NAME_REGEX + ASSIGNMENT_REGEX + _VAR_VALUE_REGEX + "(;|)$",
 			Pattern.DOTALL);
+
+		_partialStatementPattern = Pattern.compile(
+				"^" + VAR_NAME_REGEX + ASSIGNMENT_REGEX + _VAR_VALUE_REGEX,
+				Pattern.DOTALL);
 
 		_varValueMathExpressionPattern = Pattern.compile(
 			_VAR_VALUE_MATH_EXPRESSION_REGEX);

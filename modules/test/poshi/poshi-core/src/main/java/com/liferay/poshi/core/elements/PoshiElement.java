@@ -306,34 +306,91 @@ public abstract class PoshiElement
 	protected void checkSemicolon(String poshiScript)
 		throws PoshiScriptParserException {
 
-		Pattern statementPattern = getStatementPattern();
+		poshiScript = poshiScript.trim();
 
-		Matcher matcher = statementPattern.matcher(poshiScript);
+		StringBuilder sb = new StringBuilder();
+
+		Pattern statementPattern = getStatementPattern();
 
 		String errorMessage = "Missing semicolon";
 
-		if (matcher.find()) {
-			for (int i = matcher.end(); i < poshiScript.length(); i++) {
-				char c = poshiScript.charAt(i);
+		List<Integer> indices = new ArrayList<>();
 
+		for (int i = 0; i < poshiScript.length(); i++) {
+			Matcher matcher = statementPattern.matcher(sb.toString());
+			sb.append(poshiScript.charAt(i));
+			String balanced = sb.toString();
+			while (PoshiScriptParserUtil.isBalancedPoshiScript(balanced) && matcher.find()){
+				indices.add( i + 1);
+			}
+		}
+
+		boolean missingSemicolon = true;
+		for (int index : indices) {
+			for (int i = index; i < poshiScript.length(); i++) {
+				char c = poshiScript.charAt(i);
 				if (Character.isWhitespace(c)) {
 					continue;
 				}
 
-				if (c != ';') {
-					throw new PoshiScriptParserException(
-						errorMessage, poshiScript, (PoshiElement)getParent());
+				if (c == ';') {
+					missingSemicolon = false;
+//				System.out.println("script: " + poshiScript);
+//					System.out.println("sb: " + sb.toString());
+//				System.out.println("index: " + index);
+//				System.out.println("char: " + c);
 				}
 			}
 		}
 
-		poshiScript = poshiScript.trim();
+		if (missingSemicolon && !(poshiScript.endsWith(";"))){
+			System.out.println(poshiScript);
+			System.out.println(indices);
+			throw new PoshiScriptParserException(
+					errorMessage, poshiScript, (PoshiElement) getParent());
+		}
+
+
+//		for (char c : poshiScript.toCharArray()) {
+//
+//			String balanced = sb.toString();
+//
+//			sb.append(c);
+//
+//			if (PoshiScriptParserUtil.isBalancedPoshiScript(balanced)) {
+//				Matcher matcher = statementPattern.matcher(balanced);
+//				if (matcher.find()) {
+//					for (int i = matcher.end(); i < balanced.length(); i++) {
+//						char c1 = balanced.charAt(i);
+//
+//						System.out.println("balanced script: " + balanced);
+//						System.out.println("reg script: " + poshiScript);
+//						System.out.println("*" + c1 + "*");
+
+//						if (!balanced.endsWith(";")) {
+//							throw new PoshiScriptParserException(
+//									errorMessage, poshiScript, (PoshiElement)getParent());
+//						}
+//
+//						if (Character.isWhitespace(c1)) {
+//							continue;
+//						}
+//
+//						if (c1 != ';') {
+//							throw new PoshiScriptParserException(
+//									errorMessage, poshiScript, (PoshiElement)getParent());
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		if (!poshiScript.endsWith(";")) {
 			throw new PoshiScriptParserException(
 				errorMessage, poshiScript, (PoshiElement)getParent());
 		}
 	}
+
 
 	protected String createPoshiScriptBlock(List<PoshiNode<?, ?>> poshiNodes) {
 		StringBuilder sb = new StringBuilder();

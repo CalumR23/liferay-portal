@@ -81,6 +81,7 @@ public class ExecutePoshiElement extends PoshiElement {
 				"Missing semicolon", poshiScript, parentPoshiElement);
 		}
 
+
 		String poshiScriptParentheticalContent = getParentheticalContent(
 			poshiScript);
 		String fileExtension = getFileExtension();
@@ -437,7 +438,7 @@ public class ExecutePoshiElement extends PoshiElement {
 		}
 
 		if ((isVarAssignedToMacroInvocation(poshiScript) ||
-			 isValidPoshiScriptStatement(_statementPattern, poshiScript)) &&
+			 isValidPoshiScriptStatement(_partialStatementPattern, poshiScript)) &&
 			!isValidPoshiScriptStatement(
 				_utilityInvocationStatementPattern, poshiScript)) {
 
@@ -467,9 +468,11 @@ public class ExecutePoshiElement extends PoshiElement {
 		"locator1", "locator2", "value1", "value2", "value3");
 	private static final Pattern _functionParameterPattern = Pattern.compile(
 		_FUNCTION_PARAMETER_REGEX);
+	private static final Pattern _partialStatementPattern = Pattern.compile(
+			"^" + INVOCATION_REGEX + "(;|)$", Pattern.DOTALL);
 	private static final Pattern _statementPattern = Pattern.compile(
-		"^" + INVOCATION_REGEX, Pattern.DOTALL);
+		"^" + "[\\s]*?[\\w\\.]*?" + "\\(.*?\\)" + "(;|)$", Pattern.DOTALL);
 	private static final Pattern _utilityInvocationStatementPattern =
-		Pattern.compile("^" + _UTILITY_INVOCATION_REGEX + STATEMENT_END_REGEX);
+		Pattern.compile("^" + _UTILITY_INVOCATION_REGEX);
 
 }
