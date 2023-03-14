@@ -23,35 +23,39 @@ import com.liferay.poshi.runner.selenium.LiferaySeleniumUtil;
  */
 public class LogFileUtil {
 
-	public void assertConsoleTextNotPresent(String text) throws Exception {
+	public static void assertConsoleTextNotPresent(String text)
+		throws Exception {
+
 		Condition consoleTextNotPresentCondition =
 			getConsoleTextNotPresentCondition(text);
 
 		consoleTextNotPresentCondition.assertTrue();
 	}
 
-	public void assertConsoleTextPresent(String text) throws Exception {
+	public static void assertConsoleTextPresent(String text) throws Exception {
 		Condition consoleTextPresentCondition = getConsoleTextPresentCondition(
 			text);
 
 		consoleTextPresentCondition.assertTrue();
 	}
 
-	public void waitForConsoleTextNotPresent(String text) throws Exception {
+	public static void waitForConsoleTextNotPresent(String text)
+		throws Exception {
+
 		Condition consoleTextNotPresentCondition =
 			getConsoleTextNotPresentCondition(text);
 
 		consoleTextNotPresentCondition.waitFor();
 	}
 
-	public void waitForConsoleTextPresent(String text) throws Exception {
+	public static void waitForConsoleTextPresent(String text) throws Exception {
 		Condition consoleTextPresentCondition = getConsoleTextPresentCondition(
 			text);
 
 		consoleTextPresentCondition.waitFor();
 	}
 
-	public abstract class Condition {
+	public abstract static class Condition {
 
 		public Condition() {
 			this("");
@@ -105,11 +109,11 @@ public class LogFileUtil {
 			}
 		}
 
-		protected final String _message;
+		private final String _message;
 
 	}
 
-	protected Condition getConsoleTextNotPresentCondition(String text) {
+	protected static Condition getConsoleTextNotPresentCondition(String text) {
 		String message = "\"" + text + "\" is present in console";
 
 		return new Condition(message) {
@@ -121,7 +125,7 @@ public class LogFileUtil {
 		};
 	}
 
-	protected Condition getConsoleTextPresentCondition(String text) {
+	protected static Condition getConsoleTextPresentCondition(String text) {
 		String message = "\"" + text + "\" is not present in console";
 
 		return new Condition(message) {
