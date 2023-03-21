@@ -33,6 +33,7 @@ import com.liferay.poshi.runner.exception.JavaScriptException;
 import com.liferay.poshi.runner.exception.PoshiRunnerWarningException;
 import com.liferay.poshi.runner.util.AntCommands;
 import com.liferay.poshi.runner.util.ArchiveUtil;
+import com.liferay.poshi.runner.util.Condition;
 import com.liferay.poshi.runner.util.EmailCommands;
 import com.liferay.poshi.runner.util.HtmlUtil;
 import com.liferay.poshi.runner.var.type.DefaultTable;
@@ -4483,64 +4484,6 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 
 	protected void setNavigationBarHeight(int navigationBarHeight) {
 		_navigationBarHeight = navigationBarHeight;
-	}
-
-	protected abstract class Condition {
-
-		public Condition() {
-			this("");
-		}
-
-		public Condition(String message) {
-			_message = message;
-		}
-
-		public void assertTrue() throws Exception {
-			if (!evaluate()) {
-				throw new Exception(_message);
-			}
-		}
-
-		public abstract boolean evaluate() throws Exception;
-
-		public void verify() throws Exception {
-			if (!evaluate()) {
-				throw new PoshiRunnerWarningException(
-					"VERIFICATION_WARNING: " + _message);
-			}
-		}
-
-		public void waitFor() throws Exception {
-			waitFor("true");
-		}
-
-		public void waitFor(String throwException) throws Exception {
-			int timeout = PropsValues.TIMEOUT_EXPLICIT_WAIT * 1000;
-			int wait = 500;
-
-			for (int millisecond = 0; millisecond < timeout;
-				 millisecond += wait) {
-
-				try {
-					if (evaluate()) {
-						return;
-					}
-				}
-				catch (Exception exception) {
-				}
-
-				Thread.sleep(wait);
-			}
-
-			if ((throwException == null) ||
-				Boolean.parseBoolean(throwException)) {
-
-				assertTrue();
-			}
-		}
-
-		private final String _message;
-
 	}
 
 	private boolean _isValidURL(String targetURL) {
