@@ -95,6 +95,9 @@ public class JSONUtil {
 
 		Object object = documentContext.read(jsonPath);
 
+		System.out.println("jsonString: " + jsonString);
+		System.out.println("jsonPath: " + jsonPath);
+
 		if (object == null) {
 			throw new RuntimeException(
 				"Invalid JSON path " + jsonPath + " in " + jsonString);
