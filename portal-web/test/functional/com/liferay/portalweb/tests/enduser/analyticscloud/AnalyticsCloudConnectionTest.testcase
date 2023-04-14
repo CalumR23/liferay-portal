@@ -11,7 +11,9 @@ definition {
 	setUp {
 		ACUtils.launchAC();
 
-		ACSettings.takeTokenFromAnalyticsCloud();
+		var token = ACSettings.takeTokenFromAnalyticsCloud();
+
+		static var tokenFromSetup = ${token};
 
 		TestCase.setUpPortalInstance();
 
@@ -43,7 +45,9 @@ definition {
 		}
 
 		task ("Connect DXP to AC") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(siteName = "Site Name");
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(
+				key_token = ${tokenFromSetup},
+				siteName = "Site Name");
 		}
 
 		task ("Open site Liferay DXP and close all sessions") {
@@ -167,7 +171,7 @@ definition {
 	@description = "Automation ID: LRAC-8107 | Test Summary: Navigates to data source page"
 	@priority = 5
 	test CanNavigatesToDataSourcePage {
-		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
+		var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(key_token = ${tokenFromSetup});
 
 		var dataSource = StringUtil.replace(${propertyName}, " Combined Property", "");
 
@@ -188,7 +192,7 @@ definition {
 	@priority = 4
 	test CheckIfIsPossibleToReconnectACWithDXP {
 		task ("Connect the DXP to AC") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud();
+			ACDXPSettings.connectDXPtoAnalyticsCloud(key_token = ${tokenFromSetup});
 		}
 
 		task ("Disconnect the DXP to AC") {
@@ -198,11 +202,11 @@ definition {
 		task ("Launch AC and copy the token from an existing data source") {
 			ACUtils.launchAC();
 
-			ACSettings.takeTokenFromExistingDataSource(dataSourceName = ${assignedPropertyName});
+			var existingToken = ACSettings.takeTokenFromExistingDataSource(dataSourceName = ${assignedPropertyName});
 		}
 
 		task ("Reconnect AC with DXP") {
-			ACDXPSettings.connectDXPtoAnalyticsCloud();
+			ACDXPSettings.connectDXPtoAnalyticsCloud(key_token = ${existingToken});
 		}
 	}
 
@@ -210,7 +214,7 @@ definition {
 	@priority = 5
 	test DataSourceListIsSearchable {
 		task ("Create data sources") {
-			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud();
+			var propertyName = ACDXPSettings.connectDXPtoAnalyticsCloud(key_token = ${tokenFromSetup});
 
 			var dataSource = StringUtil.replace(${propertyName}, " Combined Property", "");
 
