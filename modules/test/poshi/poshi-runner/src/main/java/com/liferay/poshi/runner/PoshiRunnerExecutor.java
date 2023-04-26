@@ -570,6 +570,11 @@ public class PoshiRunnerExecutor {
 							getNamespaceFromNamespacedClassCommandName(
 								locator));
 
+					System.out.println("locator: " + locator);
+					System.out.println("namespace classCommand name: " + PoshiGetterUtil.
+							getNamespaceFromNamespacedClassCommandName(
+									locator));
+
 					if (locator == null) {
 						exception = new Exception(
 							"No such locator key " + pathClassName + "#" +
