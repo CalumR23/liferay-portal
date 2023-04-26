@@ -189,6 +189,7 @@ public class PoshiVariablesContext {
 	}
 
 	public Object replaceExecuteVars(String token) {
+		System.out.println("token: " + token);
 		Matcher matcher = _pattern.matcher(token);
 
 		if (matcher.matches() && _executeMap.containsKey(matcher.group(1))) {
