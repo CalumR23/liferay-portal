@@ -330,6 +330,8 @@ public class PoshiGetterUtil {
 	public static String getNamespaceFromNamespacedClassCommandName(
 		String namespacedClassCommandName) {
 
+		System.out.println("namespace: " + namespacedClassCommandName);
+
 		Matcher matcher = _namespacedClassCommandNamePattern.matcher(
 			namespacedClassCommandName);
 
