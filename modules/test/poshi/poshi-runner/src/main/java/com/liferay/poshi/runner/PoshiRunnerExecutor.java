@@ -545,7 +545,6 @@ public class PoshiRunnerExecutor {
 			if (locator == null) {
 				locator = _poshiVariablesContext.getStringFromCommandMap(
 					"locator" + i);
-				System.out.println("locator is null: " + locator);
 			}
 
 			if (locator != null) {
