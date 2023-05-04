@@ -296,6 +296,10 @@ public class PoshiContext {
 
 	public static String getPathLocator(
 		String pathLocatorKey, String namespace) {
+		if (namespace.contains("User")) {
+			System.out.println("path locator key: " + pathLocatorKey);
+			System.out.println("path locator namespace: " + namespace);
+		}
 
 		String pathLocator = _pathLocators.get(
 			namespace + "." + pathLocatorKey);
