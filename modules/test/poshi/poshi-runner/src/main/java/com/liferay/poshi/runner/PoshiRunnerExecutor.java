@@ -540,9 +540,12 @@ public class PoshiRunnerExecutor {
 		for (int i = 1; i <= PoshiContext.getFunctionMaxArgumentCount(); i++) {
 			String locator = executeElement.attributeValue("locator" + i);
 
+			System.out.println("locator 1: " + locator);
+
 			if (locator == null) {
 				locator = _poshiVariablesContext.getStringFromCommandMap(
 					"locator" + i);
+				System.out.println("locator is null: " + locator);
 			}
 
 			if (locator != null) {
@@ -570,10 +573,7 @@ public class PoshiRunnerExecutor {
 							getNamespaceFromNamespacedClassCommandName(
 								locator));
 
-					System.out.println("locator: " + locator);
-					System.out.println("namespace classCommand name: " + PoshiGetterUtil.
-							getNamespaceFromNamespacedClassCommandName(
-									locator));
+					System.out.println("locator2: " + locator);
 
 					if (locator == null) {
 						exception = new Exception(
