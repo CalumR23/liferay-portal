@@ -2497,6 +2497,11 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 	}
 
 	@Override
+	public void sendKeysNoElement(String value) {
+		typeKeys("//body", value);
+	}
+
+	@Override
 	public void setDefaultTimeout() {
 	}
 
