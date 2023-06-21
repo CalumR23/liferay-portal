@@ -430,6 +430,8 @@ public interface LiferaySelenium {
 	public void sendKeysAceEditor(String locator, String value)
 		throws Exception;
 
+	public void sendKeysNoElement(String value);
+
 	public void setDefaultTimeout();
 
 	public void setDefaultTimeoutImplicit();
