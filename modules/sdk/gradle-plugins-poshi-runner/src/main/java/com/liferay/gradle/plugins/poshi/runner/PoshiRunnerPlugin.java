@@ -658,14 +658,14 @@ public class PoshiRunnerPlugin implements Plugin<Project> {
 	}
 
 	private String _getChromeDriverURL(String chromeDriverVersion) {
-		StringBuilder sb = new StringBuilder();
-
 		Matcher matcher = _browserVersionPattern.matcher(chromeDriverVersion);
 
 		Integer chromeMajorVersion = Integer.parseInt(
 			matcher.group("majorVersion"));
 
 		if (chromeMajorVersion >= 115) {
+			StringBuilder sb = new StringBuilder();
+
 			sb.append(
 				"https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/");
 			sb.append(chromeDriverVersion);
@@ -690,23 +690,7 @@ public class PoshiRunnerPlugin implements Plugin<Project> {
 			return sb.toString();
 		}
 
-		sb.append(chromeDriverVersion);
-
-		sb.append("/chromedriver_");
-
-		if (OSDetector.isApple()) {
-			sb.append("mac64");
-		}
-		else if (OSDetector.isWindows()) {
-			sb.append("win32");
-		}
-		else {
-			sb.append("linux64");
-		}
-
-		sb.append(".zip");
-
-		return sb.toString();
+		return _getLegacyChromeDriverURL(chromeDriverVersion);
 	}
 
 	private String _getChromeDriverVersion(
@@ -817,7 +801,7 @@ public class PoshiRunnerPlugin implements Plugin<Project> {
 				}
 
 				URL url = new URL(
-					_CHROME_DRIVER_BASE_URL + "LATEST_RELEASE_" +
+					_LEGACY_CHROME_DRIVER_BASE_URL + "LATEST_RELEASE_" +
 						chromeMajorVersion.toString());
 
 				String chromeDriverVersion = StringUtil.read(url.openStream());
@@ -959,6 +943,30 @@ public class PoshiRunnerPlugin implements Plugin<Project> {
 		else {
 			sb.append("linux64.tar.gz");
 		}
+
+		return sb.toString();
+	}
+
+	private String _getLegacyChromeDriverURL(String chromeDriverVersion) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(_LEGACY_CHROME_DRIVER_BASE_URL);
+
+		sb.append(chromeDriverVersion);
+
+		sb.append("/chromedriver_");
+
+		if (OSDetector.isApple()) {
+			sb.append("mac64");
+		}
+		else if (OSDetector.isWindows()) {
+			sb.append("win32");
+		}
+		else {
+			sb.append("linux64");
+		}
+
+		sb.append(".zip");
 
 		return sb.toString();
 	}
@@ -1235,12 +1243,12 @@ public class PoshiRunnerPlugin implements Plugin<Project> {
 		}
 	}
 
-	private static final String _CHROME_DRIVER_BASE_URL =
-		"https://chromedriver.storage.googleapis.com/";
-
 	private static final String _DEFAULT_CHROME_DRIVER_VERSION = "2.37";
 
 	private static final String _DEFAULT_GECKO_DRIVER_VERSION = "0.31.0";
+
+	private static final String _LEGACY_CHROME_DRIVER_BASE_URL =
+		"https://chromedriver.storage.googleapis.com/";
 
 	private static final String _START_TESTABLE_TOMCAT_TASK_NAME =
 		"startTestableTomcat";
