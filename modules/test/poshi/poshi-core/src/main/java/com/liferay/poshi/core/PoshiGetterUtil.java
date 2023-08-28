@@ -26,12 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
+import java.lang.reflect.Method;
+
 import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -254,6 +257,20 @@ public class PoshiGetterUtil {
 
 		Object[] parameters = new Object[args.size()];
 
+		Class<?> clazz = Class.forName(className);
+
+		Method executeMethod = null;
+
+		for (Method method : clazz.getMethods()) {
+			if (!methodName.equals(method.getName())) {
+				continue;
+			}
+
+			executeMethod = method;
+		}
+
+		Class<?>[] methodParameterTypes = executeMethod.getParameterTypes();
+
 		for (int i = 0; i < args.size(); i++) {
 			String arg = args.get(i);
 
@@ -278,6 +295,15 @@ public class PoshiGetterUtil {
 			}
 			else if (className.endsWith("StringUtil")) {
 				parameter = String.valueOf(parameter);
+			}
+
+			Class<?> parameterTypeClass = methodParameterTypes[i];
+
+			if (Objects.equals(
+					parameterTypeClass.getName(), "java.lang.String") &&
+				!parameterTypeClass.isAssignableFrom(parameter.getClass())) {
+
+				parameter = parameter.toString();
 			}
 
 			parameters[i] = parameter;
