@@ -13,6 +13,9 @@ import com.liferay.poshi.core.util.TestUtil;
 
 import java.io.File;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -82,6 +85,29 @@ public class PoshiElementFactoryTest {
 				childPoshiElement.getPoshiScriptLineNumber());
 
 			i++;
+		}
+	}
+
+	@Test
+	public void testFunctionRegen() throws Exception {
+		File dir = new File(
+			"/opt/dev/projects/github/liferay-portal/portal-web/test/functional/com/liferay/portalweb/functions");
+
+		List<File> files = Arrays.asList(dir.listFiles());
+
+		for (File file : files) {
+			String actualFileName = file.toString();
+
+			PoshiElement actualElement = _getPoshiElement(actualFileName);
+
+			String actualContent = actualElement.toPoshiScript();
+
+			FileUtil.write(actualFileName, actualContent);
+			PoshiElement lastElement = _getPoshiElement(actualFileName);
+
+			String lastContent = lastElement.toPoshiScript();
+
+			FileUtil.write(actualFileName, lastContent);
 		}
 	}
 
@@ -442,7 +468,6 @@ public class PoshiElementFactoryTest {
 			FileUtil.getURL(_getFile(fileName)));
 	}
 
-	private static final String _BASE_DIR =
-		"src/test/resources/com/liferay/poshi/core/dependencies/elements/";
+	private static final String _BASE_DIR = "";
 
 }
