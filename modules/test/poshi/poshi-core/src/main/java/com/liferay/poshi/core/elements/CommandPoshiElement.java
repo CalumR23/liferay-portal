@@ -123,9 +123,11 @@ public class CommandPoshiElement extends PoshiElement {
 		if (blockNameMatcher.find()) {
 			addAttribute("name", blockNameMatcher.group(3));
 
-			String commandType = blockNameMatcher.group(2);
+			String type = blockNameMatcher.group(2);
 
-			if (commandType.equals("function") || commandType.equals("macro")) {
+			addAttribute("type", type);
+
+			if (type.equals("function") || type.equals("macro")) {
 				String argumentsValue = getParentheticalContent(
 					blockNameMatcher.group(4));
 
@@ -135,7 +137,7 @@ public class CommandPoshiElement extends PoshiElement {
 					for (String argument : _getArguments(blockContent)) {
 						sb.append(argument);
 
-						if (commandType.equals("macro")) {
+						if (type.equals("macro")) {
 							sb.append(" = null");
 						}
 
