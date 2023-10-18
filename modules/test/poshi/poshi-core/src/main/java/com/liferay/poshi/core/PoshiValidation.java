@@ -273,13 +273,15 @@ public class PoshiValidation {
 		String filePath = _getFilePath(poshiElement);
 
 		List<String> possibleAttributeNames = Arrays.asList(
-			"arguments", "line-number", "name", "prose", "return", "summary",
-			"summary-ignore");
+			"arguments", "type", "line-number", "name", "prose", "return",
+			"summary", "summary-ignore");
 
 		validatePossibleAttributeNames(poshiElement, possibleAttributeNames);
 
 		validateRequiredAttributeNames(
 			poshiElement, Arrays.asList("name"), filePath);
+
+		validateCommandName(poshiElement);
 
 		List<PoshiElement> returnPoshiElements = poshiElement.toPoshiElements(
 			PoshiGetterUtil.getAllChildElements(poshiElement, "return"));
@@ -351,6 +353,26 @@ public class PoshiValidation {
 							commandReturnPoshiElement, "'", returnVariableName,
 							"' not listed as a return variable"));
 				}
+			}
+		}
+	}
+
+	protected static void validateCommandName(PoshiElement poshiElement) {
+		String name = poshiElement.attributeValue("name");
+		String type = poshiElement.attributeValue("type");
+
+		for (String commandType : _COMMAND_TYPES) {
+			if (name.contains(commandType)) {
+				if (commandType.equals(type)) {
+					continue;
+				}
+
+				_exceptions.add(
+					new PoshiElementException(
+						poshiElement,
+						"Command name " + name +
+							" contains incorrect command type: " + commandType +
+								"\nCorrect command type " + type));
 			}
 		}
 	}
@@ -1534,6 +1556,7 @@ public class PoshiValidation {
 			String attributeName = attribute.getName();
 
 			if (!possibleAttributeNames.contains(attributeName)) {
+				System.out.println("uhhhhh: " + poshiElement);
 				_exceptions.add(
 					new PoshiElementException(
 						poshiElement, "Invalid ", attributeName, " attribute"));
@@ -1821,8 +1844,9 @@ public class PoshiValidation {
 
 			if (childPoshiElementName.equals("command")) {
 				List<String> possibleAttributeNames = Arrays.asList(
-					"annotations", "description", "disable-webdriver", "ignore",
-					"known-issues", "line-number", "name", "priority");
+					"annotations", "type", "description", "disable-webdriver",
+					"ignore", "known-issues", "line-number", "name",
+					"priority");
 
 				validateHasChildElements(childPoshiElement, filePath);
 				validateHasRequiredPropertyElements(childPoshiElement);
@@ -2148,6 +2172,10 @@ public class PoshiValidation {
 			_logger.warning(poshiElementException.getSimpleMessage());
 		}
 	}
+
+	private static final String[] _COMMAND_TYPES = {
+		"macro", "function", "test"
+	};
 
 	private static final Logger _logger = Logger.getLogger(
 		PoshiValidation.class.getName());
