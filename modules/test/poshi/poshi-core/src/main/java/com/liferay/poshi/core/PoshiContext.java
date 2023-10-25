@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.nio.file.FileSystem;
@@ -1971,7 +1972,16 @@ public class PoshiContext {
 	private static class PoshiFileRunnable implements Runnable {
 
 		public void run() {
-			String filePath = _url.getFile();
+			URI uri = null;
+
+			try {
+				uri = _url.toURI();
+			}
+			catch (URISyntaxException uriSyntaxException) {
+				throw new RuntimeException(uriSyntaxException);
+			}
+
+			String filePath = uri.getPath();
 
 			try {
 				if (OSDetector.isWindows()) {

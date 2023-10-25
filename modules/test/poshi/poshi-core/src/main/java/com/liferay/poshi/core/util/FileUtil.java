@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.nio.file.FileSystem;
@@ -206,7 +207,8 @@ public class FileUtil {
 	}
 
 	public static String read(File file) throws IOException {
-		return read(getURL(file));
+		return new String(
+			Files.readAllBytes(Paths.get(file.getCanonicalPath())));
 	}
 
 	public static String read(String fileName) throws IOException {
@@ -216,23 +218,14 @@ public class FileUtil {
 	}
 
 	public static String read(URL url) throws IOException {
-		StringBuilder sb = new StringBuilder();
+		try {
+			URI uri = url.toURI();
 
-		BufferedReader bufferedReader = new BufferedReader(
-			new InputStreamReader(url.openStream()));
-
-		String line = null;
-
-		while ((line = bufferedReader.readLine()) != null) {
-			sb.append(line);
-			sb.append("\n");
+			return read(new File(uri.getPath()));
 		}
-
-		if (sb.length() != 0) {
-			sb.setLength(sb.length() - 1);
+		catch (URISyntaxException uriSyntaxException) {
+			throw new RuntimeException(uriSyntaxException);
 		}
-
-		return sb.toString();
 	}
 
 	public static void replaceStringInFile(
