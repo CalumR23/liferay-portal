@@ -30,11 +30,13 @@ use Poshi, more information is available at
     - [Creating a function](#creating-a-function)
         - [Creating a `.function` file](#creating-a-function-file)
         - [Creating a function command](#creating-a-function-command)
+        - [Adding a signature](#adding-a-signature)
         - [Default functions](#default-functions)
     - [Creating a macro](#creating-a-macro)
         - [Creating a `.macro` file](#creating-a-macro-file)
         - [Creating a macro command](#creating-a-macro-command)
         - [Returning values](#returning-values)
+        - [Adding a signature to macros](#adding-a-signature-to-macros)
     - [Creating or requesting Java functionality](#creating-or-requesting-java-functionality)
     - [Executing Poshi functions, Poshi macros, and Java methods](#executing-poshi-functions-poshi-macros-and-java-methods)
         - [Executing Poshi functions](#executing-poshi-functions)
@@ -111,6 +113,8 @@ those changes) to improve usability and readability for users.
 - **Improved variable references**. This was a minor change that removed
   unnecessary quotes from variable references and integer declarations.
   *(August 2023)*
+- **Addition of signatures to macros and functions**. This was a major change that added signatures to macros and functions to help give more context on needed parameters for each execute type.
+*(October 2023)*
 
 ## Variables
 
@@ -299,16 +303,26 @@ by a string identifier (note that each function name must be unique) that is
 used to reference the function command.
 
 To reference a method from (LiferaySelenium.java)[https://github.com/liferay/liferay-portal/blob/master/modules/test/poshi/poshi-core/src/main/java/com/liferay/poshi/core/selenium/LiferaySelenium.java],
-simply use `selenium.` and the method name. This syntax is pending changes that
-will enforce a command signature and explicit variables that are passed into the 
-LiferaySelenium method. 
+simply use `selenium.` and the method name. Methods may or may not require `parameters` passed into the method call. If a method does require a `parameter` to be passed into it, you can pass the required parameter into the `selenium` method call with a `${locator|value}`. Most methods follow the order of `locator1, value1, locator2` per number of parameters required. Some are unique and require a different order of `parameters` which can be found in (LiferaySeleniumMethod.java)[https://github.com/liferay/liferay-portal/blob/master/modules/test/poshi/poshi-core/src/main/java/com/liferay/poshi/core/selenium/LiferaySeleniumMethod.java]
 
 `Open.function`:
 
 ```javascript
 definition {
 	function open {
-		selenium.open();
+		selenium.open(${value1});
+	}
+}
+```
+#### Adding a signature
+Each function requires a `signature` next to its name. These `sigantures` declare what parameter/s need to be passed into the function for exepected behavior. These are added next to the name with the `parameters` being added into `()`.
+
+`Open.function`:
+
+```javascript
+definition {
+	function open(value1) {
+		selenium.open(${value1});
 	}
 }
 ```
@@ -324,8 +338,8 @@ the default function, see
 ```javascript
 @default = "open"
 definition {
-	function open {
-		selenium.open();
+	function open(value1) {
+		selenium.open(${value1});
 	}
 }
 ```
@@ -395,6 +409,45 @@ macro viewPG {
 		locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
 		value1 = ${breadcrumbNameUppercase}
 	);
+
+	return ${breadcrumbNameUppercase};
+}
+```
+
+#### Adding a signature to macros
+Very similar rules apply to `macros` as `functions` when it comes to their `signature`. The main difference for `macros` is that we can validate a `macros` call and its required `parameters` through the `signature`. When declaring the `macro's signature` you add the `parameters` into `()` next to the name of said `macro`.
+
+*Required Example:*
+
+```javascript
+macro viewPG(breadcrumbName) {
+	var breadcrumbNameUppercase = StringUtil.upperCase(${breadcrumbName});
+
+	AssertTextEquals(
+		locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+		value1 = ${breadcrumbNameUppercase}
+	);
+
+	return ${breadcrumbNameUppercase};
+}
+```
+
+An optional example would be for a `parameter` that does not neccesarliy need to be set for the `macro` to execute it's expected behavior. This can be done by adding ` = null` after the optional `parameter`.
+
+*Optional Example:*
+
+```javascript
+macro viewPG(breadcrumbName, optionalParameter = null) {
+	var breadcrumbNameUppercase = StringUtil.upperCase(${breadcrumbName});
+
+	AssertTextEquals(
+		locator1 = "Breadcrumb#BREADCRUMB_ENTRY",
+		value1 = ${breadcrumbNameUppercase}
+	);
+
+    if(isSet(${optionalParameter})) {
+        echo(${optionalParameter})
+    }
 
 	return ${breadcrumbNameUppercase};
 }
