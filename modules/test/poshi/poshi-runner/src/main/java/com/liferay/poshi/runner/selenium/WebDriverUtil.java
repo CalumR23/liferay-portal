@@ -53,7 +53,7 @@ import org.openqa.selenium.safari.SafariOptions;
  */
 public class WebDriverUtil {
 
-	public static LiferaySelenium getLiferaySelenium(String testName) {
+	public static LiferaySelenium getLiferaySelenium(String testName) throws MalformedURLException {
 		if (!_webDrivers.containsKey(testName)) {
 			startWebDriver(testName);
 		}
@@ -65,7 +65,7 @@ public class WebDriverUtil {
 		return _webDrivers.get(testName);
 	}
 
-	public static synchronized void startWebDriver(String testName) {
+	public static synchronized void startWebDriver(String testName) throws MalformedURLException {
 		if (_webDrivers.containsKey(testName)) {
 			throw new RuntimeException(
 				"WebDriver instance already started for: " + testName);
@@ -82,7 +82,7 @@ public class WebDriverUtil {
 		if (poshiProperties.browserType.equals("android")) {
 			_webDrivers.put(
 				testName,
-				new ChromeWebDriverImpl(portalURL, _getAndroidAppiumDriver()));
+				new AndroidAppiumDriverImpl(portalURL, _getAndroidAppiumDriver()));
 		}
 		else if (poshiProperties.browserType.equals("chrome")) {
 			_webDrivers.put(
@@ -145,14 +145,14 @@ public class WebDriverUtil {
 		_webDrivers.remove(testName);
 	}
 
-	private static WebDriver _getAndroidAppiumDriver() {
+	private static WebDriver _getAndroidAppiumDriver() throws MalformedURLException {
 		PoshiProperties poshiProperties = PoshiProperties.getPoshiProperties();
 
 		UiAutomator2Options uiAutomator2Options = new UiAutomator2Options();
 
-		uiAutomator2Options.setUdid(poshiProperties.mobileDeviceUDID);
+		uiAutomator2Options.setDeviceName(poshiProperties.mobileDeviceName);
 
-		return new AndroidDriver(uiAutomator2Options);
+		return new AndroidDriver(new URL("http://127.0.0.1:4723"), uiAutomator2Options);
 	}
 
 	private static WebDriver _getChromeDriver() {
