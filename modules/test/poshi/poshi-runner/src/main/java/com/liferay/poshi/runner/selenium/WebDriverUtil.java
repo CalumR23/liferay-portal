@@ -174,11 +174,16 @@ public class WebDriverUtil {
 	private static ChromeOptions _getDefaultChromeOptions() {
 		ChromeOptions chromeOptions = new ChromeOptions();
 
+		PoshiProperties poshiProperties = PoshiProperties.getPoshiProperties();
+
+		if (Validator.isNotNull(poshiProperties.seleniumRemoteDriverURL)) {
+			chromeOptions.addArguments("--no-sandbox");
+			chromeOptions.addArguments("--disable-dev-shm-usage");
+		}
+
 		_setGenericCapabilities(chromeOptions);
 
 		Map<String, Object> preferences = new HashMap<>();
-
-		PoshiProperties poshiProperties = PoshiProperties.getPoshiProperties();
 
 		String outputDirName = poshiProperties.outputDirName;
 
