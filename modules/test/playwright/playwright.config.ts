@@ -7,6 +7,7 @@ import {defineConfig} from '@playwright/test';
 
 import {config as exportImportWeb} from './tests/export-import-web/config';
 import {config as batchPlanner} from './tests/batch-planner/config';
+import {config as analyticsCloud} from './tests/analytics-cloud/config';
 import {config as setup} from './tests/global.setup.config';
 import {config as object} from './tests/object-web/config';
 import {config as portalWeb} from './tests/portal-web/config';
@@ -14,7 +15,7 @@ import {config as usersAdminWeb} from './tests/users-admin-web/config';
 
 export default defineConfig({
 	forbidOnly: !!process.env.CI,
-	projects: [batchPlanner, exportImportWeb, object, portalWeb, setup, usersAdminWeb],
+	projects: [analyticsCloud, batchPlanner, exportImportWeb, object, portalWeb, setup, usersAdminWeb],
 	reporter: [
 		[
 			'html',
