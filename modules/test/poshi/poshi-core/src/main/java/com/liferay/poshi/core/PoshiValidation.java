@@ -273,8 +273,8 @@ public class PoshiValidation {
 		String filePath = _getFilePath(poshiElement);
 
 		List<String> possibleAttributeNames = Arrays.asList(
-			"arguments", "line-number", "name", "return",
-			"summary", "summary-ignore", "type");
+			"arguments", "line-number", "name", "return", "summary",
+			"summary-ignore", "type");
 
 		validatePossibleAttributeNames(poshiElement, possibleAttributeNames);
 
@@ -1832,9 +1832,8 @@ public class PoshiValidation {
 
 			if (childPoshiElementName.equals("command")) {
 				List<String> possibleAttributeNames = Arrays.asList(
-					"annotations", "description", "disable-webdriver",
-					"ignore", "known-issues", "line-number", "name",
-					"priority", "type");
+					"annotations", "description", "disable-webdriver", "ignore",
+					"known-issues", "line-number", "name", "priority", "type");
 
 				validateHasChildElements(childPoshiElement, filePath);
 				validateHasRequiredPropertyElements(childPoshiElement);

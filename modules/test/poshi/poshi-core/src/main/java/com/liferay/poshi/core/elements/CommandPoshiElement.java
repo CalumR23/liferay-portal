@@ -121,11 +121,27 @@ public class CommandPoshiElement extends PoshiElement {
 		Matcher blockNameMatcher = _blockNamePattern.matcher(blockName);
 
 		if (blockNameMatcher.find()) {
-			addAttribute("name", blockNameMatcher.group(3));
+			String name = blockNameMatcher.group(3);
+
+			addAttribute("name", name);
 
 			String type = blockNameMatcher.group(2);
 
 			addAttribute("type", type);
+
+			for (String commandType : _COMMAND_TYPES) {
+				if (name.contains(commandType)) {
+					if (commandType.equals(type)) {
+						continue;
+					}
+
+					throw new PoshiScriptParserException(
+						"Command name " + name +
+							" contains incorrect command type: " + commandType +
+								"\nCorrect command type " + type,
+						poshiScript, (PoshiElement)getParent());
+				}
+			}
 
 			if (type.equals("function") || type.equals("macro")) {
 				String argumentsValue = getParentheticalContent(
@@ -299,6 +315,10 @@ public class CommandPoshiElement extends PoshiElement {
 
 		return isValidPoshiScriptBlock(_blockNamePattern, poshiScript);
 	}
+
+	private static final String[] _COMMAND_TYPES = {
+		"macro", "function", "test"
+	};
 
 	private static final String _ELEMENT_NAME = "command";
 
