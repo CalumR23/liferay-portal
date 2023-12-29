@@ -3,17 +3,18 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {defineConfig} from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-import {config as analyticsCloud} from './tests/analytics-cloud/config';
+import {config as analyticsSettings} from './tests/analytics-settings-web/config';
 import {config as setup} from './tests/global.setup.config';
 import {config as object} from './tests/object-web/config';
 import {config as portalWeb} from './tests/portal-web/config';
+import { config as faro } from './tests/osb-faro-web/config';
 import {config as usersAdminWeb} from './tests/users-admin-web/config';
 
 export default defineConfig({
 	forbidOnly: !!process.env.CI,
-	projects: [analyticsCloud, object, portalWeb, setup],
+	projects: [analyticsSettings, faro, object, portalWeb, setup],
 	reporter: [
 		[
 			'html',
