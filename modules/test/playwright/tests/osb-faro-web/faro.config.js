@@ -12,7 +12,7 @@ const faroConfig = {
 			: 'http://localhost:8080',
 		enabled: process.env.FARO_ANALYTICS_CLOUD_ENABLED
 			? process.env.FARO_ANALYTICS_CLOUD_ENABLED
-			: false
+			: true
 	},
 	user: {
 		login: process.env.FARO_USER_LOGIN || liferayConfig.user.login,
