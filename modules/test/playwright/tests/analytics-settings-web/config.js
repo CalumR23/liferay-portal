@@ -6,7 +6,6 @@
 import {devices} from '@playwright/test';
 
 export const config = {
-	dependencies: ['setup'],
 	name: 'analytics-settings',
 	testDir: 'tests/analytics-settings-web',
 	use: {
