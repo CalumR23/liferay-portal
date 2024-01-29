@@ -6,7 +6,6 @@
 import {devices} from '@playwright/test';
 
 export const config = {
-	dependencies: ['setup'],
 	name: 'osb-faro-web',
 	testDir: 'tests/osb-faro-web',
 	use: {

@@ -15,6 +15,10 @@ import {config as frontendDataSetViewsWebConfig} from './tests/frontend-data-set
 import {config as headlessBuilderWebConfig} from './tests/headless-builder-web/config';
 import {config as layoutContentPageEditorWebConfig} from './tests/layout-content-page-editor-web/config';
 import {config as objectWebConfig} from './tests/object-web/config';
+import {config as batchPlanner} from './tests/batch-planner/config';
+import {config as exportImportWeb} from './tests/export-import-web/config';
+import {config as layoutContentPageEditorWeb} from './tests/layout-content-page-editor-web/config';
+import {config as object} from './tests/object-web/config';
 import {config as osbFaroWeb} from './tests/osb-faro-web/config';
 import {config as portalWebConfig} from './tests/portal-web/config';
 import {config as usersAdminWebConfig} from './tests/users-admin-web/config';
@@ -25,7 +29,6 @@ export default defineConfig({
 	},
 	forbidOnly: !!process.env.CI,
 	projects: [
-		analyticsCloud,
 		analyticsSettingsWeb,
 		batchPlannerConfig,
 		clientExtensionWebConfig,
