@@ -333,6 +333,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 					JSONObject errorJSONObject = errorsJSONArray.getJSONObject(
 						i);
 
+					System.out.println("errorJSONObj: " + errorJSONObject);
+
 					sb.append(errorJSONObject.getString("stack"));
 
 					sb.append("\n");
