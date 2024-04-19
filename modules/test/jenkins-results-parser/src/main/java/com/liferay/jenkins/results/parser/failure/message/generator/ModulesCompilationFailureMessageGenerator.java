@@ -6,6 +6,7 @@
 package com.liferay.jenkins.results.parser.failure.message.generator;
 
 import com.liferay.jenkins.results.parser.Build;
+import com.liferay.jenkins.results.parser.Dom4JUtil;
 
 import org.dom4j.Element;
 
@@ -16,18 +17,7 @@ public class ModulesCompilationFailureMessageGenerator
 	extends BaseFailureMessageGenerator {
 
 	@Override
-	public Element getMessageElement(Build build) {
-		String jobVariant = build.getJobVariant();
-
-		if (!jobVariant.contains("modules-compile")) {
-			return null;
-		}
-
-		return getMessageElement(build.getConsoleText());
-	}
-
-	@Override
-	public Element getMessageElement(String consoleText) {
+	public String getMessage(String consoleText) {
 		if (!consoleText.contains(_TOKEN_COULD_NOT_RESOLVE_CONFIG)) {
 			return null;
 		}
@@ -42,7 +32,23 @@ public class ModulesCompilationFailureMessageGenerator
 
 		start = consoleText.lastIndexOf("\n", start);
 
-		return getConsoleTextSnippetElement(consoleText, true, start, end);
+		return getConsoleTextSnippet(consoleText, true, start, end);
+	}
+
+	@Override
+	public Element getMessageElement(Build build) {
+		String jobVariant = build.getJobVariant();
+
+		if (!jobVariant.contains("modules-compile")) {
+			return null;
+		}
+
+		return getMessageElement(build.getConsoleText());
+	}
+
+	@Override
+	public Element getMessageElement(String consoleText) {
+		return Dom4JUtil.toCodeSnippetElement(getMessage(consoleText));
 	}
 
 	private static final String _TOKEN_COULD_NOT_RESOLVE_CONFIG =
