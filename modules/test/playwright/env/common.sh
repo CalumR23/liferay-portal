@@ -79,7 +79,15 @@ function deploy_client_extensions {
 	then
 		for client_extension_name in ${@}
 		do
-			local client_extension_dir=$(find ${_PORTAL_PROJECT_DIR}/workspaces -type d -name "${client_extension_name}" | grep -v .releng | grep -v .npmscripts)
+
+			uniqueExtensions=()
+			if [[ ${client_extension_name} == $1 ]]
+			then
+			 echo "Duplicate Client Extentions found: ${client_extension_name}"
+			 else
+				uniqueExtensions+=(${client_extension_name})
+			fi
+			local client_extension_dir=$(find ${_PORTAL_PROJECT_DIR}/workspaces -type d -name "${client_extension_name}" | grep -v .releng | grep -v .npmscripts | grep -v node_modules)
 
 			if [[ -d ${client_extension_dir} ]]
 			then
@@ -90,6 +98,8 @@ function deploy_client_extensions {
 				local gradlew=$(get_gradlew)
 
 				${gradlew} deploy -Pliferay.workspace.home.dir=${LIFERAY_HOME}
+			else
+				echo "Unable to find Client Extension directory at ${client_extension_dir}"
 			fi
 		done
 	fi
@@ -124,7 +134,14 @@ function deploy_osgi_modules {
 
 		for osgi_module_name in ${@}
 		do
-			local osgi_module_dir=$(find ${_PORTAL_PROJECT_DIR}/modules -type d -name "${osgi_module_name}" | grep -v .releng | grep -v .npmscripts)
+			uniqueModules=()
+			if [[ ${osgi_module_name} == $1 ]]
+			then
+			 echo "Duplicate OSGI Modules found: ${osgi_module_name}"
+			 else
+				uniqueModules+=(${osgi_module_name})
+			fi
+			local osgi_module_dir=$(find ${_PORTAL_PROJECT_DIR}/modules -type d -name "${osgi_module_name}" | grep -v .releng | grep -v .npmscripts | grep -v node_modules)
 
 			if [[ -f ${osgi_module_dir}/build.gradle ]]
 			then
@@ -135,6 +152,8 @@ function deploy_osgi_modules {
 				local gradlew=$(get_gradlew)
 
 				${gradlew} deploy
+				else
+				echo "Unable to find OSGi module directory at ${osgi_module_dir}"
 			fi
 		done
 	fi
