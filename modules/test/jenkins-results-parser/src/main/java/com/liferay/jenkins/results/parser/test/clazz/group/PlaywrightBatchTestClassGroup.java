@@ -61,6 +61,17 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 	}
 
 	protected PlaywrightBatchTestClassGroup(
+		JSONObject jsonObject, PortalTestClassJob portalTestClassJob,
+		String playwrightBaseDir) {
+
+		super(jsonObject, portalTestClassJob);
+
+		if (playwrightBaseDir != null) {
+			_playwrightBaseDir = playwrightBaseDir;
+		}
+	}
+
+	protected PlaywrightBatchTestClassGroup(
 		String batchName, PortalTestClassJob portalTestClassJob) {
 
 		super(batchName, portalTestClassJob);
@@ -185,6 +196,54 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				String.valueOf(testClasses.size()),
 				" Playwright test classes in ",
 				JenkinsResultsParserUtil.toDurationString(duration)));
+	}
+
+	protected PlaywrightBatchTestClassGroup(
+		String batchName, PortalTestClassJob portalTestClassJob,
+		String playwrightBaseDir) {
+
+		super(batchName, portalTestClassJob);
+
+		if (playwrightBaseDir != null) {
+			_playwrightBaseDir = playwrightBaseDir;
+		}
+
+		new PlaywrightBatchTestClassGroup(batchName, portalTestClassJob);
+	}
+
+	protected List<JobProperty> getRelevantPlaywrightJobProperties() {
+		Set<JobProperty> playwrightJobProperties = new HashSet<>();
+
+		for (File modifiedFile :
+				portalGitWorkingDirectory.getModifiedFilesList(false)) {
+
+			List<JobProperty> playwrightTestProjectJobProperties =
+				getJobProperties(
+					modifiedFile, PLAYWRIGHT_TEST_PROJECT_PROPERTY_NAME,
+					JobProperty.Type.MODULE_TEST_DIR, null);
+
+			for (JobProperty playwrightTestProjectJobProperty :
+					playwrightTestProjectJobProperties) {
+
+				if (playwrightTestProjectJobProperty.getValue() != null) {
+					String projectNames =
+						playwrightTestProjectJobProperty.getValue();
+
+					_addProjectNames(projectNames);
+
+					playwrightJobProperties.add(
+						playwrightTestProjectJobProperty);
+				}
+			}
+		}
+
+		playwrightJobProperties.removeAll(Collections.singleton(null));
+
+		return new ArrayList<>(playwrightJobProperties);
+	}
+
+	protected List<JSONObject> getSpecJSONObjects() {
+		return _specJSONObjects;
 	}
 
 	protected static final String PLAYWRIGHT_TEST_PROJECT_PROPERTY_NAME =
@@ -327,7 +386,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				portalGitWorkingDirectory.getWorkingDirectory();
 
 			File playwrightBaseDir = new File(
-				workingDirectory, "modules/test/playwright");
+				workingDirectory, _playwrightBaseDir);
 
 			try {
 				AntUtil.callTarget(workingDirectory, "build.xml", "setup-yarn");
@@ -427,6 +486,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 		}
 	}
 
+	private static String _playwrightBaseDir = "modules/test/playwright";
 	private static JSONObject _playwrightJSONObject;
 	private static final AtomicBoolean _playwrightJSONObjectsLoaded =
 		new AtomicBoolean();
