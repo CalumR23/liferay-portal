@@ -53,6 +53,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			return;
 		}
 
+		System.out.println("job prop value: " + jobPropertyValue);
+
 		_addProjectNames(jobPropertyValue);
 
 		recordJobProperty(jobProperty);
