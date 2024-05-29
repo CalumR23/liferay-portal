@@ -14,6 +14,7 @@ import com.liferay.jenkins.results.parser.PortalTestClassJob;
 import com.liferay.jenkins.results.parser.QAWebsitesGitRepositoryJob;
 import com.liferay.jenkins.results.parser.test.batch.PlaywrightTestBatch;
 import com.liferay.jenkins.results.parser.test.batch.TestBatch;
+import com.liferay.jenkins.results.parser.QAWebsitesPlaywrightBatchTestClassGroup;
 
 import java.io.File;
 
@@ -429,6 +430,18 @@ public class TestClassGroupFactory {
 				else {
 					batchTestClassGroup =
 						new QAWebsitesFunctionalBatchTestClassGroup(
+							batchName, (QAWebsitesGitRepositoryJob)job);
+				}
+			}
+			else if (batchName.startsWith("qa-websites-playwright-")) {
+				if (jsonObject != null) {
+					batchTestClassGroup =
+						new QAWebsitesPlaywrightBatchTestClassGroup(
+							jsonObject, (QAWebsitesGitRepositoryJob)job);
+				}
+				else {
+					batchTestClassGroup =
+						new QAWebsitesPlaywrightBatchTestClassGroup(
 							batchName, (QAWebsitesGitRepositoryJob)job);
 				}
 			}
