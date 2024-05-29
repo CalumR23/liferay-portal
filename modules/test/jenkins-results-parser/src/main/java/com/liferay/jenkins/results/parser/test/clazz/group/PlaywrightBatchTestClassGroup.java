@@ -6,7 +6,10 @@
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
 import com.liferay.jenkins.results.parser.AntUtil;
+import com.liferay.jenkins.results.parser.GitRepositoryJob;
+import com.liferay.jenkins.results.parser.GitWorkingDirectory;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.NotificationUtil;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
@@ -46,6 +49,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 		String jobPropertyValue = jobProperty.getValue();
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue)) {
+			System.out.println("returning job prop null");
 			return;
 		}
 
@@ -382,11 +386,15 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				return;
 			}
 
-			File workingDirectory =
-				portalGitWorkingDirectory.getWorkingDirectory();
+			Job job = getJob();
+
+			GitRepositoryJob gitRepositoryJob = (GitRepositoryJob)job;
+
+			GitWorkingDirectory gitWorkingDirectory =
+				gitRepositoryJob.getGitWorkingDirectory();
 
 			File playwrightBaseDir = new File(
-				workingDirectory, _playwrightBaseDir);
+				gitWorkingDirectory.getWorkingDirectory(), _playwrightBaseDir);
 
 				System.out.println("playwright dir before set: " + playwrightBaseDir);
 
