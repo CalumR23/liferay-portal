@@ -100,6 +100,8 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 		sb.append("PLAYWRIGHT_PROJECT_NAME=");
 		sb.append(getProjectName());
 
+		System.out.println("testcase props: " + sb.toString());
+
 		return sb.toString();
 	}
 
