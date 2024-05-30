@@ -86,6 +86,7 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 		int axisCount = getAxisCount();
 
 		if (axisCount >= 1) {
+			System.out.println("axis count more than 1");
 			for (int axisIndex = 0; axisIndex < getAxisCount(); axisIndex++) {
 				sb.append("PLAYWRIGHT_ARGS_");
 				sb.append(axisIndex);
