@@ -188,6 +188,17 @@ public class TestClassGroupFactory {
 
 			return new ModulesSegmentTestClassGroup(batchTestClassGroup);
 		}
+		else if (batchTestClassGroup instanceof
+					QAWebsitesPlaywrightBatchTestClassGroup) {
+
+			if (jsonObject != null) {
+				return new QAWebsitesPlaywrightSegmentTestClassGroup(
+					batchTestClassGroup, jsonObject);
+			}
+
+			return new QAWebsitesPlaywrightSegmentTestClassGroup(
+				batchTestClassGroup);
+		}
 		else if (batchTestClassGroup instanceof PlaywrightBatchTestClassGroup) {
 			if (jsonObject != null) {
 				return new PlaywrightSegmentTestClassGroup(

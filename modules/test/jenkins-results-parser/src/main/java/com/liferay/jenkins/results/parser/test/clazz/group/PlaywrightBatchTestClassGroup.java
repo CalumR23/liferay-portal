@@ -50,6 +50,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 		if (JenkinsResultsParserUtil.isNullOrEmpty(jobPropertyValue)) {
 			System.out.println("returning job prop null");
+
 			return;
 		}
 
