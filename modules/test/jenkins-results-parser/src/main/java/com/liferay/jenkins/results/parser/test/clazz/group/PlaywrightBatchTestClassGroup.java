@@ -168,6 +168,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			if (segmentTestClassGroup instanceof
 					PlaywrightSegmentTestClassGroup) {
 
+				System.out.println("instance of playwright segment");
+
 				PlaywrightSegmentTestClassGroup
 					playwrightSegmentTestClassGroup =
 						(PlaywrightSegmentTestClassGroup)segmentTestClassGroup;
