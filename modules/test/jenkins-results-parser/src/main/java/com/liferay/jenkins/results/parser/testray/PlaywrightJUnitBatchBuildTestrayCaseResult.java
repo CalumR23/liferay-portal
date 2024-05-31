@@ -5,10 +5,13 @@
 
 package com.liferay.jenkins.results.parser.testray;
 
+import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.TopLevelBuild;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightJUnitTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
+
+import java.io.File;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +49,7 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 		testrayAttachments.addAll(getLiferayOSGiLogTestrayAttachments());
 
 		testrayAttachments.add(getPlaywrightReportTestrayAttachment());
+		testrayAttachments.add(getPlaywrightTraceTestrayAttachment());
 
 		testrayAttachments.removeAll(Collections.singleton(null));
 
@@ -56,6 +60,19 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 		return getTestrayAttachment(
 			getBuild(), "Playwright Report",
 			getAxisBuildURLPath() + "/playwright-report/index.html");
+	}
+
+	protected TestrayAttachment getPlaywrightTraceTestrayAttachment() {
+		File dataDir = new File(getAxisBuildURLPath() + "/data");
+
+		List<File> traceFileList = JenkinsResultsParserUtil.findFiles(
+			dataDir, ".zip");
+
+		File traceFile = traceFileList.get(0);
+
+		return getTestrayAttachment(
+			getBuild(), "Trace Zip",
+			getAxisBuildURLPath() + traceFile.getPath());
 	}
 
 	private final PlaywrightJUnitTestClass _playwrightJUnitTestClass;
