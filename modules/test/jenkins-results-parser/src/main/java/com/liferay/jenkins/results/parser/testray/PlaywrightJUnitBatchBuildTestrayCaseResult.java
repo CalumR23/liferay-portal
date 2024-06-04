@@ -49,30 +49,35 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 		testrayAttachments.addAll(getLiferayOSGiLogTestrayAttachments());
 
 		testrayAttachments.add(getPlaywrightReportTestrayAttachment());
-		testrayAttachments.add(getPlaywrightTraceTestrayAttachment());
+		testrayAttachments.add(
+			getPlaywrightDataTestrayAttachment(".zip", "Trace Zip"));
+		testrayAttachments.add(
+			getPlaywrightDataTestrayAttachment(".png", "Failure Screenshot"));
 
 		testrayAttachments.removeAll(Collections.singleton(null));
 
 		return testrayAttachments;
 	}
 
-	protected TestrayAttachment getPlaywrightReportTestrayAttachment() {
-		return getTestrayAttachment(
-			getBuild(), "Playwright Report",
-			getAxisBuildURLPath() + "/playwright-report/index.html");
-	}
+	protected TestrayAttachment getPlaywrightDataTestrayAttachment(
+		String filePattern, String attachmentName) {
 
-	protected TestrayAttachment getPlaywrightTraceTestrayAttachment() {
 		File dataDir = new File(getAxisBuildURLPath() + "/data");
 
 		List<File> traceFileList = JenkinsResultsParserUtil.findFiles(
-			dataDir, ".zip");
+			dataDir, filePattern);
 
 		File traceFile = traceFileList.get(0);
 
 		return getTestrayAttachment(
-			getBuild(), "Trace Zip",
+			getBuild(), attachmentName,
 			getAxisBuildURLPath() + traceFile.getPath());
+	}
+
+	protected TestrayAttachment getPlaywrightReportTestrayAttachment() {
+		return getTestrayAttachment(
+			getBuild(), "Playwright Report",
+			getAxisBuildURLPath() + "/playwright-report/index.html");
 	}
 
 	private final PlaywrightJUnitTestClass _playwrightJUnitTestClass;
