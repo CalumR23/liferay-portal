@@ -185,14 +185,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				playwrightSegmentTestClassGroup.addAxisTestClassGroup(
 					axisTestClassGroup);
 
-				if (axisTestClassGroup != null){
-					System.out.println("axis name: " + axisTestClassGroup.getAxisName());
-				}
-				else {
-					System.out.println("axis" + null);
-				}
-
 				for (TestClass testClass : testClasses) {
+					System.out.println("adding test classes");
 					axisTestClassGroup.addTestClass(testClass);
 
 					addTestClass(testClass);
@@ -201,8 +195,14 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				addAxisTestClassGroup(axisTestClassGroup);
 
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
+
+				if (axisTestClassGroup != null){
+					System.out.println("axis name: " + axisTestClassGroup.getAxisName());
+				}
 			}
 		}
+
+		System.out.println("final axis count check: " + getAxisCount());
 
 		List<TestClass> testClasses = getTestClasses();
 
