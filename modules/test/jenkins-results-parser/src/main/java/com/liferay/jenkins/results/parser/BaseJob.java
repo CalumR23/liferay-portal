@@ -563,6 +563,10 @@ public abstract class BaseJob implements Job {
 		for (BatchTestClassGroup batchTestClassGroup : batchTestClassGroups) {
 			Properties batchProperties = new Properties();
 
+			System.out.println("batch name: " + batchTestClassGroup.getBatchName());
+
+			System.out.println("segmentclass groups: " + batchTestClassGroup.getSegmentCount());
+
 			batchProperties.setProperty(
 				"test.batch.cohort.name", batchTestClassGroup.getCohortName());
 			batchProperties.setProperty(
