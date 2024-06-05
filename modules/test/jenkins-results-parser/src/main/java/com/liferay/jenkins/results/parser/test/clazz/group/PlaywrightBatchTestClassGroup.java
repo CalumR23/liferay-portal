@@ -182,15 +182,15 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				AxisTestClassGroup axisTestClassGroup =
 					TestClassGroupFactory.newAxisTestClassGroup(this);
 
+				playwrightSegmentTestClassGroup.addAxisTestClassGroup(
+					axisTestClassGroup);
+
 				if (axisTestClassGroup != null){
 					System.out.println("axis name: " + axisTestClassGroup.getAxisName());
 				}
 				else {
 					System.out.println("axis" + null);
 				}
-
-				playwrightSegmentTestClassGroup.addAxisTestClassGroup(
-					axisTestClassGroup);
 
 				for (TestClass testClass : testClasses) {
 					axisTestClassGroup.addTestClass(testClass);
