@@ -114,6 +114,8 @@ public abstract class BaseJob implements Job {
 				return _batchTestClassGroups;
 			}
 
+			System.out.println("creating list");
+
 			_batchTestClassGroups = Collections.synchronizedList(
 				new ArrayList<BatchTestClassGroup>());
 
@@ -161,6 +163,11 @@ public abstract class BaseJob implements Job {
 				_batchTestClassGroups.addAll(
 					getBatchTestClassGroups(getRawBatchNames()));
 			}
+			List<BatchTestClassGroup> batchTestClassGroupList = getBatchTestClassGroups(getRawBatchNames());
+
+			System.out.println("list size: " + batchTestClassGroupList.size());
+
+			_batchTestClassGroups.addAll(batchTestClassGroupList);
 
 			return _batchTestClassGroups;
 		}

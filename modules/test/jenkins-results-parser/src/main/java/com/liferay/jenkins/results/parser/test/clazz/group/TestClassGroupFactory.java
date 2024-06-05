@@ -450,6 +450,7 @@ public class TestClassGroupFactory {
 				}
 			}
 			else if (batchName.startsWith("qa-websites-playwright-")) {
+				System.out.println("created qa-web batch");
 				if (jsonObject != null) {
 					batchTestClassGroup =
 						new QAWebsitesPlaywrightBatchTestClassGroup(
