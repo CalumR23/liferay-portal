@@ -636,6 +636,10 @@ public abstract class BaseJob implements Job {
 				String testCasePropertiesContent =
 					segmentTestClassGroup.getTestCasePropertiesContent();
 
+				System.out.println("class name: " + segmentTestClassGroup.getClass().getName());
+
+				System.out.println("base job props content: " + testCasePropertiesContent);
+
 				if (testCasePropertiesContent != null) {
 					testCasePropertiesContent =
 						testCasePropertiesContent.replaceAll(

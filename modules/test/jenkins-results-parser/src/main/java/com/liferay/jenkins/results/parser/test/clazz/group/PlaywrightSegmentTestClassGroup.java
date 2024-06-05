@@ -41,6 +41,7 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 
 	@Override
 	public String getTestCasePropertiesContent() {
+		System.out.println("made into segment props content");
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(super.getTestCasePropertiesContent());
@@ -69,6 +70,7 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 			}
 		}
 		else {
+			System.out.println("else in get props content");
 			JobProperty jobProperty =
 				playwrightBatchTestClassGroup.getJobProperty(
 					playwrightTestProjectPropertyName,
