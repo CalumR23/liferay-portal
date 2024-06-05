@@ -1300,6 +1300,8 @@ public abstract class BaseJob implements Job {
 
 		recordJobProperty(jobProperty);
 
+		System.out.println("offical batch name: " + getSetFromString(jobProperty.getValue()));
+
 		return getSetFromString(jobProperty.getValue());
 	}
 
