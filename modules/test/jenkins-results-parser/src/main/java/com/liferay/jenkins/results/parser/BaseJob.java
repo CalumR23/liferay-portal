@@ -560,6 +560,8 @@ public abstract class BaseJob implements Job {
 
 		batchTestClassGroups.addAll(getDependentBatchTestClassGroups());
 
+		System.out.println("size : " + batchTestClassGroups.size());
+
 		for (BatchTestClassGroup batchTestClassGroup : batchTestClassGroups) {
 			Properties batchProperties = new Properties();
 
