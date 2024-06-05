@@ -190,6 +190,7 @@ public class TestClassGroupFactory {
 		}
 		else if (batchTestClassGroup instanceof
 					QAWebsitesPlaywrightBatchTestClassGroup) {
+			System.out.println("qa web batch");
 
 			if (jsonObject != null) {
 				System.out.println("two param const");
@@ -203,6 +204,7 @@ public class TestClassGroupFactory {
 				batchTestClassGroup);
 		}
 		else if (batchTestClassGroup instanceof PlaywrightBatchTestClassGroup) {
+			System.out.println("playwright web batch");
 			if (jsonObject != null) {
 				return new PlaywrightSegmentTestClassGroup(
 					batchTestClassGroup, jsonObject);
