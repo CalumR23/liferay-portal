@@ -82,6 +82,7 @@ public class AxisTestClassGroup extends BaseTestClassGroup {
 
 	public String getAxisName() {
 		if (_segmentTestClassGroup != null) {
+			System.out.println("segment not null");
 			List<AxisTestClassGroup> axisTestClassGroups =
 				_segmentTestClassGroup.getAxisTestClassGroups();
 
@@ -89,6 +90,8 @@ public class AxisTestClassGroup extends BaseTestClassGroup {
 				_segmentTestClassGroup.getSegmentName(), "/",
 				String.valueOf(axisTestClassGroups.indexOf(this)));
 		}
+
+		System.out.println("segment is null");
 
 		List<AxisTestClassGroup> axisTestClassGroups =
 			_batchTestClassGroup.getAxisTestClassGroups();
