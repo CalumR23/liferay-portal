@@ -86,6 +86,8 @@ public class AxisTestClassGroup extends BaseTestClassGroup {
 			List<AxisTestClassGroup> axisTestClassGroups =
 				_segmentTestClassGroup.getAxisTestClassGroups();
 
+			System.out.println("axis size: " + _segmentTestClassGroup.getAxisCount());
+
 			return JenkinsResultsParserUtil.combine(
 				_segmentTestClassGroup.getSegmentName(), "/",
 				String.valueOf(axisTestClassGroups.indexOf(this)));
