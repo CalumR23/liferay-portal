@@ -192,9 +192,12 @@ public class TestClassGroupFactory {
 					QAWebsitesPlaywrightBatchTestClassGroup) {
 
 			if (jsonObject != null) {
+				System.out.println("two param const");
 				return new QAWebsitesPlaywrightSegmentTestClassGroup(
 					batchTestClassGroup, jsonObject);
 			}
+
+			System.out.println("one param const");
 
 			return new QAWebsitesPlaywrightSegmentTestClassGroup(
 				batchTestClassGroup);
