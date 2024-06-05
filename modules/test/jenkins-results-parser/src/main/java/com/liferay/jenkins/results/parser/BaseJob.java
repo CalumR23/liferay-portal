@@ -1172,6 +1172,7 @@ public abstract class BaseJob implements Job {
 									new Date())));
 
 						if (batchTestClassGroup.getAxisCount() <= 0) {
+							System.out.println(batchTestClassGroup.getClass().getName());
 							System.out.println("axis count low");
 							return null;
 						}
