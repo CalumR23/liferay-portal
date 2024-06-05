@@ -110,6 +110,7 @@ public abstract class BaseJob implements Job {
 	public List<BatchTestClassGroup> getBatchTestClassGroups() {
 		synchronized (_jobProperties) {
 			if (_batchTestClassGroups != null) {
+				System.out.println("first return : " + _batchTestClassGroups.size());
 				return _batchTestClassGroups;
 			}
 
@@ -131,6 +132,8 @@ public abstract class BaseJob implements Job {
 						TestClassGroupFactory.newBatchTestClassGroup(
 							this, batchJSONObject));
 				}
+
+				System.out.println("second return"  + _batchTestClassGroups.size());
 
 				return _batchTestClassGroups;
 			}
