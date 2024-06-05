@@ -108,6 +108,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 	public int getAxisCount() {
 		if (ignore()) {
+			System.out.println("why ignore");
 			return 0;
 		}
 
@@ -123,16 +124,22 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		int testClassCount = testClasses.size();
 
+		System.out.println("testClassCount: " + testClassCount);
+
 		if (testClassCount == 0) {
 			return 0;
 		}
 
 		int axisMaxSize = getAxisMaxSize();
 
+		System.out.println("axis max size: " + axisMaxSize);
+
 		if (axisMaxSize <= 0) {
 			throw new RuntimeException(
 				"'test.batch.axis.max.size' cannot be 0 or less");
 		}
+
+		System.out.println("weird math stuff: " + (int)Math.ceil((double)testClassCount / axisMaxSize));
 
 		return (int)Math.ceil((double)testClassCount / axisMaxSize);
 	}
