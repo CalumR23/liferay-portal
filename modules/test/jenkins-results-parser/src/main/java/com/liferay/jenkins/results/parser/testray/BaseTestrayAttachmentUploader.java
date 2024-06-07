@@ -53,13 +53,37 @@ public abstract class BaseTestrayAttachmentUploader
 		for (File preparedFile : getPreparedFiles()) {
 			String preparedFilePath = preparedFile.toString();
 
-			if (preparedFilePath.contains("playwright-report")) {
-				continue;
-			}
-
 			String preparedFileName = preparedFile.getName();
 
 			if (preparedFileName.endsWith(".html")) {
+				if (preparedFilePath.contains("playwright-report")) {
+					try {
+						String preparedFileContent = JenkinsResultsParserUtil.read(
+								preparedFile);
+
+						File preparedParentFile = preparedFile.getParentFile();
+
+						preparedFileContent = preparedFileContent.replaceAll(
+								"data\\/\\S*\\.zip",
+								JenkinsResultsParserUtil.combine(
+										String.valueOf(getTestrayServerLogsURL()), "/",
+										testrayAttachmentRecorder.getRelativeBuildDirPath(),
+										"/", preparedParentFile.getName(), "/$1.zip"));
+
+						preparedFileContent = preparedFileContent.replaceAll(
+								"data\\/\\S*\\.png",
+								JenkinsResultsParserUtil.combine(
+										String.valueOf(getTestrayServerLogsURL()), "/",
+										testrayAttachmentRecorder.getRelativeBuildDirPath(),
+										"/", preparedParentFile.getName(), "/$1.png.gz"));
+
+						JenkinsResultsParserUtil.write(
+								preparedFile, preparedFileContent);
+					}
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
+				}
 				try {
 					String preparedFileContent = JenkinsResultsParserUtil.read(
 						preparedFile);
