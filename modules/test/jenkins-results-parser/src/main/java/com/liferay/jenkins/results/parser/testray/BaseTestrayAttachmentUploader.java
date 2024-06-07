@@ -83,6 +83,7 @@ public abstract class BaseTestrayAttachmentUploader
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
 					}
+					continue;
 				}
 				try {
 					String preparedFileContent = JenkinsResultsParserUtil.read(
