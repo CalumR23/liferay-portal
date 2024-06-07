@@ -64,14 +64,14 @@ public abstract class BaseTestrayAttachmentUploader
 						File preparedParentFile = preparedFile.getParentFile();
 
 						preparedFileContent = preparedFileContent.replaceAll(
-								"data\\/\\S*\\.zip",
+                                "data/\\S*\\.zip",
 								JenkinsResultsParserUtil.combine(
 										String.valueOf(getTestrayServerLogsURL()), "/",
 										testrayAttachmentRecorder.getRelativeBuildDirPath(),
 										"/", preparedParentFile.getName(), "/$1.zip"));
 
 						preparedFileContent = preparedFileContent.replaceAll(
-								"data\\/\\S*\\.png",
+                                "data/\\S*\\.png",
 								JenkinsResultsParserUtil.combine(
 										String.valueOf(getTestrayServerLogsURL()), "/",
 										testrayAttachmentRecorder.getRelativeBuildDirPath(),
