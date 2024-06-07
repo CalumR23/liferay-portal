@@ -50,9 +50,9 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 
 		testrayAttachments.add(getPlaywrightReportTestrayAttachment());
 		testrayAttachments.add(
-			getPlaywrightDataTestrayAttachment(".zip", "Trace Zip"));
+			getPlaywrightDataTestrayAttachment(".*\\.zip", "Trace Zip"));
 		testrayAttachments.add(
-			getPlaywrightDataTestrayAttachment(".png", "Failure Screenshot"));
+			getPlaywrightDataTestrayAttachment(".*\\.png", "Failure Screenshot"));
 
 		testrayAttachments.removeAll(Collections.singleton(null));
 
