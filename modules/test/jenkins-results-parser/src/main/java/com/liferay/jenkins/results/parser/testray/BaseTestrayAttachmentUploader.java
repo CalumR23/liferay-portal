@@ -57,11 +57,14 @@ public abstract class BaseTestrayAttachmentUploader
 
 			if (preparedFileName.endsWith(".html")) {
 				if (preparedFilePath.contains("playwright-report")) {
+					System.out.println("is playwright");
 					try {
 						String preparedFileContent = JenkinsResultsParserUtil.read(
 								preparedFile);
 
 						File preparedParentFile = preparedFile.getParentFile();
+
+						System.out.println("file content: " + preparedFileContent);
 
 						preparedFileContent = preparedFileContent.replaceAll(
                                 "data/\\S*\\.zip",
