@@ -55,6 +55,8 @@ public abstract class BaseTestrayAttachmentUploader
 
 			String preparedFileName = preparedFile.getName();
 
+			System.out.println("prepared name: " + preparedFileName);
+
 			if (preparedFileName.endsWith(".html")) {
 				if (preparedFilePath.contains("playwright-report")) {
 					System.out.println("is playwright");
