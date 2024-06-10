@@ -7809,6 +7809,39 @@ ${docker.start.error}</fail>
 		</sequential>
 	</macrodef>
 
+	<macrodef name="build-testray-storage-url">
+		<beanshell>
+		<![CDATA[
+			import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+			import java.util.Date;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("https://storage.cloud.google.com/testray-results");
+
+			Date topLevelStartDate = new Date(Long.parseLong(${env.TOP_LEVEL_START_TIME}));
+
+			sb.append(
+			JenkinsResultsParserUtil.toDateString(
+				topLevelStartDate, "yyyy-MM", "America/Los_Angeles"));
+
+		sb.append("/");
+		sb.append(${env.TOP_LEVEL_MASTER_HOSTNAME});
+		sb.append("/");
+		sb.append(${env.TOP_LEVEL_JOB_NAME});
+		sb.append("/");
+		sb.append(${env.TOP_LEVEL_BUILD_NUMBER});
+		sb.append("/");
+		sb.append(${env.JOB_VARIANT});
+		sb.append("/");
+		sb.append(${env.AXIS_VARIABLE});
+		sb.append("/playwright-report");
+
+		System.out.println("storage url: " + sb.toString());
+		]]>
+		</beanshell>
+	</macrodef>
+
 	<macrodef name="start-docker-playwright">
 		<sequential>
 			<propertyregex
@@ -7842,6 +7875,8 @@ ${docker.start.error}</fail>
 			<condition else="" property="env.ci.arg" value="--env=CI=true">
 				<isset property="env.JENKINS_HOME" />
 			</condition>
+
+			<build-testray-storage-url />
 
 			<local name="env.portal.url.arg" />
 
