@@ -116,6 +116,7 @@ export default defineConfig({
 			'html',
 			{
 				open: 'never',
+				attachmentsBaseURL: process.env.CI ? process.env.TESTRAY_CLOUD_STORAGE_BASE_URL : '',
 			},
 		],
 		[
