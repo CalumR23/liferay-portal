@@ -73,7 +73,7 @@ public abstract class BaseTestrayAttachmentUploader
 								JenkinsResultsParserUtil.combine(
 										String.valueOf(getTestrayServerLogsURL()), "/",
 										testrayAttachmentRecorder.getRelativeBuildDirPath(),
-										"/", preparedParentFile.getName(), "/$1.zip"));
+										"/", preparedParentFile.getName(), "/$1.zip.gz"));
 
 						preparedFileContent = preparedFileContent.replaceAll(
                                 "data/\\S*\\.png",
