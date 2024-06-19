@@ -249,7 +249,22 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			_playwrightBaseDir = playwrightBaseDir;
 		}
 
-		new PlaywrightBatchTestClassGroup(batchName, portalTestClassJob);
+		if (ignore()) {
+			return;
+		}
+
+		if (testRelevantChanges) {
+			List<JobProperty> relevantPlaywrightJobProperties =
+					getRelevantPlaywrightJobProperties();
+
+			if (!relevantPlaywrightJobProperties.isEmpty()) {
+				recordJobProperties(relevantPlaywrightJobProperties);
+			}
+		}
+
+		addDefaultProjectJobProperty(batchName);
+
+		setTestClasses();
 	}
 
 	protected static final String PLAYWRIGHT_TEST_PROJECT_PROPERTY_NAME =
