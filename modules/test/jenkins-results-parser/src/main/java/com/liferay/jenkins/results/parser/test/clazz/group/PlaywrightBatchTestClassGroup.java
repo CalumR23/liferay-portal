@@ -194,7 +194,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				addAxisTestClassGroup(axisTestClassGroup);
 
-				System.out.println("segement info: " + playwrightSegmentTestClassGroup.getSegmentName());
+				System.out.println("segement info: " + playwrightSegmentTestClassGroup.getTestCasePropertiesContent());
 
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
 
