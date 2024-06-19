@@ -376,17 +376,16 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 			File playwrightBaseDir = new File(workingDirectory, _playwrightBaseDir);
 
-				System.out.println("playwright dir before set: " + playwrightBaseDir);
+			String workingDirectoryPath = workingDirectory.getPath();
 
-			try {
-				AntUtil.callTarget(workingDirectory, "build.xml", "setup-yarn");
+			if (!workingDirectoryPath.contains("qa-websites-ee")) {
+				try {
+					AntUtil.callTarget(workingDirectory, "build.xml", "setup-yarn");
+				} catch (Exception exception) {
+					exception.printStackTrace();
+				}
 			}
-			catch (Exception exception) {
-				exception.printStackTrace();
-			}
-
-			playwrightBaseDir = new File("/opt/dev/projects/github/liferay-qa-websites-ee/playwright");
-
+			
 			_callNPMCommand(playwrightBaseDir, "npm install");
 
 			System.out.println("playwright dir: " + playwrightBaseDir);
