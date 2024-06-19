@@ -194,6 +194,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				addAxisTestClassGroup(axisTestClassGroup);
 
+				System.out.println("segement info: " + playwrightSegmentTestClassGroup.getSegmentName());
+
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
 
 				if (axisTestClassGroup != null){
@@ -385,7 +387,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 					exception.printStackTrace();
 				}
 			}
-			
+
 			_callNPMCommand(playwrightBaseDir, "npm install");
 
 			System.out.println("playwright dir: " + playwrightBaseDir);
