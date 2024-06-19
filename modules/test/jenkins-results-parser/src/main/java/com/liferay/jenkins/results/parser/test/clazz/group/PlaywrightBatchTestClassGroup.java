@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import org.json.JSONArray;
@@ -194,8 +195,6 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				addAxisTestClassGroup(axisTestClassGroup);
 
-				System.out.println("segement info: " + playwrightSegmentTestClassGroup.getTestCasePropertiesContent());
-
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
 
 				if (axisTestClassGroup != null){
@@ -204,7 +203,29 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			}
 		}
 
+		System.out.println("-----------------------START--------------------------------");
+
+		for (SegmentTestClassGroup segmentTestClassGroup : getSegmentTestClassGroups()) {
+			System.out.println(segmentTestClassGroup.getSegmentName());
+
+			for (AxisTestClassGroup axisTestClassGroup : segmentTestClassGroup.getAxisTestClassGroups()) {
+				System.out.println("> " + axisTestClassGroup.getAxisName());
+
+				for (TestClass testClass : axisTestClassGroup.getTestClasses()) {
+					System.out.println("> > " + testClass.getTestClassFile());
+
+					for (TestClassMethod testClassMethod : testClass.getTestClassMethods()) {
+						System.out.println("> > >  " + testClassMethod.getName());
+					}
+				}
+			}
+		}
+
+		System.out.println("-----------------------END--------------------------------");
+
 		System.out.println("final axis count check: " + getAxisCount());
+
+		System.out.println("segment counts: " + getSegmentCount());
 
 		List<TestClass> testClasses = getTestClasses();
 
