@@ -229,41 +229,6 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 		new PlaywrightBatchTestClassGroup(batchName, portalTestClassJob);
 	}
 
-	protected List<JobProperty> getRelevantPlaywrightJobProperties() {
-		Set<JobProperty> playwrightJobProperties = new HashSet<>();
-
-		for (File modifiedFile :
-				portalGitWorkingDirectory.getModifiedFilesList(false)) {
-
-			List<JobProperty> playwrightTestProjectJobProperties =
-				getJobProperties(
-					modifiedFile, PLAYWRIGHT_TEST_PROJECT_PROPERTY_NAME,
-					JobProperty.Type.MODULE_TEST_DIR, null);
-
-			for (JobProperty playwrightTestProjectJobProperty :
-					playwrightTestProjectJobProperties) {
-
-				if (playwrightTestProjectJobProperty.getValue() != null) {
-					String projectNames =
-						playwrightTestProjectJobProperty.getValue();
-
-					_addProjectNames(projectNames);
-
-					playwrightJobProperties.add(
-						playwrightTestProjectJobProperty);
-				}
-			}
-		}
-
-		playwrightJobProperties.removeAll(Collections.singleton(null));
-
-		return new ArrayList<>(playwrightJobProperties);
-	}
-
-	protected List<JSONObject> getSpecJSONObjects() {
-		return _specJSONObjects;
-	}
-
 	protected static final String PLAYWRIGHT_TEST_PROJECT_PROPERTY_NAME =
 		"playwright.test.project";
 
@@ -407,8 +372,9 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			GitWorkingDirectory gitWorkingDirectory =
 				gitRepositoryJob.getGitWorkingDirectory();
 
-			File playwrightBaseDir = new File(
-				gitWorkingDirectory.getWorkingDirectory(), _playwrightBaseDir);
+			File workingDirectory = gitWorkingDirectory.getWorkingDirectory();
+
+			File playwrightBaseDir = new File(workingDirectory, _playwrightBaseDir);
 
 				System.out.println("playwright dir before set: " + playwrightBaseDir);
 
@@ -418,7 +384,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			catch (Exception exception) {
 				exception.printStackTrace();
 			}
-			File playwrightBaseDir = new File("/opt/dev/projects/github/liferay-qa-websites-ee/playwright");
+
+			playwrightBaseDir = new File("/opt/dev/projects/github/liferay-qa-websites-ee/playwright");
 
 			_callNPMCommand(playwrightBaseDir, "npm install");
 
