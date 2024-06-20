@@ -5,7 +5,13 @@
 
 package com.liferay.jenkins.results.parser.test.clazz.group;
 
+import com.liferay.jenkins.results.parser.GitWorkingDirectory;
+import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
+import com.liferay.jenkins.results.parser.Job;
+import com.liferay.jenkins.results.parser.QAWebsitesGitRepositoryJob;
 import org.json.JSONObject;
+
+import java.io.File;
 
 /**
  * @author Calum Ragan
@@ -23,6 +29,18 @@ public class QAWebsitesPlaywrightSegmentTestClassGroup
 		BatchTestClassGroup parentBatchTestClassGroup, JSONObject jsonObject) {
 
 		super(parentBatchTestClassGroup, jsonObject);
+	}
+
+	@Override
+	public String getTestCasePropertiesContent() {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(super.getTestCasePropertiesContent());
+		sb.append("\n");
+
+		sb.append("PROJECT_NAME=playwright");
+
+		return sb.toString();
 	}
 
 }
