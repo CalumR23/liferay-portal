@@ -1073,6 +1073,8 @@ public class TestrayImporter {
 						for (TestrayCaseResult testrayCaseResult :
 								testrayCaseResults) {
 
+							System.out.println("test type: " + testrayCaseResult.getType());
+
 							Element testcaseElement = rootElement.addElement(
 								"testcase");
 
@@ -1094,6 +1096,10 @@ public class TestrayImporter {
 
 							String testrayCaseName =
 								testrayCaseResult.getName();
+
+							if (testrayCaseName == null){
+								System.out.println("name is null");
+							}
 
 							if (testrayCaseName.length() > 150) {
 								testrayCaseName = testrayCaseName.substring(
