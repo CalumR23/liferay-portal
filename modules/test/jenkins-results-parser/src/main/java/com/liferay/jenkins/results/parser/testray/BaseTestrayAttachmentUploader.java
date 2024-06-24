@@ -28,11 +28,14 @@ public abstract class BaseTestrayAttachmentUploader
 
 	@Override
 	public void prepareFiles() {
+		System.out.println("preparing files");
 		if (_prepared) {
 			return;
 		}
 
 		File preparedFilesBaseDir = getPreparedFilesBaseDir();
+
+		System.out.println("files base dir: " + preparedFilesBaseDir.getPath());
 
 		JenkinsResultsParserUtil.delete(preparedFilesBaseDir);
 
@@ -52,6 +55,8 @@ public abstract class BaseTestrayAttachmentUploader
 
 		for (File preparedFile : getPreparedFiles()) {
 			String preparedFilePath = preparedFile.toString();
+
+			System.out.println("file path:" + preparedFilePath);
 
 			if (preparedFilePath.contains("playwright-report")) {
 				continue;
