@@ -54,6 +54,8 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 		Matcher matcher = _testFilePathPattern.matcher(
 			JenkinsResultsParserUtil.getCanonicalPath(getTestClassFile()));
 
+		System.out.println("tetst class file: " + JenkinsResultsParserUtil.getCanonicalPath(getTestClassFile()));
+
 		if (!matcher.find()) {
 			return null;
 		}
