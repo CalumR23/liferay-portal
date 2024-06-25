@@ -1039,6 +1039,8 @@ public class TestrayImporter {
 							axisTestClassGroup instanceof
 								PlaywrightAxisTestClassGroup) {
 
+							System.out.println("instaceof if");
+
 							PortalLogBatchBuildTestrayCaseResult
 								portalLogBatchBuildTestrayCaseResult =
 									TestrayFactory.
@@ -1064,6 +1066,7 @@ public class TestrayImporter {
 							}
 						}
 						else {
+							System.out.println("instaceof else");
 							testrayCaseResults.add(
 								TestrayFactory.newTestrayCaseResult(
 									testrayBuild, getTopLevelBuild(),
