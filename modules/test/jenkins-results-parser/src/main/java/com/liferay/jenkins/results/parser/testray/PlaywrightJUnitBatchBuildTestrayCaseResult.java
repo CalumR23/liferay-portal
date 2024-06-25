@@ -30,10 +30,14 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 
 	@Override
 	public String getName() {
+		System.out.println("get playwright name");
 		if (_playwrightJUnitTestClass == null) {
+			System.out.println("get playwright name null");
+			System.out.println("name: " + super.getName());
 			return super.getName();
 		}
-
+		System.out.println("get playwright name spec path");
+		System.out.println("spec name: " + _playwrightJUnitTestClass.getSpecFilePath());
 		return _playwrightJUnitTestClass.getSpecFilePath();
 	}
 
