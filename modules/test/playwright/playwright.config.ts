@@ -152,6 +152,9 @@ export default defineConfig({
 		baseURL: process.env.PORTAL_URL
 			? process.env.PORTAL_URL
 			: 'http://localhost:8080',
+			launchOptions: {
+				args: ['--ignore-certificate-errors'],
+			  },
 		screenshot: 'only-on-failure',
 		trace: 'retain-on-failure',
 	},
