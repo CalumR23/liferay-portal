@@ -1154,6 +1154,10 @@ public class TestrayImporter {
 									0, 150);
 							}
 
+							if (testrayCaseName.contains("spec")){
+								System.out.println("playwrightname: " + testrayCaseName);
+							}
+
 							testcasePropertiesMap.put(
 								"testray.testcase.name", testrayCaseName);
 
