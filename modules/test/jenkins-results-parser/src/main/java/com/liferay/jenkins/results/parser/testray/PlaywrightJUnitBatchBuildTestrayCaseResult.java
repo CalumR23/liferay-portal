@@ -7,7 +7,9 @@ package com.liferay.jenkins.results.parser.testray;
 
 import com.liferay.jenkins.results.parser.TopLevelBuild;
 import com.liferay.jenkins.results.parser.test.clazz.PlaywrightJUnitTestClass;
+import com.liferay.jenkins.results.parser.test.clazz.PlaywrightTestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
+import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 
 import java.util.Collections;
@@ -21,11 +23,14 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 
 	public PlaywrightJUnitBatchBuildTestrayCaseResult(
 		TestrayBuild testrayBuild, TopLevelBuild topLevelBuild,
-		AxisTestClassGroup axisTestClassGroup, TestClass testClass) {
+		AxisTestClassGroup axisTestClassGroup, TestClass testClass,
+		TestClassMethod testClassMethod) {
 
 		super(testrayBuild, topLevelBuild, axisTestClassGroup, testClass);
 
 		_playwrightJUnitTestClass = (PlaywrightJUnitTestClass)testClass;
+
+		_playwrightTestClassMethod = (PlaywrightTestClassMethod)testClassMethod;
 	}
 
 	@Override
@@ -34,7 +39,7 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 			return super.getName();
 		}
 
-		return _playwrightJUnitTestClass.getSpecFilePath();
+		return _playwrightTestClassMethod.getName();
 	}
 
 	@Override
@@ -56,5 +61,6 @@ public class PlaywrightJUnitBatchBuildTestrayCaseResult
 	}
 
 	private final PlaywrightJUnitTestClass _playwrightJUnitTestClass;
+	private final PlaywrightTestClassMethod _playwrightTestClassMethod;
 
 }
