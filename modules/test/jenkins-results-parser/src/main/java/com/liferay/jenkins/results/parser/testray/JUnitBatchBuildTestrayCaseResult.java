@@ -275,6 +275,10 @@ public class JUnitBatchBuildTestrayCaseResult
 				for (TestResult testResult : testClassResult.getTestResults()) {
 					String testName = testResult.getTestName();
 
+					if (testName.contains("spec")){
+						System.out.println("test class name: " + testName);
+					}
+
 					if (testName.equals(getName())) {
 						_testClassResults.add(testClassResult);
 
@@ -289,6 +293,8 @@ public class JUnitBatchBuildTestrayCaseResult
 
 	private List<TestResult> _getTestResults() {
 		List<TestResult> testResults = new ArrayList<>();
+
+		System.out.println("size: " + _getTestClassResults().size());
 
 		for (TestClassResult testClassResult : _getTestClassResults()) {
 			String testClassName = testClassResult.getClassName();
