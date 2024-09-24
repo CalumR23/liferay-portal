@@ -263,6 +263,8 @@ public class JUnitBatchBuildTestrayCaseResult
 		for (TestClassResult testClassResult : build.getTestClassResults()) {
 			String testClassName = testClassResult.getClassName();
 
+			System.out.println("test class name: " + testClassName);
+
 			if (testClassName.equals(getName()) ||
 				testClassName.startsWith(getName() + "$")) {
 
@@ -274,10 +276,6 @@ public class JUnitBatchBuildTestrayCaseResult
 			if (testClassName.equals("junit.framework.TestSuite")) {
 				for (TestResult testResult : testClassResult.getTestResults()) {
 					String testName = testResult.getTestName();
-
-					if (testName.contains("spec")){
-						System.out.println("test class name: " + testName);
-					}
 
 					if (testName.equals(getName())) {
 						_testClassResults.add(testClassResult);
@@ -294,23 +292,21 @@ public class JUnitBatchBuildTestrayCaseResult
 	private List<TestResult> _getTestResults() {
 		List<TestResult> testResults = new ArrayList<>();
 
-		System.out.println("size: " + _getTestClassResults().size());
+
 
 		for (TestClassResult testClassResult : _getTestClassResults()) {
 			String testClassName = testClassResult.getClassName();
 
+			System.out.println("testtclassname: " + testClassName);
+
 			if (!testClassName.equals("junit.framework.TestSuite")) {
 				testResults.addAll(testClassResult.getTestResults());
-
+				System.out.println("size: " + testResults.size());
 				continue;
 			}
 
 			for (TestResult testResult : testClassResult.getTestResults()) {
 				String testName = testResult.getTestName();
-
-				if (testName.contains("spec")){
-					System.out.println("test name: " + testName);
-				}
 
 				if (testName.equals(getName())) {
 					testResults.add(testResult);
