@@ -302,6 +302,10 @@ public class JUnitBatchBuildTestrayCaseResult
 			for (TestResult testResult : testClassResult.getTestResults()) {
 				String testName = testResult.getTestName();
 
+				if (testName.contains("spec")){
+					System.out.println("test name: " + testName);
+				}
+
 				if (testName.equals(getName())) {
 					testResults.add(testResult);
 				}
