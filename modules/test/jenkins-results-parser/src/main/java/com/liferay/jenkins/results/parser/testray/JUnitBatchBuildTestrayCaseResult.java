@@ -268,15 +268,19 @@ public class JUnitBatchBuildTestrayCaseResult
 
 			if (testClassName.contains("spec.ts")) {
 				for (TestResult testResult : testClassResult.getTestResults()) {
-					String testName = testResult.getTestName();
+					StringBuilder sb = new StringBuilder();
 
-					System.out.println("higher test name: " + testName);
+					sb.append(testClassName);
+					sb.append(" > ");
+					sb.append(testResult.getTestName());
 
-//					if (testName.equals(getName())) {
-//						_testClassResults.add(testClassResult);
-//
-//						break;
-//					}
+					String fullTestName = sb.toString();
+
+					if (fullTestName.equals(getName())) {
+						_testClassResults.add(testClassResult);
+
+						break;
+					}
 				}
 			}
 
