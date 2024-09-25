@@ -264,6 +264,7 @@ public class JUnitBatchBuildTestrayCaseResult
 			String testClassName = testClassResult.getClassName();
 
 			System.out.println("test class name: " + testClassName);
+			System.out.println("get name: " + getName());
 
 			if (testClassName.equals(getName()) ||
 				testClassName.startsWith(getName() + "$")) {
