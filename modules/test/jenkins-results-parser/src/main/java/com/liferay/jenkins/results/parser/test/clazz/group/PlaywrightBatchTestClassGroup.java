@@ -396,7 +396,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			}
 
             if (specJSONObject.has("subsuite")){
-                specTitles.add(specJSONObject.getString("subsuite") + " ??? " + specJSONObject.getString("title"));
+                specTitles.add(specJSONObject.getString("subsuite") + " > " + specJSONObject.getString("title"));
             } else {
                 specTitles.add(specJSONObject.getString("title"));
             }
