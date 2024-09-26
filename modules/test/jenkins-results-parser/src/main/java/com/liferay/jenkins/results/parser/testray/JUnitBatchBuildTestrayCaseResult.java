@@ -329,7 +329,6 @@ public class JUnitBatchBuildTestrayCaseResult
 						testResults.add(testResult);
 					}
 				}
-				testResults.addAll(testClassResult.getTestResults());
 				continue;
 			}
 
