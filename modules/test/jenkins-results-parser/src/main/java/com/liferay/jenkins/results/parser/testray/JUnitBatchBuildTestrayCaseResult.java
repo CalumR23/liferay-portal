@@ -273,10 +273,9 @@ public class JUnitBatchBuildTestrayCaseResult
 
 					String fullTestName = sb.toString();
 
-					System.out.println("test full name: " + fullTestName);
-					System.out.println("get name: " + getName());
-
 					if (fullTestName.equals(getName())) {
+						System.out.println("test full name: " + fullTestName);
+						System.out.println("get name: " + getName());
 						_testClassResults.add(testClassResult);
 
 						break;
@@ -317,11 +316,18 @@ public class JUnitBatchBuildTestrayCaseResult
 			String testClassName = testClassResult.getClassName();
 
 			if (testClassName.contains("spec.ts")){
-				System.out.println("testtclassname: " + testClassName);
-				System.out.println("size: " + testResults.size());
 				List<TestResult> results = testClassResult.getTestResults();
-				for (TestResult result : results){
-					System.out.println("result name: " + result.getTestName());
+				for (TestResult testResult : results){
+					String testName = testResult.getTestName();
+
+					testName = testClassName + " > " + testName;
+
+					System.out.println("result name: " + testName);
+					System.out.println("get result name: " + getName());
+
+					if (testName.equals(getName())) {
+						testResults.add(testResult);
+					}
 				}
 				testResults.addAll(testClassResult.getTestResults());
 				continue;
