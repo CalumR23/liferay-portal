@@ -185,16 +185,16 @@ public class JSONCurlUtil {
 			_log(response);
 
 			if (process.exitValue() != 0) {
-				inputStream = process.getErrorStream();
-
-				String errorString = ExecUtil.readInputStream(
-					inputStream, true);
-
-				_log(errorString);
-
 				throw new RuntimeException(
 					"Command finished with exit value: " + process.exitValue());
 			}
+
+			inputStream = process.getErrorStream();
+
+			String errorString = ExecUtil.readInputStream(
+					inputStream, true);
+
+			_log(errorString);
 
 			return response.replaceAll("\\\\r\\\\n|\\\\n|\\\\r", "%0A");
 		}
