@@ -204,19 +204,23 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				playwrightSegmentTestClassGroup.setProjectName(projectName);
 
-				AxisTestClassGroup axisTestClassGroup =
-					TestClassGroupFactory.newAxisTestClassGroup(this);
+				int axisCount = getAxisCount();
 
-				playwrightSegmentTestClassGroup.addAxisTestClassGroup(
-					axisTestClassGroup);
+				if (axisCount >= 1) {
+					for (int axisIndex = 0; axisIndex < getAxisCount(); axisIndex++) {
+						AxisTestClassGroup axisTestClassGroup =
+								TestClassGroupFactory.newAxisTestClassGroup(this);
 
-				for (TestClass testClass : testClasses) {
-					axisTestClassGroup.addTestClass(testClass);
+						playwrightSegmentTestClassGroup.addAxisTestClassGroup(
+								axisTestClassGroup);
 
-					addTestClass(testClass);
+						addAxisTestClassGroup(axisTestClassGroup);
+					}
 				}
 
-				addAxisTestClassGroup(axisTestClassGroup);
+				for (TestClass testClass : testClasses) {
+					addTestClass(testClass);
+				}
 
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
 			}
