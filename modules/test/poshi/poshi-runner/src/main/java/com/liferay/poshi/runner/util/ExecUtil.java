@@ -93,9 +93,13 @@ public class ExecUtil {
 			try {
 				returnCode = process.exitValue();
 
+				System.out.println("return code: " + returnCode);
+
 				if (returnCode == 0) {
 					String standardOut = readInputStream(
 						process.getInputStream(), true);
+
+					System.out.println("standard output:\n " + standardOut + " \n-------END---------");
 
 					duration = System.currentTimeMillis() - start;
 
