@@ -184,14 +184,14 @@ public class JSONCurlUtil {
 
 			_log(response);
 
-			if (process.exitValue() != 0) {
-				inputStream = process.getErrorStream();
+			inputStream = process.getErrorStream();
 
-				String errorString = ExecUtil.readInputStream(
+			String errorString = ExecUtil.readInputStream(
 					inputStream, true);
 
-				_log(errorString);
+			_log(errorString);
 
+			if (process.exitValue() != 0) {
 				throw new RuntimeException(
 					"Command finished with exit value: " + process.exitValue());
 			}
