@@ -9,10 +9,20 @@ import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 /**
  * @author Michael Hashimoto
  */
 public class PlaywrightTestClassMethod extends TestClassMethod {
+
+	public long getAverageDuration() {
+		TestClass testClass = getTestClass();
+
+		System.out.println("avg duration: " + testClass.getAverageDuration());
+
+		return testClass.getAverageDuration();
+	}
 
 	@Override
 	public String getName() {

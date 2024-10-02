@@ -67,6 +67,8 @@ public abstract class BaseTestClass implements TestClass {
 		_averageDuration = batchTestClassGroup.getAverageTestDuration(
 			getTestName());
 
+		System.out.println("avg test name: " + getTestName());
+
 		return _averageDuration;
 	}
 
