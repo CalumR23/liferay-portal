@@ -707,21 +707,27 @@ public abstract class BaseJob implements Job {
 				segmentProperties.setProperty(
 					"test.batch.cohort.name",
 					segmentTestClassGroup.getCohortName());
+                System.out.println("after cohort");
 				segmentProperties.setProperty(
 					"test.batch.job.name",
 					segmentTestClassGroup.getBatchJobName());
+                System.out.println("after batch job");
 				segmentProperties.setProperty(
 					"test.batch.maximum.slaves.per.host",
 					String.valueOf(
 						segmentTestClassGroup.getMaximumSlavesPerHost()));
+                System.out.println("slaves per host");
 				segmentProperties.setProperty(
 					"test.batch.minimum.slave.ram",
 					String.valueOf(segmentTestClassGroup.getMinimumSlaveRAM()));
+                System.out.println("min slave ram");
 				segmentProperties.setProperty(
 					"test.batch.name", segmentTestClassGroup.getBatchName());
+                System.out.println("after batch name");
 				segmentProperties.setProperty(
 					"test.batch.size",
 					String.valueOf(segmentTestClassGroup.getAxisCount()));
+                System.out.println("after batch size");
 				segmentProperties.setProperty(
 					"test.batch.slave.label",
 					segmentTestClassGroup.getSlaveLabel());
