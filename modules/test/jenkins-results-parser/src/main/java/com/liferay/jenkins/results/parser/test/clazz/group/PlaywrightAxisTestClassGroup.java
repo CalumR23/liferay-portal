@@ -22,12 +22,14 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 		List<TestClass> testClasses = getTestClasses();
 
 		if (testClasses.isEmpty()) {
+			System.out.println("empty test classes");
 			return super.getMinimumSlaveRAM();
 		}
 
 		TestClass testClass = testClasses.get(0);
 
 		if (!(testClass instanceof PlaywrightJUnitTestClass)) {
+			System.out.println("not playwright junit");
 			return super.getMinimumSlaveRAM();
 		}
 
@@ -37,6 +39,7 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 		Integer minimumSlaveRAM = playwrightJUnitTestClass.getMinimumSlaveRAM();
 
 		if (minimumSlaveRAM == null) {
+			System.out.println("null min slave ram");
 			return super.getMinimumSlaveRAM();
 		}
 
