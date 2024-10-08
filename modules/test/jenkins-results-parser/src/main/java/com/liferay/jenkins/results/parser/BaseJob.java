@@ -729,6 +729,8 @@ public abstract class BaseJob implements Job {
 				String testCasePropertiesContent =
 					segmentTestClassGroup.getTestCasePropertiesContent();
 
+				System.out.println("grabbed test case properties");
+
 				if (testCasePropertiesContent != null) {
 					testCasePropertiesContent =
 						testCasePropertiesContent.replaceAll(
@@ -751,12 +753,18 @@ public abstract class BaseJob implements Job {
 						"run.test.case.method.group", String.valueOf(i));
 				}
 
+				System.out.println("before putting properties in the map");
+
 				propertiesMap.put(
 					segmentTestClassGroup.getSegmentName(), segmentProperties);
+
+				System.out.println("after putting properties in the map");
 			}
 		}
 
 		StringBuilder sb = new StringBuilder();
+
+		System.out.println("before props for loop");
 
 		for (Map.Entry<String, Properties> propertiesEntry :
 				propertiesMap.entrySet()) {
@@ -772,6 +780,8 @@ public abstract class BaseJob implements Job {
 				sb.append("\n");
 			}
 		}
+
+		System.out.println("after props for loop");
 
 		return sb.toString();
 	}
