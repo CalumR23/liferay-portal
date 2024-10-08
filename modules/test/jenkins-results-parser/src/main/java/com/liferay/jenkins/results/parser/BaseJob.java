@@ -726,6 +726,8 @@ public abstract class BaseJob implements Job {
 					"test.batch.slave.label",
 					segmentTestClassGroup.getSlaveLabel());
 
+				System.out.println("grabbing props");
+
 				String testCasePropertiesContent =
 					segmentTestClassGroup.getTestCasePropertiesContent();
 
