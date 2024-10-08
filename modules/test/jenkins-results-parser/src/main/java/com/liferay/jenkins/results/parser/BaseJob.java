@@ -646,6 +646,8 @@ public abstract class BaseJob implements Job {
 
 		batchTestClassGroups.addAll(getDependentBatchTestClassGroups());
 
+		System.out.println("first checkpoint");
+
 		for (BatchTestClassGroup batchTestClassGroup : batchTestClassGroups) {
 			Properties batchProperties = new Properties();
 
@@ -663,6 +665,7 @@ public abstract class BaseJob implements Job {
 				"test.batch.slave.label", batchTestClassGroup.getSlaveLabel());
 
 			if (batchTestClassGroup instanceof FunctionalBatchTestClassGroup) {
+				System.out.println("instance of functional");
 				FunctionalBatchTestClassGroup functionalBatchTestClassGroup =
 					(FunctionalBatchTestClassGroup)batchTestClassGroup;
 
@@ -677,6 +680,7 @@ public abstract class BaseJob implements Job {
 				}
 			}
 			else {
+				System.out.println("else checkpoint");
 				batchProperties.setProperty(
 					"test.batch.size",
 					String.valueOf(batchTestClassGroup.getAxisCount()));
@@ -692,10 +696,13 @@ public abstract class BaseJob implements Job {
 				batchTestClassGroup.getBatchName(), batchProperties);
 
 			for (int i = 0; i < batchTestClassGroup.getSegmentCount(); i++) {
+				System.out.println("segment checkpoint");
 				Properties segmentProperties = new Properties();
 
 				SegmentTestClassGroup segmentTestClassGroup =
 					batchTestClassGroup.getSegmentTestClassGroup(i);
+
+				System.out.println("after getting segment");
 
 				segmentProperties.setProperty(
 					"test.batch.cohort.name",
