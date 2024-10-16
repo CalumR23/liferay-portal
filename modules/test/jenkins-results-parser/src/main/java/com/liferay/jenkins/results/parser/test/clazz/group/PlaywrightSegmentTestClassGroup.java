@@ -19,9 +19,9 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 
 	@Override
 	public Integer getMinimumSlaveRAM() {
-		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
-			return axisTestClassGroup.getMinimumSlaveRAM();
-		}
+//		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
+//			return axisTestClassGroup.getMinimumSlaveRAM();
+//		}
 
 		return super.getMinimumSlaveRAM();
 	}
