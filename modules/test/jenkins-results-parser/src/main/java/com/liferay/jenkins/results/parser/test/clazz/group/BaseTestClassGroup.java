@@ -23,6 +23,10 @@ public abstract class BaseTestClassGroup implements TestClassGroup {
 
 	@Override
 	public List<TestClass> getTestClasses() {
+		System.out.println("testclass count: " + testClasses.size());
+		for (TestClass testClass : testClasses){
+			System.out.println("testclass name: " + testClass.getName());
+		}
 		return testClasses;
 	}
 
