@@ -32,9 +32,9 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 
 	@Override
 	public String getSlaveLabel() {
-		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
-			return axisTestClassGroup.getSlaveLabel();
-		}
+//		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
+//			return axisTestClassGroup.getSlaveLabel();
+//		}
 
 		return super.getSlaveLabel();
 	}
