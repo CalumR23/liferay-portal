@@ -76,12 +76,17 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 		BatchTestClassGroup batchTestClassGroup) {
 
 		super(batchTestClassGroup);
+
+		List<TestClass> testClasses = getTestClasses();
+		System.out.println("axis batch size: " + testClasses.size());
 	}
 
 	protected PlaywrightAxisTestClassGroup(
 		JSONObject jsonObject, SegmentTestClassGroup segmentTestClassGroup) {
 
 		super(jsonObject, segmentTestClassGroup);
+		List<TestClass> testClasses = getTestClasses();
+		System.out.println("axis json size: " + testClasses.size());
 	}
 
 }
