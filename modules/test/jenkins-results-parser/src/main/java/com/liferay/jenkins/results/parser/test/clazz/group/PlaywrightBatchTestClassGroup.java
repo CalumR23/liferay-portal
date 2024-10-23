@@ -221,6 +221,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				}
 
 				for (TestClass testClass : testClasses) {
+					System.out.println("test class name: " + testClass.getName());
 					addTestClass(testClass);
 				}
 
