@@ -228,13 +228,13 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 						playwrightSegmentTestClassGroup.addAxisTestClassGroup(
 								axisTestClassGroup);
 
-						addAxisTestClassGroup(axisTestClassGroup);
-
 						for (TestClass testClass: testClasses){
 							if (shardJson.contains(testClass.getName())){
-								System.out.println("contains test name: " +testClass.getName());
+								axisTestClassGroup.addTestClass(testClass);
 							}
 						}
+
+						addAxisTestClassGroup(axisTestClassGroup);
 					}
 				}
 
