@@ -208,6 +208,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				System.out.println("axis count:" + axisCount);
 
+				String shardJson = _callNPMCommand(getPlaywrightBaseDir(), "npm run playwright test --project=layout-content-page-editor-web --shard=1/4 --list --reporter=json");
+				System.out.println("shard1 json: " + shardJson);
 				if (axisCount >= 1) {
 					for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
 						AxisTestClassGroup axisTestClassGroup =
