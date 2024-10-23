@@ -208,10 +208,20 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				System.out.println("axis count:" + axisCount);
 
-				String shardJson = _callNPMCommand(getPlaywrightBaseDir(), "npx playwright test --project=layout-content-page-editor-web --shard=1/4 --list --reporter=json");
-				System.out.println("shard1 json: " + shardJson);
 				if (axisCount >= 1) {
 					for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+						StringBuilder sb = new StringBuilder();
+						sb.append("npx playwright test --project=");
+						sb.append(projectName);
+						sb.append(" --shard=");
+						sb.append(axisIndex+1);
+						sb.append("/");
+						sb.append(axisCount);
+						sb.append(" --list");
+
+						String shardJson = _callNPMCommand(getPlaywrightBaseDir(), sb.toString());
+						System.out.println("shard json: " + shardJson);
+
 						AxisTestClassGroup axisTestClassGroup =
 								TestClassGroupFactory.newAxisTestClassGroup(this);
 
@@ -219,6 +229,12 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 								axisTestClassGroup);
 
 						addAxisTestClassGroup(axisTestClassGroup);
+
+						for (TestClass testClass: testClasses){
+							if (shardJson.contains(testClass.getName())){
+								System.out.println("contains test name: " +testClass.getName());
+							}
+						}
 					}
 				}
 
