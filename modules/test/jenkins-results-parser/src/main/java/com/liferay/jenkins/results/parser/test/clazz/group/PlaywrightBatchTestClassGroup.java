@@ -209,7 +209,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 				System.out.println("axis count:" + axisCount);
 
 				if (axisCount >= 1) {
-					for (int axisIndex = 0; axisIndex < getAxisCount(); axisIndex++) {
+					for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
 						AxisTestClassGroup axisTestClassGroup =
 								TestClassGroupFactory.newAxisTestClassGroup(this);
 
