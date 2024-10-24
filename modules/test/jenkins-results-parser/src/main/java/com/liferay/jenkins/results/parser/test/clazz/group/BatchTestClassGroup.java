@@ -76,6 +76,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 			TestHistory testHistory = batchHistory.getTestHistory(testName);
 
 			for (String string : batchHistory.get_testHistories().keySet()){
+				System.out.println("key: " + string);
 				if (string.contains("style-book-web/stylebookEditor.spec.ts")){
 					System.out.println("string: " + string);
 				}
