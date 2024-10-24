@@ -34,7 +34,12 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 			String testName =
 				getName() + "." + playwrightTestClassMethod.getName();
 
+			System.out.println("junit test name: " + testName);
+
 			BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
+
+			System.out.println("avg test duration: " + batchTestClassGroup.getAverageTestDuration(
+					testName));
 
 			_averageDuration += batchTestClassGroup.getAverageTestDuration(
 				testName);

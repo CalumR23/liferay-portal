@@ -138,6 +138,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 		Long totalDuration = 0L;
 
 		for (TestClass testClass : testClasses) {
+			System.out.println("test class avg duration: " + testClass.getAverageDuration());
 			totalDuration += testClass.getAverageDuration();
 		}
 
@@ -155,6 +156,10 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				Long axisCount =
 					Math.floorDiv(totalDuration, targetAxisTargetDuration) + 1;
+
+				System.out.println("not adding one axis count: " + Math.floorDiv(totalDuration, targetAxisTargetDuration));
+
+				System.out.println("calculated axis count: " + axisCount);
 
 				return Math.toIntExact(axisCount);
 			}
