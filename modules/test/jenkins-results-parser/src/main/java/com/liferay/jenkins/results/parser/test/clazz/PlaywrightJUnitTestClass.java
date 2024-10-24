@@ -32,7 +32,7 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 				(PlaywrightTestClassMethod)testClassMethod;
 
 			String testName =
-				getName() + "." + playwrightTestClassMethod.getName();
+				getName() + "." + playwrightTestClassMethod.getTestName();
 
 			System.out.println("junit test name: " + testName);
 
