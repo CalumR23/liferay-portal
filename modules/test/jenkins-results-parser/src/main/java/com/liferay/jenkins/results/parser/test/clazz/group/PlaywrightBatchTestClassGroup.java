@@ -134,6 +134,35 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 		setTestClasses();
 	}
 
+	protected int getAxisCount(List<TestClass> testClasses) {
+		Long totalDuration = 0L;
+
+		for (TestClass testClass : testClasses) {
+			totalDuration += testClass.getAverageDuration();
+		}
+
+		if (totalDuration != 0L) {
+			JobProperty jobProperty = getJobProperty(
+				"test.batch.target.axis.duration");
+
+			String jobPropertyValue = jobProperty.getValue();
+
+			if (JenkinsResultsParserUtil.isInteger(jobPropertyValue)) {
+				recordJobProperty(jobProperty);
+
+				Long targetAxisTargetDuration = Long.parseLong(
+					jobPropertyValue);
+
+				Long axisCount =
+					Math.floorDiv(totalDuration, targetAxisTargetDuration) + 1;
+
+				return Math.toIntExact(axisCount);
+			}
+		}
+
+		return getAxisCount();
+	}
+
 	protected File getPlaywrightBaseDir() {
 		PortalTestClassJob portalTestClassJob = (PortalTestClassJob)getJob();
 
@@ -204,7 +233,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				playwrightSegmentTestClassGroup.setProjectName(projectName);
 
-				int axisCount = getAxisCount();
+				int axisCount = getAxisCount(testClasses);
 
 				if (axisCount >= 1) {
 					for (int axisIndex = 0; axisIndex < axisCount;
