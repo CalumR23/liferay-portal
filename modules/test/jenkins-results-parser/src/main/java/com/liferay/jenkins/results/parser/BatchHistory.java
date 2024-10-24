@@ -32,6 +32,10 @@ public class BatchHistory {
 		return _testHistories.get(key);
 	}
 
+	public Map<String, TestHistory> get_testHistories(){
+		return _testHistories;
+	}
+
 	public TestTaskHistory getTestTaskHistory(String key) {
 		return _testTaskHistories.get(key);
 	}

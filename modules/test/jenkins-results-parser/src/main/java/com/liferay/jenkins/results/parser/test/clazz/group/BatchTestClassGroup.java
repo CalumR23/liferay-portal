@@ -21,6 +21,7 @@ import com.liferay.jenkins.results.parser.TestTaskHistory;
 import com.liferay.jenkins.results.parser.job.property.GlobJobProperty;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
 import com.liferay.jenkins.results.parser.job.property.JobPropertyFactory;
+import com.liferay.jenkins.results.parser.test.clazz.BatchTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 
 import java.io.File;
@@ -73,6 +74,15 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 		if (batchHistory != null) {
 			TestHistory testHistory = batchHistory.getTestHistory(testName);
+
+			for (String string : batchHistory.get_testHistories().keySet()){
+				if (string.contains("style-book-web/stylebookEditor.spec.ts")){
+					System.out.println("string: " + string);
+				}
+				if (string.contains(testName)){
+					System.out.println("contains name: " + string);
+				}
+			}
 
 			if (testHistory != null) {
 				averageTestDuration = testHistory.getAverageDuration();
