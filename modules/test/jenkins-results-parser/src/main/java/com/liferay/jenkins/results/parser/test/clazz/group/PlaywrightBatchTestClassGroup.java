@@ -204,19 +204,44 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 				playwrightSegmentTestClassGroup.setProjectName(projectName);
 
-				AxisTestClassGroup axisTestClassGroup =
-					TestClassGroupFactory.newAxisTestClassGroup(this);
+				int axisCount = getAxisCount();
 
-				playwrightSegmentTestClassGroup.addAxisTestClassGroup(
-					axisTestClassGroup);
+				if (axisCount >= 1) {
+					for (int axisIndex = 0; axisIndex < axisCount;
+						 axisIndex++) {
 
-				for (TestClass testClass : testClasses) {
-					axisTestClassGroup.addTestClass(testClass);
+						AxisTestClassGroup axisTestClassGroup =
+							TestClassGroupFactory.newAxisTestClassGroup(this);
 
-					addTestClass(testClass);
+						playwrightSegmentTestClassGroup.addAxisTestClassGroup(
+							axisTestClassGroup);
+
+						StringBuilder sb = new StringBuilder();
+
+						sb.append("npx playwright test --project=");
+						sb.append(projectName);
+						sb.append(" --shard=");
+						sb.append(axisIndex + 1);
+						sb.append("/");
+						sb.append(axisCount);
+						sb.append(" --list");
+
+						String result = _callNPMCommand(
+							getPlaywrightBaseDir(), sb.toString());
+
+						for (TestClass testClass : testClasses) {
+							if (result.contains(testClass.getName())) {
+								axisTestClassGroup.addTestClass(testClass);
+							}
+						}
+
+						addAxisTestClassGroup(axisTestClassGroup);
+					}
 				}
 
-				addAxisTestClassGroup(axisTestClassGroup);
+				for (TestClass testClass : testClasses) {
+					addTestClass(testClass);
+				}
 
 				addSegmentTestClassGroup(playwrightSegmentTestClassGroup);
 			}
