@@ -29,9 +29,20 @@ public class JobHistory {
 
 		if (matcher.find()) {
 			batchName = matcher.group("batchName");
+			System.out.println("matcher batcha name: " + batchName);
 		}
 
+		getBatchHistories(batchName);
+
 		return _batchHistories.get(batchName);
+	}
+
+	public void getBatchHistories(String batchName){
+		for (String key : _batchHistories.keySet()){
+			if (key.contains(batchName)){
+				System.out.println("batch history name: " + batchName);
+			}
+		}
 	}
 
 	public URL getTestrayURL() {
