@@ -194,6 +194,8 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 			return null;
 		}
 
+		System.out.println("batch name: " + getBatchName());
+
 		_batchHistory = jobHistory.getBatchHistory(getBatchName());
 
 		return _batchHistory;
