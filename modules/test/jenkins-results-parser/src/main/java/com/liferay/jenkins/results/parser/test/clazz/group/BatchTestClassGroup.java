@@ -65,12 +65,17 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 
 	public long getAverageTestDuration(String testName) {
 		if (_averageTestDurations.containsKey(testName)) {
+			System.out.println("not null avg duration: " + _averageTestDurations.get(testName));
 			return _averageTestDurations.get(testName);
 		}
 
 		long averageTestDuration = _getDefaultTestDuration();
 
 		BatchHistory batchHistory = getBatchHistory();
+
+		if (batchHistory == null){
+			System.out.println("batch history null");
+		}
 
 		if (batchHistory != null) {
 			TestHistory testHistory = batchHistory.getTestHistory(testName);
