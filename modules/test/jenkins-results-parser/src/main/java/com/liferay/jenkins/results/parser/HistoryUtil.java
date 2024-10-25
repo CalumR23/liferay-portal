@@ -21,6 +21,7 @@ public class HistoryUtil {
 		URL ciHistoryURL = _getCIHistoryURL(job);
 
 		if (ciHistoryURL == null) {
+			System.out.println("ci history null");
 			return null;
 		}
 
@@ -29,8 +30,12 @@ public class HistoryUtil {
 		if (jobHistory == null) {
 			jobHistory = new JobHistory(ciHistoryURL);
 
+			System.out.println("history util null");
+
 			_jobHistories.put(ciHistoryURL, jobHistory);
 		}
+
+		System.out.println("returning non null history");
 
 		return jobHistory;
 	}

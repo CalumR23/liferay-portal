@@ -191,6 +191,7 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 		JobHistory jobHistory = job.getJobHistory();
 
 		if (jobHistory == null) {
+			System.out.println("job history null");
 			return null;
 		}
 
