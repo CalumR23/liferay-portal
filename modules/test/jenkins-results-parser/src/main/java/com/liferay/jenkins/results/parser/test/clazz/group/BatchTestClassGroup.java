@@ -84,8 +84,6 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				if (string.contains(testName)){
 					System.out.println("contains name: " + string);
 				}
-
-				System.out.println("does not contain name: " + string);
 			}
 
 			if (testHistory != null) {

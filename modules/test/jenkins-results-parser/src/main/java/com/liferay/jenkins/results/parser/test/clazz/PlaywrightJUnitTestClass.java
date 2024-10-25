@@ -44,7 +44,12 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 			System.out.println(
 					"avg test duration: " +
 							averageDuration);
-			_averageDuration += averageDuration;
+			if (_averageDuration == null){
+				_averageDuration = averageDuration;
+			}
+			else {
+				_averageDuration += averageDuration;
+			}
 		}
 
 		return _averageDuration;
