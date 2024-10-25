@@ -38,12 +38,13 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 
 			BatchTestClassGroup batchTestClassGroup = getBatchTestClassGroup();
 
-			System.out.println(
-				"avg test duration: " +
-					batchTestClassGroup.getAverageTestDuration(testName));
-
-			_averageDuration += batchTestClassGroup.getAverageTestDuration(
+			Long averageDuration = batchTestClassGroup.getAverageTestDuration(
 				testName);
+
+			System.out.println(
+					"avg test duration: " +
+							averageDuration);
+			_averageDuration += averageDuration;
 		}
 
 		return _averageDuration;
