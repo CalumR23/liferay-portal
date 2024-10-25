@@ -40,7 +40,7 @@ public class JobHistory {
 	public void getBatchHistories(String batchName){
 		for (String key : _batchHistories.keySet()){
 			if (key.contains("playwright")){
-				System.out.println("batch history name: " + batchName);
+				System.out.println("batch history name: " + key);
 			}
 		}
 	}
