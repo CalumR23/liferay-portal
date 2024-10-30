@@ -205,10 +205,17 @@ public class PoshiRunner {
 
 			throw webDriverException;
 		}
-		catch (Exception exception) {
+		catch (Exception exception1) {
 			LiferaySeleniumUtil.printJavaProcessStacktrace();
 
-			_throwException(exception);
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("Failed setup with: ");
+			sb.append(exception1.getMessage());
+
+			Exception exception2 = new Exception(sb.toString(), exception1);
+
+			_throwException(exception2);
 		}
 	}
 
