@@ -74,6 +74,14 @@ public class FunctionalBatchBuildTestrayCaseResult
 
 	@Override
 	public Status getStatus() {
+		TestResult testResult = getTestResult();
+
+		String errorDetails = testResult.getErrorDetails();
+
+		if (errorDetails.contains("Failed setup with:")) {
+			return Status.BLOCKED;
+		}
+
 		return getTestResultStatus();
 	}
 
