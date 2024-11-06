@@ -408,6 +408,48 @@ function main {
 	set_variables
 }
 
+function prepare_additional_bundles {
+	appServerBundlesSize="$1"
+
+	LIFERAY_HOME="/opt/dev/projects/github/liferay-portal/bundles"
+
+	leadingPortNumber=$((8 + ${appServerBundlesSize}))
+
+	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
+
+	cp -r "${LIFERAY_HOME}"  "${testAppServerParentDir}"
+
+	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
+
+	echo "${testAppServerDir}"
+
+	gsed -i "s/=\"8\([0-9]\{3\}\)\"/=\"${leadingPortNumber}\1\"/g" "${testAppServerDir}/conf/server.xml"
+
+	gsed -i "s/channel-logic-name/channel-logic-name-${appServerBundlesSize}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+
+	gsed -i "s/liferay.home=${LIFERAY_HOME}/liferay.home=${testAppServerParentDir}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+
+	osgiConsolePort=$((11312 + ${appServerBundlesSize}))
+
+	gsed -i "s/11312/${osgiConsolePort}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+
+	chmod a+x "${testAppServerDir}"
+
+	cd "${testAppServerDir}/bin"
+
+	/bin/bash catalina.sh run
+
+	while ! curl --output /dev/null --silent --head --fail https://localhost:${leadingPortNumber}080/
+	do
+		sleep 5
+	done
+
+	wait_for_portal_log_inactivity
+
+	echo "https://localhost:${leadingPortNumber}080/ is now available."
+
+}
+
 function reverse {
 	local array=(${@})
 
@@ -497,6 +539,23 @@ function stop_analytics_cloud {
 	cd ${_PORTAL_PROJECT_DIR}
 
 	ant -f build-test-analytics-cloud.xml stop-analytics-cloud
+}
+
+function stop_additional_bundles {
+	testAppServerParentDir=${LIFERAY_HOME}-$1
+
+	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
+
+	cd "${testAppServerDir}/bin"
+
+	/bin/bash shutdown.sh &
+
+	while curl --output /dev/null --silent --head --fail ${LIFERAY_PORTAL_URL}
+	do
+		sleep 5
+	done
+
+	echo "${LIFERAY_PORTAL_URL} is no longer available."
 }
 
 function stop_app_server {
@@ -612,4 +671,4 @@ function wait_for_portal_log_inactivity {
 	echo "No portal activity in ${sleep_interval}s"
 }
 
-main "${@}"
+prepare_additional_bundles 1
