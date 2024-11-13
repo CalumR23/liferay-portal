@@ -409,9 +409,7 @@ function main {
 }
 
 function prepare_additional_bundles {
-	appServerBundlesSize="$1"
-
-	LIFERAY_HOME="/opt/dev/projects/github/liferay-portal/bundles"
+	appServerBundlesSize="1"
 
 	leadingPortNumber=$((8 + ${appServerBundlesSize}))
 
@@ -542,20 +540,22 @@ function stop_analytics_cloud {
 }
 
 function stop_additional_bundles {
-	testAppServerParentDir=${LIFERAY_HOME}-$1
+	testAppServerParentDir=${LIFERAY_HOME}-1
 
 	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
+
+	leadingPortNumber=$((8 + ${appServerBundlesSize}))
 
 	cd "${testAppServerDir}/bin"
 
 	/bin/bash shutdown.sh &
 
-	while curl --output /dev/null --silent --head --fail ${LIFERAY_PORTAL_URL}
+	while curl --output /dev/null --silent --head --fail https://localhost:${leadingPortNumber}080/ 
 	do
 		sleep 5
 	done
 
-	echo "${LIFERAY_PORTAL_URL} is no longer available."
+	echo "https://localhost:${leadingPortNumber}080/  is no longer available."
 }
 
 function stop_app_server {
@@ -671,4 +671,4 @@ function wait_for_portal_log_inactivity {
 	echo "No portal activity in ${sleep_interval}s"
 }
 
-prepare_additional_bundles 1
+main "${@}"
