@@ -415,8 +415,10 @@ function prepare_additional_bundles {
 
 	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
 
-	if [ -d "${testAppServerParentDir}" ]; then
+	if [ -d "${testAppServerParentDir}" ]
+	 then
 	rm -rf "${testAppServerParentDir}"
+	fi
 
 	cp -r "${LIFERAY_HOME}"  "${testAppServerParentDir}"
 
