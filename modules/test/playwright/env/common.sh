@@ -415,6 +415,9 @@ function prepare_additional_bundles {
 
 	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
 
+	if [ -d "${testAppServerParentDir}" ]; then
+	rm -rf "${testAppServerParentDir}"
+
 	cp -r "${LIFERAY_HOME}"  "${testAppServerParentDir}"
 
 	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
