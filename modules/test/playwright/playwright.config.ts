@@ -116,6 +116,7 @@ export default defineConfig({
 	expect: {
 		timeout: 15 * 1000,
 	},
+	globalTimeout: 60 * 60 * 1000,
 	forbidOnly: !!process.env.CI,
 	projects: [
 		accessibilityMenuWeb,
