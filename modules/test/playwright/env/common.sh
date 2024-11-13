@@ -426,15 +426,15 @@ function prepare_additional_bundles {
 
 	echo "${testAppServerDir}"
 
-	gsed -i "s/=\"8\([0-9]\{3\}\)\"/=\"${leadingPortNumber}\1\"/g" "${testAppServerDir}/conf/server.xml"
+	sed -i "s/=\"8\([0-9]\{3\}\)\"/=\"${leadingPortNumber}\1\"/g" "${testAppServerDir}/conf/server.xml"
 
-	gsed -i "s/channel-logic-name/channel-logic-name-${appServerBundlesSize}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+	sed -i "s/channel-logic-name/channel-logic-name-${appServerBundlesSize}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 
-	gsed -i "s/liferay.home=${LIFERAY_HOME}/liferay.home=${testAppServerParentDir}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+	sed -i "s/liferay.home=${LIFERAY_HOME}/liferay.home=${testAppServerParentDir}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 
 	osgiConsolePort=$((11312 + ${appServerBundlesSize}))
 
-	gsed -i "s/11312/${osgiConsolePort}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+	sed -i "s/11312/${osgiConsolePort}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 
 	chmod a+x "${testAppServerDir}"
 
