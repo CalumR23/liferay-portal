@@ -430,7 +430,7 @@ function prepare_additional_bundles {
 
 	sed -i "s/channel-logic-name/channel-logic-name-${appServerBundlesSize}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 
-	sed -i "s/liferay.home=${LIFERAY_HOME}/liferay.home=${testAppServerParentDir}/g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
+	sed -i "s|liferay.home=${LIFERAY_HOME}|liferay.home=${testAppServerParentDir}|g" "${testAppServerDir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 
 	osgiConsolePort=$((11312 + ${appServerBundlesSize}))
 
