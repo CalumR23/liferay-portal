@@ -442,11 +442,6 @@ function prepare_additional_bundles {
 
 	/bin/bash catalina.sh run
 
-	while ! curl --output /dev/null --silent --head --fail https://localhost:${leadingPortNumber}080/
-	do
-		sleep 5
-	done
-
 	echo "https://localhost:${leadingPortNumber}080/ is now available."
 
 }
@@ -551,12 +546,7 @@ function stop_additional_bundles {
 
 	cd "${testAppServerDir}/bin"
 
-	/bin/bash shutdown.sh &
-
-	while curl --output /dev/null --silent --head --fail https://localhost:${leadingPortNumber}080/ 
-	do
-		sleep 5
-	done
+	/bin/bash shutdown.sh
 
 	echo "https://localhost:${leadingPortNumber}080/  is no longer available."
 }
