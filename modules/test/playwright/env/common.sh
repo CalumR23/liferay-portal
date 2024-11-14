@@ -447,8 +447,6 @@ function prepare_additional_bundles {
 		sleep 5
 	done
 
-	wait_for_portal_log_inactivity
-
 	echo "https://localhost:${leadingPortNumber}080/ is now available."
 
 }
