@@ -440,9 +440,18 @@ function prepare_additional_bundles {
 
 	cd "${testAppServerDir}/bin"
 
+	additionalPortalURL=${LIFERAY_PORTAL_URL}
+
+	echo "${additionalPortalURL}" | sed -e 's/8\([0-9]\{3\}\)/${leadingPortNumber}\1/g'
+
 	/bin/bash catalina.sh run
 
-	echo "https://localhost:${leadingPortNumber}080/ is now available."
+	while ! curl --output /dev/null --silent --head --fail ${additionalPortalURL}
+	do
+		sleep 5
+	done
+
+	echo "${additionalPortalURL} is now available."
 
 }
 
