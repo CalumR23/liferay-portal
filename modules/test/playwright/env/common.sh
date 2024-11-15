@@ -438,20 +438,7 @@ function prepare_additional_bundles {
 
 	chmod a+x "${testAppServerDir}"
 
-	cd "${testAppServerDir}/bin"
-
-	additionalPortalURL=${LIFERAY_PORTAL_URL}
-
-	echo "${additionalPortalURL}" | sed -e 's/8\([0-9]\{3\}\)/${leadingPortNumber}\1/g'
-
-	/bin/bash catalina.sh run
-
-	while ! curl --output /dev/null --silent --head --fail ${additionalPortalURL}
-	do
-		sleep 5
-	done
-
-	echo "${additionalPortalURL} is now available."
+	
 
 }
 
@@ -469,6 +456,29 @@ function set_variables {
 
 	_PLAYWRIGHT_BASE_DIR=$(get_absolute_dir ${playwright_env_dir}/../..)
 	_PORTAL_PROJECT_DIR=$(get_absolute_dir ${playwright_env_dir}/../../../../..)
+}
+
+function start_additional_bundles {
+	appServerBundlesSize="1"
+
+	leadingPortNumber=$((8 + ${appServerBundlesSize}))
+
+	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
+	
+	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
+
+	additionalPortalURL=${LIFERAY_PORTAL_URL}
+
+	echo "${additionalPortalURL}" | sed -e "s/8\([0-9]\{3\}\)/${leadingPortNumber}\1/g"
+
+	/bin/bash catalina.sh run
+
+	while ! curl --output /dev/null --silent --head --fail ${additionalPortalURL}
+	do
+		sleep 5
+	done
+
+	echo "${additionalPortalURL} is now available."
 }
 
 function start_analytics_cloud {
