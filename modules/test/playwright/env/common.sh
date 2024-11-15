@@ -464,12 +464,14 @@ function start_additional_bundles {
 	leadingPortNumber=$((8 + ${appServerBundlesSize}))
 
 	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
-	
-	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
 
 	additionalPortalURL=${LIFERAY_PORTAL_URL}
 
 	echo "${additionalPortalURL}" | sed -e "s/8\([0-9]\{3\}\)/${leadingPortNumber}\1/g"
+
+	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
+
+	cd ${testAppServerDir}/bin
 
 	/bin/bash catalina.sh run
 
