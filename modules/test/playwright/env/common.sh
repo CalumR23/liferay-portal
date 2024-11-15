@@ -467,7 +467,7 @@ function start_additional_bundles {
 
 	additionalPortalURL=${LIFERAY_PORTAL_URL}
 
-	echo "${additionalPortalURL}" | sed -e "s/8\([0-9]\{3\}\)/${leadingPortNumber}\1/g"
+	echo "${additionalPortalURL/\:8/\:"$leadingPortNumber"}"
 
 	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
 
