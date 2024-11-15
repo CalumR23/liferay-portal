@@ -473,6 +473,12 @@ function start_additional_bundles {
 
 	cd ${testAppServerDir}/bin
 
+	echo "${additionalPortalURL}"
+
+	additionalPortalURL="${additionalPortalURL/\:8/\:"$leadingPortNumber"}"
+
+	echo "${additionalPortalURL}"
+
 	/bin/bash catalina.sh run
 
 	while ! curl --output /dev/null --silent --head --fail ${additionalPortalURL}
