@@ -10,7 +10,11 @@ test('title is Home - Liferay DXP', async ({page}) => {
 
 	await expect(page).toHaveTitle('Home - Liferay DXP');
 
-	await page.goto('https://localhost:9080/');
+	const baseURL = process.env.PORTAL_URL;
+
+	const newURL = baseURL.replace(":8",":9");
+
+	await page.goto(newURL);
 
 	await expect(page).toHaveTitle('Home - Liferay DXP');
 });
@@ -20,7 +24,11 @@ test('has homepage image', async ({page}) => {
 
 	await expect(page.locator('#main-content img')).toBeVisible();
 
-	await page.goto('https://localhost:9080/');
+	const baseURL = process.env.PORTAL_URL;
+
+	const newURL = baseURL.replace(":8",":9");
+
+	await page.goto(newURL);
 
 	await expect(page.locator('#main-content img')).toBeVisible();
 });
