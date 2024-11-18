@@ -359,6 +359,10 @@ function get_portal_log_file_size {
 	wc --lines --total=always ${LIFERAY_HOME}/logs/liferay.*.log | grep total | awk '{print $1}'
 }
 
+function get_additional_portal_log_file_size {
+	wc --lines --total=always ${LIFERAY_HOME}-1/logs/liferay.*.log | grep total | awk '{print $1}'
+}
+
 function get_portal_project_dir {
 	echo ${_PORTAL_PROJECT_DIR}
 }
@@ -465,19 +469,11 @@ function start_additional_bundles {
 
 	testAppServerParentDir="${LIFERAY_HOME}-${appServerBundlesSize}"
 
-	additionalPortalURL=${LIFERAY_PORTAL_URL}
-
-	echo "${additionalPortalURL/\:8/\:"$leadingPortNumber"}"
+	additionalPortalURL="${LIFERAY_PORTAL_URL/\:8/\:"$leadingPortNumber"}"
 
 	testAppServerDir=$(find ${testAppServerParentDir} -type d -name "tomcat*")
 
 	cd ${testAppServerDir}/bin
-
-	echo "${additionalPortalURL}"
-
-	additionalPortalURL="${additionalPortalURL/\:8/\:"$leadingPortNumber"}"
-
-	echo "${additionalPortalURL}"
 
 	/bin/bash catalina.sh run
 
@@ -485,6 +481,8 @@ function start_additional_bundles {
 	do
 		sleep 5
 	done
+
+	wait_for_additional_portal_log_inactivity
 
 	echo "${additionalPortalURL} is now available."
 }
@@ -675,6 +673,34 @@ function wait_for_portal_log_inactivity {
 	while [[ ${portal_log_file_size} != $(get_portal_log_file_size) ]]
 	do
 		portal_log_file_size=$(get_portal_log_file_size)
+
+		if [[ ${total_duration} -ge ${sleep_duration} ]]
+		then
+			break
+		fi
+
+		sleep ${sleep_interval}
+
+		total_duration=$((total_duration + sleep_interval))
+
+		echo "Waiting for portal log inactivity"
+	done
+
+	echo "No portal activity in ${sleep_interval}s"
+}
+
+function wait_for_additional_portal_log_inactivity {
+	local portal_log_file_size=$(get_additional_portal_log_file_size)
+
+	local sleep_interval=15
+	local sleep_duration=180
+	local total_duration=0
+
+	sleep ${sleep_interval}
+
+	while [[ ${portal_log_file_size} != $(get_additional_portal_log_file_size) ]]
+	do
+		portal_log_file_size=$(get_additional_portal_log_file_size)
 
 		if [[ ${total_duration} -ge ${sleep_duration} ]]
 		then
