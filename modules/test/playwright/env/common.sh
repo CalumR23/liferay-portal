@@ -475,7 +475,7 @@ function start_additional_bundles {
 
 	cd ${testAppServerDir}/bin
 
-	/bin/bash catalina.sh run
+	/bin/bash catalina.sh run &
 
 	while ! curl --output /dev/null --silent --head --fail ${additionalPortalURL}
 	do
