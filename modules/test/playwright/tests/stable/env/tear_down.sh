@@ -1,0 +1,3 @@
+stop_additional_bundles 1
+
+stop_default_app_server
