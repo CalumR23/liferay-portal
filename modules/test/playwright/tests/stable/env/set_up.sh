@@ -1,3 +1,10 @@
+CURRENT_DIR_NAME=$(dirname ${BASH_SOURCE[0]})
+
+echo CURRENT_DIR_NAME=${CURRENT_DIR_NAME}
+
+source ${CURRENT_DIR_NAME}/../../../env/common.sh
+
+function main {
 update_portal_ext_properties
 
 prepare_additional_bundles 1
@@ -21,3 +28,5 @@ start_additional_bundles 1
 	deploy_parent_project_client_extensions
 
 	deploy_project_client_extensions
+}
+main "${@}"
