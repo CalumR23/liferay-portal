@@ -449,6 +449,7 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 				}
 			}
 			else if (testClass instanceof PlaywrightJUnitTestClass) {
+				System.out.println("testclass name: " + testClass.getName());
 				list.add(testClass.getName());
 			}
 		}
