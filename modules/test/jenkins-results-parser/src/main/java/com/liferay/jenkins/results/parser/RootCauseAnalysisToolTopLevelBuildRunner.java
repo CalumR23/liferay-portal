@@ -425,6 +425,7 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 
 		for (TestClass testClass : batchTestClassGroup.getTestClasses()) {
 			if (testClass instanceof FunctionalTestClass) {
+				System.out.println("functional test");
 				FunctionalTestClass functionalTestClass =
 					(FunctionalTestClass)testClass;
 
@@ -432,6 +433,7 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 			}
 			else if ((testClass instanceof JUnitTestClass) &&
 					 !(testClass instanceof PlaywrightJUnitTestClass)) {
+				System.out.println("junit test");
 
 				String testClassFilePath =
 					JenkinsResultsParserUtil.getCanonicalPath(
@@ -442,6 +444,7 @@ public class RootCauseAnalysisToolTopLevelBuildRunner
 						".*/(com/.*)\\.java", "$1.class"));
 			}
 			else if (testClass instanceof ModulesTestClass) {
+				System.out.println("modules test");
 				for (TestClassMethod testClassMethod :
 						testClass.getTestClassMethods()) {
 
