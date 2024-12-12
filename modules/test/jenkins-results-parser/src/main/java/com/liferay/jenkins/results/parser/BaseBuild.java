@@ -37,6 +37,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.liferay.jenkins.results.parser.failure.message.generator.ModulesCompilationFailureMessageGenerator;
 import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.Document;
@@ -547,15 +548,23 @@ public abstract class BaseBuild implements Build {
 				getFailureMessageGenerators()) {
 
 			try {
+				if(failureMessageGenerator instanceof ModulesCompilationFailureMessageGenerator){
+					System.out.println("class name: " + failureMessageGenerator.getClass().getName());
+				}
 				String failureMessage = failureMessageGenerator.getMessage(
 					this);
+
+				System.out.println("failure msg: " + failureMessage);
 
 				if (failureMessage != null) {
 					return failureMessage;
 				}
 			}
 			catch (Exception exception) {
+				System.out.println("START: \n");
 				exception.printStackTrace();
+
+				System.out.println("\n:END");
 
 				Class<?> clazz = failureMessageGenerator.getClass();
 
