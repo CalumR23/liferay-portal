@@ -153,6 +153,12 @@ public abstract class BatchTestClassGroup extends BaseTestClassGroup {
 				"'test.batch.axis.max.size' cannot be 0 or less");
 		}
 
+		System.out.println("testClassCount: " + (double)testClassCount);
+
+		System.out.println("axis max size: " + axisMaxSize);
+
+		System.out.println("axis count: " + (int)Math.ceil((double)testClassCount / axisMaxSize));
+
 		return (int)Math.ceil((double)testClassCount / axisMaxSize);
 	}
 
