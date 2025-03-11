@@ -33,6 +33,7 @@ public class AnnouncementsPanelApp extends BasePanelApp {
 
 	@Override
 	public String getPortletId() {
+		System.out.println("echo");
 		return AnnouncementsPortletKeys.ANNOUNCEMENTS_ADMIN;
 	}
 
