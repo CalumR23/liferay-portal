@@ -34,6 +34,8 @@ public class AccessibilitySettingTest {
 	public void testIsEnabled() {
 		Assert.assertEquals(_accessibilitySetting.isEnabled(), true);
 
+		System.out.println("echo");
+
 		_accessibilitySetting.setDefaultValue(false);
 
 		Assert.assertEquals(_accessibilitySetting.isEnabled(), false);
