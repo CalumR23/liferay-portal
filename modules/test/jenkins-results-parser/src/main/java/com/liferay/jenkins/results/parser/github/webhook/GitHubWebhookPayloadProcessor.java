@@ -2182,6 +2182,10 @@ public class GitHubWebhookPayloadProcessor {
 				_log.info("Comment triggered test");
 			}
 
+			String message = body + " has been triggered";
+
+			pullRequest.addComment(message + ".");
+
 			testPullRequest(pullRequestTesterParameters);
 		}
 
