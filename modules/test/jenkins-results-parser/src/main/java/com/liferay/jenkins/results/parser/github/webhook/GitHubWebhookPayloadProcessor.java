@@ -1699,6 +1699,8 @@ public class GitHubWebhookPayloadProcessor {
 
 		String body = comment.getBody();
 
+		body = body.toLowerCase();
+
 		String login = comment.getUserLogin();
 
 		PullRequest pullRequest = pullRequestCommentPayload.getPullRequest();
