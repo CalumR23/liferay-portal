@@ -536,17 +536,17 @@ function start_app_server {
 
 	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
-	if [[ ${APP_SERVER_TYPE} == ^(jboss|wildfly)$ ]]
+	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
 		cd ${app_server_dir}/bin
 
 		/bin/bash standalone.sh &
-	elif [[ ${APP_SERVER_TYPE} == "tomcat" ]]
+	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
 	then
 		cd ${app_server_dir}/bin
 
 		/bin/bash catalina.sh run &
-	elif [[ ${APP_SERVER_TYPE} == "weblogic" ]]
+	elif [[ "${APP_SERVER_TYPE}" == "weblogic" ]]
 	then
 		cd ${app_server_dir}/domains/liferay
 
@@ -643,9 +643,24 @@ function stop_analytics_cloud {
 function stop_app_server {
 	local liferay_home=${1}
 
-	cd $(get_app_server_dir ${liferay_home})/bin
+	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
-	/bin/bash shutdown.sh &
+	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
+	then
+		cd ${app_server_dir}/bin
+
+		/bin/bash jboss-cli.sh --connect:shutdown &
+	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
+	then
+		cd ${app_server_dir}/bin
+
+		/bin/bash shutdown.sh &
+	elif [[ "${APP_SERVER_TYPE}" == "weblogic" ]]
+	then
+		cd ${app_server_dir}/domains/liferay
+
+		/bin/bash stopWeblogic.sh
+	fi
 
 	local portal_url=${2}
 
