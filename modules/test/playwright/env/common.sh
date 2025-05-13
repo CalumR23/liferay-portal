@@ -536,6 +536,8 @@ function start_app_server {
 
 	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
+	echo "app server type: ${APP_SERVER_TYPE}"
+
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
 		echo "jboss/wildfly"
