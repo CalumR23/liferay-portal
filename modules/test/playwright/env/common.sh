@@ -91,6 +91,7 @@ function combine_properties_files {
 }
 
 function default_set_up {
+	echo "in default set up"
 	update_portal_ext_properties
 
 	start_default_app_server
