@@ -94,6 +94,8 @@ function default_set_up {
 	echo "in default set up"
 	update_portal_ext_properties
 
+	echo "past portal ext"
+
 	start_default_app_server
 
 	deploy_parent_project_osgi_modules
