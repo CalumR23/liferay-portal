@@ -538,7 +538,11 @@ function start_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
+		echo "jboss/wildfly"
+
 		cd ${app_server_dir}/bin
+
+		echo "dir path: $PWD"
 
 		/bin/bash standalone.sh &
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
@@ -548,7 +552,11 @@ function start_app_server {
 		/bin/bash catalina.sh run &
 	elif [[ "${APP_SERVER_TYPE}" == "weblogic" ]]
 	then
+		echo "weblogic"
+		
 		cd ${app_server_dir}/domains/liferay
+
+		echo "dir path: $PWD"
 
 		/bin/bash startWeblogic.sh
 	fi
