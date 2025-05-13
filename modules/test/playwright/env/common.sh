@@ -426,6 +426,7 @@ function get_project_client_extension_workspace_portal_ext_properties_files {
 }
 
 function get_app_server_dir {
+	echo "liferay home: ${1}"
 	find "${1}" -type d -name "${APP_SERVER_TYPE}*"
 }
 
@@ -534,6 +535,8 @@ function start_analytics_cloud {
 function start_app_server {
 	local liferay_home=${1}
 
+	echo "getting app server"
+
 	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
 	echo "app server type: ${APP_SERVER_TYPE}"
@@ -624,6 +627,7 @@ function start_client_extension_spring_boot_application {
 }
 
 function start_default_app_server {
+	echo "staring app server"
 	start_app_server ${LIFERAY_HOME} ${LIFERAY_PORTAL_URL}
 }
 
