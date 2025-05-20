@@ -544,6 +544,8 @@ function start_app_server {
 
 	echo "app server type: ${APP_SERVER_TYPE}"
 
+	echo "app server dir: ${app_server_dir}"
+
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
 		echo "jboss/wildfly"
