@@ -429,8 +429,12 @@ function get_project_client_extension_workspace_portal_ext_properties_files {
 }
 
 function get_app_server_dir {
-	echo "liferay home: ${1}"
-	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}*"
+	if [["${APP_SERVER_TYPE}" == "jboss" ]]
+	then
+	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}-eap-7.3.0"
+	else
+	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}*[0-9]"
+	fi
 }
 
 function get_tomcat_portal_ext_properties_file {
@@ -550,9 +554,11 @@ function start_app_server {
 	then
 		echo "jboss/wildfly"
 
-		cd ${app_server_dir}/bin
+		pwd
 
-		echo "dir path: $PWD"
+		ls
+
+		cd ${app_server_dir}/bin
 
 		/bin/bash standalone.sh &
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
@@ -565,8 +571,6 @@ function start_app_server {
 		echo "weblogic"
 		
 		cd ${app_server_dir}/domains/liferay
-
-		echo "dir path: $PWD"
 
 		/bin/bash startWeblogic.sh
 	fi
