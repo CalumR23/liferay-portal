@@ -430,7 +430,7 @@ function get_project_client_extension_workspace_portal_ext_properties_files {
 
 function get_app_server_dir {
 	echo "liferay home: ${1}"
-	find "${1}" -maxdepth 2 -mindepth 2 -type d -name "${APP_SERVER_TYPE}*"
+	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}*"
 }
 
 function get_tomcat_portal_ext_properties_file {
