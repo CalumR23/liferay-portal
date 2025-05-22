@@ -550,22 +550,18 @@ function start_app_server {
 
 	echo "app server dir: ${app_server_dir}"
 
+	cd bundles
+	ls
+	echo "bundles file list"
+
 	if [[ "${APP_SERVER_TYPE}" == "jboss" ]]
 	then
-		cd bundles/jboss-eap-7.3.0/bin
-
-		pwd
-
-		ls
+		cd jboss-eap-7.3.0/bin
 
 		/bin/bash standalone.sh &
 	elif [[  "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
 		cd ${app_server_dir}/bin
-
-		pwd
-
-		ls
 
 		/bin/bash standalone.sh &
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
