@@ -550,15 +550,22 @@ function start_app_server {
 
 	echo "app server dir: ${app_server_dir}"
 
-	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
+	if [[ "${APP_SERVER_TYPE}" == "jboss" ]]
 	then
-		echo "jboss/wildfly"
+		cd bundles/jboss-eap-7.3.0/bin
 
 		pwd
 
 		ls
 
+		/bin/bash standalone.sh &
+	elif [[  "${APP_SERVER_TYPE}" == "wildfly" ]]
+	then
 		cd ${app_server_dir}/bin
+
+		pwd
+
+		ls
 
 		/bin/bash standalone.sh &
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
@@ -582,7 +589,7 @@ function start_app_server {
 		sleep 5
 	done
 
-	wait_for_portal_log_inactivity ${liferay_home}
+	# wait_for_portal_log_inactivity ${liferay_home}
 
 	echo "${liferay_portal_url} is now available."
 }
