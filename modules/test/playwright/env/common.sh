@@ -583,6 +583,8 @@ function start_app_server {
 	while ! curl --output /dev/null --silent --head --fail ${liferay_portal_url}
 	do
 		sleep 5
+
+		echo "Waiting for ${liferay_portal_url}"
 	done
 
 	# wait_for_portal_log_inactivity ${liferay_home}
