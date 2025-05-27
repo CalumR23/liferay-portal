@@ -556,7 +556,7 @@ function start_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" ]]
 	then
-		cd jboss-eap-7.3.0/bin
+		cd jboss-eap-7.4.0/bin
 
 		/bin/bash standalone.sh &
 	elif [[  "${APP_SERVER_TYPE}" == "wildfly" ]]
