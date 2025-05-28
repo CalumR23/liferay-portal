@@ -91,10 +91,7 @@ function combine_properties_files {
 }
 
 function default_set_up {
-	echo "in default set up"
 	update_portal_ext_properties
-
-	echo "past portal ext"
 
 	start_default_app_server
 
@@ -429,12 +426,7 @@ function get_project_client_extension_workspace_portal_ext_properties_files {
 }
 
 function get_app_server_dir {
-	if [["${APP_SERVER_TYPE}" == "jboss" ]]
-	then
-	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}-eap-7.3.0"
-	else
 	find "${1}" -maxdepth 2 -type d -name "${APP_SERVER_TYPE}*[0-9]"
-	fi
 }
 
 function get_tomcat_portal_ext_properties_file {
@@ -546,20 +538,9 @@ function start_app_server {
 
 	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
-	echo "app server type: ${APP_SERVER_TYPE}"
-
 	echo "app server dir: ${app_server_dir}"
 
-	cd bundles
-	ls
-	echo "bundles file list"
-
-	if [[ "${APP_SERVER_TYPE}" == "jboss" ]]
-	then
-		cd jboss-eap-7.4.0/bin
-
-		/bin/bash standalone.sh &
-	elif [[  "${APP_SERVER_TYPE}" == "wildfly" ]]
+	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
 		cd ${app_server_dir}/bin
 
