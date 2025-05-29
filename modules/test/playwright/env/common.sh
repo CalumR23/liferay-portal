@@ -542,6 +542,10 @@ function start_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
+		cd ${_PORTAL_PROJECT_DIR}
+
+		ant setup-sdk
+		
 		cd ${app_server_dir}/bin
 
 		/bin/bash standalone.sh &
