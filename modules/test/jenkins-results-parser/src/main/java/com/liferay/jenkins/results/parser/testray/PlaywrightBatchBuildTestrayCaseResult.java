@@ -194,26 +194,27 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 	protected TestrayAttachment getPlaywrightTraceZip() {
 		System.out.println("spec file path: " + _playwrightJUnitTestClass.getSpecFilePath());
-		Matcher matcher = _traceZipDirPattern.matcher(_playwrightJUnitTestClass.getSpecFilePath());
-		String fullTestName = getName();
-		String testName = fullTestName.substring(fullTestName.indexOf(">") + 1);
-		testName = testName.trim();
-		testName = testName.replace(" ","-");
-		StringBuilder sb = new StringBuilder();
-		sb.append("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results");
-		sb.append(getAxisBuildURLPath());
-		sb.append("/test-results/");
-		sb.append(matcher.group("fileName"));
-		sb.append("-");
-		sb.append(testName);
-		sb.append("-");
-		String projectDir = matcher.group("projectDir");
-		sb.append(projectDir.replace("/","-"));
-		sb.append("/trace.zip");
-
 		System.out.println("axis build URL: " + getAxisBuildURLPath());
+		Matcher matcher = _traceZipDirPattern.matcher(_playwrightJUnitTestClass.getSpecFilePath());
+		StringBuilder sb = new StringBuilder();
+		if (matcher.matches()) {
+			String fullTestName = getName();
+			String testName = fullTestName.substring(fullTestName.indexOf(">") + 1);
+			testName = testName.trim();
+			testName = testName.replace(" ", "-");
+			sb.append("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results");
+			sb.append(getAxisBuildURLPath());
+			sb.append("/test-results/");
+			sb.append(matcher.group("fileName"));
+			sb.append("-");
+			sb.append(testName);
+			sb.append("-");
+			String projectDir = matcher.group("projectDir");
+			sb.append(projectDir.replace("/", "-"));
+			sb.append("/trace.zip");
 
-		System.out.println("sb: " + sb.toString());
+			System.out.println("sb: " + sb.toString());
+		}
 
 		return getTestrayAttachment(getBuild(), "Trace Zip", sb.toString());
 	}
@@ -223,7 +224,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			getBuild(), "Playwright Report",
 			getAxisBuildURLPath() + "/playwright-report/index.html");
 	}
-	private final Pattern _traceZipDirPattern = Pattern.compile("(?<projectDir>\\S*/\\S*)/(?<fileName>\\S*)\\.spec.ts");
+	private final Pattern _traceZipDirPattern = Pattern.compile("(?<projectDir>\\S*/\\S*)/(?<fileName>\\S*)\\.spec\\.ts");
 	private final PlaywrightJUnitTestClass _playwrightJUnitTestClass;
 	private final PlaywrightTestClassMethod _playwrightTestClassMethod;
 
