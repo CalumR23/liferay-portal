@@ -223,7 +223,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			getBuild(), "Playwright Report",
 			getAxisBuildURLPath() + "/playwright-report/index.html");
 	}
-	private final Pattern _traceZipDirPattern = Pattern.compile("(?<projectDir>\\S*/\\S*)/(?<fileName>\\S*)\\.spec.ts\\S*");
+	private final Pattern _traceZipDirPattern = Pattern.compile("(?<projectDir>\\S*/\\S*)/(?<fileName>\\S*)\\.spec.ts");
 	private final PlaywrightJUnitTestClass _playwrightJUnitTestClass;
 	private final PlaywrightTestClassMethod _playwrightTestClassMethod;
 
