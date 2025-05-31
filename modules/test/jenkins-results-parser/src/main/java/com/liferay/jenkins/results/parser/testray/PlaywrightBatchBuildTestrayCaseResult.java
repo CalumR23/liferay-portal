@@ -193,6 +193,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 	}
 
 	protected TestrayAttachment getPlaywrightTraceZip() {
+		System.out.println("spec file path: " + _playwrightJUnitTestClass.getSpecFilePath());
 		Matcher matcher = _traceZipDirPattern.matcher(_playwrightJUnitTestClass.getSpecFilePath());
 		String fullTestName = getName();
 		String testName = fullTestName.substring(fullTestName.indexOf(">") + 1);
