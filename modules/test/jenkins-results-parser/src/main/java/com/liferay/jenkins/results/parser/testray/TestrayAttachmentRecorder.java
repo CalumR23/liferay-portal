@@ -799,6 +799,17 @@ public class TestrayAttachmentRecorder {
 			if (playwrightReportFile.exists()) {
 				_copyToRecordedFilesBuildDir(
 					playwrightReportFile.getParentFile());
+			}
+		}
+
+		if (portalWorkspaceGitRepository != null) {
+			File playwrightTestResultsDir = new File(
+					portalWorkspaceGitRepository.getDirectory(),
+					"modules/test/playwright/test-results");
+
+			if (playwrightTestResultsDir.exists()) {
+				_copyToRecordedFilesBuildDir(
+						playwrightTestResultsDir);
 
 				return;
 			}

@@ -202,7 +202,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			String testName = fullTestName.substring(fullTestName.indexOf(">") + 1);
 			testName = testName.trim();
 			testName = testName.replace(" ", "-");
-			sb.append("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results");
+			sb.append("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results/");
 			sb.append(getAxisBuildURLPath());
 			sb.append("/test-results/");
 			sb.append(matcher.group("fileName"));
