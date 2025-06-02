@@ -140,7 +140,7 @@ test('Smoke', async ({
 		await expect(portletTitle).toBeVisible();
 
 		const portletBody = page
-			.locator('[class*=portlet-content]')
+			.locator('[class*=portlet-cont]')
 			.filter({has: portletTitle})
 			.locator('[class*=portlet-body]');
 
