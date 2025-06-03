@@ -542,9 +542,9 @@ function start_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
-		cd ${_PORTAL_PROJECT_DIR}
+		cd ${app_server_dir}/standalone/deployments
 
-		ant setup-sdk
+		touch ROOT.war.dodeploy
 		
 		cd ${app_server_dir}/bin
 
