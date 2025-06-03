@@ -16,6 +16,8 @@ import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -193,8 +195,6 @@ public class PlaywrightBatchBuildTestrayCaseResult
 	}
 
 	protected TestrayAttachment getPlaywrightTraceZip() {
-		System.out.println("spec file path: " + _playwrightJUnitTestClass.getSpecFilePath());
-		System.out.println("axis build URL: " + getAxisBuildURLPath());
 		Matcher matcher = _traceZipDirPattern.matcher(_playwrightJUnitTestClass.getSpecFilePath());
 		StringBuilder sb = new StringBuilder();
 		if (matcher.matches()) {
@@ -202,7 +202,6 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			String testName = fullTestName.substring(fullTestName.indexOf(">") + 1);
 			testName = testName.trim();
 			testName = testName.replace(" ", "-");
-			sb.append("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results/");
 			sb.append(getAxisBuildURLPath());
 			sb.append("/test-results/");
 			sb.append(matcher.group("fileName"));
@@ -215,8 +214,12 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 			System.out.println("sb: " + sb.toString());
 		}
-
-		return getTestrayAttachment(getBuild(), "Trace Zip", sb.toString());
+		try{
+			URL url = new URL("https://playwright.liferay.com/?trace=https://playwright.liferay.com/testray-results/" + sb.toString());
+			return new DefaultTestrayAttachment(this, "Trace Viewer", sb.toString(), url);
+		} catch (MalformedURLException exception) {
+			throw new RuntimeException(exception);
+		}
 	}
 
 	protected TestrayAttachment getPlaywrightReportTestrayAttachment() {
