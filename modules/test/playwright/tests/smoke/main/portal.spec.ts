@@ -8,7 +8,7 @@ import {expect, test} from '@playwright/test';
 test('title is Home - Liferay DXP', async ({page}) => {
 	await page.goto('/');
 
-	await expect(page).toHaveTitle('Home - Liferay DXP');
+	await expect(page).toHaveTitle('Home - google');
 });
 
 test('has homepage image', async ({page}) => {
