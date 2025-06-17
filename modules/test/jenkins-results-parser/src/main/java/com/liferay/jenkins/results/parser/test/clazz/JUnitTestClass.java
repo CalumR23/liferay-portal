@@ -383,6 +383,10 @@ public class JUnitTestClass extends BaseTestClass {
 				String methodName = methodHeaderMatcher.group("methodName");
 
 				addTestClassMethod(methodIgnored, methodName);
+
+				if(annotations.contains("@TestInfo")){
+					System.out.println("annotations: " + annotations);
+				}
 			}
 		}
 

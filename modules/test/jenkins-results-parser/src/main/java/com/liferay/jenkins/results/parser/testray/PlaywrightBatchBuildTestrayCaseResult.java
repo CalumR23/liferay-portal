@@ -158,6 +158,8 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		List<TestrayAttachment> testrayAttachments =
 			super.getTestrayAttachments();
 
+		getPlaywrightTags();
+
 		testrayAttachments.add(getPlaywrightReportTestrayAttachment());
 
 		TestrayAttachment playwrightTraceViewerTestrayAttachment =
@@ -212,6 +214,10 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		System.out.println("Unable to find test result for: " + getName());
 
 		return null;
+	}
+
+	protected void getPlaywrightTags(){
+		_playwrightJUnitTestClass.getTags();
 	}
 
 	protected TestrayAttachment getPlaywrightReportTestrayAttachment() {

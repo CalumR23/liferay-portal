@@ -38,7 +38,9 @@ test.afterEach(async ({sitesAdminPage, sitesPage}) => {
 	await sitesPage.deleteAllSites();
 });
 
-test('Smoke', async ({
+test('Smoke', 
+	{tag: ['@LPD-46415']},
+	async ({
 	apiHelpers,
 	applicationsMenuPage,
 	page,
@@ -56,7 +58,7 @@ test('Smoke', async ({
 	await test.step('Given the admin user agrees to the terms of use and answers the reminder query', async () => {
 		const user =
 			await apiHelpers.headlessAdminUser.getUserAccountByEmailAddress(
-				'test@liferay.com'
+				'tester@liferay.com'
 			);
 
 		await apiHelpers.jsonWebServicesUser.agreeToTermsOfUse(user.id);
