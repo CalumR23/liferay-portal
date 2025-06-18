@@ -98,6 +98,23 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 		_slaveLabel = slaveLabel;
 	}
 
+	@Override
+	public boolean testAnalyticsCloud() {
+		if (_testAnalyticsCloud != null) {
+			return _testAnalyticsCloud;
+		}
+
+		for (AxisTestClassGroup axisTestClassGroup : getAxisTestClassGroups()) {
+			PlaywrightAxisTestClassGroup playwrightAxisTestClassGroup =
+				(PlaywrightAxisTestClassGroup)axisTestClassGroup;
+
+			_testAnalyticsCloud =
+				playwrightAxisTestClassGroup.getAnalyticsCloudEnabled();
+		}
+
+		return _testAnalyticsCloud;
+	}
+
 	protected PlaywrightSegmentTestClassGroup(
 		BatchTestClassGroup parentBatchTestClassGroup) {
 
@@ -154,5 +171,6 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 
 	private String _projectName;
 	private String _slaveLabel;
+	private Boolean _testAnalyticsCloud;
 
 }
