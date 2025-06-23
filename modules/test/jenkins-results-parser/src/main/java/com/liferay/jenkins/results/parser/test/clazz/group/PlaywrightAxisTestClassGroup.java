@@ -33,6 +33,8 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 		PlaywrightJUnitTestClass playwrightJUnitTestClass =
 			(PlaywrightJUnitTestClass)testClass;
 
+		System.out.println("ac enabled: " + playwrightJUnitTestClass.getAnalyticsCloudEnabled());
+
 		return playwrightJUnitTestClass.getAnalyticsCloudEnabled();
 	}
 
