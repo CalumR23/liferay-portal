@@ -36,9 +36,12 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 
 			if (playwrightJUnitTestClass.getAnalyticsCloudEnabled()){
 				analyticsCloudEnabled = true;
+				System.out.println("in axis true statement");
 				break;
 			}
 		}
+
+		System.out.println("axis value: " + analyticsCloudEnabled);
 
 		return analyticsCloudEnabled;
 	}

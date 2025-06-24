@@ -157,7 +157,7 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 	private static final Pattern _testFilePathPattern = Pattern.compile(
 		".+/playwright/(setup|tests)/(?<specFilePath>.+)");
 
-	private Boolean _analyticsCloudEnabled = false;
+	private Boolean _analyticsCloudEnabled;
 	private Long _averageDuration;
 	private final Integer _minimumSlaveRAM;
 	private final String _slaveLabel;
