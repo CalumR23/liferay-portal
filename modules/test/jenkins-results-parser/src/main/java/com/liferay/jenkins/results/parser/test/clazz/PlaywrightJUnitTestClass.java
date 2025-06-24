@@ -22,6 +22,7 @@ import org.json.JSONObject;
 public class PlaywrightJUnitTestClass extends JUnitTestClass {
 
 	public boolean getAnalyticsCloudEnabled() {
+		System.out.println("return ac value: " + _analyticsCloudEnabled);
 		return _analyticsCloudEnabled;
 	}
 
@@ -133,8 +134,7 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 
 				System.out.println("ac is true");
 
-				_analyticsCloudEnabled = Boolean.getBoolean(
-					analyticsCloudEnabled);
+				_analyticsCloudEnabled = true;
 			}
 		}
 		else {
