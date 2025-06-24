@@ -24,18 +24,23 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 			return false;
 		}
 
-		TestClass testClass = testClasses.get(0);
+		Boolean analyticsCloudEnabled = false;
 
-		if (!(testClass instanceof PlaywrightJUnitTestClass)) {
-			return false;
+		for (TestClass testClass : testClasses) {
+			if (!(testClass instanceof PlaywrightJUnitTestClass)) {
+				continue;
+			}
+
+			PlaywrightJUnitTestClass playwrightJUnitTestClass =
+					(PlaywrightJUnitTestClass) testClass;
+
+			if (playwrightJUnitTestClass.getAnalyticsCloudEnabled()){
+				analyticsCloudEnabled = true;
+				break;
+			}
 		}
 
-		PlaywrightJUnitTestClass playwrightJUnitTestClass =
-			(PlaywrightJUnitTestClass)testClass;
-
-		System.out.println("ac enabled: " + playwrightJUnitTestClass.getAnalyticsCloudEnabled());
-
-		return playwrightJUnitTestClass.getAnalyticsCloudEnabled();
+		return analyticsCloudEnabled;
 	}
 
 	@Override

@@ -108,8 +108,11 @@ public class PlaywrightSegmentTestClassGroup extends SegmentTestClassGroup {
 			PlaywrightAxisTestClassGroup playwrightAxisTestClassGroup =
 				(PlaywrightAxisTestClassGroup)axisTestClassGroup;
 
-			_testAnalyticsCloud =
-				playwrightAxisTestClassGroup.getAnalyticsCloudEnabled();
+			if(playwrightAxisTestClassGroup.getAnalyticsCloudEnabled()){
+				_testAnalyticsCloud = true;
+				break;
+			}
+			_testAnalyticsCloud = false;
 		}
 
 		return _testAnalyticsCloud;
