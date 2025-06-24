@@ -27,10 +27,6 @@ public class PlaywrightAxisTestClassGroup extends AxisTestClassGroup {
 		Boolean analyticsCloudEnabled = false;
 
 		for (TestClass testClass : testClasses) {
-			if (!(testClass instanceof PlaywrightJUnitTestClass)) {
-				continue;
-			}
-
 			PlaywrightJUnitTestClass playwrightJUnitTestClass =
 					(PlaywrightJUnitTestClass) testClass;
 
