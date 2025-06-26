@@ -561,6 +561,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 						}
 					}
 
+					System.out.println("tags into obj: " + sb);
+
 					specJSONObject.put("tags", sb.toString());
 				}
 
@@ -625,6 +627,7 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			specTitles.add(title);
 
 			if (specJSONObject.has("tags")) {
+				System.out.println("has tags: " + specJSONObject.getString("tags"));
 				specTagsMap.put(title, specJSONObject.getString("tags"));
 			}
 
