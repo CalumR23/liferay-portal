@@ -23,6 +23,7 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 	}
 
 	public String getTags() {
+		System.out.println("return tag: " + _tags);
 		return _tags;
 	}
 
@@ -34,6 +35,8 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 		boolean ignored, String name, String tags, TestClass testClass) {
 
 		super(ignored, name, testClass);
+
+		System.out.println("method tag: " + tags);
 
 		_tags = tags;
 	}
