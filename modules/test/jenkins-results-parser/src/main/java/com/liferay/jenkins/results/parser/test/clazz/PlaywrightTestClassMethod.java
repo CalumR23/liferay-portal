@@ -22,8 +22,20 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 			testClass.getName(), " > ", super.getName());
 	}
 
+	public String getTags() {
+		return _tags;
+	}
+
 	public String getTestName() {
 		return super.getName();
+	}
+
+	protected PlaywrightTestClassMethod(
+		boolean ignored, String name, String tags, TestClass testClass) {
+
+		super(ignored, name, testClass);
+
+		_tags = tags;
 	}
 
 	protected PlaywrightTestClassMethod(
@@ -37,5 +49,7 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 
 		super(jsonObject, testClass);
 	}
+
+	private String _tags;
 
 }

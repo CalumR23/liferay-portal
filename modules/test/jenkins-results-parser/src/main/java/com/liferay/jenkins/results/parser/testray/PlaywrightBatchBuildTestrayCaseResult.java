@@ -216,14 +216,15 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		return null;
 	}
 
-	protected void getPlaywrightTags(){
-		_playwrightJUnitTestClass.getTags();
-	}
-
 	protected TestrayAttachment getPlaywrightReportTestrayAttachment() {
 		return getTestrayAttachment(
 			getBuildReport(), "Playwright Report",
 			"/playwright-report/index.html");
+	}
+
+	protected void getPlaywrightTags() {
+		System.out.println(
+			"playwright tags: " + _playwrightTestClassMethod.getTags());
 	}
 
 	protected TestrayAttachment getPlaywrightTraceViewerTestrayAttachment() {

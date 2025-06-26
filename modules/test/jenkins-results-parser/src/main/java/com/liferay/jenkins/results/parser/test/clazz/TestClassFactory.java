@@ -81,6 +81,17 @@ public class TestClassFactory {
 	}
 
 	public static TestClassMethod newTestClassMethod(
+		boolean ignored, String name, String tags, TestClass testClass) {
+
+		if (testClass instanceof PlaywrightJUnitTestClass) {
+			return new PlaywrightTestClassMethod(
+				ignored, name, tags, testClass);
+		}
+
+		return new TestClassMethod(ignored, name, testClass);
+	}
+
+	public static TestClassMethod newTestClassMethod(
 		boolean ignored, String name, TestClass testClass) {
 
 		if (testClass instanceof PlaywrightJUnitTestClass) {

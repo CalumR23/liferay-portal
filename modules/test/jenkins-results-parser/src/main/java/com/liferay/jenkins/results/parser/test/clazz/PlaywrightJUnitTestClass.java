@@ -74,8 +74,6 @@ public class PlaywrightJUnitTestClass extends JUnitTestClass {
 		return _slaveLabel;
 	}
 
-	public void getTags(){ System.out.println("jsonObj:" + getJSONObject()); }
-
 	public String getSpecFilePath() {
 		Matcher matcher = _testFilePathPattern.matcher(
 			JenkinsResultsParserUtil.getCanonicalPath(getTestClassFile()));
