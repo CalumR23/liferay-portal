@@ -15,26 +15,11 @@ import org.json.JSONObject;
 public class PlaywrightTestClassMethod extends TestClassMethod {
 
 	@Override
-	public JSONObject getJSONObject() {
-		JSONObject jsonObject = super.getJSONObject();
-
-		jsonObject.put("tags", _tags);
-
-		return jsonObject;
-	}
-
-	@Override
 	public String getName() {
 		TestClass testClass = getTestClass();
 
 		return JenkinsResultsParserUtil.combine(
 			testClass.getName(), " > ", super.getName());
-	}
-
-	public String getTags() {
-		System.out.println("return tag: " + _tags);
-
-		return _tags;
 	}
 
 	public String getTestName() {
@@ -44,11 +29,7 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 	protected PlaywrightTestClassMethod(
 		boolean ignored, String name, String tags, TestClass testClass) {
 
-		super(ignored, name, testClass);
-
-		System.out.println("method tag: " + tags);
-
-		_tags = tags;
+		super(ignored, name, tags, testClass);
 	}
 
 	protected PlaywrightTestClassMethod(
@@ -61,10 +42,7 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 		JSONObject jsonObject, TestClass testClass) {
 
 		super(jsonObject, testClass);
-
-		_tags = jsonObject.optString("tags");
 	}
 
-	private String _tags;
 
 }

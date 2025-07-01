@@ -222,7 +222,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 	@Override
 	public String getIssues() {
-		return _playwrightTestClassMethod.getTags();
+		return _playwrightTestClassMethod.getAnnotations();
 	}
 
 	protected TestrayAttachment getPlaywrightTraceViewerTestrayAttachment() {
