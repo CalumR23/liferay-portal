@@ -39,6 +39,10 @@ public class TestrayCaseResult {
 		"dueStatus { key name }", "errors", "id", "startDate"
 	};
 
+	public String getIssues(){
+		return null;
+	}
+
 	public TestrayAttachment getBuildResultTestrayAttachment() {
 		initTestrayAttachments();
 

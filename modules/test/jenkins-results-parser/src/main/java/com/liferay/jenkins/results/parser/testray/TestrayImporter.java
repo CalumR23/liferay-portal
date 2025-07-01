@@ -955,6 +955,135 @@ public class TestrayImporter {
 						}
 
 					});
+				for (TestrayCaseResult testrayCaseResult : testrayCaseResults) {
+					Element testcaseElement = rootElement.addElement(
+						"testcase");
+
+					Map<String, String> testcasePropertiesMap = new HashMap<>();
+
+					testcasePropertiesMap.put(
+						"testray.case.type.name", testrayCaseResult.getType());
+					testcasePropertiesMap.put(
+						"testray.component.names",
+						testrayCaseResult.getSubcomponentNames());
+					testcasePropertiesMap.put(
+						"testray.main.component.name",
+						testrayCaseResult.getComponentName());
+					testcasePropertiesMap.put(
+						"testray.team.name", testrayCaseResult.getTeamName());
+					testcasePropertiesMap.put(
+						"testray.testcase.duration",
+						String.valueOf(testrayCaseResult.getDuration()));
+
+					String testrayCaseName = testrayCaseResult.getName();
+
+					if (testrayCaseName.length() > 150) {
+						testrayCaseName = testrayCaseName.substring(0, 150);
+					}
+
+					if(testrayCaseResult.getIssues() != null){
+						System.out.println("testray issues: " + testrayCaseResult.getIssues());
+						testcasePropertiesMap.put("testray.jira.issues", testrayCaseResult.getIssues());
+					}
+
+					testcasePropertiesMap.put(
+						"testray.testcase.name", testrayCaseName);
+
+					testcasePropertiesMap.put(
+						"testray.testcase.priority",
+						String.valueOf(testrayCaseResult.getPriority()));
+
+					TestrayCaseResult.Status testrayCaseStatus =
+						testrayCaseResult.getStatus();
+
+					testcasePropertiesMap.put(
+						"testray.testcase.status", testrayCaseStatus.getName());
+
+					Element propertiesElement = testcaseElement.addElement(
+						"properties");
+
+					_addPropertyElements(
+						propertiesElement, testcasePropertiesMap);
+
+					String[] warnings = testrayCaseResult.getWarnings();
+
+					if ((warnings != null) && (warnings.length > 0)) {
+						Element warningsPropertyElement =
+							propertiesElement.addElement("property");
+
+						warningsPropertyElement.addAttribute(
+							"name", "testray.testcase.warnings");
+						warningsPropertyElement.addAttribute(
+							"value", String.valueOf(warnings.length));
+
+						for (String warning : warnings) {
+							Element warningPropertyElement =
+								warningsPropertyElement.addElement("value");
+
+							warningPropertyElement.addText(
+								StringEscapeUtils.escapeHtml(warning));
+						}
+					}
+
+					Element attachmentsElement = testcaseElement.addElement(
+						"attachments");
+
+					for (TestrayAttachment testrayAttachment :
+							testrayCaseResult.getTestrayAttachments()) {
+
+						Element attachmentFileElement =
+							attachmentsElement.addElement("file");
+
+						attachmentFileElement.addAttribute(
+							"name", testrayAttachment.getName());
+						attachmentFileElement.addAttribute(
+							"url", testrayAttachment.getURL() + "?authuser=0");
+						attachmentFileElement.addAttribute(
+							"value",
+							testrayAttachment.getKey() + "?authuser=0");
+					}
+
+					String errors = testrayCaseResult.getErrors();
+
+					if (!JenkinsResultsParserUtil.isNullOrEmpty(errors)) {
+						Element failureElement = testcaseElement.addElement(
+							"failure");
+
+						failureElement.addAttribute("message", errors);
+					}
+				}
+
+				TestrayServer testrayServer = testrayBuild.getTestrayServer();
+
+				JenkinsMaster jenkinsMaster =
+					_topLevelBuildReport.getJenkinsMaster();
+
+				try {
+					String axisName = axisTestClassGroup.getAxisName();
+
+					testrayServer.writeCaseResult(
+						JenkinsResultsParserUtil.combine(
+							"TESTS-", jenkinsMaster.getName(), "_",
+							_topLevelBuildReport.getJobName(), "_",
+							String.valueOf(
+								_topLevelBuildReport.getBuildNumber()),
+							"_", axisName.replace("/", "_"), ".xml"),
+						Dom4JUtil.format(rootElement));
+				}
+				catch (IOException ioException) {
+					throw new RuntimeException(ioException);
+				}
+
+				long currentTimeMillis =
+					JenkinsResultsParserUtil.getCurrentTimeMillis();
+
+				System.out.println(
+					JenkinsResultsParserUtil.combine(
+						"Recorded ", String.valueOf(testrayCaseResults.size()),
+						" case results for ", axisTestClassGroup.getAxisName(),
+						" in ",
+						JenkinsResultsParserUtil.toDurationString(
+							currentTimeMillis - start)));
 			}
 		}
 

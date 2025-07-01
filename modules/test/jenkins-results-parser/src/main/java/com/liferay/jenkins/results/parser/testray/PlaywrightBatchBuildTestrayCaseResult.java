@@ -158,8 +158,6 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		List<TestrayAttachment> testrayAttachments =
 			super.getTestrayAttachments();
 
-		getPlaywrightTags();
-
 		testrayAttachments.add(getPlaywrightReportTestrayAttachment());
 
 		TestrayAttachment playwrightTraceViewerTestrayAttachment =
@@ -222,9 +220,9 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			"/playwright-report/index.html");
 	}
 
-	protected void getPlaywrightTags() {
-		System.out.println(
-			"playwright tags: " + _playwrightTestClassMethod.getTags());
+	@Override
+	public String getIssues() {
+		return _playwrightTestClassMethod.getTags();
 	}
 
 	protected TestrayAttachment getPlaywrightTraceViewerTestrayAttachment() {

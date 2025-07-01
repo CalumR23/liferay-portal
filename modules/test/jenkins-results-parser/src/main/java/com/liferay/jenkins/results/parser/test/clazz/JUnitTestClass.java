@@ -382,10 +382,26 @@ public class JUnitTestClass extends BaseTestClass {
 			if (annotations.contains("@Test")) {
 				String methodName = methodHeaderMatcher.group("methodName");
 
-				addTestClassMethod(methodIgnored, methodName);
+				if (annotations.contains("@TestInfo")) {
+					List<String> issuesList = new ArrayList<>();
 
-				if(annotations.contains("@TestInfo")){
-					System.out.println("annotations: " + annotations);
+					String testInfo = annotations.substring(
+						annotations.indexOf("@TestInfo"));
+
+					Matcher matcher = _issuesPattern.matcher(testInfo);
+
+					while (matcher.find()) {
+						issuesList.add(matcher.group());
+					}
+
+					System.out.println("is method");
+
+					addTestClassMethod(
+						methodIgnored, methodName,
+						String.join(", ", issuesList));
+				}
+				else {
+					addTestClassMethod(methodIgnored, methodName);
 				}
 			}
 		}
@@ -428,6 +444,8 @@ public class JUnitTestClass extends BaseTestClass {
 		JenkinsResultsParserUtil.combine(
 			"\\*/(?<annotations>[^/]*)public\\s+class\\s+",
 			"(?<className>[^\\(\\s]+)"));
+	private static final Pattern _issuesPattern = Pattern.compile(
+		"[A-Z]+-\\d+");
 	private static final Pattern _methodHeaderPattern = Pattern.compile(
 		JenkinsResultsParserUtil.combine(
 			"\\t(?<annotations>(@[\\s\\S]+?))public\\s+void\\s+",

@@ -15,6 +15,15 @@ import org.json.JSONObject;
 public class PlaywrightTestClassMethod extends TestClassMethod {
 
 	@Override
+	public JSONObject getJSONObject() {
+		JSONObject jsonObject = super.getJSONObject();
+
+		jsonObject.put("tags", _tags);
+
+		return jsonObject;
+	}
+
+	@Override
 	public String getName() {
 		TestClass testClass = getTestClass();
 
@@ -24,6 +33,7 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 
 	public String getTags() {
 		System.out.println("return tag: " + _tags);
+
 		return _tags;
 	}
 
@@ -51,6 +61,8 @@ public class PlaywrightTestClassMethod extends TestClassMethod {
 		JSONObject jsonObject, TestClass testClass) {
 
 		super(jsonObject, testClass);
+
+		_tags = jsonObject.optString("tags");
 	}
 
 	private String _tags;
