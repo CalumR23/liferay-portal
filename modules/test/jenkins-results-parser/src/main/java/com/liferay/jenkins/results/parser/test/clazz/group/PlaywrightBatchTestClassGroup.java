@@ -561,8 +561,6 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 						}
 					}
 
-					System.out.println("tags into obj: " + sb);
-
 					specJSONObject.put("tags", sb.toString());
 				}
 
