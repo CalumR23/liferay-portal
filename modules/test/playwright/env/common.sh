@@ -538,7 +538,11 @@ function start_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
-		ant -f build-test-jboss.xml run-jboss-playwright
+		ant -f build-test-jboss.xml setup-jboss-playwright
+
+		cd ${app_server_dir}/bin
+
+		/bin/bash standalone.sh &
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
 	then
 		cd ${app_server_dir}/bin
