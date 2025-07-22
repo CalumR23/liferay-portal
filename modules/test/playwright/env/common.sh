@@ -540,6 +540,10 @@ function start_app_server {
 	then
 		ant -f build-test-jboss.xml setup-jboss-playwright
 
+		cd ${app_server_dir}/standalone/deployments
+
+		touch ROOT.war.dodeploy
+
 		cd ${app_server_dir}/bin
 
 		/bin/bash standalone.sh &
