@@ -229,6 +229,8 @@ public class JUnitBatchBuildTestrayCaseResult
 				_jUnitTestClass.getTestClassMethods()) {
 
 			testClassMethodNames.add(testClassMethod.getName());
+			System.out.println("method name: " +  testClassMethod.getName());
+			getMethodStatus(testClassMethod.getName());
 		}
 
 		return testClassMethodNames;
@@ -241,6 +243,7 @@ public class JUnitBatchBuildTestrayCaseResult
 			String testReportName = testReport.getTestName();
 
 			if (testReportName.equals(testName)) {
+				System.out.println("test status: " + testReport.getStatus());
 				return testReport.getStatus();
 			}
 		}
