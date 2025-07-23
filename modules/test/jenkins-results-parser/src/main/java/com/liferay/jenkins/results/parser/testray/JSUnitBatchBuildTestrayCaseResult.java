@@ -170,6 +170,8 @@ public class JSUnitBatchBuildTestrayCaseResult
 
 		TestClassReport testClassResult = _getTestClassReport();
 
+		System.out.println("result name: " + getName());
+
 		if (testClassResult == null) {
 			String result = buildReport.getResult();
 
@@ -182,6 +184,8 @@ public class JSUnitBatchBuildTestrayCaseResult
 
 			return Status.FAILED;
 		}
+
+		System.out.println("result status: " + testClassResult.getStatus());
 
 		if (_isTestClassResultsFailing()) {
 			return Status.FAILED;
