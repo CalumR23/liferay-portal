@@ -653,7 +653,24 @@ function stop_app_server {
 
 	cd $(get_app_server_dir ${liferay_home})/bin
 
-	/bin/bash shutdown.sh &
+	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
+	then
+		cd ${app_server_dir}/bin
+
+		/bin/bash jboss-cli.sh --connect:shutdown &
+	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
+	then
+		cd ${app_server_dir}/bin
+
+		/bin/bash shutdown.sh &
+	elif [[ "${APP_SERVER_TYPE}" == "weblogic" ]]
+	then
+		echo "weblogic"
+
+		cd ${app_server_dir}/domains/liferay
+
+		/bin/bash startWeblogic.sh
+	fi
 
 	local portal_url=${2}
 
