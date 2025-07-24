@@ -362,6 +362,7 @@ public class JUnitBatchBuildTestrayCaseResult
 		}
 
 		if (JenkinsResultsParserUtil.isBuildCachingEnabled()) {
+			System.out.println("caching is enabled");
 			List<TestClassReport> cachedTestClassReports =
 				_jUnitTestClass.getCachedTestClassReports();
 
@@ -387,6 +388,13 @@ public class JUnitBatchBuildTestrayCaseResult
 				downstreamBuildReport.getTestClassReports()) {
 
 			String testClassName = testClassReport.getTestClassName();
+
+			System.out.println("testClassName: " + testClassName);
+			System.out.println("getName: " + getName());
+
+			if(testClassName.contains("PoshiRunner")){
+				System.out.println("class report size: + " + testClassReport.getTestReports().size());
+			}
 
 			if (testClassName.equals(getName()) ||
 				testClassName.startsWith(getName() + "$")) {
@@ -417,11 +425,6 @@ public class JUnitBatchBuildTestrayCaseResult
 
 		for (TestClassReport testClassReport : getTestClassReports()) {
 			String testClassName = testClassReport.getTestClassName();
-
-			if(testClassName.contains("PoshiRunner")){
-				System.out.println("testClassName: " + testClassName);
-				System.out.println("class report size: + " + testClassReport.getTestReports().size());
-			}
 
 			if (!testClassName.equals("junit.framework.TestSuite")) {
 				testReports.addAll(testClassReport.getTestReports());
