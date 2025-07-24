@@ -1442,6 +1442,8 @@ public class TestrayImporter {
 				testrayCaseName = testrayCaseName.substring(0, 150);
 			}
 
+			System.out.println("class name: " + testrayCaseResult.getClass().getSimpleName());
+
 			testcasePropertiesMap.put("testray.testcase.name", testrayCaseName);
 
 			testcasePropertiesMap.put(
