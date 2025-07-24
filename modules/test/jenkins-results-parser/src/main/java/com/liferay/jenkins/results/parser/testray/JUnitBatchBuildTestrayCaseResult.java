@@ -247,7 +247,7 @@ public class JUnitBatchBuildTestrayCaseResult
 			}
 
 			System.out.println("passed in test name: " + testName);
-			System.out.println("test report name: " + testReportName);
+
 			System.out.println("json obj status: "+ testReport.getStatus());
 		}
 
@@ -306,8 +306,6 @@ public class JUnitBatchBuildTestrayCaseResult
 	public List<TestrayAttachment> getTestrayAttachments() {
 		List<TestrayAttachment> testrayAttachments =
 			super.getTestrayAttachments();
-
-		getMethodNames();
 
 		testrayAttachments.add(getFailureMessagesTestrayAttachment());
 		testrayAttachments.addAll(getLiferayLogTestrayAttachments());
@@ -419,6 +417,11 @@ public class JUnitBatchBuildTestrayCaseResult
 
 		for (TestClassReport testClassReport : getTestClassReports()) {
 			String testClassName = testClassReport.getTestClassName();
+
+			if(testClassName.contains("PoshiRunner")){
+				System.out.println("testClassName: " + testClassName);
+				System.out.println("class report size: + " + testClassReport.getTestReports().size());
+			}
 
 			if (!testClassName.equals("junit.framework.TestSuite")) {
 				testReports.addAll(testClassReport.getTestReports());
