@@ -304,6 +304,8 @@ public class JUnitBatchBuildTestrayCaseResult
 		List<TestrayAttachment> testrayAttachments =
 			super.getTestrayAttachments();
 
+		getMethodNames();
+
 		testrayAttachments.add(getFailureMessagesTestrayAttachment());
 		testrayAttachments.addAll(getLiferayLogTestrayAttachments());
 		testrayAttachments.addAll(getLiferayOSGiLogTestrayAttachments());
