@@ -243,9 +243,12 @@ public class JUnitBatchBuildTestrayCaseResult
 			String testReportName = testReport.getTestName();
 
 			if (testReportName.equals(testName)) {
-				System.out.println("test status: " + testReport.getStatus());
 				return testReport.getStatus();
 			}
+
+			System.out.println("passed in test name: " + testName);
+			System.out.println("test report name: " + testReportName);
+			System.out.println("json obj status: "+ testReport.getStatus());
 		}
 
 		return null;
