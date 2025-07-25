@@ -1459,7 +1459,7 @@ public class TestrayImporter {
 
 			String jobName = _topLevelBuildReport.getJobName();
 
-			if (jobName.contains("upstream-dxp")) {
+			if (jobName.contains("acceptance-pullrequest")) {
 				if (testrayCaseResult instanceof
 						JUnitBatchBuildTestrayCaseResult) {
 
