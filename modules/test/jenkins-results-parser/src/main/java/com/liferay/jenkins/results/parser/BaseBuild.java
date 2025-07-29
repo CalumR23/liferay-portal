@@ -758,6 +758,27 @@ public abstract class BaseBuild implements Build {
 		return injectedEnvironmentVariablesMap;
 	}
 
+	public Map<ReinvokeRule, Integer> getInvocationCountMap() {
+		Map<ReinvokeRule, Integer> invocationCounts = new HashMap<>();
+
+		for (Invocation invocation : _invocations) {
+			ReinvokeRule reinvokeRule = invocation.getReinvokeRule();
+
+			if (reinvokeRule == null) {
+				continue;
+			}
+
+			Integer invocationCount = invocationCounts.getOrDefault(
+				reinvokeRule, 0);
+
+			invocationCount++;
+
+			invocationCounts.put(reinvokeRule, invocationCount);
+		}
+
+		return invocationCounts;
+	}
+
 	@Override
 	public String getInvocationURL() {
 		String jobURL = getJobURL();
@@ -1412,6 +1433,18 @@ public abstract class BaseBuild implements Build {
 		return (TopLevelBuild)topLevelBuild;
 	}
 
+	public int getTotalInvocationCount() {
+		Map<ReinvokeRule, Integer> invocationCounts = getInvocationCountMap();
+
+		int invocationsSum = 0;
+
+		for (Integer invocationCount : invocationCounts.values()) {
+			invocationsSum += invocationCount;
+		}
+
+		return Math.subtractExact(invocationsSum, invocationCounts.size());
+	}
+
 	@Override
 	public List<TestResult> getUniqueFailureTestResults() {
 		return Collections.emptyList();
@@ -1492,22 +1525,7 @@ public abstract class BaseBuild implements Build {
 
 	@Override
 	public boolean hasMaximumInvocationCount() {
-		Map<ReinvokeRule, Integer> invocationCounts = new HashMap<>();
-
-		for (Invocation invocation : _invocations) {
-			ReinvokeRule reinvokeRule = invocation.getReinvokeRule();
-
-			if (reinvokeRule == null) {
-				continue;
-			}
-
-			Integer invocationCount = invocationCounts.getOrDefault(
-				reinvokeRule, 0);
-
-			invocationCount++;
-
-			invocationCounts.put(reinvokeRule, invocationCount);
-		}
+		Map<ReinvokeRule, Integer> invocationCounts = getInvocationCountMap();
 
 		for (Map.Entry<ReinvokeRule, Integer> entry :
 				invocationCounts.entrySet()) {
