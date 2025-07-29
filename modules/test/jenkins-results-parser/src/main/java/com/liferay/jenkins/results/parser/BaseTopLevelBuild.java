@@ -1534,6 +1534,9 @@ public abstract class BaseTopLevelBuild
 				JenkinsResultsParserUtil.toDurationString(
 					getQueuingDuration())),
 			Dom4JUtil.getNewElement(
+				"p", null, "Total number of reinvocations: ",
+				String.valueOf(getTotalInvocationCount())),
+			Dom4JUtil.getNewElement(
 				"p", null, "Build Time: ",
 				JenkinsResultsParserUtil.toDurationString(getDuration())),
 			Dom4JUtil.getNewElement(
