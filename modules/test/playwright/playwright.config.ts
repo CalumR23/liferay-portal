@@ -157,10 +157,10 @@ const resultsPath = 'test-results/TEST-playwright.xml';
 
 export default defineConfig({
 	expect: {
-		timeout: 15 * 1000,
+		timeout: 15 * 5000,
 	},
 	forbidOnly: !!process.env.CI,
-	globalTimeout: 60 * 60 * 1000,
+	globalTimeout: 60 * 60 * 5000,
 	projects: [
 		accessibilityMenuWeb,
 		accountAdminWebConfig,

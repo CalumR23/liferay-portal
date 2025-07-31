@@ -536,7 +536,7 @@ function start_app_server {
 
 	local app_server_dir=$(get_app_server_dir ${liferay_home})
 
-	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
+	if [[ "${APP_SERVER_TYPE}" == "jboss" ]]
 	then
 		ant -f build-test-jboss.xml setup-jboss-playwright
 
@@ -559,6 +559,17 @@ function start_app_server {
 		cd ${app_server_dir}/domains/liferay
 
 		/bin/bash startWeblogic.sh
+	elif [[ "${APP_SERVER_TYPE}" == "wildfly" ]]
+	then
+		ant -f build-test-wildfly.xml setup-wildfly-playwright
+
+		cd ${app_server_dir}/standalone/deployments
+
+		touch ROOT.war.dodeploy
+
+		cd ${app_server_dir}/bin
+
+		/bin/bash standalone.sh &
 	fi
 
 	local liferay_portal_url=${2}
