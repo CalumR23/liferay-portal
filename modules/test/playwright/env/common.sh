@@ -666,9 +666,7 @@ function stop_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
-		cd ${app_server_dir}/bin
-
-		/bin/bash jboss-cli.sh --connect:shutdown &
+		ant -f build-test-wildfly.xml stop-wildfly-playwright
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
 	then
 		cd ${app_server_dir}/bin
