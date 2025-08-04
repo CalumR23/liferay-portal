@@ -666,6 +666,8 @@ function stop_app_server {
 
 	if [[ "${APP_SERVER_TYPE}" == "jboss" || "${APP_SERVER_TYPE}" == "wildfly" ]]
 	then
+		cd ${_PORTAL_PROJECT_DIR}
+		
 		ant -f build-test-wildfly.xml stop-wildfly-playwright
 	elif [[ "${APP_SERVER_TYPE}" == "tomcat" ]]
 	then
