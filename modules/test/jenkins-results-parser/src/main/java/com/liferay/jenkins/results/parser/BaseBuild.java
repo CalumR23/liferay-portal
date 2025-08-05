@@ -173,7 +173,7 @@ public abstract class BaseBuild implements Build {
 		List<String> badBuildURLs = new ArrayList<>();
 
 		for (Invocation invocation :
-				_invocations.subList(0, _invocations.size() - 2)) {
+				_invocations.subList(0, _invocations.size() - 1)) {
 
 			badBuildURLs.add(invocation.getBuildURL());
 		}
