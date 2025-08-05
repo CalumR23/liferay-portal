@@ -95,6 +95,8 @@ public interface Build {
 	public Map<String, String> getInjectedEnvironmentVariablesMap()
 		throws IOException;
 
+	public Map<ReinvokeRule, Integer> getInvocationCountMap();
+
 	public String getInvocationURL();
 
 	public int getInvokedBatchSize();
