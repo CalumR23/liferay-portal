@@ -629,6 +629,28 @@ public abstract class BaseTopLevelBuild
 		return _topLevelBuildReport;
 	}
 
+	@Override
+	public int getTotalInvocationCount() {
+		List<Build> downstreamBuilds = getDownstreamBuilds();
+
+		int totalInvocations = 0;
+
+		int invocationCountSize = 0;
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			Map<ReinvokeRule, Integer> invocationCountMap =
+				downstreamBuild.getInvocationCountMap();
+
+			invocationCountSize += invocationCountMap.size();
+
+			for (Integer invocationCount : invocationCountMap.values()) {
+				totalInvocations += invocationCount;
+			}
+		}
+
+		return Math.subtractExact(totalInvocations, invocationCountSize);
+	}
+
 	public URL getUserContentURL() {
 		JenkinsMaster jenkinsMaster = getJenkinsMaster();
 
