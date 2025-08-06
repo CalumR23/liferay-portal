@@ -1534,6 +1534,9 @@ public abstract class BaseTopLevelBuild
 				JenkinsResultsParserUtil.toDurationString(
 					getQueuingDuration())),
 			Dom4JUtil.getNewElement(
+				"p", null, "Total number of reinvocations: ",
+				String.valueOf(_getTotalReinvocationCount())),
+			Dom4JUtil.getNewElement(
 				"p", null, "Build Time: ",
 				JenkinsResultsParserUtil.toDurationString(getDuration())),
 			Dom4JUtil.getNewElement(
@@ -2440,6 +2443,20 @@ public abstract class BaseTopLevelBuild
 			String.valueOf(getDownstreamBuildCount("completed")),
 			" Completed / ", String.valueOf(getDownstreamBuildCount(null)),
 			" Total ");
+	}
+
+	private Integer _getTotalReinvocationCount() {
+		List<Build> downstreamBuilds = getDownstreamBuilds();
+
+		int totalReinvocations = 0;
+
+		for (Build downstreamBuild : downstreamBuilds) {
+			List<String> badBuildURLs = downstreamBuild.getBadBuildURLs();
+
+			totalReinvocations += badBuildURLs.size();
+		}
+
+		return totalReinvocations;
 	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
