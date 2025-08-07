@@ -2456,7 +2456,11 @@ public abstract class BaseTopLevelBuild
 			totalReinvocations += badBuildURLs.size();
 		}
 
-		return totalReinvocations;
+		if (_totalReinvocations < totalReinvocations) {
+			_totalReinvocations = totalReinvocations;
+		}
+
+		return _totalReinvocations;
 	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
@@ -2520,5 +2524,6 @@ public abstract class BaseTopLevelBuild
 	private final boolean _sendBuildMetrics;
 	private final List<URL> _testrayAttachmentURLs = new ArrayList<>();
 	private TopLevelBuildReport _topLevelBuildReport;
+	private int _totalReinvocations;
 
 }
