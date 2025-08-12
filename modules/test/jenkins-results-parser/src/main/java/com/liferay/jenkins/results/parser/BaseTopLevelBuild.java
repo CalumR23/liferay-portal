@@ -2446,26 +2446,30 @@ public abstract class BaseTopLevelBuild
 	}
 
 	private Integer _getTotalReinvocationCount() {
-		BuildDatabase buildDatabase = getBuildDatabase();
-
 		List<Build> downstreamBuilds = getDownstreamBuilds();
 
-		for (Build downstreamBuild : downstreamBuilds){
+		for (Build downstreamBuild : downstreamBuilds) {
 			downstreamBuild.getBadBuildURLs();
 		}
 
-		System.out.println("getting bad URL properties");
+		BuildDatabase buildDatabase = getBuildDatabase();
 
 		Properties properties = buildDatabase.getProperties(
-				BAD_BUILD_URLS_PROPERTIES_KEY);
+			BAD_BUILD_URLS_PROPERTIES_KEY);
 
 		System.out.println("got bad URL properties");
 
-		Set<String> properitesStringNames = properties.stringPropertyNames();
+		int invocationCount = 0;
 
-		System.out.println("size: " + properitesStringNames.size());
+		for (String propertyName : properties.stringPropertyNames()) {
+			String badBuildURLList = properties.getProperty(propertyName);
 
-		return properitesStringNames.size();
+			String[] splitString = badBuildURLList.split(",");
+
+			invocationCount += splitString.length;
+		}
+
+		return invocationCount;
 	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
@@ -2529,6 +2533,5 @@ public abstract class BaseTopLevelBuild
 	private final boolean _sendBuildMetrics;
 	private final List<URL> _testrayAttachmentURLs = new ArrayList<>();
 	private TopLevelBuildReport _topLevelBuildReport;
-	private int _totalReinvocations;
 
 }
