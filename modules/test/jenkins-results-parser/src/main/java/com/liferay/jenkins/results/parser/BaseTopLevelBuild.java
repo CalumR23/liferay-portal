@@ -2464,9 +2464,11 @@ public abstract class BaseTopLevelBuild
 		for (String propertyName : properties.stringPropertyNames()) {
 			String badBuildURLList = properties.getProperty(propertyName);
 
-			String[] splitString = badBuildURLList.split(",");
+			if (!badBuildURLList.isEmpty()) {
+				String[] splitString = badBuildURLList.split(",");
 
-			invocationCount += splitString.length;
+				invocationCount += splitString.length;
+			}
 		}
 
 		return invocationCount;
