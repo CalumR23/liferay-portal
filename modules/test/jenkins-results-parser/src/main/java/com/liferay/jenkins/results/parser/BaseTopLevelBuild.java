@@ -2448,10 +2448,16 @@ public abstract class BaseTopLevelBuild
 	private Integer _getTotalReinvocationCount() {
 		BuildDatabase buildDatabase = getBuildDatabase();
 
+		System.out.println("getting bad URL properties");
+
 		Properties properties = buildDatabase.getProperties(
 				BAD_BUILD_URLS_PROPERTIES_KEY);
 
+		System.out.println("got bad URL properties");
+
 		Set<String> properitesStringNames = properties.stringPropertyNames();
+
+		System.out.println("size: " + properitesStringNames.size());
 
 		return properitesStringNames.size();
 	}

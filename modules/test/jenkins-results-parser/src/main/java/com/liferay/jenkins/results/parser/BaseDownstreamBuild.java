@@ -653,12 +653,17 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 	public void saveBadBuildURLs(List<String> badBuildURLs) {
 		BuildDatabase buildDatabase = getBuildDatabase();
 
+		System.out.println("saving bad URLs");
+
 		if (buildDatabase.hasProperties(BAD_BUILD_URLS_PROPERTIES_KEY)) {
+			System.out.println("has bad build URL properties");
 			Properties properties = buildDatabase.getProperties(
 				BAD_BUILD_URLS_PROPERTIES_KEY);
 
 			for (String propertyName : properties.stringPropertyNames()) {
 				String buildURL = properties.getProperty(propertyName);
+
+				System.out.println("build URL: " + buildURL);
 
 				if (badBuildURLs.contains(buildURL)) {
 					continue;
@@ -667,13 +672,17 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 				buildDatabase.putProperty(
 					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(), getBuildURL(),
 					false);
+
+				System.out.println("put into buildDB");
 			}
 		}
 		else {
 			for (String badBuildURL : badBuildURLs) {
+				System.out.println("else BUILD url: " + badBuildURL);
 				buildDatabase.putProperty(
 					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(), badBuildURL,
 					false);
+				System.out.println("bad build URL");
 			}
 		}
 	}
