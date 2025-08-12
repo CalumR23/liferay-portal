@@ -2448,6 +2448,12 @@ public abstract class BaseTopLevelBuild
 	private Integer _getTotalReinvocationCount() {
 		BuildDatabase buildDatabase = getBuildDatabase();
 
+		List<Build> downstreamBuilds = getDownstreamBuilds();
+
+		for (Build downstreamBuild : downstreamBuilds){
+			downstreamBuild.getBadBuildURLs();
+		}
+
 		System.out.println("getting bad URL properties");
 
 		Properties properties = buildDatabase.getProperties(
