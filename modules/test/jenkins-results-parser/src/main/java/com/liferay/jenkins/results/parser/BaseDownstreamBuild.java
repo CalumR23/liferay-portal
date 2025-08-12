@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -188,6 +189,13 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 	@Override
 	public String getAxisVariable() {
 		return getParameterValue("AXIS_VARIABLE");
+	}
+
+	@Override
+	public List<String> getBadBuildURLs() {
+		saveBadBuildURLs(super.getBadBuildURLs());
+
+		return super.getBadBuildURLs();
 	}
 
 	@Override
@@ -640,6 +648,34 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		}
 
 		return warningMessages;
+	}
+
+	public void saveBadBuildURLs(List<String> badBuildURLs) {
+		BuildDatabase buildDatabase = getBuildDatabase();
+
+		if (buildDatabase.hasProperties(BAD_BUILD_URLS_PROPERTIES_KEY)) {
+			Properties properties = buildDatabase.getProperties(
+				BAD_BUILD_URLS_PROPERTIES_KEY);
+
+			for (String propertyName : properties.stringPropertyNames()) {
+				String buildURL = properties.getProperty(propertyName);
+
+				if (badBuildURLs.contains(buildURL)) {
+					continue;
+				}
+
+				buildDatabase.putProperty(
+					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(), getBuildURL(),
+					false);
+			}
+		}
+		else {
+			for (String badBuildURL : badBuildURLs) {
+				buildDatabase.putProperty(
+					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(), badBuildURL,
+					false);
+			}
+		}
 	}
 
 	@Override
