@@ -2446,21 +2446,14 @@ public abstract class BaseTopLevelBuild
 	}
 
 	private Integer _getTotalReinvocationCount() {
-		List<Build> downstreamBuilds = getDownstreamBuilds();
+		BuildDatabase buildDatabase = getBuildDatabase();
 
-		int totalReinvocations = 0;
+		Properties properties = buildDatabase.getProperties(
+				BAD_BUILD_URLS_PROPERTIES_KEY);
 
-		for (Build downstreamBuild : downstreamBuilds) {
-			List<String> badBuildURLs = downstreamBuild.getBadBuildURLs();
+		Set<String> properitesStringNames = properties.stringPropertyNames();
 
-			totalReinvocations += badBuildURLs.size();
-		}
-
-		if (_totalReinvocations < totalReinvocations) {
-			_totalReinvocations = totalReinvocations;
-		}
-
-		return _totalReinvocations;
+		return properitesStringNames.size();
 	}
 
 	private static final FailureMessageGenerator[] _FAILURE_MESSAGE_GENERATORS =
