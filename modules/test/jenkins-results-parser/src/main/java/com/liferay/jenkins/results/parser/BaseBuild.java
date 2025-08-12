@@ -3059,6 +3059,9 @@ public abstract class BaseBuild implements Build {
 			JenkinsResultsParserUtil.redact(replaceBuildURL(content)));
 	}
 
+	protected static final String BAD_BUILD_URLS_PROPERTIES_KEY =
+		"bad-build-urls.properties";
+
 	protected static final String BUILD_URLS_PROPERTIES_KEY =
 		"build-urls.properties";
 
