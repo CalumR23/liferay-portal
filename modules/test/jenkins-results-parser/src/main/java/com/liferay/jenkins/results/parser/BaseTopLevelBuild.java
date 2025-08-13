@@ -2464,6 +2464,10 @@ public abstract class BaseTopLevelBuild
 		for (String propertyName : properties.stringPropertyNames()) {
 			String badBuildURLList = properties.getProperty(propertyName);
 
+			System.out.println("axis name: " + propertyName);
+
+			System.out.println("buildURLLoop: " + badBuildURLList);
+
 			if (!badBuildURLList.isEmpty()) {
 				String[] splitString = badBuildURLList.split(",");
 
