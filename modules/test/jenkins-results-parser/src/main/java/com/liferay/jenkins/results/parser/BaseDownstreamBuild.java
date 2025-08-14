@@ -37,13 +37,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -654,9 +648,22 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 	public void saveBadBuildURLs(List<String> badBuildURLs) {
 		BuildDatabase buildDatabase = getBuildDatabase();
 
-		buildDatabase.putProperty(
-			BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
-			JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+		if (buildDatabase.hasProperties(BAD_BUILD_URLS_PROPERTIES_KEY)) {
+			Properties properties = buildDatabase.getProperties(BAD_BUILD_URLS_PROPERTIES_KEY);
+			String badURLs = properties.getProperty(getAxisName());
+			String[] badURLArray = badURLs.split(",");
+			if (badBuildURLs.size() > badURLArray.length){
+				buildDatabase.putProperty(
+						BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+						JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+			}
+		}
+		else {
+
+			buildDatabase.putProperty(
+					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+					JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+		}
 	}
 
 	@Override
