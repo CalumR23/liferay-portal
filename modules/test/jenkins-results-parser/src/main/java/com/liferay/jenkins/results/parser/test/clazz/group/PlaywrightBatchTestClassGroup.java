@@ -111,8 +111,6 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 			new CSVReport.Row(
 				"File Name", "Test Name", "Ignored", "File Path"));
 
-		System.out.println("writing report");
-
 		for (PlaywrightJUnitTestClass playwrightJUnitTestClass :
 				TestClassFactory.getPlaywrightTestClasses()) {
 
@@ -151,7 +149,8 @@ public class PlaywrightBatchTestClassGroup extends BatchTestClassGroup {
 
 		File csvReportFile = new File(
 			JenkinsResultsParserUtil.combine(
-				"Report_junit_", simpleDateFormat.format(new Date()), ".csv"));
+				"Report_playwright_", simpleDateFormat.format(new Date()),
+				".csv"));
 
 		try {
 			JenkinsResultsParserUtil.write(csvReportFile, csvReport.toString());
