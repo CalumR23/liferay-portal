@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -653,33 +652,48 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 	}
 
 	public void saveBadBuildURLs(List<String> badBuildURLs) {
+		if (badBuildURLs.isEmpty()) {
+			return;
+		}
+
 		BuildDatabase buildDatabase = getBuildDatabase();
 
-		if (buildDatabase.hasProperties(BAD_BUILD_URLS_PROPERTIES_KEY)) {
-			Properties properties = buildDatabase.getProperties(
-				BAD_BUILD_URLS_PROPERTIES_KEY);
+		buildDatabase.putProperty(
+			BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+			JenkinsResultsParserUtil.join(",", badBuildURLs), false);
 
-			String badURLs = properties.getProperty(getAxisName());
+		//		if (!buildDatabase.hasProperties(BAD_BUILD_URLS_PROPERTIES_KEY)) {
+		//			buildDatabase.putProperty(
+		//				BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+		//				JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+		//
+		//			return;
+		//		}
+		//
+		//		Properties properties = buildDatabase.getProperties(
+		//				BAD_BUILD_URLS_PROPERTIES_KEY);
 
-			System.out.println("badURLS: " + badURLs);
+		//
+		//		String badURLs = properties.getProperty(getAxisName());
 
-			if (JenkinsResultsParserUtil.isNullOrEmpty(badURLs)){
-				return;
-			}
-
-			String[] badURLArray = badURLs.split(",");
-
-			if (badBuildURLs.size() > badURLArray.length) {
-				buildDatabase.putProperty(
-					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
-					JenkinsResultsParserUtil.join(",", badBuildURLs), false);
-			}
-		}
-		else {
-			buildDatabase.putProperty(
-				BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
-				JenkinsResultsParserUtil.join(",", badBuildURLs), false);
-		}
+		//
+		//		System.out.println("badURLS: " + badURLs);
+		//
+		//		if (badURLs == null) {
+		//			buildDatabase.putProperty(
+		//					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+		//					JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+		//
+		//			return;
+		//		}
+		//
+		//		String[] badURLArray = badURLs.split(",");
+		//
+		//		if (badBuildURLs.size() > badURLArray.length) {
+		//			buildDatabase.putProperty(
+		//					BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+		//					JenkinsResultsParserUtil.join(",", badBuildURLs), false);
+		//		}
 	}
 
 	@Override
