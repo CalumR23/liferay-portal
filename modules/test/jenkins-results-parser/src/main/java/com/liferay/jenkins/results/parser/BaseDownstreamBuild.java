@@ -661,6 +661,8 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 
 			String badURLs = properties.getProperty(getAxisName());
 
+			System.out.println("badURLS: " + badURLs);
+
 			if (JenkinsResultsParserUtil.isNullOrEmpty(badURLs)){
 				return;
 			}
