@@ -191,6 +191,15 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 	}
 
 	@Override
+	public List<String> getBadBuildURLs() {
+		List<String> badBuildURLs = super.getBadBuildURLs();
+
+		saveBadBuildURLs(badBuildURLs);
+
+		return badBuildURLs;
+	}
+
+	@Override
 	public String getBaseGitRepositoryName() {
 		if (!JenkinsResultsParserUtil.isNullOrEmpty(gitRepositoryName)) {
 			return gitRepositoryName;
@@ -638,6 +647,18 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		}
 
 		return warningMessages;
+	}
+
+	public void saveBadBuildURLs(List<String> badBuildURLs) {
+		if (badBuildURLs.isEmpty()) {
+			return;
+		}
+
+		BuildDatabase buildDatabase = getBuildDatabase();
+
+		buildDatabase.putProperty(
+			BAD_BUILD_URLS_PROPERTIES_KEY, getAxisName(),
+			JenkinsResultsParserUtil.join(",", badBuildURLs), false);
 	}
 
 	@Override
