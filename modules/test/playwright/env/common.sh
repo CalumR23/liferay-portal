@@ -506,7 +506,7 @@ function prepare_additional_bundles {
 
 		chmod a+x ${app_server_dir}
 
-		if [[ "$#" -ge 2 && "${2}" == "true"]]
+		if [[ "${2}" == "true"]]
 		then
 		ant -f build-test.xml rebuild-database -Ddatabases.size=${1}
 
