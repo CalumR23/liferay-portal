@@ -508,7 +508,11 @@ function prepare_additional_bundles {
 
 		if [[ ${2} == "true" ]]
 		then
+		echo "in rebuild statement"
+		
 		ant -f build-test.xml rebuild-database -Ddatabases.size=${1}
+
+		echo "rebuilt DB"
 
 		sed -i "s/lportal/lportal${app_server_bundles_size}/g" "${app_server_dir}/webapps/ROOT/WEB-INF/classes/portal-ext.properties"
 		fi
