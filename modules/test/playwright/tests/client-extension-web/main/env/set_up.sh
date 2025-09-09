@@ -2,4 +2,8 @@
 
 source $(dirname ${BASH_SOURCE[0]})/../../../../env/common.sh
 
-cluster_set_up 1 "true"
+cd ${_PORTAL_PROJECT_DIR}
+
+ant -f build-test.xml rebuild-database -Ddatabases.size=${1}
+
+prepare_additional_bundles ${1} "true"
