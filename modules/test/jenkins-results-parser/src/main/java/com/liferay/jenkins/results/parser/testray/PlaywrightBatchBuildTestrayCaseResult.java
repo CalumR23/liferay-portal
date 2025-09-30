@@ -169,7 +169,9 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 	@Override
 	public Status getStatus() {
-		return getTestResultStatus();
+		System.out.println("get name status: " + getName());
+        System.out.println("status: " + getTestResultStatus().toString());
+        return getTestResultStatus();
 	}
 
 	@Override
@@ -202,6 +204,7 @@ public class PlaywrightBatchBuildTestrayCaseResult
 			getDownstreamBuildReport();
 
 		if (downstreamBuildReport == null) {
+            System.out.println("build report null");
 			return null;
 		}
 
@@ -210,15 +213,20 @@ public class PlaywrightBatchBuildTestrayCaseResult
 		for (TestClassReport testClassReport :
 				downstreamBuildReport.getTestClassReports()) {
 
+
+
 			if (Objects.equals(
 					_playwrightJUnitTestClass.getSpecFilePath(),
 					testClassReport.getTestClassName())) {
 
 				playwrightTestClassReport = testClassReport;
+
+                System.out.println("test class report set");
 			}
 		}
 
 		if (playwrightTestClassReport == null) {
+            System.out.println("report is null");
 			return null;
 		}
 
@@ -227,6 +235,9 @@ public class PlaywrightBatchBuildTestrayCaseResult
 
 			String fullTestName = JenkinsResultsParserUtil.combine(
 				testReport.getTestClassName(), " > ", testReport.getTestName());
+
+            System.out.println("Full test name: " + fullTestName);
+            System.out.println("get name: " + getName());
 
 			if (fullTestName.equals(getName())) {
 				return testReport;
