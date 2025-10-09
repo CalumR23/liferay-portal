@@ -80,6 +80,9 @@ public class PlaywrightBatchBuildTestrayCaseResult
 	public String getErrors() {
 		String errors = null;
 
+        System.out.println("name: " + getName());
+        System.out.println("is ignored: " + _playwrightJUnitTestClass.isIgnored());
+
 		BuildReport buildReport = getBuildReport();
 
 		TestReport testReport = getTestReport();
