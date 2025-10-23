@@ -1,0 +1,86 @@
+import com.liferay.gradle.util.FileUtil
+import com.liferay.gradle.util.StringUtil
+
+import java.nio.file.Files
+
+import java.util.regex.Matcher
+
+import org.gradle.util.GUtil
+
+
+apply plugin: "com.liferay.base.plugin"
+
+task downloadBundle
+
+buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins", version: "latest.release"
+    }
+
+	repositories {
+		mavenLocal()
+
+		maven {
+			url "https://repository-cdn.liferay.com/nexus/content/groups/public"
+		}
+
+        maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+
+        maven {
+			url file("/opt/dev/projects/github/liferay-portal/.m2-tmp")
+		}
+	}
+}
+
+ File f = project.file "../../../tmp/bundle/bundle.zip"
+ File df = project.file "../../../tmp/dxp/"
+ def targetDir =  project.file "../../../tmp/dxp/liferay-dxp/tomcat/bin"
+
+task unzipDxp(type: Copy) {
+    dependsOn downloadBundle
+    description = "Unzips the Liferay DXP bundle into the temporary folder."
+    
+    from zipTree(f)
+    into df
+}
+
+task deleteDxp(type: Delete){
+    delete f
+    delete df
+}
+
+task runTomcat(type: Exec) {
+    description = "Runs the Liferay DXP Tomcat server using ./catalina.sh run."
+
+    dependsOn unzipDxp
+
+    workingDir targetDir
+    commandLine 'bash', '-c', './catalina.sh run' 
+
+    standardInput = System.in
+    standardOutput = System.out
+    errorOutput = System.err
+}
+
+downloadBundle { 
+    doLast {
+        println "Hello foo"
+		String url = "https://releases-cdn.liferay.com/dxp/2025.q3.4/liferay-dxp-tomcat-2025.q3.4-1759710264.zip"
+        println f.path
+		FileUtil.get(project, url, f)
+
+        println targetDir.path
+
+
+
+        // exec {
+        //     executable "bash"
+
+        //     args "-c", "./catalina.sh run"
+
+        //     workingDir targetDir
+        // }
+    }
+}
