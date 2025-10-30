@@ -39,11 +39,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 				project, ciTestRunnerExtension);
     }
 
-    private File getBundleDir(CITestRunnerExtension ciTestRunnerExtension) {
-		return ciTestRunnerExtension.getBundleDir();
-	}
-
-
     private Task _addTaskDownloadTomcatZip(
 		final Project project, CITestRunnerExtension ciTestRunnerExtension) {
 
