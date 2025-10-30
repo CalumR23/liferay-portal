@@ -27,6 +27,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
     	public static final String DOWNLOAD_TOMCAT_ZIP_TASK_NAME =
         "downloadTomcatZip";
 
+        public static final String CI_TEST_RUNNER_CONFIGURATION_NAME = "ciTestRunner";
+
     @Override
 	public void apply(Project project) {
 		GradleUtil.applyPlugin(project, BasePlugin.class);
@@ -35,9 +37,23 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 			GradleUtil.addExtension(
 				project, "ciTestRunner", CITestRunnerExtension.class);
 
+                 _addConfigurationCITestRunner(project);
+
 			_addTaskDownloadTomcatZip(
 				project, ciTestRunnerExtension);
     }
+
+    private Configuration _addConfigurationCITestRunner(
+		final Project project) {
+
+		Configuration configuration = GradleUtil.addConfiguration(
+			project, CI_TEST_RUNNER_CONFIGURATION_NAME);
+
+		configuration.setDescription("Configures CI Test Runner for this project.");
+		configuration.setVisible(false);
+
+		return configuration;
+	}
 
     private Task _addTaskDownloadTomcatZip(
 		final Project project, CITestRunnerExtension ciTestRunnerExtension) {
