@@ -35,7 +35,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 			GradleUtil.addExtension(
 				project, "ciTestRunner", CITestRunnerExtension.class);
 
-        final Task downloadTomcatZipTask =
 			_addTaskDownloadTomcatZip(
 				project, ciTestRunnerExtension);
     }
