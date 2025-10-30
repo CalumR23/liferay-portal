@@ -7,6 +7,8 @@ package com.liferay.gradle.plugins.ci.test.runner;
 
 import com.liferay.gradle.util.GradleUtil;
 
+import java.io.File;
+
 import org.gradle.api.Project;
 
 /**
@@ -14,7 +16,7 @@ import org.gradle.api.Project;
  */
 public class CITestRunnerExtension {
 
-    public CITestExtension(Project project) {
+    public CITestRunnerExtension(Project project) {
 		_project = project;
 	}
 
