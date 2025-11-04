@@ -24,7 +24,7 @@ public class CITestRunnerExtension {
 		return GradleUtil.toFile(_project, _bundleDir);
 	}
 
-	private final Object _bundleDir = "bundle";
+	private final Object _bundleDir = "../bundle";
 	private final Project _project;
 
 }
