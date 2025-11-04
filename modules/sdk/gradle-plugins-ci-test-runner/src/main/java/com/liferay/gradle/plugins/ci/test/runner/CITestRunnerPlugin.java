@@ -17,8 +17,6 @@ import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.BasePlugin;
 
-import org.apache.tools.ant.Project;
-
 /**
  * @author Calum Ragan
  */
