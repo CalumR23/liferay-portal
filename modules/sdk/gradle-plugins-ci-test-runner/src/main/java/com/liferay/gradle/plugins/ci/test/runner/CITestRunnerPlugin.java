@@ -36,9 +36,17 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 		CITestRunnerExtension ciTestRunnerExtension = GradleUtil.addExtension(
 			project, "ciTestRunner", CITestRunnerExtension.class);
 
+			ExtensionContainer extensionContainer = project.getExtensions();
+
+		LiferayExtension liferayExtension = extensionContainer.getByType(
+			LiferayExtension.class);
+
+		TomcatAppServer tomcatAppServer =
+			(TomcatAppServer)liferayExtension.getAppServer("tomcat");
+
 		_addConfigurationCITestRunner(project);
 
-		_addTaskDownloadTomcatZip(project, ciTestRunnerExtension);
+		_addTaskDownloadTomcatZip(project, ciTestRunnerExtension, tomcatAppServer);
 	}
 
 	private Configuration _addConfigurationCITestRunner(Project project) {
@@ -53,7 +61,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 	}
 
 	private Task _addTaskDownloadTomcatZip(
-		Project project, CITestRunnerExtension ciTestRunnerExtension) {
+		Project project, CITestRunnerExtension ciTestRunnerExtension, TomcatAppServer tomcatAppServer) {
 
 		Task task = GradleUtil.addTask(
 			project, DOWNLOAD_TOMCAT_ZIP_TASK_NAME, Task.class);
@@ -72,8 +80,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					mirrorsGetTask.setProject(antProject);
 
 					mirrorsGetTask.setVerbose(true);
-
-					TomcatAppServer tomcatAppServer = new TomcatAppServer(project);
 
 					System.out.println("zipurl: " + tomcatAppServer.getZipUrl());
 
