@@ -68,12 +68,12 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						"https://archive.apache.org/dist/tomcat/tomcat-10" +
 							"/v10.1.42/bin/apache-tomcat-10.1.42.zip";
 
-					Project project = new Project();
-        			project.init();
+					org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
+        			antProject.init();
 
 					MirrorsGetTask mirrorsGetTask = new MirrorsGetTask();
 
-					mirrorsGetTask.setProject(project);
+					mirrorsGetTask.setProject(antProject);
 
 					mirrorsGetTask.setVerbose(true);
 					mirrorsGetTask.setSrc(url);
