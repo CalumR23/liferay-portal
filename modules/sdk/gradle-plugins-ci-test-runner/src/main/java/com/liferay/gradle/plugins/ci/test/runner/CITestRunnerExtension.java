@@ -24,7 +24,8 @@ public class CITestRunnerExtension {
 		return GradleUtil.toFile(_project, _bundleDir);
 	}
 
-	private final Object _bundleDir = liferay.appServers.tomcat.dir;
+	// private final Object _bundleDir = liferay.appServers.tomcat.dir;
+	private final Object _bundleDir = "bundle";
 	private final Project _project;
 
 }

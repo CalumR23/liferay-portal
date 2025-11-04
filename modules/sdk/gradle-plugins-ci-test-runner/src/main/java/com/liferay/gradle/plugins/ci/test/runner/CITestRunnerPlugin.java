@@ -7,6 +7,7 @@ package com.liferay.gradle.plugins.ci.test.runner;
 
 import com.liferay.ant.mirrors.get.MirrorsGetTask;
 import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 
 import org.apache.tools.ant.BuildException;
 
@@ -67,10 +68,17 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					MirrorsGetTask mirrorsGetTask = new MirrorsGetTask();
 
+				
 					mirrorsGetTask.setProject(antProject);
 
 					mirrorsGetTask.setVerbose(true);
-					mirrorsGetTask.setSrc(liferay.appServers.tomcat.zipUrl);
+
+					TomcatAppServer tomcatAppServer = new TomcatAppServer(project);
+
+					System.out.println("zipurl: " + tomcatAppServer.getZipUrl());
+
+					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
+
 					mirrorsGetTask.setDest(
 						ciTestRunnerExtension.getBundleDir());
 
