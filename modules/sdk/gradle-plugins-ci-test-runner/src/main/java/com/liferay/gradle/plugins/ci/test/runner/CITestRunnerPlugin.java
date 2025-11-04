@@ -62,10 +62,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 				@Override
 				public void execute(Task task) {
-					String url =
-						"https://archive.apache.org/dist/tomcat/tomcat-10" +
-							"/v10.1.42/bin/apache-tomcat-10.1.42.zip";
-
 					org.apache.tools.ant.Project antProject = new org.apache.tools.ant.Project();
         			antProject.init();
 
@@ -74,7 +70,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					mirrorsGetTask.setProject(antProject);
 
 					mirrorsGetTask.setVerbose(true);
-					mirrorsGetTask.setSrc(url);
+					mirrorsGetTask.setSrc(liferay.appServers.tomcat.zipUrl);
 					mirrorsGetTask.setDest(
 						ciTestRunnerExtension.getBundleDir());
 
