@@ -16,7 +16,7 @@ import org.gradle.api.Project;
  */
 public class CITestRunnerExtension {
 
-    public CITestRunnerExtension(Project project) {
+	public CITestRunnerExtension(Project project) {
 		_project = project;
 	}
 
@@ -24,7 +24,7 @@ public class CITestRunnerExtension {
 		return GradleUtil.toFile(_project, _bundleDir);
 	}
 
-    private Object _bundleDir = "bundle";
-    private final Project _project;
+	private final Object _bundleDir = "bundle";
+	private final Project _project;
 
 }
