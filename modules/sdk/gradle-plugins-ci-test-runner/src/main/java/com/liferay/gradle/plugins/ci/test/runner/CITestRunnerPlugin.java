@@ -66,13 +66,15 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						"https://archive.apache.org/dist/tomcat/tomcat-10" +
 							"/v10.1.42/bin/apache-tomcat-10.1.42.zip";
 
-					MirrorsGetTask.setVerbose(true);
-					MirrorsGetTask.setSrc(url);
-					MirrorsGetTask.setDest(
+					MirrorsGetTask mirrorsGetTask = new MirrorsGetTask();
+
+					mirrorsGetTask.setVerbose(true);
+					mirrorsGetTask.setSrc(url);
+					mirrorsGetTask.setDest(
 						ciTestRunnerExtension.getBundleDir());
 
 					try {
-						MirrorsGetTask.execute();
+						mirrorsGetTask.execute();
 					}
 					catch (BuildException buildException) {
 						buildException.printStackTrace();
