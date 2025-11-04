@@ -7,6 +7,7 @@ package com.liferay.gradle.plugins.ci.test.runner;
 
 import com.liferay.ant.mirrors.get.MirrorsGetTask;
 import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 
 import org.apache.tools.ant.BuildException;
@@ -17,6 +18,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.BasePlugin;
+import org.gradle.api.plugins.ExtensionContainer;
 
 /**
  * @author Calum Ragan
