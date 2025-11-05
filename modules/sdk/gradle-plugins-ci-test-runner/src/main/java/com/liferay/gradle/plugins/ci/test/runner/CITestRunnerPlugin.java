@@ -7,6 +7,7 @@ package com.liferay.gradle.plugins.ci.test.runner;
 
 import com.liferay.ant.mirrors.get.MirrorsGetTask;
 import com.liferay.gradle.util.GradleUtil;
+import com.liferay.gradle.plugins.LiferayBasePlugin;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 
