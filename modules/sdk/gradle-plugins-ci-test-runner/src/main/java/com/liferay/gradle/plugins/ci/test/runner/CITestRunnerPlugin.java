@@ -35,6 +35,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		GradleUtil.applyPlugin(project, BasePlugin.class);
 
+		GradleUtil.applyPlugin(project, LiferayBasePlugin.class);
+
 		CITestRunnerExtension ciTestRunnerExtension = GradleUtil.addExtension(
 			project, "ciTestRunner", CITestRunnerExtension.class);
 
