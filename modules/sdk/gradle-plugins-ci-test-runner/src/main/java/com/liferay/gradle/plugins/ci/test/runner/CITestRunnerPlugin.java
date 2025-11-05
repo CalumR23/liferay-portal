@@ -80,7 +80,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
         			antProject.init();
 
 					MirrorsGetTask mirrorsGetTask = new MirrorsGetTask();
-
 				
 					mirrorsGetTask.setProject(antProject);
 
@@ -88,10 +87,11 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					System.out.println("zipurl: " + tomcatAppServer.getZipUrl());
 
+					System.out.println("dir: " + tomcatAppServer.getDir());
+
 					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
 
-					mirrorsGetTask.setDest(
-						ciTestRunnerExtension.getBundleDir());
+					mirrorsGetTask.setDest(tomcatAppServer.getDir());
 
 					try {
 						mirrorsGetTask.execute();
