@@ -38,7 +38,7 @@ public class TomcatAppServer extends AppServer {
 		_managerUserName = managerUserName;
 	}
 
-	public String setZipName(Object zipName) {
+	public void setZipName(Object zipName) {
 		_zipName = zipName;
 	}
 
