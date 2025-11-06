@@ -86,7 +86,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
 
-					mirrorsGetTask.setDest(tomcatAppServer.getDir());
+					File tomcatAppServerDir = tomcatAppServer.getDir();
+
+					mirrorsGetTask.setDest(tomcatAppServerDir);
 
 					try {
 						mirrorsGetTask.execute();
@@ -94,6 +96,40 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					catch (BuildException buildException) {
 						throw new RuntimeException(buildException);
 					}
+
+					project.copy(
+						new Action<CopySpec>() {
+
+							@Override
+							public void execute(CopySpec copySpec) {
+								String fileName = tomcatAppServerDir.getName();
+
+                                System.out.println("fileName: " + fileName);
+                                
+								if (fileName.endsWith(".zip")) {
+									copySpec.from(project.zipTree(file));
+								}
+								else {
+									copySpec.from(project.tarTree(file));
+								}
+
+								copySpec.eachFile(
+									fileCopyDetails -> {
+										String newPath =
+											fileCopyDetails.getPath();
+
+										if (newPath.contains("/")) {
+											newPath = newPath.substring(
+												newPath.lastIndexOf("/") + 1);
+
+											fileCopyDetails.setPath(newPath);
+										}
+									});
+
+								copySpec.into(tomcatAppServerDir);
+							}
+
+						})
 				}
 
 			});
