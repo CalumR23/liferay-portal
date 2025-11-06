@@ -105,7 +105,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								String fileName = tomcatAppServerDir.getName();
 
                                 System.out.println("fileName: " + fileName);
-                                
+
 								if (fileName.endsWith(".zip")) {
 									copySpec.from(project.zipTree(file));
 								}
@@ -129,7 +129,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								copySpec.into(tomcatAppServerDir);
 							}
 
-						})
+						});
 				}
 
 			});
