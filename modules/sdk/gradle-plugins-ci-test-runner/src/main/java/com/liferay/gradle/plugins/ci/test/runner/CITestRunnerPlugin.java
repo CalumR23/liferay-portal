@@ -107,15 +107,15 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 							@Override
 							public void execute(CopySpec copySpec) {
-								String fileName = tomcatAppServerDir.getName();
+								String fileName = tomcatAppServerZipFile.getName();
 
                                 System.out.println("fileName: " + fileName);
 
 								if (fileName.endsWith(".zip")) {
-									copySpec.from(project.zipTree(tomcatAppServerDir));
+									copySpec.from(project.zipTree(tomcatAppServerZipFile));
 								}
 								else {
-									copySpec.from(project.tarTree(tomcatAppServerDir));
+									copySpec.from(project.tarTree(tomcatAppServerZipFile));
 								}
 
 								copySpec.eachFile(
