@@ -21,6 +21,7 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.CopySpec;
+import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.ExtensionContainer;
 
@@ -130,6 +131,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 											fileCopyDetails.setPath(newPath);
 										}
 									});
+
+                                copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
 								copySpec.into(tomcatAppServerDir);
 							}
