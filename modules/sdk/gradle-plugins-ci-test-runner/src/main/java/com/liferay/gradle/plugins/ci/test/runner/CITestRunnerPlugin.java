@@ -91,7 +91,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					File tomcatAppServerDir = tomcatAppServer.getDir();
 
-					mirrorsGetTask.setDest(tomcatAppServerDir);
+                    File tomcatAppServerZipFile = new File(tomcatAppServerDir, tomcatAppServer.getZipName());
+
+					mirrorsGetTask.setDest(tomcatAppServerZipFile);
 
 					try {
 						mirrorsGetTask.execute();
