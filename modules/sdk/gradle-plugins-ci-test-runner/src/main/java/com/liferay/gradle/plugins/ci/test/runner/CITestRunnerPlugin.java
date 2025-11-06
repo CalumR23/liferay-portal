@@ -13,11 +13,14 @@ import com.liferay.gradle.util.GradleUtil;
 
 import org.apache.tools.ant.BuildException;
 
+import java.io.File;
+
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.file.CopySpec;
 import org.gradle.api.plugins.BasePlugin;
 import org.gradle.api.plugins.ExtensionContainer;
 
@@ -107,10 +110,10 @@ public class CITestRunnerPlugin implements Plugin<Project> {
                                 System.out.println("fileName: " + fileName);
 
 								if (fileName.endsWith(".zip")) {
-									copySpec.from(project.zipTree(file));
+									copySpec.from(project.zipTree(tomcatAppServerDir));
 								}
 								else {
-									copySpec.from(project.tarTree(file));
+									copySpec.from(project.tarTree(tomcatAppServerDir));
 								}
 
 								copySpec.eachFile(
