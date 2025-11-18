@@ -52,7 +52,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 		_addConfigurationCITestRunner(project);
 
-		_addTaskDownloadTomcatZip(project, tomcatAppServer);
+		_addTaskDownloadTomcatZip(liferayExtension, project, tomcatAppServer);
 	}
 
 	private Configuration _addConfigurationCITestRunner(Project project) {
@@ -66,7 +66,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 		return configuration;
 	}
 
-	private Task _addTaskDownloadTomcatZip(
+	private Task _addTaskDownloadTomcatZip(LiferayExtension liferayExtension,
 		Project project, TomcatAppServer tomcatAppServer) {
 
 		Task task = GradleUtil.addTask(
@@ -134,7 +134,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
                                 copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
-								copySpec.into(tomcatAppServerDir);
+								copySpec.into(liferayExtension.getAppServerParentDir());
 							}
 
 						});
