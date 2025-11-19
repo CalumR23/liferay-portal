@@ -90,9 +90,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
 
-					File tomcatAppServerDir = tomcatAppServer.getDir();
-
-                    File tomcatAppServerZipFile = new File(tomcatAppServerDir, tomcatAppServer.getZipName());
+                    File tomcatAppServerZipFile = new File(liferayExtension.getAppServerParentDir(), tomcatAppServer.getZipName());
 
 					mirrorsGetTask.setDest(tomcatAppServerZipFile);
 
@@ -109,8 +107,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 							@Override
 							public void execute(CopySpec copySpec) {
 								String fileName = tomcatAppServerZipFile.getName();
-
-                                System.out.println("fileName: " + fileName);
 
 								if (fileName.endsWith(".zip")) {
 									copySpec.from(project.zipTree(tomcatAppServerZipFile));
@@ -134,7 +130,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
                                 copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
-								copySpec.into(liferayExtension.getAppServerParentDir());
+								copySpec.into(tomcatAppServer.getDir(););
 							}
 
 						});
