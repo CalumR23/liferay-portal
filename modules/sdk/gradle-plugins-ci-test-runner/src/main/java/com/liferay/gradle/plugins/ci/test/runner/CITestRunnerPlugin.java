@@ -128,17 +128,22 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 								copySpec.eachFile(
 									fileCopyDetails -> {
-										RelativePath currentPath = fileCopyDetails.getRelativePath();
-            
-          
-            if (currentPath.getSegments().length > 1 && currentPath.getSegments()[0].equals("apache-tomcat-10.1.44")) {
-                
-                
-                RelativePath newPath = currentPath.removeFirstSegments(1);
-                
-                
-                fileCopyDetails.setRelativePath(newPath);
-            }
+										RelativePath relativePath =
+											fileCopyDetails.getRelativePath();
+
+										if ((relativePath.getSegments().length >
+												1) &&
+											relativePath.getSegments()[0].
+												equals(
+													"apache-tomcat-10.1.44")) {
+
+											RelativePath newPath =
+												relativePath.
+													removeFirstSegments(1);
+
+											fileCopyDetails.setRelativePath(
+												newPath);
+										}
 									});
 
 								copySpec.setDuplicatesStrategy(
