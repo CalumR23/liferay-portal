@@ -113,6 +113,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								String fileName =
 									tomcatAppServerZipFile.getName();
 
+                                String tomcatAppServerVersion = tomcatAppServer.getVersion();
+
 								if (fileName.endsWith(".zip")) {
 									copySpec.from(
 										project.zipTree(
@@ -124,7 +126,11 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 											tomcatAppServerZipFile));
 								}
 
-								copySpec.include("apache-tomcat-10.1.44/**");
+								copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/bin/**");
+                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/conf/**");
+								copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/lib/**");
+                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/logs/**");
+                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/work/**"); 
 
 								copySpec.eachFile(
 									fileCopyDetails -> {
@@ -154,7 +160,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								copySpec.setDuplicatesStrategy(
 									DuplicatesStrategy.EXCLUDE);
 
-								copySpec.into(tomcatAppServer.getDir());
+								copySpec.into(tomcatAppServer.getDir().getParentFile());
 							}
 
 						});
