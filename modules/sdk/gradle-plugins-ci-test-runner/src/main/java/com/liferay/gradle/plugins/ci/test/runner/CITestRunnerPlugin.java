@@ -160,7 +160,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								copySpec.setDuplicatesStrategy(
 									DuplicatesStrategy.EXCLUDE);
 
-								copySpec.into(tomcatAppServer.getDir().getParentFile());
+								copySpec.into(tomcatAppServer.getDir());
 							}
 
 						});
