@@ -131,17 +131,23 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 										RelativePath relativePath =
 											fileCopyDetails.getRelativePath();
 
-										if ((relativePath.getSegments().length >
-												1) &&
-											relativePath.getSegments()[0].
-												equals(
-													"apache-tomcat-10.1.44")) {
+										String[] segments =
+											relativePath.getSegments();
 
-											RelativePath newPath =
-												relativePath.segment(1);
+										if ((segments.length > 1) &&
+											segments[0].equals("dirB")) {
+
+											String[] newSegments =
+												new String[segments.length - 1];
+
+											System.arraycopy(
+												segments, 1, newSegments, 0,
+												newSegments.length);
 
 											fileCopyDetails.setRelativePath(
-												newPath);
+												new RelativePath(
+													relativePath.isDirectory(),
+													newSegments));
 										}
 									});
 
