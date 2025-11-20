@@ -11,9 +11,9 @@ import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 import com.liferay.gradle.util.GradleUtil;
 
-import org.apache.tools.ant.BuildException;
-
 import java.io.File;
+
+import org.apache.tools.ant.BuildException;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -66,8 +66,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 		return configuration;
 	}
 
-	private Task _addTaskDownloadTomcatZip(LiferayExtension liferayExtension,
-		Project project, TomcatAppServer tomcatAppServer) {
+	private Task _addTaskDownloadTomcatZip(
+		LiferayExtension liferayExtension, Project project,
+		TomcatAppServer tomcatAppServer) {
 
 		Task task = GradleUtil.addTask(
 			project, DOWNLOAD_TOMCAT_ZIP_TASK_NAME, Task.class);
@@ -90,7 +91,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
 
-                    File tomcatAppServerZipFile = new File(liferayExtension.getAppServerParentDir(), tomcatAppServer.getZipName());
+					File tomcatAppServerZipFile = new File(
+						liferayExtension.getAppServerParentDir(),
+						tomcatAppServer.getZipName());
 
 					mirrorsGetTask.setDest(tomcatAppServerZipFile);
 
@@ -106,31 +109,41 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 							@Override
 							public void execute(CopySpec copySpec) {
-								String fileName = tomcatAppServerZipFile.getName();
+								String fileName =
+									tomcatAppServerZipFile.getName();
 
 								if (fileName.endsWith(".zip")) {
-									copySpec.from(project.zipTree(tomcatAppServerZipFile));
+									copySpec.from(
+										project.zipTree(
+											tomcatAppServerZipFile));
 								}
 								else {
-									copySpec.from(project.tarTree(tomcatAppServerZipFile));
+									copySpec.from(
+										project.tarTree(
+											tomcatAppServerZipFile));
 								}
 
-                                copySpec.include("apache-tomcat-10.1.44/*");
+								copySpec.include("apache-tomcat-10.1.44/*");
 
-								// copySpec.eachFile(
-								// 	fileCopyDetails -> {
-								// 		String newPath =
-								// 			fileCopyDetails.getPath();
+								copySpec.eachFile(
+									fileCopyDetails -> {
+										String pathString =
+											fileCopyDetails.getPath();
 
-								// 		if (newPath.contains("/")) {
-								// 			newPath = newPath.substring(
-								// 				newPath.lastIndexOf("/") + 1);
+										if (pathString.startsWith(
+												"apache-tomcat-10.1.44/")) {
 
-								// 			fileCopyDetails.setPath(newPath);
-								// 		}
-								// 	});
+											String newPath =
+												pathString.substring(
+													"apache-tomcat-10.1.44/".
+														length());
 
-                                copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
+											fileCopyDetails.setPath(newPath);
+										}
+									});
+
+								copySpec.setDuplicatesStrategy(
+									DuplicatesStrategy.EXCLUDE);
 
 								copySpec.into(tomcatAppServer.getDir());
 							}
