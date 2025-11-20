@@ -115,18 +115,20 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 									copySpec.from(project.tarTree(tomcatAppServerZipFile));
 								}
 
-								copySpec.eachFile(
-									fileCopyDetails -> {
-										String newPath =
-											fileCopyDetails.getPath();
+                                copySpec.include("apache-tomcat-10.1.44/*");
 
-										if (newPath.contains("/")) {
-											newPath = newPath.substring(
-												newPath.lastIndexOf("/") + 1);
+								// copySpec.eachFile(
+								// 	fileCopyDetails -> {
+								// 		String newPath =
+								// 			fileCopyDetails.getPath();
 
-											fileCopyDetails.setPath(newPath);
-										}
-									});
+								// 		if (newPath.contains("/")) {
+								// 			newPath = newPath.substring(
+								// 				newPath.lastIndexOf("/") + 1);
+
+								// 			fileCopyDetails.setPath(newPath);
+								// 		}
+								// 	});
 
                                 copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
 
