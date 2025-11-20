@@ -123,23 +123,21 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 											tomcatAppServerZipFile));
 								}
 
-								copySpec.include("apache-tomcat-10.1.44/*");
+								copySpec.include("apache-tomcat-10.1.44/**");
 
 								copySpec.eachFile(
 									fileCopyDetails -> {
-										String pathString =
-											fileCopyDetails.getPath();
-
-										if (pathString.startsWith(
-												"apache-tomcat-10.1.44/")) {
-
-											String newPath =
-												pathString.substring(
-													"apache-tomcat-10.1.44/".
-														length());
-
-											fileCopyDetails.setPath(newPath);
-										}
+										RelativePath currentPath = fileCopyDetails.getRelativePath();
+            
+          
+            if (currentPath.getSegments().length > 1 && currentPath.getSegments()[0].equals("apache-tomcat-10.1.44")) {
+                
+                
+                RelativePath newPath = currentPath.removeFirstSegments(1);
+                
+                
+                fileCopyDetails.setRelativePath(newPath);
+            }
 									});
 
 								copySpec.setDuplicatesStrategy(
