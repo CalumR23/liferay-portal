@@ -110,27 +110,27 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 							@Override
 							public void execute(CopySpec copySpec) {
-								String fileName =
-									tomcatAppServerZipFile.getName();
+								String tomcatAppServerVersion =
+									tomcatAppServer.getVersion();
 
-                                String tomcatAppServerVersion = tomcatAppServer.getVersion();
+								copySpec.from(
+									project.zipTree(tomcatAppServerZipFile));
 
-								if (fileName.endsWith(".zip")) {
-									copySpec.from(
-										project.zipTree(
-											tomcatAppServerZipFile));
-								}
-								else {
-									copySpec.from(
-										project.tarTree(
-											tomcatAppServerZipFile));
-								}
-
-								copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/bin/**");
-                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/conf/**");
-								copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/lib/**");
-                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/logs/**");
-                                copySpec.include("apache-tomcat-" + tomcatAppServerVersion + "/work/**"); 
+								copySpec.include(
+									"apache-tomcat-" + tomcatAppServerVersion +
+										"/bin/**");
+								copySpec.include(
+									"apache-tomcat-" + tomcatAppServerVersion +
+										"/conf/**");
+								copySpec.include(
+									"apache-tomcat-" + tomcatAppServerVersion +
+										"/lib/**");
+								copySpec.include(
+									"apache-tomcat-" + tomcatAppServerVersion +
+										"/logs/**");
+								copySpec.include(
+									"apache-tomcat-" + tomcatAppServerVersion +
+										"/work/**");
 
 								copySpec.eachFile(
 									fileCopyDetails -> {
@@ -141,7 +141,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 											relativePath.getSegments();
 
 										if ((segments.length > 1) &&
-											segments[0].equals("dirB")) {
+											segments[0].equals(
+												"apache-tomcat-" +
+													tomcatAppServerVersion)) {
 
 											String[] newSegments =
 												new String[segments.length - 1];
