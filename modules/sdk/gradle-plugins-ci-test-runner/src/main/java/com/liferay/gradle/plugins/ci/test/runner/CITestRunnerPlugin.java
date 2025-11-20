@@ -138,8 +138,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 													"apache-tomcat-10.1.44")) {
 
 											RelativePath newPath =
-												relativePath.
-													removeFirstSegments(1);
+												relativePath.segment(1);
 
 											fileCopyDetails.setRelativePath(
 												newPath);
