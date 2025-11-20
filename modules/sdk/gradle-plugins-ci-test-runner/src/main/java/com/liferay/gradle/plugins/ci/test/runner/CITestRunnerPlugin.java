@@ -146,7 +146,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 											fileCopyDetails.setRelativePath(
 												new RelativePath(
-													relativePath.isDirectory(),
+													!relativePath.isFile(),
 													newSegments));
 										}
 									});
