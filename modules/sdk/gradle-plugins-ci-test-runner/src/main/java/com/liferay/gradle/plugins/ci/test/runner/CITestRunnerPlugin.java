@@ -12,6 +12,7 @@ import com.liferay.gradle.plugins.extensions.TomcatAppServer;
 import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.BuildException;
@@ -111,16 +112,21 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 							@Override
 							public void execute(CopySpec copySpec) {
-                                String fileName = tomcatAppServerZipFile.getName();
+								String fileName =
+									tomcatAppServerZipFile.getName();
 
 								String tomcatAppServerVersion =
 									tomcatAppServer.getVersion();
 
 								if (fileName.endsWith(".zip")) {
-									copySpec.from(project.zipTree(tomcatAppServerZipFile));
+									copySpec.from(
+										project.zipTree(
+											tomcatAppServerZipFile));
 								}
 								else {
-									copySpec.from(project.tarTree(tomcatAppServerZipFile));
+									copySpec.from(
+										project.tarTree(
+											tomcatAppServerZipFile));
 								}
 
 								copySpec.include(
@@ -171,7 +177,16 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 								copySpec.into(tomcatAppServer.getDir());
 
-                                FileUtils.deleteDirectory(new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion));
+								try {
+									FileUtils.deleteDirectory(
+										new File(
+											tomcatAppServer.getDir(),
+											"apache-tomcat-" +
+												tomcatAppServerVersion));
+								}
+								catch (IOException ioException) {
+									throw new RuntimeException(ioException);
+								}
 							}
 
 						});
