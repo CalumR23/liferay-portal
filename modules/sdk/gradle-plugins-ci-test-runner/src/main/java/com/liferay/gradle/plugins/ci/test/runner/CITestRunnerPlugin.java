@@ -13,6 +13,7 @@ import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.BuildException;
 
 import org.gradle.api.Action;
@@ -170,7 +171,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 								copySpec.into(tomcatAppServer.getDir());
 
-                                project.delete(new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion));
+                                FileUtils.deleteDirectory(new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion)));
 							}
 
 						});
