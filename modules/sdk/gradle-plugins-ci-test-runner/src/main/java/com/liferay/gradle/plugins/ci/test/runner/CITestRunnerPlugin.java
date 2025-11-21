@@ -177,12 +177,17 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 								copySpec.into(tomcatAppServer.getDir());
 
-								try {
-									FileUtils.deleteDirectory(
-										new File(
+                                File apacheDir = new File(
 											tomcatAppServer.getDir(),
 											"apache-tomcat-" +
-												tomcatAppServerVersion));
+												tomcatAppServerVersion);
+
+								if (apacheDir.exists()) {
+                                    System.out.println("filePath: " + apacheDir.getAbsolutePath());
+                                }
+
+								try {
+									FileUtils.deleteDirectory(apacheDir);
 								}
 								catch (IOException ioException) {
 									throw new RuntimeException(ioException);
