@@ -182,9 +182,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 											"apache-tomcat-" +
 												tomcatAppServerVersion);
 
-								if (apacheDir.exists()) {
-                                    System.out.println("filePath: " + apacheDir.getAbsolutePath());
-                                }
+                                System.out.println("filePath: " + apacheDir.getAbsolutePath());
 
 								try {
 									FileUtils.deleteDirectory(apacheDir);
