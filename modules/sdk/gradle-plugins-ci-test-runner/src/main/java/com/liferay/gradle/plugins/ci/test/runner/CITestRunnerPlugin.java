@@ -110,11 +110,17 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 							@Override
 							public void execute(CopySpec copySpec) {
+                                String fileName = tomcatAppServerZipFile.getName();
+
 								String tomcatAppServerVersion =
 									tomcatAppServer.getVersion();
 
-								copySpec.from(
-									project.zipTree(tomcatAppServerZipFile));
+								if (fileName.endsWith(".zip")) {
+									copySpec.from(project.zipTree(tomcatAppServerZipFile));
+								}
+								else {
+									copySpec.from(project.tarTree(tomcatAppServerZipFile));
+								}
 
 								copySpec.include(
 									"apache-tomcat-" + tomcatAppServerVersion +
