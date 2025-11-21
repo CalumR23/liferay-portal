@@ -163,6 +163,11 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 									DuplicatesStrategy.EXCLUDE);
 
 								copySpec.into(tomcatAppServer.getDir());
+
+                                tomcatAppServerZipFile.delete();
+
+                                File directory = new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion);
+                                directory.delete();
 							}
 
 						});
