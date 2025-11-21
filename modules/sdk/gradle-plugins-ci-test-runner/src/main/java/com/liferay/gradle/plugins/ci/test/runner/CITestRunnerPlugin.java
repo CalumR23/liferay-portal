@@ -171,7 +171,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 								copySpec.into(tomcatAppServer.getDir());
 
-                                FileUtils.deleteDirectory(new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion)));
+                                FileUtils.deleteDirectory(new File(tomcatAppServer.getDir(), "apache-tomcat-" + tomcatAppServerVersion));
 							}
 
 						});
