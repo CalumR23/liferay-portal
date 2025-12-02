@@ -231,6 +231,10 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					replaceToken.append("\"${catalina.home}/lib\",");
 					replaceToken.append("\"${catalina.home}/lib/*.jar\"");
 
+                    System.out.println("token: " + token.toString());
+                    System.out.println("replace: " + replaceToken.toString());
+)
+
 					catalinaPropertiesContent.replace(
 						token.toString(), replaceToken.toString());
 
