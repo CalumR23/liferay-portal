@@ -110,6 +110,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					String tomcatAppServerVersion =
 						tomcatAppServer.getVersion();
 
+					File tomcatAppServerDir = tomcatAppServer.getDir();
+
 					project.copy(
 						new Action<CopySpec>() {
 
@@ -175,16 +177,13 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								copySpec.setDuplicatesStrategy(
 									DuplicatesStrategy.EXCLUDE);
 
-								File tomcatAppServerDir =
-									tomcatAppServer.getDir();
-
 								copySpec.into(tomcatAppServerDir);
 							}
 
 						});
 
 					File apacheDir = new File(
-						tomcatAppServer.getDir(),
+						tomcatAppServerDir,
 						"apache-tomcat-" + tomcatAppServerVersion);
 
 					try {
@@ -194,8 +193,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						throw new RuntimeException(ioException);
 					}
 
-					File webAppsDir = new File(
-						tomcatAppServer.getDir(), "webapps");
+					File webAppsDir = new File(tomcatAppServerDir, "webapps");
 
 					webAppsDir.mkdirs();
 
