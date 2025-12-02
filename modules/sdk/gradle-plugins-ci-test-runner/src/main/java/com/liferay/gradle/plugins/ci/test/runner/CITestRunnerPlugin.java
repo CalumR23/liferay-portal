@@ -107,6 +107,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						throw new RuntimeException(buildException);
 					}
 
+					String tomcatAppServerVersion =
+						tomcatAppServer.getVersion();
+
 					project.copy(
 						new Action<CopySpec>() {
 
@@ -114,9 +117,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 							public void execute(CopySpec copySpec) {
 								String fileName =
 									tomcatAppServerZipFile.getName();
-
-								String tomcatAppServerVersion =
-									tomcatAppServer.getVersion();
 
 								if (fileName.endsWith(".zip")) {
 									copySpec.from(
@@ -194,11 +194,10 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						throw new RuntimeException(ioException);
 					}
 
-                    File webAppsDir = new File(
-                        tomcatAppServer.getDir(),
-                        "webapps");
+					File webAppsDir = new File(
+						tomcatAppServer.getDir(), "webapps");
 
-                    webAppsDir.mkdirs();
+					webAppsDir.mkdirs();
 				}
 
 			});
