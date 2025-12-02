@@ -235,7 +235,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					try {
 						Files.write(
-							catalinaProperties.getAbsolutePath(),
+							Paths.get(catalinaProperties.getAbsolutePath()),
 							catalinaPropertiesContent.getBytes());
 					}
 					catch (IOException ioException) {
