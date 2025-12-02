@@ -201,9 +201,10 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					File catalinaProperties = new File(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
-
+                    
+                    String catalinaPropertiesContent;
                     try{
-					String catalinaPropertiesContent = FileUtil.read(
+					 catalinaPropertiesContent = FileUtil.read(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
                     }
