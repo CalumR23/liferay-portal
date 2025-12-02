@@ -201,13 +201,8 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
 
-					try {
-						String catalinaPropertiesContent =
-							FileUtils.readFileToString(catalinaProperties);
-					}
-					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
-					}
+					String catalinaPropertiesContent =
+						FileUtils.readFileToString(catalinaProperties);
 
 					StringBuilder token = new StringBuilder();
 
