@@ -9,7 +9,6 @@ import com.liferay.ant.mirrors.get.MirrorsGetTask;
 import com.liferay.gradle.plugins.LiferayBasePlugin;
 import com.liferay.gradle.plugins.extensions.LiferayExtension;
 import com.liferay.gradle.plugins.extensions.TomcatAppServer;
-import com.liferay.gradle.util.FileUtil;
 import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
@@ -201,15 +200,11 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					File catalinaProperties = new File(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
-                    
-                    String catalinaPropertiesContent;
-                    System.out.println("path: " + catalinaProperties.getAbsolutePath());
-                    System.out.println("exists: " + catalinaProperties.exists());
-                    try{
-					 catalinaPropertiesContent = FileUtil.read(
-						tomcatAppServerDir.getAbsolutePath() +
-							"/conf/catalina.properties");
-                    }
+
+					try {
+						String catalinaPropertiesContent =
+							FileUtils.readFileToString(catalinaProperties);
+					}
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
 					}
@@ -233,11 +228,12 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					catalinaPropertiesContent.replace(
 						token.toString(), replaceToken.toString());
-                    
-                    try{
-					FileUtils.write(
-						catalinaProperties, catalinaPropertiesContent, "UTF-8");
-                    }
+
+					try {
+						FileUtils.write(
+							catalinaProperties, catalinaPropertiesContent,
+							"UTF-8");
+					}
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
 					}
