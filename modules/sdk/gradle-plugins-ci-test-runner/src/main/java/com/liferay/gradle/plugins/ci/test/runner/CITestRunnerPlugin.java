@@ -238,7 +238,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
                         System.out.println("contains token");
                     }
 
-					catalinaPropertiesContent.replace(
+					catalinaPropertiesContent = catalinaPropertiesContent.replace(
 						token.toString(), replaceToken.toString());
                     
                     if(catalinaPropertiesContent.contains(replaceToken.toString())){
