@@ -175,7 +175,10 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 								copySpec.setDuplicatesStrategy(
 									DuplicatesStrategy.EXCLUDE);
 
-								copySpec.into(tomcatAppServer.getDir());
+								File tomcatAppServerDir =
+									tomcatAppServer.getDir();
+
+								copySpec.into(tomcatAppServerDir);
 							}
 
 						});
@@ -183,9 +186,6 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					File apacheDir = new File(
 						tomcatAppServer.getDir(),
 						"apache-tomcat-" + tomcatAppServerVersion);
-
-					System.out.println(
-						"filePath: " + apacheDir.getAbsolutePath());
 
 					try {
 						FileUtils.deleteDirectory(apacheDir);
@@ -198,6 +198,36 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						tomcatAppServer.getDir(), "webapps");
 
 					webAppsDir.mkdirs();
+
+					File catalinaProperties = new File(
+						tomcatAppServerDir.getAbsolutePath() +
+							"/conf/catalina.properties");
+
+					String catalinaPropertiesContent = FileUtil.read(
+						catalinaProperties);
+
+					StringBuilder token = new StringBuilder();
+
+					token.append("common.loader=\"${catalina.base}/lib\",");
+					token.append("\"${catalina.base}/lib/*.jar\",");
+					token.append("\"${catalina.home}/lib\",");
+					token.append("\"${catalina.home}/lib/*.jar\"");
+
+					StringBuilder replaceToken = new StringBuilder();
+
+					replaceToken.append(
+						"common.loader=\"${catalina.home}/webapps/ROOT/");
+					replaceToken.append("WEB-INF/lib/support-tomcat.jar\",");
+					replaceToken.append("\"${catalina.base}/lib\",\"");
+					replaceToken.append("${catalina.base}/lib/*.jar\",");
+					replaceToken.append("\"${catalina.home}/lib\",");
+					replaceToken.append("\"${catalina.home}/lib/*.jar\"");
+
+					catalinaPropertiesContent.replace(
+						token.toString(), replaceToken.toString());
+
+					FileUtils.write(
+						catalinaProperties, catalinaPropertiesContent, "UTF-8");
 				}
 
 			});
