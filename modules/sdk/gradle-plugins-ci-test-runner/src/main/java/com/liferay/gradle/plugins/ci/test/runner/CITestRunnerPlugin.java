@@ -13,8 +13,8 @@ import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.BuildException;
@@ -235,7 +235,7 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					try {
 						Files.write(
-							catalinaProperties.toAbsolutePath(),
+							catalinaProperties.getAbsolutePath(),
 							catalinaPropertiesContent.getBytes());
 					}
 					catch (IOException ioException) {
