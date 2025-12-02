@@ -202,9 +202,14 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
 
+                    try{
 					String catalinaPropertiesContent = FileUtil.read(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
+                    }
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
 
 					StringBuilder token = new StringBuilder();
 
@@ -225,9 +230,14 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 					catalinaPropertiesContent.replace(
 						token.toString(), replaceToken.toString());
-
+                    
+                    try{
 					FileUtils.write(
 						catalinaProperties, catalinaPropertiesContent, "UTF-8");
+                    }
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
 				}
 
 			});
