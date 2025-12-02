@@ -193,6 +193,12 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
 					}
+
+                    File webAppsDir = new File(
+                        tomcatAppServer.getDir(),
+                        "webapps");
+
+                    webAppsDir.mkdirs();
 				}
 
 			});
