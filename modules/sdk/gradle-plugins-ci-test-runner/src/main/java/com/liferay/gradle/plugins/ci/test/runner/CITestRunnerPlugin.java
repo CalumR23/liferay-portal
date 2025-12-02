@@ -13,6 +13,8 @@ import com.liferay.gradle.util.GradleUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.BuildException;
@@ -232,9 +234,9 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 						token.toString(), replaceToken.toString());
 
 					try {
-						FileUtils.write(
-							catalinaProperties, catalinaPropertiesContent,
-							"UTF-8");
+						Files.write(
+							catalinaProperties.toAbsolutePath(),
+							catalinaPropertiesContent.getBytes());
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
