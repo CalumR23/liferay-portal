@@ -231,19 +231,19 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					replaceToken.append("\"${catalina.home}/lib\",");
 					replaceToken.append("\"${catalina.home}/lib/*.jar\"");
 
-                    System.out.println("token: " + token.toString());
-                    System.out.println("replace: " + replaceToken.toString());
+					catalinaPropertiesContent =
+						catalinaPropertiesContent.replace(
+							token.toString(), replaceToken.toString());
 
-                    if(catalinaPropertiesContent.contains(token.toString())){
-                        System.out.println("contains token");
-                    }
+					StringBuilder sb = new StringBuilder();
 
-					catalinaPropertiesContent = catalinaPropertiesContent.replace(
-						token.toString(), replaceToken.toString());
-                    
-                    if(catalinaPropertiesContent.contains(replaceToken.toString())){
-                        System.out.println("contains replace token");
-                    }
+					sb.append(
+						"tomcat.util.scan.StandardJarScanFilter.jarsToSkip=*");
+					sb.append("\n");
+					sb.append(
+						"tomcat.util.scan.StandardJarScanFilter.jarsToScan=");
+
+					catalinaPropertiesContent += sb.toString();
 
 					try {
 						Files.write(
@@ -253,6 +253,54 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 					catch (IOException ioException) {
 						throw new RuntimeException(ioException);
 					}
+
+					File contextXML = new File(
+						tomcatAppServerDir.getAbsolutePath() +
+							"/conf/context.xml");
+
+					List<String> contextXMLLines = null;
+
+					try {
+						contextXMLLines = Files.readAllLines(
+							contextXML.toPath());
+
+						String contentLF = String.join("\n", contextXMLLines);
+
+						Files.write(
+							filePath,
+							contentLF.getBytes());
+					}
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
+
+                    String regex = "<\!--\s*Uncomment\D* \/>\s*-->";
+
+                    String replacement = " <Manager pathname=\"SESSIONS.ser\" />\n";
+
+                    String contentXMLContent = null;
+
+					try {
+						contentXMLContent = FileUtils.readFileToString(
+							contextXML);
+					}
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
+
+                    contentXMLContent = contentXMLContent.replaceAll(
+                        regex, replacement);
+
+                    try {
+						Files.write(
+							Paths.get(contentXML.getAbsolutePath()),
+							contentXMLContent.getBytes());
+					}
+					catch (IOException ioException) {
+						throw new RuntimeException(ioException);
+					}
+
+                    
 				}
 
 			});
