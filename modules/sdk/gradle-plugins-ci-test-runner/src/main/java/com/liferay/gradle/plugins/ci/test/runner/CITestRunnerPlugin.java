@@ -5,29 +5,18 @@
 
 package com.liferay.gradle.plugins.ci.test.runner;
 
-import com.liferay.ant.mirrors.get.MirrorsGetTask;
 import com.liferay.gradle.plugins.LiferayBasePlugin;
-import com.liferay.gradle.plugins.extensions.LiferayExtension;
-import com.liferay.gradle.plugins.extensions.TomcatAppServer;
+import com.liferay.gradle.plugins.ci.test.runner.task.DownloadTomcatBundleTask;
 import com.liferay.gradle.util.GradleUtil;
 
-import org.apache.tools.ant.BuildException;
-
-import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.BasePlugin;
-import org.gradle.api.plugins.ExtensionContainer;
 
 /**
  * @author Calum Ragan
  */
 public class CITestRunnerPlugin implements Plugin<Project> {
-    
-	public static final String DOWNLOAD_TOMCAT_ZIP_TASK_NAME =
-		"downloadTomcatZip";
 
 	@Override
 	public void apply(Project project) {
@@ -35,54 +24,16 @@ public class CITestRunnerPlugin implements Plugin<Project> {
 
 		GradleUtil.applyPlugin(project, LiferayBasePlugin.class);
 
-		ExtensionContainer extensionContainer = project.getExtensions();
-
-		LiferayExtension liferayExtension = extensionContainer.getByType(
-			LiferayExtension.class);
-
-		TomcatAppServer tomcatAppServer =
-			(TomcatAppServer)liferayExtension.getAppServer("tomcat");
-
-		_addTaskDownloadTomcatZip(project, tomcatAppServer);
+		DownloadTomcatBundleTask downloadTomcatBundleTask =
+			addTaskDownloadTomcatBundle(project);
 	}
 
-	private Task _addTaskDownloadTomcatZip(
-		Project project, TomcatAppServer tomcatAppServer) {
+	protected DownloadTomcatBundleTask addTaskDownloadTomcatBundle(
+		Project project) {
 
-		Task task = GradleUtil.addTask(
-			project, DOWNLOAD_TOMCAT_ZIP_TASK_NAME, Task.class);
-
-		task.doLast(
-			new Action<Task>() {
-
-				@Override
-				public void execute(Task task) {
-					MirrorsGetTask mirrorsGetTask = new MirrorsGetTask();
-
-					org.apache.tools.ant.Project antProject =
-						new org.apache.tools.ant.Project();
-
-					antProject.init();
-
-					mirrorsGetTask.setProject(antProject);
-
-					mirrorsGetTask.setVerbose(true);
-
-					mirrorsGetTask.setSrc(tomcatAppServer.getZipUrl());
-
-					mirrorsGetTask.setDest(tomcatAppServer.getDir());
-
-					try {
-						mirrorsGetTask.execute();
-					}
-					catch (BuildException buildException) {
-						throw new RuntimeException(buildException);
-					}
-				}
-
-			});
-
-		return task;
+		return GradleUtil.addTask(
+			project, DOWNLOAD_TOMCAT_BUNDLE_TASK_NAME,
+			DownloadTomcatBundleTask.class);
 	}
 
 }
