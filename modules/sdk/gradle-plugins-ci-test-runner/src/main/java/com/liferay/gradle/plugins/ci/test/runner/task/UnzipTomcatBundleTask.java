@@ -74,6 +74,10 @@ public class UnzipTomcatBundleTask extends JavaExec {
 		File tomcatAppServerZipFile = new File(getParentDir(), getZipName());
 		final Project project = getProject();
 
+		String tomcatAppServerVersion = getVersion();
+
+		File tomcatAppServerDir = getDir();
+
 		project.copy(
 			new Action<CopySpec>() {
 
@@ -87,8 +91,6 @@ public class UnzipTomcatBundleTask extends JavaExec {
 					else {
 						copySpec.from(project.tarTree(tomcatAppServerZipFile));
 					}
-
-					String tomcatAppServerVersion = getVersion();
 
 					copySpec.include(
 						"apache-tomcat-" + tomcatAppServerVersion + "/bin/**");
@@ -132,6 +134,16 @@ public class UnzipTomcatBundleTask extends JavaExec {
 				}
 
 			});
+
+		File apacheDir = new File(
+			tomcatAppServerDir, "apache-tomcat-" + tomcatAppServerVersion);
+
+		try {
+			FileUtils.deleteDirectory(apacheDir);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
 	}
 
 	private Object _dir;
