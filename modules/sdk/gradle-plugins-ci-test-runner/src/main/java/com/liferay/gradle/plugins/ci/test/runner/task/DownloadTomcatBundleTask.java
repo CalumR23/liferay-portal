@@ -122,6 +122,7 @@ public class DownloadTomcatBundleTask extends JavaExec {
 	}
 
 	private Object _dest;
+	private Object _parentDir;
 	private Object _sha;
 	private Object _src;
 	private Boolean _verbose;
