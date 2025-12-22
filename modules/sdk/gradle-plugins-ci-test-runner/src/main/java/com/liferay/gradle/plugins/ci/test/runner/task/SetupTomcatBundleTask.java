@@ -122,6 +122,13 @@ public class SetupTomcatBundleTask extends JavaExec {
 
 						String contextXMLFileContent = String.join("\n", contextXMLLines);
 
+                        String regex = "<\!--\s*Un\D* \/>\s*-->";
+
+                        String replacement = "  <Manager pathname=\"SESSIONS.ser\" />\n";
+
+                        contextXMLFileContent = contextXMLFileContent.replaceAll(
+                            regex, replacement);
+
 						Files.write(
 							contextXMLFile.getPath(),
 							contextXMLFileContent.getBytes());
@@ -133,37 +140,7 @@ public class SetupTomcatBundleTask extends JavaExec {
 							ioException);
 					}
 
-                    String regex = '<\!--\s*Un\D* \/>\s*-->';
-
-                    String replacement = ' <Manager pathname=\"SESSIONS.ser\" />\n';
-
-                    String contextXMLContent = null;
-
-					try {
-						contextXMLFileContent = FileUtils.readFileToString(
-							contextXMLFile);
-					}
-					catch (IOException ioException) {
-						throw new RuntimeException(
-							"Unable to read context XML file " +
-								contextXMLFile.getPath(),
-							ioException);
-					}
-
-                    contextXMLFileContent = contextXMLFileContent.replaceAll(
-                        regex, replacement);
-
-                    try {
-						Files.write(
-							Paths.get(contextXMLFile.getAbsolutePath()),
-							contextXMLFileContent.getBytes());
-					}
-					catch (IOException ioException) {
-						throw new RuntimeException(
-							"Unable to write content XML file " +
-								contextXML.getPath(),
-							ioException);
-					}
+                    
 
     }
     	private Object _dir;
