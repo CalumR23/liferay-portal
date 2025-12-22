@@ -76,8 +76,6 @@ public class UnzipTomcatBundleTask extends JavaExec {
 
 		String tomcatAppServerVersion = getVersion();
 
-		File tomcatAppServerDir = getDir();
-
 		project.copy(
 			new Action<CopySpec>() {
 
@@ -134,6 +132,8 @@ public class UnzipTomcatBundleTask extends JavaExec {
 				}
 
 			});
+
+		File tomcatAppServerDir = getDir();
 
 		File apacheDir = new File(
 			tomcatAppServerDir, "apache-tomcat-" + tomcatAppServerVersion);
