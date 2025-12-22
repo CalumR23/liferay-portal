@@ -61,10 +61,12 @@ public class RunTomcatBundleTask extends JavaExec {
 
 			int exitCode = process.waitFor();
 
-			System.out.println("\nExited with error code: " + exitCode);
+			if (exitCode != 0) {
+				throw new RuntimeException("\nTomcat failed with error code: " + exitCode);
+			}
 		}
 		catch (Exception exception) {
-			exception.printStackTrace();
+			throw new RuntimeException("Unable to start Tomcat bundle.", exception);
 		}
 	}
 
