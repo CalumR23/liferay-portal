@@ -137,10 +137,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 
                     String replacement = ' <Manager pathname=\"SESSIONS.ser\" />\n';
 
-                    String contentXMLContent = null;
+                    String contextXMLContent = null;
 
 					try {
-						contentXMLFileContent = FileUtils.readFileToString(
+						contextXMLFileContent = FileUtils.readFileToString(
 							contextXMLFile);
 					}
 					catch (IOException ioException) {
@@ -150,18 +150,18 @@ public class SetupTomcatBundleTask extends JavaExec {
 							ioException);
 					}
 
-                    contentXMLFileContent = contentXMLFileContent.replaceAll(
+                    contextXMLFileContent = contextXMLFileContent.replaceAll(
                         regex, replacement);
 
                     try {
 						Files.write(
-							Paths.get(contentXMLFile.getAbsolutePath()),
-							contentXMLFileContent.getBytes());
+							Paths.get(contextXMLFile.getAbsolutePath()),
+							contextXMLFileContent.getBytes());
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
 							"Unable to write content XML file " +
-								contentXML.getPath(),
+								contextXML.getPath(),
 							ioException);
 					}
 
