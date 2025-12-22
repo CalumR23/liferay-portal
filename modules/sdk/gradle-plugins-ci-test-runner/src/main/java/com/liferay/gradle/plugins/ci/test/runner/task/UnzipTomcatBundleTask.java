@@ -142,7 +142,9 @@ public class UnzipTomcatBundleTask extends JavaExec {
 			FileUtils.deleteDirectory(apacheDir);
 		}
 		catch (IOException ioException) {
-			throw new RuntimeException(ioException);
+			throw new RuntimeException(
+				"Unable to delete directory " + apacheDir.getPath(),
+				ioException);
 		}
 	}
 

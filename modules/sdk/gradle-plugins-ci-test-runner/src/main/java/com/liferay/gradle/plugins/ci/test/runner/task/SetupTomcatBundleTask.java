@@ -61,7 +61,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 							catalinaProperties);
 					}
 					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
+						throw new RuntimeException(
+							"Unable to read file " +
+								catalinaPropertiesFile.getPath(),
+							ioException);
 					}
 
 					StringBuilder token = new StringBuilder();
@@ -101,7 +104,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 							catalinaPropertiesContent.getBytes());
 					}
 					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
+						throw new RuntimeException(
+							"Unable to write catalina properties file " +
+								catalinePropertiesFile.getPath(),
+							ioException);
 					}
 
 					File contextXML = new File(
@@ -121,7 +127,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 							contentLF.getBytes());
 					}
 					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
+						throw new RuntimeException(
+							"Unable to rewrite context XML file " +
+								contextXML.getPath(),
+							ioException);
 					}
 
                     String regex = '<\!--\s*Un\D* \/>\s*-->';
@@ -135,7 +144,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 							contextXML);
 					}
 					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
+						throw new RuntimeException(
+							"Unable to read context XML file " +
+								contextXMLFile.getPath(),
+							ioException);
 					}
 
                     contentXMLContent = contentXMLContent.replaceAll(
@@ -147,7 +159,10 @@ public class SetupTomcatBundleTask extends JavaExec {
 							contentXMLContent.getBytes());
 					}
 					catch (IOException ioException) {
-						throw new RuntimeException(ioException);
+						throw new RuntimeException(
+							"Unable to write content XML file " +
+								contentXML.getPath(),
+							ioException);
 					}
 
     }
