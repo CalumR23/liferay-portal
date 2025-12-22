@@ -122,7 +122,7 @@ public class SetupTomcatBundleTask extends JavaExec {
 
 						String contextXMLFileContent = String.join("\n", contextXMLLines);
 
-                        String regex = "<\!--\s*Un\D* \/>\s*-->";
+                        String regex = "<\\!--\\s*Un\\D* \\/>\\s*-->";
 
                         String replacement = "  <Manager pathname=\"SESSIONS.ser\" />\n";
 
