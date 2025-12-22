@@ -14,7 +14,6 @@ import org.gradle.api.Project;
 /**
  * @author Calum Ragan
  */
-
 public class PoshiRunnerExtension {
 
 	public PoshiRunnerExtension(Project project) {
