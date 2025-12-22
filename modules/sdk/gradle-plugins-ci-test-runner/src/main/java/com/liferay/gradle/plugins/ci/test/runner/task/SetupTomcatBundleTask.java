@@ -50,15 +50,15 @@ public class SetupTomcatBundleTask extends JavaExec {
 
 					webAppsDir.mkdirs();
 
-					File catalinaProperties = new File(
+					File catalinaPropertiesFile = new File(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/catalina.properties");
 
-					String catalinaPropertiesContent = null;
+					String catalinaPropertiesFileContent = null;
 
 					try {
-						catalinaPropertiesContent = FileUtils.readFileToString(
-							catalinaProperties);
+						catalinaPropertiesFileContent = FileUtils.readFileToString(
+							catalinaPropertiesFile);
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
@@ -67,26 +67,26 @@ public class SetupTomcatBundleTask extends JavaExec {
 							ioException);
 					}
 
-					StringBuilder token = new StringBuilder();
+					StringBuilder tokenStringBuilder = new StringBuilder();
 
-					token.append("common.loader=\"${catalina.base}/lib\",");
-					token.append("\"${catalina.base}/lib/*.jar\",");
-					token.append("\"${catalina.home}/lib\",");
-					token.append("\"${catalina.home}/lib/*.jar\"");
+					tokenStringBuilder.append("common.loader=\"${catalina.base}/lib\",");
+					tokenStringBuilder.append("\"${catalina.base}/lib/*.jar\",");
+					tokenStringBuilder.append("\"${catalina.home}/lib\",");
+					tokenStringBuilder.append("\"${catalina.home}/lib/*.jar\"");
 
-					StringBuilder replaceToken = new StringBuilder();
+					StringBuilder replaceTokenStringBuilder = new StringBuilder();
 
-					replaceToken.append(
+					replaceTokenStringBuilder.append(
 						"common.loader=\"${catalina.home}/webapps/ROOT/");
-					replaceToken.append("WEB-INF/lib/support-tomcat.jar\",");
-					replaceToken.append("\"${catalina.base}/lib\",\"");
-					replaceToken.append("${catalina.base}/lib/*.jar\",");
-					replaceToken.append("\"${catalina.home}/lib\",");
-					replaceToken.append("\"${catalina.home}/lib/*.jar\"");
+					replaceTokenStringBuilder.append("WEB-INF/lib/support-tomcat.jar\",");
+					replaceTokenStringBuilder.append("\"${catalina.base}/lib\",\"");
+					replaceTokenStringBuilder.append("${catalina.base}/lib/*.jar\",");
+					replaceTokenStringBuilder.append("\"${catalina.home}/lib\",");
+					replaceTokenStringBuilder.append("\"${catalina.home}/lib/*.jar\"");
 
-					catalinaPropertiesContent =
-						catalinaPropertiesContent.replace(
-							token.toString(), replaceToken.toString());
+					catalinaPropertiesFileContent =
+						catalinaPropertiesFileContent.replace(
+							tokenStringBuilder.toString(), replaceTokenStringBuilder.toString());
 
 					StringBuilder sb = new StringBuilder();
 
@@ -96,12 +96,12 @@ public class SetupTomcatBundleTask extends JavaExec {
 					sb.append(
 						"tomcat.util.scan.StandardJarScanFilter.jarsToScan=");
 
-					catalinaPropertiesContent += sb.toString();
+					catalinaPropertiesFileContent += sb.toString();
 
 					try {
 						Files.write(
-							Paths.get(catalinaProperties.getAbsolutePath()),
-							catalinaPropertiesContent.getBytes());
+							Paths.get(catalinaPropertiesFile.getAbsolutePath()),
+							catalinaPropertiesFileContent.getBytes());
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
