@@ -123,7 +123,7 @@ public class SetupTomcatBundleTask extends JavaExec {
 						String contextXMLFileContent = String.join("\n", contextXMLLines);
 
 						Files.write(
-							filePath,
+							contextXMLFile.getPath(),
 							contextXMLFileContent.getBytes());
 					}
 					catch (IOException ioException) {
