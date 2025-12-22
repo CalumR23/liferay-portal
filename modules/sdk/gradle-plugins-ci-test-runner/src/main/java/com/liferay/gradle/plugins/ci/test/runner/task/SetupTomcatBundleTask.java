@@ -110,26 +110,26 @@ public class SetupTomcatBundleTask extends JavaExec {
 							ioException);
 					}
 
-					File contextXML = new File(
+					File contextXMLFile = new File(
 						tomcatAppServerDir.getAbsolutePath() +
 							"/conf/context.xml");
 
-					List<String> contextXMLLines = null;
+					List<String> contextXMLFileLines = null;
 
 					try {
-						contextXMLLines = Files.readAllLines(
-							contextXML.toPath());
+						contextXMLFileLines = Files.readAllLines(
+							contextXMLFile.toPath());
 
-						String contentLF = String.join("\n", contextXMLLines);
+						String contextXMLFileContent = String.join("\n", contextXMLLines);
 
 						Files.write(
 							filePath,
-							contentLF.getBytes());
+							contextXMLFileContent.getBytes());
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
 							"Unable to rewrite context XML file " +
-								contextXML.getPath(),
+								contextXMLFile.getPath(),
 							ioException);
 					}
 
@@ -140,8 +140,8 @@ public class SetupTomcatBundleTask extends JavaExec {
                     String contentXMLContent = null;
 
 					try {
-						contentXMLContent = FileUtils.readFileToString(
-							contextXML);
+						contentXMLFileContent = FileUtils.readFileToString(
+							contextXMLFile);
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
@@ -150,13 +150,13 @@ public class SetupTomcatBundleTask extends JavaExec {
 							ioException);
 					}
 
-                    contentXMLContent = contentXMLContent.replaceAll(
+                    contentXMLFileContent = contentXMLFileContent.replaceAll(
                         regex, replacement);
 
                     try {
 						Files.write(
-							Paths.get(contentXML.getAbsolutePath()),
-							contentXMLContent.getBytes());
+							Paths.get(contentXMLFile.getAbsolutePath()),
+							contentXMLFileContent.getBytes());
 					}
 					catch (IOException ioException) {
 						throw new RuntimeException(
