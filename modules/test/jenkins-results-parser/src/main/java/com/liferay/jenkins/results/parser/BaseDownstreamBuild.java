@@ -258,16 +258,20 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		return buildReportJSONObject;
 	}
 
-	@Override
-	public String getDisplayName() {
-		StringBuilder sb = new StringBuilder();
+    @Override
+    public String getDisplayName() {
+        StringBuilder sb = new StringBuilder();
 
-		sb.append(getJobVariant());
-		sb.append("/");
-		sb.append(getAxisVariable());
+        System.out.println("BaseDownstreamBuild display name");
 
-		return sb.toString();
-	}
+        sb.append(getJobVariant());
+        sb.append("/");
+        sb.append(getAxisVariable());
+
+        System.out.println("axis variable: " + getAxisVariable());
+
+        return sb.toString();
+    }
 
 	@Override
 	public DownstreamBuildReport getDownstreamBuildReport() {

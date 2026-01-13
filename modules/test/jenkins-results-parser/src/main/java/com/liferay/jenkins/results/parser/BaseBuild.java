@@ -37,6 +37,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.Document;
@@ -566,22 +567,29 @@ public abstract class BaseBuild implements Build {
 		return parentBuild.getDepth() + 1;
 	}
 
-	@Override
-	public String getDisplayName() {
-		StringBuilder sb = new StringBuilder();
+    @Override
+    public String getDisplayName() {
+        StringBuilder sb = new StringBuilder();
 
-		sb.append(getJobName());
+        sb.append(getJobName());
 
-		String jobVariant = getParameterValue("JOB_VARIANT");
+        Job job = getJob();
 
-		if ((jobVariant != null) && !jobVariant.isEmpty()) {
-			sb.append("/");
-			sb.append(jobVariant);
-		}
+        for (AxisTestClassGroup axisTestClassGroup : job.getAxisTestClassGroups()){
+            System.out.println("axis name: " + axisTestClassGroup.getAxisName());
+        }
 
-		return sb.toString();
-	}
+        String jobVariant = getParameterValue("JOB_VARIANT");
 
+        if ((jobVariant != null) && !jobVariant.isEmpty()) {
+            sb.append("/");
+            sb.append(jobVariant);
+        }
+
+        System.out.println("jobVaraint name: " + sb.toString());
+
+        return sb.toString();
+    }
 	@Override
 	public long getDuration() {
 		if (_duration != null) {
