@@ -262,13 +262,12 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
     public String getDisplayName() {
         StringBuilder sb = new StringBuilder();
 
-        System.out.println("BaseDownstreamBuild display name");
-
         sb.append(getJobVariant());
         sb.append("/");
         sb.append(getAxisVariable());
 
         System.out.println("axis variable: " + getAxisVariable());
+        System.out.println("BaseDownstreamBuild display name: " + sb.toString());
 
         return sb.toString();
     }
