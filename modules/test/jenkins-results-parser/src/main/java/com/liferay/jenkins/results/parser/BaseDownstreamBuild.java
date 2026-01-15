@@ -263,7 +263,9 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 
         if(isBuildCached()){
             AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
-            System.out.println("axis test name: " + axisTestClassGroup.getAxisName());
+            if (axisTestClassGroup != null) {
+                System.out.println("axis test name: " + axisTestClassGroup.getAxisName());
+            }
         }
         StringBuilder sb = new StringBuilder();
 
