@@ -260,6 +260,11 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 
     @Override
     public String getDisplayName() {
+
+        if(isBuildCached()){
+            AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
+            System.out.println("axis test name: " + axisTestClassGroup.getAxisName());
+        }
         StringBuilder sb = new StringBuilder();
 
         sb.append(getJobVariant());
