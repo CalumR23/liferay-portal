@@ -573,20 +573,12 @@ public abstract class BaseBuild implements Build {
 
         sb.append(getJobName());
 
-        Job job = getJob();
-
-        for (AxisTestClassGroup axisTestClassGroup : job.getAxisTestClassGroups()){
-            System.out.println("axis name: " + axisTestClassGroup.getAxisName());
-        }
-
         String jobVariant = getParameterValue("JOB_VARIANT");
 
         if ((jobVariant != null) && !jobVariant.isEmpty()) {
             sb.append("/");
             sb.append(jobVariant);
         }
-
-        System.out.println("jobVaraint name: " + sb.toString());
 
         return sb.toString();
     }
