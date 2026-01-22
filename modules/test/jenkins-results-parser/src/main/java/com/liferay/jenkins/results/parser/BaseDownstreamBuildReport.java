@@ -155,6 +155,10 @@ public abstract class BaseDownstreamBuildReport
 		return false;
 	}
 
+    public void setBuildReportJSONObject(JSONObject buildReportJSONObject) {
+        _buildReportJSONObject = buildReportJSONObject;
+    }
+    
 	protected BaseDownstreamBuildReport(DownstreamBuild downstreamBuild) {
 		super(downstreamBuild.getBuildURL());
 
@@ -179,7 +183,7 @@ public abstract class BaseDownstreamBuildReport
 
 	private final String _batchName;
 	private final boolean _buildCached;
-	private final JSONObject _buildReportJSONObject;
+	private JSONObject _buildReportJSONObject;
 	private Map<String, TestClassReport> _testClassReportsMap;
 	private final TopLevelBuildReport _topLevelBuildReport;
 
