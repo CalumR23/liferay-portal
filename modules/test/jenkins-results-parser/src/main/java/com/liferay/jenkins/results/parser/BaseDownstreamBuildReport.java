@@ -156,17 +156,10 @@ public abstract class BaseDownstreamBuildReport
 	}
 
     public void setAxisName(String axisName) {
-        JSONObject buildReportJSONObject = getBuildReportJSONObject();
-
-        System.out.println("got Object");
-
-        if (buildReportJSONObject == null) {
-            System.out.println("null obj");
+        if (JenkinsResultsParserUtil.isNullOrEmpty(axisName)){
             return;
         }
-        System.out.println("not null obj");
-        buildReportJSONObject.put("axisName", axisName);
-        _buildReportJSONObject = buildReportJSONObject;
+        _buildReportJSONObject.put("axisName", axisName);
     }
 
 	protected BaseDownstreamBuildReport(DownstreamBuild downstreamBuild) {
