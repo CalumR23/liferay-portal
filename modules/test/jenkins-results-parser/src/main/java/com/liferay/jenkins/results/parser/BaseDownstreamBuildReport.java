@@ -155,10 +155,16 @@ public abstract class BaseDownstreamBuildReport
 		return false;
 	}
 
-    public void setBuildReportJSONObject(JSONObject buildReportJSONObject) {
+    public void setAxisName(String axisName) {
+        JSONObject buildReportJSONObject = getBuildReportJSONObject();
+
+        if (buildReportJSONObject == null) {
+            return;
+        }
+        buildReportJSONObject.put("axisName", axisName);
         _buildReportJSONObject = buildReportJSONObject;
     }
-    
+
 	protected BaseDownstreamBuildReport(DownstreamBuild downstreamBuild) {
 		super(downstreamBuild.getBuildURL());
 
