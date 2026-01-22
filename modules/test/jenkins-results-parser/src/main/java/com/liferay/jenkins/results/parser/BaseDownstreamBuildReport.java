@@ -158,9 +158,13 @@ public abstract class BaseDownstreamBuildReport
     public void setAxisName(String axisName) {
         JSONObject buildReportJSONObject = getBuildReportJSONObject();
 
+        System.out.println("got Object");
+
         if (buildReportJSONObject == null) {
+            System.out.println("null obj");
             return;
         }
+        System.out.println("not null obj");
         buildReportJSONObject.put("axisName", axisName);
         _buildReportJSONObject = buildReportJSONObject;
     }
