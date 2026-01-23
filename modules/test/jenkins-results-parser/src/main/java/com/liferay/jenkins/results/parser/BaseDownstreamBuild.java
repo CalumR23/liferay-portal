@@ -266,16 +266,14 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
         sb.append("/");
         sb.append(getAxisVariable());
 
-        DownstreamBuildReport downstreamBuildReport = getDownstreamBuildReport();
+
 
         System.out.println("axis variable: " + getAxisVariable());
         System.out.println("BaseDownstreamBuild display name: " + sb.toString());
 
-        if (downstreamBuildReport == null){
-            return sb.toString();
-        }
+        JSONObject buildReportJSONObject = super.getBuildReportJSONObject();
 
-        System.out.println("downstream build report axis: " + downstreamBuildReport.getAxisName());
+        System.out.println("getAxisName: " + buildReportJSONObject.optString("axisName", null));
 
         return sb.toString();
     }
