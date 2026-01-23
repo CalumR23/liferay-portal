@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
+import com.sun.org.apache.xml.internal.dtm.Axis;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import org.dom4j.Document;
@@ -266,14 +267,12 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
         sb.append("/");
         sb.append(getAxisVariable());
 
+        AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
 
+        System.out.println("axis TCG name: " + axisTestClassGroup.getAxisName());
 
         System.out.println("axis variable: " + getAxisVariable());
         System.out.println("BaseDownstreamBuild display name: " + sb.toString());
-
-        JSONObject buildReportJSONObject = super.getBuildReportJSONObject();
-
-        System.out.println("getAxisName: " + buildReportJSONObject.optString("axisName", null));
 
         return sb.toString();
     }
