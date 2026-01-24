@@ -267,9 +267,9 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
         sb.append("/");
         sb.append(getAxisVariable());
 
-        AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
-
-        System.out.println("axis TCG name: " + axisTestClassGroup.getAxisName());
+        if (isBuildCached()){
+           System.out.println(getDownstreamBuildReport().getBuildReportJSONObject().optString("axisName"));
+        }
 
         System.out.println("axis variable: " + getAxisVariable());
         System.out.println("BaseDownstreamBuild display name: " + sb.toString());
