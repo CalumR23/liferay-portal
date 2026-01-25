@@ -276,6 +276,9 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
               System.out.println("axisTestClassGroup is null");
           }
         }
+        else{
+            System.out.println("build is not cached");
+        }
 
         System.out.println("axis variable: " + getAxisVariable());
         System.out.println("BaseDownstreamBuild display name: " + sb.toString());
