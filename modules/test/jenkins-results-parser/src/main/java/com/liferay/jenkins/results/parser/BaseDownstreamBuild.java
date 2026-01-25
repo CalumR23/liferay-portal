@@ -268,7 +268,13 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
         sb.append(getAxisVariable());
 
         if (isBuildCached()){
-           System.out.println(getDownstreamBuildReport().getBuildReportJSONObject().optString("axisName"));
+           System.out.println("build is cached");
+          AxisTestClassGroup axisTestClassGroup = getAxisTestClassGroup();
+          if (axisTestClassGroup != null) {
+             System.out.println("cached axis name: " + axisTestClassGroup.getAxisName());
+          }else {
+              System.out.println("axisTestClassGroup is null");
+          }
         }
 
         System.out.println("axis variable: " + getAxisVariable());
