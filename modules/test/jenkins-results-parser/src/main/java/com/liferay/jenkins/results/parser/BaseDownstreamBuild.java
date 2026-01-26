@@ -280,6 +280,12 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
             System.out.println("build is not cached");
         }
 
+        JSONObject buildReportJSONObject = super.getBuildReportJSONObject();
+
+        if (buildReportJSONObject != null){
+            System.out.println("JSON axis name: " + buildReportJSONObject.optString("axisName", null));
+        }
+
         System.out.println("axis variable: " + getAxisVariable());
         System.out.println("BaseDownstreamBuild display name: " + sb.toString());
 
