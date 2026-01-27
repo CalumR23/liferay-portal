@@ -75,6 +75,17 @@ public abstract class BaseTopLevelBuild
 			BuildFactory.newBuild(cachedDownstreamBuildReport, this));
 	}
 
+	public void addCachedDownstreamBuildReport(
+		String axisName, DownstreamBuildReport cachedDownstreamBuildReport) {
+
+		if (cachedDownstreamBuildReport == null) {
+			return;
+		}
+
+		addCachedDownstreamBuild(
+			BuildFactory.newBuild(axisName, cachedDownstreamBuildReport, this));
+	}
+
 	@Override
 	public void addTestrayAttachmentURL(URL testrayAttachmentURL) {
 		if (_testrayAttachmentURLs.contains(testrayAttachmentURL)) {
@@ -999,7 +1010,7 @@ public abstract class BaseTopLevelBuild
 		if (!cachedBuildURLs.isEmpty()) {
 			for (String cachedBuildURL : cachedBuildURLs) {
 				Build downstreamBuild = BuildFactory.newBuild(
-					cachedBuildURL, null, this);
+					null, cachedBuildURL, null, this);
 
 				downstreamBuild.setBuildCached(true);
 

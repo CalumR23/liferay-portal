@@ -27,12 +27,38 @@ public class BuildFactory {
 	}
 
 	public static Build newBuild(String buildURL, Build parentBuild) {
-		return newBuild(buildURL, null, null, parentBuild);
+		return newBuild(null, buildURL, null, null, parentBuild);
+	}
+
+	public static Build newBuild(
+		String axisName, DownstreamBuildReport cachedDownstreamBuildReport,
+		Build parentBuild) {
+
+		return newBuild(
+			axisName, String.valueOf(cachedDownstreamBuildReport.getBuildURL()),
+			cachedDownstreamBuildReport,
+			cachedDownstreamBuildReport.getJobVariant(), parentBuild);
 	}
 
 	public static Build newBuild(
 		String buildURL, DownstreamBuildReport cachedDownstreamBuildReport,
 		String jobVariant, Build parentBuild) {
+
+		return newBuild(
+			null, buildURL, cachedDownstreamBuildReport, jobVariant,
+			parentBuild);
+	}
+
+	public static Build newBuild(
+		String buildURL, String jobVariant, Build parentBuild) {
+
+		return newBuild(null, buildURL, null, jobVariant, parentBuild);
+	}
+
+	public static Build newBuild(
+		String axisName, String buildURL,
+		DownstreamBuildReport cachedDownstreamBuildReport, String jobVariant,
+		Build parentBuild) {
 
 		buildURL = JenkinsResultsParserUtil.getLocalURL(buildURL);
 
@@ -262,9 +288,10 @@ public class BuildFactory {
 	}
 
 	public static Build newBuild(
-		String buildURL, String jobVariant, Build parentBuild) {
+		String axisName, String buildURL, String jobVariant,
+		Build parentBuild) {
 
-		return newBuild(buildURL, null, jobVariant, parentBuild);
+		return newBuild(axisName, buildURL, null, jobVariant, parentBuild);
 	}
 
 	public static synchronized Build newBuildFromArchive(
