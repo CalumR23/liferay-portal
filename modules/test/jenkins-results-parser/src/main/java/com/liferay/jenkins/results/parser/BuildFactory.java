@@ -100,8 +100,12 @@ public class BuildFactory {
 				return new PoshiAxisBuild(buildURL, (BatchBuild)parentBuild);
 			}
 
+            System.out.println("not null axis var job var: " + jobVariant);
+
 			return new AxisBuild(buildURL, (BatchBuild)parentBuild);
 		}
+
+        System.out.println("null axis var job var: " + jobVariant);
 
 		String jobName = matcher.group("jobName");
 
