@@ -69,7 +69,14 @@ public class BuildFactory {
 				"Invalid Jenkins build URL: " + buildURL);
 		}
 
-		String axisVariable = matcher.group("axisVariable");
+        String axisVariable = matcher.group("axisVariable");
+
+        if (!JenkinsResultsParserUtil.isNullOrEmpty(axisName)){
+            jobVariant = axisName.substring(0, axisName.lastIndexOf("/"));
+            axisVariable = axisName.substring(axisName.lastIndexOf("/")+ 1);
+            System.out.println("axis var: " + axisVariable);
+            System.out.println("jobVariant: " + jobVariant);
+        }
 
 		if (jobVariant == null) {
 			if (cachedDownstreamBuildReport != null) {
@@ -100,12 +107,8 @@ public class BuildFactory {
 				return new PoshiAxisBuild(buildURL, (BatchBuild)parentBuild);
 			}
 
-            System.out.println("not null axis var job var: " + jobVariant);
-
 			return new AxisBuild(buildURL, (BatchBuild)parentBuild);
 		}
-
-        System.out.println("null axis var job var: " + jobVariant);
 
 		String jobName = matcher.group("jobName");
 
