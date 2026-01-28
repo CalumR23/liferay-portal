@@ -266,6 +266,9 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		sb.append("/");
 		sb.append(getAxisVariable());
 
+		System.out.println(
+			"BaseDownstreamBuild display name: " + sb.toString());
+
 		return sb.toString();
 	}
 
