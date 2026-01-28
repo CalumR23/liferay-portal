@@ -37,7 +37,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
 import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.Document;

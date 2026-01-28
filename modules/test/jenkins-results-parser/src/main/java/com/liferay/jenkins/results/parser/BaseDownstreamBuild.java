@@ -46,7 +46,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 
-import com.sun.org.apache.xml.internal.dtm.Axis;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import org.dom4j.Document;
