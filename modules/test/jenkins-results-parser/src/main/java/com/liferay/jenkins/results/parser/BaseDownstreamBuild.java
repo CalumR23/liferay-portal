@@ -121,11 +121,6 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		}
 	}
 
-    @Override
-    public String getJobVariant(){
-        return _jobvariant;
-    }
-
 	@Override
 	public URL getArtifactsBaseURL() {
 		TopLevelBuild topLevelBuild = getTopLevelBuild();
@@ -194,8 +189,7 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 
 	@Override
 	public String getAxisVariable() {
-        return _axisVariable;
-
+		return _axisVariable;
 	}
 
 	@Override
@@ -394,6 +388,11 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		_gitHubMessageElement = messageElement;
 
 		return _gitHubMessageElement;
+	}
+
+	@Override
+	public String getJobVariant() {
+		return _jobVariant;
 	}
 
 	public Map<String, List<String>> getTestClassMethodNamesMap() {
@@ -678,15 +677,7 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		return true;
 	}
 
-    public void setAxisVariable(String axisVariable) {
-        _axisVariable = axisVariable;
-    }
-
-    public void setJobVariant(String jobVariant){
-        _jobvariant = jobVariant;
-    }
-
-    @Override
+	@Override
 	public void saveBuildURLInBuildDatabase() {
 		BuildDatabase buildDatabase = getBuildDatabase();
 
@@ -703,25 +694,33 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		_saveBadBuildURLsInBuildDatabase(getBadBuildURLs());
 	}
 
+	public void setAxisVariable(String axisVariable) {
+		_axisVariable = axisVariable;
+	}
+
+	public void setJobVariant(String jobVariant) {
+		_jobVariant = jobVariant;
+	}
+
 	protected BaseDownstreamBuild(
 		String buildURL, DownstreamBuildReport cachedDownstreamBuildReport,
 		TopLevelBuild topLevelBuild) {
 
 		super(buildURL, cachedDownstreamBuildReport, topLevelBuild);
 
-        if (cachedDownstreamBuildReport != null){
-            String axisName = cachedDownstreamBuildReport.getAxisName();
+		if (cachedDownstreamBuildReport == null) {
+			setAxisVariable(getParameterValue("AXIS_VARIABLE"));
 
-            setJobVariant(axisName.substring(0, axisName.lastIndexOf("/")));
+			setJobVariant(super.getJobVariant());
 
-            setAxisVariable(axisName.substring(axisName.lastIndexOf("/") + 1));
+			return;
+		}
 
-            return;
-        }
+		String axisName = cachedDownstreamBuildReport.getAxisName();
 
-        setAxisVariable(getParameterValue("AXIS_VARIABLE"));
-        
-        setJobVariant(super.getJobVariant());
+		setJobVariant(axisName.substring(0, axisName.lastIndexOf("/")));
+
+		setAxisVariable(axisName.substring(axisName.lastIndexOf("/") + 1));
 	}
 
 	@Override
@@ -1287,9 +1286,9 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		new GenericFailureMessageGenerator()
 	};
 
-    private String _axisVariable;
-    private String _jobvariant;
+	private String _axisVariable;
 	private DownstreamBuildReport _downstreamBuildReport;
 	private Element _gitHubMessageElement;
+	private String _jobVariant;
 
 }
