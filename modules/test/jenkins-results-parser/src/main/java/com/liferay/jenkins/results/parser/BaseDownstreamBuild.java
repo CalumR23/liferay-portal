@@ -709,14 +709,18 @@ public class BaseDownstreamBuild extends BaseBuild implements DownstreamBuild {
 		super(buildURL, cachedDownstreamBuildReport, topLevelBuild);
 
 		if (cachedDownstreamBuildReport == null) {
+            System.out.println("axis param value: " + getParameterValue("AXIS_VARIABLE"));
 			setAxisVariable(getParameterValue("AXIS_VARIABLE"));
 
+            System.out.println("param job variant: " + getJobVariant());
 			setJobVariant(super.getJobVariant());
 
 			return;
 		}
 
 		String axisName = cachedDownstreamBuildReport.getAxisName();
+
+        System.out.println("cached build axis name: " + axisName);
 
 		setJobVariant(axisName.substring(0, axisName.lastIndexOf("/")));
 
