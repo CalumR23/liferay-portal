@@ -107,6 +107,10 @@ public class GenerateReportsControllerBuildRunner
 			sb.append(invocationParameter.getKey());
 			sb.append("=");
 			sb.append(invocationParameterValue);
+
+			if (invocationParameterValue.startsWith("flaky-test-report")) {
+				invocationParameters.put("SLAVE_LABEL", "slave");
+			}
 		}
 
 		try {
