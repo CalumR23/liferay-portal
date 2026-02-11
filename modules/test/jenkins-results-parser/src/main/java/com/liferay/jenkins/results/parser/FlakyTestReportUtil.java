@@ -35,7 +35,7 @@ public class FlakyTestReportUtil {
 	}
 
 	public static void copyCIHistoryFiles(String filePath) throws IOException {
-		FileUtils.copyDirectory(_CI_HISTORY_DIR, new File(filePath));
+		FileUtils.copyDirectory(_CI_HISTORY_DIR, new File(filePath + "ci-history"));
 	}
 
 	public static File createCIHistoryJSONObjectFile(
