@@ -35,7 +35,8 @@ public class FlakyTestReportUtil {
 	}
 
 	public static void copyCIHistoryFiles(String filePath) throws IOException {
-		FileUtils.copyDirectory(_CI_HISTORY_DIR, new File(filePath + "ci-history"));
+		FileUtils.copyDirectory(
+			_CI_HISTORY_DIR, new File(filePath + "ci-history"));
 	}
 
 	public static File createCIHistoryJSONObjectFile(
@@ -66,7 +67,7 @@ public class FlakyTestReportUtil {
 		}
 
 		String ciHistoryJSONObjectFilePath =
-			baseReportFilePath + "/ci-history.json.gz";
+			baseReportFilePath + "ci-history.json.gz";
 
 		TestrayJobHistory testrayJobHistory = (TestrayJobHistory)jobHistory;
 
@@ -95,7 +96,7 @@ public class FlakyTestReportUtil {
 		JSONObject ciHistoryJSONObject = new JSONObject(
 			JenkinsResultsParserUtil.read(ciHistoryJSONObjectFile));
 
-		File ciHistoryFile = new File(reportsDirPath, "/ci-history/index.html");
+		File ciHistoryFile = new File(reportsDirPath, "ci-history/index.html");
 
 		String ciHistoryFileContent = JenkinsResultsParserUtil.read(
 			ciHistoryFile);
