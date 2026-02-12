@@ -618,7 +618,7 @@ public class GenerateReportsBuildRunner extends BaseBuildRunner<BuildData> {
 			}
 
 			sb.append("<a href=\"");
-			sb.append("http://test-1-0.liferay.com/userContent/reports/");
+			sb.append("http://test-1-0-aws.liferay.com/userContent/reports/");
 
 			sb.append(_getReportDirName(reportName));
 
