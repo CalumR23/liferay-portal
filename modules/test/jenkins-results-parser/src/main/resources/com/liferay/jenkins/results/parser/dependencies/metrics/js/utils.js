@@ -78,7 +78,7 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 	rowElements.forEach(rowElement => {
 		let cellElements = rowElement.querySelectorAll('td');
 
-		if ((cellElements[0].textContent === 'All') || (cellElements[0].textContent === '[Total]')) {
+		if ((cellElements[0].textContent === 'All') || (cellElements[0].textContent === '[Total]') || (cellElements[0].textContent === '[Unknown]')) {
 			return;
 		}
 
