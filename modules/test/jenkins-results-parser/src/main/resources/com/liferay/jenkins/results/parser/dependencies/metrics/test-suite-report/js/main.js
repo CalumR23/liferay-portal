@@ -9,10 +9,6 @@ addReportName();
 if ((typeof categoryTableData !== 'undefined') && categoryTableData) {
 	let categoryTableDataElement = createTable(categoryTableData, 'test-suite-data-table');
 
-	addUtilizationRows(categoryTableDataElement);
-
-	updateHeaderNames(categoryTableDataElement);
-
 	window.onload = function () {
 		triggerEvent(getElementByXpath('//th[contains(.,"Test Suite Name")]'), 'click');
 
