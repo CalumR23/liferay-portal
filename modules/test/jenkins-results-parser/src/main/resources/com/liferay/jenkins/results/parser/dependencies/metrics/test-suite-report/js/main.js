@@ -4,7 +4,7 @@ window.onload = function () {
 	triggerEvent(statusChangesRowHeader, 'click');
 }
 
-addReportName();
+// addReportName();
 
 if ((typeof tableData !== 'undefined') && tableData) {
 	let tableElement = createTable(tableData, 'test-suite-data-table');
