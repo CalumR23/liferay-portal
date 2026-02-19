@@ -1,12 +1,24 @@
 const COLORS = [
-	'#59adf6',
-	'#42d6a4',
-	'#ff6961',
-	'#ffb480',
-	'#f8f38d',
-	'#08cad1',
-	'#9d94ff',
-	'#c780e8'
+    '#59adf6',
+    '#42d6a4',
+    '#ff6961',
+    '#ffb480',
+    '#f8f38d',
+    '#08cad1',
+    '#9d94ff',
+    '#98edff',
+    '#ef0b79',
+    '#c780e8',
+    '#4472c4',
+    '#ed7d31',
+    '#70ad47',
+    '#ffc000',
+    '#a5a5a5',
+    '#636363',
+    '#ff85a1',
+    '#4bacc6',
+    '#8064a2',
+    '#9bbb59'
 ];
 
 const MAX_WEEKLY_SERVER_DURATION_MILLIS = 2370 * 7 * 24 * 60 * 60 * 1000;
@@ -59,13 +71,17 @@ function addTotalColumn(tableElement) {
 	});
 }
 
-function createBarChartFromTable(chartTitle, elementID, metricName, tableElement, dataSuffix) {
+function createBarChartFromTable(chartTitle, elementID, metricName, tableElement, dataSuffix, yAxesMax) {
 	headerElements = tableElement.querySelectorAll('thead tr th');
 
 	let xLabels = [];
 
 	headerElements.forEach(headerElement => {
 		if (headerElement.classList.contains('col-1') || headerElement.classList.contains('col-2')) {
+			return;
+		}
+
+		if (headerElement.textContent.trim() === 'Total' && chartTitle == 'Daily Server Duration by Test Suite') {
 			return;
 		}
 
@@ -93,7 +109,16 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 				return;
 			}
 
-			dataValues.push(cellElement.getAttribute('data-value'));
+			let dataValue = cellElement.getAttribute('data-value');
+
+			if (chartTitle == 'Daily Server Duration by Test Suite') {
+				dataValue = dataValue / 3600;
+				if (dataValue > 0){
+				dataValue = dataValue.toFixed(2);
+				}
+			}
+
+			dataValues.push(dataValue);
 		});
 
 		let color = getColor(datasets.length);
@@ -123,7 +148,7 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 				yAxes: [{
 					scaleLabel: {
 						display: true,
-						labelString: yAxesLabel
+						labelString: dataSuffix
 					},
 					stacked: true,
 					ticks: {
@@ -131,7 +156,7 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 						callback: function(value) {
 							return value + dataSuffix;
 						},
-						max: 100
+						max: yAxesMax
 					}
 				}]
 			},
