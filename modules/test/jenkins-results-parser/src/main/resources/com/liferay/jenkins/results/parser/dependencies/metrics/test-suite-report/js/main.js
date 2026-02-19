@@ -14,7 +14,7 @@ if ((typeof categoryTableData !== 'undefined') && categoryTableData) {
 	updateHeaderNames(categoryTableDataElement);
 
 	window.onload = function () {
-		triggerEvent(getElementByXpath('//th[contains(.,"Category")]'), 'click');
+		triggerEvent(getElementByXpath('//th[contains(.,"Test Suite")]'), 'click');
 
 		createBarChartFromTable('Daily Server Duration by Test Suite', 'server-duration-canvas', 'Total Server Duration', categoryTableDataElement);
 	}
