@@ -12,7 +12,7 @@ if ((typeof categoryTableData !== 'undefined') && categoryTableData) {
 	window.onload = function () {
 		triggerEvent(getElementByXpath('//th[contains(.,"Test Suite Name")]'), 'click');
 
-		createBarChartFromTable('Daily Server Duration by Test Suite', 'server-duration-canvas', 'Total Server Duration', categoryTableDataElement);
+		createBarChartFromTable('Daily Server Duration by Test Suite', 'server-duration-canvas', 'Total Server Duration', categoryTableDataElement, 'hrs');
 	}
 }
 

@@ -59,7 +59,7 @@ function addTotalColumn(tableElement) {
 	});
 }
 
-function createBarChartFromTable(chartTitle, elementID, metricName, tableElement) {
+function createBarChartFromTable(chartTitle, elementID, metricName, tableElement, dataSuffix) {
 	headerElements = tableElement.querySelectorAll('thead tr th');
 
 	let xLabels = [];
@@ -123,13 +123,13 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 				yAxes: [{
 					scaleLabel: {
 						display: true,
-						labelString: 'Server Duration in Hours'
+						labelString: yAxesLabel
 					},
 					stacked: true,
 					ticks: {
 						beginAtZero: true,
 						callback: function(value) {
-							return value + '%';
+							return value + dataSuffix;
 						},
 						max: 100
 					}
@@ -144,18 +144,18 @@ function createBarChartFromTable(chartTitle, elementID, metricName, tableElement
 				callbacks: {
 					label: function(tooltipItem, data) {
 				        let label = data.datasets[tooltipItem.datasetIndex].label;
-				        let percentage = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-				        let totalPercentage = 0;
+				        let dataDenomination = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+				        let totaldataDenomination = 0;
 
 				        for (let i = 0; i < data.datasets.length; i++) {
-				            totalPercentage += parseFloat(data.datasets[i].data[tooltipItem.index]);
+				            totaldataDenomination += parseFloat(data.datasets[i].data[tooltipItem.index]);
 				        }
 
 				        if (tooltipItem.datasetIndex != 0) {
-				            return label + ' : ' + percentage + '%';
+				            return label + ' : ' + dataDenomination + dataSuffix;
 				        }
 				        else {
-				            return [label + ' : ' + percentage + '%', "Total : " + totalPercentage.toFixed(2) + '%'];
+				            return [label + ' : ' + dataDenomination + dataSuffix, "Total : " + totaldataDenomination.toFixed(2) + dataSuffix];
 				        }
 					}
 				},
