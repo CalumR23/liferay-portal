@@ -73,26 +73,6 @@ function addTotalColumn(tableElement) {
 	});
 }
 
-function getDynamicMax(datasets) {
-    let indexTotals = [];
-
-    datasets.forEach(dataset => {
-        let data = dataset.data;
-        
-        data.forEach((dataValue, i) => {
-            const val = parseFloat(dataValue) || 0;
-            indexTotals[i] = (indexTotals[i] || 0) + val;
-        });
-    });
-
-    const top = Math.max(...indexTotals, 0);
-
-	console.log(top)
-
-    return Math.round(top * 1.10);
-}
-
-
 function createBarChartFromTable(chartTitle, dataSuffix, elementID, metricName, tableElement) {
 	headerElements = tableElement.querySelectorAll('thead tr th');
 
@@ -312,6 +292,25 @@ function createTable(table, tableElementID) {
 
 function getColor(index) {
 	return COLORS[index % COLORS.length];
+}
+
+function getDynamicMax(datasets) {
+    let indexTotals = [];
+
+    datasets.forEach(dataset => {
+        let data = dataset.data;
+        
+        data.forEach((dataValue, i) => {
+            const val = parseFloat(dataValue) || 0;
+            indexTotals[i] = (indexTotals[i] || 0) + val;
+        });
+    });
+
+    const top = Math.max(...indexTotals, 0);
+
+	console.log(top)
+
+    return Math.round(top * 1.10);
 }
 
 function getElementByXpath(path) {
