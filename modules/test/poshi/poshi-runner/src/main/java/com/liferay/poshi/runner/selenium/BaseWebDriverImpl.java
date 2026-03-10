@@ -145,6 +145,10 @@ public abstract class BaseWebDriverImpl implements LiferaySelenium, WebDriver {
 		timeouts.pageLoadTimeout(
 			Duration.ofSeconds(poshiProperties.timeoutPageLoadWait));
 
+        Duration activeTimeout = webDriver.manage().timeouts().getPageLoadTimeout();
+
+        System.out.println("page load timeout: " + activeTimeout.toString());
+
 		options.deleteAllCookies();
 
 		String browserResolution = poshiProperties.browserResolution;
