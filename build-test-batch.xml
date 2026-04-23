@@ -10413,11 +10413,24 @@ tar --extract --file=liferay-portal-source.tar.gz modules/core/portal-bootstrap/
 					<arg value="${liferay.portal.branch}..HEAD" />
 				</exec>
 
+				<var name="sf.build.from.source" value="false" />
+
+				<for list="${sf.force.build.from.source.suites}" param="sf.suite">
+					<sequential>
+						<if>
+							<equals arg1="@{sf.suite}" arg2="${env.CI_TEST_SUITE}" />
+							<then>
+								<var name="sf.build.from.source" value="true" />
+							</then>
+						</if>
+					</sequential>
+				</for>
+
 				<if>
 					<or>
 						<contains string="${git.diff}" substring="modules${file.separator}util${file.separator}source-formatter" />
 						<contains string="${git.diff}" substring="source-formatter.properties" />
-						<contains string=",${sf.force.build.from.source.suites}," substring=",${env.CI_TEST_SUITE}," />
+						<istrue value="${sf.build.from.source}" />
 						<matches pattern="release-((\d{4})\.q([1-4])|(7\.[0-4]\.[0-9]?[0-9]\.\d+))" string="${liferay.portal.branch}" />
 					</or>
 					<then>
