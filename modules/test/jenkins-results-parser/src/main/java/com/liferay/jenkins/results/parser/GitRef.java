@@ -10,6 +10,8 @@ package com.liferay.jenkins.results.parser;
  */
 public interface GitRef {
 
+	// LRCI-7163-4 dummy change to trigger workspace bundle init CI test
+
 	public String getName();
 
 	public String getSHA();
