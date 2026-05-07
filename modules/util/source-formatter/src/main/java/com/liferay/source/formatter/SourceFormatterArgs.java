@@ -18,6 +18,8 @@ import java.util.Set;
  */
 public class SourceFormatterArgs {
 
+	// LRCI-7360 dummy change to trigger full source-format run
+
 	public static final boolean AUTO_FIX = true;
 
 	public static final String BASE_DIR_NAME = "./";
