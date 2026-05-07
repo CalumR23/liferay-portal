@@ -32,6 +32,15 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 		return _sortMethodCalls(content);
 	}
 
+	private static Pattern _getCaseInsensitivePattern(String regex) {
+		return _caseInsensitivePatternCache.computeIfAbsent(
+			regex, key -> Pattern.compile(key, Pattern.CASE_INSENSITIVE));
+	}
+
+	private static Pattern _getPattern(String regex) {
+		return _patternCache.computeIfAbsent(regex, Pattern::compile);
+	}
+
 	private String _getMethodCall(String content, int start) {
 		int end = start;
 
@@ -475,15 +484,6 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 		}
 
 		return content;
-	}
-
-	private static Pattern _getCaseInsensitivePattern(String regex) {
-		return _caseInsensitivePatternCache.computeIfAbsent(
-			regex, key -> Pattern.compile(key, Pattern.CASE_INSENSITIVE));
-	}
-
-	private static Pattern _getPattern(String regex) {
-		return _patternCache.computeIfAbsent(regex, Pattern::compile);
 	}
 
 	private static final String _GENERIC_TYPE_NAMES_PATTERN;
