@@ -64,11 +64,6 @@ public abstract class BasePersistentResource implements PersistentResource {
 	}
 
 	@Override
-	public String getControllerBuildURL() {
-		return _controllerBuildURL;
-	}
-
-	@Override
 	public String getProducerBuildURL() {
 		return _producerBuildURL;
 	}
@@ -325,7 +320,7 @@ public abstract class BasePersistentResource implements PersistentResource {
 
 	protected boolean isController() {
 		return Objects.equals(
-			getCurrentTopLevelBuildURL(), getControllerBuildURL());
+			getCurrentTopLevelBuildURL(), _controllerBuildURL);
 	}
 
 	protected boolean isMissing() {
@@ -333,7 +328,7 @@ public abstract class BasePersistentResource implements PersistentResource {
 			return false;
 		}
 
-		String controllerBuildURL = getControllerBuildURL();
+		String controllerBuildURL = _controllerBuildURL;
 
 		if (!JenkinsResultsParserUtil.isURL(controllerBuildURL)) {
 			return false;
@@ -362,7 +357,7 @@ public abstract class BasePersistentResource implements PersistentResource {
 		dataJSONObject.put(
 			"artifacts", artifactsJSONArray
 		).put(
-			"controller_build_url", getControllerBuildURL()
+			"controller_build_url", _controllerBuildURL
 		).put(
 			"producer_build_url", getProducerBuildURL()
 		);

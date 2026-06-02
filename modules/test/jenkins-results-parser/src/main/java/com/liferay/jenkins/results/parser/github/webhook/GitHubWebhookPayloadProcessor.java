@@ -407,10 +407,6 @@ public class GitHubWebhookPayloadProcessor {
 		_testPullRequestQueryStrings.remove(queryString);
 	}
 
-	public void removeTestPullRequestURL(String url) {
-		_testPullRequestURLs.remove(url);
-	}
-
 	protected void commentMergeSubrepoPullRequest(PullRequest pullRequest) {
 		try {
 			String currentSHA = "";

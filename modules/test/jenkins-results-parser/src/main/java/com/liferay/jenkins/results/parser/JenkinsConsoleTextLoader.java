@@ -114,18 +114,6 @@ public class JenkinsConsoleTextLoader {
 		return consoleText;
 	}
 
-	public int getLineCount() {
-		String consoleLog = getConsoleText();
-
-		String[] consoleLogLines = consoleLog.split("\n");
-
-		return consoleLogLines.length;
-	}
-
-	public boolean hasMoreData() {
-		return hasMoreData;
-	}
-
 	public void moveCacheFileToArchiveFile(File archiveFile) {
 		if ((archiveFile == null) ||
 			JenkinsResultsParserUtil.isNullOrEmpty(getConsoleText())) {

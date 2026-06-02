@@ -28,8 +28,6 @@ public interface PersistentResource {
 
 	public String getBaseS3ObjectPath();
 
-	public String getControllerBuildURL();
-
 	public String getProducerBuildURL();
 
 	public JenkinsMaster getProducerJenkinsMaster();
