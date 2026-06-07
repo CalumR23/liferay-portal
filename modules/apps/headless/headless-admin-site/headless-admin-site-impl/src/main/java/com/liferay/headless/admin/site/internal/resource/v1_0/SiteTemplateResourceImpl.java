@@ -8,6 +8,7 @@ package com.liferay.headless.admin.site.internal.resource.v1_0;
 import com.liferay.headless.admin.site.dto.v1_0.SiteTemplate;
 import com.liferay.headless.admin.site.resource.v1_0.SiteTemplateResource;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeService;
@@ -52,11 +53,16 @@ public class SiteTemplateResourceImpl extends BaseSiteTemplateResourceImpl {
 			layoutSetPrototypes = ListUtil.filter(
 				layoutSetPrototypes,
 				layoutSetPrototype -> {
-					Group group = layoutSetPrototype.getGroup();
+					try {
+						Group group = layoutSetPrototype.getGroup();
 
-					return !ArrayUtil.contains(
-						excludedSiteExternalReferenceCodes,
-						group.getExternalReferenceCode());
+						return !ArrayUtil.contains(
+							excludedSiteExternalReferenceCodes,
+							group.getExternalReferenceCode());
+					}
+					catch (PortalException portalException) {
+						return true;
+					}
 				});
 		}
 
