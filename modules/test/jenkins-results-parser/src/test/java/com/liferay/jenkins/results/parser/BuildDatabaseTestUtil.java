@@ -8,7 +8,6 @@ package com.liferay.jenkins.results.parser;
 import java.io.File;
 import java.io.IOException;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONArray;
@@ -63,7 +62,7 @@ public class BuildDatabaseTestUtil {
 		).put(
 			"portal_releases", new JSONObject()
 		).put(
-			"properties", _newPropertiesJSONObject(buildDatabaseArgs)
+			"properties", new JSONObject()
 		).put(
 			"pull_requests", _newPullRequestsJSONObject(index)
 		).put(
@@ -110,37 +109,6 @@ public class BuildDatabaseTestUtil {
 		jobsJSONObject.put(buildDatabaseArgs.jobKey, jobJSONObject);
 
 		return jobsJSONObject;
-	}
-
-	private static JSONObject _newPropertiesJSONObject(
-		BuildDatabaseArgs buildDatabaseArgs) {
-
-		JSONObject propertiesJSONObject = new JSONObject();
-
-		for (Map.Entry<String, Map<String, String>> entry :
-				buildDatabaseArgs.properties.entrySet()) {
-
-			JSONArray propertyJSONArray = new JSONArray();
-
-			for (Map.Entry<String, String> propertyEntry :
-					entry.getValue(
-					).entrySet()) {
-
-				JSONObject propertyJSONObject = new JSONObject();
-
-				propertyJSONObject.put(
-					"name", propertyEntry.getKey()
-				).put(
-					"value", propertyEntry.getValue()
-				);
-
-				propertyJSONArray.put(propertyJSONObject);
-			}
-
-			propertiesJSONObject.put(entry.getKey(), propertyJSONArray);
-		}
-
-		return propertiesJSONObject;
 	}
 
 	private static JSONObject _newPullRequestsJSONObject(int index) {

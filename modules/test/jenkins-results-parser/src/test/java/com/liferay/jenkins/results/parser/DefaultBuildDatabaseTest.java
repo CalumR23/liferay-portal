@@ -27,12 +27,12 @@ public class DefaultBuildDatabaseTest {
 
 		buildDatabaseArgs.modifiedFiles = new String[] {_MODIFIED_FILE};
 
-		buildDatabaseArgs.addProperty(
-			_PROPERTIES_KEY, _PROPERTY_NAME, _PROPERTY_VALUE);
-
 		BuildDatabase buildDatabase =
 			BuildDatabaseTestUtil.addPortalAcceptancePullRequest(
 				buildDatabaseArgs);
+
+		buildDatabase.putProperty(
+			_PROPERTIES_KEY, _PROPERTY_NAME, _PROPERTY_VALUE);
 
 		DefaultBuildDatabase reloadedBuildDatabase = _getReloadedBuildDatabase(
 			buildDatabase);
@@ -46,14 +46,11 @@ public class DefaultBuildDatabaseTest {
 
 	@Test
 	public void testGetProperties() {
-		BuildDatabaseArgs buildDatabaseArgs = new BuildDatabaseArgs();
-
-		buildDatabaseArgs.addProperty(
-			_PROPERTIES_KEY, _PROPERTY_NAME, _PROPERTY_VALUE);
-
 		BuildDatabase buildDatabase =
-			BuildDatabaseTestUtil.addPortalAcceptancePullRequest(
-				buildDatabaseArgs);
+			BuildDatabaseTestUtil.addPortalAcceptancePullRequest();
+
+		buildDatabase.putProperty(
+			_PROPERTIES_KEY, _PROPERTY_NAME, _PROPERTY_VALUE);
 
 		DefaultBuildDatabase reloadedBuildDatabase = _getReloadedBuildDatabase(
 			buildDatabase);
