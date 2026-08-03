@@ -28,6 +28,27 @@ import org.mockito.Mockito;
 public class JenkinsResultsParserUtilTest
 	extends com.liferay.jenkins.results.parser.Test {
 
+	@Test
+	public void testEncodeURLParameterPart() {
+		testEquals(
+			"PortalSmoke%23Smoke",
+			JenkinsResultsParserUtil.encodeURLParameterPart(
+				"PortalSmoke#Smoke"));
+		testEquals(
+			"AWS%20CI",
+			JenkinsResultsParserUtil.encodeURLParameterPart("AWS CI"));
+		testEquals(
+			"a%26b", JenkinsResultsParserUtil.encodeURLParameterPart("a&b"));
+		testEquals(
+			"100%25%20pass",
+			JenkinsResultsParserUtil.encodeURLParameterPart("100% pass"));
+		testEquals(
+			"a%2Bb", JenkinsResultsParserUtil.encodeURLParameterPart("a+b"));
+		testEquals(
+			"master",
+			JenkinsResultsParserUtil.encodeURLParameterPart("master"));
+	}
+
 	@Test(timeout = 30000)
 	public void testExecuteJenkinsScriptReadTimeout() throws Exception {
 		try (ServerSocket serverSocket = _createServerSocket()) {
