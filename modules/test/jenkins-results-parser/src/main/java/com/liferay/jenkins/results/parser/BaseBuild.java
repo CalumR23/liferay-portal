@@ -3099,13 +3099,15 @@ public abstract class BaseBuild implements Build {
 				continue;
 			}
 
-			String[] nameValueArray = parameter.split("=");
+			String[] nameValueArray = parameter.split("=", 2);
+
+			String name = _decodeParameter(nameValueArray[0]);
 
 			if (nameValueArray.length == 2) {
-				_parameters.put(nameValueArray[0], nameValueArray[1]);
+				_parameters.put(name, _decodeParameter(nameValueArray[1]));
 			}
-			else if (nameValueArray.length == 1) {
-				_parameters.put(nameValueArray[0], "");
+			else {
+				_parameters.put(name, "");
 			}
 		}
 	}
@@ -3317,6 +3319,18 @@ public abstract class BaseBuild implements Build {
 
 	private void _archiveTestReportJSON() {
 		_archive(null, false, "testReport/api/json");
+	}
+
+	private String _decodeParameter(String parameter) {
+		try {
+			return JenkinsResultsParserUtil.decode(parameter);
+		}
+		catch (Exception exception) {
+			System.out.println(
+				"Unable to decode the query string parameter " + parameter);
+
+			return parameter;
+		}
 	}
 
 	private int _getMaximumInvocationCount() {
@@ -3643,15 +3657,6 @@ public abstract class BaseBuild implements Build {
 			return;
 		}
 
-		try {
-			invocationURL = JenkinsResultsParserUtil.decode(invocationURL);
-		}
-		catch (UnsupportedEncodingException unsupportedEncodingException) {
-			throw new IllegalArgumentException(
-				"Unable to decode " + invocationURL,
-				unsupportedEncodingException);
-		}
-
 		Matcher invocationURLMatcher = _invocationURLPattern.matcher(
 			invocationURL);
 
@@ -3659,7 +3664,7 @@ public abstract class BaseBuild implements Build {
 			throw new RuntimeException("Invalid invocation URL");
 		}
 
-		setJobName(invocationURLMatcher.group("jobName"));
+		setJobName(_decodeParameter(invocationURLMatcher.group("jobName")));
 
 		JenkinsCohort jenkinsCohort = JenkinsCohort.getInstance(
 			invocationURLMatcher.group("cohortName"));
