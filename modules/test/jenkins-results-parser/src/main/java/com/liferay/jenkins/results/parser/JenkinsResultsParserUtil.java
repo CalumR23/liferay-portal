@@ -510,6 +510,18 @@ public class JenkinsResultsParserUtil {
 		return new URL(uriASCIIString.replace("#", "%23"));
 	}
 
+	public static String encodeURLParameterPart(String parameterPart) {
+		try {
+			parameterPart = URLEncoder.encode(
+				parameterPart, StandardCharsets.UTF_8.name());
+
+			return parameterPart.replace("+", "%20");
+		}
+		catch (UnsupportedEncodingException unsupportedEncodingException) {
+			throw new RuntimeException(unsupportedEncodingException);
+		}
+	}
+
 	public static String escapeForBash(String string) {
 		string = string.replaceAll(" ", "\\\\ ");
 		string = string.replaceAll("'", "\\\\\\\'");
