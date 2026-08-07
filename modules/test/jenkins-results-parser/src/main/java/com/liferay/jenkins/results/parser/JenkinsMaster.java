@@ -1291,7 +1291,8 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		}
 
 		public long getEstimatedDuration() {
-			return _currentExecutableJSONObject.optLong("estimatedDuration", -1);
+			return _currentExecutableJSONObject.optLong(
+				"estimatedDuration", -1);
 		}
 
 		public String getFullDisplayName() {
@@ -1336,7 +1337,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 			return offlineCauseReason.contains("is being removed");
 		}
 
-		public boolean isJenkinsSlaveOffline() {
+		public boolean isJenkinsSlaveOfflineUnexpectedly() {
 			if (_isJenkinsSlaveOffline() &&
 				!_isJenkinsSlaveTemporarilyOffline()) {
 
