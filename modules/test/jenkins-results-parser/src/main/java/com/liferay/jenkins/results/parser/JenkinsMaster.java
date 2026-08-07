@@ -1455,10 +1455,6 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		}
 
 		private boolean _isJenkinsSlaveTemporarilyOffline() {
-
-			// Absent means the payload never carried the field, so assume the
-			// node was drained deliberately rather than reaping its builds.
-
 			return _computerJSONObject.optBoolean("temporarilyOffline", true);
 		}
 
@@ -1947,13 +1943,6 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 	}
 
 	private synchronized boolean _isUpdated(boolean minimal) {
-
-		// A minimal update leaves out the executor detail a full update
-		// collects, so it can satisfy a later minimal request but never a
-		// full one. Without this a caller asking for the full payload can be
-		// handed a minimal snapshot and read every missing field as a
-		// default.
-
 		if ((_updateTimestamp == -1) ||
 			((System.currentTimeMillis() - _updateTimestamp) >
 				_MAXIMUM_UPDATE_DURATION) ||
