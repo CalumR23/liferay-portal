@@ -16,6 +16,7 @@ import com.liferay.source.formatter.processor.JSPSourceProcessor;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,15 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 		String fileName, String absolutePath, String content) {
 
 		return _sortMethodCalls(content);
+	}
+
+	private static Pattern _getCaseInsensitivePattern(String regex) {
+		return _caseInsensitivePatternCache.computeIfAbsent(
+			regex, key -> Pattern.compile(key, Pattern.CASE_INSENSITIVE));
+	}
+
+	private static Pattern _getPattern(String regex) {
+		return _patternCache.computeIfAbsent(regex, Pattern::compile);
 	}
 
 	private String _getMethodCall(String content, int start) {
@@ -206,7 +216,7 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 		String content, String methodName, String... variableTypeNames) {
 
 		for (String variableTypeName : variableTypeNames) {
-			Pattern pattern = Pattern.compile(
+			Pattern pattern = _getPattern(
 				"\\Wnew " + variableTypeName + "[(<][^;]*?\\) \\{\n");
 
 			Matcher matcher = pattern.matcher(content);
@@ -258,7 +268,7 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 			return content;
 		}
 
-		Pattern pattern = Pattern.compile(
+		Pattern pattern = _getPattern(
 			StringBundler.concat(
 				"(\\W(\\w+)(\\(\\s*\\))?\\.(create\\(\\s*\\w+\\s*\\)\\.)?\\s*(",
 				_GENERIC_TYPE_NAMES_PATTERN, ")?|[\n\t]\\)\\.)", methodName,
@@ -389,9 +399,8 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 		MethodCallComparator methodCallComparator = new MethodCallComparator();
 
 		for (String variableTypeName : variableTypeNames) {
-			Pattern pattern = Pattern.compile(
-				"\n(\t+\\w*" + variableTypeName + "\\.)(\\w+)\\(",
-				Pattern.CASE_INSENSITIVE);
+			Pattern pattern = _getCaseInsensitivePattern(
+				"\n(\t+\\w*" + variableTypeName + "\\.)(\\w+)\\(");
 
 			Matcher matcher = pattern.matcher(content);
 
@@ -444,7 +453,7 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 			return content;
 		}
 
-		Pattern pattern = Pattern.compile(
+		Pattern pattern = _getPattern(
 			"[^;]\n\t+((\\w*)\\." + methodName + "\\()");
 
 		Matcher matcher = pattern.matcher(content);
@@ -479,6 +488,10 @@ public class MethodCallsOrderCheck extends BaseFileCheck {
 
 	private static final String _GENERIC_TYPE_NAMES_PATTERN;
 
+	private static final ConcurrentHashMap<String, Pattern>
+		_caseInsensitivePatternCache = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Pattern> _patternCache =
+		new ConcurrentHashMap<>();
 	private static final Pattern _typeNamePattern;
 
 	static {
