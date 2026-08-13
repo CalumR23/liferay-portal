@@ -172,7 +172,7 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 
 		Assert.assertEquals(runningBuilds.toString(), 3, runningBuilds.size());
 
-		Assert.assertEquals(7, jenkinsMaster.getMaxRunningBuildCount());
+		Assert.assertEquals(7, jenkinsMaster.getMaxRunningBuildsCount());
 
 		List<String> buildURLs = jenkinsMaster.getBuildURLs();
 
@@ -253,7 +253,7 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 
 		Assert.assertEquals(runningBuilds.toString(), 3, runningBuilds.size());
 
-		Assert.assertEquals(7, jenkinsMaster.getMaxRunningBuildCount());
+		Assert.assertEquals(7, jenkinsMaster.getMaxRunningBuildsCount());
 
 		jenkinsMaster.update(true);
 
