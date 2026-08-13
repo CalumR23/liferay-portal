@@ -577,8 +577,8 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		return new ArrayList<>(_jenkinsSlavesMap.values());
 	}
 
-	public int getMaxRunningBuildCount() {
-		return Math.max(_busyExecutorCount, _runningBuilds.size());
+	public int getMaxRunningBuildsCount() {
+		return Math.max(_busyExecutorsCount, _runningBuilds.size());
 	}
 
 	@Override
@@ -1032,7 +1032,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		if (!isAvailable()) {
 			_assignedLabels.clear();
 			_buildURLs.clear();
-			_busyExecutorCount = 0;
+			_busyExecutorsCount = 0;
 			_jenkinsSlavesMap.clear();
 			_runningBuilds.clear();
 
@@ -1067,7 +1067,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		catch (Exception exception) {
 			_assignedLabels.clear();
 			_buildURLs.clear();
-			_busyExecutorCount = 0;
+			_busyExecutorsCount = 0;
 			_jenkinsSlavesMap.clear();
 			_labelExpressionLabels.clear();
 			_runningBuilds.clear();
@@ -1171,14 +1171,14 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		_buildURLs.addAll(buildURLs);
 
 		if (minimal) {
-			_busyExecutorCount = 0;
+			_busyExecutorsCount = 0;
 
 			_runningBuilds.clear();
 
 			return;
 		}
 
-		_busyExecutorCount = computerAPIJSONObject.optInt("busyExecutors", 0);
+		_busyExecutorsCount = computerAPIJSONObject.optInt("busyExecutors", 0);
 
 		_runningBuilds.clear();
 
@@ -2044,7 +2044,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 		new HashMap<>();
 	private final Map<String, Long> _buildsUpdateTimes = new HashMap<>();
 	private final List<String> _buildURLs = new CopyOnWriteArrayList<>();
-	private int _busyExecutorCount;
+	private int _busyExecutorsCount;
 	private final List<DefaultBuild> _defaultBuilds = new ArrayList<>();
 	private Map<String, String> _globalEnvironmentVariables;
 	private boolean _idle;
