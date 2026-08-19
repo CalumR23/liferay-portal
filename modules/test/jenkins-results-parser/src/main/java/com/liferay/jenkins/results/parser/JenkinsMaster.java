@@ -642,7 +642,7 @@ public class JenkinsMaster implements JenkinsNode<JenkinsMaster> {
 						"/api/json?tree=actions[parameters[name,value]],",
 						"cancelled,executable[url],id,inQueueSince,",
 						"task[name,url],url,why"),
-					false, 5000);
+					false, 0, 0, 5000);
 
 			if ((queueItemJSONObject == null) ||
 				!queueItemJSONObject.has("id")) {
