@@ -375,16 +375,16 @@ public class BatchTestClassGroupTest
 			AxisTestClassGroup.class);
 
 		Mockito.doReturn(
-			minimumSlaveRAM
-		).when(
-			axisTestClassGroup
-		).getMinimumSlaveRAM();
-
-		Mockito.doReturn(
 			slaveLabel
 		).when(
 			axisTestClassGroup
 		).getBaseSlaveLabel();
+
+		Mockito.doReturn(
+			minimumSlaveRAM
+		).when(
+			axisTestClassGroup
+		).getMinimumSlaveRAM();
 
 		Mockito.doReturn(
 			testBaseDir
@@ -398,13 +398,13 @@ public class BatchTestClassGroupTest
 	private File _newAutoBalanceWorkingDirectory(String className)
 		throws Exception {
 
+		String randomString = RandomTestUtil.randomString();
+
+		String dirName = randomString.substring(0, 8);
+
 		File workingDirectory = new File(
 			JenkinsResultsParserUtil.getCanonicalPath(
-				temporaryFolder.newFolder(
-					RandomTestUtil.randomString(
-					).substring(
-						0, 8
-					))));
+				temporaryFolder.newFolder(dirName)));
 
 		File packageDir = new File(workingDirectory, "com/liferay");
 
@@ -462,11 +462,9 @@ public class BatchTestClassGroupTest
 
 		List<File> testClassFiles = new ArrayList<>();
 
-		File testDir = temporaryFolder.newFolder(
-			RandomTestUtil.randomString(
-			).substring(
-				0, 8
-			));
+		String randomString = RandomTestUtil.randomString();
+
+		File testDir = temporaryFolder.newFolder(randomString.substring(0, 8));
 
 		for (int i = 0; i < testClassCount; i++) {
 			String className = "Sample" + i + "Test";
@@ -485,10 +483,10 @@ public class BatchTestClassGroupTest
 		return testClassFiles;
 	}
 
-	private File _newModuleDir(String name, int modulesProjectDirCount)
+	private File _newModuleDir(String moduleDirName, int modulesProjectDirCount)
 		throws Exception {
 
-		File moduleDir = temporaryFolder.newFolder(name);
+		File moduleDir = temporaryFolder.newFolder(moduleDirName);
 
 		File lfrBuildPortalFile = new File(moduleDir, ".lfrbuild-portal");
 
@@ -640,26 +638,25 @@ public class BatchTestClassGroupTest
 
 			for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
 				testEquals(
-					firstAxisTestClassGroup.getMinimumSlaveRAM(),
-					axisTestClassGroup.getMinimumSlaveRAM());
-				testEquals(
 					firstAxisTestClassGroup.getBaseSlaveLabel(),
 					axisTestClassGroup.getBaseSlaveLabel());
+				testEquals(
+					firstAxisTestClassGroup.getMinimumSlaveRAM(),
+					axisTestClassGroup.getMinimumSlaveRAM());
 				testEquals(
 					firstAxisTestClassGroup.getTestBaseDir(),
 					axisTestClassGroup.getTestBaseDir());
 			}
 		}
 
-		testEquals(
-			batchTestClassGroup.getAxisTestClassGroups(
-			).size(),
-			segmentAxisTestClassGroups.size());
+		List<AxisTestClassGroup> axisTestClassGroups =
+			batchTestClassGroup.getAxisTestClassGroups();
 
 		testEquals(
-			true,
-			segmentAxisTestClassGroups.containsAll(
-				batchTestClassGroup.getAxisTestClassGroups()));
+			axisTestClassGroups.size(), segmentAxisTestClassGroups.size());
+
+		testEquals(
+			true, segmentAxisTestClassGroups.containsAll(axisTestClassGroups));
 	}
 
 }

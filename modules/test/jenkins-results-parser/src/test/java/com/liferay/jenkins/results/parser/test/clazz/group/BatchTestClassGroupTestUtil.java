@@ -143,11 +143,6 @@ public class BatchTestClassGroupTestUtil {
 	}
 
 	public static void resetCaches() {
-		Map<String, ?> jobProperties = ReflectionTestUtil.getFieldValue(
-			JobPropertyFactory.class, "_jobProperties");
-
-		jobProperties.clear();
-
 		Set<String> javaDirPathStrings = ReflectionTestUtil.getFieldValue(
 			JUnitBatchTestClassGroup.class, "_javaDirPathStrings");
 
@@ -162,6 +157,11 @@ public class BatchTestClassGroupTestUtil {
 			JUnitBatchTestClassGroup.class, "_javaTestClassFiles");
 
 		javaTestClassFiles.clear();
+
+		Map<String, ?> jobProperties = ReflectionTestUtil.getFieldValue(
+			JobPropertyFactory.class, "_jobProperties");
+
+		jobProperties.clear();
 
 		if (_portalTestClassJob != null) {
 			Mockito.doReturn(
