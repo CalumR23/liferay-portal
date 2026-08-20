@@ -157,11 +157,7 @@ public class BatchTestClassGroupTest
 			(int)Math.ceil((double)testClasses.size() / axisMaxSize),
 			axisTestClassGroups.size());
 
-		List<TestClass> axisTestClasses = new ArrayList<>();
-
-		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
-			axisTestClasses.addAll(axisTestClassGroup.getTestClasses());
-		}
+		List<TestClass> axisTestClasses = _getTestClasses(axisTestClassGroups);
 
 		Collections.sort(axisTestClasses);
 
@@ -320,10 +316,46 @@ public class BatchTestClassGroupTest
 		return axisCounts;
 	}
 
+	private List<Integer> _getAxisSizes(
+		List<AxisTestClassGroup> axisTestClassGroups) {
+
+		List<Integer> axisSizes = new ArrayList<>();
+
+		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
+			List<TestClass> testClasses = axisTestClassGroup.getTestClasses();
+
+			axisSizes.add(testClasses.size());
+		}
+
+		return axisSizes;
+	}
+
+	private List<Integer> _getIntegers(int[] ints) {
+		List<Integer> integers = new ArrayList<>();
+
+		for (int i : ints) {
+			integers.add(i);
+		}
+
+		return integers;
+	}
+
 	private File _getParentFile(List<File> files) {
 		File file = files.get(0);
 
 		return file.getParentFile();
+	}
+
+	private List<TestClass> _getTestClasses(
+		List<AxisTestClassGroup> axisTestClassGroups) {
+
+		List<TestClass> testClasses = new ArrayList<>();
+
+		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
+			testClasses.addAll(axisTestClassGroup.getTestClasses());
+		}
+
+		return testClasses;
 	}
 
 	private long _getWeight(AxisTestClassGroup axisTestClassGroup) {
@@ -378,16 +410,13 @@ public class BatchTestClassGroupTest
 
 		packageDir.mkdirs();
 
+		File testClassFile = new File(packageDir, className + ".java");
+
+		String testClassFileContent =
+			BatchTestClassGroupTestUtil.getTestClassFileContent(className);
+
 		Files.write(
-			new File(
-				packageDir, className + ".java"
-			).toPath(),
-			JenkinsResultsParserUtil.combine(
-				"public class ", className, " {\n\n\t@Test\n\tpublic ",
-				"void testSample() {\n\t}\n\n}"
-			).getBytes(
-				"UTF-8"
-			));
+			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
 
 		return workingDirectory;
 	}
@@ -444,14 +473,11 @@ public class BatchTestClassGroupTest
 
 			File testClassFile = new File(testDir, className + ".java");
 
+			String testClassFileContent =
+				BatchTestClassGroupTestUtil.getTestClassFileContent(className);
+
 			Files.write(
-				testClassFile.toPath(),
-				JenkinsResultsParserUtil.combine(
-					"public class ", className, " {\n\n\t@Test\n\tpublic ",
-					"void testSample() {\n\t}\n\n}"
-				).getBytes(
-					"UTF-8"
-				));
+				testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
 
 			testClassFiles.add(testClassFile);
 		}
@@ -527,25 +553,11 @@ public class BatchTestClassGroupTest
 		List<AxisTestClassGroup> axisTestClassGroups =
 			batchTestClassGroup.getAxisTestClassGroups();
 
-		List<Integer> axisSizes = new ArrayList<>();
+		testEquals(
+			_getIntegers(expectedAxisSizes),
+			_getAxisSizes(axisTestClassGroups));
 
-		List<TestClass> axisTestClasses = new ArrayList<>();
-
-		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
-			List<TestClass> testClasses = axisTestClassGroup.getTestClasses();
-
-			axisSizes.add(testClasses.size());
-
-			axisTestClasses.addAll(testClasses);
-		}
-
-		List<Integer> expectedAxisSizesList = new ArrayList<>();
-
-		for (int expectedAxisSize : expectedAxisSizes) {
-			expectedAxisSizesList.add(expectedAxisSize);
-		}
-
-		testEquals(expectedAxisSizesList, axisSizes);
+		List<TestClass> axisTestClasses = _getTestClasses(axisTestClassGroups);
 
 		Collections.sort(axisTestClasses);
 
@@ -585,25 +597,12 @@ public class BatchTestClassGroupTest
 
 			};
 
-		List<Integer> axisSizes = new ArrayList<>();
-
-		for (AxisTestClassGroup axisTestClassGroup :
-				jUnitBatchTestClassGroup.getAxisTestClassGroups()) {
-
-			List<TestClass> testClasses = axisTestClassGroup.getTestClasses();
-
-			axisSizes.add(testClasses.size());
-		}
-
-		List<Integer> expectedAxisSizesList = new ArrayList<>();
-
-		for (int expectedAxisSize : expectedAxisSizes) {
-			expectedAxisSizesList.add(expectedAxisSize);
-		}
+		List<Integer> axisSizes = _getAxisSizes(
+			jUnitBatchTestClassGroup.getAxisTestClassGroups());
 
 		Collections.sort(axisSizes, Collections.reverseOrder());
 
-		testEquals(expectedAxisSizesList, axisSizes);
+		testEquals(_getIntegers(expectedAxisSizes), axisSizes);
 	}
 
 	private void _testSetSegmentTestClassGroups(

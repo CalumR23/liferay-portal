@@ -5,7 +5,6 @@
 
 package com.liferay.jenkins.results.parser.test.clazz;
 
-import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
 import com.liferay.jenkins.results.parser.RandomTestUtil;
 import com.liferay.jenkins.results.parser.ReflectionTestUtil;
@@ -49,12 +48,6 @@ public class TestClassFactoryTest
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-	private String _getTestClassFileContent(String className) {
-		return JenkinsResultsParserUtil.combine(
-			"public class ", className, " {\n\n\t@Test\n\tpublic void ",
-			"testSample() {\n\t}\n\n}");
-	}
-
 	private BatchTestClassGroup _mockBatchTestClassGroup(
 		String batchName, Class<? extends BatchTestClassGroup> clazz) {
 
@@ -90,7 +83,8 @@ public class TestClassFactoryTest
 
 		File testClassFile = new File(packageDir, className + ".java");
 
-		String testClassFileContent = _getTestClassFileContent(className);
+		String testClassFileContent =
+			BatchTestClassGroupTestUtil.getTestClassFileContent(className);
 
 		Files.write(
 			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));

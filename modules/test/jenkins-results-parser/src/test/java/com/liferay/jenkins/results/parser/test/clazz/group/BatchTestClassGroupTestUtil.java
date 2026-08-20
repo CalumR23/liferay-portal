@@ -82,6 +82,12 @@ public class BatchTestClassGroupTestUtil {
 		return portalTestClassJob;
 	}
 
+	public static String getTestClassFileContent(String className) {
+		return JenkinsResultsParserUtil.combine(
+			"public class ", className, " {\n\n\t@Test\n\tpublic void ",
+			"testSample() {\n\t}\n\n}");
+	}
+
 	public static CompileModulesBatchTestClassGroup
 		newCompileModulesBatchTestClassGroup(
 			Properties jobProperties, File... modifiedModuleDirs) {
