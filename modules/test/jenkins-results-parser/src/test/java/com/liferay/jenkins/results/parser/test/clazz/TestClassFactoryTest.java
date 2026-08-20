@@ -15,8 +15,6 @@ import com.liferay.jenkins.results.parser.test.clazz.group.ModulesJUnitBatchTest
 
 import java.io.File;
 
-import java.nio.file.Files;
-
 import java.util.Map;
 
 import org.junit.Before;
@@ -76,20 +74,11 @@ public class TestClassFactoryTest
 
 		String classNameSuffix = randomString.replaceAll("-", "");
 
-		String className = "Sample" + classNameSuffix;
-
 		File packageDir = temporaryFolder.newFolder(
 			"com", "liferay", randomString.substring(0, 8));
 
-		File testClassFile = new File(packageDir, className + ".java");
-
-		String testClassFileContent =
-			BatchTestClassGroupTestUtil.getTestClassFileContent(className);
-
-		Files.write(
-			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
-
-		return testClassFile;
+		return BatchTestClassGroupTestUtil.newTestClassFile(
+			"Sample" + classNameSuffix, packageDir);
 	}
 
 	private void _resetCaches() {

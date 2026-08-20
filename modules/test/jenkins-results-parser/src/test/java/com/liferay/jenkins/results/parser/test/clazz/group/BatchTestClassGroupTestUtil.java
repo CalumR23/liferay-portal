@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.nio.file.Files;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,12 +84,6 @@ public class BatchTestClassGroupTestUtil {
 		return portalTestClassJob;
 	}
 
-	public static String getTestClassFileContent(String className) {
-		return JenkinsResultsParserUtil.combine(
-			"public class ", className, " {\n\n\t@Test\n\tpublic void ",
-			"testSample() {\n\t}\n\n}");
-	}
-
 	public static CompileModulesBatchTestClassGroup
 		newCompileModulesBatchTestClassGroup(
 			Properties jobProperties, File... modifiedModuleDirs) {
@@ -140,6 +136,19 @@ public class BatchTestClassGroupTestUtil {
 
 		return new ServiceBuilderModulesBatchTestClassGroup(
 			"service-builder-modules", portalTestClassJob);
+	}
+
+	public static File newTestClassFile(String className, File parentDir)
+		throws IOException {
+
+		File testClassFile = new File(parentDir, className + ".java");
+
+		String testClassFileContent = _getTestClassFileContent(className);
+
+		Files.write(
+			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
+
+		return testClassFile;
 	}
 
 	public static void resetCaches() {
@@ -220,6 +229,12 @@ public class BatchTestClassGroupTestUtil {
 			repositoryName, "relevant", upstreamBranchName);
 
 		return _portalTestClassJob;
+	}
+
+	private static String _getTestClassFileContent(String className) {
+		return JenkinsResultsParserUtil.combine(
+			"public class ", className, " {\n\n\t@Test\n\tpublic void ",
+			"testSample() {\n\t}\n\n}");
 	}
 
 	private static PortalTestClassJob _setJobPropertiesFiles(

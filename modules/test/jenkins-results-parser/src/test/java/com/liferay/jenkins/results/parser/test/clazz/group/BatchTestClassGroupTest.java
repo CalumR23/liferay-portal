@@ -13,8 +13,6 @@ import com.liferay.jenkins.results.parser.test.clazz.TestClassFactory;
 
 import java.io.File;
 
-import java.nio.file.Files;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -175,11 +173,11 @@ public class BatchTestClassGroupTest
 
 	@Test
 	public void testSetAxisTestClassGroups() {
-		_testSetAxisTestClassGroups("10", null, new int[] {1, 1, 1}, 3);
-		_testSetAxisTestClassGroups("4", null, new int[] {2, 2, 2, 1}, 7);
-		_testSetAxisTestClassGroups(null, null, new int[0], 0);
-		_testSetAxisTestClassGroups(null, null, new int[] {4, 4, 4}, 12);
-		_testSetAxisTestClassGroups(null, null, new int[] {5, 5, 3}, 13);
+		_testSetAxisTestClassGroups("10", null, Arrays.asList(1, 1, 1), 3);
+		_testSetAxisTestClassGroups("4", null, Arrays.asList(2, 2, 2, 1), 7);
+		_testSetAxisTestClassGroups(null, null, Collections.emptyList(), 0);
+		_testSetAxisTestClassGroups(null, null, Arrays.asList(4, 4, 4), 12);
+		_testSetAxisTestClassGroups(null, null, Arrays.asList(5, 5, 3), 13);
 	}
 
 	@Test
@@ -210,9 +208,9 @@ public class BatchTestClassGroupTest
 	public void testSetAxisTestClassGroupsTargetAxisDuration()
 		throws Exception {
 
-		_testSetAxisTestClassGroupsTargetAxisDuration(new int[] {4, 3}, "");
+		_testSetAxisTestClassGroupsTargetAxisDuration(Arrays.asList(4, 3), "");
 		_testSetAxisTestClassGroupsTargetAxisDuration(
-			new int[] {3, 3, 1}, "3000");
+			Arrays.asList(3, 3, 1), "3000");
 	}
 
 	@Test
@@ -220,32 +218,35 @@ public class BatchTestClassGroupTest
 		File testBaseDir = new File(RandomTestUtil.randomString());
 
 		Integer minimumSlaveRAM = RandomTestUtil.randomInt();
-		String slaveLabel = RandomTestUtil.randomString();
+		String baseSlaveLabel = RandomTestUtil.randomString();
+
+		AxisTestClassGroup axisTestClassGroup = _mockAxisTestClassGroup(
+			baseSlaveLabel, minimumSlaveRAM, testBaseDir);
 
 		_testSetSegmentTestClassGroups(
-			1, new Integer[] {minimumSlaveRAM, minimumSlaveRAM},
-			new String[] {slaveLabel, slaveLabel},
-			new File[] {testBaseDir, testBaseDir});
+			1, axisTestClassGroup,
+			_mockAxisTestClassGroup(
+				baseSlaveLabel, minimumSlaveRAM, testBaseDir));
 
 		_testSetSegmentTestClassGroups(
-			2, new Integer[] {minimumSlaveRAM, RandomTestUtil.randomInt()},
-			new String[] {slaveLabel, slaveLabel},
-			new File[] {testBaseDir, testBaseDir});
+			2, axisTestClassGroup,
+			_mockAxisTestClassGroup(
+				baseSlaveLabel, RandomTestUtil.randomInt(), testBaseDir));
 
 		_testSetSegmentTestClassGroups(
-			2, new Integer[] {minimumSlaveRAM, minimumSlaveRAM},
-			new String[] {slaveLabel, RandomTestUtil.randomString()},
-			new File[] {testBaseDir, testBaseDir});
+			2, axisTestClassGroup,
+			_mockAxisTestClassGroup(
+				RandomTestUtil.randomString(), minimumSlaveRAM, testBaseDir));
 
 		_testSetSegmentTestClassGroups(
-			2, new Integer[] {minimumSlaveRAM, minimumSlaveRAM},
-			new String[] {slaveLabel, slaveLabel},
-			new File[] {testBaseDir, new File(RandomTestUtil.randomString())});
+			2, axisTestClassGroup,
+			_mockAxisTestClassGroup(
+				baseSlaveLabel, minimumSlaveRAM,
+				new File(RandomTestUtil.randomString())));
 
 		_testSetSegmentTestClassGroups(
-			2, new Integer[] {minimumSlaveRAM, minimumSlaveRAM},
-			new String[] {slaveLabel, slaveLabel},
-			new File[] {testBaseDir, null});
+			2, axisTestClassGroup,
+			_mockAxisTestClassGroup(baseSlaveLabel, minimumSlaveRAM, null));
 	}
 
 	@Test
@@ -266,11 +267,11 @@ public class BatchTestClassGroupTest
 			null, null, "3", 0);
 
 		Integer minimumSlaveRAM = RandomTestUtil.randomInt();
-		String slaveLabel = RandomTestUtil.randomString();
+		String baseSlaveLabel = RandomTestUtil.randomString();
 
 		for (int i = 0; i < 7; i++) {
 			batchTestClassGroup.addAxisTestClassGroup(
-				_mockAxisTestClassGroup(minimumSlaveRAM, slaveLabel, null));
+				_mockAxisTestClassGroup(baseSlaveLabel, minimumSlaveRAM, null));
 		}
 
 		batchTestClassGroup.setSegmentTestClassGroups();
@@ -287,7 +288,7 @@ public class BatchTestClassGroupTest
 
 		batchTestClassGroup.addAxisTestClassGroup(
 			_mockAxisTestClassGroup(
-				RandomTestUtil.randomInt(), RandomTestUtil.randomString(),
+				RandomTestUtil.randomString(), RandomTestUtil.randomInt(),
 				null));
 
 		try {
@@ -330,22 +331,6 @@ public class BatchTestClassGroupTest
 		return axisSizes;
 	}
 
-	private List<Integer> _getIntegers(int[] ints) {
-		List<Integer> integers = new ArrayList<>();
-
-		for (int i : ints) {
-			integers.add(i);
-		}
-
-		return integers;
-	}
-
-	private File _getParentFile(List<File> files) {
-		File file = files.get(0);
-
-		return file.getParentFile();
-	}
-
 	private List<TestClass> _getTestClasses(
 		List<AxisTestClassGroup> axisTestClassGroups) {
 
@@ -369,13 +354,13 @@ public class BatchTestClassGroupTest
 	}
 
 	private AxisTestClassGroup _mockAxisTestClassGroup(
-		Integer minimumSlaveRAM, String slaveLabel, File testBaseDir) {
+		String baseSlaveLabel, Integer minimumSlaveRAM, File testBaseDir) {
 
 		AxisTestClassGroup axisTestClassGroup = Mockito.mock(
 			AxisTestClassGroup.class);
 
 		Mockito.doReturn(
-			slaveLabel
+			baseSlaveLabel
 		).when(
 			axisTestClassGroup
 		).getBaseSlaveLabel();
@@ -398,25 +383,15 @@ public class BatchTestClassGroupTest
 	private File _newAutoBalanceWorkingDirectory(String className)
 		throws Exception {
 
-		String randomString = RandomTestUtil.randomString();
-
-		String dirName = randomString.substring(0, 8);
-
 		File workingDirectory = new File(
 			JenkinsResultsParserUtil.getCanonicalPath(
-				temporaryFolder.newFolder(dirName)));
+				temporaryFolder.newFolder()));
 
 		File packageDir = new File(workingDirectory, "com/liferay");
 
 		packageDir.mkdirs();
 
-		File testClassFile = new File(packageDir, className + ".java");
-
-		String testClassFileContent =
-			BatchTestClassGroupTestUtil.getTestClassFileContent(className);
-
-		Files.write(
-			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
+		BatchTestClassGroupTestUtil.newTestClassFile(className, packageDir);
 
 		return workingDirectory;
 	}
@@ -455,32 +430,6 @@ public class BatchTestClassGroupTest
 		}
 
 		return batchTestClassGroup;
-	}
-
-	private List<File> _newJUnitTestClassFiles(int testClassCount)
-		throws Exception {
-
-		List<File> testClassFiles = new ArrayList<>();
-
-		String randomString = RandomTestUtil.randomString();
-
-		File testDir = temporaryFolder.newFolder(randomString.substring(0, 8));
-
-		for (int i = 0; i < testClassCount; i++) {
-			String className = "Sample" + i + "Test";
-
-			File testClassFile = new File(testDir, className + ".java");
-
-			String testClassFileContent =
-				BatchTestClassGroupTestUtil.getTestClassFileContent(className);
-
-			Files.write(
-				testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
-
-			testClassFiles.add(testClassFile);
-		}
-
-		return testClassFiles;
 	}
 
 	private File _newModuleDir(String moduleDirName, int modulesProjectDirCount)
@@ -540,7 +489,7 @@ public class BatchTestClassGroupTest
 	}
 
 	private void _testSetAxisTestClassGroups(
-		String axisCount, String axisMaxSize, int[] expectedAxisSizes,
+		String axisCount, String axisMaxSize, List<Integer> expectedAxisSizes,
 		int testClassCount) {
 
 		BatchTestClassGroup batchTestClassGroup = _newBatchTestClassGroup(
@@ -551,9 +500,7 @@ public class BatchTestClassGroupTest
 		List<AxisTestClassGroup> axisTestClassGroups =
 			batchTestClassGroup.getAxisTestClassGroups();
 
-		testEquals(
-			_getIntegers(expectedAxisSizes),
-			_getAxisSizes(axisTestClassGroups));
+		testEquals(expectedAxisSizes, _getAxisSizes(axisTestClassGroups));
 
 		List<TestClass> axisTestClasses = _getTestClasses(axisTestClassGroups);
 
@@ -563,7 +510,7 @@ public class BatchTestClassGroupTest
 	}
 
 	private void _testSetAxisTestClassGroupsTargetAxisDuration(
-			int[] expectedAxisSizes, String targetAxisDuration)
+			List<Integer> expectedAxisSizes, String targetAxisDuration)
 		throws Exception {
 
 		BatchTestClassGroupTestUtil.resetCaches();
@@ -576,14 +523,21 @@ public class BatchTestClassGroupTest
 		jobProperties.setProperty(
 			"test.batch.target.axis.duration", targetAxisDuration);
 
-		final List<File> testClassFiles = _newJUnitTestClassFiles(7);
+		File workingDirectory = temporaryFolder.newFolder();
+
+		final List<File> testClassFiles = new ArrayList<>();
+
+		for (int i = 0; i < 7; i++) {
+			testClassFiles.add(
+				BatchTestClassGroupTestUtil.newTestClassFile(
+					"Sample" + i + "Test", workingDirectory));
+		}
 
 		JUnitBatchTestClassGroup jUnitBatchTestClassGroup =
 			new JUnitBatchTestClassGroup(
 				"unit",
 				BatchTestClassGroupTestUtil.getPortalTestClassJob(
-					jobProperties, new ArrayList<File>(),
-					_getParentFile(testClassFiles))) {
+					jobProperties, new ArrayList<>(), workingDirectory)) {
 
 				@Override
 				protected void setTestClasses() {
@@ -600,20 +554,17 @@ public class BatchTestClassGroupTest
 
 		Collections.sort(axisSizes, Collections.reverseOrder());
 
-		testEquals(_getIntegers(expectedAxisSizes), axisSizes);
+		testEquals(expectedAxisSizes, axisSizes);
 	}
 
 	private void _testSetSegmentTestClassGroups(
-		int expectedSegmentCount, Integer[] minimumSlaveRAMs,
-		String[] slaveLabels, File[] testBaseDirs) {
+		int expectedSegmentCount, AxisTestClassGroup... axisTestClassGroups) {
 
 		BatchTestClassGroup batchTestClassGroup = _newBatchTestClassGroup(
 			null, null, null, 0);
 
-		for (int i = 0; i < minimumSlaveRAMs.length; i++) {
-			batchTestClassGroup.addAxisTestClassGroup(
-				_mockAxisTestClassGroup(
-					minimumSlaveRAMs[i], slaveLabels[i], testBaseDirs[i]));
+		for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
+			batchTestClassGroup.addAxisTestClassGroup(axisTestClassGroup);
 		}
 
 		batchTestClassGroup.setSegmentTestClassGroups();
@@ -628,35 +579,37 @@ public class BatchTestClassGroupTest
 		for (SegmentTestClassGroup segmentTestClassGroup :
 				segmentTestClassGroups) {
 
-			List<AxisTestClassGroup> axisTestClassGroups =
+			List<AxisTestClassGroup> childAxisTestClassGroups =
 				segmentTestClassGroup.getAxisTestClassGroups();
 
-			segmentAxisTestClassGroups.addAll(axisTestClassGroups);
+			segmentAxisTestClassGroups.addAll(childAxisTestClassGroups);
 
 			AxisTestClassGroup firstAxisTestClassGroup =
-				axisTestClassGroups.get(0);
+				childAxisTestClassGroups.get(0);
 
-			for (AxisTestClassGroup axisTestClassGroup : axisTestClassGroups) {
+			for (AxisTestClassGroup childAxisTestClassGroup :
+					childAxisTestClassGroups) {
+
 				testEquals(
 					firstAxisTestClassGroup.getBaseSlaveLabel(),
-					axisTestClassGroup.getBaseSlaveLabel());
+					childAxisTestClassGroup.getBaseSlaveLabel());
 				testEquals(
 					firstAxisTestClassGroup.getMinimumSlaveRAM(),
-					axisTestClassGroup.getMinimumSlaveRAM());
+					childAxisTestClassGroup.getMinimumSlaveRAM());
 				testEquals(
 					firstAxisTestClassGroup.getTestBaseDir(),
-					axisTestClassGroup.getTestBaseDir());
+					childAxisTestClassGroup.getTestBaseDir());
 			}
 		}
 
-		List<AxisTestClassGroup> axisTestClassGroups =
+		List<AxisTestClassGroup> batchAxisTestClassGroups =
 			batchTestClassGroup.getAxisTestClassGroups();
 
 		testEquals(
-			axisTestClassGroups.size(), segmentAxisTestClassGroups.size());
+			batchAxisTestClassGroups.size(), segmentAxisTestClassGroups.size());
 
-		testEquals(
-			true, segmentAxisTestClassGroups.containsAll(axisTestClassGroups));
+		Assert.assertTrue(
+			segmentAxisTestClassGroups.containsAll(batchAxisTestClassGroups));
 	}
 
 }
