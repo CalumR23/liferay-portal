@@ -34,23 +34,23 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 
 		Environment.setInstance(Mockito.mock(Environment.class));
 
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
 			new JSONObject(
 			).put(
 				"items", new JSONArray()
 			).toString(),
-			"http://test-9-1/queue/api/json", mockUrlReaders);
+			"http://test-9-1/queue/api/json", mockURLReaders);
 		setUrlReaderOutput(
 			new JSONObject(
 			).put(
 				"mode", "NORMAL"
 			).toString(),
-			"http://test-9-1/api/json?tree=mode", mockUrlReaders);
+			"http://test-9-1/api/json?tree=mode", mockURLReaders);
 		setUrlReaderOutput(
 			read(new File(dependenciesDirs.get(0), "computer-api.json")),
-			"http://test-9-1/computer/api/json", mockUrlReaders);
+			"http://test-9-1/computer/api/json", mockURLReaders);
 
 		_jenkinsMaster = JenkinsMasterTestUtil.getJenkinsMaster(
 			"test-9-1", "http://test-9-1");
@@ -93,14 +93,14 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 
 	@Test
 	public void testGetQueueItem() throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
 			new JSONObject(
 			).put(
 				"id", 7800
 			).toString(),
-			"http://test-9-1/queue/item/7800/api/json", mockUrlReaders);
+			"http://test-9-1/queue/item/7800/api/json", mockURLReaders);
 
 		JenkinsMaster.QueueItem queueItem = _jenkinsMaster.getQueueItem(7800);
 
@@ -109,13 +109,13 @@ public class JenkinsMasterTest extends com.liferay.jenkins.results.parser.Test {
 
 	@Test
 	public void testGetQueueItemNotFound() throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		String queueItemAPIURL = "http://test-9-1/queue/item/7800/api/json";
 
 		setUrlReaderException(
 			new FileNotFoundException(queueItemAPIURL), queueItemAPIURL,
-			mockUrlReaders);
+			mockURLReaders);
 
 		ByteArrayOutputStream byteArrayOutputStream =
 			new ByteArrayOutputStream();
