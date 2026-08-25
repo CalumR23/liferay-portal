@@ -1,0 +1,42 @@
+/**
+ * SPDX-FileCopyrightText: (c) 2026 Liferay, Inc. https://liferay.com
+ * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
+ */
+
+package com.liferay.jenkins.results.parser;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Holds one spy per reader type, so a test can stub every entry point at once
+ * and still reach for the single reader whose attempts it wants to count.
+ *
+ * @author Calum Ragan
+ */
+public class MockURLReaders {
+
+	public MockURLReaders(
+		JSONArrayURLReader jsonArrayURLReader,
+		JSONObjectURLReader jsonObjectURLReader,
+		StreamURLReader streamURLReader, TextURLReader textURLReader) {
+
+		_streamURLReader = streamURLReader;
+
+		_urlReaders = Arrays.asList(
+			jsonArrayURLReader, jsonObjectURLReader, streamURLReader,
+			textURLReader);
+	}
+
+	public StreamURLReader getStreamURLReader() {
+		return _streamURLReader;
+	}
+
+	public List<URLReader<?>> getURLReaders() {
+		return _urlReaders;
+	}
+
+	private final StreamURLReader _streamURLReader;
+	private final List<URLReader<?>> _urlReaders;
+
+}
