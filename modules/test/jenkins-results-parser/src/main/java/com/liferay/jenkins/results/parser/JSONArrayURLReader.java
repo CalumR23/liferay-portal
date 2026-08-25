@@ -15,10 +15,10 @@ import org.json.JSONException;
 /**
  * @author Kenji Heigel
  */
-public class JSONArrayUrlReader extends BaseBodyUrlReader<JSONArray> {
+public class JSONArrayURLReader extends BaseBodyURLReader<JSONArray> {
 
-	public static JSONArrayUrlReader getInstance() {
-		return _jsonArrayUrlReader;
+	public static JSONArrayURLReader getInstance() {
+		return _jsonArrayURLReader;
 	}
 
 	public static JSONArray read(
@@ -27,13 +27,13 @@ public class JSONArrayUrlReader extends BaseBodyUrlReader<JSONArray> {
 			String url)
 		throws IOException {
 
-		return _jsonArrayUrlReader.doRead(
+		return _jsonArrayURLReader.doRead(
 			checkCache, true, httpAuthorization, null, maxRetries, postContent,
 			retryPeriod, timeout, url);
 	}
 
-	public static void setInstance(JSONArrayUrlReader jsonArrayUrlReader) {
-		_jsonArrayUrlReader = jsonArrayUrlReader;
+	public static void setInstance(JSONArrayURLReader jsonArrayURLReader) {
+		_jsonArrayURLReader = jsonArrayURLReader;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class JSONArrayUrlReader extends BaseBodyUrlReader<JSONArray> {
 		}
 	}
 
-	private static volatile JSONArrayUrlReader _jsonArrayUrlReader =
-		new JSONArrayUrlReader();
+	private static volatile JSONArrayURLReader _jsonArrayURLReader =
+		new JSONArrayURLReader();
 
 }

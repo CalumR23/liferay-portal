@@ -41,7 +41,7 @@ import javax.net.ssl.SSLContext;
 /**
  * @author Kenji Heigel
  */
-public abstract class UrlReader<T> {
+public abstract class URLReader<T> {
 
 	/**
 	 * The <code>expectResponse</code> flag travels down to

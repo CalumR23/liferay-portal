@@ -17,11 +17,11 @@ import java.net.URLConnection;
 /**
  * Reads the whole body inside the attempt, so a response that arrives but is
  * unusable fails the same way a connection reset does and the retry loop in
- * {@link UrlReader} can act on it.
+ * {@link URLReader} can act on it.
  *
  * @author Kenji Heigel
  */
-public abstract class BaseBodyUrlReader<T> extends UrlReader<T> {
+public abstract class BaseBodyURLReader<T> extends URLReader<T> {
 
 	@Override
 	protected T handleCachedFile(File cachedFile) throws IOException {

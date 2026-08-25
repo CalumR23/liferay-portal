@@ -13,10 +13,10 @@ import java.io.IOException;
 /**
  * @author Kenji Heigel
  */
-public class TextUrlReader extends BaseBodyUrlReader<String> {
+public class TextURLReader extends BaseBodyURLReader<String> {
 
-	public static TextUrlReader getInstance() {
-		return _textUrlReader;
+	public static TextURLReader getInstance() {
+		return _textURLReader;
 	}
 
 	public static String read(
@@ -26,13 +26,13 @@ public class TextUrlReader extends BaseBodyUrlReader<String> {
 			String postContent, int retryPeriod, int timeout, String url)
 		throws IOException {
 
-		return _textUrlReader.doRead(
+		return _textURLReader.doRead(
 			checkCache, expectResponse, httpAuthorization, httpRequestMethod,
 			maxRetries, postContent, retryPeriod, timeout, url);
 	}
 
-	public static void setInstance(TextUrlReader textUrlReader) {
-		_textUrlReader = textUrlReader;
+	public static void setInstance(TextURLReader textURLReader) {
+		_textURLReader = textURLReader;
 	}
 
 	@Override
@@ -40,6 +40,6 @@ public class TextUrlReader extends BaseBodyUrlReader<String> {
 		return content;
 	}
 
-	private static volatile TextUrlReader _textUrlReader = new TextUrlReader();
+	private static volatile TextURLReader _textURLReader = new TextURLReader();
 
 }
