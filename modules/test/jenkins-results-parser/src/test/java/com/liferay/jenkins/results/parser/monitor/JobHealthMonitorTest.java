@@ -7,7 +7,7 @@ package com.liferay.jenkins.results.parser.monitor;
 
 import com.liferay.jenkins.results.parser.JenkinsMasterTestUtil;
 import com.liferay.jenkins.results.parser.JenkinsResultsParserUtil;
-import com.liferay.jenkins.results.parser.MockUrlReaders;
+import com.liferay.jenkins.results.parser.MockURLReaders;
 import com.liferay.jenkins.results.parser.RandomTestUtil;
 
 import java.util.Collections;
@@ -428,10 +428,10 @@ public class JobHealthMonitorTest
 
 	@Test
 	public void testExecuteUnreadableResponse() throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
-			RandomTestUtil.randomString(), _JOB_API_URL, mockUrlReaders);
+			RandomTestUtil.randomString(), _JOB_API_URL, mockURLReaders);
 
 		MonitorResult monitorResult = _execute(_newMonitorProperties());
 
@@ -539,10 +539,10 @@ public class JobHealthMonitorTest
 	}
 
 	private void _setJobJSONObject(JSONObject jobJSONObject) throws Exception {
-		MockUrlReaders mockUrlReaders = mockUrlReaders();
+		MockURLReaders mockURLReaders = mockURLReaders();
 
 		setUrlReaderOutput(
-			jobJSONObject.toString(), _JOB_API_URL, mockUrlReaders);
+			jobJSONObject.toString(), _JOB_API_URL, mockURLReaders);
 	}
 
 	private void _testJobHealthMonitorExpectedIllegalArgumentException(
