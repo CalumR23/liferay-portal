@@ -11,16 +11,22 @@ import com.liferay.jenkins.results.parser.Job;
 import com.liferay.jenkins.results.parser.JobFactory;
 import com.liferay.jenkins.results.parser.PortalGitWorkingDirectory;
 import com.liferay.jenkins.results.parser.PortalTestClassJob;
+import com.liferay.jenkins.results.parser.ReflectionTestUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import java.nio.file.Files;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.mockito.Mockito;
 
@@ -28,6 +34,23 @@ import org.mockito.Mockito;
  * @author Kenji Heigel
  */
 public class BatchTestClassGroupTestUtil {
+
+	public static void clearJavaFileCaches() {
+		Set<String> javaDirPathStrings = ReflectionTestUtil.getFieldValue(
+			JUnitBatchTestClassGroup.class, "_javaDirPathStrings");
+
+		javaDirPathStrings.clear();
+
+		AtomicBoolean javaFilesLoaded = ReflectionTestUtil.getFieldValue(
+			JUnitBatchTestClassGroup.class, "_javaFilesLoaded");
+
+		javaFilesLoaded.set(false);
+
+		Set<File> javaTestClassFiles = ReflectionTestUtil.getFieldValue(
+			JUnitBatchTestClassGroup.class, "_javaTestClassFiles");
+
+		javaTestClassFiles.clear();
+	}
 
 	public static PortalTestClassJob getPortalTestClassJob() {
 		return getPortalTestClassJob(null);
@@ -52,7 +75,73 @@ public class BatchTestClassGroupTestUtil {
 				"src/test/resources/dependencies/test/clazz/group" +
 					"/BatchTestClassGroupTestUtil/test.properties"));
 
+		Mockito.doReturn(
+			_workingDirectory
+		).when(
+			portalTestClassJob.getPortalGitWorkingDirectory()
+		).getWorkingDirectory();
+
 		return portalTestClassJob;
+	}
+
+	public static PortalTestClassJob getPortalTestClassJob(
+		Properties jobProperties, List<File> modifiedFiles,
+		File workingDirectory) {
+
+		PortalTestClassJob portalTestClassJob = getPortalTestClassJob(
+			jobProperties);
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			portalTestClassJob.getPortalGitWorkingDirectory();
+
+		Mockito.doReturn(
+			modifiedFiles
+		).when(
+			portalGitWorkingDirectory
+		).getModifiedFilesList();
+
+		Mockito.doReturn(
+			modifiedFiles
+		).when(
+			portalGitWorkingDirectory
+		).getModifiedFilesList(
+			Mockito.anyBoolean(), Mockito.any(), Mockito.anyList()
+		);
+
+		Mockito.doReturn(
+			workingDirectory
+		).when(
+			portalGitWorkingDirectory
+		).getWorkingDirectory();
+
+		return portalTestClassJob;
+	}
+
+	public static CompileModulesBatchTestClassGroup
+		newCompileModulesBatchTestClassGroup(
+			Properties jobProperties, File... modifiedModuleDirs) {
+
+		PortalTestClassJob portalTestClassJob = getPortalTestClassJob(
+			jobProperties);
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory =
+			portalTestClassJob.getPortalGitWorkingDirectory();
+
+		try {
+			Mockito.doReturn(
+				Arrays.asList(modifiedModuleDirs)
+			).when(
+				portalGitWorkingDirectory
+			).getModifiedModuleDirsList(
+				Mockito.anyList(), Mockito.anyList()
+			);
+		}
+		catch (IOException ioException) {
+			throw new RuntimeException(ioException);
+		}
+
+		return new CompileModulesBatchTestClassGroup(
+			"modules-compile", portalTestClassJob);
 	}
 
 	public static ServiceBuilderModulesBatchTestClassGroup
@@ -80,6 +169,19 @@ public class BatchTestClassGroupTestUtil {
 
 		return new ServiceBuilderModulesBatchTestClassGroup(
 			"service-builder-modules", portalTestClassJob);
+	}
+
+	public static File newTestClassFile(String className, File parentDir)
+		throws IOException {
+
+		File testClassFile = new File(parentDir, className + ".java");
+
+		String testClassFileContent = _getTestClassFileContent(className);
+
+		Files.write(
+			testClassFile.toPath(), testClassFileContent.getBytes("UTF-8"));
+
+		return testClassFile;
 	}
 
 	private static PortalTestClassJob _getPortalTestClassJob() {
@@ -122,12 +224,20 @@ public class BatchTestClassGroupTestUtil {
 			throw new RuntimeException(ioException);
 		}
 
+		_workingDirectory = portalGitWorkingDirectory.getWorkingDirectory();
+
 		_portalTestClassJob = (PortalTestClassJob)JobFactory.newJob(
 			Job.BuildProfile.DXP, "test-portal-acceptance-pullrequest(master)",
 			null, portalGitWorkingDirectory, upstreamBranchName, null,
 			repositoryName, "relevant", upstreamBranchName);
 
 		return _portalTestClassJob;
+	}
+
+	private static String _getTestClassFileContent(String className) {
+		return JenkinsResultsParserUtil.combine(
+			"public class ", className, " {\n\n\t@Test\n\tpublic void ",
+			"testSample() {\n\t}\n\n}");
 	}
 
 	private static File _writeJobPropertiesFile(Properties jobProperties) {
@@ -151,5 +261,6 @@ public class BatchTestClassGroupTestUtil {
 	}
 
 	private static PortalTestClassJob _portalTestClassJob;
+	private static File _workingDirectory;
 
 }
