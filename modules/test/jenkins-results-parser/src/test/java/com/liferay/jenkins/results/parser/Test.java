@@ -218,7 +218,7 @@ public class Test {
 			jsonArrayBodyURLReader, jsonObjectBodyURLReader, streamURLReader,
 			textBodyURLReader);
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			try {
 				Mockito.doAnswer(
 					invocation -> {
@@ -276,7 +276,7 @@ public class Test {
 			IOException ioException, String url, MockURLReaders mockURLReaders)
 		throws Exception {
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			Mockito.doThrow(
 				ioException
 			).when(
@@ -295,7 +295,7 @@ public class Test {
 			MockURLReaders mockURLReaders)
 		throws Exception {
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			Mockito.doAnswer(
 				invocation -> {
 					JenkinsResultsParserUtil.sleep(delayMillis);
@@ -324,7 +324,7 @@ public class Test {
 			int responseCode, String url, MockURLReaders mockURLReaders)
 		throws Exception {
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			Mockito.doAnswer(
 				invocation -> _mockURLConnection(responseCode)
 			).when(
@@ -372,7 +372,7 @@ public class Test {
 
 		int count = 0;
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			MockingDetails mockingDetails = Mockito.mockingDetails(urlReader);
 
 			for (Invocation invocation : mockingDetails.getInvocations()) {
@@ -399,7 +399,7 @@ public class Test {
 
 		int count = 0;
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			MockingDetails mockingDetails = Mockito.mockingDetails(urlReader);
 
 			for (Invocation invocation : mockingDetails.getInvocations()) {
@@ -439,7 +439,7 @@ public class Test {
 
 		List<Long> durations = new ArrayList<>();
 
-		for (URLReader<?> urlReader : mockURLReaders.getURLReaders()) {
+		for (BaseURLReader<?> urlReader : mockURLReaders.getURLReaders()) {
 			MockingDetails mockingDetails = Mockito.mockingDetails(urlReader);
 
 			for (Invocation invocation : mockingDetails.getInvocations()) {
@@ -461,7 +461,7 @@ public class Test {
 
 	private static Method _getDoReadMethod() {
 		try {
-			return URLReader.class.getDeclaredMethod(
+			return BaseURLReader.class.getDeclaredMethod(
 				"doRead", boolean.class, boolean.class,
 				JenkinsResultsParserUtil.HTTPAuthorization.class,
 				JenkinsResultsParserUtil.HttpRequestMethod.class, int.class,
@@ -474,7 +474,7 @@ public class Test {
 
 	private static Method _getOpenURLConnectionMethod() {
 		try {
-			return URLReader.class.getDeclaredMethod(
+			return BaseURLReader.class.getDeclaredMethod(
 				"openURLConnection", String.class, boolean.class,
 				JenkinsResultsParserUtil.HttpRequestMethod.class, String.class,
 				boolean.class, int.class, String.class);
@@ -486,7 +486,7 @@ public class Test {
 
 	private static Method _getSleepMethod() {
 		try {
-			return URLReader.class.getDeclaredMethod("sleep", long.class);
+			return BaseURLReader.class.getDeclaredMethod("sleep", long.class);
 		}
 		catch (NoSuchMethodException noSuchMethodException) {
 			throw new ExceptionInInitializerError(noSuchMethodException);
