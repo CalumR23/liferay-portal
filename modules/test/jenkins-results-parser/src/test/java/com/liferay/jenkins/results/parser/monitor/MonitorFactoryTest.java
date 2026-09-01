@@ -68,6 +68,25 @@ public class MonitorFactoryTest
 	}
 
 	@Test
+	public void testNewMonitorProcessContainer() {
+		Properties monitorProperties = new Properties();
+
+		monitorProperties.setProperty(
+			"monitor[a].parameter[container.name]",
+			RandomTestUtil.randomString());
+		monitorProperties.setProperty(
+			"monitor[a].parameter[host]", RandomTestUtil.randomString());
+		monitorProperties.setProperty("monitor[a].type", "process-container");
+
+		List<MonitorConfig> monitorConfigs =
+			MonitorConfigLoader.getMonitorConfigs(monitorProperties);
+
+		Monitor monitor = MonitorFactory.newMonitor(monitorConfigs.get(0));
+
+		Assert.assertTrue(monitor instanceof ProcessContainerMonitor);
+	}
+
+	@Test
 	public void testNewMonitorResourceThreshold() {
 		String masterName = RandomTestUtil.randomString();
 
