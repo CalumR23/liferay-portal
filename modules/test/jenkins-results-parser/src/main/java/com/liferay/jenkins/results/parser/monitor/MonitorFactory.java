@@ -24,6 +24,10 @@ public class MonitorFactory {
 				return new JobHealthMonitor(monitorConfig);
 			}
 
+			if (type.equals("process-container")) {
+				return new ProcessContainerMonitor(monitorConfig);
+			}
+
 			if (type.equals("resource-threshold")) {
 				return new ResourceThresholdMonitor(monitorConfig);
 			}
