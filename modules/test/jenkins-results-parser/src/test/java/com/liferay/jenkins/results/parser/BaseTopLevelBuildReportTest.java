@@ -233,6 +233,63 @@ public class BaseTopLevelBuildReportTest
 	}
 
 	@Test
+	public void testGetFailureReports() {
+		BaseTopLevelBuildReport baseTopLevelBuildReport =
+			_newBaseTopLevelBuildReport(
+				new JSONObject(
+				).put(
+					"failureReports",
+					new JSONArray(
+					).put(
+						new JSONObject(
+						).put(
+							"message", RandomTestUtil.randomString()
+						)
+					)
+				).put(
+					"result", "FAILURE"
+				));
+
+		FailureReport cachedFailureReport = Mockito.mock(FailureReport.class);
+
+		DownstreamBuildReport cachedDownstreamBuildReport =
+			_newDownstreamBuildReport(RandomTestUtil.randomString(), true);
+
+		Mockito.doReturn(
+			Collections.singletonList(cachedFailureReport)
+		).when(
+			cachedDownstreamBuildReport
+		).getFailureReports();
+
+		FailureReport downstreamFailureReport = Mockito.mock(
+			FailureReport.class);
+
+		DownstreamBuildReport downstreamBuildReport = _newDownstreamBuildReport(
+			RandomTestUtil.randomString(), false);
+
+		Mockito.doReturn(
+			Collections.singletonList(downstreamFailureReport)
+		).when(
+			downstreamBuildReport
+		).getFailureReports();
+
+		baseTopLevelBuildReport.addDownstreamBuildReport(
+			cachedDownstreamBuildReport);
+		baseTopLevelBuildReport.addDownstreamBuildReport(downstreamBuildReport);
+
+		List<FailureReport> failureReports =
+			baseTopLevelBuildReport.getFailureReports();
+
+		Assert.assertEquals(
+			failureReports.toString(), 3, failureReports.size());
+		Assert.assertTrue(failureReports.contains(cachedFailureReport));
+		Assert.assertTrue(failureReports.contains(downstreamFailureReport));
+
+		Assert.assertSame(
+			failureReports, baseTopLevelBuildReport.getFailureReports());
+	}
+
+	@Test
 	public void testGetTopLevelActiveDuration() {
 		BaseTopLevelBuildReport baseTopLevelBuildReport =
 			_newBaseTopLevelBuildReport(
