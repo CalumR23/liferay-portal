@@ -96,12 +96,14 @@ public abstract class BaseTestClass implements TestClass {
 	public JSONObject getJSONObject() {
 		JSONObject jsonObject = new JSONObject();
 
+		File testClassFile = getTestClassFile();
+
 		jsonObject.put(
 			"average_duration", getAverageDuration()
 		).put(
 			"average_overhead_duration", getAverageOverheadDuration()
 		).put(
-			"file", getTestClassFile()
+			"file", testClassFile.getPath()
 		).put(
 			"ignored", isIgnored()
 		);
