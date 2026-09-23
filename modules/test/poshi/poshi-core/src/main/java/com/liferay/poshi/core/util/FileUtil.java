@@ -124,9 +124,7 @@ public class FileUtil {
 
 		List<String> filePaths = new ArrayList<>();
 
-		for (Path path :
-				_getIncludedPaths(fileSystem, includes, baseDirName)) {
-
+		for (Path path : _getIncludedPaths(fileSystem, includes, baseDirName)) {
 			filePaths.add(path.toString());
 		}
 
@@ -147,9 +145,7 @@ public class FileUtil {
 
 		List<URL> urls = new ArrayList<>();
 
-		for (Path path :
-				_getIncludedPaths(fileSystem, includes, baseDirName)) {
-
+		for (Path path : _getIncludedPaths(fileSystem, includes, baseDirName)) {
 			URI uri = path.toUri();
 
 			urls.add(uri.toURL());
@@ -260,7 +256,6 @@ public class FileUtil {
 
 		write(file, string);
 	}
-
 
 	private static List<Path> _getIncludedPaths(
 			FileSystem fileSystem, String[] includes, String baseDirName)
