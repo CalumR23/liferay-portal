@@ -29,7 +29,7 @@ import com.liferay.portal.kernel.service.LayoutService;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.multipart.BinaryFile;
 import com.liferay.portal.vulcan.multipart.MultipartBody;
@@ -150,7 +150,8 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 		long groupId = group.getGroupId();
 
 		PermissionUtil.checkImportPermission(
-			contextCompany.getCompanyId(), groupId);
+			contextCompany.getCompanyId(), groupId,
+			PermissionUtil.getGroupActionId(portletId));
 
 		FileEntry fileEntry = _addTempFileEntry(groupId, multipartBody);
 
@@ -167,13 +168,15 @@ public class ImportPreviewResourceImpl extends BaseImportPreviewResourceImpl {
 
 		boolean portletScoped = !Validator.isBlank(portletId);
 
-		for (Portlet portlet : manifestSummary.getDataPortlets()) {
-			if (portletScoped &&
-				!StringUtil.equals(portlet.getPortletId(), portletId)) {
+		List<Portlet> portlets = manifestSummary.getDataPortlets();
 
-				continue;
-			}
+		if (portletScoped) {
+			portlets = ListUtil.fromArray(
+				_portletLocalService.getPortletById(
+					contextCompany.getCompanyId(), portletId));
+		}
 
+		for (Portlet portlet : portlets) {
 			PreviewPortletDataHandlerUtil.addPreviewPortletDataHandler(
 				contextCompany.getCompanyId(), locale, manifestSummary, portlet,
 				portlet.getPortletDataHandlerInstance(),

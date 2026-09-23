@@ -18,6 +18,8 @@ import com.liferay.portal.kernel.test.AssertUtils;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.odata.filter.InvalidFilterException;
+import com.liferay.portal.odata.sort.InvalidSortException;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.portal.vulcan.http.VulcanRequestForwarder;
 
@@ -87,6 +89,24 @@ public class OpenAPIUtilTest {
 			JSONUtil.put("filter", "name eq 'John Doe'"), "getItems");
 		_testGetRequest(
 			null, null, "GET",
+			"/v1.0/items?filter=object1%2Fboolean+eq+true&restrictFields=" +
+				"actions%2Cobject1.string",
+			JSONUtil.put("filter", "object1/boolean eq true"), "object1.string",
+			"getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?filter=string+eq+%27boolean%27%27s%27&" +
+				"restrictFields=actions%2Cboolean",
+			JSONUtil.put("filter", "string eq 'boolean''s'"), "boolean",
+			"getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?filter=string+eq+%27phoneNumber%27&restrictFields=" +
+				"actions%2CphoneNumber",
+			JSONUtil.put("filter", "string eq 'phoneNumber'"), "phoneNumber",
+			"getItems");
+		_testGetRequest(
+			null, null, "GET",
 			"/v1.0/items?page=1&pageSize=20&fields=name&restrictFields=actions",
 			JSONUtil.put(
 				"fields", "name"
@@ -101,10 +121,25 @@ public class OpenAPIUtilTest {
 			JSONFactoryUtil.createJSONObject(), "getItems");
 		_testGetRequest(
 			null, null, "GET", "/v1.0/items?restrictFields=actions",
+			JSONFactoryUtil.createJSONObject(), StringPool.BLANK, "getItems");
+		_testGetRequest(
+			null, null, "GET", "/v1.0/items?restrictFields=actions",
 			JSONUtil.put("fields", ""), "getItems");
 		_testGetRequest(
 			null, null, "GET", "/v1.0/items?restrictFields=actions",
 			JSONUtil.put("restrictFields", "name"), "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?restrictFields=actions%2Cname%2Cparent.name",
+			JSONFactoryUtil.createJSONObject(), "name,parent.name", "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?sort=boolean%3Aasc&restrictFields=actions%2Cstring",
+			JSONUtil.put("sort", "boolean:asc"), "string", "getItems");
+		_testGetRequest(
+			null, null, "GET",
+			"/v1.0/items?sort=string%3Aasc&restrictFields=actions",
+			JSONUtil.put("sort", "string:asc"), "getItems");
 		_testGetRequest(
 			JSONUtil.put(
 				"name", "Test"
@@ -117,9 +152,74 @@ public class OpenAPIUtilTest {
 			),
 			"patchItem");
 		_testGetRequest(
+			JSONUtil.put(
+				"name", "Test"
+			).toString(),
+			"application/json", "PATCH", "/v1.0/items/123?restrictFields=name",
+			JSONUtil.put(
+				"body", JSONUtil.put("name", "Test")
+			).put(
+				"itemId", "123"
+			),
+			"name", "patchItem");
+		_testGetRequest(
 			"{}", "application/json", "POST", "/v1.0/items",
 			JSONUtil.put("body", JSONFactoryUtil.createJSONObject()),
 			"postItem");
+		_testGetRequest(
+			"{}", "application/json", "POST", "/v1.0/items?restrictFields=name",
+			JSONUtil.put("body", JSONFactoryUtil.createJSONObject()), "name",
+			"postItem");
+		_testGetRequest(
+			JSONUtil.put(
+				"name", "Test"
+			).toString(),
+			"application/json", "PUT", "/v1.0/items/123?restrictFields=name",
+			JSONUtil.put(
+				"body", JSONUtil.put("name", "Test")
+			).put(
+				"itemId", "123"
+			),
+			"name", "putItem");
+
+		_testGetRequestFailure(
+			InvalidFilterException.class,
+			"Parameter \"filter\" references a restricted field",
+			JSONUtil.put("filter", "object1.string eq 'Test'"),
+			"object1.string", "getItems");
+		_testGetRequestFailure(
+			InvalidFilterException.class,
+			"Parameter \"filter\" references a restricted field",
+			JSONUtil.put("filter", "object1/object2/boolean eq true"),
+			"object1", "getItems");
+		_testGetRequestFailure(
+			InvalidFilterException.class,
+			"Parameter \"filter\" references a restricted field",
+			JSONUtil.put("filter", "object1/string eq 'Test'"),
+			"object1.string", "getItems");
+		_testGetRequestFailure(
+			InvalidFilterException.class,
+			"Parameter \"filter\" references a restricted field",
+			JSONUtil.put("filter", "string eq 'Test'"), "string", "getItems");
+		_testGetRequestFailure(
+			InvalidFilterException.class,
+			"Parameter \"filter\" references a restricted field",
+			JSONUtil.put("filter", "string eq 'Test' and boolean eq true"),
+			"string,boolean", "getItems");
+		_testGetRequestFailure(
+			InvalidSortException.class,
+			"Parameter \"sort\" references a restricted field",
+			JSONUtil.put("sort", "boolean:asc, string :desc"), "string",
+			"getItems");
+		_testGetRequestFailure(
+			InvalidSortException.class,
+			"Parameter \"sort\" references a restricted field",
+			JSONUtil.put("sort", "boolean:asc,string:desc"), "string",
+			"getItems");
+		_testGetRequestFailure(
+			InvalidSortException.class,
+			"Parameter \"sort\" references a restricted field",
+			JSONUtil.put("sort", "object1/string"), "object1", "getItems");
 
 		String fileContent = RandomTestUtil.randomString();
 		String fileName = RandomTestUtil.randomString();
@@ -144,7 +244,7 @@ public class OpenAPIUtilTest {
 			).put(
 				"name", name
 			),
-			_openAPIJSONObject, "postBinary", null);
+			_openAPIJSONObject, null, "postBinary", null);
 
 		Assert.assertEquals("POST", request.getMethod());
 		Assert.assertEquals("/v1.0/binaries", request.getPath());
@@ -175,7 +275,7 @@ public class OpenAPIUtilTest {
 			).put(
 				"string", fileContent
 			),
-			_openAPIJSONObject, "postUpload", null);
+			_openAPIJSONObject, null, "postUpload", null);
 
 		Assert.assertEquals("POST", request.getMethod());
 		Assert.assertEquals("/v1.0/uploads", request.getPath());
@@ -196,7 +296,7 @@ public class OpenAPIUtilTest {
 
 		request = OpenAPIUtil.getRequest(
 			StringPool.BLANK, headers, JSONUtil.put("itemId", "123"),
-			_openAPIJSONObject, "getItem", null);
+			_openAPIJSONObject, null, "getItem", null);
 
 		Assert.assertEquals(headers, request.getHeaders());
 
@@ -212,7 +312,7 @@ public class OpenAPIUtilTest {
 				JSONUtil.put(
 					RandomTestUtil.randomString(),
 					RandomTestUtil.randomString()),
-				_openAPIJSONObject, "postItem", null));
+				_openAPIJSONObject, null, "postItem", null));
 	}
 
 	@Test
@@ -220,12 +320,13 @@ public class OpenAPIUtilTest {
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class,
 			"OpenAPI document has no tool with name \"missing\"",
-			() -> OpenAPIUtil.getTool(true, _openAPIJSONObject, "missing"));
+			() -> OpenAPIUtil.getTool(
+				true, _openAPIJSONObject, null, "missing"));
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class,
 			"OpenAPI document has no \"paths\" object",
 			() -> OpenAPIUtil.getTool(
-				true, JSONFactoryUtil.createJSONObject(),
+				true, JSONFactoryUtil.createJSONObject(), null,
 				RandomTestUtil.randomString()));
 		AssertUtils.assertFailure(
 			IllegalArgumentException.class, "Request body has no content",
@@ -271,6 +372,58 @@ public class OpenAPIUtilTest {
 		_testGetTool(
 			"PUT /v1.0/items/{itemId}", "put_test_v1.0_items_itemId.json",
 			"putItem");
+
+		Tool tool = OpenAPIUtil.getTool(
+			true, _openAPIJSONObject, "boolean,object1.name", "getItems");
+
+		Map<String, ?> inputSchemaMap = tool.getInputSchema();
+
+		Map<String, ?> propertiesMap = (Map<String, ?>)inputSchemaMap.get(
+			"properties");
+
+		Map<String, ?> fieldsMap = (Map<String, ?>)propertiesMap.get("fields");
+
+		Map<String, ?> itemsMap = (Map<String, ?>)fieldsMap.get("items");
+
+		List<String> enumValues = (List<String>)itemsMap.get("enum");
+
+		Assert.assertFalse(enumValues.contains("boolean"));
+		Assert.assertTrue(enumValues.contains("object1"));
+
+		JSONObject itemJSONObject = JSONFactoryUtil.createJSONObject(
+			_read("get_test_v1.0_items_itemId_output.json"));
+
+		_testGetToolOutputSchema(itemJSONObject, "getItem");
+		_testGetToolOutputSchema(
+			JSONUtil.put(
+				"items", itemJSONObject
+			).put(
+				"type", "array"
+			),
+			"getItems");
+		_testGetToolOutputSchema(
+			JSONUtil.put(
+				"properties",
+				JSONUtil.put(
+					"items",
+					JSONUtil.put(
+						"items", itemJSONObject
+					).put(
+						"type", "array"
+					)
+				).put(
+					"page", JSONUtil.put("type", "integer")
+				).put(
+					"totalCount", JSONUtil.put("type", "integer")
+				)
+			).put(
+				"type", "object"
+			),
+			"getItemsPage");
+
+		Assert.assertNull(_getOutputSchema("patchItem"));
+		Assert.assertNull(_getOutputSchema("postItem"));
+		Assert.assertNull(_getOutputSchema("putItem"));
 	}
 
 	@Test
@@ -350,6 +503,12 @@ public class OpenAPIUtilTest {
 				"No part named \"", fieldName, "\" in ", fileItems));
 	}
 
+	private String _getFileItemValue(List<FileItem> fileItems, String name) {
+		FileItem fileItem = _getFileItem(fileItems, name);
+
+		return fileItem.getString();
+	}
+
 	private List<FileItem> _getFileItems(VulcanRequestForwarder.Request request)
 		throws Exception {
 
@@ -388,18 +547,17 @@ public class OpenAPIUtilTest {
 			});
 	}
 
-	private String _getFileItemValue(List<FileItem> fileItems, String name) {
-		FileItem fileItem = _getFileItem(fileItems, name);
-
-		return fileItem.getString();
-	}
-
 	private Map<String, ?> _getInputSchema(
 		JSONObject openAPIJSONObject, String toolName) {
 
-		Tool tool = OpenAPIUtil.getTool(true, openAPIJSONObject, toolName);
+		Tool tool = OpenAPIUtil.getTool(
+			true, openAPIJSONObject, null, toolName);
 
 		return tool.getInputSchema();
+	}
+
+	private Map<String, ?> _getOutputSchema(String toolName) {
+		return OpenAPIUtil.getOutputSchema(_openAPIJSONObject, toolName);
 	}
 
 	private String _read(String fileName) throws Exception {
@@ -413,9 +571,20 @@ public class OpenAPIUtilTest {
 			JSONObject inputJSONObject, String toolName)
 		throws Exception {
 
+		_testGetRequest(
+			expectedBody, expectedContentType, expectedMethod,
+			expectedPathWithQuery, inputJSONObject, null, toolName);
+	}
+
+	private void _testGetRequest(
+			String expectedBody, String expectedContentType,
+			String expectedMethod, String expectedPathWithQuery,
+			JSONObject inputJSONObject, String restrictFields, String toolName)
+		throws Exception {
+
 		VulcanRequestForwarder.Request request = OpenAPIUtil.getRequest(
 			StringPool.BLANK, null, inputJSONObject, _openAPIJSONObject,
-			toolName, null);
+			restrictFields, toolName, null);
 
 		if (expectedBody == null) {
 			Assert.assertNull(request.getBody());
@@ -432,13 +601,25 @@ public class OpenAPIUtilTest {
 		Assert.assertEquals(expectedPathWithQuery, request.getPath());
 	}
 
+	private void _testGetRequestFailure(
+		Class<? extends Exception> expectedExceptionClass,
+		String expectedMessage, JSONObject inputJSONObject,
+		String restrictFields, String toolName) {
+
+		AssertUtils.assertFailure(
+			expectedExceptionClass, expectedMessage,
+			() -> OpenAPIUtil.getRequest(
+				StringPool.BLANK, null, inputJSONObject, _openAPIJSONObject,
+				restrictFields, toolName, null));
+	}
+
 	private void _testGetTool(
 			String expectedDescription, String expectedSchemaFileName,
 			boolean injectVulcanParameters, String toolName)
 		throws Exception {
 
 		Tool tool = OpenAPIUtil.getTool(
-			injectVulcanParameters, _openAPIJSONObject, toolName);
+			injectVulcanParameters, _openAPIJSONObject, null, toolName);
 
 		Assert.assertEquals(expectedDescription, tool.getDescription());
 		Assert.assertEquals(toolName, tool.getName());
@@ -459,6 +640,19 @@ public class OpenAPIUtilTest {
 
 		_testGetTool(
 			expectedDescription, expectedSchemaFileName, true, toolName);
+	}
+
+	private void _testGetToolOutputSchema(
+			JSONObject expectedJSONObject, String toolName)
+		throws Exception {
+
+		JSONAssert.assertEquals(
+			expectedJSONObject.toString(),
+			new ObjectMapper(
+			).writeValueAsString(
+				_getOutputSchema(toolName)
+			),
+			true);
 	}
 
 	private JSONObject _openAPIJSONObject;

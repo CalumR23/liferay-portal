@@ -73,6 +73,13 @@ public class TestClassGroupFactory {
 				(PluginsGulpBatchTestClassGroup)batchTestClassGroup);
 		}
 
+		if (batchTestClassGroup instanceof
+				WorkspacesCompileBatchTestClassGroup) {
+
+			return new WorkspacesCompileAxisTestClassGroup(
+				(WorkspacesCompileBatchTestClassGroup)batchTestClassGroup);
+		}
+
 		return new AxisTestClassGroup(batchTestClassGroup);
 	}
 
@@ -116,6 +123,13 @@ public class TestClassGroupFactory {
 
 		if (batchTestClassGroup instanceof PluginsGulpBatchTestClassGroup) {
 			return new PluginsGulpAxisTestClassGroup(
+				jsonObject, segmentTestClassGroup);
+		}
+
+		if (batchTestClassGroup instanceof
+				WorkspacesCompileBatchTestClassGroup) {
+
+			return new WorkspacesCompileAxisTestClassGroup(
 				jsonObject, segmentTestClassGroup);
 		}
 
@@ -566,6 +580,38 @@ public class TestClassGroupFactory {
 				else {
 					batchTestClassGroup =
 						new WorkspacesCompileBatchTestClassGroup(
+							batchName, portalTestClassJob);
+				}
+			}
+			else if (batchName.startsWith("workspaces-integration") ||
+					 batchName.startsWith("workspaces-unit")) {
+
+				if (jsonObject != null) {
+					batchTestClassGroup =
+						new WorkspacesModulesJUnitBatchTestClassGroup(
+							jsonObject, portalTestClassJob);
+				}
+				else if (testBatch instanceof JUnitTestBatch) {
+					batchTestClassGroup =
+						new WorkspacesModulesJUnitBatchTestClassGroup(
+							batchName, portalTestClassJob,
+							(JUnitTestBatch)testBatch);
+				}
+				else {
+					batchTestClassGroup =
+						new WorkspacesModulesJUnitBatchTestClassGroup(
+							batchName, portalTestClassJob);
+				}
+			}
+			else if (batchName.startsWith("workspaces-js-unit")) {
+				if (jsonObject != null) {
+					batchTestClassGroup =
+						new WorkspacesJSUnitModulesBatchTestClassGroup(
+							jsonObject, portalTestClassJob);
+				}
+				else {
+					batchTestClassGroup =
+						new WorkspacesJSUnitModulesBatchTestClassGroup(
 							batchName, portalTestClassJob);
 				}
 			}

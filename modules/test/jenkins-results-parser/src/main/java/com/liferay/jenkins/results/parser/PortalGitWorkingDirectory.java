@@ -18,9 +18,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -98,7 +100,31 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		}
 
 		_jsUnitFiles = new ArrayList<>(
-			findFiles(null, "describe\\( -- '*.js' '*.jsx' '*.ts' '*.tsx'"));
+			findFiles(null, _FILE_CONTENT_SNIPPET_JS_UNIT));
+
+		File portalPrivateDir = getPortalPrivateDir();
+
+		if (portalPrivateDir != null) {
+			String standardOut = null;
+
+			try {
+				Process process = JenkinsResultsParserUtil.executeBashCommands(
+					false, portalPrivateDir, 60 * 1000,
+					"git grep " + _FILE_CONTENT_SNIPPET_JS_UNIT);
+
+				standardOut = JenkinsResultsParserUtil.readInputStream(
+					process.getInputStream());
+			}
+			catch (IOException | TimeoutException exception) {
+				throw new GitWorkingDirectoryRuntimeException(
+					this, "Unable to run: git grep in " + portalPrivateDir,
+					exception);
+			}
+
+			for (String filePath : getJSUnitFilePaths(standardOut)) {
+				_jsUnitFiles.add(new File(portalPrivateDir, filePath));
+			}
+		}
 
 		return _jsUnitFiles;
 	}
@@ -141,21 +167,6 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		return modifiedModuleDirsList;
 	}
 
-	public List<File> getModifiedNonposhiModules() throws IOException {
-		List<File> modifiedFilesList = getModifiedFilesList();
-
-		List<File> modifiedNonposhiFilesList = new ArrayList<>();
-
-		for (File modifiedFile : modifiedFilesList) {
-			if (!JenkinsResultsParserUtil.isPoshiFile(modifiedFile)) {
-				modifiedNonposhiFilesList.add(modifiedFile);
-			}
-		}
-
-		return JenkinsResultsParserUtil.getDirectoriesContainingFiles(
-			getModuleDirsList(null, null), modifiedNonposhiFilesList);
-	}
-
 	public List<File> getModifiedNPMTestModuleDirsList() throws IOException {
 		List<File> modifiedModuleDirsList = getModifiedModuleDirsList();
 
@@ -169,6 +180,21 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 		}
 
 		return modifiedNPMTestModuleDirsList;
+	}
+
+	public List<File> getModifiedNonposhiModules() throws IOException {
+		List<File> modifiedFilesList = getModifiedFilesList();
+
+		List<File> modifiedNonposhiFilesList = new ArrayList<>();
+
+		for (File modifiedFile : modifiedFilesList) {
+			if (!JenkinsResultsParserUtil.isPoshiFile(modifiedFile)) {
+				modifiedNonposhiFilesList.add(modifiedFile);
+			}
+		}
+
+		return JenkinsResultsParserUtil.getDirectoriesContainingFiles(
+			getModuleDirsList(null, null), modifiedNonposhiFilesList);
 	}
 
 	public List<File> getModifiedPoshiModules() throws IOException {
@@ -374,6 +400,28 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 			"Unable to find a plugins Git working directory");
 	}
 
+	public File getPortalPrivateDir() {
+		String portalPrivateDirPath = JenkinsResultsParserUtil.getProperty(
+			getTestProperties(), "liferay.portal.private.dir");
+
+		if (JenkinsResultsParserUtil.isNullOrEmpty(portalPrivateDirPath)) {
+			return null;
+		}
+
+		File portalPrivateDir = new File(portalPrivateDirPath);
+
+		if (!portalPrivateDir.isAbsolute()) {
+			portalPrivateDir = new File(
+				getWorkingDirectory(), portalPrivateDirPath);
+		}
+
+		if (!portalPrivateDir.exists()) {
+			return null;
+		}
+
+		return JenkinsResultsParserUtil.getCanonicalFile(portalPrivateDir);
+	}
+
 	public Properties getReleaseProperties() {
 		if (_releaseProperties != null) {
 			return _releaseProperties;
@@ -426,7 +474,8 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 				properties.put(
 					propertyName,
 					JenkinsResultsParserUtil.getBuildProperty(
-						"portal.build.properties[" + propertyName + "]"));
+						"portal.build.properties[" + propertyName + "]",
+						getUpstreamBranchName()));
 			}
 
 			JenkinsResultsParserUtil.writePropertiesFile(
@@ -548,6 +597,18 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 
 	}
 
+	protected static List<String> getJSUnitFilePaths(String standardOut) {
+		Set<String> filePaths = new LinkedHashSet<>();
+
+		Matcher matcher = _jsUnitFilePathPattern.matcher(standardOut);
+
+		while (matcher.find()) {
+			filePaths.add(matcher.group("filePath"));
+		}
+
+		return new ArrayList<>(filePaths);
+	}
+
 	protected PortalGitWorkingDirectory(
 			String upstreamBranchName, String workingDirectoryPath)
 		throws IOException {
@@ -663,11 +724,16 @@ public class PortalGitWorkingDirectory extends GitWorkingDirectory {
 	}
 
 	private static final String[] _BINARIES_CACHE_EXCLUDE_REGEXES = {
-		"\\.gradle/", "\\.yarn/", "modules/\\.tsc/", "node_modules_cache/"
+		"\\.gradle/", "\\.yarn/", "modules/\\.tsc/", "node_modules_cache"
 	};
+
+	private static final String _FILE_CONTENT_SNIPPET_JS_UNIT =
+		"describe\\( -- '*.js' '*.jsx' '*.ts' '*.tsx'";
 
 	private static final Pattern _esBuildFileNamePattern = Pattern.compile(
 		"@esbuild-(linux-.*?)-.*");
+	private static final Pattern _jsUnitFilePathPattern = Pattern.compile(
+		"(?<filePath>[^\\n:]+):.+");
 
 	private Properties _appServerProperties;
 	private List<File> _jsUnitFiles;

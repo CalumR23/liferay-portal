@@ -985,7 +985,7 @@ test(
 
 test(
 	'Order Details - Order Summary',
-	{tag: ['@LPD-35558', '@LPD-35252']},
+	{tag: ['@LPD-35252', '@LPD-35558']},
 	async ({
 		apiHelpers,
 		commerceAdminChannelDetailsPage,
@@ -1045,6 +1045,12 @@ test(
 		const taxCategory = (
 			await apiHelpers.headlessCommerceAdminChannel.getTaxCategories()
 		).items[0];
+
+		await commerceAdminChannelsPage.goto();
+
+		await (
+			await commerceAdminChannelsPage.channelsTableRowLink(channel.name)
+		).click();
 
 		await commerceAdminChannelDetailsPage.addFixedTaxRate(
 			'7.5',

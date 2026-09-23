@@ -30,13 +30,12 @@ import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.json.JSONFactory;
-import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.ContentDispositionUtil;
@@ -77,7 +76,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 			_backgroundTaskLocalService.getBackgroundTask(exportProcessId);
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), backgroundTask.getGroupId());
+			contextCompany.getCompanyId(), backgroundTask.getGroupId(),
+			PermissionUtil.getGroupActionId(backgroundTask));
 
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
@@ -108,7 +108,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 			_backgroundTaskLocalService.getBackgroundTask(exportProcessId);
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), backgroundTask.getGroupId());
+			contextCompany.getCompanyId(), backgroundTask.getGroupId(),
+			PermissionUtil.getGroupActionId(backgroundTask));
 
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
@@ -124,7 +125,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 			_backgroundTaskLocalService.getBackgroundTask(exportProcessId);
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), backgroundTask.getGroupId());
+			contextCompany.getCompanyId(), backgroundTask.getGroupId(),
+			PermissionUtil.getGroupActionId(backgroundTask));
 
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
@@ -148,17 +150,6 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 	}
 
 	@Override
-	public Page<ExportProcess> getExportProcessesPage(
-			Long creatorId, String portletId, String search, Integer status,
-			Pagination pagination, Sort[] sorts)
-		throws Exception {
-
-		return _getExportProcessesPage(
-			creatorId, GroupUtil.getCompanyGroup(contextCompany.getCompanyId()),
-			pagination, portletId, search, sorts, status);
-	}
-
-	@Override
 	public ProcessProgress getExportProcessProgress(Long exportProcessId)
 		throws Exception {
 
@@ -166,7 +157,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 			_backgroundTaskLocalService.getBackgroundTask(exportProcessId);
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), backgroundTask.getGroupId());
+			contextCompany.getCompanyId(), backgroundTask.getGroupId(),
+			PermissionUtil.getGroupActionId(backgroundTask));
 
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
@@ -178,6 +170,17 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 						backgroundTask.getBackgroundTaskId()));
 			}
 		};
+	}
+
+	@Override
+	public Page<ExportProcess> getExportProcessesPage(
+			Long creatorId, String portletId, String search, Integer status,
+			Pagination pagination, Sort[] sorts)
+		throws Exception {
+
+		return _getExportProcessesPage(
+			creatorId, GroupUtil.getCompanyGroup(contextCompany.getCompanyId()),
+			pagination, portletId, search, sorts, status);
 	}
 
 	@Override
@@ -227,7 +230,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 			_backgroundTaskLocalService.getBackgroundTask(exportProcessId);
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), backgroundTask.getGroupId());
+			contextCompany.getCompanyId(), backgroundTask.getGroupId(),
+			PermissionUtil.getGroupActionId(backgroundTask));
 
 		BackgroundTaskUtil.checkTaskExecutorClassName(
 			backgroundTask, _CLASS_NAMES_TASK_EXECUTOR);
@@ -280,7 +284,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 		throws Exception {
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), groupId);
+			contextCompany.getCompanyId(), groupId,
+			PermissionUtil.getGroupActionId(portletId));
 
 		DynamicQuery dynamicQuery = _getDynamicQuery(
 			creatorId, groupId, portletId, search, status);
@@ -380,7 +385,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 		long groupId = group.getGroupId();
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), groupId);
+			contextCompany.getCompanyId(), groupId,
+			ActionKeys.EXPORT_IMPORT_LAYOUTS);
 
 		Map<String, String[]> parameterMap =
 			ParameterMapUtil.putDateRangeParameters(
@@ -451,7 +457,8 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 		long groupId = group.getGroupId();
 
 		PermissionUtil.checkExportPermission(
-			contextCompany.getCompanyId(), groupId);
+			contextCompany.getCompanyId(), groupId,
+			ActionKeys.EXPORT_IMPORT_PORTLET_INFO);
 
 		String fileName = exportProcessRequest.getName();
 
@@ -509,18 +516,9 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 				setDateCreated(backgroundTask::getCreateDate);
 				setDateModified(backgroundTask::getModifiedDate);
 				setErrorMessage(
-					() -> {
-						JSONObject jsonObject =
-							_jsonFactory.safeCreateJSONObject(
-								backgroundTask.getStatusMessage(), true);
-
-						if (jsonObject == null) {
-							return backgroundTask.getStatusMessage();
-						}
-
-						return jsonObject.getString(
-							"message", backgroundTask.getStatusMessage());
-					});
+					() -> BackgroundTaskUtil.getErrorMessage(
+						backgroundTask,
+						contextAcceptLanguage.getPreferredLocale()));
 				setId(backgroundTask::getBackgroundTaskId);
 				setName(() -> BackgroundTaskUtil.getName(backgroundTask));
 				setStatus(
@@ -559,9 +557,6 @@ public class ExportProcessResourceImpl extends BaseExportProcessResourceImpl {
 
 	@Reference
 	private ExportImportLocalService _exportImportLocalService;
-
-	@Reference
-	private JSONFactory _jsonFactory;
 
 	@Reference
 	private Language _language;

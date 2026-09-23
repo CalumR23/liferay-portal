@@ -342,7 +342,8 @@ public class CommerceCatalogLocalServiceImpl
 
 	@Override
 	public CommerceCatalog getOrAddEmptyCommerceCatalog(
-			String externalReferenceCode, long companyId, long userId)
+			String externalReferenceCode, long companyId, long userId,
+			String commerceCurrencyCode)
 		throws PortalException {
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -355,7 +356,7 @@ public class CommerceCatalogLocalServiceImpl
 			() -> commerceCatalogLocalService.addCommerceCatalog(
 				externalReferenceCode,
 				AccountConstants.ACCOUNT_ENTRY_ID_DEFAULT,
-				externalReferenceCode, externalReferenceCode,
+				externalReferenceCode, commerceCurrencyCode,
 				LocaleUtil.toLanguageId(LocaleUtil.getSiteDefault()), false,
 				serviceContext),
 			externalReferenceCode,
@@ -559,6 +560,10 @@ public class CommerceCatalogLocalServiceImpl
 				"Commerce catalogs can only be assigned with an account " +
 					"entry type:" +
 						AccountConstants.ACCOUNT_ENTRY_TYPE_SUPPLIER);
+		}
+
+		if (accountEntry.getStatus() == WorkflowConstants.STATUS_EMPTY) {
+			return;
 		}
 
 		if (accountEntry.getStatus() != WorkflowConstants.STATUS_APPROVED) {

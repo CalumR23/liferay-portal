@@ -19,15 +19,17 @@ module.exports = merge(common.config, {
 		},
 		host: '0.0.0.0',
 		port: 3000,
-		proxy: {
-			'**': {
+
+		proxy: [
+			{
 				changeOrigin: true,
+				context: ['**'],
 				onProxyReq: createOnProxyReq(COOKIE, TARGET),
 				onProxyRes: createOnProxyRes(TARGET),
 				selfHandleResponse: true,
 				target: TARGET,
 			},
-		},
+		],
 	},
 
 	// Non-eval source map: React Router v7's ESM build uses `import.meta.hot`,

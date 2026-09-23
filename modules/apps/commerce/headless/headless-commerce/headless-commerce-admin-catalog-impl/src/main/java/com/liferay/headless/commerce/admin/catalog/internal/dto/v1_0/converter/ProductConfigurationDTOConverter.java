@@ -48,7 +48,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Alessio Antonio Rendina
  */
 @Component(
-	property = "dto.class.name=com.liferay.commerce.model.CPDefinitionInventory",
+	property = {
+		"default=true",
+		"dto.class.name=com.liferay.commerce.model.CPDefinitionInventory"
+	},
 	service = DTOConverter.class
 )
 public class ProductConfigurationDTOConverter
@@ -164,6 +167,17 @@ public class ProductConfigurationDTOConverter
 					() -> _getTaxCategory(
 						cpConfigurationEntry.getCPTaxCategory(),
 						dtoConverterContext.getLocale()));
+				productTaxConfiguration.setTaxCategoryExternalReferenceCode(
+					() -> {
+						CPTaxCategory cpTaxCategory =
+							cpConfigurationEntry.getCPTaxCategory();
+
+						if (cpTaxCategory == null) {
+							return null;
+						}
+
+						return cpTaxCategory.getExternalReferenceCode();
+					});
 
 				return productTaxConfiguration;
 			});

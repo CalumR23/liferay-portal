@@ -31,6 +31,7 @@ public class ObjectDefinitionServiceWrapper
 	@Override
 	public com.liferay.object.model.ObjectDefinition addCustomObjectDefinition(
 			String externalReferenceCode, long objectFolderId, String className,
+			java.util.Map<java.util.Locale, String> descriptionMap,
 			boolean enableCategorization, boolean enableComments,
 			boolean enableFormContainer, boolean enableFriendlyURLCustomization,
 			boolean enableIndexSearch, boolean enableObjectEntryDraft,
@@ -51,7 +52,7 @@ public class ObjectDefinitionServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionService.addCustomObjectDefinition(
-			externalReferenceCode, objectFolderId, className,
+			externalReferenceCode, objectFolderId, className, descriptionMap,
 			enableCategorization, enableComments, enableFormContainer,
 			enableFriendlyURLCustomization, enableIndexSearch,
 			enableObjectEntryDraft, enableObjectEntrySchedule,
@@ -63,13 +64,26 @@ public class ObjectDefinitionServiceWrapper
 	}
 
 	@Override
+	public void addOrUpdateWorkflowDefinitionLinks(
+			long objectDefinitionId,
+			java.util.List
+				<com.liferay.portal.kernel.model.WorkflowDefinitionLink>
+					workflowDefinitionLinks)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		_objectDefinitionService.addOrUpdateWorkflowDefinitionLinks(
+			objectDefinitionId, workflowDefinitionLinks);
+	}
+
+	@Override
 	public com.liferay.object.model.ObjectDefinition addSystemObjectDefinition(
 			String externalReferenceCode, long userId, long objectFolderId,
-			String className, boolean enableCategorization,
-			boolean enableComments, boolean enableFormContainer,
-			boolean enableFriendlyURLCustomization, boolean enableIndexSearch,
-			boolean enableObjectEntryDraft, boolean enableObjectEntryHistory,
-			boolean enableObjectEntrySchedule,
+			String className,
+			java.util.Map<java.util.Locale, String> descriptionMap,
+			boolean enableCategorization, boolean enableComments,
+			boolean enableFormContainer, boolean enableFriendlyURLCustomization,
+			boolean enableIndexSearch, boolean enableObjectEntryDraft,
+			boolean enableObjectEntryHistory, boolean enableObjectEntrySchedule,
 			boolean enableObjectEntrySubscription,
 			boolean enableObjectEntryVersioning, String friendlyURLSeparator,
 			java.util.Map<java.util.Locale, String> labelMap, String name,
@@ -86,9 +100,9 @@ public class ObjectDefinitionServiceWrapper
 
 		return _objectDefinitionService.addSystemObjectDefinition(
 			externalReferenceCode, userId, objectFolderId, className,
-			enableCategorization, enableComments, enableFormContainer,
-			enableFriendlyURLCustomization, enableIndexSearch,
-			enableObjectEntryDraft, enableObjectEntryHistory,
+			descriptionMap, enableCategorization, enableComments,
+			enableFormContainer, enableFriendlyURLCustomization,
+			enableIndexSearch, enableObjectEntryDraft, enableObjectEntryHistory,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
 			enableObjectEntryVersioning, friendlyURLSeparator, labelMap, name,
 			panelAppOrder, panelCategoryKey, pluralLabelMap, portlet, scope,
@@ -145,7 +159,8 @@ public class ObjectDefinitionServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.object.model.ObjectDefinition>
-		getObjectDefinitions(int start, int end) {
+			getObjectDefinitions(int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _objectDefinitionService.getObjectDefinitions(start, end);
 	}
@@ -207,8 +222,10 @@ public class ObjectDefinitionServiceWrapper
 				long accountEntryRestrictedObjectFieldId,
 				long descriptionObjectFieldId, long objectFolderId,
 				long titleObjectFieldId, boolean accountEntryRestricted,
-				boolean active, String className, boolean enableCategorization,
-				boolean enableComments, boolean enableFormContainer,
+				boolean active, String className,
+				java.util.Map<java.util.Locale, String> descriptionMap,
+				boolean enableCategorization, boolean enableComments,
+				boolean enableFormContainer,
 				boolean enableFriendlyURLCustomization,
 				boolean enableIndexSearch, boolean enableObjectEntryDraft,
 				boolean enableObjectEntryHistory,
@@ -234,7 +251,7 @@ public class ObjectDefinitionServiceWrapper
 			externalReferenceCode, objectDefinitionId,
 			accountEntryRestrictedObjectFieldId, descriptionObjectFieldId,
 			objectFolderId, titleObjectFieldId, accountEntryRestricted, active,
-			className, enableCategorization, enableComments,
+			className, descriptionMap, enableCategorization, enableComments,
 			enableFormContainer, enableFriendlyURLCustomization,
 			enableIndexSearch, enableObjectEntryDraft, enableObjectEntryHistory,
 			enableObjectEntrySchedule, enableObjectEntrySubscription,
@@ -298,4 +315,4 @@ public class ObjectDefinitionServiceWrapper
 	private ObjectDefinitionService _objectDefinitionService;
 
 }
-// LIFERAY-SERVICE-BUILDER-HASH:-1614657440
+// LIFERAY-SERVICE-BUILDER-HASH:-1243867172

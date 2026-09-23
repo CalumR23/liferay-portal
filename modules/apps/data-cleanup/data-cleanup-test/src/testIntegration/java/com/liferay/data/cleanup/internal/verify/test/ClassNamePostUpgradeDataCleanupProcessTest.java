@@ -11,11 +11,7 @@ import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.message.boards.util.MBUtil;
 import com.liferay.object.constants.ObjectDefinitionConstants;
-import com.liferay.object.constants.ObjectFieldConstants;
-import com.liferay.object.field.util.ObjectFieldUtil;
-import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.service.ObjectDefinitionLocalService;
-import com.liferay.object.test.util.ObjectDefinitionTestUtil;
 import com.liferay.petra.concurrent.DCLSingleton;
 import com.liferay.petra.function.UnsafeConsumer;
 import com.liferay.petra.function.UnsafeRunnable;
@@ -30,14 +26,12 @@ import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
-import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.test.log.LogCapture;
 import com.liferay.portal.test.rule.Inject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -152,48 +146,17 @@ public class ClassNamePostUpgradeDataCleanupProcessTest
 	public void testFoundLiferayClassNameWithPoundIsNotDeleted()
 		throws Exception {
 
-		AtomicReference<ObjectDefinition> objectDefinitionAtomicReference =
-			new AtomicReference<>();
-
-		test(
-			logCapture -> {
+		testObjectDefinition(
+			(logCapture, objectDefinition) -> {
 				List<String> messages = logCapture.getMessages();
 
 				Assert.assertTrue(messages.toString(), messages.isEmpty());
-
-				ObjectDefinition objectDefinition =
-					objectDefinitionAtomicReference.get();
 
 				ClassName className = _classNameLocalService.fetchClassName(
 					objectDefinition.getClassName());
 
 				Assert.assertEquals(
 					objectDefinition.getClassName(), className.getValue());
-			},
-			() -> {
-				ObjectDefinition objectDefinition =
-					objectDefinitionAtomicReference.get();
-
-				if (objectDefinition != null) {
-					_objectDefinitionLocalService.deleteObjectDefinition(
-						objectDefinition);
-				}
-			},
-			() -> {
-				ObjectDefinition objectDefinition =
-					ObjectDefinitionTestUtil.addCustomObjectDefinition(
-						Collections.singletonList(
-							ObjectFieldUtil.createObjectField(
-								ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-								ObjectFieldConstants.DB_TYPE_STRING, true, true,
-								null, "First Name", "firstName", true)));
-
-				objectDefinition =
-					_objectDefinitionLocalService.publishCustomObjectDefinition(
-						TestPropsValues.getUserId(),
-						objectDefinition.getObjectDefinitionId());
-
-				objectDefinitionAtomicReference.set(objectDefinition);
 			});
 	}
 
@@ -574,18 +537,18 @@ public class ClassNamePostUpgradeDataCleanupProcessTest
 	}
 
 	@Override
-	protected Object[] getPostUpgradeDataCleanupProcessArguments() {
-		return new Object[] {
-			_classNameLocalService, _companyLocalService, connection,
-			_objectDefinitionLocalService
-		};
-	}
-
-	@Override
 	protected Class<?>[] getPostUpgradeDataCleanupProcessArgumentTypes() {
 		return new Class<?>[] {
 			ClassNameLocalService.class, CompanyLocalService.class,
 			Connection.class, ObjectDefinitionLocalService.class
+		};
+	}
+
+	@Override
+	protected Object[] getPostUpgradeDataCleanupProcessArguments() {
+		return new Object[] {
+			_classNameLocalService, _companyLocalService, connection,
+			_objectDefinitionLocalService
 		};
 	}
 

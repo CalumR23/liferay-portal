@@ -65,7 +65,7 @@ public class CommerceCurrencyLocalServiceTest {
 			() -> {
 				CommerceCurrency commerceCurrency =
 					_commerceCurrencyLocalService.addCommerceCurrency(
-						null, _user.getUserId(), RandomTestUtil.randomString(3),
+						null, _user.getUserId(), RandomTestUtil.randomString(),
 						RandomTestUtil.randomLocaleStringMap(),
 						RandomTestUtil.randomString(3), BigDecimal.ONE,
 						LocalizationUtil.getLocalizationMap(
@@ -84,7 +84,7 @@ public class CommerceCurrencyLocalServiceTest {
 		AssertUtils.assertFailure(
 			CommerceCurrencyRateException.class, null,
 			() -> _commerceCurrencyLocalService.addCommerceCurrency(
-				null, _user.getUserId(), RandomTestUtil.randomString(3),
+				null, _user.getUserId(), RandomTestUtil.randomString(),
 				RandomTestUtil.randomLocaleStringMap(),
 				RandomTestUtil.randomString(3), BigDecimal.ZERO,
 				LocalizationUtil.getLocalizationMap(
@@ -94,11 +94,13 @@ public class CommerceCurrencyLocalServiceTest {
 
 	@Test
 	public void testGetOrAddEmptyCommerceCurrency() throws Exception {
+		String code = RandomTestUtil.randomString();
 		String externalReferenceCode = RandomTestUtil.randomString();
 
 		try {
 			_commerceCurrencyLocalService.getOrAddEmptyCommerceCurrency(
-				externalReferenceCode, _user.getCompanyId(), _user.getUserId());
+				externalReferenceCode, _user.getCompanyId(), _user.getUserId(),
+				code);
 
 			Assert.fail();
 		}
@@ -114,10 +116,11 @@ public class CommerceCurrencyLocalServiceTest {
 			commerceCurrency =
 				_commerceCurrencyLocalService.getOrAddEmptyCommerceCurrency(
 					externalReferenceCode, _user.getCompanyId(),
-					_user.getUserId());
+					_user.getUserId(), code);
 
 			Assert.assertEquals(
 				WorkflowConstants.STATUS_EMPTY, commerceCurrency.getStatus());
+			Assert.assertEquals(code, commerceCurrency.getCode());
 			Assert.assertEquals(
 				externalReferenceCode,
 				commerceCurrency.getExternalReferenceCode());
@@ -125,7 +128,7 @@ public class CommerceCurrencyLocalServiceTest {
 			CommerceCurrency resolvedCommerceCurrency =
 				_commerceCurrencyLocalService.getOrAddEmptyCommerceCurrency(
 					externalReferenceCode, _user.getCompanyId(),
-					_user.getUserId());
+					_user.getUserId(), code);
 
 			Assert.assertEquals(
 				commerceCurrency.getCommerceCurrencyId(),
@@ -152,6 +155,7 @@ public class CommerceCurrencyLocalServiceTest {
 
 		Assert.assertNotEquals(
 			WorkflowConstants.STATUS_EMPTY, commerceCurrency.getStatus());
+		Assert.assertEquals(code, commerceCurrency.getCode());
 	}
 
 	@Test
@@ -161,7 +165,7 @@ public class CommerceCurrencyLocalServiceTest {
 			() -> {
 				CommerceCurrency commerceCurrency =
 					_commerceCurrencyLocalService.addCommerceCurrency(
-						null, _user.getUserId(), RandomTestUtil.randomString(3),
+						null, _user.getUserId(), RandomTestUtil.randomString(),
 						RandomTestUtil.randomLocaleStringMap(),
 						RandomTestUtil.randomString(3), BigDecimal.ONE,
 						LocalizationUtil.getLocalizationMap(

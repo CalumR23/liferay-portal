@@ -20,11 +20,17 @@ export class CommerceMiniCartPage {
 	readonly miniCartItem: (productName: string) => Locator;
 	readonly miniCartItemShowOptionsButton: (productName: string) => Locator;
 	readonly miniCartItemsContainer: Locator;
+	readonly miniCartItemListPrice: (productName: string) => Locator;
 	readonly miniCartItemPrice: (text: RegExp, productName?: string) => Locator;
+	readonly miniCartItemPriceOnApplication: (productName: string) => Locator;
+	readonly miniCartItemPromoPrice: (productName: string) => Locator;
 	readonly miniCartItemReplacementLabel: (productName: string) => Locator;
+	readonly miniCartItemUnitOfMeasure: (productName: string) => Locator;
 	readonly miniCartReplacementInfoMessage: Locator;
+	readonly miniCartResume: Locator;
 	readonly miniCartSaveButton: Locator;
 	readonly miniCartSku: (skuName: string) => Locator;
+	readonly miniCartSummaryItem: (label: string) => Locator;
 	readonly miniCartTotalPrice: Locator;
 	readonly miniCartUnitOfMeasureSelector: Locator;
 	readonly page: Page;
@@ -88,6 +94,18 @@ export class CommerceMiniCartPage {
 				exact: true,
 				name: 'Show Options',
 			});
+		this.miniCartItemListPrice = (productName: string) =>
+			this.miniCartItem(productName).locator(
+				'.mini-cart-item-price .price-value:not(.price-value-promo)'
+			);
+		this.miniCartItemPriceOnApplication = (productName: string) =>
+			this.miniCartItem(productName).locator(
+				'.price-on-application.price-value'
+			);
+		this.miniCartItemPromoPrice = (productName: string) =>
+			this.miniCartItem(productName).locator(
+				'.mini-cart-item-price .price-value-promo'
+			);
 		this.miniCartItemPrice = (text: RegExp, productName?: string) =>
 			(productName ? this.miniCartItem(productName) : page)
 				.locator('div')
@@ -97,9 +115,14 @@ export class CommerceMiniCartPage {
 			this.miniCartItem(productName).getByText('Replacement', {
 				exact: true,
 			});
+		this.miniCartItemUnitOfMeasure = (productName: string) =>
+			this.miniCartItem(productName).locator(
+				'.mini-cart-item-quantity .ml-2'
+			);
 		this.miniCartReplacementInfoMessage = page.getByText(
 			'There are replacement products in your cart.'
 		);
+		this.miniCartResume = page.locator('.mini-cart-header-resume');
 		this.miniCartSaveButton = page
 			.locator('.mini-cart-footer')
 			.getByRole('button', {
@@ -108,6 +131,11 @@ export class CommerceMiniCartPage {
 			});
 		this.miniCartSku = (skuName: string) =>
 			this.miniCartItemsContainer.getByText(skuName, {exact: true});
+		this.miniCartSummaryItem = (label: string) =>
+			page
+				.locator('.summary-table > div')
+				.filter({hasText: new RegExp(`^${label}$`)})
+				.locator('xpath=following-sibling::div[1]');
 		this.miniCartTotalPrice = page.locator(
 			`xpath=//div[text()='Total']/../following-sibling::div/div`
 		);

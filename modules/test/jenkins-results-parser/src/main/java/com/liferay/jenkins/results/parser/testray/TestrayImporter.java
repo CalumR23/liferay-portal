@@ -31,6 +31,7 @@ import com.liferay.jenkins.results.parser.WorkspaceGitRepository;
 import com.liferay.jenkins.results.parser.job.property.JobProperty;
 import com.liferay.jenkins.results.parser.job.property.JobPropertyFactory;
 import com.liferay.jenkins.results.parser.persistent.resource.PersistentResource;
+import com.liferay.jenkins.results.parser.test.clazz.JSUnitJUnitTestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClass;
 import com.liferay.jenkins.results.parser.test.clazz.TestClassMethod;
 import com.liferay.jenkins.results.parser.test.clazz.group.AxisTestClassGroup;
@@ -39,6 +40,7 @@ import com.liferay.jenkins.results.parser.test.clazz.group.JSUnitAxisTestClassGr
 import com.liferay.jenkins.results.parser.test.clazz.group.JUnitAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.ModulesAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightAxisTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.WorkspacesCompileAxisTestClassGroup;
 
 import java.io.File;
 import java.io.IOException;
@@ -1552,6 +1554,21 @@ public class TestrayImporter {
 		return null;
 	}
 
+	private boolean _isTestClassFileReported(TestClass testClass) {
+		if (!(testClass instanceof JSUnitJUnitTestClass)) {
+			return false;
+		}
+
+		JSUnitJUnitTestClass jsUnitJUnitTestClass =
+			(JSUnitJUnitTestClass)testClass;
+
+		if (!jsUnitJUnitTestClass.isTestClassFileReported()) {
+			return false;
+		}
+
+		return testClass.hasTestClassMethods();
+	}
+
 	private TestrayCaseResult _recordAppServerTestrayCaseResult(
 		Job job, PersistentResource.Type persistentResourceType,
 		File testBaseDir, TestrayCaseResult topLevelTestrayCaseResult) {
@@ -1655,7 +1672,8 @@ public class TestrayImporter {
 		if (axisTestClassGroup instanceof FunctionalAxisTestClassGroup ||
 			axisTestClassGroup instanceof JSUnitAxisTestClassGroup ||
 			axisTestClassGroup instanceof JUnitAxisTestClassGroup ||
-			axisTestClassGroup instanceof ModulesAxisTestClassGroup) {
+			axisTestClassGroup instanceof ModulesAxisTestClassGroup ||
+			axisTestClassGroup instanceof WorkspacesCompileAxisTestClassGroup) {
 
 			PortalLogBatchBuildTestrayCaseResult
 				portalLogBatchBuildTestrayCaseResult =
@@ -1673,6 +1691,28 @@ public class TestrayImporter {
 			}
 
 			for (TestClass testClass : axisTestClassGroup.getTestClasses()) {
+				if (_isTestClassFileReported(testClass)) {
+					for (TestClassMethod testClassMethod :
+							testClass.getTestClassMethods()) {
+
+						TestrayCaseResult testClassMethodTestrayCaseResult =
+							TestrayFactory.newBuildTestrayCaseResult(
+								axisTestClassGroup, testClass, testClassMethod,
+								testrayBuild, _topLevelBuildReport);
+
+						testClassMethodTestrayCaseResult.
+							setParentTestrayCaseResult(buildTestrayCaseResult);
+
+						testClassMethodTestrayCaseResult.setTestrayRun(
+							testrayRun);
+
+						testrayCaseResults.add(
+							testClassMethodTestrayCaseResult);
+					}
+
+					continue;
+				}
+
 				TestrayCaseResult testClassTestrayCaseResult =
 					TestrayFactory.newBuildTestrayCaseResult(
 						axisTestClassGroup, testClass, testrayBuild,

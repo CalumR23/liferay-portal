@@ -490,6 +490,17 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		return _searchResponseBuilderFactory.builder(searchContext);
 	}
 
+	private Integer _getTrackTotalHitsLimit(Integer trackTotalHitsLimit) {
+		int elasticsearchTrackTotalHitsLimit =
+			_elasticsearchConfigurationWrapper.trackTotalHitsLimit();
+
+		if (trackTotalHitsLimit == null) {
+			return elasticsearchTrackTotalHitsLimit;
+		}
+
+		return Math.min(trackTotalHitsLimit, elasticsearchTrackTotalHitsLimit);
+	}
+
 	private boolean _isEnableDeepPagination(long companyId) {
 		DeepPaginationConfiguration deepPaginationConfiguration =
 			_getDeepPaginationConfiguration(companyId);
@@ -544,7 +555,7 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 		baseSearchRequest.setRescores(searchRequest.getRescores());
 		baseSearchRequest.setStatsRequests(searchRequest.getStatsRequests());
 		baseSearchRequest.setTrackTotalHitsLimit(
-			_elasticsearchConfigurationWrapper.trackTotalHitsLimit());
+			_getTrackTotalHitsLimit(searchRequest.getTrackTotalHitsLimit()));
 
 		_setAggregations(baseSearchRequest, searchRequest);
 		_setConnectionId(baseSearchRequest, searchRequest);
@@ -610,7 +621,13 @@ public class ElasticsearchIndexSearcher extends BaseIndexSearcher {
 
 			Document[] documents = hits.getDocs();
 
-			if ((documents.length != 0) || (start == 0)) {
+			if ((documents.length != 0) || (start == 0) ||
+				!GetterUtil.getBoolean(
+					searchContext.getAttribute(
+						SearchContextAttributes.
+							ATTRIBUTE_KEY_FALLBACK_TO_LAST_PAGE),
+					true)) {
+
 				break;
 			}
 

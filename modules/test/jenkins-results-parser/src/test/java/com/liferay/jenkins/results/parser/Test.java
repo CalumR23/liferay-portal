@@ -6,6 +6,8 @@
 package com.liferay.jenkins.results.parser;
 
 import com.liferay.jenkins.results.parser.job.property.JobPropertyFactory;
+import com.liferay.jenkins.results.parser.test.clazz.TestClassFactory;
+import com.liferay.jenkins.results.parser.test.clazz.group.JUnitBatchTestClassGroup;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -18,6 +20,7 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,6 +33,7 @@ import org.junit.Rule;
 import org.junit.rules.ErrorCollector;
 
 import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 
 /**
  * @author Peter Yoo
@@ -39,6 +43,8 @@ public class Test {
 	@Before
 	public void setUp() throws Exception {
 		JenkinsResultsParserUtil.clearCache();
+
+		mockEnvironment(Collections.<String, String>emptyMap());
 	}
 
 	@After
@@ -46,6 +52,8 @@ public class Test {
 		BuildDatabaseUtil.clearBuildDatabases();
 
 		Environment.setInstance(new Environment());
+
+		JUnitBatchTestClassGroup.clear();
 
 		JenkinsMasterTestUtil.resetCaches();
 
@@ -61,6 +69,8 @@ public class Test {
 		JobPropertyFactory.clear();
 
 		Shell.setInstance(new Shell());
+
+		TestClassFactory.clear();
 
 		UrlReader.setInstance(new UrlReader());
 	}
@@ -108,6 +118,14 @@ public class Test {
 		}
 
 		return _simpleClassNames;
+	}
+
+	protected VerificationMode getVerificationMode(boolean invoked) {
+		if (invoked) {
+			return Mockito.times(1);
+		}
+
+		return Mockito.never();
 	}
 
 	protected boolean hasCommand(
@@ -187,6 +205,20 @@ public class Test {
 
 	protected String read(File dir, String fileName) throws IOException {
 		return read(new File(dir, fileName));
+	}
+
+	protected void setShellCommandExitValue(
+			String command, Shell shell, int exitValue)
+		throws Exception {
+
+		Mockito.doReturn(
+			new Shell.ExecutionResult(exitValue, "", "")
+		).when(
+			shell
+		).doExecute(
+			Mockito.argThat(
+				executionRequest -> hasCommand(executionRequest, command))
+		);
 	}
 
 	protected void setShellCommandOutput(

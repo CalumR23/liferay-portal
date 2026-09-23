@@ -11,11 +11,9 @@ type TDiscount = {
 	couponCode?: string;
 	discountCategories?: string;
 	discountProductGroups?: string;
-	discountProducts?: [
-		{
-			productId: number | string;
-		},
-	];
+	discountProducts?: Array<{
+		productId: number | string;
+	}>;
 	id?: number;
 	level?: string;
 	limitationTimes?: number;
@@ -58,6 +56,7 @@ type TDiscountSku = {
 };
 
 class TPriceEntry {
+	bulkPricing?: boolean;
 	discountDiscovery?: boolean;
 	discountLevel1?: number;
 	discountLevel2?: number;
@@ -79,6 +78,15 @@ class TPriceList {
 	name: string;
 	priority?: number;
 	type: string;
+}
+
+class TTierPrice {
+	active?: boolean;
+	id?: number;
+	minimumQuantity: number;
+	price: number;
+	priceEntryId?: number;
+	unitOfMeasureKey?: string;
 }
 
 export class HeadlessCommerceAdminPricingApiHelper {
@@ -116,6 +124,12 @@ export class HeadlessCommerceAdminPricingApiHelper {
 	async deletePriceModifier(priceModifierId: number) {
 		return this.apiHelpers.delete(
 			`${this.apiHelpers.baseUrl}${this.basePath}/price-modifiers/${priceModifierId}`
+		);
+	}
+
+	async deleteTierPrice(tierPriceId: number) {
+		return this.apiHelpers.delete(
+			`${this.apiHelpers.baseUrl}${this.basePath}/tier-prices/${tierPriceId}`
 		);
 	}
 
@@ -204,6 +218,31 @@ export class HeadlessCommerceAdminPricingApiHelper {
 		);
 	}
 
+	async patchDiscount(discountId: number, discount: Partial<TDiscount>) {
+		return this.apiHelpers.patch(
+			`${this.apiHelpers.baseUrl}${this.basePath}/discounts/${discountId}`,
+			discount
+		);
+	}
+
+	async patchPriceModifier(
+		priceModifierId: number,
+		priceModifier: {
+			active?: boolean;
+			modifierAmount?: number;
+			modifierType?: string;
+			priceListId?: number;
+			priority?: number;
+			target?: string;
+			title?: string;
+		}
+	) {
+		return this.apiHelpers.patch(
+			`${this.apiHelpers.baseUrl}${this.basePath}/price-modifiers/${priceModifierId}`,
+			priceModifier
+		);
+	}
+
 	async patchPriceEntry(
 		priceEntryId: number,
 		priceEntry: Partial<TPriceEntry>
@@ -211,6 +250,13 @@ export class HeadlessCommerceAdminPricingApiHelper {
 		return this.apiHelpers.patch(
 			`${this.apiHelpers.baseUrl}${this.basePath}/price-entries/${priceEntryId}`,
 			priceEntry
+		);
+	}
+
+	async patchTierPrice(tierPriceId: number, tierPrice: Partial<TTierPrice>) {
+		return this.apiHelpers.patch(
+			`${this.apiHelpers.baseUrl}${this.basePath}/tier-prices/${tierPriceId}`,
+			tierPrice
 		);
 	}
 
@@ -350,6 +396,13 @@ export class HeadlessCommerceAdminPricingApiHelper {
 		);
 	}
 
+	async postDiscountCategory(discountId: number, categoryId: number) {
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/discounts/${discountId}/discount-categories`,
+			{data: {categoryId}}
+		);
+	}
+
 	async postDiscountProductGroup(discountId: number, productGroupId: number) {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/discounts/${discountId}/discount-product-groups`,
@@ -380,6 +433,19 @@ export class HeadlessCommerceAdminPricingApiHelper {
 		);
 	}
 
+	async postPriceModifierCategory(
+		priceModifierId: number,
+		categoryId: number
+	) {
+		return this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/price-modifiers/${priceModifierId}/price-modifier-categories`,
+			{
+				data: {categoryId, priceModifierId},
+				failOnStatusCode: true,
+			}
+		);
+	}
+
 	async postPriceModifierProduct(priceModifierId: number, productId: number) {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/price-modifiers/${priceModifierId}/price-modifier-products`,
@@ -401,5 +467,33 @@ export class HeadlessCommerceAdminPricingApiHelper {
 				failOnStatusCode: true,
 			}
 		);
+	}
+
+	async postTierPrice(
+		priceEntryId: number,
+		tierPrice: TTierPrice,
+		{failOnStatusCode = true}: {failOnStatusCode?: boolean} = {}
+	) {
+		const postTierPrice = await this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/price-entries/${priceEntryId}/tier-prices`,
+			{
+				data: {
+					active: true,
+					priceEntryId,
+					unitOfMeasureKey: '',
+					...tierPrice,
+				},
+				failOnStatusCode,
+			}
+		);
+
+		if (this.apiHelpers instanceof DataApiHelpers && postTierPrice?.id) {
+			this.apiHelpers.data.push({
+				id: postTierPrice.id,
+				type: 'tierPrice',
+			});
+		}
+
+		return postTierPrice;
 	}
 }

@@ -39,6 +39,7 @@ ComponentAnnotationCheck | .java | Performs several checks on classes with @Comp
 ConfigurableCreateConfigurableCallCheck | .java | Checks illegal call to `Configurable.createConfigurable`. |
 ConsumerTypeAnnotationCheck | .java | Performs several checks on classes with @ConsumerType annotation. |
 [CreatingThreadsForDBAccessCheck](check/creating_threads_for_db_access_check.md#creatingthreadsfordbaccesscheck) | .java | Finds cases where `CompanyInheritableThreadLocalCallable` should be used when creating threads for DB access. |
+CredentialBufferCheck | .java | Finds buffers that are derived from a `String` and passed straight into a credential API, leaving no reference to clear. |
 DTOEnumCreationCheck | .java | Checks the creation of DTO enum. |
 DatabaseMetaDataCheck | .java | Checks usages of `java.sql.DatabaseMetaData`. |
 DatabaseMetaDataSupportsBatchUpdatesCallCheck | .java | Checks illegal call to `DatabaseMetaData.supportsBatchUpdates`. |
@@ -72,8 +73,8 @@ IllegalTaglibsCheck | .ftl, .jsp, .jspf, .jspx, .tag, .tpl, or .vm | Finds cases
 [IncorrectFileLocationCheck](check/incorrect_file_location_check.md#incorrectfilelocationcheck) | | Checks that `/src/*/java/` only contains `.java` files. |
 IncorrectFilePathCheck | | Checks that file path contains illegal characters. |
 InnerExceptionClassCheck | .java | Checks that classes that should have either public constructors or inner classes. |
-JDKDynamicAgentLoadingCheck | .action, .eslintignore, .expect, .function, .jelly, .jrxml, .macro, .pom, .prettierignore, .project, .properties, .qti, .sh, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, .xsd, .yaml, or .yml | Checks that dynamic loading of agents is not used. |
-JDKPreviewFeaturesCheck | .action, .eslintignore, .expect, .function, .jelly, .jrxml, .macro, .pom, .prettierignore, .project, .properties, .qti, .sh, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, .xsd, .yaml, or .yml | Checks that preview features are not used. |
+JDKDynamicAgentLoadingCheck | .action, .eslintignore, .expect, .function, .gotmpl, .jelly, .jrxml, .macro, .pom, .prettierignore, .project, .properties, .qti, .sh, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, .xsd, .yaml, or .yml | Checks that dynamic loading of agents is not used. |
+JDKPreviewFeaturesCheck | .action, .eslintignore, .expect, .function, .gotmpl, .jelly, .jrxml, .macro, .pom, .prettierignore, .project, .properties, .qti, .sh, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, .xsd, .yaml, or .yml | Checks that preview features are not used. |
 JSCompatibilityCheck | | Checks for JavaScript compatibility. |
 [JSLodashDependencyCheck](check/js_lodash_dependency_check.md#jslodashdependencycheck) | .js or .jsx | Finds incorrect use of `AUI._`. |
 [JSONDeprecatedPackagesCheck](check/json_deprecated_packages_check.md#jsondeprecatedpackagescheck) | .ipynb, .json, or .npmbridgerc | Finds incorrect use of deprecated packages in `package.json` files. |
@@ -275,4 +276,4 @@ XMLSourcechecksFileCheck | .action, .function, .jelly, .jrxml, .macro, .pom, .pr
 XMLSuppressionsFileCheck | .action, .function, .jelly, .jrxml, .macro, .pom, .project, .properties, .qti, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, or .xsd | Performs several checks on `source-formatter-suppressions.xml` file. |
 XMLTagAttributesCheck | .action, .function, .html, .jelly, .jrxml, .macro, .path, .pom, .project, .properties, .qti, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, or .xsd | Performs several checks on tag attributes. |
 XMLWebFileCheck | .action, .function, .jelly, .jrxml, .macro, .pom, .project, .properties, .qti, .svg, .testcase, .toggle, .tpl, .wsdl, .xlf, .xml, or .xsd | Performs several checks on `web.xml` file. |
-YMLRESTConfigFileBreakingChangeCommitMessageCheck | .tpl, .yaml, or .yml | Checks that commit message should contain the schematized breaking changes. |
+YMLRESTConfigFileBreakingChangeCommitMessageCheck | .gotmpl, .tpl, .yaml, or .yml | Checks that commit message should contain the schematized breaking changes. |

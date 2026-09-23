@@ -7,6 +7,7 @@ import {mockChannelContext} from 'test/mock-channel-context';
 import {MemoryRouter} from 'react-router-dom';
 import {Provider} from 'react-redux';
 import {RangeKeyTimeRanges} from 'shared/util/constants';
+import {warmFrontendDataSet} from 'test/warm-frontend-data-set';
 
 jest.unmock('react-dom');
 
@@ -141,6 +142,21 @@ jest.mock('@liferay/frontend-data-set-web', () => ({
 				</button>
 
 				<button
+					data-testid="trigger-view-asset"
+					onClick={() =>
+						itemsActions?.[1]?.onClick?.({
+							itemData: {
+								assetTitle: 'Test Asset Title',
+								assetType: 'blog',
+								id: 'asset-id-1',
+							},
+						})
+					}
+				>
+					{'View Asset'}
+				</button>
+
+				<button
 					data-testid="trigger-info-panel-with-items"
 					onClick={() =>
 						itemsActions?.[0]?.onClick?.({
@@ -206,10 +222,12 @@ jest.mock('@liferay/frontend-data-set-web', () => ({
 
 jest.mock('shared/components/download-report/DownloadStaticCSVReport', () => ({
 	DownloadStaticCSVReport: ({
+		bordered,
 		getFDSQuery,
 		rangeSelectors,
 		type,
 	}: {
+		bordered?: boolean;
 		getFDSQuery?: () => {filter: string; query: string};
 		rangeSelectors?: any;
 		type?: string;
@@ -219,6 +237,10 @@ jest.mock('shared/components/download-report/DownloadStaticCSVReport', () => ({
 		return (
 			<div data-testid="download-csv">
 				<div data-testid="download-csv-type">{type}</div>
+
+				<div data-testid="download-csv-bordered">
+					{JSON.stringify(!!bordered)}
+				</div>
 
 				<div data-testid="download-csv-range-selectors">
 					{JSON.stringify(rangeSelectors ?? null)}
@@ -245,13 +267,19 @@ jest.mock('shared/components/download-report/DownloadStaticCSVReport', () => ({
 
 jest.mock('shared/components/dropdown-range-key/DropdownRangeKey', () => ({
 	DropdownRangeKey: ({
+		bordered,
 		onRangeSelectorChange,
 		rangeSelectors,
 	}: {
+		bordered?: boolean;
 		onRangeSelectorChange: (rs: any) => void;
 		rangeSelectors: any;
 	}) => (
 		<div data-testid="dropdown-range-key">
+			<span data-testid="dropdown-range-key-bordered">
+				{JSON.stringify(!!bordered)}
+			</span>
+
 			<span data-testid="current-range-key">
 				{rangeSelectors.rangeKey}
 			</span>
@@ -340,6 +368,8 @@ const renderList = ({
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const {useNavigate} = require('react-router-dom');
 
+beforeAll(warmFrontendDataSet);
+
 describe('List', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -412,6 +442,31 @@ describe('List', () => {
 			);
 		});
 
+		it('should pass the cmpProjects filter to FrontendDataSet', () => {
+			renderList();
+
+			const filters = JSON.parse(
+				screen.getByTestId('fds-filters').textContent
+			);
+
+			const cmpProjectsFilter = filters.find(
+				(filter: {apiURL: string; id: string; label: string}) =>
+					filter.id === 'cmpProjects/id'
+			);
+
+			expect(cmpProjectsFilter).toBeDefined();
+			expect(cmpProjectsFilter.label).toBe('CMP Projects');
+			expect(cmpProjectsFilter.apiURL).toContain(
+				'asset-summary-cmp-projects'
+			);
+
+			const groupedFilters = JSON.parse(
+				screen.getByTestId('fds-grouped-filters').textContent
+			);
+
+			expect(groupedFilters[0].filters).toContain('cmpProjects/id');
+		});
+
 		it('should pass the mimeType filter to FrontendDataSet', () => {
 			renderList();
 
@@ -435,6 +490,31 @@ describe('List', () => {
 			expect(
 				screen.getByTestId('dropdown-range-key')
 			).toBeInTheDocument();
+		});
+
+		it('should render the DropdownRangeKey as bordered', () => {
+			renderList();
+
+			expect(
+				screen.getByTestId('dropdown-range-key-bordered')
+			).toHaveTextContent('true');
+		});
+
+		it('should render the DropdownRangeKey before the Download CSV button, separated by a divider', () => {
+			const {container} = renderList();
+
+			const dropdownRangeKey = screen.getByTestId('dropdown-range-key');
+			const downloadCSV = screen.getByTestId('download-csv');
+			const divider = container.querySelector(
+				'.align-self-stretch.border-left'
+			);
+
+			expect(divider).toBeInTheDocument();
+
+			expect(
+				dropdownRangeKey.compareDocumentPosition(downloadCSV) &
+					Node.DOCUMENT_POSITION_FOLLOWING
+			).toBeTruthy();
 		});
 
 		it('should match the snapshot', () => {
@@ -471,6 +551,34 @@ describe('List', () => {
 			expect(apiURL).toContain('rangeKey=7');
 			expect(apiURL).not.toContain('rangeEnd=');
 			expect(apiURL).not.toContain('rangeStart=');
+		});
+
+		// The endpoints want a custom range without its key; links need it.
+
+		it('should keep the range key on the asset link for a custom range', () => {
+			renderList({
+				queryString:
+					'?rangeKey=CUSTOM&rangeStart=2024-01-01&rangeEnd=2024-03-01',
+			});
+
+			fireEvent.click(screen.getByTestId('trigger-view-asset'));
+
+			const pushedPath: string = mockHistoryPush.mock.calls[0][0];
+
+			expect(pushedPath).toContain('rangeKey=CUSTOM');
+			expect(pushedPath).toContain('rangeEnd=2024-03-01');
+			expect(pushedPath).toContain('rangeStart=2024-01-01');
+		});
+
+		it('should put only the range key on the asset link for a preset range', () => {
+			renderList({queryString: '?rangeKey=7'});
+
+			fireEvent.click(screen.getByTestId('trigger-view-asset'));
+
+			const pushedPath: string = mockHistoryPush.mock.calls[0][0];
+
+			expect(pushedPath).toContain('rangeKey=7');
+			expect(pushedPath).not.toContain('rangeStart=');
 		});
 	});
 
@@ -580,8 +688,8 @@ describe('List', () => {
 			expect(getObjectTypeFilter()).toBeDefined();
 		});
 
-		it('should label the object type filter "Object Type"', () => {
-			expect(getObjectTypeFilter().label).toBe('Object Type');
+		it('should label the object type filter "Asset Structure Type"', () => {
+			expect(getObjectTypeFilter().label).toBe('Asset Structure Type');
 		});
 
 		it('should offer Content and File as the only options', () => {
@@ -607,6 +715,7 @@ describe('List', () => {
 				'objectType',
 				'tags/id',
 				'categories/id',
+				'cmpProjects/id',
 				'mimeType',
 			]);
 		});
@@ -645,6 +754,14 @@ describe('List', () => {
 			expect(screen.getByTestId('download-csv-type')).toHaveTextContent(
 				'asset'
 			);
+		});
+
+		it('should render the Download CSV button as bordered', () => {
+			renderList();
+
+			expect(
+				screen.getByTestId('download-csv-bordered')
+			).toHaveTextContent('true');
 		});
 
 		it('should pass the current rangeSelectors to the Download CSV button', () => {
@@ -823,6 +940,7 @@ describe('List', () => {
 					'objectType',
 					'tags/id',
 					'categories/id',
+					'cmpProjects/id',
 					'mimeType',
 				]);
 			});

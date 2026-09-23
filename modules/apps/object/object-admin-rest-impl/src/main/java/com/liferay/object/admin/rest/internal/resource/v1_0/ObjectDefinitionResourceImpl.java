@@ -67,6 +67,9 @@ import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
+import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -113,6 +116,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -372,6 +376,9 @@ public class ObjectDefinitionResourceImpl
 							objectDefinition.
 								getObjectFolderExternalReferenceCode()),
 						objectDefinition.getClassName(),
+						LocalizedMapUtil.populateLocalizedMap(
+							objectDefinition.getDefaultLanguageId(),
+							objectDefinition.getDescription()),
 						_isEnableCategorization(objectDefinition),
 						GetterUtil.getBoolean(
 							objectDefinition.getEnableComments()),
@@ -424,6 +431,9 @@ public class ObjectDefinitionResourceImpl
 							objectDefinition.
 								getObjectFolderExternalReferenceCode()),
 						objectDefinition.getClassName(),
+						LocalizedMapUtil.populateLocalizedMap(
+							objectDefinition.getDefaultLanguageId(),
+							objectDefinition.getDescription()),
 						_isEnableCategorization(objectDefinition),
 						GetterUtil.getBoolean(
 							objectDefinition.getEnableComments()),
@@ -494,7 +504,8 @@ public class ObjectDefinitionResourceImpl
 							objectDefinition.getDefaultLanguageId(),
 							objectField, serviceBuilderObjectDefinition);
 
-					if (objectDefinition.getAccountEntryRestricted() &&
+					if (GetterUtil.getBoolean(
+							objectDefinition.getAccountEntryRestricted()) &&
 						StringUtil.equals(
 							objectDefinition.
 								getAccountEntryRestrictedObjectFieldName(),
@@ -689,6 +700,9 @@ public class ObjectDefinitionResourceImpl
 							objectDefinition.getActive(),
 							serviceBuilderObjectDefinition.isActive()),
 						objectDefinition.getClassName(),
+						LocalizedMapUtil.populateLocalizedMap(
+							objectDefinition.getDefaultLanguageId(),
+							objectDefinition.getDescription()),
 						GetterUtil.getBoolean(
 							objectDefinition.getEnableCategorization(), true),
 						GetterUtil.getBoolean(
@@ -1012,6 +1026,54 @@ public class ObjectDefinitionResourceImpl
 
 		existingObjectDefinition.setObjectDefinitionSettings(
 			objectDefinition::getObjectDefinitionSettings);
+
+		if (objectDefinition.getObjectFields() != null) {
+			Map<String, ObjectField> externalReferenceCodeObjectFieldsMap =
+				new HashMap<>();
+			Map<String, ObjectField> nameObjectFieldsMap = new HashMap<>();
+
+			for (ObjectField existingObjectField :
+					existingObjectDefinition.getObjectFields()) {
+
+				externalReferenceCodeObjectFieldsMap.put(
+					existingObjectField.getExternalReferenceCode(),
+					existingObjectField);
+				nameObjectFieldsMap.put(
+					existingObjectField.getName(), existingObjectField);
+			}
+
+			existingObjectDefinition.setObjectFields(
+				() -> transformToArray(
+					ListUtil.fromArray(objectDefinition.getObjectFields()),
+					objectField -> {
+						ObjectField existingObjectField =
+							externalReferenceCodeObjectFieldsMap.get(
+								objectField.getExternalReferenceCode());
+
+						if (existingObjectField == null) {
+							existingObjectField = nameObjectFieldsMap.get(
+								objectField.getName());
+
+							if (existingObjectField == null) {
+								return objectField;
+							}
+						}
+
+						JSONObject jsonObject = JSONUtil.merge(
+							_jsonFactory.createJSONObject(
+								existingObjectField.toString()),
+							_jsonFactory.createJSONObject(
+								objectField.toString()));
+
+						ObjectField patchedObjectField =
+							ObjectField.unsafeToDTO(jsonObject.toString());
+
+						patchedObjectField.setId(existingObjectField::getId);
+
+						return patchedObjectField;
+					},
+					ObjectField.class));
+		}
 	}
 
 	private void _addListTypeDefinition(ObjectDefinition objectDefinition)
@@ -1581,6 +1643,7 @@ public class ObjectDefinitionResourceImpl
 				serviceBuilderObjectField.getListTypeDefinitionId(),
 				objectDefinitionId, serviceBuilderObjectField.getBusinessType(),
 				null, dbTableName, serviceBuilderObjectField.getDBType(),
+				serviceBuilderObjectField.getDescriptionMap(),
 				serviceBuilderObjectField.isIndexed(),
 				serviceBuilderObjectField.isIndexedAsKeyword(),
 				serviceBuilderObjectField.getIndexedLanguageId(),
@@ -1607,6 +1670,9 @@ public class ObjectDefinitionResourceImpl
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private JSONFactory _jsonFactory;
 
 	@Reference
 	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;

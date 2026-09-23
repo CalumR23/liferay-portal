@@ -18,7 +18,7 @@ interface postSiteTaxonomyVocabularyProps {
 
 export interface postTaxonomyCategoryTaxonomyCategory {
 	name: string;
-	name_i18n?: {['ES-es']: string};
+	name_i18n?: {[key: string]: string};
 	parentTaxonomyCategoryId: number;
 }
 
@@ -26,13 +26,13 @@ export interface postTaxonomyVocabularyProps {
 	assetLibraries?: AssetLibrary[];
 	assetTypes?: AssetType[];
 	name: string;
-	name_i18n?: {['ES-es']: string};
+	name_i18n?: {[key: string]: string};
 	visibilityType?: string;
 }
 
 export interface postTaxonomyVocabularyTaxonomyCategoryProps {
 	name: string;
-	name_i18n?: {['ES-es']: string};
+	name_i18n?: {[key: string]: string};
 	system?: boolean;
 	vocabularyId: number;
 }
@@ -44,8 +44,9 @@ export type TTaxonomyVocabulary = {
 };
 
 interface patchTaxonomyCategoryProps {
+	friendlyUrlPath?: string;
 	id: number;
-	name: string;
+	name?: string;
 }
 
 interface postAssetLibraryKeywordProps {
@@ -117,6 +118,36 @@ export class HeadlessAdminTaxonomyApiHelper {
 		return this.apiHelpers.get(
 			`${this.apiHelpers.baseUrl}${this.basePath}/sites/${siteId}/taxonomy-vocabularies`
 		);
+	}
+
+	/**
+	 * It allows creating a vocabulary inside an asset library.
+	 *
+	 * @param assetLibraryId the group id of the asset library in which the
+	 * vocabulary will be created
+	 * @param name the name of the vocabulary
+	 */
+
+	async postAssetLibraryTaxonomyVocabulary({
+		assetLibraryId,
+		name,
+	}: {
+		assetLibraryId: number | string;
+		name: string;
+	}): Promise<TTaxonomyVocabulary> {
+		const taxonomyVocabulary = await this.apiHelpers.post(
+			`${this.apiHelpers.baseUrl}${this.basePath}/asset-libraries/${assetLibraryId}/taxonomy-vocabularies`,
+			{data: {name}}
+		);
+
+		if (this.apiHelpers instanceof DataApiHelpers) {
+			this.apiHelpers.data.push({
+				id: taxonomyVocabulary.id,
+				type: 'taxonomyVocabulary',
+			});
+		}
+
+		return taxonomyVocabulary;
 	}
 
 	/**
@@ -214,12 +245,13 @@ export class HeadlessAdminTaxonomyApiHelper {
 	 */
 
 	async patchTaxonomyCategory({
+		friendlyUrlPath,
 		id,
 		name,
 	}: patchTaxonomyCategoryProps): Promise<{id: number}> {
 		return this.apiHelpers.patch(
 			`${this.apiHelpers.baseUrl}${this.basePath}/taxonomy-categories/${id}`,
-			{name}
+			{friendlyUrlPath, name}
 		);
 	}
 
@@ -268,6 +300,20 @@ export class HeadlessAdminTaxonomyApiHelper {
 	}: postAssetLibraryKeywordProps): Promise<{id: number}> {
 		return this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/asset-libraries/${depotEntryId}/keywords`,
+			{data: {name}}
+		);
+	}
+
+	/**
+	 * It allows renaming a tag.
+	 *
+	 * @param id the id of the tag
+	 * @param name the new name of the tag
+	 */
+
+	async putKeyword({id, name}: {id: number; name: string}) {
+		return this.apiHelpers.put(
+			`${this.apiHelpers.baseUrl}${this.basePath}/keywords/${id}`,
 			{data: {name}}
 		);
 	}

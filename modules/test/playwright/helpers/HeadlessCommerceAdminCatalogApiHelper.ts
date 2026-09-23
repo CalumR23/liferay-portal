@@ -48,17 +48,20 @@ type TCurrency = {
 
 export type TDiagram = {
 	attachmentBase64: TAttachmentBase64;
+	color?: string;
+	radius?: number;
+	type?: string;
 };
 
 export type TPin = {
 	id?: number;
 	mappedProduct: {
-		productId: number;
-		quantity: number;
+		productId?: number;
+		quantity?: number;
 		sequence: string;
-		sku: string;
-		skuId: number;
-		type?: number;
+		sku?: string;
+		skuId?: number;
+		type?: 'diagram' | 'external' | 'sku';
 	};
 	positionX?: number;
 	positionY?: number;
@@ -77,6 +80,12 @@ export type TProduct = {
 	expirationDate?: string;
 	externalReferenceCode?: string;
 	id?: number;
+	images?: Array<{
+		attachment?: string;
+		title?: {
+			[key: string]: string;
+		};
+	}>;
 	name?: {
 		[key: string]: string;
 	};
@@ -105,6 +114,9 @@ export type TProduct = {
 	};
 	skus?: TSku[];
 	tags?: [string];
+	urls?: {
+		[key: string]: string;
+	};
 	version?: number;
 };
 
@@ -153,6 +165,14 @@ type TProductSpecifications = {
 	specificationKey?: string;
 	value?: Record<string, string>;
 	visible?: boolean;
+};
+
+export type TProductSubscriptionConfiguration = {
+	enable?: boolean;
+	length?: number;
+	numberOfLength?: number;
+	subscriptionType?: string;
+	subscriptionTypeSettings?: {[key: string]: number};
 };
 
 export type TProductTaxConfiguration = {
@@ -352,6 +372,12 @@ export class HeadlessCommerceAdminCatalogApiHelper {
 		);
 	}
 
+	async getPins(productId: number) {
+		return this.apiHelpers.get(
+			`${this.apiHelpers.baseUrl}${this.basePath}/products/${productId}/pins`
+		);
+	}
+
 	async getProduct(productId: number) {
 		return this.apiHelpers.get(
 			`${this.apiHelpers.baseUrl}${this.basePath}/products/${productId}?nestedFields=skus`
@@ -376,11 +402,19 @@ export class HeadlessCommerceAdminCatalogApiHelper {
 		);
 	}
 
-	async getProductByName(name: string) {
+	async getProductByName(
+		name: string,
+		{
+			catalogId,
+			nestedFields = 'skus',
+		}: {catalogId?: number; nestedFields?: string} = {}
+	) {
 		const {items} = await this.getProducts(
 			new URLSearchParams({
-				filter: `name eq '${name}'`,
-				nestedFields: 'skus',
+				filter: catalogId
+					? `catalogId eq ${catalogId} and name eq '${name}'`
+					: `name eq '${name}'`,
+				nestedFields,
 			})
 		);
 
@@ -485,6 +519,18 @@ export class HeadlessCommerceAdminCatalogApiHelper {
 		);
 	}
 
+	async patchProductSubscriptionConfiguration(
+		productId: number,
+		productSubscriptionConfiguration: TProductSubscriptionConfiguration
+	) {
+		return this.apiHelpers.patch(
+			`${this.apiHelpers.baseUrl}${this.basePath}/products/${productId}/subscriptionConfiguration`,
+			{
+				...(productSubscriptionConfiguration || {}),
+			}
+		);
+	}
+
 	async patchProductTaxConfiguration(
 		productId: number,
 		productTaxConfiguration: TProductTaxConfiguration
@@ -577,12 +623,14 @@ export class HeadlessCommerceAdminCatalogApiHelper {
 		fieldType: string = 'select',
 		key: string = 'key-' + getRandomInt(),
 		name: string = 'Option' + getRandomInt(),
-		priority: number = getRandomInt()
+		priority: number = getRandomInt(),
+		facetable: boolean = false
 	) {
 		const postOption = await this.apiHelpers.post(
 			`${this.apiHelpers.baseUrl}${this.basePath}/options`,
 			{
 				data: {
+					facetable,
 					fieldType,
 					key,
 					name: {

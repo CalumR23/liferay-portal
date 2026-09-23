@@ -1032,26 +1032,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		Assert.assertEquals(SitePage.Type.PAGE_SET_PAGE, sitePage.getType());
 	}
 
-	private void _assertPageSpecifications(
-			ContentPageSpecification draftContentPageSpecification,
-			ContentPageSpecification publishedContentPageSpecification,
-			SitePage sitePage)
-		throws Exception {
-
-		Layout layout = _layoutLocalService.getLayoutByExternalReferenceCode(
-			sitePage.getExternalReferenceCode(), testGroup.getGroupId());
-
-		PageSpecification.Status status = PageSpecification.Status.APPROVED;
-
-		if (!layout.isPublished()) {
-			status = PageSpecification.Status.DRAFT;
-		}
-
-		PageSpecificationsTestUtil.assertPageSpecifications(
-			draftContentPageSpecification, publishedContentPageSpecification,
-			sitePage.getPageSpecifications(), layout, status);
-	}
-
 	private void _assertPageSpecificationVersions(
 			Layout layout, PageSpecificationVersion[] pageSpecificationVersions)
 		throws Exception {
@@ -1095,6 +1075,26 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		Assert.assertEquals(
 			Arrays.toString(pageSpecificationVersions),
 			layoutContentVersions.size(), pageSpecificationVersions.length);
+	}
+
+	private void _assertPageSpecifications(
+			ContentPageSpecification draftContentPageSpecification,
+			ContentPageSpecification publishedContentPageSpecification,
+			SitePage sitePage)
+		throws Exception {
+
+		Layout layout = _layoutLocalService.getLayoutByExternalReferenceCode(
+			sitePage.getExternalReferenceCode(), testGroup.getGroupId());
+
+		PageSpecification.Status status = PageSpecification.Status.APPROVED;
+
+		if (!layout.isPublished()) {
+			status = PageSpecification.Status.DRAFT;
+		}
+
+		PageSpecificationsTestUtil.assertPageSpecifications(
+			draftContentPageSpecification, publishedContentPageSpecification,
+			sitePage.getPageSpecifications(), layout, status);
 	}
 
 	private void _assertParentAndPriority(
@@ -2217,26 +2217,25 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		return draftFragmentOrWidgetInstanceExternalReferenceCodes;
 	}
 
-	private SafeCloseable _setExportImportThreadLocalWithSafeCloseable(
-		String fieldName, boolean value) {
+	private <T> SafeCloseable _setExportImportThreadLocalWithSafeCloseable(
+		String fieldName, T value) {
 
-		CentralizedThreadLocal<Boolean> originalCentralizedThreadLocal =
+		CentralizedThreadLocal<T> centralizedThreadLocal =
 			ReflectionTestUtil.getFieldValue(
 				ExportImportThreadLocal.class, fieldName);
 
-		Boolean originalValue = originalCentralizedThreadLocal.get();
+		T originalValue = centralizedThreadLocal.get();
 
-		originalCentralizedThreadLocal.set(value);
+		centralizedThreadLocal.set(value);
 
-		Supplier<Boolean> originalSupplier =
-			ReflectionTestUtil.getAndSetFieldValue(
-				originalCentralizedThreadLocal, "_supplier", () -> value);
+		Supplier<T> originalSupplier = ReflectionTestUtil.getAndSetFieldValue(
+			centralizedThreadLocal, "_supplier", () -> value);
 
 		return () -> {
-			originalCentralizedThreadLocal.set(originalValue);
+			centralizedThreadLocal.set(originalValue);
 
 			ReflectionTestUtil.setFieldValue(
-				originalCentralizedThreadLocal, "_supplier", originalSupplier);
+				centralizedThreadLocal, "_supplier", originalSupplier);
 		};
 	}
 
@@ -2320,38 +2319,6 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 		_testGetSiteSitePageWithNestedFields(sitePage);
 	}
 
-	private void _testGetSiteSitePagesPageWithPageSpecificationVersionsNestedField()
-		throws Exception {
-
-		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
-
-		Layout draftLayout = layout.fetchDraftLayout();
-
-		ContentLayoutTestUtil.publishLayout(draftLayout, layout);
-
-		Assert.assertTrue(
-			ListUtil.isNotEmpty(
-				_layoutContentVersionLocalService.getLayoutContentVersions(
-					draftLayout.getPlid())));
-
-		LayoutTestUtil.addTypePortletLayout(testGroup);
-
-		SitePageResource sitePageResource = _getSitePageResource(
-			"pageSpecificationVersions");
-
-		Page<SitePage> sitePagesPage = sitePageResource.getSiteSitePagesPage(
-			testGroup.getExternalReferenceCode(), false, null, null, null,
-			Pagination.of(1, -1), null);
-
-		for (SitePage sitePage : sitePagesPage.getItems()) {
-			_assertPageSpecificationVersions(
-				_layoutLocalService.getLayoutByExternalReferenceCode(
-					sitePage.getExternalReferenceCode(),
-					testGroup.getGroupId()),
-				sitePage.getPageSpecificationVersions());
-		}
-	}
-
 	private void _testGetSiteSitePageWithNestedFields(SitePage sitePage)
 		throws Exception {
 
@@ -2388,6 +2355,38 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 
 		_assertWidgetPageWidgetInstances(
 			null, 1, customApplicationDecorator, sitePage);
+	}
+
+	private void _testGetSiteSitePagesPageWithPageSpecificationVersionsNestedField()
+		throws Exception {
+
+		Layout layout = LayoutTestUtil.addTypeContentLayout(testGroup);
+
+		Layout draftLayout = layout.fetchDraftLayout();
+
+		ContentLayoutTestUtil.publishLayout(draftLayout, layout);
+
+		Assert.assertTrue(
+			ListUtil.isNotEmpty(
+				_layoutContentVersionLocalService.getLayoutContentVersions(
+					draftLayout.getPlid())));
+
+		LayoutTestUtil.addTypePortletLayout(testGroup);
+
+		SitePageResource sitePageResource = _getSitePageResource(
+			"pageSpecificationVersions");
+
+		Page<SitePage> sitePagesPage = sitePageResource.getSiteSitePagesPage(
+			testGroup.getExternalReferenceCode(), false, null, null, null,
+			Pagination.of(1, -1), null);
+
+		for (SitePage sitePage : sitePagesPage.getItems()) {
+			_assertPageSpecificationVersions(
+				_layoutLocalService.getLayoutByExternalReferenceCode(
+					sitePage.getExternalReferenceCode(),
+					testGroup.getGroupId()),
+				sitePage.getPageSpecificationVersions());
+		}
 	}
 
 	private SitePage _testPatchSiteSitePage(
@@ -4851,6 +4850,7 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			serviceContext, SitePage.Type.WIDGET_PAGE);
 
 		_testPutSiteSitePageWithStagingImportByAnotherUser(serviceContext);
+		_testPutSiteSitePageWithStagingImportWithLastImportUser(serviceContext);
 	}
 
 	private void _testPutSiteSitePageWithStagingImport(
@@ -4965,6 +4965,49 @@ public class SitePageResourceTest extends BaseSitePageResourceTestCase {
 			layout.getTypeSettingsProperty("last-import-user-name"));
 		Assert.assertEquals(
 			user.getUuid(),
+			layout.getTypeSettingsProperty("last-import-user-uuid"));
+	}
+
+	private void _testPutSiteSitePageWithStagingImportWithLastImportUser(
+			ServiceContext serviceContext)
+		throws Exception {
+
+		User lastImportUser = UserTestUtil.addCompanyAdminUser(testCompany);
+
+		SitePage sitePage = sitePageResource.postSiteSitePage(
+			testGroup.getExternalReferenceCode(), false,
+			_getRandomSitePage(serviceContext, SitePage.Type.CONTENT_PAGE));
+
+		SitePage randomSitePage = _getRandomSitePage(serviceContext, sitePage);
+
+		try (SafeCloseable safeCloseable1 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_layoutImportInProcess", true);
+			SafeCloseable safeCloseable2 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_layoutStagingInProcess", true);
+			SafeCloseable safeCloseable3 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_lastImportUserName", lastImportUser.getFullName());
+			SafeCloseable safeCloseable4 =
+				_setExportImportThreadLocalWithSafeCloseable(
+					"_lastImportUserUuid", lastImportUser.getUuid())) {
+
+			sitePageResource.putSiteSitePage(
+				testGroup.getExternalReferenceCode(),
+				randomSitePage.getExternalReferenceCode(), false,
+				randomSitePage);
+		}
+
+		Layout layout = _layoutLocalService.getLayoutByExternalReferenceCode(
+			randomSitePage.getExternalReferenceCode(), testGroup.getGroupId());
+
+		Assert.assertEquals(TestPropsValues.getUserId(), layout.getUserId());
+		Assert.assertEquals(
+			lastImportUser.getFullName(),
+			layout.getTypeSettingsProperty("last-import-user-name"));
+		Assert.assertEquals(
+			lastImportUser.getUuid(),
 			layout.getTypeSettingsProperty("last-import-user-uuid"));
 	}
 

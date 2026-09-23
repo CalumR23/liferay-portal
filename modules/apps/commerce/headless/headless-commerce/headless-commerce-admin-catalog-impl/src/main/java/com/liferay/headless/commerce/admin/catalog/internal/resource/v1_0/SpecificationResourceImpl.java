@@ -17,9 +17,10 @@ import com.liferay.headless.commerce.admin.catalog.resource.v1_0.SpecificationRe
 import com.liferay.headless.commerce.core.helper.ServiceContextHelper;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.list.type.model.ListTypeDefinition;
-import com.liferay.list.type.service.ListTypeDefinitionLocalService;
+import com.liferay.list.type.service.ListTypeDefinitionService;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Field;
@@ -352,22 +353,33 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 				optionCategoryId);
 		}
 
-		if (cpOptionCategory == null) {
-			String externalReferenceCode = GetterUtil.getString(
-				optionCategory.getExternalReferenceCode());
-
-			if (Validator.isNotNull(externalReferenceCode)) {
-				cpOptionCategory =
-					_cpOptionCategoryService.
-						fetchCPOptionCategoryByExternalReferenceCode(
-							externalReferenceCode,
-							contextCompany.getCompanyId());
-			}
+		if (cpOptionCategory != null) {
+			return cpOptionCategory.getCPOptionCategoryId();
 		}
 
-		if (cpOptionCategory == null) {
+		String externalReferenceCode = GetterUtil.getString(
+			optionCategory.getExternalReferenceCode());
+
+		if (Validator.isNull(externalReferenceCode)) {
 			return 0;
 		}
+
+		cpOptionCategory =
+			_cpOptionCategoryService.
+				fetchCPOptionCategoryByExternalReferenceCode(
+					externalReferenceCode, contextCompany.getCompanyId());
+
+		if (cpOptionCategory != null) {
+			return cpOptionCategory.getCPOptionCategoryId();
+		}
+
+		if (!LazyReferencingThreadLocal.isEnabled()) {
+			return 0;
+		}
+
+		cpOptionCategory =
+			_cpOptionCategoryService.getOrAddEmptyCPOptionCategory(
+				externalReferenceCode);
 
 		return cpOptionCategory.getCPOptionCategoryId();
 	}
@@ -386,11 +398,8 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 			externalReferenceCodes,
 			externalReferenceCode -> {
 				ListTypeDefinition listTypeDefinition =
-					_listTypeDefinitionLocalService.
-						getOrAddEmptyListTypeDefinition(
-							externalReferenceCode,
-							contextCompany.getCompanyId(),
-							contextUser.getUserId(), false);
+					_listTypeDefinitionService.getOrAddEmptyListTypeDefinition(
+						externalReferenceCode, false);
 
 				return listTypeDefinition.getListTypeDefinitionId();
 			});
@@ -489,7 +498,7 @@ public class SpecificationResourceImpl extends BaseSpecificationResourceImpl {
 	private CPSpecificationOptionService _cpSpecificationOptionService;
 
 	@Reference
-	private ListTypeDefinitionLocalService _listTypeDefinitionLocalService;
+	private ListTypeDefinitionService _listTypeDefinitionService;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;

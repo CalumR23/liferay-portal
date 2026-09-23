@@ -9,11 +9,12 @@ import {useControlledState} from '@clayui/shared';
 import {useIsMounted, useThunk} from '@liferay/frontend-js-react-web';
 import {useLiferayState} from '@liferay/frontend-js-state-web/react';
 import classNames from 'classnames';
-import {openToast} from 'frontend-js-components-web';
+import {openToast, useStableCallback} from 'frontend-js-components-web';
 import {
 	ClientExtensionDefinition,
 	ClientExtensionResolution,
 	deepClone,
+	escapeHTML,
 	fetch,
 	getObjectValueFromPath,
 	loadClientExtensions,
@@ -46,7 +47,6 @@ import {
 	InlineNotification,
 } from './inline_notification/InlineNotification';
 import ManagementBar from './management_bar/ManagementBar';
-import {FILTER_IMPLEMENTATIONS} from './management_bar/controls/filters/Filter';
 
 // @ts-ignore
 
@@ -57,9 +57,12 @@ import Modal from './modal/Modal';
 import SidePanel from './side_panel/SidePanel';
 import filterCreationActions from './utils/actionItems/filterCreationActions';
 import {readConfigFromURL} from './utils/configInURL';
+import {IConnectedFDSState} from './utils/connection/types';
+import {useOfferedCustomConfigs} from './utils/connection/useOfferedCustomConfigs';
 import EVENTS from './utils/eventsDefinitions';
 import {activateFilter} from './utils/filters/activateFilter';
 import {deactivateFilter} from './utils/filters/deactivateFilter';
+import {getOdataFiltersStrings} from './utils/filters/getOdataFiltersStrings';
 import {getOrCreateFDSAtom} from './utils/getOrCreateFDSAtom';
 import getRandomId from './utils/getRandomId';
 
@@ -71,6 +74,7 @@ import {loadData} from './utils/loadData';
 // @ts-ignore
 
 import {logError} from './utils/logError';
+import recentSearches from './utils/recentSearches';
 import {transformAdditionalAPIURLParameters} from './utils/transformAdditionalAPIURLParameters';
 import transformDataSetItems from './utils/transformDataSetItems';
 import {
@@ -140,6 +144,8 @@ const FrontendDataSetContent = ({
 	overrideEmptyResultView,
 	pagination,
 	portletId,
+	searchAsYouType = false,
+	searchSuggestionsEnabled = false,
 	selectedItems: externalSelectedItems,
 	selectedItemsKey = 'id',
 	selectionType,
@@ -378,6 +384,31 @@ const FrontendDataSetContent = ({
 		useState(initialAdditionalAPIURLParameters);
 	const [globalFDSState, setGlobalFDSState] =
 		useLiferayState<IFDSState>(memoizedAtom);
+
+	const {appliedCustomConfigs, connectionFilters, filteringOwnerAppId} =
+		globalFDSState as IConnectedFDSState;
+
+	const [customConfigsOffered, setCustomConfigsOffered] = useState(false);
+
+	const {getCustomConfigs, settled: customConfigsSettled} =
+		useOfferedCustomConfigs({
+			configInURLBehavior,
+			customConfigsOffered,
+			filteringOwnerAppId,
+			id,
+			offeredCustomConfigs: globalFDSState.offeredCustomConfigs,
+			onGiveUp: () => {
+				const unfrozenGlobalFDSState: IFDSState =
+					deepClone(globalFDSState);
+
+				delete unfrozenGlobalFDSState.offeredCustomConfigs;
+
+				setGlobalFDSState(unfrozenGlobalFDSState);
+			},
+		});
+
+	const filteringDelegated =
+		Boolean(filteringOwnerAppId) || !customConfigsSettled;
 
 	const [globalFDSStateInitialized, setGlobalFDSStateInitialized] =
 		useState(false);
@@ -657,76 +688,87 @@ const FrontendDataSetContent = ({
 		!!items?.length &&
 		!!total;
 
-	const requestData = useCallback(() => {
-		if (!apiURL) {
-			return;
-		}
+	const requestIdRef = useRef(0);
 
-		const unfrozenGlobalFDSState: IFDSState = deepClone(globalFDSState);
+	const requestData = useCallback(
+		(signal?: AbortSignal) => {
+			if (!apiURL) {
+				return;
+			}
 
-		const activeFilters: Array<IBaseFilterState> =
-			unfrozenGlobalFDSState.filters.filter((filter) => filter.active) ||
-			[];
+			const unfrozenGlobalFDSState: IFDSState = deepClone(globalFDSState);
 
-		const activeFiltersOdataStrings = activeFilters.map((filter) => {
-			const filterImplementation = FILTER_IMPLEMENTATIONS[filter.type];
+			const activeFiltersOdataStrings = getOdataFiltersStrings(
+				unfrozenGlobalFDSState
+			);
 
-			return filterImplementation.getOdataString(filter);
-		});
+			const activeSorts =
+				sorts.length > 1
+					? sorts.filter((sort: TSort) => sort.active)
+					: sorts;
 
-		const activeSorts =
-			sorts.length > 1
-				? sorts.filter((sort: TSort) => sort.active)
-				: sorts;
+			const loadDataArgs = {
+				additionalAPIURLParameters,
+				apiURL,
+				currentURL,
+				delta: paginationDelta,
+				odataFiltersStrings: activeFiltersOdataStrings,
+				page: pageNumber,
+				searchParam: unfrozenGlobalFDSState.search.query,
+				sorts: activeSorts,
+			};
 
-		const loadDataArgs = {
+			const requestId = ++requestIdRef.current;
+
+			return loadData({
+				...loadDataArgs,
+				additionalAPIURLParameters: transformAdditionalAPIURLParameters(
+					loadDataArgs,
+					additionalAPIURLParametersTransformer
+				),
+				signal,
+			}).then((response) => ({
+				...response,
+				stale: requestId !== requestIdRef.current,
+			}));
+		},
+		[
 			additionalAPIURLParameters,
+			additionalAPIURLParametersTransformer,
 			apiURL,
 			currentURL,
-			delta: paginationDelta,
-			odataFiltersStrings: activeFiltersOdataStrings,
-			page: pageNumber,
-			searchParam: unfrozenGlobalFDSState.search.query,
-			sorts: activeSorts,
-		};
-
-		return loadData({
-			...loadDataArgs,
-			additionalAPIURLParameters: transformAdditionalAPIURLParameters(
-				loadDataArgs,
-				additionalAPIURLParametersTransformer
-			),
-		});
-	}, [
-		additionalAPIURLParameters,
-		additionalAPIURLParametersTransformer,
-		apiURL,
-		currentURL,
-		globalFDSState,
-		pageNumber,
-		paginationDelta,
-		sorts,
-	]);
+			globalFDSState,
+			pageNumber,
+			paginationDelta,
+			sorts,
+		]
+	);
 
 	const onClearFilters = useCallback(() => {
 		const unfrozenGlobalFDSState: IFDSState = deepClone(globalFDSState);
 
-		const filters = unfrozenGlobalFDSState.filters.map((filter) =>
-			deactivateFilter(filter)
-		);
+		// Delegated filters must survive a clear: the user cannot see them, so
+		// removing them would silently change the results.
+
+		const filters = filteringDelegated
+			? unfrozenGlobalFDSState.filters
+			: unfrozenGlobalFDSState.filters.map((filter) =>
+					deactivateFilter(filter)
+				);
 
 		setGlobalFDSState({
 			...unfrozenGlobalFDSState,
 			filters,
 			search: {query: ''},
 		});
-	}, [globalFDSState, setGlobalFDSState]);
+	}, [filteringDelegated, globalFDSState, setGlobalFDSState]);
 
 	const skipSnapshotsUpdatedChangeRef = useRef(true);
 
 	useEffect(() => {
 		if (
 			globalFDSStateInitialized ||
+			!customConfigsSettled ||
 			!filterClientExtensionsLoaded ||
 			!cellClientExtensionsLoaded
 		) {
@@ -736,6 +778,7 @@ const FrontendDataSetContent = ({
 		setGlobalFDSStateInitialized(true);
 	}, [
 		cellClientExtensionsLoaded,
+		customConfigsSettled,
 		filterClientExtensionsLoaded,
 		globalFDSStateInitialized,
 	]);
@@ -781,6 +824,21 @@ const FrontendDataSetContent = ({
 				globalFDSState.filters as Array<any>;
 		}
 
+		const filteredByConnection = Boolean(
+			connectionFilters?.some(({odataFilterString}) => odataFilterString)
+		);
+
+		const shouldUpdateCustomConfigs =
+			filteringOwnerAppId &&
+			(filteredByConnection ||
+				configInURL?.[EConfigInURLKeys.CUSTOM_CONFIGS] !== undefined);
+
+		if (shouldUpdateCustomConfigs) {
+			updateConfig[EConfigInURLKeys.CUSTOM_CONFIGS] = filteredByConnection
+				? appliedCustomConfigs
+				: undefined;
+		}
+
 		if (shouldUpdateSearch) {
 			updateConfig[EConfigInURLKeys.SEARCH_PARAM] =
 				globalFDSState.search.query;
@@ -800,12 +858,49 @@ const FrontendDataSetContent = ({
 			});
 		}
 	}, [
+		appliedCustomConfigs,
+		connectionFilters,
+		filteringOwnerAppId,
 		globalFDSState,
 		globalFDSStateInitialized,
 		id,
 		updateConfigInURL,
 		viewsDispatch,
 	]);
+
+	// A response is only ever applied when it is the newest one, so the query
+	// held here is the one it answers
+
+	const searchQueryRef = useRef<string>();
+
+	searchQueryRef.current = globalFDSState.search.query;
+
+	// A query is only worth remembering once its results are known, so the
+	// history is written where a response is applied rather than when the user
+	// submits. The count comes off that response, because reading it from state
+	// would judge the query by the results of the one before it.
+
+	const recordSearch = useCallback(
+		(totalCount: number) => {
+			if (!searchSuggestionsEnabled) {
+				return;
+			}
+
+			const query = (searchQueryRef.current ?? '').trim();
+
+			if (!query) {
+				return;
+			}
+
+			if (totalCount) {
+				recentSearches.add(id, query);
+			}
+			else {
+				recentSearches.remove(id, query);
+			}
+		},
+		[id, searchSuggestionsEnabled]
+	);
 
 	const updateDataSetItems = useCallback(
 		(dataSetData: IDataSetData) => {
@@ -814,13 +909,15 @@ const FrontendDataSetContent = ({
 			setItems(transformedItems);
 			setTotal(dataSetData.totalCount);
 
+			recordSearch(dataSetData.totalCount);
+
 			if (!dataSetData.items.length && dataSetData.totalCount > 0) {
 				viewsDispatch(updatePageNumber(dataSetData.lastPage));
 			}
 
 			return transformedItems;
 		},
-		[updatePageNumber, viewsDispatch]
+		[recordSearch, updatePageNumber, viewsDispatch]
 	);
 
 	useEffect(() => {
@@ -835,6 +932,8 @@ const FrontendDataSetContent = ({
 		}
 
 		const searchParam = getSearchParam();
+
+		const offeredCustomConfigs = getCustomConfigs();
 
 		const preloadFilters = (
 			filters: Array<IBaseFilterState> | undefined
@@ -886,9 +985,14 @@ const FrontendDataSetContent = ({
 		else {
 			setFilterClientExtensionsLoaded(true);
 
+			if (offeredCustomConfigs !== undefined) {
+				setCustomConfigsOffered(true);
+			}
+
 			setGlobalFDSState({
 				...globalFDSState,
 				filters: preloadFilters(initialFilters),
+				offeredCustomConfigs,
 				search: {query: searchParam ?? ''},
 			});
 		}
@@ -974,9 +1078,14 @@ const FrontendDataSetContent = ({
 							return filter;
 						}) || [];
 
+					if (offeredCustomConfigs !== undefined) {
+						setCustomConfigsOffered(true);
+					}
+
 					setGlobalFDSState({
 						...globalFDSState,
 						filters: preloadFilters(newFilters),
+						offeredCustomConfigs,
 						search: {query: searchParam ?? ''},
 					});
 
@@ -1023,6 +1132,7 @@ const FrontendDataSetContent = ({
 		cellClientExtensionsLoading,
 		filterClientExtensionsLoaded,
 		filterClientExtensionsLoading,
+		getCustomConfigs,
 		getSearchParam,
 		globalFDSState,
 		globalFDSStateInitialized,
@@ -1201,8 +1311,19 @@ const FrontendDataSetContent = ({
 			});
 		}
 
+		const customConfigsInURL = getCustomConfigs();
+
+		const offeredCustomConfigs =
+			filteringOwnerAppId || customConfigsInURL !== undefined
+				? customConfigsInURL ?? null
+				: undefined;
+
 		if (activeFilters || searchParam) {
 			const unfrozenGlobalFDSState: IFDSState = deepClone(globalFDSState);
+
+			if (offeredCustomConfigs !== undefined) {
+				setCustomConfigsOffered(true);
+			}
 
 			setGlobalFDSState({
 				...unfrozenGlobalFDSState,
@@ -1210,6 +1331,7 @@ const FrontendDataSetContent = ({
 					newFilters: activeFilters,
 					oldFilters: unfrozenGlobalFDSState.filters,
 				}),
+				offeredCustomConfigs,
 				search: {
 					query: searchParam ?? '',
 				},
@@ -1267,7 +1389,9 @@ const FrontendDataSetContent = ({
 			});
 		}
 	}, [
+		filteringOwnerAppId,
 		getActiveSorts,
+		getCustomConfigs,
 		getDelta,
 		getFilters,
 		getPageNumber,
@@ -1287,7 +1411,7 @@ const FrontendDataSetContent = ({
 			setDataLoading(true);
 
 			return requestData()!
-				.then(({data}) => {
+				.then(({data, stale}) => {
 					if (successNotification?.showSuccessNotification) {
 						openToast({
 							message:
@@ -1297,7 +1421,7 @@ const FrontendDataSetContent = ({
 						});
 					}
 
-					if (isMounted()) {
+					if (isMounted() && !stale) {
 						const updatedItems = updateDataSetItems(data);
 
 						setSelectedItems(
@@ -1388,8 +1512,8 @@ const FrontendDataSetContent = ({
 		logError(apiErrorMessage);
 
 		openToast({
-			message: apiErrorMessage,
-			title: `${Liferay.Language.get('error')} ${statusCode}`,
+			message: escapeHTML(apiErrorMessage),
+			title: escapeHTML(`${Liferay.Language.get('error')} ${statusCode}`),
 			type: 'danger',
 		});
 	};
@@ -1399,10 +1523,16 @@ const FrontendDataSetContent = ({
 			return;
 		}
 
+		const abortController = new AbortController();
+
 		setDataLoading(true);
 
-		requestData()!.then(({data, ok, status: statusCode}) => {
-			if (isMounted()) {
+		requestData(abortController.signal)!
+			.then(({data, ok, stale, status: statusCode}) => {
+				if (!isMounted() || stale) {
+					return;
+				}
+
 				if (!ok) {
 					handleApiError({data, statusCode});
 				}
@@ -1430,8 +1560,22 @@ const FrontendDataSetContent = ({
 				setDataLoading(false);
 
 				setSearching(false);
-			}
-		});
+			})
+			.catch((error) => {
+
+				// An aborted request is always followed by a newer one, which
+				// takes over the loading state
+
+				if (error.name === 'AbortError' || !isMounted()) {
+					return;
+				}
+
+				setDataLoading(false);
+
+				setSearching(false);
+			});
+
+		return () => abortController.abort();
 	}, [
 		apiURL,
 		globalFDSStateInitialized,
@@ -1543,6 +1687,7 @@ const FrontendDataSetContent = ({
 				selectedItemsKey={selectedItemsKey}
 				selectedItemsValue={selectedItemsValue}
 				selectionType={selectionType}
+				showFilters={!filteringDelegated}
 				showNavBarWhenSelected={showNavBarWhenSelected}
 				showSearch={showSearch}
 				showSelectAll={showSelectAll}
@@ -1793,11 +1938,37 @@ const FrontendDataSetContent = ({
 
 	const unfrozenGlobalFDSState: IFDSState = deepClone(globalFDSState);
 
+	// Consumers debounce this callback, so it keeps a stable identity and
+	// always reaches the current state
+
+	const handleSearch = useStableCallback(({query}: {query: string}) => {
+		skipSnapshotsUpdatedChangeRef.current = true;
+
+		setGlobalFDSState({
+			...unfrozenGlobalFDSState,
+			search: {
+				query,
+			},
+		});
+
+		if (query !== unfrozenGlobalFDSState.search.query) {
+			viewsDispatch(updatePageNumber(1));
+		}
+	});
+
+	const offerCustomConfigs = (customConfigs: unknown) =>
+		filteringOwnerAppId || customConfigs !== undefined
+			? customConfigs ?? null
+			: undefined;
+
 	const handleSnapshotChange = ({defaultSnapshot, snapshots, value}: any) => {
 		if (value === 'DEFAULT_VIEW') {
+			const offeredCustomConfigs = offerCustomConfigs(undefined);
+
 			updateConfigInURL({
 				[EConfigInURLKeys.ACTIVE_FILTERS]: defaultSnapshot.filters,
 				[EConfigInURLKeys.ACTIVE_SORTS]: defaultSnapshot.sorts,
+				[EConfigInURLKeys.CUSTOM_CONFIGS]: undefined,
 				[EConfigInURLKeys.DELTA]: {...defaultSnapshot.paginationDelta},
 				[EConfigInURLKeys.VIEW_NAME]: {
 					...defaultSnapshot.activeView.name,
@@ -1813,9 +1984,14 @@ const FrontendDataSetContent = ({
 
 			skipSnapshotsUpdatedChangeRef.current = true;
 
+			if (offeredCustomConfigs !== undefined) {
+				setCustomConfigsOffered(true);
+			}
+
 			setGlobalFDSState({
 				...unfrozenGlobalFDSState,
 				filters: defaultSnapshot.filters,
+				offeredCustomConfigs,
 			});
 		}
 		else {
@@ -1825,6 +2001,10 @@ const FrontendDataSetContent = ({
 					.find((snapshot: ISnapshot) => snapshot.erc === value)
 			);
 
+			const {customConfigs} = snapshot.configuration;
+
+			const offeredCustomConfigs = offerCustomConfigs(customConfigs);
+
 			updateConfigInURL({
 				[EConfigInURLKeys.ACTIVE_FILTERS]:
 					snapshot.configuration.filters,
@@ -1832,6 +2012,7 @@ const FrontendDataSetContent = ({
 					newSorts: snapshot.configuration.sorts,
 					oldSorts: sorts,
 				}),
+				[EConfigInURLKeys.CUSTOM_CONFIGS]: customConfigs,
 				[EConfigInURLKeys.DELTA]:
 					snapshot.configuration.paginationDelta,
 				[EConfigInURLKeys.VIEW_NAME]:
@@ -1847,9 +2028,14 @@ const FrontendDataSetContent = ({
 
 			skipSnapshotsUpdatedChangeRef.current = true;
 
+			if (offeredCustomConfigs !== undefined) {
+				setCustomConfigsOffered(true);
+			}
+
 			setGlobalFDSState({
 				...unfrozenGlobalFDSState,
 				filters: snapshot.configuration.filters,
+				offeredCustomConfigs,
 			});
 		}
 	};
@@ -1913,7 +2099,7 @@ const FrontendDataSetContent = ({
 			.catch((error) => {
 				logError(error);
 				openToast({
-					message: error.message,
+					message: escapeHTML(String(error.message ?? '')),
 					type: 'danger',
 				});
 
@@ -1968,7 +2154,7 @@ const FrontendDataSetContent = ({
 			.catch((error) => {
 				logError(error);
 				openToast({
-					message: error.message,
+					message: escapeHTML(String(error.message ?? '')),
 					type: 'danger',
 				});
 
@@ -2024,9 +2210,11 @@ const FrontendDataSetContent = ({
 				onActionDropdownItemClick,
 				onBulkActionItemClick,
 				onClearResultsBar: () => {
-					const filters = unfrozenGlobalFDSState.filters.map(
-						(filter) => deactivateFilter(filter)
-					);
+					const filters = filteringDelegated
+						? unfrozenGlobalFDSState.filters
+						: unfrozenGlobalFDSState.filters.map((filter) =>
+								deactivateFilter(filter)
+							);
 
 					setGlobalFDSState({
 						...unfrozenGlobalFDSState,
@@ -2067,16 +2255,7 @@ const FrontendDataSetContent = ({
 					setInfoPanelOpen((value) => !value);
 				},
 				onItemsChange,
-				onSearch: ({query}) => {
-					skipSnapshotsUpdatedChangeRef.current = true;
-
-					setGlobalFDSState({
-						...unfrozenGlobalFDSState,
-						search: {
-							query,
-						},
-					});
-				},
+				onSearch: handleSearch,
 				onSnapshotChange: handleSnapshotChange,
 				onViewChange: (viewName: string) => {
 					const view = views.find(({name}) => name === viewName);
@@ -2128,7 +2307,9 @@ const FrontendDataSetContent = ({
 				openModal,
 				openSidePanel,
 				portletId,
+				searchAsYouType,
 				searchParam: unfrozenGlobalFDSState.search.query,
+				searchSuggestionsEnabled,
 				searching,
 				selectable,
 				selectedItems,

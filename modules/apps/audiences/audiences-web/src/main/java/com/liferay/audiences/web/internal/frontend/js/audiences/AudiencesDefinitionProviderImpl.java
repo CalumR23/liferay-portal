@@ -5,14 +5,14 @@
 
 package com.liferay.audiences.web.internal.frontend.js.audiences;
 
+import com.liferay.audiences.cache.AudiencesDefinitionCache;
 import com.liferay.audiences.criteria.AudiencesCriteriaProvider;
 import com.liferay.audiences.model.AudiencesEntry;
+import com.liferay.audiences.service.AudiencesEntryGroupRelLocalService;
 import com.liferay.audiences.service.AudiencesEntryLocalService;
 import com.liferay.frontend.js.audiences.AudiencesDefinition;
 import com.liferay.frontend.js.audiences.AudiencesDefinitionProvider;
 import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.kernel.cache.MultiVMPool;
-import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
@@ -23,14 +23,14 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 
 import java.util.List;
 import java.util.Set;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -46,7 +46,8 @@ public class AudiencesDefinitionProviderImpl
 			return null;
 		}
 
-		AudiencesDefinition audiencesDefinition = _portalCache.get(companyId);
+		AudiencesDefinition audiencesDefinition =
+			_audiencesDefinitionCache.getAudiencesDefinition(companyId);
 
 		if (audiencesDefinition != null) {
 			return audiencesDefinition;
@@ -81,6 +82,12 @@ public class AudiencesDefinitionProviderImpl
 				continue;
 			}
 
+			JSONArray scopeJSONArray = _getScopeJSONArray(audiencesEntry);
+
+			if (scopeJSONArray.length() > 0) {
+				jsonObject.put("scope", scopeJSONArray);
+			}
+
 			audiencesJSONArray.put(
 				jsonObject.put(
 					"id", audiencesEntry.getExternalReferenceCode()));
@@ -93,21 +100,10 @@ public class AudiencesDefinitionProviderImpl
 		audiencesDefinition = new AudiencesDefinition(
 			json, HashedFilesUtil.computeHash(json));
 
-		_portalCache.put(companyId, audiencesDefinition);
+		_audiencesDefinitionCache.putAudiencesDefinition(
+			companyId, audiencesDefinition);
 
 		return audiencesDefinition;
-	}
-
-	@Activate
-	protected void activate() {
-		_portalCache =
-			(PortalCache<Long, AudiencesDefinition>)_multiVMPool.getPortalCache(
-				AudiencesEntry.class.getName());
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_multiVMPool.removePortalCache(AudiencesEntry.class.getName());
 	}
 
 	private JSONObject _getAudiencesEntryJSONObject(
@@ -123,6 +119,27 @@ public class AudiencesDefinitionProviderImpl
 		}
 
 		return _jsonFactory.createJSONObject();
+	}
+
+	private JSONArray _getScopeJSONArray(AudiencesEntry audiencesEntry) {
+		return JSONUtil.toJSONArray(
+			_audiencesEntryGroupRelLocalService.
+				getAudiencesEntryGroupRelsByAudienceEntryERC(
+					audiencesEntry.getCompanyId(),
+					audiencesEntry.getExternalReferenceCode()),
+			audiencesEntryGroupRel -> {
+				Group group =
+					_groupLocalService.fetchGroupByExternalReferenceCode(
+						audiencesEntryGroupRel.getGroupERC(),
+						audiencesEntryGroupRel.getCompanyId());
+
+				if (group == null) {
+					return null;
+				}
+
+				return group.getGroupId();
+			},
+			_log);
 	}
 
 	private boolean _hasValidAttributes(
@@ -161,14 +178,19 @@ public class AudiencesDefinitionProviderImpl
 	private AudiencesCriteriaProvider _audiencesCriteriaProvider;
 
 	@Reference
+	private AudiencesDefinitionCache _audiencesDefinitionCache;
+
+	@Reference
+	private AudiencesEntryGroupRelLocalService
+		_audiencesEntryGroupRelLocalService;
+
+	@Reference
 	private AudiencesEntryLocalService _audiencesEntryLocalService;
 
 	@Reference
-	private JSONFactory _jsonFactory;
+	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private MultiVMPool _multiVMPool;
-
-	private PortalCache<Long, AudiencesDefinition> _portalCache;
+	private JSONFactory _jsonFactory;
 
 }

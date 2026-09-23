@@ -36,6 +36,10 @@ public class AuditRequestThreadLocal {
 		return _clientIP;
 	}
 
+	public String getCorrelationId() {
+		return _correlationId;
+	}
+
 	public String getQueryString() {
 		return _queryString;
 	}
@@ -50,6 +54,10 @@ public class AuditRequestThreadLocal {
 
 	public String getRealUserLogin() {
 		return _realUserLogin;
+	}
+
+	public String getRequestId() {
+		return _requestId;
 	}
 
 	public String getRequestURL() {
@@ -68,12 +76,20 @@ public class AuditRequestThreadLocal {
 		return _sessionID;
 	}
 
+	public boolean isRequestIdGenerated() {
+		return _requestIdGenerated;
+	}
+
 	public void setClientHost(String clientHost) {
 		_clientHost = clientHost;
 	}
 
 	public void setClientIP(String clientIP) {
 		_clientIP = clientIP;
+	}
+
+	public void setCorrelationId(String correlationId) {
+		_correlationId = correlationId;
 	}
 
 	public void setQueryString(String queryString) {
@@ -90,6 +106,14 @@ public class AuditRequestThreadLocal {
 
 	public void setRealUserLogin(String realUserLogin) {
 		_realUserLogin = realUserLogin;
+	}
+
+	public void setRequestId(String requestId) {
+		_requestId = requestId;
+	}
+
+	public void setRequestIdGenerated(boolean requestIdGenerated) {
+		_requestIdGenerated = requestIdGenerated;
 	}
 
 	public void setRequestURL(String requestURL) {
@@ -114,10 +138,13 @@ public class AuditRequestThreadLocal {
 
 	private String _clientHost;
 	private String _clientIP;
+	private String _correlationId;
 	private String _queryString;
 	private String _realUserEmailAddress;
 	private long _realUserId;
 	private String _realUserLogin;
+	private String _requestId;
+	private boolean _requestIdGenerated;
 	private String _requestURL;
 	private String _serverName;
 	private int _serverPort;

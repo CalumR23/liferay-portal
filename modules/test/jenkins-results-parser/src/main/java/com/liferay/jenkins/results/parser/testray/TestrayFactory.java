@@ -18,6 +18,7 @@ import com.liferay.jenkins.results.parser.test.clazz.group.JSUnitAxisTestClassGr
 import com.liferay.jenkins.results.parser.test.clazz.group.JUnitAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.ModulesAxisTestClassGroup;
 import com.liferay.jenkins.results.parser.test.clazz.group.PlaywrightAxisTestClassGroup;
+import com.liferay.jenkins.results.parser.test.clazz.group.WorkspacesCompileAxisTestClassGroup;
 
 import java.io.IOException;
 
@@ -64,8 +65,8 @@ public class TestrayFactory {
 			}
 			else if (axisTestClassGroup instanceof JSUnitAxisTestClassGroup) {
 				return new JSUnitBatchBuildTestrayCaseResult(
-					axisTestClassGroup, testClass, testrayBuild,
-					topLevelBuildReport);
+					axisTestClassGroup, testClass, testClassMethod,
+					testrayBuild, topLevelBuildReport);
 			}
 			else if (axisTestClassGroup instanceof JUnitAxisTestClassGroup) {
 				return new JUnitBatchBuildTestrayCaseResult(
@@ -89,6 +90,13 @@ public class TestrayFactory {
 				return new PlaywrightBatchBuildTestrayCaseResult(
 					axisTestClassGroup, testClass, testClassMethod,
 					testrayBuild, topLevelBuildReport);
+			}
+			else if (axisTestClassGroup instanceof
+						WorkspacesCompileAxisTestClassGroup) {
+
+				return new WorkspacesCompileBatchBuildTestrayCaseResult(
+					axisTestClassGroup, testClass, testrayBuild,
+					topLevelBuildReport);
 			}
 		}
 

@@ -28,7 +28,7 @@ export const test = mergeTests(
 	dataApiHelpersTest,
 	featureFlagsTest({
 		'LPD-35443': {enabled: true},
-		'LPD-78863': {enabled: true, system: true},
+		'LPD-78863': {enabled: true},
 		'LPS-178052': {enabled: true},
 	}),
 	isolatedSiteTest,
@@ -1260,7 +1260,12 @@ test(
 		await rolePage.definePermissionsLink.click();
 
 		const menuItems = {
-			'Applications Menu': ['Communication', 'Content', 'Workflow'],
+			'Applications Menu': [
+				'Developer and Integration',
+				'In Maintenance',
+				'Search',
+				'Workflow',
+			],
 			'Control Panel': [
 				'Accounts',
 				'Configuration',

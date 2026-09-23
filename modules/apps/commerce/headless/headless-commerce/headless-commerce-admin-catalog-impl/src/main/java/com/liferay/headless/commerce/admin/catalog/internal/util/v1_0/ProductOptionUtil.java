@@ -14,9 +14,11 @@ import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.vulcan.custom.field.CustomFieldsUtil;
 
 import java.io.Serializable;
@@ -37,24 +39,44 @@ public class ProductOptionUtil {
 
 		CPOption cpOption = null;
 
-		long optionId = GetterUtil.getLong(productOption.getOptionId());
+		String optionExternalReferenceCode =
+			productOption.getOptionExternalReferenceCode();
 
-		if (optionId > 0) {
-			cpOption = cpOptionService.getCPOption(optionId);
+		if (Validator.isNull(optionExternalReferenceCode)) {
+			cpOption = cpOptionService.getCPOption(
+				GetterUtil.getLong(productOption.getOptionId()));
+		}
+		else if (LazyReferencingThreadLocal.isEnabled()) {
+			cpOption = cpOptionService.getOrAddEmptyCPOption(
+				optionExternalReferenceCode);
 		}
 		else {
 			cpOption = cpOptionService.fetchCPOptionByExternalReferenceCode(
-				productOption.getOptionExternalReferenceCode(),
-				serviceContext.getCompanyId());
+				optionExternalReferenceCode, serviceContext.getCompanyId());
 
 			if (cpOption == null) {
-				throw new NoSuchCPOptionException();
+				throw new NoSuchCPOptionException(
+					"Unable to find option with external reference code " +
+						optionExternalReferenceCode);
 			}
 		}
 
-		CPDefinitionOptionRel cpDefinitionOptionRel =
-			cpDefinitionOptionRelService.fetchCPDefinitionOptionRel(
-				cpDefinitionId, cpOption.getCPOptionId());
+		CPDefinitionOptionRel cpDefinitionOptionRel = null;
+
+		String externalReferenceCode = productOption.getExternalReferenceCode();
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			cpDefinitionOptionRel =
+				cpDefinitionOptionRelService.
+					fetchCPDefinitionOptionRelByExternalReferenceCode(
+						externalReferenceCode, serviceContext.getCompanyId());
+		}
+
+		if (cpDefinitionOptionRel == null) {
+			cpDefinitionOptionRel =
+				cpDefinitionOptionRelService.fetchCPDefinitionOptionRel(
+					cpDefinitionId, cpOption.getCPOptionId());
+		}
 
 		Map<String, String> nameMap = productOption.getName();
 
@@ -85,7 +107,7 @@ public class ProductOptionUtil {
 		if (cpDefinitionOptionRel == null) {
 			cpDefinitionOptionRel =
 				cpDefinitionOptionRelService.addCPDefinitionOptionRel(
-					cpDefinitionId, cpOption.getCPOptionId(),
+					null, cpDefinitionId, cpOption.getCPOptionId(),
 					LanguageUtils.getLocalizedMap(nameMap),
 					LanguageUtils.getLocalizedMap(descriptionMap),
 					GetterUtil.get(
@@ -145,6 +167,13 @@ public class ProductOptionUtil {
 						productOption.getTypeSettings(),
 						cpDefinitionOptionRel.getTypeSettings()),
 					serviceContext);
+		}
+
+		if (Validator.isNotNull(externalReferenceCode)) {
+			cpDefinitionOptionRel =
+				cpDefinitionOptionRelService.updateExternalReferenceCode(
+					cpDefinitionOptionRel.getCPDefinitionOptionRelId(),
+					externalReferenceCode);
 		}
 
 		return cpDefinitionOptionRel;

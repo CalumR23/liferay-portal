@@ -13,11 +13,20 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagService;
+import com.liferay.commerce.currency.exception.NoSuchCurrencyException;
+import com.liferay.commerce.currency.model.CommerceCurrency;
+import com.liferay.commerce.currency.service.CommerceCurrencyService;
 import com.liferay.commerce.price.list.service.CommercePriceEntryLocalService;
 import com.liferay.commerce.price.list.service.CommercePriceEntryService;
 import com.liferay.commerce.price.list.service.CommercePriceListLocalService;
+import com.liferay.commerce.pricing.model.CommercePricingClass;
+import com.liferay.commerce.pricing.model.CommercePricingClassCPDefinitionRel;
+import com.liferay.commerce.pricing.service.CommercePricingClassCPDefinitionRelLocalService;
+import com.liferay.commerce.pricing.service.CommercePricingClassCPDefinitionRelService;
+import com.liferay.commerce.pricing.service.CommercePricingClassService;
 import com.liferay.commerce.product.configuration.CProductVersionConfiguration;
 import com.liferay.commerce.product.constants.CPAttachmentFileEntryConstants;
+import com.liferay.commerce.product.constants.CPPortletKeys;
 import com.liferay.commerce.product.exception.CPDefinitionProductTypeNameException;
 import com.liferay.commerce.product.exception.NoSuchCPDefinitionException;
 import com.liferay.commerce.product.exception.NoSuchCatalogException;
@@ -41,9 +50,10 @@ import com.liferay.commerce.product.service.CPInstanceUnitOfMeasureService;
 import com.liferay.commerce.product.service.CPOptionCategoryService;
 import com.liferay.commerce.product.service.CPOptionService;
 import com.liferay.commerce.product.service.CPSpecificationOptionService;
-import com.liferay.commerce.product.service.CPTaxCategoryLocalService;
+import com.liferay.commerce.product.service.CPTaxCategoryService;
 import com.liferay.commerce.product.service.CProductLocalService;
 import com.liferay.commerce.product.service.CommerceCatalogLocalService;
+import com.liferay.commerce.product.service.CommerceCatalogService;
 import com.liferay.commerce.product.service.CommerceChannelRelService;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.product.type.CPType;
@@ -63,6 +73,8 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
+import com.liferay.exportimport.constants.ExportImportConstants;
+import com.liferay.exportimport.vulcan.batch.engine.ExportImportVulcanBatchEngineTaskItemDelegate;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Attachment;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Category;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Diagram;
@@ -74,6 +86,7 @@ import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductChannel;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductConfiguration;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOption;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOptionValue;
+import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductProductGroup;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductShippingConfiguration;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSubscriptionConfiguration;
@@ -102,6 +115,7 @@ import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.SkuUnitOfM
 import com.liferay.headless.commerce.admin.catalog.internal.util.v1_0.SkuUtil;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductResource;
 import com.liferay.headless.commerce.core.helper.ServiceContextHelper;
+import com.liferay.headless.commerce.core.util.CommerceCurrencyUtil;
 import com.liferay.headless.commerce.core.util.DateConfig;
 import com.liferay.headless.commerce.core.util.ExpandoUtil;
 import com.liferay.headless.commerce.core.util.LanguageUtils;
@@ -112,6 +126,10 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.change.tracking.CTAware;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.NoSuchModelException;
+import com.liferay.portal.kernel.lazy.referencing.LazyReferencingThreadLocal;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Sort;
@@ -146,6 +164,7 @@ import com.liferay.portal.vulcan.pagination.Pagination;
 import com.liferay.portal.vulcan.util.SearchUtil;
 import com.liferay.upload.UniqueFileNameProvider;
 
+import jakarta.ws.rs.NotSupportedException;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 import java.io.Serializable;
@@ -156,6 +175,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -170,18 +190,122 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Component(
 	properties = "OSGI-INF/liferay/rest/v1_0/product.properties",
+	property = "export.import.vulcan.batch.engine.task.item.delegate=true",
 	scope = ServiceScope.PROTOTYPE, service = ProductResource.class
 )
 @CTAware
-public class ProductResourceImpl extends BaseProductResourceImpl {
+public class ProductResourceImpl
+	extends BaseProductResourceImpl
+	implements ExportImportVulcanBatchEngineTaskItemDelegate<Product> {
+
+	@Override
+	public void create(
+			Collection<Product> products, Map<String, Serializable> parameters)
+		throws Exception {
+
+		UnsafeFunction<Product, Product, Exception> unsafeFunction = null;
+
+		String createStrategy = (String)parameters.getOrDefault(
+			"createStrategy", "INSERT");
+
+		if (StringUtil.equalsIgnoreCase(createStrategy, "INSERT")) {
+			unsafeFunction = product -> postProduct(product);
+		}
+
+		if (StringUtil.equalsIgnoreCase(createStrategy, "UPSERT")) {
+			String updateStrategy = (String)parameters.getOrDefault(
+				"updateStrategy", "UPDATE");
+
+			if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
+				unsafeFunction = product -> {
+					try {
+						Product getProduct = getProductByExternalReferenceCode(
+							product.getExternalReferenceCode());
+
+						return patchProduct(getProduct.getProductId(), product);
+					}
+					catch (NoSuchModelException noSuchModelException) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(noSuchModelException);
+						}
+
+						return postProduct(product);
+					}
+				};
+			}
+
+			if (StringUtil.equalsIgnoreCase(updateStrategy, "UPDATE")) {
+				unsafeFunction = product -> putProductByExternalReferenceCode(
+					product.getExternalReferenceCode(), product);
+			}
+		}
+
+		if (unsafeFunction == null) {
+			throw new NotSupportedException(
+				"Create strategy \"" + createStrategy +
+					"\" is not supported for Product");
+		}
+
+		if (contextBatchUnsafeBiConsumer != null) {
+			contextBatchUnsafeBiConsumer.accept(products, unsafeFunction);
+		}
+		else if (contextBatchUnsafeConsumer != null) {
+			contextBatchUnsafeConsumer.accept(products, unsafeFunction::apply);
+		}
+		else {
+			for (Product product : products) {
+				unsafeFunction.apply(product);
+			}
+		}
+	}
 
 	@Override
 	public void delete(
 			Collection<Product> products, Map<String, Serializable> parameters)
 		throws Exception {
 
-		for (Product product : products) {
-			deleteProduct(product.getProductId());
+		UnsafeFunction<Product, Product, Exception> unsafeFunction =
+			product -> {
+				if (product.getProductId() != null) {
+					try {
+						deleteProduct(product.getProductId());
+
+						return product;
+					}
+					catch (Exception exception) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(exception);
+						}
+
+						if (product.getExternalReferenceCode() != null) {
+							deleteProductByExternalReferenceCode(
+								product.getExternalReferenceCode());
+
+							return product;
+						}
+					}
+				}
+				else if (product.getExternalReferenceCode() != null) {
+					deleteProductByExternalReferenceCode(
+						product.getExternalReferenceCode());
+
+					return product;
+				}
+
+				throw new UnsupportedOperationException(
+					"Unable to delete by external reference code or ID");
+			};
+
+		if (contextBatchUnsafeBiConsumer != null) {
+			contextBatchUnsafeBiConsumer.accept(products, unsafeFunction);
+		}
+		else if (contextBatchUnsafeConsumer != null) {
+			contextBatchUnsafeConsumer.accept(products, unsafeFunction::apply);
+		}
+		else {
+			for (Product product : products) {
+				unsafeFunction.apply(product);
+			}
 		}
 	}
 
@@ -263,6 +387,54 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 				_portal.getClassNameId(CPDefinition.class.getName()),
 				contextCompany.getCompanyId(), _expandoColumnLocalService,
 				_expandoTableLocalService));
+	}
+
+	@Override
+	public ExportImportDescriptor<CPDefinition> getExportImportDescriptor() {
+		return new ExportImportDescriptor<>() {
+
+			@Override
+			public String getKey() {
+				return ProductResourceImpl.class.getName();
+			}
+
+			@Override
+			public String getLabelLanguageKey() {
+				return "products";
+			}
+
+			@Override
+			public Class<CPDefinition> getModelClass() {
+				return CPDefinition.class;
+			}
+
+			@Override
+			public List<String> getNestedFields() {
+				return List.of(
+					"attachments", "diagram", "images", "mappedProducts",
+					"pins", "productAccountGroups", "productChannels",
+					"productConfiguration", "productGroups", "productOptions",
+					"productSpecifications", "productVirtualSettings",
+					"relatedProducts", "shippingConfiguration", "skus",
+					"subscriptionConfiguration", "taxConfiguration");
+			}
+
+			@Override
+			public String getPortletId() {
+				return CPPortletKeys.CP_DEFINITIONS;
+			}
+
+			@Override
+			public Scope getScope() {
+				return Scope.COMPANY;
+			}
+
+			@Override
+			public String getSectionKey() {
+				return ExportImportConstants.SECTION_KEY_PRODUCT_MANAGEMENT;
+			}
+
+		};
 	}
 
 	@Override
@@ -462,8 +634,38 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			Collection<Product> products, Map<String, Serializable> parameters)
 		throws Exception {
 
-		for (Product product : products) {
-			patchProduct(product.getProductId(), product);
+		UnsafeFunction<Product, Product, Exception> unsafeFunction = null;
+
+		String updateStrategy = (String)parameters.getOrDefault(
+			"updateStrategy", "UPDATE");
+
+		if (StringUtil.equalsIgnoreCase(updateStrategy, "PARTIAL_UPDATE")) {
+			unsafeFunction = product -> {
+				if (product.getProductId() != null) {
+					return patchProduct(product.getProductId(), product);
+				}
+
+				return patchProductByExternalReferenceCode(
+					product.getExternalReferenceCode(), product);
+			};
+		}
+
+		if (unsafeFunction == null) {
+			throw new NotSupportedException(
+				"Update strategy \"" + updateStrategy +
+					"\" is not supported for Product");
+		}
+
+		if (contextBatchUnsafeBiConsumer != null) {
+			contextBatchUnsafeBiConsumer.accept(products, unsafeFunction);
+		}
+		else if (contextBatchUnsafeConsumer != null) {
+			contextBatchUnsafeConsumer.accept(products, unsafeFunction::apply);
+		}
+		else {
+			for (Product product : products) {
+				unsafeFunction.apply(product);
+			}
 		}
 	}
 
@@ -471,18 +673,31 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			String externalReferenceCode, Product product)
 		throws Exception {
 
+		String catalogExternalReferenceCode =
+			product.getCatalogExternalReferenceCode();
+
 		CommerceCatalog commerceCatalog = null;
 
-		if (product.getCatalogId() != null) {
-			commerceCatalog = _commerceCatalogLocalService.getCommerceCatalog(
-				product.getCatalogId());
+		if (Validator.isNull(catalogExternalReferenceCode)) {
+			Long catalogId = product.getCatalogId();
+
+			if (catalogId != null) {
+				commerceCatalog =
+					_commerceCatalogLocalService.fetchCommerceCatalog(
+						catalogId);
+			}
 		}
-		else if (product.getCatalogExternalReferenceCode() != null) {
+		else {
 			commerceCatalog =
-				_commerceCatalogLocalService.
-					getCommerceCatalogByExternalReferenceCode(
-						product.getCatalogExternalReferenceCode(),
+				_commerceCatalogService.
+					fetchCommerceCatalogByExternalReferenceCode(
+						catalogExternalReferenceCode,
 						contextCompany.getCompanyId());
+
+			if (commerceCatalog == null) {
+				commerceCatalog = _fetchCommerceCatalog(
+					catalogExternalReferenceCode, product);
+			}
 		}
 
 		if (commerceCatalog == null) {
@@ -768,6 +983,20 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		return cpDefinition;
 	}
 
+	private CommerceCatalog _fetchCommerceCatalog(
+			String catalogExternalReferenceCode, Product product)
+		throws Exception {
+
+		if (!LazyReferencingThreadLocal.isEnabled()) {
+			return null;
+		}
+
+		CommerceCurrency commerceCurrency = _getCommerceCurrency(product);
+
+		return _commerceCatalogService.getOrAddEmptyCommerceCatalog(
+			catalogExternalReferenceCode, commerceCurrency.getCode());
+	}
+
 	private Map<String, Map<String, String>> _getActions(
 		CPDefinition cpDefinition) {
 
@@ -874,6 +1103,32 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		return cpDefinition;
 	}
 
+	private CommerceCurrency _getCommerceCurrency(Product product)
+		throws Exception {
+
+		String catalogCurrencyCode = product.getCatalogCurrencyCode();
+		String catalogCurrencyExternalReferenceCode =
+			product.getCatalogCurrencyExternalReferenceCode();
+
+		CommerceCurrency commerceCurrency =
+			CommerceCurrencyUtil.fetchCommerceCurrency(
+				contextCompany.getCompanyId(), catalogCurrencyCode,
+				catalogCurrencyExternalReferenceCode, 0);
+
+		if (commerceCurrency != null) {
+			return commerceCurrency;
+		}
+
+		if (Validator.isNull(catalogCurrencyExternalReferenceCode)) {
+			throw new NoSuchCurrencyException(
+				"Unable to find currency with external reference code " +
+					catalogCurrencyExternalReferenceCode);
+		}
+
+		return _commerceCurrencyService.getOrAddEmptyCommerceCurrency(
+			catalogCurrencyExternalReferenceCode, catalogCurrencyCode);
+	}
+
 	private Map<String, Serializable> _getExpandoBridgeAttributes(
 		String className, CustomField[] customFields) {
 
@@ -922,6 +1177,39 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		return productShippingConfiguration;
 	}
 
+	private ProductTaxConfiguration _getProductTaxConfiguration(
+		Product product) {
+
+		ProductConfiguration productConfiguration =
+			product.getProductConfiguration();
+
+		if (productConfiguration != null) {
+			return _getProductTaxConfiguration(productConfiguration);
+		}
+
+		ProductTaxConfiguration productTaxConfiguration =
+			product.getTaxConfiguration();
+
+		if (productTaxConfiguration != null) {
+			return productTaxConfiguration;
+		}
+
+		return new ProductTaxConfiguration();
+	}
+
+	private ProductTaxConfiguration _getProductTaxConfiguration(
+		ProductConfiguration productConfiguration) {
+
+		ProductTaxConfiguration productTaxConfiguration =
+			productConfiguration.getProductTaxConfiguration();
+
+		if (productTaxConfiguration == null) {
+			return new ProductTaxConfiguration();
+		}
+
+		return productTaxConfiguration;
+	}
+
 	private Page<Product> _getProductsPage(
 			long companyId, String search, Filter filter, Pagination pagination,
 			Sort[] sorts,
@@ -956,39 +1244,6 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 				}
 			},
 			sorts, transformUnsafeFunction);
-	}
-
-	private ProductTaxConfiguration _getProductTaxConfiguration(
-		Product product) {
-
-		ProductConfiguration productConfiguration =
-			product.getProductConfiguration();
-
-		if (productConfiguration != null) {
-			return _getProductTaxConfiguration(productConfiguration);
-		}
-
-		ProductTaxConfiguration productTaxConfiguration =
-			product.getTaxConfiguration();
-
-		if (productTaxConfiguration != null) {
-			return productTaxConfiguration;
-		}
-
-		return new ProductTaxConfiguration();
-	}
-
-	private ProductTaxConfiguration _getProductTaxConfiguration(
-		ProductConfiguration productConfiguration) {
-
-		ProductTaxConfiguration productTaxConfiguration =
-			productConfiguration.getProductTaxConfiguration();
-
-		if (productTaxConfiguration == null) {
-			return new ProductTaxConfiguration();
-		}
-
-		return productTaxConfiguration;
 	}
 
 	private boolean _isPublishedCPDefinitionVersionable(
@@ -1172,9 +1427,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		if (productTaxConfiguration != null) {
 			cpDefinition =
 				ProductTaxConfigurationUtil.updateCPDefinitionTaxCategoryInfo(
-					contextCompany.getCompanyId(), cpDefinition,
-					_cpDefinitionService, _cpTaxCategoryLocalService,
-					productTaxConfiguration, contextUser.getUserId());
+					cpDefinition, _cpDefinitionService, _cpTaxCategoryService,
+					productTaxConfiguration);
 		}
 
 		// Product specifications
@@ -1264,7 +1518,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 				CPInstance cpInstance = SkuUtil.addOrUpdateCPInstance(
 					_cpInstanceService, sku, cpDefinition,
 					_cpDefinitionOptionRelService,
-					_cpDefinitionOptionValueRelService, serviceContext);
+					_cpDefinitionOptionValueRelService, _cpOptionService,
+					serviceContext);
 
 				serviceContext.setExpandoBridgeAttributes(null);
 
@@ -1358,21 +1613,31 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 				CPDefinition.class.getName(), cpDefinition.getCPDefinitionId());
 
 			for (ProductChannel productChannel : productChannels) {
-				CommerceChannel commerceChannel =
-					_commerceChannelService.
-						fetchCommerceChannelByExternalReferenceCode(
-							GetterUtil.getString(
-								productChannel.getExternalReferenceCode()),
-							contextCompany.getCompanyId());
+				CommerceChannel commerceChannel = null;
 
-				if (commerceChannel == null) {
+				String externalReferenceCode = GetterUtil.getString(
+					productChannel.getExternalReferenceCode());
+
+				if (Validator.isNull(externalReferenceCode)) {
 					commerceChannel =
 						_commerceChannelService.fetchCommerceChannel(
 							GetterUtil.getLong(productChannel.getChannelId()));
+				}
+				else if (LazyReferencingThreadLocal.isEnabled()) {
+					commerceChannel =
+						_commerceChannelService.getOrAddEmptyCommerceChannel(
+							externalReferenceCode);
+				}
+				else {
+					commerceChannel =
+						_commerceChannelService.
+							fetchCommerceChannelByExternalReferenceCode(
+								externalReferenceCode,
+								contextCompany.getCompanyId());
+				}
 
-					if (commerceChannel == null) {
-						continue;
-					}
+				if (commerceChannel == null) {
+					continue;
 				}
 
 				_commerceChannelRelService.addCommerceChannelRel(
@@ -1395,27 +1660,96 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 			for (ProductAccountGroup productAccountGroup :
 					productAccountGroups) {
 
-				AccountGroup accountGroup =
-					_accountGroupService.
-						fetchAccountGroupByExternalReferenceCode(
-							GetterUtil.getString(
-								productAccountGroup.getExternalReferenceCode()),
-							contextCompany.getCompanyId());
+				AccountGroup accountGroup = null;
 
-				if (accountGroup == null) {
+				String externalReferenceCode = GetterUtil.getString(
+					productAccountGroup.getExternalReferenceCode());
+
+				if (Validator.isNull(externalReferenceCode)) {
 					accountGroup = _accountGroupService.fetchAccountGroup(
 						GetterUtil.getLong(
 							productAccountGroup.getAccountGroupId()));
+				}
+				else if (LazyReferencingThreadLocal.isEnabled()) {
+					accountGroup =
+						_accountGroupService.getOrAddEmptyAccountGroup(
+							externalReferenceCode,
+							GetterUtil.getString(
+								productAccountGroup.getName(),
+								externalReferenceCode));
+				}
+				else {
+					accountGroup =
+						_accountGroupService.
+							fetchAccountGroupByExternalReferenceCode(
+								externalReferenceCode,
+								contextCompany.getCompanyId());
+				}
 
-					if (accountGroup == null) {
-						continue;
-					}
+				if (accountGroup == null) {
+					continue;
 				}
 
 				_accountGroupRelService.addAccountGroupRel(
 					accountGroup.getAccountGroupId(),
 					CPDefinition.class.getName(),
 					cpDefinition.getCPDefinitionId());
+			}
+		}
+
+		// Product groups
+
+		ProductProductGroup[] productProductGroups = product.getProductGroups();
+
+		if (productProductGroups != null) {
+			for (CommercePricingClassCPDefinitionRel
+					commercePricingClassCPDefinitionRel :
+						_commercePricingClassCPDefinitionRelLocalService.
+							getCommercePricingClassByCPDefinitionId(
+								cpDefinition.getCPDefinitionId())) {
+
+				_commercePricingClassCPDefinitionRelService.
+					deleteCommercePricingClassCPDefinitionRel(
+						commercePricingClassCPDefinitionRel.
+							getCommercePricingClassCPDefinitionRelId());
+			}
+
+			for (ProductProductGroup productProductGroup :
+					productProductGroups) {
+
+				CommercePricingClass commercePricingClass = null;
+
+				String externalReferenceCode = GetterUtil.getString(
+					productProductGroup.getExternalReferenceCode());
+
+				if (Validator.isNull(externalReferenceCode)) {
+					commercePricingClass =
+						_commercePricingClassService.fetchCommercePricingClass(
+							GetterUtil.getLong(
+								productProductGroup.getProductGroupId()));
+				}
+				else if (LazyReferencingThreadLocal.isEnabled()) {
+					commercePricingClass =
+						_commercePricingClassService.
+							getOrAddEmptyCommercePricingClass(
+								externalReferenceCode);
+				}
+				else {
+					commercePricingClass =
+						_commercePricingClassService.
+							fetchCommercePricingClassByExternalReferenceCode(
+								externalReferenceCode,
+								contextCompany.getCompanyId());
+				}
+
+				if (commercePricingClass == null) {
+					continue;
+				}
+
+				_commercePricingClassCPDefinitionRelService.
+					addCommercePricingClassCPDefinitionRel(
+						commercePricingClass.getCommercePricingClassId(),
+						cpDefinition.getCPDefinitionId(), serviceContext);
 			}
 		}
 
@@ -1674,8 +2008,8 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 		if (!Validator.isBlank(product.getExternalReferenceCode())) {
 			_cpDefinitionService.updateExternalReferenceCode(
-				product.getExternalReferenceCode(),
-				cpDefinition.getCPDefinitionId());
+				cpDefinition.getCPDefinitionId(),
+				product.getExternalReferenceCode());
 		}
 
 		Map<String, ?> expando = product.getExpando();
@@ -1711,6 +2045,9 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		return cpDefinition;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		ProductResourceImpl.class);
+
 	@Reference
 	private AccountGroupRelLocalService _accountGroupRelLocalService;
 
@@ -1727,6 +2064,9 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private AssetTagService _assetTagService;
 
 	@Reference
+	private CProductLocalService _cProductLocalService;
+
+	@Reference
 	private ClassNameLocalService _classNameLocalService;
 
 	@Reference
@@ -1737,10 +2077,16 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private CommerceCatalogLocalService _commerceCatalogLocalService;
 
 	@Reference
+	private CommerceCatalogService _commerceCatalogService;
+
+	@Reference
 	private CommerceChannelRelService _commerceChannelRelService;
 
 	@Reference
 	private CommerceChannelService _commerceChannelService;
+
+	@Reference
+	private CommerceCurrencyService _commerceCurrencyService;
 
 	@Reference
 	private CommercePriceEntryLocalService _commercePriceEntryLocalService;
@@ -1752,6 +2098,17 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private CommercePriceListLocalService _commercePriceListLocalService;
 
 	@Reference
+	private CommercePricingClassCPDefinitionRelLocalService
+		_commercePricingClassCPDefinitionRelLocalService;
+
+	@Reference
+	private CommercePricingClassCPDefinitionRelService
+		_commercePricingClassCPDefinitionRelService;
+
+	@Reference
+	private CommercePricingClassService _commercePricingClassService;
+
+	@Reference
 	private ConfigurationProvider _configurationProvider;
 
 	@Reference
@@ -1759,9 +2116,6 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 
 	@Reference
 	private CPConfigurationEntryService _cpConfigurationEntryService;
-
-	@Reference
-	private CPDAvailabilityEstimateService _cpdAvailabilityEstimateService;
 
 	@Reference
 	private CPDefinitionInventoryService _cpDefinitionInventoryService;
@@ -1794,10 +2148,6 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 		_cpDefinitionVirtualSettingService;
 
 	@Reference
-	private CPDVirtualSettingFileEntryService
-		_cpdVirtualSettingFileEntryService;
-
-	@Reference
 	private CPInstanceService _cpInstanceService;
 
 	@Reference
@@ -1810,16 +2160,20 @@ public class ProductResourceImpl extends BaseProductResourceImpl {
 	private CPOptionService _cpOptionService;
 
 	@Reference
-	private CProductLocalService _cProductLocalService;
-
-	@Reference
 	private CPSpecificationOptionService _cpSpecificationOptionService;
 
 	@Reference
-	private CPTaxCategoryLocalService _cpTaxCategoryLocalService;
+	private CPTaxCategoryService _cpTaxCategoryService;
 
 	@Reference
 	private CPTypeRegistry _cpTypeRegistry;
+
+	@Reference
+	private CPDAvailabilityEstimateService _cpdAvailabilityEstimateService;
+
+	@Reference
+	private CPDVirtualSettingFileEntryService
+		_cpdVirtualSettingFileEntryService;
 
 	@Reference
 	private CSDiagramEntryService _csDiagramEntryService;
