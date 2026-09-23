@@ -72,15 +72,43 @@ public class PortalWorkspace extends BaseWorkspace {
 	}
 
 	public PortalWorkspaceGitRepository getPortalWorkspaceGitRepository() {
-		WorkspaceGitRepository workspaceGitRepository =
-			getPrimaryWorkspaceGitRepository();
+		String portalUpstreamBranchName = jsonObject.optString(
+			"portal_upstream_branch_name");
 
-		if (!(workspaceGitRepository instanceof PortalWorkspaceGitRepository)) {
+		if (JenkinsResultsParserUtil.isNullOrEmpty(portalUpstreamBranchName)) {
+			WorkspaceGitRepository workspaceGitRepository =
+				getPrimaryWorkspaceGitRepository();
+
+			if (workspaceGitRepository instanceof
+					PortalWorkspaceGitRepository) {
+
+				return (PortalWorkspaceGitRepository)workspaceGitRepository;
+			}
+
+			portalUpstreamBranchName =
+				workspaceGitRepository.getUpstreamBranchName();
+		}
+
+		String repositoryName = "liferay-portal";
+
+		if (!portalUpstreamBranchName.equals("master")) {
+			repositoryName += "-ee";
+		}
+
+		String directoryName = JenkinsResultsParserUtil.getGitDirectoryName(
+			repositoryName, portalUpstreamBranchName);
+
+		WorkspaceGitRepository portalWorkspaceGitRepository =
+			getWorkspaceGitRepository(directoryName);
+
+		if (!(portalWorkspaceGitRepository instanceof
+				PortalWorkspaceGitRepository)) {
+
 			throw new RuntimeException(
 				"The portal workspace Git repository is not set");
 		}
 
-		return (PortalWorkspaceGitRepository)workspaceGitRepository;
+		return (PortalWorkspaceGitRepository)portalWorkspaceGitRepository;
 	}
 
 	public void setBuildProfile(Job.BuildProfile buildProfile) {
@@ -101,6 +129,10 @@ public class PortalWorkspace extends BaseWorkspace {
 
 	public void setOSBFaroGitHubURL(String osbFaroGitHubURL) {
 		_osbFaroGitHubURL = osbFaroGitHubURL;
+	}
+
+	public void setPortalUpstreamBranchName(String portalUpstreamBranchName) {
+		jsonObject.put("portal_upstream_branch_name", portalUpstreamBranchName);
 	}
 
 	@Override
