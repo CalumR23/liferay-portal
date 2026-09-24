@@ -39,6 +39,22 @@ public class PullRequestPortalTopLevelBuildTest
 	}
 
 	@Test
+	public void testGetPortalUpstreamBranchName() {
+		String portalUpstreamBranchName = RandomTestUtil.randomString();
+
+		_testGetPortalUpstreamBranchName("master-private", "master", null);
+		_testGetPortalUpstreamBranchName(
+			"master-private", portalUpstreamBranchName,
+			portalUpstreamBranchName);
+		_testGetPortalUpstreamBranchName(
+			RandomTestUtil.randomString(), portalUpstreamBranchName,
+			portalUpstreamBranchName);
+
+		_testGetPortalUpstreamBranchName(
+			RandomTestUtil.randomString(), null, "");
+	}
+
+	@Test
 	public void testGetWorkspace() {
 		mockEnvironment(
 			Collections.singletonMap(
@@ -59,6 +75,37 @@ public class PullRequestPortalTopLevelBuildTest
 
 		_testGetWorkspace(null, "");
 		_testGetWorkspace(null, null);
+	}
+
+	private void _testGetPortalUpstreamBranchName(
+		String branchName, String expectedPortalUpstreamBranchName,
+		String portalUpstreamBranchName) {
+
+		PullRequestPortalTopLevelBuild pullRequestPortalTopLevelBuild =
+			Mockito.mock(PullRequestPortalTopLevelBuild.class);
+
+		Mockito.doReturn(
+			branchName
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getBranchName();
+
+		Mockito.doReturn(
+			portalUpstreamBranchName
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getParameterValue(
+			"PORTAL_UPSTREAM_BRANCH_NAME"
+		);
+
+		Mockito.doCallRealMethod(
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getPortalUpstreamBranchName();
+
+		testEquals(
+			expectedPortalUpstreamBranchName,
+			pullRequestPortalTopLevelBuild.getPortalUpstreamBranchName());
 	}
 
 	private void _testGetWorkspace(
@@ -101,6 +148,11 @@ public class PullRequestPortalTopLevelBuildTest
 		).getParameterValue(
 			"PORTAL_UPSTREAM_BRANCH_NAME"
 		);
+
+		Mockito.doCallRealMethod(
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getPortalUpstreamBranchName();
 
 		Mockito.doReturn(
 			pullRequest
