@@ -59,7 +59,7 @@ public class PortalWorkspaceTest
 			Mockito.mock(PortalWorkspaceGitRepository.class);
 
 		PortalWorkspace portalWorkspace = _getPortalWorkspace(
-			portalWorkspaceGitRepository);
+			new JSONObject(), portalWorkspaceGitRepository);
 
 		testSame(
 			portalWorkspaceGitRepository,
@@ -81,6 +81,21 @@ public class PortalWorkspaceTest
 
 		_testGetPortalWorkspaceGitRepository(
 			gitDirectoryName, null, workspaceGitRepository);
+
+		portalWorkspace = _getPortalWorkspace(
+			new JSONObject(
+			).put(
+				"portal_upstream_branch_name", upstreamBranchName
+			),
+			workspaceGitRepository);
+
+		RuntimeException runtimeException = Assert.assertThrows(
+			RuntimeException.class,
+			portalWorkspace::getPortalWorkspaceGitRepository);
+
+		testEquals(
+			"The portal workspace Git repository is not set",
+			runtimeException.getMessage());
 	}
 
 	@Test
@@ -119,7 +134,7 @@ public class PortalWorkspaceTest
 	}
 
 	private PortalWorkspace _getPortalWorkspace(
-		WorkspaceGitRepository workspaceGitRepository) {
+		JSONObject jsonObject, WorkspaceGitRepository workspaceGitRepository) {
 
 		PortalWorkspace portalWorkspace = Mockito.mock(PortalWorkspace.class);
 
@@ -135,7 +150,7 @@ public class PortalWorkspaceTest
 		).getPrimaryWorkspaceGitRepository();
 
 		ReflectionTestUtil.setFieldValue(
-			portalWorkspace, "jsonObject", new JSONObject());
+			portalWorkspace, "jsonObject", jsonObject);
 
 		return portalWorkspace;
 	}
@@ -145,6 +160,10 @@ public class PortalWorkspaceTest
 		WorkspaceGitRepository workspaceGitRepository) {
 
 		PortalWorkspace portalWorkspace = _getPortalWorkspace(
+			new JSONObject(
+			).put(
+				"portal_upstream_branch_name", portalUpstreamBranchName
+			),
 			workspaceGitRepository);
 
 		PortalWorkspaceGitRepository portalWorkspaceGitRepository =
@@ -157,15 +176,6 @@ public class PortalWorkspaceTest
 		).getWorkspaceGitRepository(
 			gitDirectoryName
 		);
-
-		Mockito.doCallRealMethod(
-		).when(
-			portalWorkspace
-		).setPortalUpstreamBranchName(
-			Mockito.any()
-		);
-
-		portalWorkspace.setPortalUpstreamBranchName(portalUpstreamBranchName);
 
 		testSame(
 			portalWorkspaceGitRepository,
