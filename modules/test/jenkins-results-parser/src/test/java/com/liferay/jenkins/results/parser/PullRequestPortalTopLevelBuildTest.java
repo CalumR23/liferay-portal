@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.junit.After;
 import org.junit.Test;
 
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 /**
@@ -26,6 +27,8 @@ public class PullRequestPortalTopLevelBuildTest
 	public void tearDown() {
 		super.tearDown();
 
+		ReflectionTestUtil.setFieldValue(
+			JenkinsResultsParserUtil.class, "_ciNode", null);
 		ReflectionTestUtil.setFieldValue(
 			JenkinsResultsParserUtil.class, "_gitDirectoriesJSONArray", null);
 		ReflectionTestUtil.setFieldValue(
@@ -52,6 +55,19 @@ public class PullRequestPortalTopLevelBuildTest
 
 		_testGetPortalUpstreamBranchName(
 			RandomTestUtil.randomString(), null, "");
+	}
+
+	@Test
+	public void testGetStableJob() {
+		BuildDatabaseUtil.setBuildDatabase(Mockito.mock(BuildDatabase.class));
+
+		ReflectionTestUtil.setFieldValue(
+			JenkinsResultsParserUtil.class, "_ciNode", true);
+
+		String branchName = RandomTestUtil.randomString();
+
+		_testGetStableJob("master-private", "master");
+		_testGetStableJob(branchName, branchName);
 	}
 
 	@Test
@@ -106,6 +122,65 @@ public class PullRequestPortalTopLevelBuildTest
 		testEquals(
 			expectedPortalUpstreamBranchName,
 			pullRequestPortalTopLevelBuild.getPortalUpstreamBranchName());
+	}
+
+	private void _testGetStableJob(
+		String branchName, String expectedPortalUpstreamBranchName) {
+
+		PullRequestPortalTopLevelBuild pullRequestPortalTopLevelBuild =
+			Mockito.mock(PullRequestPortalTopLevelBuild.class);
+
+		Mockito.doReturn(
+			branchName
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getBranchName();
+
+		Mockito.doCallRealMethod(
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getPortalUpstreamBranchName();
+
+		Mockito.doReturn(
+			"relevant"
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getTestSuiteName();
+
+		Job job = Mockito.mock(Job.class);
+		PortalGitWorkingDirectory portalGitWorkingDirectory = Mockito.mock(
+			PortalGitWorkingDirectory.class);
+
+		try (MockedStatic<GitWorkingDirectoryFactory>
+				gitWorkingDirectoryFactoryMockedStatic = Mockito.mockStatic(
+					GitWorkingDirectoryFactory.class);
+			MockedStatic<JobFactory> jobFactoryMockedStatic =
+				Mockito.mockStatic(JobFactory.class)) {
+
+			gitWorkingDirectoryFactoryMockedStatic.when(
+				() -> GitWorkingDirectoryFactory.newPortalGitWorkingDirectory(
+					expectedPortalUpstreamBranchName)
+			).thenReturn(
+				portalGitWorkingDirectory
+			);
+
+			jobFactoryMockedStatic.when(
+				() -> JobFactory.newJob(
+					Mockito.isNull(), Mockito.isNull(), Mockito.isNull(),
+					Mockito.eq(portalGitWorkingDirectory), Mockito.isNull(),
+					Mockito.eq(expectedPortalUpstreamBranchName),
+					Mockito.isNull(), Mockito.isNull(), Mockito.eq("stable"),
+					Mockito.eq(branchName))
+			).thenReturn(
+				job
+			);
+
+			testSame(
+				job,
+				ReflectionTestUtil.invoke(
+					pullRequestPortalTopLevelBuild, "_getStableJob",
+					new Class<?>[0]));
+		}
 	}
 
 	private void _testGetWorkspace(
