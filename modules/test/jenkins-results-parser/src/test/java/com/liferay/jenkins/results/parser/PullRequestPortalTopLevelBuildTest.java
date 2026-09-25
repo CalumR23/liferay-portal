@@ -59,23 +59,15 @@ public class PullRequestPortalTopLevelBuildTest
 
 	@Test
 	public void testGetStableJob() {
-		BuildDatabaseUtil.setBuildDatabase(Mockito.mock(BuildDatabase.class));
-
-		ReflectionTestUtil.setFieldValue(
-			JenkinsResultsParserUtil.class, "_ciNode", true);
-
 		String branchName = RandomTestUtil.randomString();
 
-		_testGetStableJob("master-private", "master");
-		_testGetStableJob(branchName, branchName);
+		_testGetStableJob("master-private", true, "master");
+		_testGetStableJob(branchName, false, branchName);
+		_testGetStableJob(branchName, true, branchName);
 	}
 
 	@Test
 	public void testGetWorkspace() {
-		mockEnvironment(
-			Collections.singletonMap(
-				"BUILD_DIR", RandomTestUtil.randomString()));
-
 		BuildDatabaseUtil.setBuildDatabase(Mockito.mock(BuildDatabase.class));
 
 		ReflectionTestUtil.setFieldValue(
@@ -85,12 +77,61 @@ public class PullRequestPortalTopLevelBuildTest
 			JenkinsResultsParserUtil.class, "_gitWorkingDirectoriesJSONArray",
 			new JSONArray());
 
+		PullRequest pullRequest = Mockito.mock(PullRequest.class);
+
+		String gitRepositoryName = RandomTestUtil.randomString();
+
+		Mockito.doReturn(
+			gitRepositoryName
+		).when(
+			pullRequest
+		).getGitRepositoryName();
+
+		PortalWorkspace portalWorkspace = Mockito.mock(PortalWorkspace.class);
+
+		WorkspaceGitRepository workspaceGitRepository = Mockito.mock(
+			WorkspaceGitRepository.class);
+
+		Mockito.doReturn(
+			workspaceGitRepository
+		).when(
+			portalWorkspace
+		).getPrimaryWorkspaceGitRepository();
+
+		Map<String, Workspace> workspaces = ReflectionTestUtil.getFieldValue(
+			WorkspaceFactory.class, "_workspaces");
+
+		workspaces.put(gitRepositoryName, portalWorkspace);
+
+		PullRequestPortalTopLevelBuild pullRequestPortalTopLevelBuild =
+			Mockito.mock(PullRequestPortalTopLevelBuild.class);
+
 		String portalUpstreamBranchName = RandomTestUtil.randomString();
 
-		_testGetWorkspace(portalUpstreamBranchName, portalUpstreamBranchName);
+		Mockito.doReturn(
+			portalUpstreamBranchName
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getPortalUpstreamBranchName();
 
-		_testGetWorkspace(null, "");
-		_testGetWorkspace(null, null);
+		Mockito.doReturn(
+			pullRequest
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getPullRequest();
+
+		Mockito.doCallRealMethod(
+		).when(
+			pullRequestPortalTopLevelBuild
+		).getWorkspace();
+
+		pullRequestPortalTopLevelBuild.getWorkspace();
+
+		Mockito.verify(
+			portalWorkspace
+		).setPortalUpstreamBranchName(
+			portalUpstreamBranchName
+		);
 	}
 
 	private void _testGetPortalUpstreamBranchName(
@@ -125,7 +166,29 @@ public class PullRequestPortalTopLevelBuildTest
 	}
 
 	private void _testGetStableJob(
-		String branchName, String expectedPortalUpstreamBranchName) {
+		String branchName, boolean ciNode,
+		String expectedPortalUpstreamBranchName) {
+
+		Map<String, String> environmentMap = Collections.emptyMap();
+
+		if (ciNode) {
+			environmentMap = Collections.singletonMap(
+				"JENKINS_URL", RandomTestUtil.randomString());
+		}
+
+		mockEnvironment(environmentMap);
+
+		JenkinsResultsParserUtil.clearCache();
+
+		BuildDatabaseUtil.setBuildDatabase(Mockito.mock(BuildDatabase.class));
+
+		Job job = Mockito.mock(Job.class);
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory = Mockito.mock(
+			PortalGitWorkingDirectory.class);
+
+		PortalGitWorkingDirectory expectedPortalGitWorkingDirectory =
+			ciNode ? portalGitWorkingDirectory : null;
 
 		PullRequestPortalTopLevelBuild pullRequestPortalTopLevelBuild =
 			Mockito.mock(PullRequestPortalTopLevelBuild.class);
@@ -147,10 +210,6 @@ public class PullRequestPortalTopLevelBuildTest
 			pullRequestPortalTopLevelBuild
 		).getTestSuiteName();
 
-		Job job = Mockito.mock(Job.class);
-		PortalGitWorkingDirectory portalGitWorkingDirectory = Mockito.mock(
-			PortalGitWorkingDirectory.class);
-
 		try (MockedStatic<GitWorkingDirectoryFactory>
 				gitWorkingDirectoryFactoryMockedStatic = Mockito.mockStatic(
 					GitWorkingDirectoryFactory.class);
@@ -167,7 +226,8 @@ public class PullRequestPortalTopLevelBuildTest
 			jobFactoryMockedStatic.when(
 				() -> JobFactory.newJob(
 					Mockito.isNull(), Mockito.isNull(), Mockito.isNull(),
-					Mockito.eq(portalGitWorkingDirectory), Mockito.isNull(),
+					Mockito.eq(expectedPortalGitWorkingDirectory),
+					Mockito.isNull(),
 					Mockito.eq(expectedPortalUpstreamBranchName),
 					Mockito.isNull(), Mockito.isNull(), Mockito.eq("stable"),
 					Mockito.eq(branchName))
@@ -181,72 +241,6 @@ public class PullRequestPortalTopLevelBuildTest
 					pullRequestPortalTopLevelBuild, "_getStableJob",
 					new Class<?>[0]));
 		}
-	}
-
-	private void _testGetWorkspace(
-		String expectedPortalUpstreamBranchName,
-		String portalUpstreamBranchName) {
-
-		PullRequest pullRequest = Mockito.mock(PullRequest.class);
-
-		String gitRepositoryName = RandomTestUtil.randomString();
-
-		Mockito.doReturn(
-			gitRepositoryName
-		).when(
-			pullRequest
-		).getGitRepositoryName();
-
-		PortalWorkspace portalWorkspace = Mockito.mock(PortalWorkspace.class);
-
-		WorkspaceGitRepository workspaceGitRepository = Mockito.mock(
-			WorkspaceGitRepository.class);
-
-		Mockito.doReturn(
-			workspaceGitRepository
-		).when(
-			portalWorkspace
-		).getPrimaryWorkspaceGitRepository();
-
-		Map<String, Workspace> workspaces = ReflectionTestUtil.getFieldValue(
-			WorkspaceFactory.class, "_workspaces");
-
-		workspaces.put(gitRepositoryName, portalWorkspace);
-
-		PullRequestPortalTopLevelBuild pullRequestPortalTopLevelBuild =
-			Mockito.mock(PullRequestPortalTopLevelBuild.class);
-
-		Mockito.doReturn(
-			portalUpstreamBranchName
-		).when(
-			pullRequestPortalTopLevelBuild
-		).getParameterValue(
-			"PORTAL_UPSTREAM_BRANCH_NAME"
-		);
-
-		Mockito.doCallRealMethod(
-		).when(
-			pullRequestPortalTopLevelBuild
-		).getPortalUpstreamBranchName();
-
-		Mockito.doReturn(
-			pullRequest
-		).when(
-			pullRequestPortalTopLevelBuild
-		).getPullRequest();
-
-		Mockito.doCallRealMethod(
-		).when(
-			pullRequestPortalTopLevelBuild
-		).getWorkspace();
-
-		pullRequestPortalTopLevelBuild.getWorkspace();
-
-		Mockito.verify(
-			portalWorkspace
-		).setPortalUpstreamBranchName(
-			expectedPortalUpstreamBranchName
-		);
 	}
 
 }
