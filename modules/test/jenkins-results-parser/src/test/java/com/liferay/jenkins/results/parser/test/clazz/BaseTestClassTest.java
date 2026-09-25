@@ -29,7 +29,8 @@ public class BaseTestClassTest extends com.liferay.jenkins.results.parser.Test {
 			baseTestClass
 		).getJSONObject();
 
-		File testClassFile = new File(RandomTestUtil.randomString());
+		File testClassFile = new File(
+			RandomTestUtil.randomString(), RandomTestUtil.randomString());
 
 		Mockito.doReturn(
 			testClassFile
