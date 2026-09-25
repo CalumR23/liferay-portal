@@ -7,8 +7,11 @@ package com.liferay.jenkins.results.parser;
 
 import org.json.JSONObject;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 /**
@@ -19,51 +22,66 @@ public class PortalGitRepositoryJobTest
 
 	@Test
 	public void testGetPortalUpstreamBranchName() {
-		PortalGitRepositoryJob portalGitRepositoryJob = Mockito.mock(
-			PortalGitRepositoryJob.class);
-
+		String portalUpstreamBranchName = RandomTestUtil.randomString();
 		String upstreamBranchName = RandomTestUtil.randomString();
 
-		Mockito.doReturn(
-			upstreamBranchName
-		).when(
-			portalGitRepositoryJob
-		).getUpstreamBranchName();
-
-		String portalUpstreamBranchName = RandomTestUtil.randomString();
-
 		_testGetPortalUpstreamBranchName(
-			portalUpstreamBranchName,
 			new JSONObject(
 			).put(
-				"branch",
-				new JSONObject(
-				).put(
-					"upstream_branch_name", portalUpstreamBranchName
-				)
+				"upstream_branch_name", portalUpstreamBranchName
 			),
-			portalGitRepositoryJob);
-
+			portalUpstreamBranchName, upstreamBranchName);
 		_testGetPortalUpstreamBranchName(
-			upstreamBranchName, new JSONObject(), portalGitRepositoryJob);
+			new JSONObject(), upstreamBranchName, upstreamBranchName);
 		_testGetPortalUpstreamBranchName(
-			upstreamBranchName,
-			new JSONObject(
-			).put(
-				"branch", new JSONObject()
-			),
-			portalGitRepositoryJob);
+			null, upstreamBranchName, upstreamBranchName);
 	}
 
-	private void _testGetPortalUpstreamBranchName(
-		String expectedPortalUpstreamBranchName, JSONObject jsonObject,
-		PortalGitRepositoryJob portalGitRepositoryJob) {
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-		testEquals(
-			expectedPortalUpstreamBranchName,
-			ReflectionTestUtil.invoke(
-				portalGitRepositoryJob, "_getPortalUpstreamBranchName",
-				new Class<?>[] {JSONObject.class}, jsonObject));
+	private void _testGetPortalUpstreamBranchName(
+		JSONObject branchJSONObject, String expectedPortalUpstreamBranchName,
+		String upstreamBranchName) {
+
+		PortalGitWorkingDirectory portalGitWorkingDirectory = Mockito.mock(
+			PortalGitWorkingDirectory.class);
+
+		Mockito.doReturn(
+			temporaryFolder.getRoot()
+		).when(
+			portalGitWorkingDirectory
+		).getWorkingDirectory();
+
+		try (MockedStatic<GitWorkingDirectoryFactory>
+				gitWorkingDirectoryFactoryMockedStatic = Mockito.mockStatic(
+					GitWorkingDirectoryFactory.class,
+					invocation -> portalGitWorkingDirectory)) {
+
+			Mockito.mock(
+				PortalGitRepositoryJob.class,
+				Mockito.withSettings(
+				).defaultAnswer(
+					Mockito.CALLS_REAL_METHODS
+				).useConstructor(
+					new JSONObject(
+					).put(
+						"branch", branchJSONObject
+					).put(
+						"build_profile", "dxp"
+					).put(
+						"git_repository_dir", RandomTestUtil.randomString()
+					).put(
+						"job_name", RandomTestUtil.randomString()
+					).put(
+						"upstream_branch_name", upstreamBranchName
+					)
+				));
+
+			gitWorkingDirectoryFactoryMockedStatic.verify(
+				() -> GitWorkingDirectoryFactory.newPortalGitWorkingDirectory(
+					expectedPortalUpstreamBranchName));
+		}
 	}
 
 }
