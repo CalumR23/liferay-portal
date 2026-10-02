@@ -118,55 +118,40 @@ public class FileUtil {
 		return String.valueOf(path.getFileName());
 	}
 
+	public static List<String> getIncludedFilePaths(
+			FileSystem fileSystem, String[] includes, String baseDirName)
+		throws IOException {
+
+		List<String> filePaths = new ArrayList<>();
+
+		for (Path path : _getIncludedPaths(fileSystem, includes, baseDirName)) {
+			filePaths.add(path.toString());
+		}
+
+		return filePaths;
+	}
+
+	public static List<String> getIncludedFilePaths(
+			String[] includes, String baseDirName)
+		throws IOException {
+
+		return getIncludedFilePaths(
+			FileSystems.getDefault(), includes, baseDirName);
+	}
+
 	public static List<URL> getIncludedResourceURLs(
 			FileSystem fileSystem, String[] includes, String baseDirName)
 		throws IOException {
 
-		final List<PathMatcher> pathMatchers = new ArrayList<>();
+		List<URL> urls = new ArrayList<>();
 
-		for (String include : includes) {
-			pathMatchers.add(fileSystem.getPathMatcher("glob:" + include));
+		for (Path path : _getIncludedPaths(fileSystem, includes, baseDirName)) {
+			URI uri = path.toUri();
+
+			urls.add(uri.toURL());
 		}
 
-		final List<URL> filePaths = new ArrayList<>();
-
-		if (Validator.isNull(baseDirName)) {
-			return filePaths;
-		}
-
-		Path path = fileSystem.getPath(baseDirName);
-
-		if (!Files.exists(path)) {
-			System.out.println("Directory " + baseDirName + " does not exist.");
-
-			return filePaths;
-		}
-
-		Files.walkFileTree(
-			path,
-			new SimpleFileVisitor<Path>() {
-
-				@Override
-				public FileVisitResult visitFile(
-						Path filePath, BasicFileAttributes basicFileAttributes)
-					throws IOException {
-
-					for (PathMatcher pathMatcher : pathMatchers) {
-						URI uri = filePath.toUri();
-
-						if (pathMatcher.matches(filePath)) {
-							filePaths.add(uri.toURL());
-
-							break;
-						}
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-			});
-
-		return filePaths;
+		return urls;
 	}
 
 	public static List<URL> getIncludedResourceURLs(
@@ -270,6 +255,55 @@ public class FileUtil {
 		File file = new File(fileName);
 
 		write(file, string);
+	}
+
+	private static List<Path> _getIncludedPaths(
+			FileSystem fileSystem, String[] includes, String baseDirName)
+		throws IOException {
+
+		final List<PathMatcher> pathMatchers = new ArrayList<>();
+
+		for (String include : includes) {
+			pathMatchers.add(fileSystem.getPathMatcher("glob:" + include));
+		}
+
+		final List<Path> filePaths = new ArrayList<>();
+
+		if (Validator.isNull(baseDirName)) {
+			return filePaths;
+		}
+
+		Path path = fileSystem.getPath(baseDirName);
+
+		if (!Files.exists(path)) {
+			System.out.println("Directory " + baseDirName + " does not exist.");
+
+			return filePaths;
+		}
+
+		Files.walkFileTree(
+			path,
+			new SimpleFileVisitor<Path>() {
+
+				@Override
+				public FileVisitResult visitFile(
+						Path filePath, BasicFileAttributes basicFileAttributes)
+					throws IOException {
+
+					for (PathMatcher pathMatcher : pathMatchers) {
+						if (pathMatcher.matches(filePath)) {
+							filePaths.add(filePath);
+
+							break;
+						}
+					}
+
+					return FileVisitResult.CONTINUE;
+				}
+
+			});
+
+		return filePaths;
 	}
 
 }
