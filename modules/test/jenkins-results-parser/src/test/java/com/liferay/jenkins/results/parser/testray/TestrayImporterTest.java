@@ -98,6 +98,32 @@ public class TestrayImporterTest
 		return jsUnitModulesBatchTestClassGroup;
 	}
 
+	private JSUnitJUnitTestClass _getTestClass(String... methodNames) {
+		JSONArray methodsJSONArray = new JSONArray();
+
+		for (String methodName : methodNames) {
+			methodsJSONArray.put(
+				new JSONObject(
+				).put(
+					"ignored", false
+				).put(
+					"name", methodName
+				));
+		}
+
+		JSONObject jsonObject = new JSONObject(
+		).put(
+			"file", RandomTestUtil.randomString()
+		).put(
+			"ignored", false
+		).put(
+			"methods", methodsJSONArray
+		);
+
+		return (JSUnitJUnitTestClass)TestClassFactory.newTestClass(
+			_getBatchTestClassGroup(), jsonObject);
+	}
+
 	private String _getTestcaseName(String name) throws Exception {
 		TestrayCaseResult testrayCaseResult = Mockito.mock(
 			TestrayCaseResult.class);
@@ -133,32 +159,6 @@ public class TestrayImporterTest
 		}
 
 		return null;
-	}
-
-	private JSUnitJUnitTestClass _getTestClass(String... methodNames) {
-		JSONArray methodsJSONArray = new JSONArray();
-
-		for (String methodName : methodNames) {
-			methodsJSONArray.put(
-				new JSONObject(
-				).put(
-					"ignored", false
-				).put(
-					"name", methodName
-				));
-		}
-
-		JSONObject jsonObject = new JSONObject(
-		).put(
-			"file", RandomTestUtil.randomString()
-		).put(
-			"ignored", false
-		).put(
-			"methods", methodsJSONArray
-		);
-
-		return (JSUnitJUnitTestClass)TestClassFactory.newTestClass(
-			_getBatchTestClassGroup(), jsonObject);
 	}
 
 	private boolean _isTestClassFileReported(TestClass testClass) {
