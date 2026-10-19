@@ -15,6 +15,12 @@ import com.liferay.jenkins.results.parser.test.clazz.group.JSUnitModulesBatchTes
 
 import java.io.File;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
+import org.dom4j.Element;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,6 +34,22 @@ import org.mockito.Mockito;
  */
 public class TestrayImporterTest
 	extends com.liferay.jenkins.results.parser.Test {
+
+	@Test
+	public void testGetTestcaseElementName() throws Exception {
+		String name = StringUtils.repeat(RandomTestUtil.randomString(), 7);
+
+		name = name.substring(0, 250);
+
+		testEquals(name, _getTestcaseName(name));
+	}
+
+	@Test
+	public void testGetTestcaseElementNameLong() throws Exception {
+		String name = StringUtils.repeat(RandomTestUtil.randomString(), 8);
+
+		testEquals(name.substring(0, 250), _getTestcaseName(name));
+	}
 
 	@Test
 	public void testIsTestClassFileReported() throws Exception {
@@ -84,6 +106,43 @@ public class TestrayImporterTest
 		).getPortalGitWorkingDirectory();
 
 		return jsUnitModulesBatchTestClassGroup;
+	}
+
+	private String _getTestcaseName(String name) throws Exception {
+		TestrayCaseResult testrayCaseResult = Mockito.mock(
+			TestrayCaseResult.class);
+
+		Mockito.doReturn(
+			name
+		).when(
+			testrayCaseResult
+		).getName();
+
+		Mockito.doReturn(
+			TestrayCaseResult.Status.PASSED
+		).when(
+			testrayCaseResult
+		).getStatus();
+
+		Element testcaseElement = ReflectionTestUtil.invoke(
+			Mockito.mock(TestrayImporter.class), "_getTestcaseElement",
+			new Class<?>[] {
+				TestrayCaseResult.class, String.class, String[].class
+			},
+			testrayCaseResult, RandomTestUtil.randomString(), null);
+
+		Element propertiesElement = testcaseElement.element("properties");
+
+		for (Element propertyElement : propertiesElement.elements("property")) {
+			if (Objects.equals(
+					propertyElement.attributeValue("name"),
+					"testray.testcase.name")) {
+
+				return propertyElement.attributeValue("value");
+			}
+		}
+
+		return null;
 	}
 
 	private JSUnitJUnitTestClass _getTestClass(String... methodNames) {
