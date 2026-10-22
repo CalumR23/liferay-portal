@@ -108,17 +108,17 @@ public class SourceFormatterReleaseUtilTest
 			_isReleasedSourceMatch(
 				0,
 				JenkinsResultsParserUtil.combine(
-					"diff --git a/", _BND_PATH, " b/", _BND_PATH, "\n",
+					"diff --git a/", _PATH_BND, " b/", _PATH_BND, "\n",
 					"deleted file mode 100644\n", "index 1111111..0000000\n",
-					"--- a/", _BND_PATH, "\n", "+++ /dev/null\n",
+					"--- a/", _PATH_BND, "\n", "+++ /dev/null\n",
 					"@@ -1 +0,0 @@\n", "-Bundle-Version: 1.0.1643\n")));
 		Assert.assertFalse(
 			_isReleasedSourceMatch(
 				0,
 				JenkinsResultsParserUtil.combine(
-					"diff --git a/", _BND_PATH, " b/", _BND_PATH, "\n",
+					"diff --git a/", _PATH_BND, " b/", _PATH_BND, "\n",
 					"new file mode 100644\n", "index 0000000..1111111\n",
-					"--- /dev/null\n", "+++ b/", _BND_PATH, "\n",
+					"--- /dev/null\n", "+++ b/", _PATH_BND, "\n",
 					"@@ -0,0 +1 @@\n", "+Bundle-Version: 1.0.1644\n")));
 	}
 
@@ -221,9 +221,9 @@ public class SourceFormatterReleaseUtilTest
 			_isReleasedSourceMatch(
 				0,
 				JenkinsResultsParserUtil.combine(
-					"diff --git a/", _BND_PATH, " b/", _BND_PATH, "\n",
-					"index 1111111..2222222 100644\n", "--- a/", _BND_PATH,
-					"\n", "+++ b/", _BND_PATH, "\n", "@@ -1,2 +1,2 @@\n",
+					"diff --git a/", _PATH_BND, " b/", _PATH_BND, "\n",
+					"index 1111111..2222222 100644\n", "--- a/", _PATH_BND,
+					"\n", "+++ b/", _PATH_BND, "\n", "@@ -1,2 +1,2 @@\n",
 					"-Bundle-Name: Liferay Source Formatter\n",
 					"-Bundle-SymbolicName: com.liferay.source.formatter\n",
 					"+Bundle-SymbolicName: com.liferay.source.formatter\n",
@@ -279,7 +279,7 @@ public class SourceFormatterReleaseUtilTest
 					_getVersionBumpGitDiff(),
 					_getGitDiff(
 						"Import-Package: org.example;version=\"[1.5,2)\"",
-						_BND_PATH,
+						_PATH_BND,
 						"Import-Package: org.example;version=\"[1.0,2)\""))));
 	}
 
@@ -293,7 +293,7 @@ public class SourceFormatterReleaseUtilTest
 		throws Exception {
 
 		List<String> versionFilePaths = Arrays.asList(
-			_BND_PATH, _PLUGIN_HELP_PATH, _PLUGIN_PATH, _POM_PATH);
+			_PATH_BND, _PATH_PLUGIN, _PATH_PLUGIN_HELP, _PATH_POM);
 
 		for (String versionFilePath : versionFilePaths) {
 			Assert.assertFalse(
@@ -366,16 +366,16 @@ public class SourceFormatterReleaseUtilTest
 	private String _getVersionBumpGitDiff() {
 		return JenkinsResultsParserUtil.combine(
 			_getGitDiff(
-				"Bundle-Version: 1.0.1644", _BND_PATH,
+				"Bundle-Version: 1.0.1644", _PATH_BND,
 				"Bundle-Version: 1.0.1643"),
 			_getGitDiff(
-				"\t\t\t\t<version>1.0.1643</version>", _POM_PATH,
+				"\t\t\t\t<version>1.0.1643</version>", _PATH_POM,
 				"\t\t\t\t<version>1.0.1642</version>"),
 			_getGitDiff(
-				"\t<version>1.0.1643</version>", _PLUGIN_HELP_PATH,
+				"\t<version>1.0.1643</version>", _PATH_PLUGIN_HELP,
 				"\t<version>1.0.1642</version>"),
 			_getGitDiff(
-				"\t<version>1.0.1643</version>", _PLUGIN_PATH,
+				"\t<version>1.0.1643</version>", _PATH_PLUGIN,
 				"\t<version>1.0.1642</version>"));
 	}
 
@@ -409,19 +409,19 @@ public class SourceFormatterReleaseUtilTest
 			gitWorkingDirectory, ref);
 	}
 
-	private static final String _BND_PATH =
+	private static final String _PATH_BND =
 		"modules/util/source-formatter/bnd.bnd";
 
-	private static final String _PLUGIN_HELP_PATH =
+	private static final String _PATH_PLUGIN =
+		"modules/util/source-formatter/src/main/resources/META-INF/maven" +
+			"/plugin.xml";
+
+	private static final String _PATH_PLUGIN_HELP =
 		JenkinsResultsParserUtil.combine(
 			"modules/util/source-formatter/src/main/resources/META-INF/maven",
 			"/com.liferay/com.liferay.source.formatter/plugin-help.xml");
 
-	private static final String _PLUGIN_PATH =
-		"modules/util/source-formatter/src/main/resources/META-INF/maven" +
-			"/plugin.xml";
-
-	private static final String _POM_PATH =
+	private static final String _PATH_POM =
 		"modules/util/source-formatter/samples/pom.xml";
 
 	private String _artifactGitId;
