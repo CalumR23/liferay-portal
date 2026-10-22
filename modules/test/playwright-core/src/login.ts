@@ -105,6 +105,8 @@ export async function performLoginViaApi({
 		rememberMe: String(rememberMe),
 	});
 
+	let lastAttempt = '(no attempt made)';
+
 	try {
 		await page.goto(loginUrl);
 
@@ -114,15 +116,26 @@ export async function performLoginViaApi({
 
 		await expect
 			.poll(async () => {
-				const response = await page.request.post(url, {
-					data: params.toString(),
-					headers: await getHeader(
-						page,
-						'application/x-www-form-urlencoded'
-					),
-				});
+				try {
+					const response = await page.request.post(url, {
+						data: params.toString(),
+						headers: await getHeader(
+							page,
+							'application/x-www-form-urlencoded'
+						),
+					});
 
-				return response.status();
+					const body = await response.text();
+
+					lastAttempt = `${response.status()} ${response.url()} ${body.slice(0, 200)}`;
+
+					return response.status();
+				}
+				catch (postError) {
+					lastAttempt = `threw: ${postError.message}`;
+
+					throw postError;
+				}
 			})
 			.toBe(200);
 
@@ -131,7 +144,7 @@ export async function performLoginViaApi({
 		await readAuthToken(page);
 	}
 	catch (error) {
-		error.message = `Login via API failed\n\n${error.message}`;
+		error.message = `Login via API failed\n\nLast attempt: ${lastAttempt}\n\n${error.message}`;
 
 		throw error;
 	}
