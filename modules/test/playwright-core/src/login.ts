@@ -4,6 +4,7 @@
  */
 
 import {Cookie, Page, expect} from '@playwright/test';
+import {promises as dns} from 'dns';
 
 import {clearAuthToken, getHeader, readAuthToken} from './authToken';
 import {liferayConfig} from './liferayConfig';
@@ -88,6 +89,109 @@ export async function performLogin(
 	return await page.context().cookies();
 }
 
+async function collectLoginDiagnostics({
+	loginUrl,
+	page,
+	params,
+}: {
+	loginUrl: string;
+	page: Page;
+	params: URLSearchParams;
+}) {
+	const hostname = new URL(loginUrl).hostname;
+
+	const results: string[] = [];
+
+	try {
+		const addresses = await dns.lookup(hostname, {all: true});
+
+		results.push(`dns ${hostname}: ${JSON.stringify(addresses)}`);
+	}
+	catch (dnsError) {
+		results.push(`dns ${hostname} threw: ${dnsError.message}`);
+	}
+
+	let startedAt = Date.now();
+
+	try {
+		const response = await page.request.get(loginUrl, {
+			timeout: 10 * 1000,
+		});
+
+		results.push(
+			`request GET ${loginUrl}: ${response.status()} in ${Date.now() - startedAt}ms`
+		);
+	}
+	catch (getError) {
+		results.push(
+			`request GET ${loginUrl} threw after ${Date.now() - startedAt}ms: ${getError.message.split('\n')[0]}`
+		);
+	}
+
+	startedAt = Date.now();
+
+	try {
+		const headers = await getHeader(
+			page,
+			'application/x-www-form-urlencoded'
+		);
+
+		const browserFetch = page.evaluate(
+			async ({body, headers, url}) => {
+				const abortController = new AbortController();
+
+				const abortTimer = setTimeout(
+					() => abortController.abort(),
+					10 * 1000
+				);
+
+				const fetchStartedAt = Date.now();
+
+				try {
+					const response = await fetch(url, {
+						body,
+						credentials: 'include',
+						headers,
+						method: 'POST',
+						signal: abortController.signal,
+					});
+
+					return `${response.status} in ${Date.now() - fetchStartedAt}ms`;
+				}
+				catch (fetchError) {
+					return `threw ${fetchError.name} after ${Date.now() - fetchStartedAt}ms`;
+				}
+				finally {
+					clearTimeout(abortTimer);
+				}
+			},
+			{
+				body: params.toString(),
+				headers,
+				url: `${loginUrl}/c/portal/login`,
+			}
+		);
+
+		const evaluateTimeout = new Promise<string>((resolve) =>
+			setTimeout(
+				() => resolve('page.evaluate did not return within 15000ms'),
+				15 * 1000
+			)
+		);
+
+		results.push(
+			`browser fetch POST: ${await Promise.race([browserFetch, evaluateTimeout])}`
+		);
+	}
+	catch (evaluateError) {
+		results.push(
+			`browser fetch POST threw after ${Date.now() - startedAt}ms: ${evaluateError.message.split('\n')[0]}`
+		);
+	}
+
+	return results.join(' | ');
+}
+
 export async function performLoginViaApi({
 	domain = '@liferay.com',
 	loginUrl = liferayConfig.environment.baseUrl,
@@ -105,6 +209,8 @@ export async function performLoginViaApi({
 		rememberMe: String(rememberMe),
 	});
 
+	let lastAttempt = '(no attempt made)';
+
 	try {
 		await page.goto(loginUrl);
 
@@ -114,15 +220,37 @@ export async function performLoginViaApi({
 
 		await expect
 			.poll(async () => {
-				const response = await page.request.post(url, {
-					data: params.toString(),
-					headers: await getHeader(
+				const attemptStartedAt = Date.now();
+
+				try {
+					lastAttempt = `reading the auth token on ${page.url()}`;
+
+					const headers = await getHeader(
 						page,
 						'application/x-www-form-urlencoded'
-					),
-				});
+					);
 
-				return response.status();
+					lastAttempt = `posting to ${url} from ${page.url()}`;
+
+					const response = await page.request.post(url, {
+						data: params.toString(),
+						headers,
+						timeout: 10 * 1000,
+					});
+
+					lastAttempt = `reading the body of ${response.status()} ${response.url()}`;
+
+					const body = await response.text();
+
+					lastAttempt = `${response.status()} ${response.url()} ${body.slice(0, 200)}`;
+
+					return response.status();
+				}
+				catch (postError) {
+					lastAttempt = `threw after ${Date.now() - attemptStartedAt}ms: ${postError.message}`;
+
+					throw postError;
+				}
 			})
 			.toBe(200);
 
@@ -131,7 +259,13 @@ export async function performLoginViaApi({
 		await readAuthToken(page);
 	}
 	catch (error) {
-		error.message = `Login via API failed\n\n${error.message}`;
+		const diagnostics = await collectLoginDiagnostics({
+			loginUrl,
+			page,
+			params,
+		});
+
+		error.message = `Login via API failed\n\nLast attempt: ${lastAttempt}\n\nDiagnostics: ${diagnostics}\n\n${error.message}`;
 
 		throw error;
 	}
