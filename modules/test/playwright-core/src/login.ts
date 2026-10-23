@@ -117,13 +117,22 @@ export async function performLoginViaApi({
 		await expect
 			.poll(async () => {
 				try {
+					lastAttempt = `reading the auth token on ${page.url()}`;
+
+					const headers = await getHeader(
+						page,
+						'application/x-www-form-urlencoded'
+					);
+
+					lastAttempt = `posting to ${url} from ${page.url()}`;
+
 					const response = await page.request.post(url, {
 						data: params.toString(),
-						headers: await getHeader(
-							page,
-							'application/x-www-form-urlencoded'
-						),
+						headers,
+						timeout: 10 * 1000,
 					});
+
+					lastAttempt = `reading the body of ${response.status()} ${response.url()}`;
 
 					const body = await response.text();
 
