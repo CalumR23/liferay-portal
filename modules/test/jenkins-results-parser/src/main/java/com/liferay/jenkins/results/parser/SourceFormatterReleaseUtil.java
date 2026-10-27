@@ -128,11 +128,11 @@ public class SourceFormatterReleaseUtil {
 		List<String> versionFilePaths = Arrays.asList(
 			_SOURCE_FORMATTER_PATH + "/bnd.bnd",
 			_SOURCE_FORMATTER_PATH + "/samples/pom.xml",
-			_SOURCE_FORMATTER_PATH +
-				"/src/main/resources/META-INF/maven/plugin.xml",
 			JenkinsResultsParserUtil.combine(
 				_SOURCE_FORMATTER_PATH, "/src/main/resources/META-INF/maven",
-				"/com.liferay/com.liferay.source.formatter/plugin-help.xml"));
+				"/com.liferay/com.liferay.source.formatter/plugin-help.xml"),
+			_SOURCE_FORMATTER_PATH +
+				"/src/main/resources/META-INF/maven/plugin.xml");
 
 		List<String> addedLines = new ArrayList<>();
 		List<String> removedLines = new ArrayList<>();

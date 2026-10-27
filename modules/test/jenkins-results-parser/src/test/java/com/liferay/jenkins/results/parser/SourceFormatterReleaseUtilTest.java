@@ -83,7 +83,7 @@ public class SourceFormatterReleaseUtilTest
 			_ivyXMLFile,
 			_getIvyXML(
 				"<dependency name=\"com.liferay.portal.kernel\" rev=\"" +
-					_VERSION + "\" />"));
+					RandomTestUtil.randomString() + "\" />"));
 
 		Assert.assertNull(
 			SourceFormatterReleaseUtil.getIvyVersion(
