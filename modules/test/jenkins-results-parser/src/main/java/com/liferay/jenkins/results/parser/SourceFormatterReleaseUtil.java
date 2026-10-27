@@ -120,16 +120,25 @@ public class SourceFormatterReleaseUtil {
 			return false;
 		}
 
-		boolean documentation = false;
-		boolean hunk = false;
-
 		Pattern versionPattern = Pattern.compile(
 			JenkinsResultsParserUtil.combine(
 				"(?<![\\d.])", Pattern.quote(version.substring(0, index + 1)),
 				"\\d+(?![\\d.])"));
 
+		List<String> versionFilePaths = Arrays.asList(
+			_SOURCE_FORMATTER_PATH + "/bnd.bnd",
+			_SOURCE_FORMATTER_PATH + "/samples/pom.xml",
+			_SOURCE_FORMATTER_PATH +
+				"/src/main/resources/META-INF/maven/plugin.xml",
+			JenkinsResultsParserUtil.combine(
+				_SOURCE_FORMATTER_PATH, "/src/main/resources/META-INF/maven",
+				"/com.liferay/com.liferay.source.formatter/plugin-help.xml"));
+
 		List<String> addedLines = new ArrayList<>();
 		List<String> removedLines = new ArrayList<>();
+
+		boolean documentation = false;
+		boolean hunk = false;
 
 		for (String line : gitDiff.split("\n")) {
 			if (line.startsWith("diff --git ")) {
@@ -140,17 +149,6 @@ public class SourceFormatterReleaseUtil {
 					filePath.startsWith(
 						_SOURCE_FORMATTER_PATH +
 							"/src/main/resources/documentation/");
-
-				List<String> versionFilePaths = Arrays.asList(
-					_SOURCE_FORMATTER_PATH + "/bnd.bnd",
-					_SOURCE_FORMATTER_PATH + "/samples/pom.xml",
-					JenkinsResultsParserUtil.combine(
-						_SOURCE_FORMATTER_PATH,
-						"/src/main/resources/META-INF/maven/com.liferay",
-						"/com.liferay.source.formatter/plugin-help.xml"),
-					JenkinsResultsParserUtil.combine(
-						_SOURCE_FORMATTER_PATH,
-						"/src/main/resources/META-INF/maven/", "plugin.xml"));
 
 				if (!documentation && !versionFilePaths.contains(filePath)) {
 					return false;
