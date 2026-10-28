@@ -95,7 +95,7 @@ export class HeadlessCommerceAdminOrderApiHelper {
 
 	constructor(apiHelpers: ApiHelpers | DataApiHelpers) {
 		this.apiHelpers = apiHelpers;
-		this.basePath = 'headless-commerce-admin-order/v1.0/';
+		this.basePath = 'headless-commerce-admin-order/v1.0';
 	}
 
 	async deleteOrder(orderId: number) {
@@ -163,12 +163,12 @@ export class HeadlessCommerceAdminOrderApiHelper {
 
 	async patchOrder(id: number, order: TOrder) {
 		await this.apiHelpers.patch(
-			`${this.apiHelpers.baseUrl}${this.basePath}orders/${id}?nestedFields=orderItems`,
+			`${this.apiHelpers.baseUrl}${this.basePath}/orders/${id}?nestedFields=orderItems`,
 			order
 		);
 
 		const patchOrder = await this.apiHelpers.get(
-			`${this.apiHelpers.baseUrl}${this.basePath}orders/${id}`
+			`${this.apiHelpers.baseUrl}${this.basePath}/orders/${id}`
 		);
 
 		if (this.apiHelpers instanceof DataApiHelpers) {
