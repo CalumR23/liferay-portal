@@ -1403,11 +1403,13 @@ public class JenkinsResultsParserUtil {
 		}
 
 		if (jsonObject == null) {
-			String buildParametersURL = getLocalURL(
-				buildURL + "api/json?tree=actions[parameters[name,value]]");
+			URIBuilder uriBuilder = newURIBuilder(
+				getLocalURL(buildURL + "api/json"));
+
+			uriBuilder.addParameter("tree", "actions[parameters[name,value]]");
 
 			try {
-				jsonObject = toJSONObject(buildParametersURL);
+				jsonObject = toJSONObject(uriBuilder.toString());
 			}
 			catch (IOException ioException) {
 				throw new RuntimeException(ioException);
@@ -2075,8 +2077,12 @@ public class JenkinsResultsParserUtil {
 	}
 
 	public static String getGitHubApiSearchUrl(List<String> filters) {
-		return combine(
-			"https://api.github.com/search/issues?q=", join("+", filters));
+		URIBuilder uriBuilder = newURIBuilder(
+			"https://api.github.com/search/issues");
+
+		uriBuilder.addParameter("q", join(" ", filters));
+
+		return uriBuilder.toString();
 	}
 
 	public static List<String> getGitHubCacheHostnames() {
@@ -2402,8 +2408,11 @@ public class JenkinsResultsParserUtil {
 
 	public static String getJenkinsBuildResult(String buildURL) {
 		try {
-			JSONObject jsonObject = toJSONObject(
-				buildURL + "/api/json?tree=result", false);
+			URIBuilder uriBuilder = newURIBuilder(buildURL + "/api/json");
+
+			uriBuilder.addParameter("tree", "result");
+
+			JSONObject jsonObject = toJSONObject(uriBuilder.toString(), false);
 
 			if (!jsonObject.has("result") || jsonObject.isNull("result")) {
 				return null;
@@ -4370,10 +4379,15 @@ public class JenkinsResultsParserUtil {
 			public Set<String> execute() {
 				JSONObject topLevelBuildsJSONObject;
 
+				URIBuilder uriBuilder = newURIBuilder(
+					jenkinsMaster.getRemoteURL() +
+						"/view/Top%20Level/api/json");
+
+				uriBuilder.addParameter("tree", "jobs[name]");
+
 				try {
 					topLevelBuildsJSONObject = toJSONObject(
-						jenkinsMaster.getRemoteURL() +
-							"/view/Top%20Level/api/json?tree=jobs[name]");
+						uriBuilder.toString());
 				}
 				catch (IOException ioException) {
 					throw new RuntimeException(ioException);
